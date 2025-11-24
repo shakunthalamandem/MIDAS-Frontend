@@ -12,7 +12,9 @@ import {
   TableRow,
   TextField,
   Typography,
+  TableSortLabel,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import DealDetailsPanel from "./DealDetailsPanel";
 import PredictionCell from "./PredictionCell";
 
@@ -46,58 +48,105 @@ export interface DealRecord {
 type Align = "left" | "center" | "right";
 
 interface ColumnConfig {
-  key: string;
-  label: string;
+  key: keyof DealRecord | string;
+  label: string; // can contain "\n" for multi-line header
   align?: Align;
   width?: number;
   render?: (row: DealRecord) => React.ReactNode;
+  sortKey?: keyof DealRecord;
 }
 
+const PREDICTION_COL_WIDTH = 190;
+
 const TABLE_COLUMNS: ColumnConfig[] = [
-  { key: "ticker", label: "Ticker", align: "left", width: 90 },
-  { key: "pricing_date", label: "Pricing Date", align: "center", width: 110 },
-  { key: "issuer_name", label: "Issuer", align: "left", width: 220 },
-  { key: "sector", label: "Sector", align: "left", width: 180 },
+  {
+    key: "ticker",
+    label: "Ticker",
+    align: "left",
+    width: 90,
+    sortKey: "ticker",
+  },
+  {
+    key: "pricing_date",
+    label: "Pricing Date",
+    align: "center",
+    width: 120,
+    sortKey: "pricing_date",
+    render: (row) => (row.pricing_date ? row.pricing_date : "TBD"),
+  },
+  {
+    key: "issuer_name",
+    label: "Issuer Name",
+    align: "left",
+    width: 220,
+    sortKey: "issuer_name",
+  },
+  {
+    key: "sector",
+    label: "Sector",
+    align: "left",
+    width: 180,
+    sortKey: "sector",
+  },
   {
     key: "t1d_close",
-    label: "1st Day Close from Issue Price",
+    label: "1st Day Close\nfrom Issue Price",
     align: "center",
-    width: 130,
+    width: PREDICTION_COL_WIDTH,
+    sortKey: "t1d_confidence",
     render: (row) => (
-      <PredictionCell pred={row.t1d_pred} confidence={row.t1d_confidence} />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        <PredictionCell pred={row.t1d_pred} confidence={row.t1d_confidence} />
+      </Box>
     ),
   },
   {
     key: "t1d_open",
-    label: "1st Day Close from Open Price",
+    label: "1st Day Close\nfrom Open Price",
     align: "center",
-    width: 160,
+    width: PREDICTION_COL_WIDTH,
+    sortKey: "t1d_openprice_confidence",
     render: (row) => (
-      <PredictionCell
-        pred={row.t1d_openprice_pred}
-        confidence={row.t1d_openprice_confidence}
-      />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        <PredictionCell
+          pred={row.t1d_openprice_pred}
+          confidence={row.t1d_openprice_confidence}
+        />
+      </Box>
     ),
   },
   {
     key: "t1w",
-    label: "1 Week from 1st Day Close",
+    label: "1 Week from\n1st Day Close",
     align: "center",
-    width: 120,
+    width: PREDICTION_COL_WIDTH,
+    sortKey: "t1w_confidence",
     render: (row) => (
-      <PredictionCell pred={row.t1w_pred} confidence={row.t1w_confidence} />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        <PredictionCell pred={row.t1w_pred} confidence={row.t1w_confidence} />
+      </Box>
     ),
   },
   {
     key: "t1m",
-    label: "1 Month from 1st Day Close",
+    label: "1 Month from\n1st Day Close",
     align: "center",
-    width: 120,
+    width: PREDICTION_COL_WIDTH,
+    sortKey: "t1m_confidence",
     render: (row) => (
-      <PredictionCell pred={row.t1m_pred} confidence={row.t1m_confidence} />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        <PredictionCell pred={row.t1m_pred} confidence={row.t1m_confidence} />
+      </Box>
     ),
   },
 ];
+
+type SortDirection = "asc" | "desc";
+
+interface SortConfig {
+  key: keyof DealRecord | null;
+  direction: SortDirection;
+}
 
 /* ---------- Main component ---------- */
 
@@ -107,6 +156,10 @@ const DealsPredictionsTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: "pricing_date",
+    direction: "desc",
+  });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -146,6 +199,108 @@ const DealsPredictionsTable: React.FC = () => {
     return data.filter((row) => row.ticker.toLowerCase().includes(q));
   }, [data, search]);
 
+  const getComparableValue = (
+    row: DealRecord,
+    key: keyof DealRecord
+  ): string | number | null => {
+    let value = row[key] as any;
+
+    if (value === null || value === undefined || value === "") {
+      return null;
+    }
+
+    // Special handling for pricing_date
+    if (key === "pricing_date") {
+      if (!value) return null;
+      const time = new Date(value as string).getTime();
+      return Number.isNaN(time) ? null : time;
+    }
+
+    if (typeof value === "number") return value;
+
+    if (typeof value === "string") {
+      const num = parseFloat(value);
+      if (!Number.isNaN(num)) {
+        return num;
+      }
+      return value.toLowerCase();
+    }
+
+    return value;
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return filteredData;
+
+    const sorted = [...filteredData];
+    const { key, direction } = sortConfig;
+
+    sorted.sort((a, b) => {
+      const aVal = getComparableValue(a, key);
+      const bVal = getComparableValue(b, key);
+
+      // Treat null/undefined/empty as "last"
+      if (aVal === null && bVal === null) return 0;
+      if (aVal === null) return 1;
+      if (bVal === null) return -1;
+
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+
+      const aStr = String(aVal);
+      const bStr = String(bVal);
+      const cmp = aStr.localeCompare(bStr);
+      return direction === "asc" ? cmp : -cmp;
+    });
+
+    return sorted;
+  }, [filteredData, sortConfig]);
+
+  const handleSortClick = (column: ColumnConfig) => {
+    const sortKey =
+      column.sortKey || (column.key as keyof DealRecord | undefined);
+
+    if (!sortKey) return;
+
+    setSortConfig((prev) => {
+      if (prev.key === sortKey) {
+        return {
+          key: sortKey,
+          direction: prev.direction === "asc" ? "desc" : "asc",
+        };
+      }
+      return { key: sortKey, direction: "asc" };
+    });
+  };
+
+  const renderHeaderLabel = (label: string, align: Align = "center") => {
+    const lines = label.split("\n");
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems={
+          align === "left"
+            ? "flex-start"
+            : align === "right"
+              ? "flex-end"
+              : "center"
+        }
+      >
+        {lines.map((line, idx) => (
+          <Typography
+            key={idx}
+            variant={lines.length === 1 ? "subtitle2" : "caption"}
+            sx={{ lineHeight: 1.2 }}
+          >
+            {line}
+          </Typography>
+        ))}
+      </Box>
+    );
+  };
+
   return (
     <Box>
       {/* Header + search */}
@@ -164,6 +319,10 @@ const DealsPredictionsTable: React.FC = () => {
           <Typography variant="body2" color="text.secondary">
             Quick view of key deals with model predictions. Click a row to see
             the full breakdown below.
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Showing {sortedData.length} deal
+            {sortedData.length === 1 ? "" : "s"}
           </Typography>
         </Box>
 
@@ -188,14 +347,20 @@ const DealsPredictionsTable: React.FC = () => {
         </Alert>
       )}
 
-      {!loading && !error && filteredData.length === 0 && (
+      {!loading && !error && sortedData.length === 0 && (
         <Alert severity="info">No deals found for the selected criteria.</Alert>
       )}
 
-      {!loading && !error && filteredData.length > 0 && (
+      {!loading && !error && sortedData.length > 0 && (
         <>
           {/* Table */}
-          <Paper elevation={1}>
+          <Paper
+            elevation={2}
+            sx={{
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
             <TableContainer
               sx={{
                 maxHeight: 420,
@@ -204,44 +369,115 @@ const DealsPredictionsTable: React.FC = () => {
             >
               <Table stickyHeader size="small">
                 <TableHead>
-                  <TableRow>
-                    {TABLE_COLUMNS.map((col) => (
-                      <TableCell
-                        key={col.key}
-                        align={col.align || "center"}
-                        sx={{
-                          fontWeight: 600,
-                          whiteSpace: "nowrap",
-                          width: col.width,
-                          maxWidth: col.width,
-                          minWidth: col.width,
-                          backgroundColor: (theme) => theme.palette.grey[100],
-                        }}
-                      >
-                        {col.label}
-                      </TableCell>
-                    ))}
+                  <TableRow
+                    sx={(theme) => ({
+                      backgroundColor: theme.palette.grey[100],
+                      boxShadow: `inset 0 -1px 0 ${theme.palette.divider}`,
+                    })}
+                  >
+                    {TABLE_COLUMNS.map((col) => {
+                      const sortKey =
+                        col.sortKey ||
+                        (col.key as keyof DealRecord | undefined);
+                      const isSorted = sortKey && sortConfig.key === sortKey;
+
+                      return (
+                        <TableCell
+                          key={col.key}
+                          align={col.align || "center"}
+                          sortDirection={
+                            isSorted ? sortConfig.direction : false
+                          }
+                          sx={(theme) => ({
+                            width: col.width,
+                            maxWidth: col.width,
+                            minWidth: col.width,
+                            paddingX: 1.5,
+                            paddingY: 1.2,
+                            whiteSpace: "normal",
+
+                            // 🔥 Header Typography improvements
+                            fontWeight: 700,
+                            fontSize: "14.5px",
+                            letterSpacing: "0.2px",
+                            color: theme.palette.grey[900],
+
+                            backgroundColor: theme.palette.grey[100],
+                            borderBottom: `2px solid ${theme.palette.divider}`,
+                            borderRight: `1px solid ${theme.palette.divider}`,
+                          })}
+                        >
+                          {sortKey ? (
+                            <TableSortLabel
+                              active={isSorted}
+                              direction={
+                                isSorted ? sortConfig.direction : "asc"
+                              }
+                              onClick={() => handleSortClick(col)}
+                              sx={{
+                                "& .MuiTableSortLabel-icon": {
+                                  opacity: 1,
+                                  fontSize: "18px", // bigger arrow
+                                },
+                                fontWeight: 700,
+                              }}
+                            >
+                              {renderHeaderLabel(
+                                col.label,
+                                col.align || "center"
+                              )}
+                            </TableSortLabel>
+                          ) : (
+                            renderHeaderLabel(col.label, col.align || "center")
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
-                  {filteredData.map((row, idx) => {
+                  {sortedData.map((row, idx) => {
                     const isSelected =
                       selectedDeal?.ticker === row.ticker &&
                       selectedDeal?.pricing_date === row.pricing_date;
+
                     return (
                       <TableRow
                         key={`${row.ticker}-${idx}`}
                         hover
                         onClick={() => setSelectedDeal(row)}
-                        sx={{
-                          cursor: "pointer",
-                          backgroundColor: (theme) =>
-                            isSelected
-                              ? theme.palette.action.selected
-                              : "inherit",
+                        sx={(theme) => {
+                          const isEven = idx % 2 === 0;
+
+                          return {
+                            cursor: "pointer",
+                            backgroundColor: isSelected
+                              ? theme.palette.mode === "light"
+                                ? theme.palette.primary.light + "20" // very light tint
+                                : theme.palette.primary.dark + "40"
+                              : isEven
+                                ? theme.palette.background.paper
+                                : theme.palette.grey[50],
+
+                            // subtle left accent when selected
+                            boxShadow: isSelected
+                              ? `inset 3px 0 0 ${theme.palette.primary.main}`
+                              : "none",
+
+                            transition:
+                              "background-color 0.2s ease, box-shadow 0.2s ease",
+
+                            "&:hover": {
+                              backgroundColor: isSelected
+                                ? theme.palette.primary.light + "33" // slightly stronger tint
+                                : theme.palette.action.hover,
+                            },
+                          };
                         }}
                       >
                         {TABLE_COLUMNS.map((col) => {
+                          const isIssuerColumn = col.key === "issuer_name";
                           const value = col.render
                             ? col.render(row)
                             : (row as any)[col.key];
@@ -250,11 +486,20 @@ const DealsPredictionsTable: React.FC = () => {
                             <TableCell
                               key={col.key}
                               align={col.align || "center"}
-                              sx={{
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
+                              sx={(theme) => ({
+                                fontSize: 13,
+                                whiteSpace: isIssuerColumn
+                                  ? "normal"
+                                  : "nowrap",
+                                overflow: isIssuerColumn ? "visible" : "hidden",
+                                textOverflow: isIssuerColumn
+                                  ? "clip"
+                                  : "ellipsis",
+                                borderBottom: `1px solid ${theme.palette.divider}`,
+                                borderRight: `1px solid ${theme.palette.action.hover}`,
+                                px: 1.5,
+                                py: 0.75,
+                              })}
                             >
                               {value}
                             </TableCell>
