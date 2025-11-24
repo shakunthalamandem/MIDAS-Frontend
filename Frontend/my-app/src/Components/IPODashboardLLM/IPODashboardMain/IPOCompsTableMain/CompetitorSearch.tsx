@@ -71,14 +71,6 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
               >
                 {option.company}
               </Typography>
-              {option.exchange && (
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: "0.7rem", color: "#888", ml: 0.5 }}
-                >
-                  ({option.exchange})
-                </Typography>
-              )}
             </Box>
           </li>
         )}
