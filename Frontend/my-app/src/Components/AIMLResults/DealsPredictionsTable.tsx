@@ -15,6 +15,8 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import RocketLaunchOutlinedIcon from "@mui/icons-material/RocketLaunchOutlined";
+import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import DealDetailsPanel from "./DealDetailsPanel";
 import PredictionCell from "./PredictionCell";
 
@@ -56,36 +58,56 @@ interface ColumnConfig {
   sortKey?: keyof DealRecord;
 }
 
-const PREDICTION_COL_WIDTH = 190;
+type SortDirection = "asc" | "desc";
+
+interface SortConfig {
+  key: keyof DealRecord | null;
+  direction: SortDirection;
+}
+
+type DealTypeFilter = "IPO" | "FO";
+
+// narrower to reduce horizontal scroll
+const PREDICTION_COL_WIDTH = 160;
 
 const TABLE_COLUMNS: ColumnConfig[] = [
   {
-    key: "ticker",
-    label: "Ticker",
+    key: "ticker_issuer",
+    label: "Ticker / Issuer",
     align: "left",
-    width: 90,
+    width: 230,
     sortKey: "ticker",
+    render: (row) => (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 700, lineHeight: 1.2 }}
+        >
+          {row.ticker}
+        </Typography>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ lineHeight: 1.2 }}
+        >
+          {row.issuer_name}
+        </Typography>
+      </Box>
+    ),
   },
   {
     key: "pricing_date",
     label: "Pricing Date",
     align: "center",
-    width: 120,
+    width: 110,
     sortKey: "pricing_date",
     render: (row) => (row.pricing_date ? row.pricing_date : "TBD"),
-  },
-  {
-    key: "issuer_name",
-    label: "Issuer Name",
-    align: "left",
-    width: 220,
-    sortKey: "issuer_name",
   },
   {
     key: "sector",
     label: "Sector",
     align: "left",
-    width: 180,
+    width: 150,
     sortKey: "sector",
   },
   {
@@ -141,13 +163,6 @@ const TABLE_COLUMNS: ColumnConfig[] = [
   },
 ];
 
-type SortDirection = "asc" | "desc";
-
-interface SortConfig {
-  key: keyof DealRecord | null;
-  direction: SortDirection;
-}
-
 /* ---------- Main component ---------- */
 
 const DealsPredictionsTable: React.FC = () => {
@@ -160,6 +175,7 @@ const DealsPredictionsTable: React.FC = () => {
     key: "pricing_date",
     direction: "desc",
   });
+  const [dealTypeFilter, setDealTypeFilter] = useState<DealTypeFilter>("IPO");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -193,11 +209,26 @@ const DealsPredictionsTable: React.FC = () => {
     fetchDeals();
   }, [apiUrl, token]);
 
+  // Search by ticker OR issuer, then filter by IPO / FO
   const filteredData = useMemo(() => {
+    let rows = data;
+
     const q = search.trim().toLowerCase();
-    if (!q) return data;
-    return data.filter((row) => row.ticker.toLowerCase().includes(q));
-  }, [data, search]);
+    if (q) {
+      rows = rows.filter((row) => {
+        const tickerMatch = row.ticker?.toLowerCase().includes(q);
+        const issuerMatch = row.issuer_name?.toLowerCase().includes(q);
+        return tickerMatch || issuerMatch;
+      });
+    }
+
+    rows = rows.filter((row) => {
+      const type = (row.deal_type || "").toUpperCase();
+      return type.includes(dealTypeFilter);
+    });
+
+    return rows;
+  }, [data, search, dealTypeFilter]);
 
   const getComparableValue = (
     row: DealRecord,
@@ -209,9 +240,7 @@ const DealsPredictionsTable: React.FC = () => {
       return null;
     }
 
-    // Special handling for pricing_date
     if (key === "pricing_date") {
-      if (!value) return null;
       const time = new Date(value as string).getTime();
       return Number.isNaN(time) ? null : time;
     }
@@ -239,7 +268,6 @@ const DealsPredictionsTable: React.FC = () => {
       const aVal = getComparableValue(a, key);
       const bVal = getComparableValue(b, key);
 
-      // Treat null/undefined/empty as "last"
       if (aVal === null && bVal === null) return 0;
       if (aVal === null) return 1;
       if (bVal === null) return -1;
@@ -303,12 +331,12 @@ const DealsPredictionsTable: React.FC = () => {
 
   return (
     <Box>
-      {/* Header + search */}
+      {/* Header + filters + search */}
       <Box
         mb={2}
         display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        alignItems={{ xs: "flex-start", sm: "center" }}
+        flexDirection={{ xs: "column", md: "row" }}
+        alignItems={{ xs: "flex-start", md: "center" }}
         justifyContent="space-between"
         gap={1.5}
       >
@@ -326,13 +354,82 @@ const DealsPredictionsTable: React.FC = () => {
           </Typography>
         </Box>
 
-        <TextField
-          size="small"
-          label="Search by ticker"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ minWidth: 220 }}
-        />
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={1}
+          flexWrap="wrap"
+          justifyContent={{ xs: "flex-start", md: "flex-end" }}
+        >
+          {/* IPO / FO segmented control */}
+          <Box
+            sx={(theme) => ({
+              display: "inline-flex",
+              alignItems: "center",
+              borderRadius: 999,
+              padding: 0.3,
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? theme.palette.grey[100]
+                  : theme.palette.background.paper,
+            })}
+          >
+            {(["IPO", "FO"] as DealTypeFilter[]).map((type) => {
+              const active = dealTypeFilter === type;
+              return (
+                <Box
+                  key={type}
+                  onClick={() => setDealTypeFilter(type)}
+                  sx={(theme) => ({
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.6,
+                    px: 1.6,
+                    py: 0.45,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    background: active
+                      ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                      : "transparent",
+                    color: active
+                      ? theme.palette.common.white
+                      : theme.palette.text.secondary,
+                  })}
+                >
+                  {type === "IPO" ? (
+                    <RocketLaunchOutlinedIcon
+                      sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+                    />
+                  ) : (
+                    <AttachMoneyOutlinedIcon
+                      sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+                    />
+                  )}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                    }}
+                  >
+                    {type}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+
+          {/* Search */}
+          <TextField
+            size="small"
+            label="Search by ticker or issuer"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ minWidth: 230 }}
+          />
+        </Box>
       </Box>
 
       {loading && (
@@ -367,7 +464,7 @@ const DealsPredictionsTable: React.FC = () => {
                 overflowX: "auto",
               }}
             >
-              <Table stickyHeader size="small">
+              <Table stickyHeader size="small" sx={{ tableLayout: "fixed" }}>
                 <TableHead>
                   <TableRow
                     sx={(theme) => ({
@@ -392,15 +489,14 @@ const DealsPredictionsTable: React.FC = () => {
                             width: col.width,
                             maxWidth: col.width,
                             minWidth: col.width,
-                            paddingX: 1.5,
-                            paddingY: 1.2,
+                            paddingX: 1.2,
+                            paddingY: 1.1,
                             whiteSpace: "normal",
 
-                            // 🔥 Header Typography improvements
-                            fontWeight: 700,
-                            fontSize: "14.5px",
+                            fontWeight: 800,
+                            fontSize: "15px",
                             letterSpacing: "0.2px",
-                            color: theme.palette.grey[900],
+                            color: theme.palette.primary.main,
 
                             backgroundColor: theme.palette.grey[100],
                             borderBottom: `2px solid ${theme.palette.divider}`,
@@ -414,13 +510,17 @@ const DealsPredictionsTable: React.FC = () => {
                                 isSorted ? sortConfig.direction : "asc"
                               }
                               onClick={() => handleSortClick(col)}
-                              sx={{
-                                "& .MuiTableSortLabel-icon": {
-                                  opacity: 1,
-                                  fontSize: "18px", // bigger arrow
+                              sx={(theme) => ({
+                                color: theme.palette.primary.main,
+                                "&.Mui-active": {
+                                  color: theme.palette.primary.main,
                                 },
-                                fontWeight: 700,
-                              }}
+                                "& .MuiTableSortLabel-icon": {
+                                  opacity: 0.35,
+                                  color: theme.palette.primary.light,
+                                  fontSize: "18px",
+                                },
+                              })}
                             >
                               {renderHeaderLabel(
                                 col.label,
@@ -453,16 +553,13 @@ const DealsPredictionsTable: React.FC = () => {
                           return {
                             cursor: "pointer",
                             backgroundColor: isSelected
-                              ? theme.palette.mode === "light"
-                                ? theme.palette.primary.light + "20" // very light tint
-                                : theme.palette.primary.dark + "40"
+                              ? alpha(theme.palette.success.main, 0.16)
                               : isEven
                                 ? theme.palette.background.paper
                                 : theme.palette.grey[50],
 
-                            // subtle left accent when selected
                             boxShadow: isSelected
-                              ? `inset 3px 0 0 ${theme.palette.primary.main}`
+                              ? `inset 3px 0 0 ${theme.palette.success.main}`
                               : "none",
 
                             transition:
@@ -470,14 +567,13 @@ const DealsPredictionsTable: React.FC = () => {
 
                             "&:hover": {
                               backgroundColor: isSelected
-                                ? theme.palette.primary.light + "33" // slightly stronger tint
+                                ? alpha(theme.palette.success.main, 0.22)
                                 : theme.palette.action.hover,
                             },
                           };
                         }}
                       >
                         {TABLE_COLUMNS.map((col) => {
-                          const isIssuerColumn = col.key === "issuer_name";
                           const value = col.render
                             ? col.render(row)
                             : (row as any)[col.key];
@@ -488,17 +584,13 @@ const DealsPredictionsTable: React.FC = () => {
                               align={col.align || "center"}
                               sx={(theme) => ({
                                 fontSize: 13,
-                                whiteSpace: isIssuerColumn
-                                  ? "normal"
-                                  : "nowrap",
-                                overflow: isIssuerColumn ? "visible" : "hidden",
-                                textOverflow: isIssuerColumn
-                                  ? "clip"
-                                  : "ellipsis",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
                                 borderBottom: `1px solid ${theme.palette.divider}`,
                                 borderRight: `1px solid ${theme.palette.action.hover}`,
-                                px: 1.5,
-                                py: 0.75,
+                                px: 1.2,
+                                py: 0.7,
                               })}
                             >
                               {value}
