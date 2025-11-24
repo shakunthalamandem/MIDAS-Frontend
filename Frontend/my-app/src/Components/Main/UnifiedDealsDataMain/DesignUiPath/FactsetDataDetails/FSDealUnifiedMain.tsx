@@ -48,7 +48,7 @@ interface Payload {
 
 const FSDealUnifiedMain: React.FC = () => {
   const [fs_ticker, setTicker] = useState("");
-  const [pricingDate, setPricingDate] = useState("2025-09-29");
+  const [pricingDate, setPricingDate] = useState("");
   const [data, setData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
