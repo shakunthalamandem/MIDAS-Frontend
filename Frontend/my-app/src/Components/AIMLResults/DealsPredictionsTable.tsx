@@ -13,6 +13,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import DealDetailsPanel from "./DealDetailsPanel";
+import PredictionCell from "./PredictionCell";
 
 export interface DealRecord {
   ticker: string;
@@ -48,249 +50,63 @@ interface ColumnConfig {
   label: string;
   align?: Align;
   width?: number;
-  sticky?: "left" | "right";
   render?: (row: DealRecord) => React.ReactNode;
 }
 
-const formatNumber = (
-  value: number | string | null | undefined,
-  options?: { suffix?: string; decimals?: number }
-): string => {
-  const { suffix = "", decimals = 2 } = options || {};
-  if (value === null || value === undefined || value === "") return "";
-  const num = typeof value === "string" ? Number(value) : value;
-  if (isNaN(num)) return String(value);
-  const base =
-    Math.abs(num) >= 1000
-      ? num.toLocaleString(undefined, { maximumFractionDigits: decimals })
-      : num.toFixed(decimals).replace(/\.00$/, "");
-  return suffix ? `${base}${suffix}` : base;
-};
-
-const parseConfidence = (value: number | string): number | null => {
-  if (value === "" || value === null || value === undefined) return null;
-  const num = typeof value === "string" ? Number(value) : value;
-  if (isNaN(num)) return null;
-  return num;
-};
-
-const PredictionCell: React.FC<{ pred: string; confidence: number | string }> = ({
-  pred,
-  confidence,
-}) => {
-  const confNum = parseConfidence(confidence);
-  const hasPred = !!pred;
-  const hasConf = confNum !== null;
-
-  if (!hasPred && !hasConf) {
-    return <Typography variant="body2">-</Typography>;
-  }
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        rowGap: 0.25,
-      }}
-    >
-      {hasPred && (
-        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-          {pred}
-        </Typography>
-      )}
-      {hasConf && (
-        <Typography variant="caption" color="text.secondary">
-          {confNum!.toFixed(1)}%
-        </Typography>
-      )}
-    </Box>
-  );
-};
-
-const ActualCell: React.FC<{ value: number | string }> = ({ value }) => {
-  const hasActual =
-    value !== "" && value !== null && value !== undefined && !isNaN(Number(value));
-  if (!hasActual) {
-    return <Typography variant="body2">-</Typography>;
-  }
-  return (
-    <Typography variant="body2">
-      {formatNumber(value, { suffix: "%", decimals: 2 })}
-    </Typography>
-  );
-};
-
-/**
- * Sticky left columns – core info (very compact)
- */
-const LEFT_COLUMNS: ColumnConfig[] = [
+const TABLE_COLUMNS: ColumnConfig[] = [
+  { key: "ticker", label: "Ticker", align: "left", width: 90 },
+  { key: "pricing_date", label: "Pricing Date", align: "center", width: 110 },
+  { key: "issuer_name", label: "Issuer", align: "left", width: 220 },
+  { key: "sector", label: "Sector", align: "left", width: 180 },
   {
-    key: "ticker",
-    label: "Ticker",
-    align: "left",
-    sticky: "left",
-    width: 70,
-  },
-  {
-    key: "pricing_date",
-    label: "Date",
+    key: "t1d_close",
+    label: "1st Day Close from Issue Price",
     align: "center",
-    sticky: "left",
-    width: 80,
-  },
-  {
-    key: "issuer_name",
-    label: "Issuer",
-    align: "left",
-    sticky: "left",
-    width: 160,
-  },
-  {
-    key: "deal_type",
-    label: "Type",
-    align: "center",
-    sticky: "left",
-    width: 70,
-  },
-];
-
-const LAST_LEFT_KEY = LEFT_COLUMNS[LEFT_COLUMNS.length - 1].key;
-
-/**
- * Middle scrollable columns only
- */
-const MIDDLE_COLUMNS: ColumnConfig[] = [
-  { key: "fo_type", label: "FO", align: "center", width: 90 },
-  { key: "region", label: "Region", align: "center", width: 90 },
-  { key: "sector", label: "Sector", align: "center", width: 130 },
-  {
-    key: "deal_size",
-    label: "Deal Size",
-    align: "right",
     width: 130,
-    render: (row) => formatNumber(row.deal_size),
-  },
-  {
-    key: "issue_price",
-    label: "Issue Px",
-    align: "right",
-    width: 110,
-    render: (row) => formatNumber(row.issue_price),
-  },
-  {
-    key: "discount_from_announcement_price",
-    label: "Disc vs Annc (%)",
-    align: "right",
-    width: 150,
-    render: (row) =>
-      formatNumber(row.discount_from_announcement_price, { suffix: "%" }),
-  },
-  {
-    key: "allocation_as_percentage_of_deal_size",
-    label: "Alloc % Deal",
-    align: "right",
-    width: 120,
-    render: (row) =>
-      formatNumber(row.allocation_as_percentage_of_deal_size, {
-        suffix: "%",
-      }),
-  },
-  {
-    key: "allocation_as_percentage_of_ioi",
-    label: "Alloc % IOI",
-    align: "right",
-    width: 120,
-    render: (row) =>
-      formatNumber(row.allocation_as_percentage_of_ioi, { suffix: "%" }),
-  },
-];
-
-/**
- * Right sticky block – 4 horizons: 1D Close, 1D Open, 1W, 1M (Pred + Actual)
- */
-const RIGHT_COLUMNS: ColumnConfig[] = [
-  {
-    key: "t1d_close_pred",
-    label: "1st Day Close",
-    align: "center",
-    sticky: "right",
-    width: 90,
     render: (row) => (
-      <PredictionCell pred={row.t1d_pred} confidence={row.t1d_actual_return} />
+      <PredictionCell pred={row.t1d_pred} confidence={row.t1d_confidence} />
     ),
   },
   {
-    key: "t1d_open_pred",
-    label: "1st Day Open to Close",
+    key: "t1d_open",
+    label: "1st Day Close from Open Price",
     align: "center",
-    sticky: "right",
-    width: 90,
+    width: 160,
     render: (row) => (
       <PredictionCell
         pred={row.t1d_openprice_pred}
-        confidence={row.t1d_openprice_actual_return}
+        confidence={row.t1d_openprice_confidence}
       />
     ),
   },
   {
-    key: "t1w_pred",
-    label: "1 Week",
+    key: "t1w",
+    label: "1 Week from 1st Day Close",
     align: "center",
-    sticky: "right",
-    width: 90,
+    width: 120,
     render: (row) => (
-      <PredictionCell pred={row.t1w_pred} confidence={row.t1w_actual_return} />
+      <PredictionCell pred={row.t1w_pred} confidence={row.t1w_confidence} />
     ),
   },
   {
-    key: "t1m_pred",
-    label: "1 Month",
+    key: "t1m",
+    label: "1 Month from 1st Day Close",
     align: "center",
-    sticky: "right",
-    width: 90,
+    width: 120,
     render: (row) => (
-      <PredictionCell pred={row.t1m_pred} confidence={row.t1m_actual_return} />
+      <PredictionCell pred={row.t1m_pred} confidence={row.t1m_confidence} />
     ),
   },
 ];
 
-const FIRST_RIGHT_KEY = RIGHT_COLUMNS[0].key;
-
-const ALL_COLUMNS: ColumnConfig[] = [
-  ...LEFT_COLUMNS,
-  ...MIDDLE_COLUMNS,
-  ...RIGHT_COLUMNS,
-];
-
-/**
- * Helper: dynamic offsets for sticky columns
- */
-const getLeftOffset = (key: string): number => {
-  let offset = 0;
-  for (const col of LEFT_COLUMNS) {
-    if (col.key === key) break;
-    offset += col.width ?? 100;
-  }
-  return offset;
-};
-
-const getRightOffset = (key: string): number => {
-  let offset = 0;
-  for (let i = RIGHT_COLUMNS.length - 1; i >= 0; i--) {
-    const col = RIGHT_COLUMNS[i];
-    if (col.key === key) break;
-    offset += col.width ?? 90;
-  }
-  return offset;
-};
+/* ---------- Main component ---------- */
 
 const DealsPredictionsTable: React.FC = () => {
   const [data, setData] = useState<DealRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -332,6 +148,7 @@ const DealsPredictionsTable: React.FC = () => {
 
   return (
     <Box>
+      {/* Header + search */}
       <Box
         mb={2}
         display="flex"
@@ -345,8 +162,8 @@ const DealsPredictionsTable: React.FC = () => {
             IPO & FO Deals – Prediction Summary
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Left: core info · Center: deal details (scroll) · Right: 1D close, 1D
-            open, 1W & 1M (pred + actual)
+            Quick view of key deals with model predictions. Click a row to see
+            the full breakdown below.
           </Typography>
         </Box>
 
@@ -376,172 +193,86 @@ const DealsPredictionsTable: React.FC = () => {
       )}
 
       {!loading && !error && filteredData.length > 0 && (
-        <Paper elevation={1}>
-          <TableContainer
-            sx={{
-              maxHeight: 520,
-              overflowX: "auto",
-              // === IMPORTANT: create new stacking context so sticky z-index works predictably
-              position: "relative",
-              isolation: "isolate",
-            }}
-          >
-            <Table
-              stickyHeader
-              size="small"
+        <>
+          {/* Table */}
+          <Paper elevation={1}>
+            <TableContainer
               sx={{
-                minWidth: 1300,
-                // make table create its own stacking context as well
-                position: "relative",
+                maxHeight: 420,
+                overflowX: "auto",
               }}
             >
-              <TableHead>
-                <TableRow>
-                  {ALL_COLUMNS.map((col) => {
-                    const align: Align = col.align || "center";
-                    const left =
-                      col.sticky === "left" ? getLeftOffset(col.key) : undefined;
-                    const right =
-                      col.sticky === "right"
-                        ? getRightOffset(col.key)
-                        : undefined;
-
-                    const isLeftSticky = col.sticky === "left";
-                    const isRightSticky = col.sticky === "right";
-                    const isSeparatorLeft = col.key === LAST_LEFT_KEY;
-                    const isSeparatorRight = col.key === FIRST_RIGHT_KEY;
-
-                    return (
+              <Table stickyHeader size="small">
+                <TableHead>
+                  <TableRow>
+                    {TABLE_COLUMNS.map((col) => (
                       <TableCell
                         key={col.key}
-                        align={align}
+                        align={col.align || "center"}
                         sx={{
-                          top: 0,
-                          // ensure sticky headers sit above everything when scrolled
-                          zIndex: isLeftSticky || isRightSticky ? 6 : 4,
-                          position: "sticky",
-                          left,
-                          right,
-                          // opaque background so scrolled middle cells don't show through
-                          backgroundColor: (theme) =>
-                            isLeftSticky || isRightSticky
-                              ? theme.palette.background.paper
-                              : theme.palette.grey[100],
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
                           width: col.width,
                           maxWidth: col.width,
                           minWidth: col.width,
-                          px: 1,
-                          fontWeight: 600,
-                          borderRight:
-                            isSeparatorLeft
-                              ? (theme) => `2px solid ${theme.palette.primary.main}`
-                              : 0,
-                          borderLeft:
-                            isSeparatorRight
-                              ? (theme) =>
-                                  `2px solid ${theme.palette.primary.main}`
-                              : undefined,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          boxShadow:
-                            isLeftSticky
-                              ? "2px 0 4px rgba(15,23,42,0.1)"
-                              : isRightSticky
-                              ? "-2px 0 4px rgba(15,23,42,0.1)"
-                              : "none",
+                          backgroundColor: (theme) => theme.palette.grey[100],
                         }}
                       >
                         {col.label}
                       </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredData.map((row, idx) => {
+                    const isSelected =
+                      selectedDeal?.ticker === row.ticker &&
+                      selectedDeal?.pricing_date === row.pricing_date;
+                    return (
+                      <TableRow
+                        key={`${row.ticker}-${idx}`}
+                        hover
+                        onClick={() => setSelectedDeal(row)}
+                        sx={{
+                          cursor: "pointer",
+                          backgroundColor: (theme) =>
+                            isSelected
+                              ? theme.palette.action.selected
+                              : "inherit",
+                        }}
+                      >
+                        {TABLE_COLUMNS.map((col) => {
+                          const value = col.render
+                            ? col.render(row)
+                            : (row as any)[col.key];
+
+                          return (
+                            <TableCell
+                              key={col.key}
+                              align={col.align || "center"}
+                              sx={{
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {value}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
                     );
                   })}
-                </TableRow>
-              </TableHead>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
 
-              <TableBody>
-                {filteredData.map((row, idx) => (
-                  <TableRow
-                    key={`${row.ticker}-${idx}`}
-                    hover
-                    sx={{
-                      "& td": {
-                        py: 1.5,
-                      },
-                    }}
-                  >
-                    {ALL_COLUMNS.map((col) => {
-                      const align: Align = col.align || "center";
-                      const left =
-                        col.sticky === "left"
-                          ? getLeftOffset(col.key)
-                          : undefined;
-                      const right =
-                        col.sticky === "right"
-                          ? getRightOffset(col.key)
-                          : undefined;
-
-                      const isLeftSticky = col.sticky === "left";
-                      const isRightSticky = col.sticky === "right";
-                      const isSeparatorLeft = col.key === LAST_LEFT_KEY;
-                      const isSeparatorRight = col.key === FIRST_RIGHT_KEY;
-
-                      const rawValue =
-                        col.key in row ? (row as any)[col.key] : undefined;
-                      const value = col.render ? col.render(row) : rawValue;
-
-                      return (
-                        <TableCell
-                          key={col.key}
-                          align={align}
-                          sx={{
-                            // IMPORTANT: body sticky cells must be sticky and above middle cells
-                            position:
-                              isLeftSticky || isRightSticky ? "sticky" : "static",
-                            left,
-                            right,
-                            // sticky cells get a solid background so center columns are hidden under them
-                            backgroundColor: (theme) =>
-                              isLeftSticky || isRightSticky
-                                ? theme.palette.background.paper + "" // opaque
-                                : "inherit",
-                            // body sticky z-index lower than header but above normal cells
-                            zIndex: isLeftSticky || isRightSticky ? 5 : 1,
-                            width: col.width,
-                            maxWidth: col.width,
-                            minWidth: col.width,
-                            px: 1,
-                            borderRight:
-                              isSeparatorLeft
-                                ? (theme) =>
-                                    `2px solid ${theme.palette.primary.main}`
-                                : 0,
-                            borderLeft:
-                              isSeparatorRight
-                                ? (theme) =>
-                                    `2px solid ${theme.palette.primary.main}`
-                                : undefined,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            boxShadow:
-                              isLeftSticky
-                                ? "2px 0 4px rgba(15,23,42,0.08)"
-                                : isRightSticky
-                                ? "-2px 0 4px rgba(15,23,42,0.08)"
-                                : "none",
-                          }}
-                        >
-                          {value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+          {/* Details panel */}
+          <Box mt={2}>
+            <DealDetailsPanel deal={selectedDeal} />
+          </Box>
+        </>
       )}
     </Box>
   );
