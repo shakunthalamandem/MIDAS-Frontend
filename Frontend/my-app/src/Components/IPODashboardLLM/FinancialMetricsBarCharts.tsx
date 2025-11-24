@@ -122,7 +122,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
         const normalized = (json.data || []).map((series) => ({
           ticker: series.ticker,
           data: [...series.data].sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            (a, b) => new Date(a.date || "").getTime() - new Date(b.date || "").getTime()
           ),
         }));
         setPeData(normalized);
@@ -143,10 +143,10 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
       return (
         <Box mt={4}>
           <FinancialMetricsPEchart
-            apiUrl={apiUrl}
-            token={token}
-            width="100%"
-            height={360}
+            // apiUrl={apiUrl}
+            // token={token}
+            // width="100%"
+            // height={360}
             data={peData}
             loading={peLoading}
             error={peError}
