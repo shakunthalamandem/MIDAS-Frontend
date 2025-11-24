@@ -340,96 +340,91 @@ const DealsPredictionsTable: React.FC = () => {
         justifyContent="space-between"
         gap={1.5}
       >
-        <Box>
-          <Typography variant="h6" fontWeight={600}>
-            IPO & FO Deals – Prediction Summary
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Quick view of key deals with model predictions. Click a row to see
-            the full breakdown below.
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Showing {sortedData.length} deal
-            {sortedData.length === 1 ? "" : "s"}
-          </Typography>
-        </Box>
+        
 
-        <Box
-          display="flex"
-          alignItems="center"
-          gap={1}
-          flexWrap="wrap"
-          justifyContent={{ xs: "flex-start", md: "flex-end" }}
-        >
-          {/* IPO / FO segmented control */}
+     <Box
+  display="flex"
+  justifyContent="center" // center horizontally
+  width="100%"            // make the Box take full width
+>
+  <Box
+    display="flex"
+    alignItems="center"
+    gap={1}
+    flexWrap="wrap"
+  >
+    {/* IPO / FO segmented control */}
+    <Box
+      sx={(theme) => ({
+        display: "inline-flex",
+        alignItems: "center",
+        borderRadius: 999,
+        padding: 0.3,
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor:
+          theme.palette.mode === "light"
+            ? theme.palette.grey[100]
+            : theme.palette.background.paper,
+      })}
+    >
+      {(["IPO", "FO"] as DealTypeFilter[]).map((type) => {
+        const active = dealTypeFilter === type;
+        return (
           <Box
+            key={type}
+            onClick={() => setDealTypeFilter(type)}
             sx={(theme) => ({
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
+              justifyContent: "center",
+              gap: 0.6,
+              px: 1.6,
+              py: 0.45,
               borderRadius: 999,
-              padding: 0.3,
-              border: `1px solid ${theme.palette.divider}`,
-              backgroundColor:
-                theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
-                  : theme.palette.background.paper,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              background: active
+                ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                : "transparent",
+              color: active
+                ? theme.palette.common.white
+                : theme.palette.text.secondary,
             })}
           >
-            {(["IPO", "FO"] as DealTypeFilter[]).map((type) => {
-              const active = dealTypeFilter === type;
-              return (
-                <Box
-                  key={type}
-                  onClick={() => setDealTypeFilter(type)}
-                  sx={(theme) => ({
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 0.6,
-                    px: 1.6,
-                    py: 0.45,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    background: active
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
-                      : "transparent",
-                    color: active
-                      ? theme.palette.common.white
-                      : theme.palette.text.secondary,
-                  })}
-                >
-                  {type === "IPO" ? (
-                    <RocketLaunchOutlinedIcon
-                      sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
-                    />
-                  ) : (
-                    <AttachMoneyOutlinedIcon
-                      sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
-                    />
-                  )}
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 700,
-                      letterSpacing: 0.6,
-                    }}
-                  >
-                    {type}
-                  </Typography>
-                </Box>
-              );
-            })}
+            {type === "IPO" ? (
+              <RocketLaunchOutlinedIcon
+                sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+              />
+            ) : (
+              <AttachMoneyOutlinedIcon
+                sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+              />
+            )}
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: 0.6,
+              }}
+            >
+              {type}
+            </Typography>
           </Box>
+        );
+      })}
+    </Box>
 
-          {/* Search */}
-          <TextField
-            size="small"
-            label="Search by ticker or issuer"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ minWidth: 230 }}
-          />
-        </Box>
+    {/* Search */}
+    <TextField
+      size="small"
+      label="Search by ticker or issuer"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      sx={{ minWidth: 230 }}
+    />
+  </Box>
+</Box>
+
       </Box>
 
       {loading && (
@@ -489,11 +484,12 @@ const DealsPredictionsTable: React.FC = () => {
                             width: col.width,
                             maxWidth: col.width,
                             minWidth: col.width,
+                            fontWeight: 700,
                             paddingX: 1.2,
                             paddingY: 1.1,
                             whiteSpace: "normal",
 
-                            fontWeight: 800,
+                            // fontWeight: 800,
                             fontSize: "15px",
                             letterSpacing: "0.2px",
                             color: theme.palette.primary.main,
