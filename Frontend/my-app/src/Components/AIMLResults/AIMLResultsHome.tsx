@@ -40,15 +40,15 @@ const AIMLResultsHome: React.FC = () => {
             p: { xs: 2, md: 3 },
           }}
         >
-          
-             <Typography variant="h6" fontWeight={600} textAlign={"center"} color="#002060">
-                        IPO & FO Deals – Prediction Summary
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" textAlign={"center"}>
-                        Quick view of key deals with model predictions. Click a row to see
-                        the full breakdown below.
-                      </Typography>
-                     
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            textAlign={"center"}
+            color="#002060"
+          >
+            IPO & FO Deals – Prediction Summary
+          </Typography>
+
           <Box
             sx={{
               backgroundColor: "#f7f9fc",
