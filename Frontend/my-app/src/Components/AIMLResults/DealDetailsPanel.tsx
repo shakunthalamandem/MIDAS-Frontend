@@ -10,6 +10,9 @@ import {
   Paper,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import PredictionCell, { ActualCell } from "./PredictionCell";
 
 export interface DealRecord {
@@ -253,75 +256,199 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
         }}
       >
         <Box
-          display="flex"
-          flexDirection={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "flex-start", sm: "center" }}
-          gap={1}
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "flex-start", sm: "center" },
+            gap: 1.5,
+          }}
         >
-          <Box>
-            <Typography variant="h6" fontWeight={700}>
-              {deal.ticker}
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ maxWidth: 520 }}
-            >
-              {deal.issuer_name}
-            </Typography>
+          {/* LEFT: Ticker + Issuer + key meta pills */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.75,
+            }}
+          >
+            {/* Ticker badge + issuer */}
             <Box
-              mt={0.5}
               sx={{
                 display: "flex",
                 flexWrap: "wrap",
-                gap: 1,
                 alignItems: "center",
-                fontSize: 12,
+                gap: 1,
               }}
             >
-              <Typography variant="caption" color="text.secondary">
-                {`Pricing: ${pricingDateText}`}
-              </Typography>
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={{ mx: 0.5, my: 0.25 }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {deal.region}
-              </Typography>
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={{ mx: 0.5, my: 0.25 }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {deal.sector}
+              <Box
+                sx={(theme) => ({
+                  px: 1.6,
+                  py: 0.5,
+                  borderRadius: 2,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.8,
+                  backgroundColor:
+                    theme.palette.mode === "light"
+                      ? theme.palette.common.white
+                      : theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  boxShadow:
+                    theme.palette.mode === "light"
+                      ? "0 0 0 1px rgba(0,0,0,0.02)"
+                      : "none",
+                })}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    textTransform: "uppercase",
+                    letterSpacing: 0.7,
+                    color: "text.secondary",
+                    fontSize: 10.5,
+                  }}
+                >
+                  Ticker
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 800,
+                    letterSpacing: 0.8,
+                  }}
+                >
+                  {deal.ticker}
+                </Typography>
+              </Box>
+
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 600,
+                  lineHeight: 1.2,
+                  maxWidth: { xs: "100%", sm: 420 },
+                }}
+                color="text.primary"
+              >
+                {deal.issuer_name}
               </Typography>
             </Box>
-          </Box>
 
-          <Box display="flex" flexWrap="wrap" gap={0.5}>
+            {/* Meta row: pricing · region · sector as small financial chips */}
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 0.75,
+                alignItems: "center",
+                mt: 0.25,
+              }}
+            >
+              <Box
+                sx={(theme) => ({
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.6,
+                  px: 1,
+                  py: 0.35,
+                  borderRadius: 999,
+                  backgroundColor:
+                    theme.palette.mode === "light"
+                      ? theme.palette.grey[100]
+                      : theme.palette.background.paper,
+                })}
+              >
+                <CalendarTodayOutlinedIcon
+                  sx={{ fontSize: 14, opacity: 0.8 }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {`Pricing: ${pricingDateText}`}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={(theme) => ({
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.6,
+                  px: 1,
+                  py: 0.35,
+                  borderRadius: 999,
+                  backgroundColor:
+                    theme.palette.mode === "light"
+                      ? theme.palette.grey[100]
+                      : theme.palette.background.paper,
+                })}
+              >
+                <PublicOutlinedIcon sx={{ fontSize: 14, opacity: 0.8 }} />
+                <Typography variant="caption" color="text.secondary">
+                  {deal.region || "Region N/A"}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={(theme) => ({
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.6,
+                  px: 1,
+                  py: 0.35,
+                  borderRadius: 999,
+                  backgroundColor:
+                    theme.palette.mode === "light"
+                      ? theme.palette.grey[100]
+                      : theme.palette.background.paper,
+                })}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  {deal.fo_type || "Sector N/A"}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.6,
+              alignItems: "center",
+              justifyContent: { xs: "flex-start", sm: "flex-end" },
+            }}
+          >
             {deal.deal_type && (
               <Chip
                 label={deal.deal_type}
                 size="small"
                 color="primary"
                 variant="outlined"
+                sx={{
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                }}
               />
             )}
+
             {deal.fo_type && (
-              <Chip
-                label={deal.fo_type}
-                size="small"
-                color="secondary"
-                variant="outlined"
-              />
+              <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+                <CategoryOutlinedIcon sx={{ fontSize: 14, opacity: 0.8 }} />
+                <Chip
+                  label={deal.sector || deal.fo_type}
+                  size="small"
+                  color="secondary"
+                  variant="outlined"
+                  sx={{
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                />
+              </Box>
             )}
           </Box>
-        </Box>
-      </Box>
+          </Box>
+          </Box>
 
       <CardContent sx={{ pt: 2.5 }}>
         {/* ROW 1: DEAL PARAMETER CARDS (HORIZONTAL) */}
@@ -359,10 +486,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 />
                 <DetailRow
                   label="Disc vs announcement"
-                  value={formatNumber(
-                    deal.discount_from_announcement_price,
-                    { suffix: "%", decimals: 2 }
-                  )}
+                  value={formatNumber(deal.discount_from_announcement_price, {
+                    suffix: "%",
+                    decimals: 2,
+                  })}
                 />
               </SectionCard>
             </Grid>
@@ -378,10 +505,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 />
                 <DetailRow
                   label="Alloc · % of IOI"
-                  value={formatNumber(
-                    deal.allocation_as_percentage_of_ioi,
-                    { suffix: "%", decimals: 2 }
-                  )}
+                  value={formatNumber(deal.allocation_as_percentage_of_ioi, {
+                    suffix: "%",
+                    decimals: 2,
+                  })}
                 />
               </SectionCard>
             </Grid>
@@ -408,7 +535,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1st Day Close"
+                title="1st Day Close from Issue Price"
                 subtitle="From issue price"
                 pred={deal.t1d_pred}
                 confidence={deal.t1d_confidence}
@@ -418,7 +545,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1st Day Open → Close"
+                title="1st Day Close from Open Price"
                 subtitle="Intraday from open"
                 pred={deal.t1d_openprice_pred}
                 confidence={deal.t1d_openprice_confidence}
@@ -428,7 +555,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1 Week"
+                title="1 Week from 1st Day Close"
                 subtitle="From 1st day close"
                 pred={deal.t1w_pred}
                 confidence={deal.t1w_confidence}
@@ -438,7 +565,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
-                title="1 Month"
+                title="1 Month from 1st Day Close"
                 subtitle="From 1st day close"
                 pred={deal.t1m_pred}
                 confidence={deal.t1m_confidence}
