@@ -20,6 +20,31 @@ export interface MetricsRow {
   roe_2025: number | null;
   roe_2024: number | null;
   roe_2026: number | null;
+  sales_estimate_2024: number | null;
+  sales_estimate_2025: number | null;
+  sales_estimate_2026: number | null;
+  gross_income_2024: number | null;
+  gross_income_2025: number | null;
+  gross_income_2026: number | null;
+  ebit_2024: number | null;
+  ebit_2025: number | null;
+  ebit_2026: number | null;
+  adj_ebitda_2024: number | null;
+  adj_ebitda_2025: number | null;
+  adj_ebitda_2026: number | null;
+  net_income_2024: number | null;
+  net_income_2025: number | null;
+  net_income_2026: number | null;
+  net_interest_income_2024: number | null;
+  net_interest_income_2025: number | null;
+  net_interest_income_2026: number | null;
+  pbt_2024: number | null;
+  pbt_2025: number | null;
+  pbt_2026: number | null;
+  net_revenue_net_sales_2024: number | null;
+  net_revenue_net_sales_2025: number | null;
+  net_revenue_net_sales_2026: number | null;
+  price: number | null;
   date: string;
 }
 

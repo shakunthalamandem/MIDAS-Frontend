@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Paper,
   Typography,
@@ -18,6 +18,7 @@ import {
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import ChangeHistoryIcon from "@mui/icons-material/ChangeHistory";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -35,14 +36,24 @@ interface PredictionModel {
 interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
   onRepredict?: (t1dOpenPrice: number) => void;
+  initialT1dOpenReturn?: number | null;
 }
 
 const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
   result,
   onRepredict,
+  initialT1dOpenReturn,
 }) => {
   const [price, setPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initialT1dOpenReturn === null || initialT1dOpenReturn === undefined) {
+      setPrice("");
+    } else {
+      setPrice(initialT1dOpenReturn);
+    }
+  }, [initialT1dOpenReturn]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -60,29 +71,23 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     }
   };
 
-  // versions like ["t1d", "t1d_open"]
-  const modelVersions = Array.from(
-    new Set(
-      Object.keys(result).map((key) => {
-        const parts = key.split("_");
-        return parts[1] === "open" ? `${parts[0]}_${parts[1]}` : parts[0];
-      })
-    )
-  );
+  const modelTypes = ["main"] as const;
 
-  const issueVersions = modelVersions.filter((v) => !v.includes("open")); // "t1d"
-  const openVersions = modelVersions.filter((v) => v.includes("open")); // "t1d_open"
-
-  // We only show the "main" row for this component (as in your code)
-  const modelTypes = ["main"];
-
-  const getModelKey = (version: string, type: string): string => {
-    return `${version}_${type}_model`; // works for both "t1d_main_model" & "t1d_open_main_model"
+  const getModelKey = (versionPrefix: string, type: string): string => {
+    // "t1d" + "main"      => "t1d_main_model"
+    // "t1d_open" + "main" => "t1d_open_main_model"
+    return `${versionPrefix}_${type}_model`;
   };
 
   const getOutcomeCategory = (
     prediction: string | null | undefined
-  ): "Low Return" | "Neutral Return" | "Positive Return" => {
+  ):
+    | "Low Return"
+    | "Neutral Return"
+    | "Positive Return"
+    | "Extreme Return"
+    | "Negative Return"
+    | "Positive" => {
     const DEFAULT = "Neutral Return" as const;
     if (!prediction || typeof prediction !== "string") return DEFAULT;
     const lower = prediction.trim().toLowerCase();
@@ -90,6 +95,8 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     if (lower.includes("low return")) return "Low Return";
     if (lower.includes("neutral return")) return "Neutral Return";
     if (lower.includes("positive return")) return "Positive Return";
+    if (lower.includes("negative return")) return "Negative Return";
+    if (lower.includes("extreme")) return "Extreme Return";
 
     return DEFAULT;
   };
@@ -104,7 +111,16 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     }
 
     const outcomeCategory = getOutcomeCategory(prediction);
+
     switch (outcomeCategory) {
+      case "Extreme Return":
+        return (
+          <Box display="flex" alignItems="center" color="warning.main">
+            <ChangeHistoryIcon sx={{ mr: 1, fontSize: 22 }} />
+            Extreme Positive or Extreme Negative Return Possible
+          </Box>
+        );
+
       case "Low Return":
         return (
           <Box display="flex" alignItems="center" color="error.main">
@@ -112,6 +128,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
             Low Return Deal
           </Box>
         );
+
       case "Neutral Return":
         return (
           <Box display="flex" alignItems="center" color="text.secondary">
@@ -119,6 +136,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
             Neutral Return Deal
           </Box>
         );
+
       case "Positive Return":
         return (
           <Box display="flex" alignItems="center" color="success.main">
@@ -126,6 +144,15 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
             Positive Return Deal
           </Box>
         );
+
+      case "Negative Return":
+        return (
+          <Box display="flex" alignItems="center" color="error.main">
+            <TrendingDownIcon sx={{ mr: 1 }} />
+            Negative Return Deal
+          </Box>
+        );
+
       default:
         return (
           <Box display="flex" alignItems="center" color="text.disabled">
@@ -172,10 +199,6 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
         </Box>
       );
     }
-
-    let color = "#f44336";
-    if (accuracy >= 70) color = "#4caf50";
-    else if (accuracy >= 50) color = "#ff9800";
 
     return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -242,17 +265,17 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     main: "Overall Return Category",
   };
 
-  /** Single-version table renderer (used twice) */
+  /** Generic table renderer for a given "versionPrefix" */
   const renderSingleVersionTable = (
-    version: string,
+    versionPrefix: string,
     headerTitle: string,
     showRepredict: boolean,
     tableNumber: number
-
   ) => {
-    const headerBg = version.includes("open") ? "#ede7f6" : "#e3f2fd";
-    const columnLabel = version.includes("open")
-      ? "1st Day Close from Open price"
+    const isOpenVersion = versionPrefix.includes("open");
+    const headerBg = isOpenVersion ? "#ede7f6" : "#e3f2fd";
+    const columnLabel = isOpenVersion
+      ? "1st Day Close from Open Price"
       : "1st Day Close from Issue Price";
 
     return (
@@ -345,11 +368,11 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
               </TableRow>
 
               {modelTypes.map((type) => {
-                const key = getModelKey(version, type);
-                const modelData = result[key];
+                const key = getModelKey(versionPrefix, type);
+                const modelData = result[key]; // may be undefined initially for open
 
                 return (
-                  <TableRow key={`${version}-${type}`}>
+                  <TableRow key={`${versionPrefix}-${type}`}>
                     <TableCell>{rowLabels[type]}</TableCell>
                     <TableCell>
                       <Typography variant="body2" whiteSpace="pre-line">
@@ -367,7 +390,8 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
                     {/* Confidence */}
                     <TableCell sx={{ bgcolor: headerBg }}>
                       <Box display="flex" flexDirection="column" gap={1}>
-                        {/* {renderAccuracyLevel(modelData?.accuracy)}  // keep if you want to show accuracy */}
+                        {/* Uncomment if you want accuracy */}
+                        {/* {renderAccuracyLevel(modelData?.accuracy)} */}
                         {renderConfidenceLevel(modelData?.confidence)}
                       </Box>
                     </TableCell>
@@ -381,24 +405,38 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
     );
   };
 
+  const hasAnyPrediction =
+    result && Object.keys(result).length > 0 && result.constructor === Object;
+
+  // We still detect if open results exist (for nicer handling),
+  // but we ALSO show table 2 whenever onRepredict is available.
+  const hasOpenVersion = Object.keys(result || {}).some((key) =>
+    key.toLowerCase().includes("open")
+  );
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
       <IPOModelMethodologyAccordion />
 
       {/* Table 1: Issue Price (no Repredict) */}
-      {issueVersions.length > 0 &&
+      {hasAnyPrediction &&
         renderSingleVersionTable(
-          issueVersions[0],
-          "1st Day Close from Issue Price - Model Predictions ",
+          "t1d",
+          "1st Day Close from Issue Price - Model Predictions",
           false,
           1
         )}
 
-      {/* Table 2: From T+1D Open (Repredict shown) */}
-      {openVersions.length > 0 &&
+      {/* Table 2: From T+1D Open (Repredict shown)
+          - Shown if:
+            a) we actually have "open" model keys, OR
+            b) we have an onRepredict handler (so user can input open return)
+      */}
+      {(hasOpenVersion || !!onRepredict) &&
+        hasAnyPrediction &&
         renderSingleVersionTable(
-          openVersions[0],
-          "1st Day Close from Open- Model Predictions",
+          "t1d_open",
+          "1st Day Close from Open - Model Predictions",
           true,
           2
         )}

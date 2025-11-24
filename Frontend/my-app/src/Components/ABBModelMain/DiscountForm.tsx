@@ -34,6 +34,23 @@ interface DiscountFormProps {
   onReset: () => void;
 }
 
+const resolveTicker = (option: any): string =>
+  typeof option === "string"
+    ? option
+    : option?.ticker || option?.symbol || option?.ticker_symbol || "";
+
+const resolveCompany = (option: any): string =>
+  typeof option === "string"
+    ? ""
+    : option?.company || option?.company_name || option?.companyName || "";
+
+const formatOptionLabel = (option: any): string => {
+  const ticker = resolveTicker(option);
+  const company = resolveCompany(option);
+  if (!ticker) return company;
+  return company ? `${ticker} - ${company}` : ticker;
+};
+
 const DiscountForm: React.FC<DiscountFormProps> = ({
   formValues,
   formErrors,
@@ -50,34 +67,78 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   <Box component="form" onSubmit={onSubmit} noValidate>
     <Grid container spacing={3}>
       <Grid item {...gridItemProps}>
-<Autocomplete
-  options={companyOptions}
-  loading={searchLoading}
-  value={formValues.ticker ? { ticker: formValues.ticker } : null}
-  inputValue={formValues.ticker}
-  getOptionLabel={(opt: any) => opt?.ticker || ""}
-  onInputChange={(event, value) => {
-    onSearchInput(value); 
-    onFieldChange("ticker")({ target: { value } } as any);
-  }}
-  onChange={(event, value) => onCompanySelect(value)}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Ticker"
-      variant="standard"
-      fullWidth
-      InputLabelProps={{
-        shrink: true,
-        sx: inputLabelSx,
-      }}
-      required
-      error={Boolean(formErrors.ticker)}
-      helperText={formErrors.ticker || ""}
-    />
-  )}
-/>
-
+        <Autocomplete
+          options={companyOptions}
+          loading={searchLoading}
+          value={formValues.ticker ? { ticker: formValues.ticker } : null}
+          inputValue={formValues.ticker}
+          getOptionLabel={(opt: any) => formatOptionLabel(opt)}
+          onInputChange={(event, value) => {
+            onSearchInput(value);
+            onFieldChange("ticker")({ target: { value } } as any);
+          }}
+          onChange={(event, value) => onCompanySelect(value)}
+          renderOption={(props, option: any) => {
+            const ticker = resolveTicker(option);
+            const company = resolveCompany(option);
+            return (
+              <li {...props} style={{ padding: "10px 12px" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.2,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 1,
+                    }}
+                  >
+                    {ticker && (
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          color: "#f57c00",
+                        }}
+                      >
+                        {ticker}
+                      </span>
+                    )}
+                    {company && (
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "#6b7280",
+                        }}
+                      >
+                        {company}
+                      </span>
+                    )}
+                  </Box>
+                </Box>
+              </li>
+            );
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Ticker"
+              variant="standard"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+                sx: inputLabelSx,
+              }}
+              required
+              error={Boolean(formErrors.ticker)}
+              helperText={formErrors.ticker || ""}
+            />
+          )}
+        />
       </Grid>
 
       <Grid item {...gridItemProps}>
