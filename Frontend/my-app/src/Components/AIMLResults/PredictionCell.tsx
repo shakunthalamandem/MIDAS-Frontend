@@ -76,7 +76,7 @@ export const ActualCell: React.FC<{ value: number | string }> = ({ value }) => {
 const getPredictionMeta = (
   pred: string
 ): {
-  displayLabel: string;
+  displayLabel: React.ReactNode;
   tone: Tone;
   icon: React.ReactNode | null;
 } => {
@@ -104,10 +104,14 @@ const getPredictionMeta = (
     normalized.includes("up")
   ) {
     return {
-      displayLabel: "Positive Return",
-      tone: "positive",
-      icon: <TrendingUpIcon fontSize="small" />,
-    };
+        displayLabel: (
+    <span style={{ fontSize: "10px" }}>
+      Positive Return
+    </span>
+  ),
+  tone: "positive",
+  icon: <TrendingUpIcon fontSize="small" />,
+};
   }
 
   if (
@@ -116,10 +120,14 @@ const getPredictionMeta = (
     normalized.includes("down")
   ) {
     return {
-      displayLabel: "Negative Return",
-      tone: "negative",
-      icon: <TrendingDownIcon fontSize="small" />,
-    };
+  displayLabel: (
+    <span style={{ fontSize: "10px" }}>
+      Negative Return
+    </span>
+  ),
+  tone: "negative",
+  icon: <TrendingDownIcon fontSize="small" />,
+};
   }
 
   // Fallback: show the original text nicely
@@ -260,7 +268,7 @@ const PredictionCell: React.FC<{
         )}
         <Typography variant="caption" color="text.secondary" textAlign="center">
           {hasConf
-            ? `${formatPercent(confClamped!)} confidence`
+            ? `${formatPercent(confClamped!)} Confidence`
             : "Confidence – N/A"}
         </Typography>
       </Box>
