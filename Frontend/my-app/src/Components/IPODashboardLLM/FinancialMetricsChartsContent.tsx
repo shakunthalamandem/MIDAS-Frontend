@@ -521,18 +521,20 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
                           margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
                         >
                           <XAxis dataKey="year" />
-                          <YAxis
-                            tickFormatter={(v) =>
-                              formatValueLabel(v, metric.format)
-                            }
-                            label={{
-                              value: metric.yAxisLabel,
-                              angle: -90,
-                              position: "insideLeft",
-                              offset: 10,
-                              style: { fontSize: 11 },
-                            }}
-                          />
+                         <YAxis
+                          tickFormatter={(v) => formatValueLabel(v, metric.format)}
+                          label={{
+                            value: metric.yAxisLabel,
+                            angle: -90,
+                            position: "insideLeft",
+                            offset: 10,
+                            style: {
+                              fontSize: 11,
+                              textAnchor: "middle",    // center-align the label
+                              fill: "#464646ff",          // clean dark blue color
+                            },
+                          }}
+                        />
                           <Tooltip
                             formatter={(value: any, name: string) => [
                               formatValueLabel(value, metric.format),
