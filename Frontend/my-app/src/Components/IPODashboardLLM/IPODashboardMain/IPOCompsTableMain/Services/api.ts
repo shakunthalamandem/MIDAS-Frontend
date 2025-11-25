@@ -9,7 +9,7 @@ const getHeaders = () => {
 };
 
 export const searchTickers = async (query: string) => {
-  const res = await fetch(`${apiUrl}/api/factset_tickerlist/?search=${query}`, {
+  const res = await fetch(`${apiUrl}/api/fs_ticker_search/?search=${query}`, {
     headers: getHeaders(),
   });
   if (!res.ok) throw new Error("Failed to fetch tickers");
