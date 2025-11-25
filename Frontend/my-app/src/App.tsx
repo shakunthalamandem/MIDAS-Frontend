@@ -6,6 +6,7 @@ import FooterMain from './Components/Footer/FooterMain';
 import ScrollToTopButton from './Components/Main/HomePage/Authentication/ScrollToTopButton';
 import Box from '@mui/material/Box';
 import SecurityLayer from './Tests/SecurityLayer';
+import ChatBoxButton from './Components/Main/HomePage/Authentication/ChatBoxButton';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,8 @@ const App: React.FC = () => {
         </Box>
         <FooterMain />
         <ScrollToTopButton />
+        <ChatBoxButton />
+
       </Router>
     </Box>
   );
