@@ -79,6 +79,7 @@ import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTic
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
+import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
 
 const AppRouters: React.FC = () => {
   return (
@@ -92,6 +93,7 @@ const AppRouters: React.FC = () => {
         <Route path="/user_log" element={<Logs />} />
         
         <Route path="/equity/ai_ml_models" element={<AuthGuard><EquityAiMlPage /></AuthGuard>} />
+        <Route path="/equity/ai_ml_results" element={<AuthGuard><AIMLResultsHome /></AuthGuard>} />
 
 
 
