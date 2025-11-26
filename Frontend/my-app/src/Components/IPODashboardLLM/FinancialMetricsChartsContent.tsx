@@ -161,9 +161,10 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
-const decimalFormatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+const currencyAxisFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
 });
 
 const formatCurrencyValue = (value?: number | null): string =>
@@ -192,10 +193,36 @@ const formatValueLabel = (
   }
 
   if (format === "currency") {
-    return currencyFormatter.format(numericValue);
+    return currencyAxisFormatter.format(Math.round(numericValue));
   }
 
-  return decimalFormatter.format(numericValue);
+  if (format === "percentage") {
+    return `${Math.round(numericValue)}%`;
+  }
+
+  return Math.round(numericValue).toLocaleString("en-US");
+};
+
+const formatAxisTick = (
+  value: number | string | null | undefined,
+  format?: MetricFormat
+): string => {
+  if (value === null || value === undefined) return "";
+
+  const numericValue = typeof value === "number" ? value : Number(value);
+  if (Number.isNaN(numericValue)) return "";
+
+  const rounded = Math.round(numericValue);
+
+  if (format === "currency") {
+    return currencyAxisFormatter.format(rounded);
+  }
+
+  if (format === "percentage") {
+    return `${rounded}%`;
+  }
+
+  return rounded.toLocaleString("en-US");
 };
 
 interface Props {
@@ -520,18 +547,34 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
                           data={chartData}
                           margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
                         >
-                          <XAxis dataKey="year" />
+                          <XAxis
+                            dataKey="year"
+                            label={{
+                              value: "Year",
+                              position: "insideBottom",
+                              offset: -5,
+                              style: {
+                                fontSize: 11,
+                                fontWeight: 700,
+                                fill: "#002060",
+                              },
+                            }}
+                          />
                          <YAxis
-                          tickFormatter={(v) => formatValueLabel(v, metric.format)}
+                          tickFormatter={(v) => formatAxisTick(v, metric.format)}
+                          allowDecimals={false}
+                          width={90}
+                          tickMargin={8}
                           label={{
                             value: metric.yAxisLabel,
                             angle: -90,
-                            position: "insideLeft",
-                            offset: 10,
+                            position: "left",
+                            offset: 20,
                             style: {
                               fontSize: 11,
-                              textAnchor: "middle",    // center-align the label
-                              fill: "#464646ff",          // clean dark blue color
+                              fontWeight: 700,
+                              textAnchor: "middle",
+                              fill: "#002060",
                             },
                           }}
                         />
