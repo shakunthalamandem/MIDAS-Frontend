@@ -228,10 +228,25 @@ const formatAxisTick = (
 interface Props {
   ticker: string;
   data: MetricsRow[];
+  includeInPdf?: boolean;
+  onIncludeInPdfChange?: (checked: boolean) => void;
 }
 
-const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
-  const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
+const FinancialMetricsChartsContent: React.FC<Props> = ({
+  ticker,
+  data,
+  includeInPdf: controlledIncludeInPdf,
+  onIncludeInPdfChange,
+}) => {
+  const [localIncludeInPdf, setLocalIncludeInPdf] = useState<boolean>(false);
+  const isControlled = controlledIncludeInPdf !== undefined;
+  const includeInPdf = isControlled ? controlledIncludeInPdf : localIncludeInPdf;
+  const handleIncludeInPdfChange = (checked: boolean) => {
+    if (!isControlled) {
+      setLocalIncludeInPdf(checked);
+    }
+    onIncludeInPdfChange?.(checked);
+  };
   const [selectedPeers, setSelectedPeers] = useState<string[]>([]);
 
   const dataByTicker = useMemo(() => {
@@ -378,7 +393,9 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({ ticker, data }) => {
               control={
                 <Checkbox
                   checked={includeInPdf}
-                  onChange={(event) => setIncludeInPdf(event.target.checked)}
+                  onChange={(event) =>
+                    handleIncludeInPdfChange(event.target.checked)
+                  }
                   size="small"
                 />
               }
