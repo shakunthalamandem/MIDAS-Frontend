@@ -38,8 +38,14 @@ interface Props {
 
 // Bright color palette
 const BRIGHT_COLORS = [
-  "#7F3FBF", "#8B4513", "#2E8B57", "#283b00ff", "#1E90FF",
-  "#8a0049ff", "#FF8C00", "#00CED1",
+  "#7F3FBF",
+  "#8B4513",
+  "#2E8B57",
+  "#283b00ff",
+  "#1E90FF",
+  "#8a0049ff",
+  "#FF8C00",
+  "#00CED1",
 ];
 
 const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
@@ -69,19 +75,15 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
           label: series.ticker,
           data: monthKeys.map((m) => map.get(m) ?? null),
           borderColor: color,
-
-          // 🔥 FIX: No “gaps” around the dots
           pointBackgroundColor: color,
-          pointBorderColor: color,  // (was white)
+          pointBorderColor: color,
           pointBorderWidth: 1,
           pointRadius: 3,
           pointHoverRadius: 4,
-
           backgroundColor: "transparent",
           borderWidth: 2,
-
-          tension: 0,           // linear (not smooth)
-          spanGaps: true,       // prevents visual breaks
+          tension: 0,
+          spanGaps: true,
         };
       }),
     };
@@ -133,7 +135,7 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
   );
 };
 
-// Format "YYYY-MM" → "Jan"
+// Format "YYYY-MM" as month label like "Jan"
 function formatMonth(monthStr: string) {
   const [year, month] = monthStr.split("-");
   const date = new Date(parseInt(year), parseInt(month) - 1);
@@ -165,13 +167,23 @@ const chartOptions: any = {
   scales: {
     x: {
       title: { display: true, text: "Month" },
-      ticks: { maxRotation: 0, minRotation: 0 },
-      grid: { display: false },  // ❌ remove vertical grid lines
+      ticks: { maxRotation: 0, minRotation: 0, color: "#4A4A4A" },
+      grid: {
+        display: true,
+        color: "rgba(0,0,0,0.08)",
+        drawBorder: true,
+      },
+      border: { display: true, color: "rgba(0,0,0,0.45)" },
     },
     y: {
       title: { display: true, text: "PE Ratio" },
-      grid: { display: false },  // ❌ remove horizontal grid lines
-      border: { display: false }, // optional cleaner look
+      ticks: { color: "#4A4A4A" },
+      grid: {
+        display: true,
+        color: "rgba(0,0,0,0.08)",
+        drawBorder: true,
+      },
+      border: { display: true, color: "rgba(0,0,0,0.45)" },
     },
   },
 };
