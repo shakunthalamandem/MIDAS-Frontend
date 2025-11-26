@@ -508,7 +508,7 @@ const renderFilter = (filter: Filter) => {
           </Container>
 
 
-      <Box width="100%"  flex={1}>
+      <Box width="100%"  flex={1} mb={4} >
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <CircularProgress color="primary" />
