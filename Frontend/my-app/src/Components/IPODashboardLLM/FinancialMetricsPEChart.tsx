@@ -36,20 +36,14 @@ interface Props {
   error: string | null;
 }
 
-// 🔹 Fixed bright color palette (approximating the style of your screenshot)
+// Bright color palette
 const BRIGHT_COLORS = [
-  "#7F3FBF", // purple
-  "#8B4513", // brown
-  "#2E8B57", // green
-  "#283b00ff", // light green
-  "#1E90FF", // blue
-  "#8a0049ff", // pink
-  "#FF8C00", // orange
-  "#00CED1", // teal
+  "#7F3FBF", "#8B4513", "#2E8B57", "#283b00ff", "#1E90FF",
+  "#8a0049ff", "#FF8C00", "#00CED1",
 ];
 
 const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
-  // 1️⃣ Extract unique months (YYYY-MM)
+  // Extract unique months (YYYY-MM)
   const monthKeys = React.useMemo(() => {
     const allDates = data.flatMap((series) =>
       series.data.map((d) => d.date).filter(Boolean) as string[]
@@ -58,7 +52,7 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
     return Array.from(new Set(months)).sort();
   }, [data]);
 
-  // 2️⃣ Build datasets aligned to month keys
+  // Build datasets aligned to month keys
   const chartData = React.useMemo(() => {
     return {
       labels: monthKeys.map((m) => formatMonth(m)),
@@ -75,23 +69,28 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
           label: series.ticker,
           data: monthKeys.map((m) => map.get(m) ?? null),
           borderColor: color,
-          backgroundColor: "transparent",
+
+          // 🔥 FIX: No “gaps” around the dots
           pointBackgroundColor: color,
-          pointBorderColor: color,
-          pointRadius: 2,
+          pointBorderColor: color,  // (was white)
+          pointBorderWidth: 1,
+          pointRadius: 3,
+          pointHoverRadius: 4,
+
+          backgroundColor: "transparent",
           borderWidth: 2,
-          tension: 0.2,
+
+          tension: 0,           // linear (not smooth)
+          spanGaps: true,       // prevents visual breaks
         };
       }),
     };
   }, [data, monthKeys]);
 
   return (
-    <Container
-      maxWidth="xl" 
-    >
-      <Card elevation={2} sx={{ backgroundColor: "#FFF" }}>
-        <CardContent>
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Card elevation={2} sx={{ backgroundColor: "#FFFFFF", borderRadius: 2 }}>
+        <CardContent sx={{ p: 3 }}>
           <Typography
             variant="h6"
             gutterBottom
@@ -124,7 +123,7 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
 
           {/* Chart */}
           {!loading && !error && data.length > 0 && (
-            <Box width="100%" height="500px" mt={2}>
+            <Box sx={{ width: "100%", height: 420, mt: 2 }}>
               <Line data={chartData} options={chartOptions} />
             </Box>
           )}
@@ -145,12 +144,13 @@ function formatMonth(monthStr: string) {
 const chartOptions: any = {
   responsive: true,
   maintainAspectRatio: false,
+
   plugins: {
     legend: {
-      position: "top",
+      position: "bottom",
+      labels: { usePointStyle: true, padding: 15 },
     },
     tooltip: {
-      animation: false,
       intersect: false,
       mode: "nearest",
       callbacks: {
@@ -159,14 +159,19 @@ const chartOptions: any = {
       },
     },
   },
+
   animation: false,
+
   scales: {
     x: {
       title: { display: true, text: "Month" },
       ticks: { maxRotation: 0, minRotation: 0 },
+      grid: { display: false },  // ❌ remove vertical grid lines
     },
     y: {
       title: { display: true, text: "PE Ratio" },
+      grid: { display: false },  // ❌ remove horizontal grid lines
+      border: { display: false }, // optional cleaner look
     },
   },
 };
