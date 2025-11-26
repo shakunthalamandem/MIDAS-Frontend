@@ -6,6 +6,7 @@ import {
   Button,
   Box,
   Typography,
+  createFilterOptions,
 } from "@mui/material";
 import { searchTickers } from "./Services/api";
 
@@ -14,6 +15,10 @@ interface CompetitorSearchProps {
 }
 
 const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
+  const filterOptions = createFilterOptions({
+    stringify: (option: any) => `${option.ticker} ${option.company}`,
+  });
+
   const [options, setOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // for search
   const [adding, setAdding] = useState(false); // for add button
@@ -53,6 +58,7 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
       <Autocomplete
         options={options}
         getOptionLabel={(option: any) => option.ticker}
+        filterOptions={filterOptions}
         loading={loading}
         onInputChange={(_, value) => handleSearch(value)}
         onChange={(_, newValue) => setSelected(newValue)}
@@ -71,14 +77,6 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
               >
                 {option.company}
               </Typography>
-              {option.exchange && (
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: "0.7rem", color: "#888", ml: 0.5 }}
-                >
-                  ({option.exchange})
-                </Typography>
-              )}
             </Box>
           </li>
         )}

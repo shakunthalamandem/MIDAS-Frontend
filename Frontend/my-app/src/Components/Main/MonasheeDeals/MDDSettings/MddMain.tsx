@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import MDDFilters from "./MDDFilters";
-import MDDScreenergrid from "./MDDScreenergrid";
 import { useNavigate } from "react-router-dom";
 
 interface MddMainProps {
@@ -48,7 +47,7 @@ const MddMain: React.FC<MddMainProps> = ({ apiName }) => {
   }, []);
 
   return<>
-  <MDDFilters filtersData={filtersData} apiName={apiName} />;
+  <MDDFilters filtersData={filtersData} apiName={apiName} />
 
   
   </> 

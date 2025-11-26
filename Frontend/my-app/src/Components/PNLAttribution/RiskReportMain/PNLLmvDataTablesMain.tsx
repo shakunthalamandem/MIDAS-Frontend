@@ -308,6 +308,7 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
           {renderSection(sections[3].section, 3)}
         </Grid>
       </Grid>
+      <Typography variant="body2" color="grey"><span style={{fontWeight:600,color:'#002060'}}>Note:</span> The YTD and ITD values are identical, as the LK file dataset starts from 1 January 2025.</Typography>
     </Box>
   );
 };

@@ -75,6 +75,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handle
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (sectorwiseData) {
@@ -260,16 +261,29 @@ const handleClosePopup = () => {
   ];
 
   const filteredRows = useMemo(() => {
-    return preprocessRows(rows).filter((row) =>
-      row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [rows, searchQuery]);
+    const processedRows = preprocessRows(rows);
+    if (!normalizedQuery) return processedRows;
+
+    return processedRows.filter((row) => {
+      const tickerValue =
+        typeof row.ticker === "string"
+          ? row.ticker
+          : row.ticker != null
+            ? String(row.ticker)
+            : "";
+
+      return tickerValue.toLowerCase().includes(normalizedQuery);
+    });
+  }, [rows, normalizedQuery]);
+
+  const noSearchMatches =
+    !loading && rows.length > 0 && normalizedQuery !== "" && filteredRows.length === 0;
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <NoDataPopup open={openNoDataPopup}   onClose={handleClosePopup}/>
       {loading && <Typography>Loading...</Typography>}
-      {filteredRows.length > 0 && (
+      {rows.length > 0 && (
         <div style={{ height: 600, width: "100%" }}>
           <Box
             display="flex"
@@ -298,32 +312,46 @@ const handleClosePopup = () => {
             />
           </Box>
 
-          <DataGrid
-            rows={filteredRows}
-            columns={columns}
-            rowCount={filteredRows.length}
-            loading={loading}
-            rowHeight={35}
-            sx={{
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "transparent",
-                fontWeight: "bold",
-                color: "#002060",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: "bold",
-                fontSize: "12px",
-              },
-              "& .MuiDataGrid-cell": {
-                color: "#000000",
-                fontSize: "12px",
-                padding: "4px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                backgroundColor: "#F5F5F5",
-              },
-            }}
-          />
+          {noSearchMatches ? (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height={200}
+              sx={{ border: "1px dashed #ccc", borderRadius: 1 }}
+            >
+              <Typography color="text.secondary" fontWeight={600}>
+                No matching ticker available here.
+              </Typography>
+            </Box>
+          ) : (
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              rowCount={filteredRows.length}
+              loading={loading}
+              rowHeight={35}
+              sx={{
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "transparent",
+                  fontWeight: "bold",
+                  color: "#002060",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: "bold",
+                  fontSize: "12px",
+                },
+                "& .MuiDataGrid-cell": {
+                  color: "#000000",
+                  fontSize: "12px",
+                  padding: "4px",
+                },
+                "& .MuiDataGrid-row:nth-of-type(odd)": {
+                  backgroundColor: "#F5F5F5",
+                },
+              }}
+            />
+          )}
         </div>
       )}
     </Container>

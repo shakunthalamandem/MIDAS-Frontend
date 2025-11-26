@@ -213,14 +213,14 @@ const formatXAxis = (dateStr: string) => {
               />
             </AreaChart>
           </ResponsiveContainer>
-          <Typography
+          {/* <Typography
             variant="body2"
             color="textSecondary"
             mt={1}
             textAlign="center"
           >
             Note: “Hedging – Others” includes all long option positions from the LK file.
-          </Typography>
+          </Typography> */}
 
         </Paper>
       </Grid>

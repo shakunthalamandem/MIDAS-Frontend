@@ -180,7 +180,6 @@ const PNLRiskReportMain: React.FC<PNLRiskReportMainProps> = ({ fund }) => {
 			"Net of Hedge P&L is calculated as: Long only P&L + Hedge P&L (allocated to each deal on the basis of exposure). This may result in some amount of unallocated Hedge P&L, which will not be captured here.",
 			"Beta Adj Net:Beta adjusted is taking from the LK File.",
 			"VaR: Calculated as historical simulated 1 year Value-at-Risk value for 5% confidence level  ",
-      "Hedging – Others” includes all long option positions from the LK file.",
 		].join("\n");
 
 	const footnoteRegion =
