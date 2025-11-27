@@ -5,42 +5,76 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const accessToken = localStorage.getItem("access_token");
 
 const MattermostChat: React.FC = () => {
-  const { stock } = useParams();               // /chat/:stock  
-  const [mmToken, setMmToken] = useState<string>("");
-
-  const fetchMMToken = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/mm_discussion_box/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: accessToken ? `Bearer ${accessToken}` : "",
-        },
-        body: JSON.stringify({}), // or remove if backend doesn't need body
-      });
-
-      const data = await response.json();
-      setMmToken(data.mm_token);
-
-    } catch (error) {
-      console.error("Error fetching Mattermost token:", error);
-    }
-  };
+  const { stock } = useParams();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    fetchMMToken();
+    const loginToMattermost = async () => {
+      try {
+        // 1. Ask backend for Mattermost user login_id + password
+        const res = await fetch(`${apiUrl}/api/mm_discussion_box/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+        });
+
+        const creds = await res.json();
+        if (!creds.mm_login_id || !creds.mm_password) {
+          console.error("❌ Backend did not return MM credentials");
+          return;
+        }
+
+        // 2. Ask backend to perform Mattermost login (no CORS issues)
+        const proxyRes = await fetch(`${apiUrl}/api/mm_login_proxy/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+          },
+          body: JSON.stringify({
+            login_id: creds.mm_login_id,
+            password: creds.mm_password,
+          }),
+        });
+
+        if (!proxyRes.ok) {
+          console.error("❌ Mattermost proxy login failed");
+          return;
+        }
+
+        const data = await proxyRes.json();
+
+        // 3. Set Mattermost cookies manually in the browser
+        if (data.cookies) {
+          if (data.cookies.MMAUTHTOKEN) {
+            document.cookie = `MMAUTHTOKEN=${data.cookies.MMAUTHTOKEN}; Path=/;`;
+          }
+          if (data.cookies.MMUSERID) {
+            document.cookie = `MMUSERID=${data.cookies.MMUSERID}; Path=/;`;
+          }
+          if (data.cookies.MMCSRF) {
+            document.cookie = `MMCSRF=${data.cookies.MMCSRF}; Path=/;`;
+          }
+        }
+
+        // 4. Allow cookies time to settle
+        setTimeout(() => setReady(true), 800);
+
+      } catch (err) {
+        console.error("❌ Mattermost login error:", err);
+      }
+    };
+
+    loginToMattermost();
   }, []);
 
-  if (!mmToken) {
-    return <div style={{ padding: "20px" }}>Loading chat...</div>;
-  }
-
-  // Final Mattermost embed URL
-  const chatUrl = `http://192.168.1.65:8065/nook/channels/nooks-party?access_token=${mmToken}`;
+  if (!ready) return <div>Loading chat...</div>;
 
   return (
     <iframe
-      src={chatUrl}
+      src="http://192.168.1.65:8065/nook/channels/nooks-party"
       title="Mattermost Chat"
       style={{
         width: "100%",
