@@ -14,7 +14,6 @@ import {
   ComposedChart,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ReferenceLine,
   Bar,
@@ -260,22 +259,18 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         });
 
         if (!res.ok) {
-          // --- Friendly 404 handling here ---
+          // Special-case 404 into a friendly message
           if (res.status === 404) {
-            // Try to read backend error, fall back to generic text
             let msg = "No data available for this ticker.";
             try {
               const errJson = await res.json();
-              if (typeof errJson?.error === "string") {
-                msg = errJson.error;
-              }
+              if (typeof errJson?.error === "string") msg = errJson.error;
             } catch {
-              // ignore JSON parse errors, keep default msg
+              // ignore parse error, keep default message
             }
             throw new Error(msg);
           }
 
-          // all other errors keep the old behaviour
           throw new Error(`Request failed with status ${res.status}`);
         }
 
@@ -443,12 +438,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   data={chartData}
                   margin={{ top: 10, right: 70, bottom: 20, left: 50 }}
                 >
-                  <CartesianGrid
-                    stroke="#d3d3d3"
-                    strokeDasharray="3 3"
-                    vertical
-                    horizontal
-                  />
+                  {/* Grey dotted CartesianGrid removed */}
 
                   <XAxis dataKey="label" />
                   <YAxis
