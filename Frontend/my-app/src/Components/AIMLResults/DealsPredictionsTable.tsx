@@ -21,6 +21,12 @@ import DealDetailsPanel from "./DealDetailsPanel";
 import PredictionCell from "./PredictionCell";
 import DealPricesChart from "./DealPricesChart";
 
+const getISODate = (offsetDays: number = 0) => {
+  const date = new Date();
+  date.setDate(date.getDate() - offsetDays);
+  return date.toISOString().split("T")[0];
+};
+
 export interface DealRecord {
   ticker: string;
   issuer_name: string;
@@ -182,8 +188,8 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(getISODate(7));
+  const [endDate, setEndDate] = useState(getISODate(0));
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
