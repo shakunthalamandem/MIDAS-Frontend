@@ -60,8 +60,6 @@ export interface DealForChart {
 /**
  * Props:
  * - You can EITHER pass `deal` OR pass `ticker` + `pricing_date`.
- * - `DealsPredictionsTable` uses `deal`.
- * - Existing code (AIMLResultsHome) can keep using `ticker` / `pricing_date`.
  */
 export interface DealPricesChartProps {
   deal?: DealForChart | null;
@@ -262,6 +260,22 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         });
 
         if (!res.ok) {
+          // --- Friendly 404 handling here ---
+          if (res.status === 404) {
+            // Try to read backend error, fall back to generic text
+            let msg = "No data available for this ticker.";
+            try {
+              const errJson = await res.json();
+              if (typeof errJson?.error === "string") {
+                msg = errJson.error;
+              }
+            } catch {
+              // ignore JSON parse errors, keep default msg
+            }
+            throw new Error(msg);
+          }
+
+          // all other errors keep the old behaviour
           throw new Error(`Request failed with status ${res.status}`);
         }
 
@@ -346,11 +360,9 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     return (
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
         <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom color="#002060">
-  <strong>Deal Price Timeseries</strong>
-</Typography>
-
-
+          <Typography variant="h6" gutterBottom>
+            Deal Price Timeseries
+          </Typography>
           <Alert severity="info">
             Select a deal to view its price chart.
           </Alert>
@@ -418,7 +430,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         )}
 
         {!loading && error && (
-          <Alert sx={{ mt: 3 }} severity="error">
+          <Alert sx={{ mt: 3 }} severity="info">
             {error}
           </Alert>
         )}

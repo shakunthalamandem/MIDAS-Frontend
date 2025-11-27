@@ -66,7 +66,7 @@ const AIMLResultsHome: React.FC = () => {
           </Box>
         </Card>
 
-        <Box mt={3}>
+        {/* <Box mt={3}>
           {chartSelection ? (
             <DealPricesChart
               ticker={chartSelection.ticker}
@@ -85,7 +85,7 @@ const AIMLResultsHome: React.FC = () => {
               Click a ticker in the table to view its price timeseries.
             </Card>
           )}
-        </Box>
+        </Box> */}
       </Box>
     </Container>
   );
