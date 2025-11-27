@@ -185,7 +185,6 @@ const AppRouters: React.FC = () => {
           <Route path="/deal_data_upload" element={<UnifiedDealDataUpload />} />
         </Route>    
         <Route path="/equity/ipo_dashboard" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
-        <Route path="/prices_chart" element={<AuthGuard><DealPricesChart /></AuthGuard>} />
 
         <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 

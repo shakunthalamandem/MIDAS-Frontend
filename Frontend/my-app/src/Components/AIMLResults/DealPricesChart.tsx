@@ -51,6 +51,24 @@ interface DealPoint {
   low: number;
 }
 
+// minimal shape we need for the selected deal
+export interface DealForChart {
+  ticker: string;
+  pricing_date: string;
+}
+
+/**
+ * Props:
+ * - You can EITHER pass `deal` OR pass `ticker` + `pricing_date`.
+ * - `DealsPredictionsTable` uses `deal`.
+ * - Existing code (AIMLResultsHome) can keep using `ticker` / `pricing_date`.
+ */
+export interface DealPricesChartProps {
+  deal?: DealForChart | null;
+  ticker?: string;
+  pricing_date?: string;
+}
+
 /* ---------- Helpers ---------- */
 
 const formatDateLabel = (value: string): string => {
@@ -90,7 +108,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
 
 /**
  * Candlesticks using <Customized>.
- * Each candle is centered on the X-axis tick (and thus the vertical grid line).
+ * Each candle is centered on the X-axis tick (vertical grid line).
  */
 const Candles: React.FC<any> = (props) => {
   const { xAxisMap, yAxisMap, data } = props;
@@ -168,7 +186,7 @@ const HorizontalLineLabel: React.FC<any> = (props) => {
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
-  const y = yScale(yValue); // same coordinate system as ReferenceLine
+  const y = yScale(yValue); // same coordinates as ReferenceLine
   const xRight = offset.left + offset.width;
 
   return (
@@ -186,7 +204,11 @@ const HorizontalLineLabel: React.FC<any> = (props) => {
 
 /* ---------- Main Component ---------- */
 
-const DealPricesChart: React.FC = () => {
+const DealPricesChart: React.FC<DealPricesChartProps> = ({
+  deal,
+  ticker: tickerProp,
+  pricing_date: pricingDateProp,
+}) => {
   const [chartData, setChartData] = useState<DealPoint[]>([]);
   const [issuePrice, setIssuePrice] = useState<number | null>(null);
   const [stopLoss, setStopLoss] = useState<number | null>(null);
@@ -199,15 +221,33 @@ const DealPricesChart: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // demo inputs – wire from props if needed
-  const ticker = "CBC";
-  const pricingDate = "2025-11-19";
+  // unified source of truth for ticker / pricing_date
+  const ticker = deal?.ticker || tickerProp || "";
+  const pricingDate = deal?.pricing_date || pricingDateProp || "";
+  const hasSelection = !!ticker && !!pricingDate;
 
   useEffect(() => {
+    // reset state whenever selection changes
+    setChartData([]);
+    setIssuePrice(null);
+    setStopLoss(null);
+    setT1mPolarity(null);
+    setT1wPred(null);
+    setT1dOpenPred(null);
+    setError(null);
+
+    if (!hasSelection) {
+      return;
+    }
+
+    if (!apiUrl) {
+      setError("API URL is not configured");
+      return;
+    }
+
     const fetchPrices = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const res = await fetch(`${apiUrl}/api/fs_price_timeseries/`, {
           method: "POST",
@@ -251,12 +291,8 @@ const DealPricesChart: React.FC = () => {
       }
     };
 
-    if (apiUrl) {
-      fetchPrices();
-    } else {
-      setError("API URL is not configured");
-    }
-  }, [apiUrl, token, ticker, pricingDate]);
+    fetchPrices();
+  }, [apiUrl, token, ticker, pricingDate, hasSelection]);
 
   const { yMin, yMax, t1mLineValue, t1mLabel } = useMemo(() => {
     if (!chartData.length) {
@@ -304,6 +340,22 @@ const DealPricesChart: React.FC = () => {
       t1mLabel: label,
     };
   }, [chartData, issuePrice, stopLoss, t1mPolarity]);
+
+  // If nothing selected yet, show helper message
+  if (!hasSelection) {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Deal Price Timeseries
+          </Typography>
+          <Alert severity="info">
+            Select a deal to view its price chart.
+          </Alert>
+        </Paper>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
