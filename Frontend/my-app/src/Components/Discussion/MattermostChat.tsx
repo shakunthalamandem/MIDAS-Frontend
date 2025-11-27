@@ -11,7 +11,7 @@ const MattermostChat: React.FC = () => {
   useEffect(() => {
     const loginToMattermost = async () => {
       try {
-        // 1. Ask backend for Mattermost user login_id + password
+        // 1. Ask backend for Mattermost login credentials
         const res = await fetch(`${apiUrl}/api/mm_discussion_box/`, {
           method: "POST",
           headers: {
@@ -26,7 +26,7 @@ const MattermostChat: React.FC = () => {
           return;
         }
 
-        // 2. Ask backend to perform Mattermost login (no CORS issues)
+        // 2. Tell backend to login to Mattermost (avoids browser CORS)
         const proxyRes = await fetch(`${apiUrl}/api/mm_login_proxy/`, {
           method: "POST",
           headers: {
@@ -46,7 +46,7 @@ const MattermostChat: React.FC = () => {
 
         const data = await proxyRes.json();
 
-        // 3. Set Mattermost cookies manually in the browser
+        // 3. Set Mattermost cookies manually
         if (data.cookies) {
           if (data.cookies.MMAUTHTOKEN) {
             document.cookie = `MMAUTHTOKEN=${data.cookies.MMAUTHTOKEN}; Path=/;`;
@@ -59,7 +59,7 @@ const MattermostChat: React.FC = () => {
           }
         }
 
-        // 4. Allow cookies time to settle
+        // 4. Give cookies time to settle
         setTimeout(() => setReady(true), 800);
 
       } catch (err) {
