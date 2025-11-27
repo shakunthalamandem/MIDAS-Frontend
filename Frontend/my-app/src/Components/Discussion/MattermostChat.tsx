@@ -58,7 +58,9 @@ const MattermostChat: React.FC = () => {
             document.cookie = `MMCSRF=${data.cookies.MMCSRF}; Path=/;`;
           }
         }
-
+                
+        // ⭐ NEW — Auto skip the popup
+        document.cookie = `MMVIEW_PREFERENCE=browser; Path=/; Max-Age=31536000;`;
         // 4. Give cookies time to settle
         setTimeout(() => setReady(true), 800);
 
