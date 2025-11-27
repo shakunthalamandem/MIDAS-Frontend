@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Card, Container, Typography } from "@mui/material";
-import DealsPredictionsTable from "./DealsPredictionsTable";
+import DealsPredictionsTable, {
+  TickerSelectionPayload,
+} from "./DealsPredictionsTable";
+import DealPricesChart from "./DealPricesChart";
 
 const AIMLResultsHome: React.FC = () => {
+  const [chartSelection, setChartSelection] =
+    useState<TickerSelectionPayload | null>(null);
+
   return (
     <Container
       maxWidth={false}
@@ -56,9 +62,30 @@ const AIMLResultsHome: React.FC = () => {
               borderRadius: 2,
             }}
           >
-            <DealsPredictionsTable />
+            <DealsPredictionsTable onTickerClick={setChartSelection} />
           </Box>
         </Card>
+
+        {/* <Box mt={3}>
+          {chartSelection ? (
+            <DealPricesChart
+              ticker={chartSelection.ticker}
+              pricing_date={chartSelection.pricing_date}
+            />
+          ) : (
+            <Card
+              sx={{
+                mt: 1,
+                p: 2,
+                borderRadius: 2,
+                textAlign: "center",
+                color: "text.secondary",
+              }}
+            >
+              Click a ticker in the table to view its price timeseries.
+            </Card>
+          )}
+        </Box> */}
       </Box>
     </Container>
   );

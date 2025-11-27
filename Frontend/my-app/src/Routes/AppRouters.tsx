@@ -80,6 +80,7 @@ import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
+import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
 
 const AppRouters: React.FC = () => {
   return (

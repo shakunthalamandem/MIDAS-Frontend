@@ -19,6 +19,7 @@ import RocketLaunchOutlinedIcon from "@mui/icons-material/RocketLaunchOutlined";
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import DealDetailsPanel from "./DealDetailsPanel";
 import PredictionCell from "./PredictionCell";
+import DealPricesChart from "./DealPricesChart";
 
 export interface DealRecord {
   ticker: string;
@@ -165,7 +166,18 @@ const TABLE_COLUMNS: ColumnConfig[] = [
 
 /* ---------- Main component ---------- */
 
-const DealsPredictionsTable: React.FC = () => {
+export interface TickerSelectionPayload {
+  ticker: string;
+  pricing_date: string;
+}
+
+interface DealsPredictionsTableProps {
+  onTickerClick?: (payload: TickerSelectionPayload) => void;
+}
+
+const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
+  onTickerClick,
+}) => {
   const [data, setData] = useState<DealRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -302,6 +314,34 @@ const DealsPredictionsTable: React.FC = () => {
     });
   };
 
+  const handleTickerClick = (row: DealRecord) => {
+    if (onTickerClick) {
+      onTickerClick({
+        ticker: row.ticker,
+        pricing_date: row.pricing_date,
+      });
+    }
+  };
+
+  const renderTickerCell = (row: DealRecord) => (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ fontWeight: 700, lineHeight: 1.2, cursor: "pointer" }}
+        onClick={() => handleTickerClick(row)}
+      >
+        {row.ticker}
+      </Typography>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ lineHeight: 1.2 }}
+      >
+        {row.issuer_name}
+      </Typography>
+    </Box>
+  );
+
   const renderHeaderLabel = (label: string, align: Align = "center") => {
     const lines = label.split("\n");
     return (
@@ -312,8 +352,8 @@ const DealsPredictionsTable: React.FC = () => {
           align === "left"
             ? "flex-start"
             : align === "right"
-              ? "flex-end"
-              : "center"
+            ? "flex-end"
+            : "center"
         }
       >
         {lines.map((line, idx) => (
@@ -342,88 +382,83 @@ const DealsPredictionsTable: React.FC = () => {
       >
         
 
-     <Box
-  display="flex"
-  justifyContent="center" // center horizontally
+        <Box
+          display="flex"
+          justifyContent="center" // center horizontally
   width="100%"            // make the Box take full width
->
-  <Box
-    display="flex"
-    alignItems="center"
-    gap={1}
-    flexWrap="wrap"
-  >
-    {/* IPO / FO segmented control */}
-    <Box
-      sx={(theme) => ({
-        display: "inline-flex",
-        alignItems: "center",
-        borderRadius: 999,
-        padding: 0.3,
-        border: `1px solid ${theme.palette.divider}`,
-        backgroundColor:
-          theme.palette.mode === "light"
-            ? theme.palette.grey[100]
-            : theme.palette.background.paper,
-      })}
-    >
-      {(["IPO", "FO"] as DealTypeFilter[]).map((type) => {
-        const active = dealTypeFilter === type;
-        return (
-          <Box
-            key={type}
-            onClick={() => setDealTypeFilter(type)}
-            sx={(theme) => ({
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 0.6,
-              px: 1.6,
-              py: 0.45,
-              borderRadius: 999,
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              background: active
-                ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
-                : "transparent",
-              color: active
-                ? theme.palette.common.white
-                : theme.palette.text.secondary,
-            })}
-          >
-            {type === "IPO" ? (
-              <RocketLaunchOutlinedIcon
-                sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
-              />
-            ) : (
-              <AttachMoneyOutlinedIcon
-                sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
-              />
-            )}
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 700,
-                letterSpacing: 0.6,
-              }}
+        >
+          <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+            {/* IPO / FO segmented control */}
+            <Box
+              sx={(theme) => ({
+                display: "inline-flex",
+                alignItems: "center",
+                borderRadius: 999,
+                padding: 0.3,
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor:
+                  theme.palette.mode === "light"
+                    ? theme.palette.grey[100]
+                    : theme.palette.background.paper,
+              })}
             >
-              {type}
-            </Typography>
-          </Box>
-        );
-      })}
-    </Box>
+              {(["IPO", "FO"] as DealTypeFilter[]).map((type) => {
+                const active = dealTypeFilter === type;
+                return (
+                  <Box
+                    key={type}
+                    onClick={() => setDealTypeFilter(type)}
+                    sx={(theme) => ({
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.6,
+                      px: 1.6,
+                      py: 0.45,
+                      borderRadius: 999,
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      background: active
+                        ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                        : "transparent",
+                      color: active
+                        ? theme.palette.common.white
+                        : theme.palette.text.secondary,
+                    })}
+                  >
+                    {type === "IPO" ? (
+                      <RocketLaunchOutlinedIcon
+                        sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+                      />
+                    ) : (
+                      <AttachMoneyOutlinedIcon
+                        sx={{ fontSize: 16, opacity: active ? 1 : 0.7 }}
+                      />
+                    )}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        letterSpacing: 0.6,
+                      }}
+                    >
+                      {type}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Box>
 
-    {/* Search */}
-    <TextField
-      size="small"
-      label="Search by ticker or issuer"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      sx={{ minWidth: 230 }}
-    />
-  </Box>
-</Box>
+            {/* Search */}
+            <TextField
+              size="small"
+              label="Search by ticker or issuer"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              sx={{ minWidth: 230 }}
+            />
+          </Box>
+        </Box>
 
       </Box>
 
@@ -551,8 +586,8 @@ const DealsPredictionsTable: React.FC = () => {
                             backgroundColor: isSelected
                               ? alpha(theme.palette.success.main, 0.16)
                               : isEven
-                                ? theme.palette.background.paper
-                                : theme.palette.grey[50],
+                              ? theme.palette.background.paper
+                              : theme.palette.grey[50],
 
                             boxShadow: isSelected
                               ? `inset 3px 0 0 ${theme.palette.success.main}`
@@ -570,9 +605,12 @@ const DealsPredictionsTable: React.FC = () => {
                         }}
                       >
                         {TABLE_COLUMNS.map((col) => {
-                          const value = col.render
-                            ? col.render(row)
-                            : (row as any)[col.key];
+                          const value =
+                            col.key === "ticker_issuer"
+                              ? renderTickerCell(row)
+                              : col.render
+                              ? col.render(row)
+                              : (row as any)[col.key];
 
                           return (
                             <TableCell
@@ -601,9 +639,10 @@ const DealsPredictionsTable: React.FC = () => {
             </TableContainer>
           </Paper>
 
-          {/* Details panel */}
+          {/* Details panel + prices chart */}
           <Box mt={2}>
             <DealDetailsPanel deal={selectedDeal} />
+            <DealPricesChart deal={selectedDeal} />
           </Box>
         </>
       )}
