@@ -182,6 +182,9 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "pricing_date",
@@ -193,16 +196,28 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 350);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  useEffect(() => {
     const fetchDeals = async () => {
       try {
         setLoading(true);
         setError(null);
+        const payload = {
+          ticker: debouncedSearch.trim() || null,
+          start_date: startDate || null,
+          end_date: endDate || null,
+        };
+
         const res = await fetch(`${apiUrl}/api/ai_ml_results/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
@@ -219,9 +234,9 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
     };
 
     fetchDeals();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, debouncedSearch, startDate, endDate]);
 
-  // Search by ticker OR issuer, then filter by IPO / FO
+  // Search by ticker or issuer, apply date range, then filter by IPO / FO
   const filteredData = useMemo(() => {
     let rows = data;
 
@@ -234,13 +249,32 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
       });
     }
 
+    if (startDate || endDate) {
+      const startTime = startDate ? Date.parse(startDate) : null;
+      const endTime = endDate ? Date.parse(endDate) : null;
+
+      rows = rows.filter((row) => {
+        const rowTime = row.pricing_date ? Date.parse(row.pricing_date) : null;
+        if (rowTime === null || Number.isNaN(rowTime)) {
+          return false;
+        }
+        if (startTime && rowTime < startTime) {
+          return false;
+        }
+        if (endTime && rowTime > endTime) {
+          return false;
+        }
+        return true;
+      });
+    }
+
     rows = rows.filter((row) => {
       const type = (row.deal_type || "").toUpperCase();
       return type.includes(dealTypeFilter);
     });
 
     return rows;
-  }, [data, search, dealTypeFilter]);
+  }, [data, search, startDate, endDate, dealTypeFilter]);
 
   const getComparableValue = (
     row: DealRecord,
@@ -345,17 +379,18 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const renderHeaderLabel = (label: string, align: Align = "center") => {
     const lines = label.split("\n");
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems={
-          align === "left"
-            ? "flex-start"
-            : align === "right"
-            ? "flex-end"
-            : "center"
-        }
-      >
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems={
+        align === "left"
+          ? "flex-start"
+          : align === "right"
+          ? "flex-end"
+          : "center"
+      }
+      sx={{ color: "inherit" }}
+    >
         {lines.map((line, idx) => (
           <Typography
             key={idx}
@@ -379,14 +414,21 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
         alignItems={{ xs: "flex-start", md: "center" }}
         justifyContent="space-between"
         gap={1.5}
+        sx={(theme) => ({
+          position: "sticky",
+          top: 0,
+          zIndex: 5,
+          paddingBottom: theme.spacing(1),
+          background: `linear-gradient(
+            180deg,
+            ${theme.palette.background.default} 70%,
+            ${alpha(theme.palette.background.default, 0)} 100%
+          )`,
+        })}
       >
         
 
-        <Box
-          display="flex"
-          justifyContent="center" // center horizontally
-  width="100%"            // make the Box take full width
-        >
+        <Box display="flex" justifyContent="center" width="100%">
           <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
             {/* IPO / FO segmented control */}
             <Box
@@ -457,6 +499,24 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
               onChange={(e) => setSearch(e.target.value)}
               sx={{ minWidth: 230 }}
             />
+            <TextField
+              size="small"
+              type="date"
+              label="Start date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              sx={{ minWidth: 180 }}
+            />
+            <TextField
+              size="small"
+              type="date"
+              label="End date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              sx={{ minWidth: 180 }}
+            />
           </Box>
         </Box>
 
@@ -497,10 +557,10 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
               <Table stickyHeader size="small" sx={{ tableLayout: "fixed" }}>
                 <TableHead>
                   <TableRow
-                    sx={(theme) => ({
-                      backgroundColor: theme.palette.grey[100],
-                      boxShadow: `inset 0 -1px 0 ${theme.palette.divider}`,
-                    })}
+                    sx={{
+                      backgroundColor: "#002060",
+                      boxShadow: "none",
+                    }}
                   >
                     {TABLE_COLUMNS.map((col) => {
                       const sortKey =
@@ -524,14 +584,16 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
                             paddingY: 1.1,
                             whiteSpace: "normal",
 
-                            // fontWeight: 800,
                             fontSize: "15px",
                             letterSpacing: "0.2px",
-                            color: theme.palette.primary.main,
-
-                            backgroundColor: theme.palette.grey[100],
-                            borderBottom: `2px solid ${theme.palette.divider}`,
-                            borderRight: `1px solid ${theme.palette.divider}`,
+                            color: theme.palette.common.white,
+                            backgroundColor: "#002060",
+                            "&.MuiTableCell-stickyHeader": {
+                              backgroundColor: "#002060",
+                            },
+                            zIndex: 2,
+                            borderBottom: "2px solid #00163f",
+                            borderRight: "1px solid rgba(255,255,255,0.25)",
                           })}
                         >
                           {sortKey ? (
@@ -541,17 +603,17 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
                                 isSorted ? sortConfig.direction : "asc"
                               }
                               onClick={() => handleSortClick(col)}
-                              sx={(theme) => ({
-                                color: theme.palette.primary.main,
+                              sx={{
+                                color: "inherit",
                                 "&.Mui-active": {
-                                  color: theme.palette.primary.main,
+                                  color: "inherit",
                                 },
                                 "& .MuiTableSortLabel-icon": {
-                                  opacity: 0.35,
-                                  color: theme.palette.primary.light,
+                                  opacity: 0.75,
+                                  color: "#fff",
                                   fontSize: "18px",
                                 },
-                              })}
+                              }}
                             >
                               {renderHeaderLabel(
                                 col.label,
