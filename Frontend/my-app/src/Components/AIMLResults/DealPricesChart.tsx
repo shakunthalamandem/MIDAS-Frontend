@@ -78,7 +78,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
   return (
     <Paper sx={{ p: 1.5 }}>
       <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-        {label}
+        {formatDateLabel(label)}
       </Typography>
       <Typography variant="body2">Open: {point.open}</Typography>
       <Typography variant="body2">High: {point.high}</Typography>
@@ -90,29 +90,32 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
 
 /**
  * Candlesticks using <Customized>.
+ * Each candle is centered on the X-axis tick (and thus the vertical grid line).
  */
 const Candles: React.FC<any> = (props) => {
-  const { xAxisMap, yAxisMap, offset, data } = props;
+  const { xAxisMap, yAxisMap, data } = props;
   if (!xAxisMap || !yAxisMap || !data || !data.length) return null;
 
   const xKey = Object.keys(xAxisMap)[0];
   const xAxis = xAxisMap[xKey];
   const xScale = xAxis.scale;
+
   const bandWidth =
-    typeof xScale.bandwidth === "function" ? xScale.bandwidth() : 10;
+    xAxis.bandSize ??
+    (typeof xScale.bandwidth === "function" ? xScale.bandwidth() : 10);
 
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
-  const left = offset.left || 0;
   const candles: DealPoint[] = data;
 
   return (
     <g>
       {candles.map((entry, index) => {
         const { label, open, close, high, low } = entry;
-        const xCenter =
-          (xScale(label) ?? 0) + bandWidth / 2 + left;
+
+        // Center of band: left edge + bandWidth / 2
+        const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
 
         const color = close >= open ? "#008000" : "#CC0000";
 
@@ -165,14 +168,13 @@ const HorizontalLineLabel: React.FC<any> = (props) => {
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
-  const y = yScale(yValue);
-  // right edge of plot area
+  const y = yScale(yValue); // same coordinate system as ReferenceLine
   const xRight = offset.left + offset.width;
 
   return (
     <text
       x={xRight - 4}
-      y={y - 3} // slightly above the line but still visually "on" it
+      y={y - 3}
       textAnchor="end"
       fill={color}
       fontSize={11}
@@ -375,7 +377,6 @@ const DealPricesChart: React.FC = () => {
                   data={chartData}
                   margin={{ top: 10, right: 70, bottom: 20, left: 50 }}
                 >
-                  {/* full background grey grid */}
                   <CartesianGrid
                     stroke="#d3d3d3"
                     strokeDasharray="3 3"
@@ -410,7 +411,7 @@ const DealPricesChart: React.FC = () => {
                   {/* Candlesticks */}
                   <Customized component={<Candles />} />
 
-                  {/* Horizontal reference lines (just lines) */}
+                  {/* Horizontal reference lines */}
                   {issuePrice != null && (
                     <ReferenceLine
                       y={issuePrice}
@@ -439,7 +440,7 @@ const DealPricesChart: React.FC = () => {
                     />
                   )}
 
-                  {/* Labels exactly on those lines, inside the plot */}
+                  {/* Labels on those lines */}
                   {issuePrice != null && (
                     <Customized
                       component={
