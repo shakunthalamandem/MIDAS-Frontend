@@ -346,9 +346,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     return (
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
         <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Deal Price Timeseries
-          </Typography>
+          <Typography variant="h6" gutterBottom color="#002060">
+  <strong>Deal Price Timeseries</strong>
+</Typography>
+
+
           <Alert severity="info">
             Select a deal to view its price chart.
           </Alert>
