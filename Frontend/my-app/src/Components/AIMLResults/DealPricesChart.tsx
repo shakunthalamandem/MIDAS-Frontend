@@ -78,6 +78,21 @@ const formatDateLabel = (value: string): string => {
   }).format(d);
 };
 
+const formatFullDate = (value: string): string => {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  }).format(d);
+};
+
+const formatPrice = (value: number | null | undefined): string => {
+  if (value == null || Number.isNaN(value)) return "-";
+  return `$${value.toFixed(2)}`;
+};
+
 const getPolarityFromText = (text?: string): TPredictionPolarity => {
   if (!text) return null;
   const lower = text.toLowerCase();
@@ -94,12 +109,12 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
   return (
     <Paper sx={{ p: 1.5 }}>
       <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-        {formatDateLabel(label)}
+        {formatFullDate(point.date || label)}
       </Typography>
-      <Typography variant="body2">Open: {point.open}</Typography>
-      <Typography variant="body2">High: {point.high}</Typography>
-      <Typography variant="body2">Low: {point.low}</Typography>
-      <Typography variant="body2">Close: {point.close}</Typography>
+      <Typography variant="body2">Open: {formatPrice(point.open)}</Typography>
+      <Typography variant="body2">High: {formatPrice(point.high)}</Typography>
+      <Typography variant="body2">Low: {formatPrice(point.low)}</Typography>
+      <Typography variant="body2">Close: {formatPrice(point.close)}</Typography>
     </Paper>
   );
 };
@@ -178,22 +193,38 @@ const Candles: React.FC<any> = (props) => {
  * - X is at the right edge *inside* the chart
  */
 const HorizontalLineLabel: React.FC<any> = (props) => {
-  const { yValue, text, color, yAxisMap, offset } = props;
+  const {
+    yValue,
+    text,
+    color,
+    yAxisMap,
+    offset,
+    labelYOffset = 0,
+    labelXOffset = 0,
+  } = props;
   if (yValue == null || !yAxisMap || !offset) return null;
 
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
   const y = yScale(yValue); // same coordinates as ReferenceLine
+  if (y == null) return null;
   const xRight = offset.left + offset.width;
+  const yPos = y - 6 + labelYOffset; // lift label off the line for readability
+  const xPos = xRight - 4 + labelXOffset;
 
   return (
     <text
-      x={xRight - 4}
-      y={y - 3}
+      x={xPos}
+      y={yPos}
       textAnchor="end"
       fill={color}
+      stroke="white"
+      strokeWidth={2}
+      paintOrder="stroke"
       fontSize={11}
+      fontWeight={600}
+      pointerEvents="none"
     >
       {text}
     </text>
@@ -351,6 +382,21 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     };
   }, [chartData, issuePrice, stopLoss, t1mPolarity]);
 
+  const stopLossOffset = useMemo(() => {
+    if (issuePrice == null || stopLoss == null) return 0;
+    if (Math.abs(issuePrice - stopLoss) > 1e-6) return 0;
+    const spread =
+      typeof yMax === "number" && typeof yMin === "number" ? yMax - yMin : 0;
+    const offset = spread ? spread * 0.01 : 0.05;
+    return offset || 0.05;
+  }, [issuePrice, stopLoss, yMin, yMax]);
+
+  const issueLineValue: number | undefined =
+    issuePrice != null ? issuePrice : undefined;
+  // Keep stop loss visually below issue price when they are equal
+  const stopLossLineValue: number | undefined =
+    stopLoss != null ? stopLoss - stopLossOffset : undefined;
+
   // If nothing selected yet, show helper message
   if (!hasSelection) {
     return (
@@ -471,7 +517,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   {/* Horizontal reference lines */}
                   {issuePrice != null && (
                     <ReferenceLine
-                      y={issuePrice}
+                      y={issueLineValue}
                       yAxisId="price"
                       stroke="#5B3310"
                       strokeWidth={2.25}
@@ -480,7 +526,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   )}
                   {stopLoss != null && (
                     <ReferenceLine
-                      y={stopLoss}
+                      y={stopLossLineValue}
                       yAxisId="price"
                       stroke="#B00020"
                       strokeWidth={2.25}
@@ -502,9 +548,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                     <Customized
                       component={
                         <HorizontalLineLabel
-                          yValue={issuePrice}
+                          yValue={issueLineValue}
                           text={`Issue Price = ${issuePrice.toFixed(2)}`}
                           color="#000000"
+                          labelYOffset={-6}
+                          labelXOffset={-6}
                         />
                       }
                     />
@@ -513,9 +561,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                     <Customized
                       component={
                         <HorizontalLineLabel
-                          yValue={stopLoss}
+                          yValue={stopLossLineValue}
                           text={`Stop Loss = ${stopLoss.toFixed(2)}`}
                           color="#B00020"
+                          labelYOffset={10}
+                          labelXOffset={-6}
                         />
                       }
                     />
