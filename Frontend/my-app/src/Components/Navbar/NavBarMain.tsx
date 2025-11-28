@@ -255,6 +255,7 @@ const NavbarMain: React.FC = () => {
                   path: "/opportunity/equity",
                 },
                 { label: "Past IPOs & FOs", path: "/opportunity/pastdeals" },
+                { label: "Monashee Daily Report", path: "/opportunity/monashee_daily_report" },
                 {
                   label: "High Yields Market Opportunity",
                   path: "/opportunity/high-yield",
