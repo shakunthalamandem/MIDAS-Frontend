@@ -99,6 +99,7 @@ const MDRDailyPortfolio: React.FC = () => {
       >
         <Typography
           variant="h6"
+          align="center"
           sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
         >
           Daily Portfolio Report

@@ -53,7 +53,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             label="Trade Date"
             type="date"
@@ -65,7 +65,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
           />
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             select
             label="Fund"
@@ -85,7 +85,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
           </TextField>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             select
             label="Asset"
@@ -105,7 +105,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
           </TextField>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <TextField
             select
             label="Region"
@@ -128,7 +128,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
         <Grid
           item
           xs={12}
-          md={12}
+          md={2}
           sx={{
             display: "flex",
             justifyContent: "flex-end",
