@@ -1,6 +1,6 @@
 // MDRDailyPortfolio.tsx
 import React, { useState } from "react";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Container, Paper, Typography } from "@mui/material";
 import MDRDailyPortfolioFilters, {
   FilterState,
 } from "./MDRDailyPortfolioFilters";
@@ -85,6 +85,9 @@ const MDRDailyPortfolio: React.FC = () => {
   };
 
   return (
+    <>
+    <Container maxWidth='xl'>
+
     <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
       <Paper
         elevation={3}
@@ -98,7 +101,7 @@ const MDRDailyPortfolio: React.FC = () => {
           variant="h6"
           sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
         >
-          Daily Portfolio
+          Daily Portfolio Report
         </Typography>
 
         <MDRDailyPortfolioFilters
@@ -122,6 +125,8 @@ const MDRDailyPortfolio: React.FC = () => {
         />
       </Paper>
     </Box>
+    </Container>
+        </>
   );
 };
 
