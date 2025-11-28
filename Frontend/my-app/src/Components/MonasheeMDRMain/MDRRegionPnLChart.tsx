@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Box,
-  useTheme,
-} from "@mui/material";
+import { Card, CardContent, CardHeader, Box } from "@mui/material";
 import {
   LineChart,
   Line,
@@ -19,15 +13,15 @@ import {
 } from "recharts";
 
 export interface RegionPnLPoint {
-  date: string;      // 'YYYY-MM-DD'
-  us: number;        // in millions
-  amerExUs: number;  // in millions
-  apac: number;      // in millions
-  emea: number;      // in millions
-  all: number;       // in millions
+  date: string;           // 'YYYY-MM-DD'
+  us: number;             // in millions
+  nonUsAmerica: number;   // in millions
+  apac: number;           // in millions
+  emea: number;           // in millions
+  all: number;            // in millions
 }
 
-interface RegionPnLChartProps {
+interface MDRRegionPnLChartProps {
   data: RegionPnLPoint[];
 }
 
@@ -37,9 +31,7 @@ const PRIMARY_COLOR = "#002060";
 const formatMillions = (value: number) =>
   `$${value.toFixed(1)}M`;
 
-const RegionPnLChart: React.FC<RegionPnLChartProps> = ({ data }) => {
-  const theme = useTheme();
-
+const MDRRegionPnLChart: React.FC<MDRRegionPnLChartProps> = ({ data }) => {
   return (
     <Box maxWidth="xl" mx="auto">
       <Card
@@ -111,8 +103,8 @@ const RegionPnLChart: React.FC<RegionPnLChartProps> = ({ data }) => {
               />
               <Line
                 type="monotone"
-                dataKey="amerExUs"
-                name="AmerExUS"
+                dataKey="nonUsAmerica"
+                name="Non-US America"
                 stroke="#ff8c00" // orange
                 strokeWidth={2}
                 dot={false}
@@ -149,4 +141,4 @@ const RegionPnLChart: React.FC<RegionPnLChartProps> = ({ data }) => {
   );
 };
 
-export default RegionPnLChart;
+export default MDRRegionPnLChart;

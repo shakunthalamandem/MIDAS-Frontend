@@ -1,6 +1,7 @@
 import React from 'react'
 import MDRDailyPortfolio from './MDRDailyPortfolio'
-import { Typography } from '@mui/material'
+import MDRRegionPnL from './MDRRegionPnL'
+import { Box, Typography } from '@mui/material'
 
 const MonasheeMDRMain = () => {
   return (
@@ -31,6 +32,9 @@ const MonasheeMDRMain = () => {
         Welcome to Monashee Daily Report
       </Typography>
         <MDRDailyPortfolio />
+        <Box mt={2}>
+          <MDRRegionPnL />
+        </Box>
       
     </div>
   )
