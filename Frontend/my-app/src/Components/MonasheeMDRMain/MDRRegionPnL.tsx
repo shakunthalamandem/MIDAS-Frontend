@@ -130,6 +130,13 @@ const MDRRegionPnL: React.FC = () => {
     }
   };
 
+  // load default view immediately
+  useEffect(() => {
+    if (!apiUrl) return;
+    handleApply();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiUrl]);
+
   const handleReset = () => {
     setFilters(initialFilters);
     setData([]);
@@ -153,7 +160,7 @@ const MDRRegionPnL: React.FC = () => {
             align="center"
             sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
           >
-            Regional Cumulative P&L
+            Region wise Cumulative P&L
           </Typography>
 
           <MDRRegionPnLFilters

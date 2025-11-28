@@ -27,9 +27,12 @@ interface MDRRegionPnLChartProps {
 
 const PRIMARY_COLOR = "#002060";
 
-// simple currency formatter ($X.XM)
-const formatMillions = (value: number) =>
-  `$${value.toFixed(1)}M`;
+// format millions with a leading minus for negatives (e.g. -$5.0M)
+const formatMillions = (value: number) => {
+  const abs = Math.abs(value);
+  const formatted = `$${abs.toFixed(1)}M`;
+  return value < 0 ? `-${formatted}` : formatted;
+};
 
 const MDRRegionPnLChart: React.FC<MDRRegionPnLChartProps> = ({ data }) => {
   return (
@@ -42,31 +45,33 @@ const MDRRegionPnLChart: React.FC<MDRRegionPnLChartProps> = ({ data }) => {
         }}
       >
         <CardHeader
-          title="Regional SP&L"
+        
+          title="Region P&L Over Time"
           sx={{
             pb: 0,
             "& .MuiCardHeader-title": {
               fontSize: 16,
               fontWeight: 600,
               color: PRIMARY_COLOR,
+              alignItems: "center",
             },
           }}
         />
         <CardContent sx={{ height: 420, pt: 1 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 10 }}
                 tickMargin={8}
-                // just show month/day like 02/01
-                tickFormatter={(value: string) =>
-                  new Date(value).toLocaleDateString("en-GB", {
+                tickFormatter={(value: string) => {
+                  const d = new Date(value);
+                  return d.toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "2-digit",
-                  })
-                }
+                    year: "numeric",
+                  });
+                }}
               />
               <YAxis
                 tick={{ fontSize: 10 }}
@@ -78,13 +83,14 @@ const MDRRegionPnLChart: React.FC<MDRRegionPnLChartProps> = ({ data }) => {
 
               <Tooltip
                 formatter={(value: number) => formatMillions(value)}
-                labelFormatter={(label) =>
-                  new Date(label).toLocaleDateString("en-GB", {
+                labelFormatter={(label) => {
+                  const d = new Date(label);
+                  return d.toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
-                  })
-                }
+                  });
+                }}
               />
               <Legend
                 verticalAlign="bottom"
