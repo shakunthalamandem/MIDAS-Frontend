@@ -1,6 +1,6 @@
 // MDRDailyPortfolio.tsx
 import React, { useState } from "react";
-import { Box, Container, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import MDRDailyPortfolioFilters, {
   FilterState,
 } from "./MDRDailyPortfolioFilters";
@@ -12,9 +12,9 @@ const PRIMARY_COLOR = "#002060";
 
 const initialFilters: FilterState = {
   tradeDate: "",
-  fund: "",
-  asset: "",
-  region: "",
+  fund: [],   // multi-select
+  asset: [],  // multi-select
+  region: [], // multi-select
 };
 
 const MDRDailyPortfolio: React.FC = () => {
@@ -40,11 +40,12 @@ const MDRDailyPortfolio: React.FC = () => {
       return;
     }
 
+    // 👇 arrays for fund/asset/region
     const payload = {
       trade_date: filters.tradeDate,
-      fund: filters.fund || null,
-      asset: filters.asset || null,
-      region: filters.region || null,
+      fund: filters.fund,     // string[]
+      asset: filters.asset,   // string[]
+      region: filters.region, // string[]
     };
 
     try {
@@ -85,9 +86,6 @@ const MDRDailyPortfolio: React.FC = () => {
   };
 
   return (
-    <>
-    <Container maxWidth='xl'>
-
     <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
       <Paper
         elevation={3}
@@ -99,10 +97,9 @@ const MDRDailyPortfolio: React.FC = () => {
       >
         <Typography
           variant="h6"
-          align="center"
           sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
         >
-          Daily Portfolio Report
+          Daily Portfolio
         </Typography>
 
         <MDRDailyPortfolioFilters
@@ -126,8 +123,6 @@ const MDRDailyPortfolio: React.FC = () => {
         />
       </Paper>
     </Box>
-    </Container>
-        </>
   );
 };
 
