@@ -1,4 +1,3 @@
-// MDRDailyPortfolioTable.tsx
 import React from "react";
 import {
   Paper,
@@ -55,7 +54,6 @@ const MDRDailyPortfolioTable: React.FC<Props> = ({
   loading,
 }) => {
   if (!hasApplied) return null;
-
   return (
     <TableContainer
       component={Paper}
@@ -171,7 +169,7 @@ const MDRDailyPortfolioTable: React.FC<Props> = ({
         </TableHead>
 
         <TableBody>
-          {rows.length === 0 && !loading ? (
+          {rows.length === 1 && !loading ? (
             <TableRow>
               <TableCell colSpan={18} align="center">
                 No data available for selected filters.

@@ -164,7 +164,7 @@ const MDRDailyPortfolio: React.FC = () => {
       }
 
       const data = await response.json();
-      const rawRows: any[] = Array.isArray(data) ? data : data.results || [];
+      const rawRows: any[] = Array.isArray(data) ? data : data.daily_portfolio || [];
       const portfolioRows: MDRDailyPortfolioRow[] = rawRows.map(normalizeRow);
 
       setRows(portfolioRows);
