@@ -44,19 +44,7 @@ const MDRRegionPnLChart: React.FC<MDRRegionPnLChartProps> = ({ data }) => {
           backgroundColor: "#ffffff",
         }}
       >
-        <CardHeader
-        
-          title="Region P&L Over Time"
-          sx={{
-            pb: 0,
-            "& .MuiCardHeader-title": {
-              fontSize: 16,
-              fontWeight: 600,
-              color: PRIMARY_COLOR,
-              alignItems: "center",
-            },
-          }}
-        />
+
         <CardContent sx={{ height: 420, pt: 1 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
