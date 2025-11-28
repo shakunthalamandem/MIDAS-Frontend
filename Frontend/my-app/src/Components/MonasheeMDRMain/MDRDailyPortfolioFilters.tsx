@@ -7,17 +7,26 @@ import {
   MenuItem,
   Button,
   CircularProgress,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 
 export interface FilterState {
   tradeDate: string;
-  fund: string[];   // multi-select
-  asset: string[];  // multi-select
-  region: string[]; // multi-select
+  fund: string[];
+  asset: string[];
+  region: string[];
+}
+
+export interface FilterOptions {
+  fund: string[];
+  assetTypes: string[];
+  regions: string[];
 }
 
 interface Props {
   filters: FilterState;
+  filterOptions: FilterOptions;
   onChange: (updated: Partial<FilterState>) => void;
   onApply: () => void;
   onReset: () => void;
@@ -26,13 +35,9 @@ interface Props {
 
 const PRIMARY_COLOR = "#002060";
 
-// replace these with real options from your API if needed
-const fundOptions = ["Fund A", "Fund B", "Fund C"];
-const assetOptions = ["Equity", "Fixed Income", "Derivatives"];
-const regionOptions = ["APAC", "EMEA", "Americas"];
-
 const MDRDailyPortfolioFilters: React.FC<Props> = ({
   filters,
+  filterOptions,
   onChange,
   onApply,
   onReset,
@@ -42,45 +47,53 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
     onChange({ tradeDate: event.target.value });
   };
 
-  // Generic handler for multi-select TextFields
   const handleMultiSelectChange =
     (field: "fund" | "asset" | "region") =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const {
-        target: { value },
-      } = event;
-
-      const arrayValue =
-        typeof value === "string" ? value.split(",") : (value as string[]);
-
+      const value = event.target.value;
+      const arrayValue = typeof value === "string" ? value.split(",") : value;
       onChange({ [field]: arrayValue } as Partial<FilterState>);
     };
 
+  const renderSelected = (selected: unknown) => {
+    const arr = selected as string[];
+    if (!arr || arr.length === 0) return "All";
+    return arr.join(", ");
+  };
+
   return (
     <Box
+      maxWidth="xl"
       sx={{
-        mb: 3,
+        mb: 2,
         p: 2,
         borderRadius: 2,
         backgroundColor: "#f0f3ff",
+        fontSize: "12px",
       }}
     >
-      <Grid container spacing={2}>
-        {/* Trade Date */}
-        <Grid item xs={12} md={3}>
+      <Grid
+        container
+        spacing={2}
+        alignItems="center"
+        sx={{ fontSize: "12px" }}
+      >
+        {/* TRADE DATE */}
+        <Grid item xs={12} md={2.4}>
           <TextField
             label="Trade Date"
             type="date"
             value={filters.tradeDate}
             onChange={handleDateChange}
             fullWidth
-            InputLabelProps={{ shrink: true }}
             size="small"
+            InputLabelProps={{ shrink: true }}
+            sx={{ fontSize: "12px" }}
           />
         </Grid>
 
-        {/* Fund (multi-select) */}
-        <Grid item xs={12} md={3}>
+        {/* FUND */}
+        <Grid item xs={12} md={2.4}>
           <TextField
             select
             label="Fund"
@@ -90,22 +103,21 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
             size="small"
             SelectProps={{
               multiple: true,
-              renderValue: (selected) =>
-                (selected as string[]).length === 0
-                  ? "All"
-                  : (selected as string[]).join(", "),
+              renderValue: renderSelected,
             }}
+            sx={{ fontSize: "12px" }}
           >
-            {fundOptions.map((f) => (
+            {filterOptions.fund.map((f) => (
               <MenuItem key={f} value={f}>
-                {f}
+                <Checkbox size="small" checked={filters.fund.includes(f)} />
+                <ListItemText primary={f} />
               </MenuItem>
             ))}
           </TextField>
         </Grid>
 
-        {/* Asset (multi-select) */}
-        <Grid item xs={12} md={3}>
+        {/* ASSET TYPE */}
+        <Grid item xs={12} md={2.4}>
           <TextField
             select
             label="Asset"
@@ -115,22 +127,21 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
             size="small"
             SelectProps={{
               multiple: true,
-              renderValue: (selected) =>
-                (selected as string[]).length === 0
-                  ? "All"
-                  : (selected as string[]).join(", "),
+              renderValue: renderSelected,
             }}
+            sx={{ fontSize: "12px" }}
           >
-            {assetOptions.map((a) => (
+            {filterOptions.assetTypes.map((a) => (
               <MenuItem key={a} value={a}>
-                {a}
+                <Checkbox size="small" checked={filters.asset.includes(a)} />
+                <ListItemText primary={a} />
               </MenuItem>
             ))}
           </TextField>
         </Grid>
 
-        {/* Region (multi-select) */}
-        <Grid item xs={12} md={3}>
+        {/* REGION */}
+        <Grid item xs={12} md={2.4}>
           <TextField
             select
             label="Region"
@@ -140,31 +151,25 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
             size="small"
             SelectProps={{
               multiple: true,
-              renderValue: (selected) =>
-                (selected as string[]).length === 0
-                  ? "All"
-                  : (selected as string[]).join(", "),
+              renderValue: renderSelected,
             }}
+            sx={{ fontSize: "12px" }}
           >
-            {regionOptions.map((r) => (
+            {filterOptions.regions.map((r) => (
               <MenuItem key={r} value={r}>
-                {r}
+                <Checkbox size="small" checked={filters.region.includes(r)} />
+                <ListItemText primary={r} />
               </MenuItem>
             ))}
           </TextField>
         </Grid>
 
-        {/* Buttons */}
+        {/* APPLY + RESET (same row) */}
         <Grid
           item
           xs={12}
-          md={12}
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 2,
-            mt: 1,
-          }}
+          md={2.4}
+          sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}
         >
           <Button
             variant="outlined"
@@ -173,28 +178,27 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
               textTransform: "none",
               borderColor: PRIMARY_COLOR,
               color: PRIMARY_COLOR,
-              "&:hover": {
-                borderColor: PRIMARY_COLOR,
-                backgroundColor: "rgba(0,32,96,0.05)",
-              },
+              fontSize: "12px",
+              minWidth: "70px",
             }}
           >
             Reset
           </Button>
+
           <Button
             variant="contained"
             onClick={onApply}
+            disabled={!filters.tradeDate || loading}
             sx={{
               textTransform: "none",
               backgroundColor: PRIMARY_COLOR,
-              "&:hover": {
-                backgroundColor: "#001540",
-              },
+              "&:hover": { backgroundColor: "#001540" },
+              fontSize: "12px",
+              minWidth: "70px",
             }}
-            disabled={!filters.tradeDate || loading}
           >
             {loading ? (
-              <CircularProgress size={20} sx={{ color: "#ffffff" }} />
+              <CircularProgress size={16} sx={{ color: "#ffffff" }} />
             ) : (
               "Apply"
             )}

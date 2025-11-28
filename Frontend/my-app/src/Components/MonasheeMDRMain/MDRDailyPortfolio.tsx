@@ -1,8 +1,9 @@
 // MDRDailyPortfolio.tsx
-import React, { useState } from "react";
-import { Box, Paper, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Container, Paper, Typography } from "@mui/material";
 import MDRDailyPortfolioFilters, {
   FilterState,
+  FilterOptions,
 } from "./MDRDailyPortfolioFilters";
 import MDRDailyPortfolioTable, {
   MDRDailyPortfolioRow,
@@ -24,12 +25,111 @@ const MDRDailyPortfolio: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasApplied, setHasApplied] = useState(false);
 
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    fund: [],
+    assetTypes: [],
+    regions: [],
+  });
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   const handleFiltersChange = (updated: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...updated }));
   };
+
+  // 🔹 Fetch distinct filter values from daily_trades_filters (GET)
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      if (!apiUrl) {
+        setError("API URL is not defined in environment variables");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${apiUrl}/api/daily_trades_filters/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Failed to fetch filter options");
+        }
+
+        const data = await response.json();
+        // data shape:
+        // {
+        //   fund: [...],
+        //   asset_type: [...],
+        //   deal_type: [...],    // ignored
+        //   broad_region: [...]
+        // }
+
+        setFilterOptions({
+          fund: data.fund || [],
+          assetTypes: data.asset_type || [],
+          regions: data.broad_region || [],
+        });
+      } catch (err: any) {
+        console.error(err);
+        // don't block the main page, just show error
+        setError(err.message || "Failed to load filter options");
+      }
+    };
+
+    fetchFilterOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiUrl]); // run once when apiUrl is available
+
+  const toNumber = (value: any, fallback = 0) => {
+    if (value === null || value === undefined || value === "") return fallback;
+    const cleaned =
+      typeof value === "string"
+        ? value.replace(/[% ,]/g, "")
+        : value;
+    const num = Number(cleaned);
+    return Number.isNaN(num) ? fallback : num;
+  };
+
+  const toNullableNumber = (value: any) => {
+    if (value === null || value === undefined || value === "") return null;
+    const cleaned =
+      typeof value === "string"
+        ? value.replace(/[% ,]/g, "")
+        : value;
+    const num = Number(cleaned);
+    return Number.isNaN(num) ? null : num;
+  };
+
+  const normalizeRow = (item: any): MDRDailyPortfolioRow => ({
+    ticker: item.ticker ?? "",
+    type: item.type ?? "",
+    deal_cap: item.deal_cap ?? "",
+    days_held: toNumber(item.days_held),
+    current_shares: toNumber(item.current_shares),
+    current_exposure: toNumber(item.current_exposure),
+    max_pct: toNumber(item.max_pct ?? item["%max"]),
+    gross_pct: toNumber(item.gross_pct ?? item["gross%"]),
+    excess_return_pct: toNumber(
+      item.excess_return_pct ?? item["excess_return%"]
+    ),
+    dtd_pnl: toNumber(item.dtd_pnl),
+    cumulative_gross_pnl: toNumber(item.cumulative_gross_pnl),
+    cumulative_net_pnl: toNumber(item.cumulative_net_pnl),
+    issue_price: toNumber(item.issue_price),
+    avg_in_price: toNumber(item.avg_in_price),
+    avg_exit_price: toNullableNumber(item.avg_exit_price),
+    current_price: toNullableNumber(item.current_price),
+    ultimate_stop: toNullableNumber(item.ultimate_stop),
+    target_price: toNullableNumber(item.target_price),
+  });
 
   const handleApply = async () => {
     setHasApplied(true);
@@ -40,7 +140,6 @@ const MDRDailyPortfolio: React.FC = () => {
       return;
     }
 
-    // 👇 arrays for fund/asset/region
     const payload = {
       trade_date: filters.tradeDate,
       fund: filters.fund,     // string[]
@@ -65,8 +164,8 @@ const MDRDailyPortfolio: React.FC = () => {
       }
 
       const data = await response.json();
-      const portfolioRows: MDRDailyPortfolioRow[] =
-        Array.isArray(data) ? data : data.results || [];
+      const rawRows: any[] = Array.isArray(data) ? data : data.results || [];
+      const portfolioRows: MDRDailyPortfolioRow[] = rawRows.map(normalizeRow);
 
       setRows(portfolioRows);
     } catch (err: any) {
@@ -86,6 +185,8 @@ const MDRDailyPortfolio: React.FC = () => {
   };
 
   return (
+    <>
+    <Container maxWidth="xl">
     <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
       <Paper
         elevation={3}
@@ -97,13 +198,15 @@ const MDRDailyPortfolio: React.FC = () => {
       >
         <Typography
           variant="h6"
+          align="center"
           sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
         >
-          Daily Portfolio
+          Daily Portfolio Report
         </Typography>
 
         <MDRDailyPortfolioFilters
           filters={filters}
+          filterOptions={filterOptions}
           onChange={handleFiltersChange}
           onApply={handleApply}
           onReset={handleReset}
@@ -123,6 +226,8 @@ const MDRDailyPortfolio: React.FC = () => {
         />
       </Paper>
     </Box>
+    </Container>
+    </>
   );
 };
 
