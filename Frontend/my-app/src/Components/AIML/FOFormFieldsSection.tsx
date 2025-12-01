@@ -43,13 +43,13 @@ interface FOFormValues {
   revenue_category: string; // e.g. in $M
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // "Negative" | "Positive"
-  issue_price: number;
-  issue_to_pre_day_close_return_category: number; // %
-  t1d_open_return_category: number | null; // %
-  t1d_return_from_bloomberg_category: number | null; // %
+  issue_price: number | string;
+  issue_to_pre_day_close_return_category: number | string; // %
+  t1d_open_return_category: number | string | null; // %
+  t1d_return_from_bloomberg_category: number | string | null; // %
 
   // NEW: T-1D close price
-  t1d_close_price_category: number; // $
+  t1d_close_price_category: number | string; // $
 
   // create new record flag
   request_from: string;
@@ -102,7 +102,33 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
   };
 
   /**
+   * Safer numeric parser that respects intermediate states
+   * (e.g. "-", "1.", "") so typing feels smooth.
+   */
+  const parseNum = (v: any): number | null => {
+    if (v === "" || v === null || v === undefined) return null;
+    const str = String(v).trim();
+
+    // Allow intermediate states while user is typing
+    if (
+      str === "-" ||
+      str === "+" ||
+      str.endsWith(".") ||
+      str === "." ||
+      str === "-." ||
+      str === "+."
+    ) {
+      return null;
+    }
+
+    const n = Number(str);
+    return Number.isNaN(n) ? null : n;
+  };
+
+  /**
    * Central handler to support auto-calculation behavior.
+   * Uses "next" values instead of stale props to avoid
+   * 1-step lag / misbehaviour.
    */
   const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -111,52 +137,53 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
     // First, notify parent about the direct change
     onChange(e);
 
-    // Parse numbers safely
-    const parseNum = (v: any): number | null => {
-      if (v === "" || v === null || v === undefined) return null;
-      const n = Number(v);
-      return Number.isNaN(n) ? null : n;
-    };
+    // Compute "next" values as if parent has already updated
+    const currentIssuePriceRaw =
+      fieldName === "issue_price" ? value : values.issue_price;
+    const currentT1CloseRaw =
+      fieldName === "t1d_close_price_category"
+        ? value
+        : values.t1d_close_price_category;
+    const currentChangePctRaw =
+      fieldName === "issue_to_pre_day_close_return_category"
+        ? value
+        : values.issue_to_pre_day_close_return_category;
 
-    const issuePrice = parseNum(values.issue_price);
+    const issuePrice = parseNum(currentIssuePriceRaw);
+    const t1Close = parseNum(currentT1CloseRaw);
+    const changePct = parseNum(currentChangePctRaw);
 
     // 1) If user changes T-1D close price or Issue Price => recompute change %
     if (
       (fieldName === "t1d_close_price_category" ||
         fieldName === "issue_price") &&
       issuePrice !== null &&
-      issuePrice > 0
+      issuePrice > 0 &&
+      t1Close !== null
     ) {
-      const t1Close =
-        fieldName === "t1d_close_price_category"
-          ? parseNum(value)
-          : parseNum(values.t1d_close_price_category);
+      // ((T-1D Close / Issue Price) - 1) * 100
+      const change = (t1Close / issuePrice - 1) * 100;
+      const rounded = Number.isFinite(change)
+        ? Number(change.toFixed(2))
+        : "";
 
-      if (t1Close !== null) {
-        // ((T-1D Close / Issue Price) - 1) * 100
-        const changePct = (t1Close / issuePrice - 1) * 100;
-        triggerValueChange(
-          "issue_to_pre_day_close_return_category",
-          Number.isFinite(changePct) ? Number(changePct.toFixed(2)) : ""
-        );
-      }
+      triggerValueChange("issue_to_pre_day_close_return_category", rounded);
     }
 
     // 2) If user changes change % => recompute T-1D close price
     if (
       fieldName === "issue_to_pre_day_close_return_category" &&
       issuePrice !== null &&
-      issuePrice > 0
+      issuePrice > 0 &&
+      changePct !== null
     ) {
-      const changePct = parseNum(value);
-      if (changePct !== null) {
-        // From ((C / I) - 1) * 100 = r  =>  C = I * (1 + r/100)
-        const t1Close = issuePrice * (1 + changePct / 100);
-        triggerValueChange(
-          "t1d_close_price_category",
-          Number.isFinite(t1Close) ? Number(t1Close.toFixed(2)) : ""
-        );
-      }
+      // From ((C / I) - 1) * 100 = r  =>  C = I * (1 + r/100)
+      const computedClose = issuePrice * (1 + changePct / 100);
+      const rounded = Number.isFinite(computedClose)
+        ? Number(computedClose.toFixed(2))
+        : "";
+
+      triggerValueChange("t1d_close_price_category", rounded);
     }
   };
 
@@ -276,7 +303,10 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
             },
           }}
         >
-          <IconButton size="small" sx={{ verticalAlign: "middle" }}>
+          <IconButton
+            size="small"
+            sx={{ verticalAlign: "middle", color: "primary.main" }}
+          >
             <InfoOutlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -305,12 +335,15 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
 
   // ---- RENDER HELPERS ----
 
-  const renderField = (field: FieldConfig, index: number, total: number) => {
-    const value = values[field.name] ?? "";
-    const isLastSingle = index === total - 1 && total % 2 === 1;
+  const renderField = (field: FieldConfig) => {
+    const rawValue = values[field.name] ?? "";
+    const value =
+      field.type === "date" && rawValue
+        ? new Date(rawValue as any).toISOString().split("T")[0]
+        : rawValue;
 
     return (
-      <Grid item xs={12} sm={isLastSingle ? 12 : 6} key={String(field.name)}>
+      <Grid item xs={12} sm={6} key={String(field.name)}>
         <Box
           sx={{
             display: "flex",
@@ -323,8 +356,8 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
             sx={{
               display: "flex",
               alignItems: "center",
-              width: { xs: "100%", sm: "180px", md: "200px" },
-              minWidth: { sm: "180px", md: "200px" },
+              width: { xs: "100%", sm: "190px", md: "210px" },
+              minWidth: { sm: "190px", md: "210px" },
             }}
           >
             <Typography component="span" sx={{ fontWeight: 500 }}>
@@ -367,11 +400,7 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
               size="small"
               name={String(field.name)}
               type={field.type || "text"}
-              value={
-                field.type === "date" && value
-                  ? new Date(value as any).toISOString().split("T")[0]
-                  : value
-              }
+              value={value}
               onChange={handleFieldChange}
               placeholder={field.placeholder}
               disabled={!!field.disabled}
@@ -407,42 +436,63 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
   }> = ({ title, fields }) => (
     <Grid item xs={12}>
       <Box
-        sx={{
+        sx={(theme) => ({
           borderRadius: 2,
-          p: 2.5,
+          p: 2,
           border: "1px solid",
-          borderColor: "divider",
-          backgroundColor: (theme) =>
+          borderColor:
             theme.palette.mode === "light"
-              ? theme.palette.grey[50]
-              : theme.palette.background.paper,
-          boxShadow: 1,
-        }}
+              ? "rgba(25,118,210,0.25)"
+              : "rgba(144,202,249,0.3)",
+          background:
+            theme.palette.mode === "light"
+              ? "linear-gradient(135deg,#f3f6ff 0%,#ffffff 55%,#e3f2fd 100%)"
+              : "linear-gradient(135deg,#0f172a 0%,#020617 50%,#0b1120 100%)",
+          boxShadow:
+            theme.palette.mode === "light"
+              ? "0 4px 14px rgba(15,23,42,0.08)"
+              : "0 6px 18px rgba(0,0,0,0.6)",
+          transition: "transform 120ms ease-out, box-shadow 120ms ease-out",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow:
+              theme.palette.mode === "light"
+                ? "0 8px 22px rgba(15,23,42,0.12)"
+                : "0 10px 26px rgba(0,0,0,0.8)",
+          },
+        })}
       >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
+            justifyContent: "center",
+            alignItems: "center",
             mb: 2,
           }}
         >
-          <Box>
-            <Typography variant="subtitle1" fontWeight={600}>
-              {title}
-            </Typography>
-          </Box>
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            sx={{
+              textAlign: "center",
+              textTransform: "uppercase",
+              letterSpacing: 0.8,
+              color: "primary.main",
+            }}
+          >
+            {title}
+          </Typography>
         </Box>
 
-        <Grid container spacing={2}>
-          {fields.map((field, idx) => renderField(field, idx, fields.length))}
+        <Grid container spacing={1.5}>
+          {fields.map((field) => renderField(field))}
         </Grid>
       </Box>
     </Grid>
   );
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={2}>
       <Section title="Deal Overview" fields={dealOverviewFields} />
       <Section
         title="Deal & Allocation Parameters"
