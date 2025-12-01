@@ -65,6 +65,7 @@ interface FOFormValues {
   revenue_category: string; // e.g. in $M
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // %
+  issue_price: number;
   issue_to_pre_day_close_return_category: number; // %
   t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // %
@@ -379,6 +380,7 @@ const FOForm: React.FC<FOFormProps> = ({
       revenue_category: "",
       revenue_growth_category: "",
       net_profit_margin_category: "",
+      issue_price: 0,
       issue_to_pre_day_close_return_category: 0,
       t1d_open_return_category: null,
       t1d_return_from_bloomberg_category: null,

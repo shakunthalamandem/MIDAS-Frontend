@@ -43,6 +43,7 @@ interface FOFormValues {
   revenue_category: string; // e.g. in $M
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // %
+  issue_price: number;
   issue_to_pre_day_close_return_category: number; // %
   t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // %
@@ -108,6 +109,13 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
       label: "Sponsor (Y/N)",
       name: "sponsor_yn_category",
       selectOptions: options.sponsor,
+    },
+    {
+      label: "Issue Price ($)",
+      name: "issue_price",
+      type: "number",
+      adornment: "$",
+      placeholder: "e.g., 30",
     },
     {
       label: "Discount from Announcement Price (%)",
