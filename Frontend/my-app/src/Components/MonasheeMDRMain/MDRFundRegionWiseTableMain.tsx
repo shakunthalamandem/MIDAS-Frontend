@@ -170,11 +170,11 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
     setError(null);
   };
 
-  const formatPnL = (num: number) =>
-    num?.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  // 🔹 ROUND OFF values (no decimals)
+  const formatPnL = (num: number) => {
+    if (num === null || num === undefined) return "";
+    return Math.round(num).toLocaleString(undefined);
+  };
 
   const pnlColor = (v: number) =>
     v < 0 ? "#d32f2f" : v > 0 ? "#2e7d32" : undefined;
@@ -366,7 +366,7 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
             </Box>
           )}
 
-          
+
           <Grid container spacing={2}>
             {hasApplied && !loading && data.length === 0 && (
               <Typography variant="body2" sx={{ ml: 2, mt: 1 }}>
