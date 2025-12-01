@@ -74,7 +74,7 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
     setFilters((prev: FundRegionFilterState) => ({ ...prev, ...updated }));
   };
 
-  // 🔹 Load Asset Types from daily_trades_filters
+  // 🔹 Load Asset Types
   useEffect(() => {
     const loadFilters = async () => {
       if (!apiUrl) {
@@ -112,7 +112,7 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
     loadFilters();
   }, [apiUrl, token]);
 
-  // 🔹 Fetch Region / Fund Net Hedge PnL
+  // 🔹 Fetch Region/Fund Net Hedge PnL
   const handleApply = async () => {
     setHasApplied(true);
     setError(null);
@@ -179,6 +179,156 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
   const pnlColor = (v: number) =>
     v < 0 ? "#d32f2f" : v > 0 ? "#2e7d32" : undefined;
 
+  // 🔹 Split normal funds vs "Total" overall fund
+  const normalFunds = data.filter(
+    (f) => f.fund.toLowerCase() !== "total"
+  );
+  const totalFund = data.find((f) => f.fund.toLowerCase() === "total");
+
+  // Helper – one card with a single table (Region rows + Total row)
+  const renderFundCard = (fund: FundBlock) => (
+    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+      <CardContent sx={{ p: 1.5 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 600,
+            mb: 1,
+            textAlign: "center",
+          }}
+        >
+          {fund.fund}
+        </Typography>
+
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{ border: "1px solid #ccc", overflowX: "hidden" }}
+        >
+          <Table
+            size="small"
+            sx={{ tableLayout: "fixed", width: "100%" }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    width: "34%",
+                    fontWeight: 700,
+                    color: "#002060",
+                    backgroundColor: "#f0f3ff",
+                    borderRight: "1px solid #ccc",
+                    borderBottom: "1px solid #ccc",
+                    padding: "4px 8px",
+                  }}
+                >
+                  Region
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    width: "22%",
+                    fontWeight: 700,
+                    color: "#002060",
+                    backgroundColor: "#f0f3ff",
+                    borderBottom: "1px solid #ccc",
+                    padding: "4px 8px",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  DTD
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    width: "22%",
+                    fontWeight: 700,
+                    color: "#002060",
+                    backgroundColor: "#f0f3ff",
+                    borderBottom: "1px solid #ccc",
+                    padding: "4px 8px",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  MTD
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    width: "22%",
+                    fontWeight: 700,
+                    color: "#002060",
+                    backgroundColor: "#f0f3ff",
+                    borderBottom: "1px solid #ccc",
+                    padding: "4px 8px",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  YTD
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {fund.rows.map((row) => (
+                <TableRow key={row.region}>
+                  <TableCell
+                    sx={{
+                      width: "34%",
+                      fontWeight:
+                        row.region.toLowerCase() === "total" ? 700 : 400,
+                      borderRight: "1px solid #ccc",
+                      borderBottom: "1px solid #eee",
+                      padding: "4px 8px",
+                    }}
+                  >
+                    {row.region}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      width: "22%",
+                      color: pnlColor(row.dtd),
+                      borderBottom: "1px solid #eee",
+                      padding: "4px 8px",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {formatPnL(row.dtd)}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      width: "22%",
+                      color: pnlColor(row.mtd),
+                      borderBottom: "1px solid #eee",
+                      padding: "4px 8px",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {formatPnL(row.mtd)}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      width: "22%",
+                      color: pnlColor(row.ytd),
+                      borderBottom: "1px solid #eee",
+                      padding: "4px 8px",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {formatPnL(row.ytd)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <Container maxWidth="xl">
       <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
@@ -191,7 +341,8 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
             align="center"
             sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
           >
-            Region / Fund wise P&amp;L (Net of Hedge, Net of FX, before fees and expenses)
+            Region / Fund wise P&amp;L (Net of Hedge, Net of FX, before fees and
+            expenses)
           </Typography>
 
           <MDRFundRegionWiseFilters
@@ -215,21 +366,7 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
             </Box>
           )}
 
-          {/* {meta && (
-            <Typography sx={{ mb: 2 }} variant="body2">
-              Period: <strong>{meta.start_date}</strong> –{" "}
-              <strong>{meta.end_date}</strong> | As of:{" "}
-              <strong>{meta.as_of_date}</strong>
-              {meta.assets && meta.assets.length > 0 && (
-                <>
-                  {" "}
-                  | Assets: <strong>{meta.assets.join(", ")}</strong>
-                </>
-              )}
-            </Typography>
-          )} */}
-
-          {/* tables */}
+          
           <Grid container spacing={2}>
             {hasApplied && !loading && data.length === 0 && (
               <Typography variant="body2" sx={{ ml: 2, mt: 1 }}>
@@ -237,123 +374,19 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
               </Typography>
             )}
 
-            {data.map((fund) => (
-              <Grid item xs={12} md={6} key={fund.fund}>
-                <Card variant="outlined" sx={{ borderRadius: 2 }}>
-                  <CardContent sx={{ p: 1.5 }}>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                      {fund.fund}
-                    </Typography>
-
-                    <TableContainer
-                      component={Paper}
-                      elevation={0}
-                      sx={{ border: "1px solid #ccc" }}
-                    >
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell
-                              sx={{
-                                fontWeight: 700,
-                                color: "#002060",
-                                backgroundColor: "#f0f3ff",
-                                borderRight: "1px solid #ccc",
-                                borderBottom: "1px solid #ccc",
-                              }}
-                            >
-                              Region
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{
-                                fontWeight: 700,
-                                color: "#002060",
-                                backgroundColor: "#f0f3ff",
-                                borderBottom: "1px solid #ccc",
-                              }}
-                            >
-                              DTD
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{
-                                fontWeight: 700,
-                                color: "#002060",
-                                backgroundColor: "#f0f3ff",
-                                borderBottom: "1px solid #ccc",
-                              }}
-                            >
-                              MTD
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{
-                                fontWeight: 700,
-                                color: "#002060",
-                                backgroundColor: "#f0f3ff",
-                                borderBottom: "1px solid #ccc",
-                              }}
-                            >
-                              YTD
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-                          {fund.rows.map((row) => (
-                            <TableRow key={row.region}>
-                              <TableCell
-                                sx={{
-                                  fontWeight:
-                                    row.region.toLowerCase() === "total"
-                                      ? 700
-                                      : 400,
-                                  borderRight: "1px solid #ccc", // region side border
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {row.region}
-                              </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{
-                                  color: pnlColor(row.dtd),
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {formatPnL(row.dtd)}
-                              </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{
-                                  color: pnlColor(row.mtd),
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {formatPnL(row.mtd)}
-                              </TableCell>
-                              <TableCell
-                                align="right"
-                                sx={{
-                                  color: pnlColor(row.ytd),
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {formatPnL(row.ytd)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </CardContent>
-                </Card>
+            {/* 3-per-row normal funds */}
+            {normalFunds.map((fund) => (
+              <Grid item xs={12} md={4} key={fund.fund}>
+                {renderFundCard(fund)}
               </Grid>
             ))}
+
+            {/* Total fund in its own smaller row, centered */}
+            {totalFund && (
+              <Grid item xs={12} md={8} lg={6} sx={{ mx: "auto" }}>
+                {renderFundCard(totalFund)}
+              </Grid>
+            )}
           </Grid>
         </Paper>
       </Box>

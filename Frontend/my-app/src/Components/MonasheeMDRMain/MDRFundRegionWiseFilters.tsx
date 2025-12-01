@@ -5,10 +5,12 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Chip,
   FormControl,
   Grid,
   InputLabel,
+  ListItemText,
   MenuItem,
   OutlinedInput,
   Select,
@@ -56,13 +58,15 @@ const MDRFundRegionWiseFilters: React.FC<Props> = ({
     onChange({ asset: arr });
   };
 
+  const isSelected = (value: string) => filters.asset.indexOf(value) > -1;
+
   return (
     <Card
       variant="outlined"
       sx={{
         mb: 3,
         borderRadius: 3,
-        backgroundColor: "#f0f3ff", // filters background
+        backgroundColor: "#f0f3ff",
       }}
     >
       <CardContent>
@@ -113,7 +117,12 @@ const MDRFundRegionWiseFilters: React.FC<Props> = ({
               >
                 {filterOptions.assetTypes.map((a) => (
                   <MenuItem key={a} value={a}>
-                    {a}
+                    <Checkbox
+                      size="small"
+                      checked={isSelected(a)}
+                      sx={{ mr: 1 }}
+                    />
+                    <ListItemText primary={a} />
                   </MenuItem>
                 ))}
               </Select>
