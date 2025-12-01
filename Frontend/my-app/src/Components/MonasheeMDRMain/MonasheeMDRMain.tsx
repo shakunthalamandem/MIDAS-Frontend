@@ -2,6 +2,7 @@ import React from 'react'
 import MDRDailyPortfolio from './MDRDailyPortfolio'
 import MDRRegionPnL from './MDRRegionPnL'
 import { Box, Typography } from '@mui/material'
+import MDRFundRegionWiseTableMain from './MDRFundRegionWiseTableMain'
 
 const MonasheeMDRMain = () => {
   return (
@@ -34,6 +35,10 @@ const MonasheeMDRMain = () => {
         <MDRDailyPortfolio />
         <Box mt={2}>
           <MDRRegionPnL />
+        </Box>
+
+        <Box mt={2}>
+          <MDRFundRegionWiseTableMain />
         </Box>
       
     </div>
