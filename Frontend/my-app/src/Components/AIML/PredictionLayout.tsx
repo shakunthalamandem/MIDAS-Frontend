@@ -45,6 +45,7 @@ const defaultFOValues = {
   revenue_growth_category: "",
   net_profit_margin_category: "",
   issue_price: 0,
+  t1d_close_price_category: 0,
   issue_to_pre_day_close_return_category: 0,
   t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
@@ -158,6 +159,10 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         issue_price:
           item.issue_price != null
             ? Number(item.issue_price)
+            : 0,
+        t1d_close_price_category:
+          item.t1d_close_price_category != null
+            ? Number(item.t1d_close_price_category)
             : 0,
         issue_to_pre_day_close_return_category:
           item.issue_to_previous_day_close != null
