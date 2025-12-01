@@ -159,7 +159,7 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
       label: "Revenue Growth (%)",
       name: "revenue_growth_category",
       type: "number",
-      adornment: "%",
+      adornment: "%", 
       placeholder: "e.g., 15",
     },
     {
@@ -169,25 +169,17 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
     },
   ];
 
-  const renderField = (field: FieldConfig, index: number, total: number) => {
+  const renderField = (field: FieldConfig) => {
     const rawValue = values[field.name];
-    const value = rawValue ?? "";
-    const isLastSingle = index === total - 1 && total % 2 === 1;
+    const baseValue = rawValue ?? "";
 
-    // Format date inputs for the text field while ensuring the raw value is a valid date-compatible type.
     const displayValue =
-      field.type === "date" &&
-      rawValue &&
-      (typeof rawValue === "string" ||
-        typeof rawValue === "number" ||
-        rawValue instanceof Date)
-        ? new Date(rawValue as string | number | Date)
-            .toISOString()
-            .split("T")[0]
-        : value;
+      field.type === "date" && rawValue
+        ? new Date(rawValue as any).toISOString().split("T")[0]
+        : baseValue;
 
     return (
-      <Grid item xs={12} sm={isLastSingle ? 12 : 6} key={String(field.name)}>
+      <Grid item xs={12} sm={6} key={String(field.name)}>
         <Box
           sx={{
             display: "flex",
@@ -198,8 +190,8 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
         >
           <Typography
             sx={{
-              width: { xs: "100%", sm: "180px", md: "200px" },
-              minWidth: { sm: "180px", md: "200px" },
+              width: { xs: "100%", sm: "190px", md: "210px" },
+              minWidth: { sm: "190px", md: "210px" },
               fontWeight: 500,
             }}
           >
@@ -211,7 +203,7 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
               select
               size="small"
               name={String(field.name)}
-              value={value}
+              value={baseValue}
               onChange={onChange}
               disabled={!!field.disabled}
               error={!!formErrors[String(field.name)]}
@@ -275,47 +267,63 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
   }> = ({ title, fields }) => (
     <Grid item xs={12}>
       <Box
-        sx={{
+        sx={(theme) => ({
           borderRadius: 2,
-          p: 2.5,
+          p: 2,
           border: "1px solid",
-          borderColor: "divider",
-          backgroundColor: (theme) =>
+          borderColor:
             theme.palette.mode === "light"
-              ? theme.palette.grey[50]
-              : theme.palette.background.paper,
-          boxShadow: 1,
-        }}
+              ? "rgba(25,118,210,0.25)"
+              : "rgba(144,202,249,0.3)",
+          background:
+            theme.palette.mode === "light"
+              ? "linear-gradient(135deg,#f3f6ff 0%,#ffffff 55%,#e3f2fd 100%)"
+              : "linear-gradient(135deg,#0f172a 0%,#020617 50%,#0b1120 100%)",
+          boxShadow:
+            theme.palette.mode === "light"
+              ? "0 4px 14px rgba(15,23,42,0.08)"
+              : "0 6px 18px rgba(0,0,0,0.6)",
+          transition: "transform 120ms ease-out, box-shadow 120ms ease-out",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow:
+              theme.palette.mode === "light"
+                ? "0 8px 22px rgba(15,23,42,0.12)"
+                : "0 10px 26px rgba(0,0,0,0.8)",
+          },
+        })}
       >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
+            justifyContent: "center",
+            alignItems: "center",
             mb: 2,
           }}
         >
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="100%" // or any specific height
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            sx={{
+              textAlign: "center",
+              textTransform: "uppercase",
+              letterSpacing: 0.8,
+              color: "primary.main",
+            }}
           >
-            <Typography variant="subtitle1" fontWeight={600}>
-              {title}
-            </Typography>
-          </Box>
+            {title}
+          </Typography>
         </Box>
 
-        <Grid container spacing={2}>
-          {fields.map((field, idx) => renderField(field, idx, fields.length))}
+        <Grid container spacing={1.5}>
+          {fields.map((field) => renderField(field))}
         </Grid>
       </Box>
     </Grid>
   );
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={2}>
       <Section title="Deal Overview" fields={dealOverviewFields} />
       <Section
         title="Deal & Allocation Parameters"

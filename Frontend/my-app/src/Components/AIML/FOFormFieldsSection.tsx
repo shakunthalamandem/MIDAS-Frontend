@@ -231,13 +231,6 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
       selectOptions: options.sponsor,
     },
     {
-      label: "Discount from Announcement Price (%)",
-      name: "discount_from_announcement_price_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 2",
-    },
-    {
       label: "Percentage Primary (%)",
       name: "percentage_primary_category",
       type: "number",
@@ -263,9 +256,35 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
       adornment: "%",
       placeholder: "e.g., 30",
     },
+    {
+      label: "Discount from Announcement Price (%)",
+      name: "discount_from_announcement_price_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 2",
+    },
   ];
 
   const fundamentalFields: FieldConfig[] = [
+    {
+      label: "Current Year Revenue ($ M)",
+      name: "revenue_category",
+      type: "number",
+      adornment: "$M",
+      placeholder: "e.g., 250",
+    },
+    {
+      label: "Revenue Growth (%) (YOY)",
+      name: "revenue_growth_category",
+      type: "number",
+      adornment: "%",
+      placeholder: "e.g., 12.5",
+    },
+    {
+      label: "Net Profit Margin",
+      name: "net_profit_margin_category",
+      selectOptions: ["Negative", "Positive"],
+    },
     {
       label: "T-1D Close Price ($)",
       name: "t1d_close_price_category",
@@ -311,25 +330,6 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
           </IconButton>
         </Tooltip>
       ),
-    },
-    {
-      label: "Current Year Revenue ($ M)",
-      name: "revenue_category",
-      type: "number",
-      adornment: "$M",
-      placeholder: "e.g., 250",
-    },
-    {
-      label: "Revenue Growth (%) (YOY)",
-      name: "revenue_growth_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., 12.5",
-    },
-    {
-      label: "Net Profit Margin",
-      name: "net_profit_margin_category",
-      selectOptions: ["Negative", "Positive"],
     },
   ];
 
