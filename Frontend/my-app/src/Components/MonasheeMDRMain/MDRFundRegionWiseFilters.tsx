@@ -57,7 +57,14 @@ const MDRFundRegionWiseFilters: React.FC<Props> = ({
   };
 
   return (
-    <Card variant="outlined" sx={{ mb: 3, borderRadius: 3 }}>
+    <Card
+      variant="outlined"
+      sx={{
+        mb: 3,
+        borderRadius: 3,
+        backgroundColor: "#f0f3ff", // filters background
+      }}
+    >
       <CardContent>
         <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
           Filters
@@ -119,11 +126,20 @@ const MDRFundRegionWiseFilters: React.FC<Props> = ({
               disabled={loading}
               fullWidth
               onClick={onApply}
+              sx={{
+                backgroundColor: "#002060",
+                "&:hover": { backgroundColor: "#001648" },
+              }}
             >
               {loading ? "Loading..." : "Apply"}
             </Button>
 
-            <Button variant="outlined" fullWidth disabled={loading} onClick={onReset}>
+            <Button
+              variant="outlined"
+              fullWidth
+              disabled={loading}
+              onClick={onReset}
+            >
               Reset
             </Button>
           </Grid>

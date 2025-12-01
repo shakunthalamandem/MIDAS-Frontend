@@ -10,9 +10,9 @@ import {
   Paper,
   Table,
   TableBody,
-  TableHead,
   TableCell,
   TableContainer,
+  TableHead,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -53,10 +53,12 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  const [filters, setFilters] = useState(initialFilters);
-  const [filterOptions, setFilterOptions] = useState<FundRegionFilterOptions>({
-    assetTypes: [],
-  });
+  const [filters, setFilters] =
+    useState<FundRegionFilterState>(initialFilters);
+  const [filterOptions, setFilterOptions] =
+    useState<FundRegionFilterOptions>({
+      assetTypes: [],
+    });
 
   const [data, setData] = useState<FundBlock[]>([]);
   const [meta, setMeta] = useState<MetaData | null>(null);
@@ -72,9 +74,14 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
     setFilters((prev: FundRegionFilterState) => ({ ...prev, ...updated }));
   };
 
-  // 🔹 Load Asset Types
+  // 🔹 Load Asset Types from daily_trades_filters
   useEffect(() => {
     const loadFilters = async () => {
+      if (!apiUrl) {
+        setError("API URL is not defined in environment variables");
+        return;
+      }
+
       try {
         setFiltersLoading(true);
 
@@ -86,14 +93,17 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
           },
         });
 
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Failed to fetch filter options");
+        }
 
         const json = await response.json();
         setFilterOptions({
           assetTypes: json.asset_type || [],
         });
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || "Failed to load filter options");
       } finally {
         setFiltersLoading(false);
       }
@@ -102,10 +112,15 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
     loadFilters();
   }, [apiUrl, token]);
 
-  // 🔹 Fetch Table Data (Region-Fund PnL)
+  // 🔹 Fetch Region / Fund Net Hedge PnL
   const handleApply = async () => {
     setHasApplied(true);
     setError(null);
+
+    if (!apiUrl) {
+      setError("API URL is not defined in environment variables");
+      return;
+    }
 
     const payload = {
       start_date: filters.startDate,
@@ -128,13 +143,18 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
         }
       );
 
-      if (!response.ok) throw new Error(await response.text());
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Failed to fetch region/fund P&L data");
+      }
 
-      const json = await response.json();
-      setData(json.data || []);
+      const json: { data: FundBlock[]; meta: MetaData } =
+        await response.json();
+
+      setData(Array.isArray(json.data) ? json.data : []);
       setMeta(json.meta || null);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "An error occurred while fetching data");
       setData([]);
       setMeta(null);
     } finally {
@@ -161,14 +181,17 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ p: 3 }}>
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+      <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 3, borderRadius: 3, backgroundColor: "#ffffff" }}
+        >
           <Typography
             variant="h6"
             align="center"
             sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
           >
-            Region / Fund wise P&amp;L (Net of Hedge, Net of FX, Fees Excluded)
+            Region / Fund wise P&amp;L (Net of Hedge, Net of FX, before fees and expenses)
           </Typography>
 
           <MDRFundRegionWiseFilters
@@ -192,31 +215,91 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
             </Box>
           )}
 
-          {meta && (
-            <Typography sx={{ mb: 2 }}>
+          {/* {meta && (
+            <Typography sx={{ mb: 2 }} variant="body2">
               Period: <strong>{meta.start_date}</strong> –{" "}
-              <strong>{meta.end_date}</strong> |
-              As of: <strong>{meta.as_of_date}</strong>
+              <strong>{meta.end_date}</strong> | As of:{" "}
+              <strong>{meta.as_of_date}</strong>
+              {meta.assets && meta.assets.length > 0 && (
+                <>
+                  {" "}
+                  | Assets: <strong>{meta.assets.join(", ")}</strong>
+                </>
+              )}
             </Typography>
-          )}
+          )} */}
 
+          {/* tables */}
           <Grid container spacing={2}>
+            {hasApplied && !loading && data.length === 0 && (
+              <Typography variant="body2" sx={{ ml: 2, mt: 1 }}>
+                No data available for the selected filters.
+              </Typography>
+            )}
+
             {data.map((fund) => (
               <Grid item xs={12} md={6} key={fund.fund}>
                 <Card variant="outlined" sx={{ borderRadius: 2 }}>
-                  <CardContent>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  <CardContent sx={{ p: 1.5 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 600, mb: 1 }}
+                    >
                       {fund.fund}
                     </Typography>
 
-                    <TableContainer component={Paper} elevation={0}>
+                    <TableContainer
+                      component={Paper}
+                      elevation={0}
+                      sx={{ border: "1px solid #ccc" }}
+                    >
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Region</TableCell>
-                            <TableCell align="right">DTD</TableCell>
-                            <TableCell align="right">MTD</TableCell>
-                            <TableCell align="right">YTD</TableCell>
+                            <TableCell
+                              sx={{
+                                fontWeight: 700,
+                                color: "#002060",
+                                backgroundColor: "#f0f3ff",
+                                borderRight: "1px solid #ccc",
+                                borderBottom: "1px solid #ccc",
+                              }}
+                            >
+                              Region
+                            </TableCell>
+                            <TableCell
+                              align="right"
+                              sx={{
+                                fontWeight: 700,
+                                color: "#002060",
+                                backgroundColor: "#f0f3ff",
+                                borderBottom: "1px solid #ccc",
+                              }}
+                            >
+                              DTD
+                            </TableCell>
+                            <TableCell
+                              align="right"
+                              sx={{
+                                fontWeight: 700,
+                                color: "#002060",
+                                backgroundColor: "#f0f3ff",
+                                borderBottom: "1px solid #ccc",
+                              }}
+                            >
+                              MTD
+                            </TableCell>
+                            <TableCell
+                              align="right"
+                              sx={{
+                                fontWeight: 700,
+                                color: "#002060",
+                                backgroundColor: "#f0f3ff",
+                                borderBottom: "1px solid #ccc",
+                              }}
+                            >
+                              YTD
+                            </TableCell>
                           </TableRow>
                         </TableHead>
 
@@ -229,17 +312,37 @@ const MDRFundRegionWiseTableMain: React.FC = () => {
                                     row.region.toLowerCase() === "total"
                                       ? 700
                                       : 400,
+                                  borderRight: "1px solid #ccc", // region side border
+                                  borderBottom: "1px solid #eee",
                                 }}
                               >
                                 {row.region}
                               </TableCell>
-                              <TableCell sx={{ color: pnlColor(row.dtd) }} align="right">
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  color: pnlColor(row.dtd),
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
                                 {formatPnL(row.dtd)}
                               </TableCell>
-                              <TableCell sx={{ color: pnlColor(row.mtd) }} align="right">
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  color: pnlColor(row.mtd),
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
                                 {formatPnL(row.mtd)}
                               </TableCell>
-                              <TableCell sx={{ color: pnlColor(row.ytd) }} align="right">
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  color: pnlColor(row.ytd),
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
                                 {formatPnL(row.ytd)}
                               </TableCell>
                             </TableRow>
