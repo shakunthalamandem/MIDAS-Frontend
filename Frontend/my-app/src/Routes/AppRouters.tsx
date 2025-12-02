@@ -81,6 +81,7 @@ import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountData
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
 import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
+import MonasheeMDRMain from "../Components/MonasheeMDRMain/MonasheeMDRMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -207,6 +208,8 @@ const AppRouters: React.FC = () => {
 
         <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
+        {/* <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MonasheeMDRMain/></AuthGuard>} /> */}
+        <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MonasheeMDRMain/></AuthGuard>} />
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
          <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
