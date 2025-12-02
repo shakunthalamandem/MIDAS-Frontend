@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Box, Typography } from "@mui/material";
@@ -22,6 +22,7 @@ interface IPODashboardMainProps {
   selectedTicker?: string; // Optional: may be passed or derived from URL
   onLoadComplete?: (status: "success" | "error") => void;
 }
+type SectionKey = "core" | "page2" | "page3" | "page4";
 
 const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   selectedTicker,
@@ -49,6 +50,12 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   const location = useLocation();
   const fromTickerClick = location.state?.fromTickerClick || false;
   const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
+  const [, setSectionsLoaded] = useState<Record<SectionKey, boolean>>({
+    core: false,
+    page2: false,
+    page3: false,
+    page4: false,
+  });
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -64,6 +71,31 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       setSearchText(selectedTicker ?? "");
     }
   }, [selectedTicker]);
+
+  useEffect(() => {
+    // Reset section tracking whenever a new ticker is selected
+    setSectionsLoaded({
+      core: false,
+      page2: false,
+      page3: false,
+      page4: false,
+    });
+  }, [currentTicker]);
+
+  const markSectionLoaded = useCallback(
+    (section: SectionKey) => {
+      setSectionsLoaded((prev) => {
+        if (prev[section]) return prev;
+        const updated = { ...prev, [section]: true };
+        const allDone = Object.values(updated).every(Boolean);
+        if (allDone) {
+          onLoadComplete?.("success");
+        }
+        return updated;
+      });
+    },
+    [onLoadComplete]
+  );
 
   useEffect(() => {
     const fetchAllIpoTickers = async () => {
@@ -145,7 +177,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         setEditMode(editModes);
         setEditedContent(contents);
         setIpoData(formattedData);
-        onLoadComplete?.("success");
+        markSectionLoaded("core");
+        markSectionLoaded("page3"); // page 3 is static once base data is ready
       } catch (err) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
@@ -619,6 +652,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               ipoData={ipoData}
               selectedTicker={currentTicker || ""}
               setIpoData={setIpoData}
+              onPageReady={() => markSectionLoaded("page2")}
             />
             <IPODashboardPage3
               renderEditableCard={(section, index) => (
@@ -646,6 +680,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               ipoData={ipoData}
               showAIComparison={showAIComparison}
               handleAIComparisonClick={handleAIComparisonClick}
+              onPageReady={() => markSectionLoaded("page4")}
             />
           </>
         )}

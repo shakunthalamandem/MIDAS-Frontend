@@ -45,6 +45,7 @@ interface IPODashboardCardRatingsProps {
   selectedTicker: string;
   ipodata: IPOData;
   setIpoData: React.Dispatch<React.SetStateAction<IPOData>>;
+  onLoaded?: () => void;
 }
 
 // ---------- ✅ Criteria Config ----------
@@ -82,12 +83,14 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   selectedTicker,
   ipodata,
   setIpoData,
+  onLoaded,
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedData, setEditedData] = useState<RevenueGrowth>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [localRevenueGrowth, setLocalRevenueGrowth] = useState<RevenueGrowth>({});
+  const [hasNotified, setHasNotified] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -98,14 +101,22 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
   });
 
   useEffect(() => {
+    setHasNotified(false);
+  }, [selectedTicker]);
+
+  useEffect(() => {
+    let isActive = true;
     const fetchRevenueGrowthData = async () => {
       if (!apiUrl) {
-        setError("API URL not defined");
-        setLoading(false);
+        if (isActive) {
+          setError("API URL not defined");
+          setLoading(false);
+        }
         return;
       }
 
       try {
+        if (isActive) setLoading(true);
         const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
           method: "POST",
           headers: getAuthHeaders(),
@@ -119,25 +130,38 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
 
         const data: RevenueGrowth = await response.json();
         if (data && typeof data === "object") {
-          setLocalRevenueGrowth(data);
-          setIpoData((prev: IPOData) => ({
-            ...prev,
-            revenue_growth: data,
-          }));
-        } else {
+          if (isActive) {
+            setLocalRevenueGrowth(data);
+            setIpoData((prev: IPOData) => ({
+              ...prev,
+              revenue_growth: data,
+            }));
+          }
+        } else if (isActive) {
           setError("No revenue growth data available.");
         }
       } catch (err: any) {
-        setError(err.message || "Unknown error occurred");
+        if (isActive) setError(err.message || "Unknown error occurred");
       } finally {
-        setLoading(false);
+        if (isActive) setLoading(false);
       }
     };
 
     if (selectedTicker) {
       fetchRevenueGrowthData();
     }
+
+    return () => {
+      isActive = false;
+    };
   }, [selectedTicker, apiUrl, setIpoData]);
+
+  useEffect(() => {
+    if (!loading && !hasNotified) {
+      onLoaded?.();
+      setHasNotified(true);
+    }
+  }, [loading, hasNotified, onLoaded]);
 
   const revenueGrowth = localRevenueGrowth;
 
