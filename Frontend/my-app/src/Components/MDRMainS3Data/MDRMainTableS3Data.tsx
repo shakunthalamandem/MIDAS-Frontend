@@ -1,10 +1,10 @@
 import React from 'react'
-import { MDRDailyPortfolio } from './MDRDailyPortfolio'
+import { MDRDailyPortfolioContainer } from './MDRDailyPortfolioContainer'
 
 const MDRMainTableS3Data = () => {
   return (
     <div>
-      <MDRDailyPortfolio />
+      <MDRDailyPortfolioContainer />
       
     </div>
   )
