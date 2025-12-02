@@ -37,9 +37,13 @@ interface SelectedData {
 
 interface IPODifferenciateSummaryProps {
   selectedData: SelectedData;
+  onLoaded?: () => void;
 }
 
-const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selectedData }) => {
+const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
+  selectedData,
+  onLoaded,
+}) => {
   const [dealData, setDealData] = useState<DealData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,29 +57,33 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-
-
-
-
-
+  const [hasNotified, setHasNotified] = useState(false);
 
   useEffect(() => {
+    setHasNotified(false);
+  }, [selectedData?.ticker_name]);
+  useEffect(() => {
+    let isActive = true;
     const fetchDeals = async () => {
 
-
       if (!apiUrl) {
-        setError("API URL is not defined in environment variables");
-        setLoading(false);
+        if (isActive) {
+          setError("API URL is not defined in environment variables");
+          setLoading(false);
+        }
         return;
       }
 
       if (!selectedData?.ticker_name) {
-        setError("No selected ticker provided.");
-        setLoading(false);
+        if (isActive) {
+          setError("No selected ticker provided.");
+          setLoading(false);
+        }
         return;
       }
 
       try {
+        if (isActive) setLoading(true);
         const response = await fetch(`${apiUrl}/api/ipo_deal_data_fairvalues/`, {
           method: "POST",
           headers: {
@@ -92,22 +100,33 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({ selec
 
         const data = await response.json();
 
-        if (data && typeof data === "object" && Object.keys(data).length > 0) {
+        if (isActive && data && typeof data === "object" && Object.keys(data).length > 0) {
           setDealData(data);
-        } else {
+        } else if (isActive) {
           setError("No deal data available.");
         }
       } catch (err: any) {
-        setError(err.message || "Unknown error occurred");
+        if (isActive) setError(err.message || "Unknown error occurred");
       } finally {
-        setLoading(false);
+        if (isActive) setLoading(false);
       }
     };
 
     if (selectedData?.ticker_name) {
       fetchDeals();
     }
-  }, [selectedData]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedData, apiUrl, token]);
+
+  useEffect(() => {
+    if (!loading && !hasNotified) {
+      onLoaded?.();
+      setHasNotified(true);
+    }
+  }, [loading, hasNotified, onLoaded]);
 
   const handleSaveDealData = async () => {
     if (!editedDealData) return;
