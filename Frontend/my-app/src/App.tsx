@@ -30,7 +30,7 @@ const App: React.FC = () => {
         </Box>
         <FooterMain />
         <ScrollToTopButton />
-        <ChatBoxButton />
+        {/* <ChatBoxButton /> */}
 
       </Router>
     </Box>

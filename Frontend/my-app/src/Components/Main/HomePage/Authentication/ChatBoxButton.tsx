@@ -1,31 +1,26 @@
 import React, { useState } from "react";
 import { IconButton, Zoom, Paper } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
-import Remark42 from "../../../Discussion/Remark42";
+import MattermostChat from "../../../Discussion/MattermostChat";
+// import Remark42 from "../../../Discussion/Remark42";
 
 const chatButtonStyle: React.CSSProperties = {
-  position: "fixed",
-  bottom: "70px",
-  right: "10px",
+  // position: "fixed",
+  // bottom: "70px",
+  // right: "10px",
   backgroundColor: "#002060",
   color: "#ffffff",
   borderRadius: "50%",
   cursor: "pointer",
   transition: "opacity 0.3s ease-in-out",
-  zIndex: 99999,
+  // zIndex: 99999,
 };
 
 const chatWindowStyle: React.CSSProperties = {
-  position: "fixed",
-  bottom: "120px",
-  right: "20px",
-  width: "400px",
-  height: "500px",
   padding: "0px",
   borderRadius: "10px",
   backgroundColor: "#ffffff",
   boxShadow: "0px 0px 10px rgba(0,0,0,0.3)",
-  zIndex: 9999,
   overflow: "auto",
 };
 
@@ -38,8 +33,9 @@ const ChatBoxButton: React.FC = () => {
     <>
       {/* Remark42 Popup */}
       {open && (
-        <Paper elevation={4} style={chatWindowStyle}>
-          <Remark42 pageId="blog-post-1" />
+        <Paper elevation={4}>
+          {/* <Remark42 pageId="blog-post-1" /> */}
+          <MattermostChat />
         </Paper>
       )}
 
