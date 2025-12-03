@@ -153,7 +153,7 @@ const MattermostChat: React.FC = () => {
           color: "#111",
         }}
       >
-        <strong>Chat unavailable</strong>
+        <strong>Unable to connect to chat</strong>
         <div style={{ marginTop: 6, opacity: 0.8 }}>{error}</div>
       </div>
     );
