@@ -3,77 +3,244 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Autocomplete,
-  Button,
+  Box,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 export interface MDRDailyPortfolioRow {
+  id: string;
   ticker: string;
   type: string;
   dealCap: string;
   daysHeld: number;
   currentShares: number;
   currentExposure: number;
-  maxPercent: string;
-  grossPercent: string;
-  excessReturnPercent: string;
+  maxPercent: number | null;
+  grossPercent: number | null;
+  excessReturnPercent: number | null;
   dtdPnl: number;
   cumulativeGrossPnl: number;
   cumulativeNetPnl: number;
   issuePrice: number;
   avgInPrice: number;
-  avgExitPrice: number;
-  currentPrice: number;
-  ultimateStop: number;
-  targetPrice: number;
+  avgExitPrice: number | null;
+  currentPrice: number | null;
+  ultimateStop: number | null;
+  targetPrice: number | null;
 }
 
-export interface MDRDailyPortfolioTableProps {
+interface MDRDailyPortfolioTableProps {
   rows: MDRDailyPortfolioRow[];
-  tradeDate: string;
   loading: boolean;
   error?: string | null;
-  onTradeDateChange: (value: string) => void;
-  onApply: () => void;
-  onReset: () => void;
+  onRefresh?: () => void;
 }
 
 const PRIMARY_COLOR = "#002060";
-const HEADER_BG = "#f0f3ff";
-const HEADER_TEXT = "#002060";
 
-const formatNumber = (value: number, decimals = 0) =>
-  Number.isFinite(value)
-    ? value.toLocaleString(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })
-    : "-";
+const formatInteger = (value: number | null | undefined) => {
+  if (!Number.isFinite(value as number)) return "-";
+  return Math.round(Number(value)).toLocaleString();
+};
+
+const formatPrice = (value: number | null | undefined) => {
+  if (!Number.isFinite(value as number)) return "-";
+  return Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const formatPercent = (value: number | null | undefined) => {
+  if (value === null || value === undefined || Number.isNaN(value)) return "-";
+  const numeric = Number(value);
+  const needsDecimals = numeric !== 0 && numeric !== 100;
+  const formatted = needsDecimals ? numeric.toFixed(2) : numeric.toString();
+  return `${formatted}%`;
+};
+
+const columns: GridColDef[] = [
+  {
+    field: "ticker",
+    headerName: "Ticker",
+    flex: 1,
+    minWidth: 140,
+    renderCell: (params) => (
+      <Typography sx={{ color: "red", fontWeight: 600 }}>
+        {params.value || "-"}
+      </Typography>
+    ),
+    headerAlign: "left",
+    align: "left",
+    cellClassName: "tickerCell",
+  },
+  {
+    field: "type",
+    headerName: "Type",
+    flex: 1,
+    minWidth: 130,
+  },
+  {
+    field: "dealCap",
+    headerName: "Deal Capt",
+    flex: 1,
+    minWidth: 140,
+  },
+  {
+    field: "daysHeld",
+    headerName: "Days Held",
+    flex: 0.8,
+    minWidth: 110,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+  },
+  {
+    field: "currentShares",
+    headerName: "Current Shares",
+    flex: 1,
+    minWidth: 140,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+  },
+  {
+    field: "currentExposure",
+    headerName: "Current $ Exposure",
+    flex: 1.2,
+    minWidth: 170,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+  },
+  {
+    field: "maxPercent",
+    headerName: "% Max",
+    flex: 0.9,
+    minWidth: 110,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPercent(params as number),
+  },
+  {
+    field: "grossPercent",
+    headerName: "Gross %",
+    flex: 0.9,
+    minWidth: 110,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPercent(params as number),
+  },
+  {
+    field: "excessReturnPercent",
+    headerName: "Excess Return %",
+    flex: 1,
+    minWidth: 140,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPercent(params as number),
+  },
+  {
+    field: "dtdPnl",
+    headerName: "DTD P&L",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+    cellClassName: (params) =>
+      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
+  },
+  {
+    field: "cumulativeGrossPnl",
+    headerName: "Cumulative Gross P&L",
+    flex: 1.3,
+    minWidth: 180,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+    cellClassName: (params) =>
+      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
+  },
+  {
+    field: "cumulativeNetPnl",
+    headerName: "Cumulative Net P&L",
+    flex: 1.2,
+    minWidth: 170,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatInteger(params as number),
+    cellClassName: (params) =>
+      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
+  },
+  {
+    field: "issuePrice",
+    headerName: "Issue Price",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+  {
+    field: "avgInPrice",
+    headerName: "Avg In Price",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+  {
+    field: "avgExitPrice",
+    headerName: "Avg Exit Price",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+  {
+    field: "currentPrice",
+    headerName: "Current Price",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+  {
+    field: "ultimateStop",
+    headerName: "Ultimate Stop",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+  {
+    field: "targetPrice",
+    headerName: "Target Price",
+    flex: 1,
+    minWidth: 130,
+    align: "right",
+    headerAlign: "right",
+    valueFormatter: (params) => formatPrice(params as number),
+  },
+];
 
 export const MDRDailyPortfolioTable: React.FC<MDRDailyPortfolioTableProps> = ({
   rows,
-  tradeDate,
   loading,
   error,
-  onTradeDateChange,
-  onApply,
-  onReset,
+  onRefresh,
 }) => {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const rowsPerPage = 20;
 
-  // Unique tickers from response
   const tickerOptions = useMemo(
     () =>
       Array.from(new Set(rows.map((r) => r.ticker)))
@@ -82,471 +249,115 @@ export const MDRDailyPortfolioTable: React.FC<MDRDailyPortfolioTableProps> = ({
     [rows]
   );
 
-  // If backend data changes and the previously selected ticker disappears, clear it
+  const filteredRows = useMemo(() => {
+    if (!selectedTicker) return rows;
+    return rows.filter((row) => row.ticker === selectedTicker);
+  }, [rows, selectedTicker]);
+
   useEffect(() => {
     if (selectedTicker && !tickerOptions.includes(selectedTicker)) {
       setSelectedTicker(null);
-      setPage(0);
     }
-  }, [tickerOptions, selectedTicker]);
-
-  // Filter rows by selected ticker
-  const filteredRows = useMemo(() => {
-    if (!selectedTicker) return rows;
-    return rows.filter((r) => r.ticker === selectedTicker);
-  }, [rows, selectedTicker]);
-
-  // Paginate
-  const pagedRows = useMemo(() => {
-    const start = page * rowsPerPage;
-    return filteredRows.slice(start, start + rowsPerPage);
-  }, [filteredRows, page, rowsPerPage]);
-
-  const handleChangePage = (
-    _event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
-
-  const handleResetClick = () => {
-    setSelectedTicker(null);
-    setPage(0);
-    onReset();
-  };
+  }, [selectedTicker, tickerOptions]);
 
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-      <Stack spacing={3}>
-        {/* Title */}
-        <Typography
-          variant="h6"
-          align="center"
-          sx={{
-            fontWeight: 600,
-            color: PRIMARY_COLOR,
-            letterSpacing: 0.5,
-          }}
-        >
-        Monahsee Daily Portfolio Report
-        </Typography>
+      <Stack spacing={2}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
+          >
+            Monashee Daily Portfolio Report
+          </Typography>
 
-        {/* Ticker Select + Controls */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          spacing={2}
-          alignItems="center"
-        >
-          {/* Ticker Autocomplete driven by response tickers */}
           <Autocomplete
             size="small"
             options={tickerOptions}
             value={selectedTicker}
-            onChange={(_event, value) => {
-              setSelectedTicker(value);
-              setPage(0);
-            }}
+            onChange={(_event, value) => setSelectedTicker(value)}
             sx={{ minWidth: 260 }}
-            disabled={rows.length === 0}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Ticker"
-                placeholder="Select ticker"
-              />
+              <TextField {...params} label="Ticker" placeholder="Select ticker" />
             )}
+            disabled={rows.length === 0}
           />
-
-          {/* Date + Buttons */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <TextField
-              label="Trade Date"
-              type="date"
-              size="small"
-              value={tradeDate}
-              onChange={(e) => onTradeDateChange(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <Button
-              variant="contained"
-              disabled={loading}
-              onClick={onApply}
-                            sx={{
-                                minWidth: 100,
-                                fontWeight: 600,
-                                backgroundColor: '#002060',  // Set the background color
-                                '&:hover': {
-                                    backgroundColor: '#001540',  // Darker shade for hover effect (optional)
-                                },
-                            }}
-            >
-              APPLY
-            </Button>
-
-            <Button
-              variant="outlined"
-              disabled={loading}
-              onClick={handleResetClick}
-              sx={{ minWidth: 100, fontWeight: 600 }}
-            >
-              RESET
-            </Button>
-          </Stack>
         </Stack>
 
         {error && <Alert severity="error">{error}</Alert>}
 
-        {/* Table */}
-        <TableContainer
-          component={Paper}
-          variant="outlined"
-          sx={{
-            mt: 1,
-            borderRadius: 2,
-            overflowX: "auto", // auto scrollbars if columns overflow
-          }}
-        >
-          <Table size="small" sx={{ minWidth: 1200 }}>
-            <TableHead>
-              {/* Group headers */}
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  align="center"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    color: HEADER_TEXT,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    borderRight: "1px solid #c0c6e0",
-                  }}
+        <Box sx={{ width: "100%" }}>
+          <DataGrid
+            autoHeight
+            density="compact"
+            rows={filteredRows}
+            columns={columns}
+            loading={loading}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            disableColumnMenu
+            pageSizeOptions={[20, 50, 100]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 20, page: 0 } },
+            }}
+            slots={{
+              noRowsOverlay: () => (
+                <Stack
+                  height="100%"
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={0.5}
                 >
-                  Deal Information
-                </TableCell>
-                <TableCell
-                  colSpan={3}
-                  align="center"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    color: HEADER_TEXT,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    borderRight: "1px solid #c0c6e0",
-                    borderLeft: "1px solid #c0c6e0",
-                  }}
-                >
-                  Current Position
-                </TableCell>
-                <TableCell
-                  colSpan={5}
-                  align="center"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    color: HEADER_TEXT,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    borderRight: "1px solid #c0c6e0",
-                    borderLeft: "1px solid #c0c6e0",
-                  }}
-                >
-                  Net vs Gross P&amp;L
-                </TableCell>
-                <TableCell
-                  colSpan={6}
-                  align="center"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    color: HEADER_TEXT,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    borderLeft: "1px solid #c0c6e0",
-                  }}
-                >
-                  Pricing{" "}
-                  <Typography
-                    component="span"
-                    sx={{ fontWeight: 700, color: HEADER_TEXT }}
-                  >
-                    (Local Currency)
+                  <Typography variant="body2" color="text.secondary">
+                    No data available.
                   </Typography>
-                </TableCell>
-              </TableRow>
-
-              {/* Column headers */}
-              <TableRow>
-                <TableCell
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Ticker
-                </TableCell>
-                <TableCell
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Type
-                </TableCell>
-                <TableCell
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Deal Capt
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Days Held
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Current Shares
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Current $ Exposure
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  % Max
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Gross %
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Excess Return %
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  DTD P&amp;L
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Cumulative Gross P&amp;L
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Cumulative Net P&amp;L
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Issue Price
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Avg In Price
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Avg Exit Price
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Current Price
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Ultimate Stop
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    backgroundColor: HEADER_BG,
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  Target Price
-                </TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {pagedRows.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={18} align="center">
+                  {onRefresh && (
                     <Typography
-                      variant="body2"
+                      variant="caption"
                       color="text.secondary"
-                      sx={{ py: 2 }}
+                      sx={{ cursor: "pointer" }}
+                      onClick={onRefresh}
                     >
-                      No data. Adjust filters or select a trade date and click
-                      Apply.
+                      Tap to retry
                     </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-
-              {pagedRows.map((row, index) => (
-                <TableRow
-                  key={`${row.ticker}-${row.dealCap}-${index}`}
-                  sx={{
-                    "&:hover": { backgroundColor: "#f9fafc" },
-                  }}
-                >
-                  <TableCell>{row.ticker}</TableCell>
-                  <TableCell>{row.type}</TableCell>
-                  <TableCell>{row.dealCap}</TableCell>
-                  <TableCell align="right">{row.daysHeld}</TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.currentShares)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.currentExposure, 2)}
-                  </TableCell>
-                  <TableCell align="right">{row.maxPercent}</TableCell>
-                  <TableCell align="right">{row.grossPercent}</TableCell>
-                  <TableCell align="right">
-                    {row.excessReturnPercent}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      color:
-                        row.dtdPnl > 0
-                          ? "green"
-                          : row.dtdPnl < 0
-                          ? "red"
-                          : "inherit",
-                    }}
-                  >
-                    {formatNumber(row.dtdPnl, 2)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.cumulativeGrossPnl, 2)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.cumulativeNetPnl, 2)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.issuePrice, 4)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.avgInPrice, 4)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.avgExitPrice, 4)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.currentPrice, 4)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.ultimateStop, 4)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatNumber(row.targetPrice, 4)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {/* Pagination: fixed 20 rows per page */}
-          <TablePagination
-            component="div"
-            rowsPerPageOptions={[rowsPerPage]}
-            rowsPerPage={rowsPerPage}
-            count={filteredRows.length}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={() => {}}
+                  )}
+                </Stack>
+              ),
+            }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f0f3ff",
+                color: PRIMARY_COLOR,
+                fontWeight: 700,
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: 700,
+                fontSize: 13,
+              },
+              "& .MuiDataGrid-cell": {
+                fontSize: 13,
+              },
+              "& .MuiDataGrid-row:nth-of-type(odd)": {
+                backgroundColor: "#fafbff",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#f5f7ff",
+              },
+              "& .tickerCell": {
+                color: "red",
+                fontWeight: 600,
+              },
+              "& .positive": {
+                color: "green",
+                fontWeight: 600,
+              },
+              "& .negative": {
+                color: "red",
+                fontWeight: 600,
+              },
+            }}
           />
-        </TableContainer>
+        </Box>
       </Stack>
     </Paper>
   );

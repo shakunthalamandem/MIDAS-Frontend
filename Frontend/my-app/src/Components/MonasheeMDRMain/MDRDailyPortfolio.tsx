@@ -108,28 +108,27 @@ const MDRDailyPortfolio: React.FC = () => {
     return Number.isNaN(num) ? null : num;
   };
 
-  const normalizeRow = (item: any): MDRDailyPortfolioRow => ({
-    ticker: item.ticker ?? "",
-    type: item.type ?? "",
-    deal_cap: item.deal_cap ?? "",
-    days_held: toNumber(item.days_held),
-    current_shares: toNumber(item.current_shares),
-    current_exposure: toNumber(item.current_exposure),
-    max_pct: toNumber(item.max_pct ?? item["%max"]),
-    gross_pct: toNumber(item.gross_pct ?? item["gross%"]),
-    excess_return_pct: toNumber(
-      item.excess_return_pct ?? item["excess_return%"]
-    ),
-    dtd_pnl: toNumber(item.dtd_pnl),
-    cumulative_gross_pnl: toNumber(item.cumulative_gross_pnl),
-    cumulative_net_pnl: toNumber(item.cumulative_net_pnl),
-    issue_price: toNumber(item.issue_price),
-    avg_in_price: toNumber(item.avg_in_price),
-    avg_exit_price: toNullableNumber(item.avg_exit_price),
-    current_price: toNullableNumber(item.current_price),
-    ultimate_stop: toNullableNumber(item.ultimate_stop),
-    target_price: toNullableNumber(item.target_price),
-  });
+const normalizeRow = (item: any, index: number): MDRDailyPortfolioRow => ({
+  id: `${item.ticker ?? "row"}-${index}`,
+  ticker: item.ticker ?? "",
+  type: item.type ?? "",
+  deal_cap: item.deal_cap ?? "",
+  days_held: toNumber(item.days_held),
+  current_shares: toNumber(item.current_shares),
+  current_exposure: toNumber(item.current_exposure),
+  max_pct: toNumber(item.max_pct ?? item["%max"]),
+  gross_pct: toNumber(item.gross_pct ?? item["gross%"]),
+  excess_return_pct: toNumber(item.excess_return_pct ?? item["excess_return%"]),
+  dtd_pnl: toNumber(item.dtd_pnl),
+  cumulative_gross_pnl: toNumber(item.cumulative_gross_pnl),
+  cumulative_net_pnl: toNumber(item.cumulative_net_pnl),
+  issue_price: toNumber(item.issue_price),
+  avg_in_price: toNumber(item.avg_in_price),
+  avg_exit_price: toNullableNumber(item.avg_exit_price),
+  current_price: toNullableNumber(item.current_price),
+  ultimate_stop: toNullableNumber(item.ultimate_stop),
+  target_price: toNullableNumber(item.target_price),
+});
 
   const handleApply = async () => {
     setHasApplied(true);
@@ -140,22 +139,15 @@ const MDRDailyPortfolio: React.FC = () => {
       return;
     }
 
-    const payload = {
-      trade_date: filters.tradeDate,
-      fund: filters.fund,     // string[]
-      asset: filters.asset,   // string[]
-      region: filters.region, // string[]
-    };
-
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/mdr_daily_portfolio/`, {
+      const response = await fetch(`${apiUrl}/api/mdr_portfolio_main/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
@@ -167,7 +159,9 @@ const MDRDailyPortfolio: React.FC = () => {
       const rawRows: any[] = Array.isArray(data)
         ? data
         : data.daily_portfolio || data.results || [];
-      const portfolioRows: MDRDailyPortfolioRow[] = rawRows.map(normalizeRow);
+      const portfolioRows: MDRDailyPortfolioRow[] = rawRows.map(
+        (row, index) => normalizeRow(row, index)
+      );
 
       setRows(portfolioRows);
     } catch (err: any) {
@@ -225,6 +219,7 @@ const MDRDailyPortfolio: React.FC = () => {
           rows={rows}
           hasApplied={hasApplied}
           loading={loading}
+          error={error}
         />
       </Paper>
     </Box>

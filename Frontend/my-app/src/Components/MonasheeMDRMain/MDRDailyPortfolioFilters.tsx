@@ -188,7 +188,7 @@ const MDRDailyPortfolioFilters: React.FC<Props> = ({
           <Button
             variant="contained"
             onClick={onApply}
-            disabled={!filters.tradeDate || loading}
+            disabled={loading}
             sx={{
               textTransform: "none",
               backgroundColor: PRIMARY_COLOR,
