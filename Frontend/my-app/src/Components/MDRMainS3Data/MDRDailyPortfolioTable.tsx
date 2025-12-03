@@ -128,7 +128,7 @@ export const MDRDailyPortfolioTable: React.FC<MDRDailyPortfolioTableProps> = ({
             letterSpacing: 0.5,
           }}
         >
-          Daily Portfolio
+        Monahsee Daily Portfolio Report
         </Typography>
 
         {/* Ticker Select + Controls */}
