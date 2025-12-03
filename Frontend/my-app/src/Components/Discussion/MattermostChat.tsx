@@ -56,7 +56,7 @@ const MattermostChat: React.FC = () => {
           signal: abortController.signal,
         });
 
-        if (!credsRes.ok) throw new Error("Could not bootstrap session");
+        if (!credsRes.ok) throw new Error("Could not load session");
 
         const creds = await credsRes.json();
 
@@ -153,7 +153,7 @@ const MattermostChat: React.FC = () => {
           color: "#111",
         }}
       >
-        <strong>Unable to connect to chat</strong>
+        <strong>Chat Loading...</strong>
         <div style={{ marginTop: 6, opacity: 0.8 }}>{error}</div>
       </div>
     );
