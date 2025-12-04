@@ -5,7 +5,6 @@ import {
   Autocomplete,
   Box,
   Container,
-  Paper,
   Stack,
   TextField,
   Typography,
@@ -234,13 +233,14 @@ const columns: GridColDef[] = [
   },
 ];
 
- const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
+const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
   rows,
   loading,
   error,
   onRefresh,
 }) => {
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  // search text (live filter)
+  const [searchText, setSearchText] = useState<string>("");
 
   const tickerOptions = useMemo(
     () =>
@@ -250,16 +250,14 @@ const columns: GridColDef[] = [
     [rows]
   );
 
+  // Filter rows as user types (no need to click/select)
   const filteredRows = useMemo(() => {
-    if (!selectedTicker) return rows;
-    return rows.filter((row) => row.ticker === selectedTicker);
-  }, [rows, selectedTicker]);
-
-  useEffect(() => {
-    if (selectedTicker && !tickerOptions.includes(selectedTicker)) {
-      setSelectedTicker(null);
-    }
-  }, [selectedTicker, tickerOptions]);
+    if (!searchText) return rows;
+    const value = searchText.toLowerCase();
+    return rows.filter((row) =>
+      row.ticker.toLowerCase().includes(value)
+    );
+  }, [rows, searchText]);
 
   return (
     <Container maxWidth="xl">
@@ -274,12 +272,17 @@ const columns: GridColDef[] = [
 
           <Autocomplete
             size="small"
+            freeSolo
             options={tickerOptions}
-            value={selectedTicker}
-            onChange={(_event, value) => setSelectedTicker(value)}
+            inputValue={searchText}
+            onInputChange={(_event, value) => setSearchText(value)}
             sx={{ minWidth: 260 }}
             renderInput={(params) => (
-              <TextField {...params} label="Ticker" placeholder="Select ticker" />
+              <TextField
+                {...params}
+                label="Ticker"
+                placeholder="Type to search ticker"
+              />
             )}
             disabled={rows.length === 0}
           />
@@ -289,8 +292,6 @@ const columns: GridColDef[] = [
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
           <DataGrid
-            autoHeight
-            density="compact"
             rows={filteredRows}
             columns={columns}
             loading={loading}
@@ -299,35 +300,10 @@ const columns: GridColDef[] = [
             disableColumnMenu
             columnHeaderHeight={50}
             rowHeight={45}
-            pageSizeOptions={[50, 100]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 50, page: 0 } },
-            }}
-            slots={{
-              noRowsOverlay: () => (
-                <Stack
-                  height="100%"
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={0.5}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    No data available.
-                  </Typography>
-                  {onRefresh && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={onRefresh}
-                    >
-                      Tap to retry
-                    </Typography>
-                  )}
-                </Stack>
-              ),
-            }}
+            // fixed height 500px + internal scrolling
+            autoHeight={false}
             sx={{
+              height: 500,
               fontSize: 12,
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f0f3ff",
@@ -362,12 +338,40 @@ const columns: GridColDef[] = [
                 fontWeight: 600,
               },
             }}
+            // pagination: 100 rows per page
+            pageSizeOptions={[100]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 100, page: 0 } },
+            }}
+            slots={{
+              noRowsOverlay: () => (
+                <Stack
+                  height="100%"
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={0.5}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    No data available.
+                  </Typography>
+                  {onRefresh && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ cursor: "pointer" }}
+                      onClick={onRefresh}
+                    >
+                      Tap to retry
+                    </Typography>
+                  )}
+                </Stack>
+              ),
+            }}
           />
         </Box>
       </Stack>
-</Container>
+    </Container>
   );
 };
-
 
 export default MDRDailyPortfolioTableMainS3;
