@@ -4,12 +4,15 @@ import {
   Alert,
   Autocomplete,
   Box,
+  Button,
   Container,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export interface MDRDailyPortfolioRow {
   id: string;
@@ -54,6 +57,9 @@ const formatPrice = (value: number | null | undefined) => {
     maximumFractionDigits: 2,
   });
 };
+
+  // exportToExcel moved into the component to access the `rows` prop
+
 
 const formatPercent = (value: number | null | undefined) => {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
@@ -252,8 +258,23 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
 
   // Filter rows as user types (no need to click/select)
   const filteredRows = useMemo(() => {
-    if (!searchText) return rows;
-    const value = searchText.toLowerCase();
+  // search text (live filter)
+  const [searchText, setSearchText] = useState<string>("");
+
+  const exportToExcel = () => {
+    const exportData = rows.map(({ id, ...row }) => row);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
+  };
     return rows.filter((row) =>
       row.ticker.toLowerCase().includes(value)
     );
@@ -286,6 +307,17 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
             )}
             disabled={rows.length === 0}
           />
+                  <Button
+            variant="contained"
+            onClick={exportToExcel}
+            sx={{
+              backgroundColor: "#002060",
+              color: "#fff",
+              textTransform: "none",
+            }}
+          >
+            Export to Excel
+          </Button>
         </Stack>
 
         {error && <Alert severity="error">{error}</Alert>}
