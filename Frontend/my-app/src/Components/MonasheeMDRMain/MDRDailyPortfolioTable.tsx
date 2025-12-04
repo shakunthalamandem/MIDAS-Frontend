@@ -259,7 +259,7 @@ const MDRDailyPortfolioTable: React.FC<Props> = ({
             variant="h6"
             sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
           >
-            Monashee Daily Portfolio Report
+            Monashee Daily Report
           </Typography>
           <Autocomplete
             size="small"
