@@ -108,7 +108,6 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
   }, [fetchPortfolio]);
 
   return (
-    <Container maxWidth={false} sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
       <Box>
         <MDRDailyPortfolioTableMainS3
           rows={rows}
@@ -117,7 +116,6 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
           onRefresh={fetchPortfolio}
         />
       </Box>
-    </Container>
   );
 };
 

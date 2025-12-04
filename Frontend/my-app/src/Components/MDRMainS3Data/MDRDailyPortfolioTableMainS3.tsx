@@ -4,6 +4,7 @@ import {
   Alert,
   Autocomplete,
   Box,
+  Container,
   Paper,
   Stack,
   TextField,
@@ -261,10 +262,7 @@ const columns: GridColDef[] = [
   }, [selectedTicker, tickerOptions]);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{ p: 3, borderRadius: 3, overflow: "hidden", width: "100%" }}
-    >
+    <Container maxWidth="xl">
       <Stack spacing={2}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography
@@ -299,11 +297,11 @@ const columns: GridColDef[] = [
             getRowId={(row) => row.id}
             disableRowSelectionOnClick
             disableColumnMenu
-            columnHeaderHeight={38}
-            rowHeight={34}
-            pageSizeOptions={[20, 50, 100]}
+            columnHeaderHeight={50}
+            rowHeight={45}
+            pageSizeOptions={[50, 100]}
             initialState={{
-              pagination: { paginationModel: { pageSize: 20, page: 0 } },
+              pagination: { paginationModel: { pageSize: 50, page: 0 } },
             }}
             slots={{
               noRowsOverlay: () => (
@@ -367,7 +365,7 @@ const columns: GridColDef[] = [
           />
         </Box>
       </Stack>
-    </Paper>
+</Container>
   );
 };
 
