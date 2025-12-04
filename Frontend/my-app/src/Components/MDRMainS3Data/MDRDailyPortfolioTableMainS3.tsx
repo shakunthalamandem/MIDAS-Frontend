@@ -14,8 +14,8 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 export interface MDRDailyPortfolioRow {
   id: string;
   ticker: string;
-  type: string;
-  dealCap: string;
+  dealType: string;
+  dealCaptain: string;
   daysHeld: number;
   currentShares: number;
   currentExposure: number;
@@ -67,10 +67,10 @@ const columns: GridColDef[] = [
   {
     field: "ticker",
     headerName: "Ticker",
-    flex: 1,
-    minWidth: 140,
+    flex: 0.75,
+    minWidth: 110,
     renderCell: (params) => (
-      <Typography sx={{ color: "red", fontWeight: 600 }}>
+      <Typography sx={{ color: "red", fontWeight: 500, fontSize: 12 }}>
         {params.value || "-"}
       </Typography>
     ),
@@ -79,22 +79,22 @@ const columns: GridColDef[] = [
     cellClassName: "tickerCell",
   },
   {
-    field: "type",
+    field: "dealType",
     headerName: "Type",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.7,
+    minWidth: 90,
   },
   {
-    field: "dealCap",
+    field: "dealCaptain",
     headerName: "Deal Capt",
-    flex: 1,
-    minWidth: 140,
+    flex: 0.9,
+    minWidth: 110,
   },
   {
     field: "daysHeld",
     headerName: "Days Held",
-    flex: 0.8,
-    minWidth: 110,
+    flex: 0.6,
+    minWidth: 90,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -102,8 +102,8 @@ const columns: GridColDef[] = [
   {
     field: "currentShares",
     headerName: "Current Shares",
-    flex: 1,
-    minWidth: 140,
+    flex: 0.9,
+    minWidth: 120,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -111,8 +111,8 @@ const columns: GridColDef[] = [
   {
     field: "currentExposure",
     headerName: "Current $ Exposure",
-    flex: 1.2,
-    minWidth: 170,
+    flex: 1,
+    minWidth: 140,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -120,8 +120,8 @@ const columns: GridColDef[] = [
   {
     field: "maxPercent",
     headerName: "% Max",
-    flex: 0.9,
-    minWidth: 110,
+    flex: 0.7,
+    minWidth: 90,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPercent(params as number),
@@ -129,8 +129,8 @@ const columns: GridColDef[] = [
   {
     field: "grossPercent",
     headerName: "Gross %",
-    flex: 0.9,
-    minWidth: 110,
+    flex: 0.7,
+    minWidth: 90,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPercent(params as number),
@@ -138,8 +138,8 @@ const columns: GridColDef[] = [
   {
     field: "excessReturnPercent",
     headerName: "Excess Return %",
-    flex: 1,
-    minWidth: 140,
+    flex: 0.9,
+    minWidth: 120,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPercent(params as number),
@@ -147,8 +147,8 @@ const columns: GridColDef[] = [
   {
     field: "dtdPnl",
     headerName: "DTD P&L",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -158,8 +158,8 @@ const columns: GridColDef[] = [
   {
     field: "cumulativeGrossPnl",
     headerName: "Cumulative Gross P&L",
-    flex: 1.3,
-    minWidth: 180,
+    flex: 1,
+    minWidth: 140,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -169,8 +169,8 @@ const columns: GridColDef[] = [
   {
     field: "cumulativeNetPnl",
     headerName: "Cumulative Net P&L",
-    flex: 1.2,
-    minWidth: 170,
+    flex: 1,
+    minWidth: 140,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatInteger(params as number),
@@ -180,8 +180,8 @@ const columns: GridColDef[] = [
   {
     field: "issuePrice",
     headerName: "Issue Price",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
@@ -189,8 +189,8 @@ const columns: GridColDef[] = [
   {
     field: "avgInPrice",
     headerName: "Avg In Price",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
@@ -198,8 +198,8 @@ const columns: GridColDef[] = [
   {
     field: "avgExitPrice",
     headerName: "Avg Exit Price",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
@@ -207,8 +207,8 @@ const columns: GridColDef[] = [
   {
     field: "currentPrice",
     headerName: "Current Price",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
@@ -216,8 +216,8 @@ const columns: GridColDef[] = [
   {
     field: "ultimateStop",
     headerName: "Ultimate Stop",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
@@ -225,15 +225,15 @@ const columns: GridColDef[] = [
   {
     field: "targetPrice",
     headerName: "Target Price",
-    flex: 1,
-    minWidth: 130,
+    flex: 0.8,
+    minWidth: 110,
     align: "right",
     headerAlign: "right",
     valueFormatter: (params) => formatPrice(params as number),
   },
 ];
 
-export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
+ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
   rows,
   loading,
   error,
@@ -261,7 +261,10 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
   }, [selectedTicker, tickerOptions]);
 
   return (
-    <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+    <Paper
+      elevation={3}
+      sx={{ p: 3, borderRadius: 3, overflow: "hidden", width: "100%" }}
+    >
       <Stack spacing={2}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography
@@ -286,7 +289,7 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
 
         {error && <Alert severity="error">{error}</Alert>}
 
-        <Box sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
           <DataGrid
             autoHeight
             density="compact"
@@ -296,6 +299,8 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
             getRowId={(row) => row.id}
             disableRowSelectionOnClick
             disableColumnMenu
+            columnHeaderHeight={38}
+            rowHeight={34}
             pageSizeOptions={[20, 50, 100]}
             initialState={{
               pagination: { paginationModel: { pageSize: 20, page: 0 } },
@@ -325,6 +330,7 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
               ),
             }}
             sx={{
+              fontSize: 12,
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f0f3ff",
                 color: PRIMARY_COLOR,
@@ -332,10 +338,12 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
               },
               "& .MuiDataGrid-columnHeaderTitle": {
                 fontWeight: 700,
-                fontSize: 13,
+                fontSize: 12,
               },
               "& .MuiDataGrid-cell": {
-                fontSize: 13,
+                fontSize: 12,
+                paddingTop: "6px",
+                paddingBottom: "6px",
               },
               "& .MuiDataGrid-row:nth-of-type(odd)": {
                 backgroundColor: "#fafbff",
@@ -362,3 +370,6 @@ export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3
     </Paper>
   );
 };
+
+
+export default MDRDailyPortfolioTableMainS3;

@@ -1,10 +1,10 @@
 // MDRDailyPortfolioContainer.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Box, Container } from "@mui/material";
-import {
+import MDRDailyPortfolioTableMainS3, {
   MDRDailyPortfolioRow,
-  MDRDailyPortfolioTableMainS3,
 } from "./MDRDailyPortfolioTableMainS3";
+
 
 const parsePercent = (value: any) => {
   if (value === null || value === undefined || value === "") return null;
@@ -15,25 +15,27 @@ const parsePercent = (value: any) => {
 const normalizeRow = (raw: any, index: number): MDRDailyPortfolioRow => ({
   id: `${raw.ticker ?? "row"}-${index}`,
   ticker: raw.ticker ?? "",
-  type: raw.deal_type ?? "",
-  dealCap: raw.deal_captain ?? raw.dealCap ?? "",
+  dealType: raw.deal_type ?? raw.type ?? "",
+  dealCaptain: raw.deal_captain ?? raw.dealCap ?? "",
   daysHeld: Number(raw.days_held ?? raw.daysHeld ?? 0),
   currentShares: Number(raw.current_shares ?? raw.currentShares ?? 0),
   currentExposure: Number(raw.current_exposure ?? raw.currentExposure ?? 0),
-  maxPercent: parsePercent(raw["%max"] ?? raw.max_percentage),
-  grossPercent: parsePercent(raw["gross%"] ?? raw.gross_percentage),
-  excessReturnPercent: parsePercent(
-    raw["excess_return%"] ?? raw.excessReturnPercent
+  maxPercent: parsePercent(raw.max_percentage ?? raw["%max"]),
+  grossPercent: parsePercent(
+    raw.gross_percentage ?? raw.percentage_total_return ?? raw["gross%"]
   ),
-  dtdPnl: Number(raw.dtd_pnl ?? raw.dtdPnl ?? 0),
+  excessReturnPercent: parsePercent(
+    raw.excess_return ?? raw["excess_return%"] ?? raw.excessReturnPercent
+  ),
+  dtdPnl: Number(raw.dtd_pnl ?? raw.total_pnl_sum ?? raw.dtdPnl ?? 0),
   cumulativeGrossPnl: Number(
     raw.cumulative_gross_pnl ?? raw.cummulative_gross_pnl ?? 0
   ),
   cumulativeNetPnl: Number(
     raw.cumulative_net_pnl ?? raw.cummulative_net_pnl ?? 0
   ),
-  issuePrice: Number(raw.issue_price ?? raw.issuePrice ?? 0),
-  avgInPrice: Number(raw.avg_in_price ?? raw.avgInPrice ?? 0),
+  issuePrice: Number(raw.issue_price ?? raw.issue_offer_price ?? 0),
+  avgInPrice: Number(raw.avg_in_price ?? raw.avg_cost_incl_comm_lcl ?? 0),
   avgExitPrice:
     raw.avg_exit_price === null || raw.avg_exit_price === undefined
       ? null
@@ -41,7 +43,7 @@ const normalizeRow = (raw: any, index: number): MDRDailyPortfolioRow => ({
   currentPrice:
     raw.current_price === null || raw.current_price === undefined
       ? null
-      : Number(raw.current_price ?? raw.currentPrice ?? 0),
+      : Number(raw.current_price ?? raw.price_value ?? 0),
   ultimateStop:
     raw.ultimate_stop === null || raw.ultimate_stop === undefined
       ? null
