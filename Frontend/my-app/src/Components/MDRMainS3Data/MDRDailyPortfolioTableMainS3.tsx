@@ -58,7 +58,20 @@ const formatPrice = (value: number | null | undefined) => {
   });
 };
 
-  // exportToExcel moved into the component to access the `rows` prop
+  const exportToExcel = () => {
+    const exportData = rows.map(({ id, ...row }) => row);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
+  };
 
 
 const formatPercent = (value: number | null | undefined) => {
@@ -258,23 +271,8 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
 
   // Filter rows as user types (no need to click/select)
   const filteredRows = useMemo(() => {
-  // search text (live filter)
-  const [searchText, setSearchText] = useState<string>("");
-
-  const exportToExcel = () => {
-    const exportData = rows.map(({ id, ...row }) => row);
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    const dataBlob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
-  };
+    if (!searchText) return rows;
+    const value = searchText.toLowerCase();
     return rows.filter((row) =>
       row.ticker.toLowerCase().includes(value)
     );
