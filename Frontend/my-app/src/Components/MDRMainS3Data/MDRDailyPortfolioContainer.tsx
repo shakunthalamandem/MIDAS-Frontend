@@ -2,8 +2,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import MDRDailyPortfolioTableMainS3, {
-  MDRDailyPortfolioRow,
 } from "./MDRDailyPortfolioTableMainS3";
+import { MDRDailyPortfolioRow } from "./MDRDailyPortfolioTypes";
 
 const parsePercent = (value: any) => {
   if (value === null || value === undefined || value === "") return null;

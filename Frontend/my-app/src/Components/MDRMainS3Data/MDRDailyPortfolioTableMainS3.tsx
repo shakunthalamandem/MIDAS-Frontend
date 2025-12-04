@@ -1,75 +1,22 @@
 // MDRDailyPortfolioTableMainS3.tsx
 import React, { useMemo, useState } from "react";
-import {
-  Alert,
-  Autocomplete,
-  Box,
-  Button,
-  Container,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Link } from "react-router-dom";
 
-
-export interface MDRDailyPortfolioRow {
-  id: string;
-  ticker: string;
-  dealType: string;
-  dealCaptain: string;
-  daysHeld: number;
-  currentShares: number;
-  currentExposure: number;
-  maxPercent: number | null;
-  grossPercent: number | null;
-  excessReturnPercent: number | null;
-  dtdPnl: number;
-  cumulativeGrossPnl: number;
-  cumulativeNetPnl: number;
-  issuePrice: number;
-  avgInPrice: number;
-  avgExitPrice: number | null;
-  currentPrice: number | null;
-  ultimateStop: number | null;
-  targetPrice: number | null;
-}
+import MDRDailyPortfolioTableView from "./MDRDailyPortfolioTableView";
+import { MDRDailyPortfolioRow } from "./MDRDailyPortfolioTypes";
 
 interface MDRDailyPortfolioTableMainS3Props {
   rows: MDRDailyPortfolioRow[];
   loading: boolean;
   error?: string | null;
   onRefresh?: () => void;
-  tradeDate?: string; // 👈 new prop
+  tradeDate?: string;
 }
 
-const PRIMARY_COLOR = "#002060";
+/* ========= Helpers used by container ========= */
 
-const formatInteger = (value: number | null | undefined) => {
-  if (!Number.isFinite(value as number)) return "-";
-  return Math.round(Number(value)).toLocaleString();
-};
-
-const formatPrice = (value: number | null | undefined) => {
-  if (!Number.isFinite(value as number)) return "-";
-  return Number(value).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-};
-
-const formatPercent = (value: number | null | undefined) => {
-  if (value === null || value === undefined || Number.isNaN(value)) return "-";
-  const numeric = Number(value);
-  const needsDecimals = numeric !== 0 && numeric !== 100;
-  const formatted = needsDecimals ? numeric.toFixed(2) : numeric.toString();
-  return `${formatted}%`;
-};
-
-// Helper to build safe filename
+// Safe filename for Excel
 const getExcelFileName = (tradeDate?: string) => {
   const safeSuffix = tradeDate
     ? `_${String(tradeDate).replace(/[^0-9A-Za-z]/g, "_")}`
@@ -77,223 +24,8 @@ const getExcelFileName = (tradeDate?: string) => {
   return `Monashee_Daily_Report${safeSuffix}.xlsx`;
 };
 
-const columns: GridColDef[] = [
-  {
-    field: "ticker",
-    headerName: "Ticker",
-    flex: 0.7,
-    minWidth: 110,
-    headerAlign: "left",
-    align: "left",
-        renderCell: (params) => (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Link
-              to={`/equity/technical/${params.value}`}
-              style={{ color: "#ac0600ff", textDecoration: "none" }}
-              target="_blank"
-            >
-              {params.value}
-            </Link>
-          </div>
-        )
-  },
-  {
-    field: "dealType",
-    headerName: "Deal Type",
-    flex: 0.7,
-    minWidth: 80,
-  },
-  {
-    field: "dealCaptain",
-    headerName: "Deal Captain",
-    flex: 0.9,
-    minWidth: 100,
-  },
-  {
-    field: "daysHeld",
-    headerName: "Days Held",
-    flex: 0.6,
-    minWidth: 85,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-  },
-  {
-    field: "currentShares",
-    headerName: "Current Shares",
-    flex: 0.9,
-    minWidth: 100,
-    align: "center",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-  },
-  {
-    field: "currentExposure",
-    headerName: "Current $ Exposure",
-    flex: 1,
-    minWidth: 130,
-    align: "center",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-  },
-  {
-    field: "maxPercent",
-    headerName: "% Max",
-    flex: 0.7,
-    minWidth: 70,
-    align: "center",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPercent(params as number),
-  },
-  {
-    field: "grossPercent",
-    headerName: "Gross %",
-    flex: 0.7,
-    minWidth: 80,
-    align: "center",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPercent(params as number),
-  },
-  {
-    field: "excessReturnPercent",
-    headerName: "Excess Return %",
-    flex: 0.9,
-    minWidth: 120,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPercent(params as number),
-  },
-  {
-    field: "dtdPnl",
-    headerName: "DTD P&L",
-    flex: 0.8,
-    minWidth: 80,
-    align: "center",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-    cellClassName: (params) =>
-      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
-  },
-  {
-    field: "cumulativeGrossPnl",
-    headerName: "Cumulative Gross $ P&L",
-    flex: 1,
-    minWidth: 130,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-    cellClassName: (params) =>
-      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
-  },
-  {
-    field: "cumulativeNetPnl",
-    headerName: "Cumulative Net $ P&L",
-    flex: 1,
-    minWidth: 130,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatInteger(params as number),
-    cellClassName: (params) =>
-      params.value > 0 ? "positive" : params.value < 0 ? "negative" : "",
-  },
-  {
-    field: "issuePrice",
-    headerName: "Issue Price",
-    flex: 0.8,
-    minWidth: 90,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-  {
-    field: "avgInPrice",
-    headerName: "Avg In Price",
-    flex: 0.8,
-    minWidth: 100,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-  {
-    field: "avgExitPrice",
-    headerName: "Avg Exit Price",
-    flex: 0.8,
-    minWidth: 110,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-  {
-    field: "currentPrice",
-    headerName: "Current Price",
-    flex: 0.8,
-    minWidth: 100,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-  {
-    field: "ultimateStop",
-    headerName: "Ultimate Stop",
-    flex: 0.8,
-    minWidth: 100,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-  {
-    field: "targetPrice",
-    headerName: "Target Price",
-    flex: 0.8,
-    minWidth: 100,
-    align: "left",
-    headerAlign: "left",
-    valueFormatter: (params) => formatPrice(params as number),
-  },
-];
-
-const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
-  rows,
-  loading,
-  error,
-  onRefresh,
-  tradeDate,
-}) => {
-  const [searchText, setSearchText] = useState<string>("");
-
-  const exportToExcel = () => {
-    const exportData = rows.map(
-      ({ id, ...row }: MDRDailyPortfolioRow) => row
-    );
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    const dataBlob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-    saveAs(dataBlob, getExcelFileName(tradeDate));
-  };
-
-  const tickerOptions = useMemo(
-    () =>
-      Array.from(new Set(rows.map((r) => r.ticker)))
-        .filter(Boolean)
-        .sort(),
-    [rows]
-  );
-
-  const formatTradeDateDisplay = (tradeDate?: string): string => {
+// Trade date label: "01st Dec 2025"
+const formatTradeDateDisplay = (tradeDate?: string): string => {
   if (!tradeDate) return "";
 
   // Expecting "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS"
@@ -332,143 +64,60 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
   const suffix = getDaySuffix(day);
   const monthName = monthNames[month - 1] ?? monthStr.toLowerCase();
 
-  // Matches your example style: "01 st dec 2025"
   return `${dayPadded}${suffix} ${monthName} ${year}`;
 };
 
+const MDRDailyPortfolioTableMainS3: React.FC<
+  MDRDailyPortfolioTableMainS3Props
+> = ({ rows, loading, error, onRefresh, tradeDate }) => {
+  const [searchText, setSearchText] = useState<string>("");
+
+  // Excel export
+  const exportToExcel = () => {
+    const exportData = rows.map(({ id, ...row }: MDRDailyPortfolioRow) => row);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, getExcelFileName(tradeDate));
+  };
+
+  // Ticker options for autocomplete
+  const tickerOptions = useMemo(
+    () =>
+      Array.from(new Set(rows.map((r) => r.ticker)))
+        .filter(Boolean)
+        .sort(),
+    [rows]
+  );
+
+  // Filter rows by ticker search
   const filteredRows = useMemo(() => {
     if (!searchText) return rows;
     const value = searchText.toLowerCase();
     return rows.filter((row) => row.ticker.toLowerCase().includes(value));
   }, [rows, searchText]);
+
   const formattedTradeDate = formatTradeDateDisplay(tradeDate);
 
   return (
-    <Container maxWidth="xl">
-      <Stack spacing={2}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
-          >
-            Monashee Daily Portfolio Report
-            {formattedTradeDate ? ` – ${formattedTradeDate}` : ""}
-          </Typography>
-
-          {/* 👇 search & export side-by-side on the right */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Autocomplete
-              size="small"
-              freeSolo
-              options={tickerOptions}
-              inputValue={searchText}
-              onInputChange={(_event, value) => setSearchText(value)}
-              sx={{ minWidth: 260 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Ticker"
-                  placeholder="Type to search ticker"
-                />
-              )}
-              disabled={rows.length === 0}
-            />
-
-            <Button
-              variant="contained"
-              onClick={exportToExcel}
-              sx={{
-                backgroundColor: "#002060",
-                color: "#fff",
-                textTransform: "none",
-              }}
-            >
-              Export to Excel
-            </Button>
-          </Stack>
-        </Stack>
-
-        {error && <Alert severity="error">{error}</Alert>}
-
-        <Box sx={{ width: "100%", overflowX: "auto" }}>
-          <DataGrid
-            rows={filteredRows}
-            columns={columns}
-            loading={loading}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            disableColumnMenu
-            columnHeaderHeight={50}
-            rowHeight={45}
-            autoHeight={false}
-            sx={{
-              height: 600,
-              fontSize: 12,
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f0f3ff",
-                color: PRIMARY_COLOR,
-                fontWeight: 700,
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: 700,
-                fontSize: 12,
-              },
-              "& .MuiDataGrid-cell": {
-                fontSize: 12,
-                paddingTop: "6px",
-                paddingBottom: "6px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                backgroundColor: "#fafbff",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: "#f5f7ff",
-              },
-              "& .positive": {
-                color: "green",
-                fontWeight: 600,
-              },
-              "& .negative": {
-                color: "red",
-                fontWeight: 600,
-              },
-            }}
-            pageSizeOptions={[100]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 100, page: 0 } },
-            }}
-            slots={{
-              noRowsOverlay: () => (
-                <Stack
-                  height="100%"
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={0.5}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    No data available.
-                  </Typography>
-                  {onRefresh && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={onRefresh}
-                    >
-                      Tap to retry
-                    </Typography>
-                  )}
-                </Stack>
-              ),
-            }}
-          />
-        </Box>
-      </Stack>
-    </Container>
+    <MDRDailyPortfolioTableView
+      rows={filteredRows}
+      loading={loading}
+      error={error}
+      onRefresh={onRefresh}
+      titleSuffix={formattedTradeDate}
+      tickerOptions={tickerOptions}
+      searchText={searchText}
+      onSearchTextChange={setSearchText}
+      onExport={exportToExcel}
+    />
   );
 };
 
