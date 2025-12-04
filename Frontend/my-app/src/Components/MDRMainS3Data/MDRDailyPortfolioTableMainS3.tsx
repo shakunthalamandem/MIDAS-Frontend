@@ -303,7 +303,7 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
             // fixed height 500px + internal scrolling
             autoHeight={false}
             sx={{
-              height: 500,
+              height: 600,
               fontSize: 12,
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f0f3ff",
