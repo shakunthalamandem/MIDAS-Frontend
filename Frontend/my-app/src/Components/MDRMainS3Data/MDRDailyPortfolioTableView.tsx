@@ -274,7 +274,7 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
         >
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
+            sx={{ fontWeight: 700, color: "#C00000", letterSpacing: 0.4 }}
           >
             Monashee Daily Portfolio Report
             {titleSuffix ? ` – ${titleSuffix}` : ""}
