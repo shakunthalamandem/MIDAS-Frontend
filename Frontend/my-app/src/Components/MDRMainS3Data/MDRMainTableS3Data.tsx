@@ -2,6 +2,7 @@ import React from 'react'
 import { MDRDailyPortfolioContainer } from './MDRDailyPortfolioContainer'
 import RegionWiseMDRTables from './RegionWiseMDRTables'
 import { Typography } from '@mui/material'
+import MDRCummulativeRegionChartMain from './MDRCharts/MDRCummulativeRegionChartMain'
 
 const MDRMainTableS3Data = () => {
   return (
@@ -32,6 +33,7 @@ const MDRMainTableS3Data = () => {
         Welcome to Monashee Daily Report
       </Typography>
       <MDRDailyPortfolioContainer />
+            <MDRCummulativeRegionChartMain />
       <RegionWiseMDRTables />
       
 </>  )
