@@ -295,7 +295,6 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
                   placeholder="Type to search ticker"
                 />
               )}
-              disabled={rows.length === 0}
             />
 
             <Button
