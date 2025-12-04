@@ -9,6 +9,7 @@ import {
   Alert,
   Stack,
   Button,
+  Container,
 } from "@mui/material"
 import MDRCummulativeRegionChart, {
   RegionPoint,
@@ -62,10 +63,12 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
       const response = await fetch(
         `${apiUrl}/api/mdr_cummulative_by_region/`,
         {
+          method: "POST", // 👈 changed from GET to POST
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
+          body: JSON.stringify({}), // 👈 send an empty JSON body (adjust if API expects payload)
         }
       )
 
@@ -91,6 +94,7 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
   }, [])
 
   return (
+     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
     <Card
       elevation={2}
       sx={{
@@ -101,25 +105,11 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
-          gap={1.5}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1F2937" }}>
+
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }} align="center">
             MDR Cumulative P&L by Region
           </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={fetchData}
-            disabled={loading}
-          >
-            Refresh
-          </Button>
-        </Stack>
+
 
         {loading && (
           <Box display="flex" justifyContent="center" py={6}>
@@ -144,6 +134,7 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
         )}
       </CardContent>
     </Card>
+   </Container>
   )
 }
 
