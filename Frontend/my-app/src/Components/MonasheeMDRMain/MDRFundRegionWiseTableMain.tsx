@@ -1,4 +1,4 @@
-// MDRRegionWiseTablesDataMain.tsx
+// MDRFundRegionWiseTableMain.tsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -16,12 +16,13 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-// import MDRFundRegionWiseFilters from "path-to-your-component";
+
+import MDRFundRegionWiseFilters, {
+  FundRegionFilterState,
+  FundRegionFilterOptions,
+} from "./MDRFundRegionWiseFilters";
 
 const PRIMARY_COLOR = "#002060";
-
-// Same order as backend
-const REGION_ORDER = ["US", "AmerExUS", "APAC", "EMEA", "Total"];
 
 interface RegionRow {
   region: string;
@@ -35,29 +36,139 @@ interface FundBlock {
   rows: RegionRow[];
 }
 
-// --- API response types (matching your Django view) ---
-interface ApiRegionPnL {
-  DTD: number;
-  MTD: number;
-  YTD: number;
+interface MetaData {
+  start_date: string;
+  end_date: string;
+  as_of_date: string;
+  assets: string[];
 }
 
-interface ApiFundsResponse {
-  funds: {
-    [fundName: string]: {
-      [region: string]: ApiRegionPnL;
-    };
-  };
-}
+const initialFilters: FundRegionFilterState = {
+  startDate: "",
+  endDate: "",
+  asset: [],
+};
 
-const MDRRegionWiseTablesDataMain: React.FC = () => {
+const MDRFundRegionWiseTableMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
+  const [filters, setFilters] =
+    useState<FundRegionFilterState>(initialFilters);
+  const [filterOptions, setFilterOptions] =
+    useState<FundRegionFilterOptions>({
+      assetTypes: [],
+    });
+
   const [data, setData] = useState<FundBlock[]>([]);
+  const [meta, setMeta] = useState<MetaData | null>(null);
+
   const [loading, setLoading] = useState(false);
+  const [filtersLoading, setFiltersLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasApplied, setHasApplied] = useState(false); // if you use filters
+  const [hasApplied, setHasApplied] = useState(false);
+
+  const handleFiltersChange = (
+    updated: Partial<FundRegionFilterState>
+  ) => {
+    setFilters((prev: FundRegionFilterState) => ({ ...prev, ...updated }));
+  };
+
+  // 🔹 Load Asset Types
+  useEffect(() => {
+    const loadFilters = async () => {
+      if (!apiUrl) {
+        setError("API URL is not defined in environment variables");
+        return;
+      }
+
+      try {
+        setFiltersLoading(true);
+
+        const response = await fetch(`${apiUrl}/api/daily_trades_filters/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Failed to fetch filter options");
+        }
+
+        const json = await response.json();
+        setFilterOptions({
+          assetTypes: json.asset_type || [],
+        });
+      } catch (err: any) {
+        setError(err.message || "Failed to load filter options");
+      } finally {
+        setFiltersLoading(false);
+      }
+    };
+
+    loadFilters();
+  }, [apiUrl, token]);
+
+  // 🔹 Fetch Region/Fund Net Hedge PnL
+  const handleApply = async () => {
+    setHasApplied(true);
+    setError(null);
+
+    if (!apiUrl) {
+      setError("API URL is not defined in environment variables");
+      return;
+    }
+
+    const payload = {
+      start_date: filters.startDate,
+      end_date: filters.endDate,
+      assets: filters.asset,
+    };
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${apiUrl}/api/mdr_fund_wise_data_table/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Failed to fetch region/fund P&L data");
+      }
+
+      const json: { data: FundBlock[]; meta: MetaData } =
+        await response.json();
+
+      setData(Array.isArray(json.data) ? json.data : []);
+      setMeta(json.meta || null);
+    } catch (err: any) {
+      setError(err.message || "An error occurred while fetching data");
+      setData([]);
+      setMeta(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setFilters(initialFilters);
+    setData([]);
+    setMeta(null);
+    setHasApplied(false);
+    setError(null);
+  };
 
   // 🔹 ROUND OFF values (no decimals)
   const formatPnL = (num: number) => {
@@ -67,74 +178,6 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
 
   const pnlColor = (v: number) =>
     v < 0 ? "#d32f2f" : v > 0 ? "#2e7d32" : undefined;
-
-  // 🔹 Fetch data from API (no payload)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch(
-          `${apiUrl}/api/mdr_fund_wise_data_table/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            // ⛔ No body / payload required by backend
-            // body: JSON.stringify({}),
-          }
-        );
-
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text || "Failed to fetch region/fund P&L data");
-        }
-
-        const json: ApiFundsResponse = await response.json();
-
-        // 🔹 Transform { funds: { fund: { region: {DTD,MTD,YTD} } } }
-        //     into FundBlock[] expected by the UI
-        const transformed: FundBlock[] = Object.entries(json.funds || {}).map(
-          ([fundName, regionsObj]) => {
-            const rows: RegionRow[] = REGION_ORDER.map((regionName) => {
-              const regionData = regionsObj[regionName] || {
-                DTD: 0,
-                MTD: 0,
-                YTD: 0,
-              };
-
-              return {
-                region: regionName,
-                dtd: regionData.DTD,
-                mtd: regionData.MTD,
-                ytd: regionData.YTD,
-              };
-            });
-
-            return {
-              fund: fundName,
-              rows,
-            };
-          }
-        );
-
-        setData(transformed);
-        setHasApplied(true); // optional – if you want "no data" message logic to work
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching data");
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (apiUrl) {
-      fetchData();
-    }
-  }, [apiUrl, token]);
 
   // 🔹 Split normal funds vs "Total" overall fund
   const normalFunds = data.filter(
@@ -228,7 +271,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
 
             <TableBody>
               {fund.rows.map((row) => (
-                <TableRow key={`${fund.fund}-${row.region}`}>
+                <TableRow key={row.region}>
                   <TableCell
                     sx={{
                       width: "34%",
@@ -302,7 +345,15 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
             expenses)
           </Typography>
 
-          {/* Keep this only if you still use filters */}
+          <MDRFundRegionWiseFilters
+            filters={filters}
+            filterOptions={filterOptions}
+            loading={loading || filtersLoading}
+            onChange={handleFiltersChange}
+            onApply={handleApply}
+            onReset={handleReset}
+          />
+
           {error && (
             <Typography color="error" sx={{ mb: 2 }}>
               {error}
@@ -314,6 +365,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
               <CircularProgress />
             </Box>
           )}
+
 
           <Grid container spacing={2}>
             {hasApplied && !loading && data.length === 0 && (
@@ -342,4 +394,4 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
   );
 };
 
-export default MDRRegionWiseTablesDataMain;
+export default MDRFundRegionWiseTableMain;
