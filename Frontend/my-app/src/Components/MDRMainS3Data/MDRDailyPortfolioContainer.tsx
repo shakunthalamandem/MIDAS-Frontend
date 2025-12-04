@@ -1,10 +1,9 @@
 // MDRDailyPortfolioContainer.tsx
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 import MDRDailyPortfolioTableMainS3, {
   MDRDailyPortfolioRow,
 } from "./MDRDailyPortfolioTableMainS3";
-
 
 const parsePercent = (value: any) => {
   if (value === null || value === undefined || value === "") return null;
@@ -58,6 +57,7 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
   const [rows, setRows] = useState<MDRDailyPortfolioRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tradeDate, setTradeDate] = useState<string>("");
 
   const apiUrl = process.env.REACT_APP_API_URL ?? "";
   const getToken = () => localStorage.getItem("access_token") || "";
@@ -93,11 +93,24 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
         ? data
         : data.daily_portfolio || data.results || [];
 
+      // Try to get trade_date from common places in the response
+      let apiTradeDate: string = "";
+
+      if (typeof data.trade_date === "string") {
+        apiTradeDate = data.trade_date;
+      } else if (typeof data.tradeDate === "string") {
+        apiTradeDate = data.tradeDate;
+      } else if (rawRows.length && typeof rawRows[0]?.trade_date === "string") {
+        apiTradeDate = rawRows[0].trade_date;
+      }
+
+      setTradeDate(apiTradeDate || "");
       setRows(rawRows.map((row, index) => normalizeRow(row, index)));
     } catch (err: any) {
       console.error(err);
       setError(err.message || "An error occurred");
       setRows([]);
+      setTradeDate("");
     } finally {
       setLoading(false);
     }
@@ -108,14 +121,15 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
   }, [fetchPortfolio]);
 
   return (
-      <Box>
-        <MDRDailyPortfolioTableMainS3
-          rows={rows}
-          loading={loading}
-          error={error}
-          onRefresh={fetchPortfolio}
-        />
-      </Box>
+    <Box>
+      <MDRDailyPortfolioTableMainS3
+        rows={rows}
+        loading={loading}
+        error={error}
+        onRefresh={fetchPortfolio}
+        tradeDate={tradeDate}
+      />
+    </Box>
   );
 };
 

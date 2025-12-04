@@ -1,5 +1,5 @@
 // MDRDailyPortfolioTableMainS3.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Alert,
   Autocomplete,
@@ -41,6 +41,7 @@ interface MDRDailyPortfolioTableMainS3Props {
   loading: boolean;
   error?: string | null;
   onRefresh?: () => void;
+  tradeDate?: string; // 👈 new prop
 }
 
 const PRIMARY_COLOR = "#002060";
@@ -58,28 +59,20 @@ const formatPrice = (value: number | null | undefined) => {
   });
 };
 
-  const exportToExcel = () => {
-    const exportData = rows.map(({ id, ...row }) => row);
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    const dataBlob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-    saveAs(dataBlob, "Deal_Detailed_Gap_Analysis.xlsx");
-  };
-
-
 const formatPercent = (value: number | null | undefined) => {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
   const numeric = Number(value);
   const needsDecimals = numeric !== 0 && numeric !== 100;
   const formatted = needsDecimals ? numeric.toFixed(2) : numeric.toString();
   return `${formatted}%`;
+};
+
+// Helper to build safe filename
+const getExcelFileName = (tradeDate?: string) => {
+  const safeSuffix = tradeDate
+    ? `_${String(tradeDate).replace(/[^0-9A-Za-z]/g, "_")}`
+    : "";
+  return `Monashee_Daily_Report${safeSuffix}.xlsx`;
 };
 
 const columns: GridColDef[] = [
@@ -257,9 +250,26 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
   loading,
   error,
   onRefresh,
+  tradeDate,
 }) => {
-  // search text (live filter)
   const [searchText, setSearchText] = useState<string>("");
+
+  const exportToExcel = () => {
+    const exportData = rows.map(
+      ({ id, ...row }: MDRDailyPortfolioRow) => row
+    );
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Deals");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(dataBlob, getExcelFileName(tradeDate));
+  };
 
   const tickerOptions = useMemo(
     () =>
@@ -269,53 +279,59 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
     [rows]
   );
 
-  // Filter rows as user types (no need to click/select)
   const filteredRows = useMemo(() => {
     if (!searchText) return rows;
     const value = searchText.toLowerCase();
-    return rows.filter((row) =>
-      row.ticker.toLowerCase().includes(value)
-    );
+    return rows.filter((row) => row.ticker.toLowerCase().includes(value));
   }, [rows, searchText]);
 
   return (
     <Container maxWidth="xl">
       <Stack spacing={2}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Typography
             variant="h6"
             sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
           >
             Monashee Daily Portfolio Report
+            {tradeDate ? ` – ${tradeDate}` : ""}
           </Typography>
 
-          <Autocomplete
-            size="small"
-            freeSolo
-            options={tickerOptions}
-            inputValue={searchText}
-            onInputChange={(_event, value) => setSearchText(value)}
-            sx={{ minWidth: 260 }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Ticker"
-                placeholder="Type to search ticker"
-              />
-            )}
-            disabled={rows.length === 0}
-          />
-                  <Button
-            variant="contained"
-            onClick={exportToExcel}
-            sx={{
-              backgroundColor: "#002060",
-              color: "#fff",
-              textTransform: "none",
-            }}
-          >
-            Export to Excel
-          </Button>
+          {/* 👇 search & export side-by-side on the right */}
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Autocomplete
+              size="small"
+              freeSolo
+              options={tickerOptions}
+              inputValue={searchText}
+              onInputChange={(_event, value) => setSearchText(value)}
+              sx={{ minWidth: 260 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Ticker"
+                  placeholder="Type to search ticker"
+                />
+              )}
+              disabled={rows.length === 0}
+            />
+
+            <Button
+              variant="contained"
+              onClick={exportToExcel}
+              sx={{
+                backgroundColor: "#002060",
+                color: "#fff",
+                textTransform: "none",
+              }}
+            >
+              Export to Excel
+            </Button>
+          </Stack>
         </Stack>
 
         {error && <Alert severity="error">{error}</Alert>}
@@ -330,7 +346,6 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
             disableColumnMenu
             columnHeaderHeight={50}
             rowHeight={45}
-            // fixed height 500px + internal scrolling
             autoHeight={false}
             sx={{
               height: 600,
@@ -368,7 +383,6 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
                 fontWeight: 600,
               },
             }}
-            // pagination: 100 rows per page
             pageSizeOptions={[100]}
             initialState={{
               pagination: { paginationModel: { pageSize: 100, page: 0 } },
