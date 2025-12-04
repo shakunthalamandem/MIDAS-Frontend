@@ -61,7 +61,7 @@ const columns: GridColDef[] = [
     headerName: "Ticker",
     flex: 0.7,
     minWidth: 110,
-    headerAlign: "left",
+    headerAlign: "center",
     align: "left",
     renderCell: (params) => (
       <div
@@ -328,6 +328,18 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
             sx={{
               height: 600,
               fontSize: 12,
+               "& .MuiDataGrid-container--top [role='row']": {
+      backgroundColor: "#002060",
+      color: "#FFFFFF",
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#cad0f1ff !important",
+    },
+    "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+      color: "#FFFFFF",
+    },
+    cursor: "pointer",
+    border: "1px solid #ccccccff",
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f0f3ff",
                 color: PRIMARY_COLOR,
