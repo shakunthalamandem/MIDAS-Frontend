@@ -3,6 +3,8 @@ import { MDRDailyPortfolioContainer } from './MDRDailyPortfolioContainer'
 import RegionWiseMDRTables from './RegionWiseMDRTables'
 import { Typography } from '@mui/material'
 import MDRCummulativeRegionChartMain from './MDRCharts/MDRCummulativeRegionChartMain'
+import MDRFundRegionWiseTableMain from '../MonasheeMDRMain/MDRFundRegionWiseTableMain'
+import MDRRegionWiseTablesDataMain from './MDRRegionWiseTables/MDRRegionWiseTablesDataMain'
 
 const MDRMainTableS3Data = () => {
   return (
@@ -33,7 +35,9 @@ const MDRMainTableS3Data = () => {
         Welcome to Monashee Daily Report
       </Typography>
       <MDRDailyPortfolioContainer />
-            <MDRCummulativeRegionChartMain />
+      <MDRCummulativeRegionChartMain />
+      <MDRRegionWiseTablesDataMain />
+
       <RegionWiseMDRTables />
       
 </>  )
