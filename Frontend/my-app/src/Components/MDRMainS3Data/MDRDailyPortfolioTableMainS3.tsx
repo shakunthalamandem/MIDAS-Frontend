@@ -13,6 +13,8 @@ import {
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { Link } from "react-router-dom";
+
 
 export interface MDRDailyPortfolioRow {
   id: string;
@@ -83,6 +85,24 @@ const columns: GridColDef[] = [
     minWidth: 110,
     headerAlign: "left",
     align: "left",
+        renderCell: (params) => (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Link
+              to={`/equity/technical/${params.value}`}
+              style={{ color: "#ac0600ff", textDecoration: "none" }}
+              target="_blank"
+            >
+              {params.value}
+            </Link>
+          </div>
+        )
   },
   {
     field: "dealType",
