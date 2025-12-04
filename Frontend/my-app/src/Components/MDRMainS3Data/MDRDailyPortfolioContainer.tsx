@@ -3,8 +3,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Box, Container } from "@mui/material";
 import {
   MDRDailyPortfolioRow,
-  MDRDailyPortfolioTable,
-} from "./MDRDailyPortfolioTable";
+  MDRDailyPortfolioTableMainS3,
+} from "./MDRDailyPortfolioTableMainS3";
 
 const parsePercent = (value: any) => {
   if (value === null || value === undefined || value === "") return null;
@@ -108,7 +108,7 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
   return (
     <Container maxWidth={false} sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
       <Box>
-        <MDRDailyPortfolioTable
+        <MDRDailyPortfolioTableMainS3
           rows={rows}
           loading={loading}
           error={error}

@@ -1,4 +1,4 @@
-// MDRDailyPortfolioTable.tsx
+// MDRDailyPortfolioTableMainS3.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -33,7 +33,7 @@ export interface MDRDailyPortfolioRow {
   targetPrice: number | null;
 }
 
-interface MDRDailyPortfolioTableProps {
+interface MDRDailyPortfolioTableMainS3Props {
   rows: MDRDailyPortfolioRow[];
   loading: boolean;
   error?: string | null;
@@ -233,7 +233,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-export const MDRDailyPortfolioTable: React.FC<MDRDailyPortfolioTableProps> = ({
+export const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> = ({
   rows,
   loading,
   error,
