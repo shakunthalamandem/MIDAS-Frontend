@@ -79,16 +79,10 @@ const columns: GridColDef[] = [
   {
     field: "ticker",
     headerName: "Ticker",
-    flex: 0.75,
+    flex: 0.7,
     minWidth: 110,
-    renderCell: (params) => (
-      <Typography sx={{ color: "red", fontWeight: 500, fontSize: 12 }}>
-        {params.value || "-"}
-      </Typography>
-    ),
     headerAlign: "left",
     align: "left",
-    cellClassName: "tickerCell",
   },
   {
     field: "dealType",
@@ -169,7 +163,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "cumulativeGrossPnl",
-    headerName: "Cumulative Gross P&L",
+    headerName: "Cumulative Gross $ P&L",
     flex: 1,
     minWidth: 130,
     align: "left",
@@ -180,7 +174,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "cumulativeNetPnl",
-    headerName: "Cumulative Net P&L",
+    headerName: "Cumulative Net $ P&L",
     flex: 1,
     minWidth: 130,
     align: "left",
@@ -413,10 +407,6 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
               },
               "& .MuiDataGrid-row:hover": {
                 backgroundColor: "#f5f7ff",
-              },
-              "& .tickerCell": {
-                color: "red",
-                fontWeight: 600,
               },
               "& .positive": {
                 color: "green",
