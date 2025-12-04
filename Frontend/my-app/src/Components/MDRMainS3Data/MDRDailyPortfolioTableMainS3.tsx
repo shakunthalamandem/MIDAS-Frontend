@@ -279,11 +279,55 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
     [rows]
   );
 
+  const formatTradeDateDisplay = (tradeDate?: string): string => {
+  if (!tradeDate) return "";
+
+  // Expecting "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS"
+  const [yearStr, monthStr, dayStr] = tradeDate.split(/[-T]/);
+  const year = Number(yearStr);
+  const month = Number(monthStr); // 1–12
+  const day = Number(dayStr);
+
+  if (!year || !month || !day) return tradeDate;
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const getDaySuffix = (d: number) => {
+    if (d >= 11 && d <= 13) return "th";
+    const last = d % 10;
+    if (last === 1) return "st";
+    if (last === 2) return "nd";
+    if (last === 3) return "rd";
+    return "th";
+  };
+
+  const dayPadded = day.toString().padStart(2, "0");
+  const suffix = getDaySuffix(day);
+  const monthName = monthNames[month - 1] ?? monthStr.toLowerCase();
+
+  // Matches your example style: "01 st dec 2025"
+  return `${dayPadded}${suffix} ${monthName} ${year}`;
+};
+
   const filteredRows = useMemo(() => {
     if (!searchText) return rows;
     const value = searchText.toLowerCase();
     return rows.filter((row) => row.ticker.toLowerCase().includes(value));
   }, [rows, searchText]);
+  const formattedTradeDate = formatTradeDateDisplay(tradeDate);
 
   return (
     <Container maxWidth="xl">
@@ -298,7 +342,7 @@ const MDRDailyPortfolioTableMainS3: React.FC<MDRDailyPortfolioTableMainS3Props> 
             sx={{ fontWeight: 700, color: PRIMARY_COLOR, letterSpacing: 0.4 }}
           >
             Monashee Daily Portfolio Report
-            {tradeDate ? ` – ${tradeDate}` : ""}
+            {formattedTradeDate ? ` – ${formattedTradeDate}` : ""}
           </Typography>
 
           {/* 👇 search & export side-by-side on the right */}
