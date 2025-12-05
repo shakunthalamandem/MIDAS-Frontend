@@ -89,7 +89,7 @@ const DataTable: React.FC<DataTableProps> = ({
   total_sum,
 }) => (
   <>
-  <Container >
+    <Container maxWidth="xl">
     <Typography
       variant="h6"
       align="center"
