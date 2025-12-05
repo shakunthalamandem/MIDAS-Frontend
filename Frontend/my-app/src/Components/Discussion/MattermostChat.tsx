@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 
 type Status = "idle" | "loading" | "ready" | "error";
 
-const MATTERMOST_ORIGIN = "http://192.168.1.65:8065";
-const MATTERMOST_TEAM = "nook";
-const DEFAULT_CHANNEL = "nooks-party";
+const MATTERMOST_ORIGIN = process.env.REACT_APP_MATTERMOST_ORIGIN as string;
+const MATTERMOST_TEAM = process.env.REACT_APP_MATTERMOST_TEAM as string;
+const DEFAULT_CHANNEL = process.env.REACT_APP_DEFAULT_CHANNEL as string;
 
 const apiUrl = process.env.REACT_APP_API_URL as string;
 
