@@ -1,9 +1,12 @@
 // MDRDailyPortfolioContainer.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import MDRDailyPortfolioTableMainS3, {
-} from "./MDRDailyPortfolioTableMainS3";
+import MDRDailyPortfolioTableMainS3 from "./MDRDailyPortfolioTableMainS3";
 import { MDRDailyPortfolioRow } from "./MDRDailyPortfolioTypes";
+
+interface MDRDailyPortfolioContainerProps {
+  pdfMode?: boolean;
+}
 
 const parsePercent = (value: any) => {
   if (value === null || value === undefined || value === "") return null;
@@ -53,7 +56,9 @@ const normalizeRow = (raw: any, index: number): MDRDailyPortfolioRow => ({
       : Number(raw.target_price ?? raw.targetPrice ?? 0),
 });
 
-export const MDRDailyPortfolioContainer: React.FC = () => {
+export const MDRDailyPortfolioContainer: React.FC<
+  MDRDailyPortfolioContainerProps
+> = ({ pdfMode = false }) => {
   const [rows, setRows] = useState<MDRDailyPortfolioRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +133,7 @@ export const MDRDailyPortfolioContainer: React.FC = () => {
         error={error}
         onRefresh={fetchPortfolio}
         tradeDate={tradeDate}
+        pdfMode={pdfMode}
       />
     </Box>
   );

@@ -44,7 +44,6 @@ const formatCurrencyPrice = (value: number | null | undefined) => {
   return num < 0 ? `-$${absVal}` : `$${absVal}`;
 };
 
-
 const formatPercent = (value: number | null | undefined) => {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
   const numeric = Number(value);
@@ -237,6 +236,56 @@ const columns: GridColDef[] = [
   },
 ];
 
+const pdfColumns = columns.map((col) => ({
+  field: col.field as keyof MDRDailyPortfolioRow,
+  header: col.headerName || String(col.field),
+  align: (col.align || "left") as React.CSSProperties["textAlign"],
+}));
+
+const PDF_TABLE_MIN_WIDTH = 1600;
+
+const pdfValueFormatters: Partial<
+  Record<keyof MDRDailyPortfolioRow, (value: any) => string>
+> = {
+  daysHeld: formatInteger,
+  currentShares: formatInteger,
+  currentExposure: formatCurrencyInteger,
+  maxPercent: formatPercent,
+  grossPercent: formatPercent,
+  excessReturnPercent: formatPercent,
+  dtdPnl: formatCurrencyInteger,
+  cumulativeGrossPnl: formatCurrencyInteger,
+  cumulativeNetPnl: formatCurrencyInteger,
+  issuePrice: formatCurrencyPrice,
+  avgInPrice: formatCurrencyPrice,
+  avgExitPrice: formatCurrencyPrice,
+  currentPrice: formatCurrencyPrice,
+  ultimateStop: formatCurrencyPrice,
+  targetPrice: formatCurrencyPrice,
+};
+
+const getDisplayValue = (
+  field: keyof MDRDailyPortfolioRow,
+  row: MDRDailyPortfolioRow
+) => {
+  const formatter = pdfValueFormatters[field];
+  const raw = row[field] as any;
+  const formatted = formatter ? formatter(raw) : raw ?? "";
+  return typeof formatted === "string" ? formatted : String(formatted ?? "");
+};
+
+const getCellColor = (
+  field: keyof MDRDailyPortfolioRow,
+  row: MDRDailyPortfolioRow
+) => {
+  const value = Number(row[field as keyof MDRDailyPortfolioRow] ?? 0);
+  if (["dtdPnl", "cumulativeGrossPnl", "cumulativeNetPnl"].includes(field)) {
+    if (value > 0) return "green";
+    if (value < 0) return "red";
+  }
+  return undefined;
+};
+
 /* ========= Props for the view ========= */
 
 interface MDRDailyPortfolioTableViewProps {
@@ -249,6 +298,7 @@ interface MDRDailyPortfolioTableViewProps {
   searchText: string;
   onSearchTextChange: (value: string) => void;
   onExport: () => void;
+  pdfMode?: boolean;
 }
 
 /* ========= Presentational component ========= */
@@ -263,6 +313,7 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
   searchText,
   onSearchTextChange,
   onExport,
+  pdfMode = false,
 }) => {
   return (
     <Container maxWidth="xl">
@@ -277,7 +328,7 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
             sx={{ fontWeight: 700, color: "#C00000", letterSpacing: 0.4 }}
           >
             Monashee Daily Portfolio Report
-            {titleSuffix ? ` – ${titleSuffix}` : ""}
+            {titleSuffix ? ` - ${titleSuffix}` : ""}
           </Typography>
 
           <Stack direction="row" spacing={2} alignItems="center">
@@ -314,89 +365,148 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
         {error && <Alert severity="error">{error}</Alert>}
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            loading={loading}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            disableColumnMenu
-            columnHeaderHeight={50}
-            rowHeight={45}
-            autoHeight={false}
-            sx={{
-              height: 600,
-              fontSize: 12,
-               "& .MuiDataGrid-container--top [role='row']": {
-      backgroundColor: "#002060",
-      color: "#FFFFFF",
-    },
-    "& .Mui-selected": {
-      backgroundColor: "#cad0f1ff !important",
-    },
-    "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
-      color: "#FFFFFF",
-    },
-    cursor: "pointer",
-    border: "1px solid #ccccccff",
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f0f3ff",
-                color: PRIMARY_COLOR,
-                fontWeight: 700,
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                fontWeight: 700,
+          {pdfMode ? (
+            <Box sx={{ width: "100%", overflowX: "auto" }}>
+              <table
+                style={{
+                  width: "100%",
+                  minWidth: PDF_TABLE_MIN_WIDTH,
+                  borderCollapse: "separate",
+                  fontSize: 12,
+                }}
+              >
+                <thead>
+                  <tr>
+                    {pdfColumns.map((col) => (
+                      <th
+                        key={col.field as string}
+                        style={{
+                          padding: "6px 8px",
+                          borderBottom: "1px solid #e5e7eb",
+                          backgroundColor: "#f0f3ff",
+                          color: PRIMARY_COLOR,
+                          textAlign: col.align,
+                          fontWeight: 700,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {col.header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id} style={{ backgroundColor: "#ffffff" }}>
+                      {pdfColumns.map((col) => {
+                        const value = getDisplayValue(col.field, row);
+                        const color = getCellColor(col.field, row);
+                        return (
+                          <td
+                            key={`${row.id}-${col.field as string}`}
+                            style={{
+                              padding: "6px 8px",
+                              borderBottom: "1px solid #f1f3f5",
+                              textAlign: col.align,
+                              color: color || "#111827",
+                              fontVariantNumeric: "tabular-nums",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {value}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Box>
+          ) : (
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              loading={loading}
+              getRowId={(row) => row.id}
+              disableRowSelectionOnClick
+              disableColumnMenu
+              columnHeaderHeight={50}
+              rowHeight={45}
+              autoHeight={false}
+              sx={{
+                height: 600,
                 fontSize: 12,
-              },
-              "& .MuiDataGrid-cell": {
-                fontSize: 12,
-                paddingTop: "6px",
-                paddingBottom: "6px",
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                backgroundColor: "#fafbff",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: "#f5f7ff",
-              },
-              "& .positive": {
-                color: "green",
-                fontWeight: 600,
-              },
-              "& .negative": {
-                color: "red",
-                fontWeight: 600,
-              },
-            }}
-            pageSizeOptions={[100]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 100, page: 0 } },
-            }}
-            slots={{
-              noRowsOverlay: () => (
-                <Stack
-                  height="100%"
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={0.5}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    No data available.
-                  </Typography>
-                  {onRefresh && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={onRefresh}
-                    >
-                      Tap to retry
+                "& .MuiDataGrid-container--top [role='row']": {
+                  backgroundColor: "#002060",
+                  color: "#FFFFFF",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#cad0f1ff !important",
+                },
+                "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+                  color: "#FFFFFF",
+                },
+                cursor: "pointer",
+                border: "1px solid #ccccccff",
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: "#f0f3ff",
+                  color: PRIMARY_COLOR,
+                  fontWeight: 700,
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: 700,
+                  fontSize: 12,
+                },
+                "& .MuiDataGrid-cell": {
+                  fontSize: 12,
+                  paddingTop: "6px",
+                  paddingBottom: "6px",
+                },
+                "& .MuiDataGrid-row:nth-of-type(odd)": {
+                  backgroundColor: "#fafbff",
+                },
+                "& .MuiDataGrid-row:hover": {
+                  backgroundColor: "#f5f7ff",
+                },
+                "& .positive": {
+                  color: "green",
+                  fontWeight: 600,
+                },
+                "& .negative": {
+                  color: "red",
+                  fontWeight: 600,
+                },
+              }}
+              pageSizeOptions={[100]}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 100, page: 0 } },
+              }}
+              slots={{
+                noRowsOverlay: () => (
+                  <Stack
+                    height="100%"
+                    alignItems="center"
+                    justifyContent="center"
+                    spacing={0.5}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      No data available.
                     </Typography>
-                  )}
-                </Stack>
-              ),
-            }}
-          />
+                    {onRefresh && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ cursor: "pointer" }}
+                        onClick={onRefresh}
+                      >
+                        Tap to retry
+                      </Typography>
+                    )}
+                  </Stack>
+                ),
+              }}
+            />
+          )}
         </Box>
       </Stack>
     </Container>

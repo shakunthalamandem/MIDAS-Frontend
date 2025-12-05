@@ -368,7 +368,12 @@ const MDRRegionWiseTopTables: React.FC = () => {
         {!loading &&
           !error &&
           sections.map((section) => (
-            <Box key={section.key} sx={{ mb: 3 }}>
+            <Box
+              key={section.key}
+              sx={{ mb: 3 }}
+              data-pdf-break-before={section.key === "days_held" ? "true" : undefined}
+              className="mdr-pdf-section"
+            >
               <MetricSection
                 title={section.title}
                 columnLabel={section.columnLabel}
