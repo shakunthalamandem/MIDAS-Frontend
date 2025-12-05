@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Alert,
   Container,
+  Grid,
 } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 
@@ -48,9 +49,9 @@ const formatValue = (value?: number | null): string => {
 
 const getCellStyle = (value: number | null | undefined) => {
   if (value === undefined || value === null) return {};
-  if (value > 0) return { color: green[600],  fontWeight: "bold"  };
+  if (value > 0) return { color: green[600], fontWeight: "bold" };
   if (value < 0) return { color: red[500], fontWeight: "bold" };
-  if (value === 0) return { color:'#000', fontWeight: "bold" };
+  if (value === 0) return { color: "#000", fontWeight: "bold" };
   return { color: "#666" };
 };
 
@@ -98,7 +99,7 @@ const PnLSummary: React.FC = () => {
 
   const calculateTotals = (): { [range: string]: number } => {
     const totals: { [range: string]: number } = {
-      "DTD": 0,
+      DTD: 0,
       MTD: 0,
       QTD: 0,
       YTD: 0,
@@ -130,14 +131,27 @@ const PnLSummary: React.FC = () => {
       day >= 11 && day <= 13
         ? "th"
         : day % 10 === 1
-        ? "st"
-        : day % 10 === 2
-        ? "nd"
-        : day % 10 === 3
-        ? "rd"
-        : "th";
+          ? "st"
+          : day % 10 === 2
+            ? "nd"
+            : day % 10 === 3
+              ? "rd"
+              : "th";
 
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
     return `${day}${suffix} ${months[monthIndex]} ${year}`;
   };
@@ -148,15 +162,26 @@ const PnLSummary: React.FC = () => {
 
   return (
     <Container>
-      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mt: 1, mb: 1 }}>
+      <Box sx={{ position: "relative", mt: 1, mb: 1 }}>
         <Typography
           variant="h6"
-          sx={{ fontWeight: "bold", color: "#002060" }}
+          sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}
         >
           P&L Summary by Asset Class
         </Typography>
+
         {formattedAsOfDate && (
-          <Typography variant="body2" sx={{ fontWeight: "bold", color: "#002060" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: "bold",
+              color: "#740091ff",
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+          >
             Data As of: {formattedAsOfDate}
           </Typography>
         )}
@@ -231,14 +256,14 @@ const PnLSummary: React.FC = () => {
                 const values = data.pnl?.[assetType];
                 return (
                   <TableRow key={assetType}>
-                    <TableCell sx={{ fontWeight: 500 }}>
-                      {assetType}
-                    </TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>{assetType}</TableCell>
                     {timeRanges.map((range) => {
                       const val = values?.[range];
                       return (
                         <TableCell key={range} sx={getCellStyle(val)}>
-                          {val !== null && val !== undefined ? formatValue(val) : "-"}
+                          {val !== null && val !== undefined
+                            ? formatValue(val)
+                            : "-"}
                         </TableCell>
                       );
                     })}
@@ -267,4 +292,3 @@ const PnLSummary: React.FC = () => {
 };
 
 export default PnLSummary;
- 
