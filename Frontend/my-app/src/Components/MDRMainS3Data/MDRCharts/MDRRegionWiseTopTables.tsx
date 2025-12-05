@@ -15,6 +15,7 @@ import {
   TableRow,
   Typography,
   Paper,
+  Container,
 } from "@mui/material"
 
 type RegionKey = "US" | "EMEA" | "APAC" | string
@@ -350,6 +351,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
   )
 
   return (
+    <Container maxWidth='xl'>
     <Card
       elevation={2}
       sx={{
@@ -403,6 +405,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
           ))}
       </CardContent>
     </Card>
+    </Container>
   )
 }
 
