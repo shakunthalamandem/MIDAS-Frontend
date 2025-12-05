@@ -1,5 +1,5 @@
 import React from 'react'
-import MDRRegionWiseDaysHeldTable from './MDRRegionWiseDaysHeldTable'
+import MDRRegionWiseDaysHeldTable from '../MDRCharts/MDRRegionWiseDaysHeldTable'
 
 const MDRPerformanceTableMain = () => {
   return (

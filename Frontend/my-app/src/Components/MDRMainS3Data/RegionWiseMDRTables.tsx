@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   Container,
   Box,
@@ -11,83 +11,179 @@ import {
   TableCell,
   TableBody,
   TableContainer,
+  CircularProgress,
+  Alert,
+  Stack,
+  Button,
 } from "@mui/material"
 
 /* ------------------------------------------------------
    TYPES
 -------------------------------------------------------*/
-type RegionKey = "US" | "EMEA" | "APAC"
+type RegionKey = "US" | "EMEA" | "APAC" | string
 
-interface RegionRow {
+type RegionMetricMap = Record<string, any[]>
+
+interface RegionRowDisplay {
   ticker: string
-  value: number
+  value: number | null
+  secondaryValue?: number | null
 }
 
-type MetricData = Record<RegionKey, RegionRow[]>
-
-interface ApiResponseShape {
-  topDaysHeld: MetricData
-  topDtdPnL: MetricData
-  topGainers: MetricData
-  currentPrice: MetricData
-}
+type MetricData = Record<RegionKey, RegionRowDisplay[]>
 
 interface RegionTableProps {
   region: RegionKey
   columnLabel: string
-  rows: RegionRow[]
+  secondaryColumnLabel?: string
+  rows: RegionRowDisplay[]
 }
 
 interface MetricSectionProps {
   title: string
   columnLabel: string
+  secondaryColumnLabel?: string
   metricData: Partial<MetricData>
 }
 
-/* ------------------------------------------------------
-   SAMPLE DATA
--------------------------------------------------------*/
-const SAMPLE_RESPONSE: ApiResponseShape = {
-  topDaysHeld: {
-    US: [
-      { ticker: "AAPL", value: 12 },
-      { ticker: "MSFT", value: 10 },
-      { ticker: "TSLA", value: 9 },
-      { ticker: "AMZN", value: 8 },
-    ],
-    EMEA: [
-      { ticker: "SIE", value: 11 },
-      { ticker: "ADS", value: 9 },
-    ],
-    APAC: [
-      { ticker: "TSM", value: 14 },
-      { ticker: "SONY", value: 10 },
-    ],
+interface ApiResponseShape {
+  trade_date?: string
+  top_10_days_held?: RegionMetricMap
+  top_10_dtd_pnl?: RegionMetricMap
+  top_10_gainers?: RegionMetricMap
+  top_10_current_price?: RegionMetricMap
+  top_10_pnl?: RegionMetricMap
+  top_10_cumulative_pnl?: RegionMetricMap
+  // fallback camelCase variants if backend changes casing
+  top10DaysHeld?: RegionMetricMap
+  top10DtdPnl?: RegionMetricMap
+  top10Gainers?: RegionMetricMap
+  top10CurrentPrice?: RegionMetricMap
+  top10Pnl?: RegionMetricMap
+  top10CumulativePnl?: RegionMetricMap
+}
+
+type MetricConfigKey =
+  | "top_10_days_held"
+  | "top_10_dtd_pnl"
+  | "top_10_gainers"
+  | "top_10_current_price"
+  | "top_10_pnl"
+  | "top_10_cumulative_pnl"
+  | "top10DaysHeld"
+  | "top10DtdPnl"
+  | "top10Gainers"
+  | "top10CurrentPrice"
+  | "top10Pnl"
+  | "top10CumulativePnl"
+
+interface MetricConfig {
+  key: MetricConfigKey
+  title: string
+  columnLabel: string
+  valueKey: string
+  secondaryColumnLabel?: string
+  secondaryValueKey?: string
+}
+
+const METRICS: MetricConfig[] = [
+  {
+    key: "top_10_days_held",
+    title: "Top 10 Days Held",
+    columnLabel: "Days Held",
+    valueKey: "days_held",
   },
-  topDtdPnL: {
-    US: [
-      { ticker: "NVDA", value: 15000 },
-      { ticker: "AMD", value: 8000 },
-    ],
-    EMEA: [{ ticker: "RDSA", value: 5000 }],
-    APAC: [{ ticker: "BABA", value: 7000 }],
+  {
+    key: "top_10_dtd_pnl",
+    title: "Top 10 DTD P&L",
+    columnLabel: "DTD P&L",
+    valueKey: "pnl",
   },
-  topGainers: {
-    US: [
-      { ticker: "META", value: 3.5 },
-      { ticker: "NFLX", value: 2.8 },
-    ],
-    EMEA: [{ ticker: "AIR", value: 4.1 }],
-    APAC: [{ ticker: "TCS", value: 5.4 }],
+  {
+    key: "top_10_pnl",
+    title: "Top 10 P&L",
+    columnLabel: "DTD P&L",
+    valueKey: "pnl",
+    secondaryColumnLabel: "Cumulative P&L",
+    secondaryValueKey: "cumulative_pnl",
   },
-  currentPrice: {
-    US: [
-      { ticker: "GOOGL", value: 162.5 },
-      { ticker: "AAPL", value: 188.2 },
-    ],
-    EMEA: [{ ticker: "VOW", value: 112.8 }],
-    APAC: [{ ticker: "INFY", value: 23.1 }],
+  {
+    key: "top_10_cumulative_pnl",
+    title: "Top 10 Cumulative P&L",
+    columnLabel: "DTD P&L",
+    valueKey: "dtd_pnl",
+    secondaryColumnLabel: "Cumulative P&L",
+    secondaryValueKey: "cumulative_pnl",
   },
+  {
+    key: "top_10_gainers",
+    title: "Top 10 Gainers",
+    columnLabel: "Gain",
+    valueKey: "gain",
+  },
+  {
+    key: "top_10_current_price",
+    title: "Top 10 Current Price",
+    columnLabel: "Current Price",
+    valueKey: "current_price",
+  },
+]
+
+const formatNumber = (value: number | null) => {
+  if (value === null || Number.isNaN(value)) return "-"
+  const abs = Math.abs(value)
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(0)}K`
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+}
+
+const normalizeMetric = (
+  metricMap: RegionMetricMap | undefined,
+  valueKey: string,
+  secondaryValueKey?: string
+): MetricData => {
+  if (!metricMap || typeof metricMap !== "object") return {}
+
+  return Object.entries(metricMap).reduce<MetricData>((acc, [region, rows]) => {
+    const normalizedRows: RegionRowDisplay[] = Array.isArray(rows)
+      ? rows.slice(0, 10).map((row: any, idx: number) => ({
+          ticker: row?.ticker ?? `row-${idx}`,
+          value:
+            row?.[valueKey] !== undefined && row?.[valueKey] !== null
+              ? Number(row[valueKey])
+              : null,
+          secondaryValue:
+            secondaryValueKey &&
+            row?.[secondaryValueKey] !== undefined &&
+            row?.[secondaryValueKey] !== null
+              ? Number(row[secondaryValueKey])
+              : secondaryValueKey
+                ? null
+                : undefined,
+        }))
+      : []
+
+    acc[region] = normalizedRows
+    return acc
+  }, {})
+}
+
+const safeMetricData = (
+  data: ApiResponseShape,
+  config: MetricConfig
+): MetricData => {
+  // Prefer snake_case keys, but fall back to camelCase variants if provided
+  const primary = data[config.key as keyof ApiResponseShape] as RegionMetricMap
+  const fallbackKey = (config.key
+    .replace(/^top_10_/, "top10")
+    .replace(/_([a-z])/g, (_, c) => c.toUpperCase()) || config.key) as MetricConfigKey
+  const fallback = data[fallbackKey as keyof ApiResponseShape] as RegionMetricMap
+
+  return normalizeMetric(
+    primary ?? fallback,
+    config.valueKey,
+    config.secondaryValueKey
+  )
 }
 
 /* ------------------------------------------------------
@@ -96,9 +192,10 @@ const SAMPLE_RESPONSE: ApiResponseShape = {
 const RegionTable: React.FC<RegionTableProps> = ({
   region,
   columnLabel,
+  secondaryColumnLabel,
   rows,
 }) => {
-  const top10: RegionRow[] = rows?.slice(0, 10) || []
+  const top10: RegionRowDisplay[] = rows?.slice(0, 10) || []
 
   return (
     <Grid item xs={12} sm={4}>
@@ -121,13 +218,21 @@ const RegionTable: React.FC<RegionTableProps> = ({
               <TableRow>
                 <TableCell>Ticker</TableCell>
                 <TableCell align="right">{columnLabel}</TableCell>
+                {secondaryColumnLabel && (
+                  <TableCell align="right">{secondaryColumnLabel}</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               {top10.map((row, idx) => (
                 <TableRow key={`${region}-${row.ticker}-${idx}`}>
                   <TableCell>{row.ticker}</TableCell>
-                  <TableCell align="right">{row.value}</TableCell>
+                  <TableCell align="right">{formatNumber(row.value)}</TableCell>
+                  {secondaryColumnLabel && (
+                    <TableCell align="right">
+                      {formatNumber(row.secondaryValue ?? null)}
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -144,6 +249,7 @@ const RegionTable: React.FC<RegionTableProps> = ({
 const MetricSection: React.FC<MetricSectionProps> = ({
   title,
   columnLabel,
+  secondaryColumnLabel,
   metricData,
 }) => {
   const regions: RegionKey[] = ["US", "EMEA", "APAC"]
@@ -171,6 +277,7 @@ const MetricSection: React.FC<MetricSectionProps> = ({
             key={region}
             region={region}
             columnLabel={columnLabel}
+            secondaryColumnLabel={secondaryColumnLabel}
             rows={metricData[region] || []}
           />
         ))}
@@ -183,7 +290,69 @@ const MetricSection: React.FC<MetricSectionProps> = ({
    MAIN COMPONENT
 -------------------------------------------------------*/
 const RegionWiseMDRTables: React.FC = () => {
-  const data = SAMPLE_RESPONSE
+  const [data, setData] = useState<ApiResponseShape | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const apiUrl = process.env.REACT_APP_API_URL ?? ""
+  const getToken = () => localStorage.getItem("access_token") || ""
+
+  const fetchTables = async () => {
+    if (!apiUrl) {
+      setError("API URL is not defined in environment variables")
+      return
+    }
+
+    try {
+      setError(null)
+      setLoading(true)
+
+      const token = getToken()
+      const response = await fetch(
+        `${apiUrl}/api/mdr_top_performance_table/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({}),
+        }
+      )
+
+      if (!response.ok) {
+        const message = await response.text()
+        throw new Error(message || "Failed to fetch top performance tables")
+      }
+
+      const body = (await response.json()) as ApiResponseShape
+      setData(body)
+    } catch (err: any) {
+      console.error(err)
+      setError(err?.message || "Unable to load top performance tables")
+      setData(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTables()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const sections = useMemo(() => {
+    if (!data) return []
+    return METRICS.map((metric) => ({
+      ...metric,
+      metricData: safeMetricData(data, metric),
+    }))
+  }, [data])
+
+  const tradeDateLabel =
+    data?.trade_date ||
+    data?.["tradeDate" as keyof ApiResponseShape]?.toString() ||
+    ""
 
   return (
     <Container
@@ -193,36 +362,65 @@ const RegionWiseMDRTables: React.FC = () => {
       <Box sx={{ maxWidth: 1400, mx: "auto" }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <MetricSection
-              title="Top 10 Days Held"
-              columnLabel="Days Held"
-              metricData={data.topDaysHeld}
-            />
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              justifyContent="space-between"
+              gap={1.5}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Top Performance Tables {tradeDateLabel ? `(${tradeDateLabel})` : ""}
+              </Typography>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={fetchTables}
+                  disabled={loading}
+                >
+                  Refresh
+                </Button>
+              </Stack>
+            </Stack>
           </Grid>
 
-          <Grid item xs={12}>
-            <MetricSection
-              title="Top 10 DTD P&L"
-              columnLabel="DTD P&L"
-              metricData={data.topDtdPnL}
-            />
-          </Grid>
+          {loading && (
+            <Grid item xs={12}>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                py={4}
+              >
+                <CircularProgress />
+              </Box>
+            </Grid>
+          )}
 
-          <Grid item xs={12}>
-            <MetricSection
-              title="Top 10 Gainers"
-              columnLabel="Gain"
-              metricData={data.topGainers}
-            />
-          </Grid>
+          {error && (
+            <Grid item xs={12}>
+              <Alert severity="error">{error}</Alert>
+            </Grid>
+          )}
 
-          <Grid item xs={12}>
-            <MetricSection
-              title="Top 10 Current Price"
-              columnLabel="Current Price"
-              metricData={data.currentPrice}
-            />
-          </Grid>
+          {!loading && !error && sections.length === 0 && (
+            <Grid item xs={12}>
+              <Alert severity="info">No top performance data available.</Alert>
+            </Grid>
+          )}
+
+          {!loading &&
+            !error &&
+            sections.map((section) => (
+              <Grid item xs={12} key={section.key}>
+                <MetricSection
+                  title={section.title}
+                  columnLabel={section.columnLabel}
+                  secondaryColumnLabel={section.secondaryColumnLabel}
+                  metricData={section.metricData}
+                />
+              </Grid>
+            ))}
         </Grid>
       </Box>
     </Container>

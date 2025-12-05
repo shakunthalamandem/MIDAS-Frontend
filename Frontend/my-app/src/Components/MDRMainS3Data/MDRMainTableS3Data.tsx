@@ -39,7 +39,7 @@ const MDRMainTableS3Data = () => {
       <MDRRegionWiseTablesDataMain />
       <MDRPerformanceTableMain />
 
-      <RegionWiseMDRTables />
+      {/* <RegionWiseMDRTables /> */}
       
 </>  )
 }
