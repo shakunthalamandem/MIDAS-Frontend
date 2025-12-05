@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react"
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -58,6 +57,20 @@ const formatNumber = (value: number | null | undefined) => {
   if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
   if (abs >= 1_000) return `${(value / 1_000).toFixed(0)}K`
   return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
+}
+
+const NumberCell: React.FC<{ value: number | null | undefined }> = ({
+  value,
+}) => {
+  const num = value === null || value === undefined ? null : Number(value)
+  const color =
+    num === null ? "#111827" : num < 0 ? "#c0392b" : num > 0 ? "#0b9a41" : "#111827"
+
+  return (
+    <Box component="span" sx={{ color }}>
+      {formatNumber(num)}
+    </Box>
+  )
 }
 
 const normalizeDaysHeldOver30 = (
@@ -126,32 +139,72 @@ const RegionTable: React.FC<RegionTableProps> = ({
         borderRadius: 2,
         height: "100%",
         boxSizing: "border-box",
+        border: "1px solid #dce3f0",
       }}
     >
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          mb: 1,
+          textAlign: "center",
+          fontWeight: 700,
+          color: "#1b2a52",
+          letterSpacing: 0.2,
+        }}
+      >
         {region}
       </Typography>
       <TableContainer>
-        <Table size="small">
+        <Table size="small" sx={{ borderCollapse: "separate", borderSpacing: 0 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Ticker</TableCell>
-              <TableCell align="right">{columnLabel}</TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: "#eef2fb",
+                  color: "#1b2a52",
+                  fontWeight: 700,
+                  borderRight: "1px solid #dce3f0",
+                }}
+              >
+                Ticker
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{ backgroundColor: "#eef2fb", color: "#1b2a52", fontWeight: 700 }}
+              >
+                {columnLabel}
+              </TableCell>
               {secondaryColumnLabel && (
-                <TableCell align="right">{secondaryColumnLabel}</TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    backgroundColor: "#eef2fb",
+                    color: "#1b2a52",
+                    fontWeight: 700,
+                    borderLeft: "1px solid #dce3f0",
+                  }}
+                >
+                  {secondaryColumnLabel}
+                </TableCell>
               )}
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row, idx) => (
-              <TableRow key={`${region}-${row.ticker}-${idx}`}>
+              <TableRow
+                key={`${region}-${row.ticker}-${idx}`}
+                sx={{
+                  "&:nth-of-type(odd)": { backgroundColor: "#fafbff" },
+                  "&:hover": { backgroundColor: "#f3f6ff" },
+                }}
+              >
                 <TableCell>{row.ticker}</TableCell>
                 <TableCell align="right">
-                  {formatNumber(row.primary)}
+                  <NumberCell value={row.primary} />
                 </TableCell>
                 {secondaryColumnLabel && (
                   <TableCell align="right">
-                    {formatNumber(row.secondary)}
+                    <NumberCell value={row.secondary} />
                   </TableCell>
                 )}
               </TableRow>
@@ -308,23 +361,20 @@ const MDRRegionWiseTopTables: React.FC = () => {
     >
       <CardContent sx={{ p: 3 }}>
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          alignItems={{ xs: "flex-start", sm: "center" }}
-          justifyContent="space-between"
-          gap={1.5}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          gap={0.5}
           mb={2}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            Region Wise Top Tables {tradeDate ? `(${tradeDate})` : ""}
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1b2a52" }}>
+            Region Wise Top Tables
           </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={fetchData}
-            disabled={loading}
-          >
-            Refresh
-          </Button>
+          {tradeDate ? (
+            <Typography variant="body2" sx={{ color: "#4b5563" }}>
+              Trade Date: {tradeDate}
+            </Typography>
+          ) : null}
         </Stack>
 
         {loading && (
