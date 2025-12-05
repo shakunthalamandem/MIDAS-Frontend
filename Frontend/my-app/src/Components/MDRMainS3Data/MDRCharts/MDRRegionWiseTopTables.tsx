@@ -237,7 +237,7 @@ const MetricSection: React.FC<MetricSectionProps> = ({
         boxSizing: "border-box",
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2,color:'#c00000',fontWeight:'600' }} align="center">
         {title}
       </Typography>
       <Grid container spacing={2}>
@@ -362,22 +362,6 @@ const MDRRegionWiseTopTables: React.FC = () => {
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Stack
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          gap={0.5}
-          mb={2}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1b2a52" }}>
-            Region Wise Top Tables
-          </Typography>
-          {tradeDate ? (
-            <Typography variant="body2" sx={{ color: "#4b5563" }}>
-              Trade Date: {tradeDate}
-            </Typography>
-          ) : null}
-        </Stack>
 
         {loading && (
           <Box display="flex" justifyContent="center" py={4}>
