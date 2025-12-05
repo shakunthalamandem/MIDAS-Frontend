@@ -4,6 +4,7 @@ import RegionWiseMDRTables from './RegionWiseMDRTables'
 import { Typography } from '@mui/material'
 import MDRCummulativeRegionChartMain from './MDRCharts/MDRCummulativeRegionChartMain'
 import MDRRegionWiseTablesDataMain from './MDRRegionWiseTables/MDRRegionWiseTablesDataMain'
+import MDRPerformanceTableMain from './MDRTopPerformanceDataTables/MDRPerformanceTableMain'
 
 const MDRMainTableS3Data = () => {
   return (
@@ -36,6 +37,7 @@ const MDRMainTableS3Data = () => {
       <MDRDailyPortfolioContainer />
       <MDRCummulativeRegionChartMain />
       <MDRRegionWiseTablesDataMain />
+      <MDRPerformanceTableMain />
 
       <RegionWiseMDRTables />
       
