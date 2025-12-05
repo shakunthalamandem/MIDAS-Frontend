@@ -62,6 +62,71 @@ interface FieldConfig {
   disabled?: boolean;
 }
 
+interface SectionProps {
+  title: string;
+  fields: FieldConfig[];
+  renderField: (field: FieldConfig) => React.ReactNode;
+}
+
+// Keep Section definition stable to avoid remounting inputs (which causes focus/value loss)
+const Section: React.FC<SectionProps> = ({ title, fields, renderField }) => (
+  <Grid item xs={12}>
+    <Box
+      sx={(theme) => ({
+        borderRadius: 2,
+        p: 2,
+        border: "1px solid",
+        borderColor:
+          theme.palette.mode === "light"
+            ? "rgba(25,118,210,0.25)"
+            : "rgba(144,202,249,0.3)",
+        background:
+          theme.palette.mode === "light"
+            ? "linear-gradient(135deg,#f3f6ff 0%,#ffffff 55%,#e3f2fd 100%)"
+            : "linear-gradient(135deg,#0f172a 0%,#020617 50%,#0b1120 100%)",
+        boxShadow:
+          theme.palette.mode === "light"
+            ? "0 4px 14px rgba(15,23,42,0.08)"
+            : "0 6px 18px rgba(0,0,0,0.6)",
+        transition: "transform 120ms ease-out, box-shadow 120ms ease-out",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow:
+            theme.palette.mode === "light"
+              ? "0 8px 22px rgba(15,23,42,0.12)"
+              : "0 10px 26px rgba(0,0,0,0.8)",
+        },
+      })}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          sx={{
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+            color: "primary.main",
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
+
+      <Grid container spacing={1.5}>
+        {fields.map((field) => renderField(field))}
+      </Grid>
+    </Box>
+  </Grid>
+);
+
 const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
   values,
   formErrors,
@@ -261,75 +326,23 @@ const IPOFormFieldsSection: React.FC<IPOFormFieldsSectionProps> = ({
     );
   };
 
-  const Section: React.FC<{
-    title: string;
-    fields: FieldConfig[];
-  }> = ({ title, fields }) => (
-    <Grid item xs={12}>
-      <Box
-        sx={(theme) => ({
-          borderRadius: 2,
-          p: 2,
-          border: "1px solid",
-          borderColor:
-            theme.palette.mode === "light"
-              ? "rgba(25,118,210,0.25)"
-              : "rgba(144,202,249,0.3)",
-          background:
-            theme.palette.mode === "light"
-              ? "linear-gradient(135deg,#f3f6ff 0%,#ffffff 55%,#e3f2fd 100%)"
-              : "linear-gradient(135deg,#0f172a 0%,#020617 50%,#0b1120 100%)",
-          boxShadow:
-            theme.palette.mode === "light"
-              ? "0 4px 14px rgba(15,23,42,0.08)"
-              : "0 6px 18px rgba(0,0,0,0.6)",
-          transition: "transform 120ms ease-out, box-shadow 120ms ease-out",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow:
-              theme.palette.mode === "light"
-                ? "0 8px 22px rgba(15,23,42,0.12)"
-                : "0 10px 26px rgba(0,0,0,0.8)",
-          },
-        })}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            mb: 2,
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            sx={{
-              textAlign: "center",
-              textTransform: "uppercase",
-              letterSpacing: 0.8,
-              color: "primary.main",
-            }}
-          >
-            {title}
-          </Typography>
-        </Box>
-
-        <Grid container spacing={1.5}>
-          {fields.map((field) => renderField(field))}
-        </Grid>
-      </Box>
-    </Grid>
-  );
-
   return (
     <Grid container spacing={2}>
-      <Section title="Deal Overview" fields={dealOverviewFields} />
+      <Section
+        title="Deal Overview"
+        fields={dealOverviewFields}
+        renderField={renderField}
+      />
       <Section
         title="Deal & Allocation Parameters"
         fields={dealParametersFields}
+        renderField={renderField}
       />
-      <Section title="Fundamental Metrics" fields={fundamentalFields} />
+      <Section
+        title="Fundamental Metrics"
+        fields={fundamentalFields}
+        renderField={renderField}
+      />
     </Grid>
   );
 };
