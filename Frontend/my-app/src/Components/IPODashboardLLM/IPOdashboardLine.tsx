@@ -284,20 +284,45 @@ useEffect(() => {
                     </Typography>
                   </motion.div>
 
-                  {/* Dot */}
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: index * 0.2 }}
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: "50%",
-                      backgroundColor: "#002060",
-                      margin: "0 auto",
-                      zIndex: 2,
+                  {/* Dot + Connecting Line */}
+                  <Box
+                    sx={{
+                      position: "relative",
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mb: editMode ? 1.5 : 1,
                     }}
-                  />
+                  >
+                    {index < timelineFields.length - 1 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          width: "100%",
+                          height: 2,
+                          backgroundColor: "#003e36",
+                          transform: "translateX(8px) translateY(-50%)",
+                          zIndex: 1,
+                        }}
+                      />
+                    )}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: index * 0.2 }}
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        backgroundColor: "#002060",
+                        margin: "0 auto",
+                        zIndex: 2,
+                      }}
+                    />
+                  </Box>
 
                   {/* Value or Input */}
                   <motion.div
@@ -341,20 +366,6 @@ useEffect(() => {
                     )}
                   </motion.div>
 
-                  {/* Connecting Line */}
-                  {index < timelineFields.length - 1 && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        width: "100%",
-                        height: 2,
-                        backgroundColor: "#003e36",
-                        transform: "translateX(8px) translateY(-50%)",
-                      }}
-                    />
-                  )}
                 </Box>
               );
             })}
@@ -384,7 +395,7 @@ useEffect(() => {
                 </>
               ) : (
                 <IconButton onClick={handleEnterEdit}>
-                  {/* <EditIcon /> */}
+                  <EditIcon />
                 </IconButton>
               )}
             </Box>

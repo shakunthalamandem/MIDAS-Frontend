@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Autocomplete,
   Box,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  Typography,
   Container,
-  Checkbox,
-  ListItemText,
   Chip,
+  Checkbox,
+  TextField,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -68,9 +64,30 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
     fetchOptions();
   }, [apiUrl, token]);
 
-  // Handle dropdown change
-  const handleChange = (event: any) => {
-    setSelected(event.target.value);
+  const availableOptions = useMemo(
+    () => options.filter((opt) => !!opt.deal_id),
+    [options]
+  );
+
+  const selectedOptions = useMemo(() => {
+    return selected
+      .map((val) => {
+        const [ticker, deal_id] = val.split("|");
+        if (!deal_id) return null;
+        return (
+          options.find(
+            (opt) => opt.ticker === ticker && opt.deal_id === deal_id
+          ) || { ticker, deal_id, pricing_date: "" }
+        );
+      })
+      .filter(Boolean) as DealOption[];
+  }, [options, selected]);
+
+  const handleSelectionChange = (_: any, newValue: DealOption[]) => {
+    const normalized = newValue
+      .filter((opt) => opt.deal_id)
+      .map((opt) => `${opt.ticker}|${opt.deal_id}`);
+    setSelected(normalized);
   };
 
   // Remove a chip
@@ -78,83 +95,94 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
     setSelected(selected.filter((item) => item !== value));
   };
 
-  // Get the label for the selected items in the dropdown
-  const getSelectedLabel = () => {
-    if (selected.length === 0) return "";
-
-    // Always show only the first selected item
-    const [firstTicker, firstDeal] = selected[0].split("|");
-    const firstLabel = `${firstTicker} (${firstDeal})`;
-
-    if (selected.length === 1) {
-      return firstLabel;
-    }
-
-    // If more than one, show first + count
-    return `${firstLabel}, +${selected.length - 1}`;
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Container>
         <Box display="flex" flexDirection="column" gap={2} sx={{ width: 350 }}>
-          {/* Dropdown select */}
-          <FormControl fullWidth>
-            <InputLabel>Select Deals</InputLabel>
-            <Select
-              multiple
-              value={selected}
-              onChange={handleChange}
-              input={<OutlinedInput label="Select Deals" />}
-              renderValue={getSelectedLabel} // Custom render value
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 300, // dropdown max height
-                    width: 350,
-                  },
-                },
-              }}
-            >
-              {loading ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} />
-                </MenuItem>
-              ) : options.length > 0 ? (
-                options.map((item, idx) => {
-                  if (!item.deal_id) return null; // skip null deal_id
-                  const value = `${item.ticker}|${item.deal_id}`;
-                  return (
-                    <MenuItem key={idx} value={value}>
-                      <Checkbox checked={selected.indexOf(value) > -1} />
-                      <ListItemText
-                        primary={
-                          <Typography fontWeight="bold">{item.ticker}</Typography>
-                        }
-                        secondary={
-                          <Typography variant="caption" color="text.secondary">
-                            {item.deal_id}
-                          </Typography>
-                        }
-                      />
-                    </MenuItem>
-                  );
-                })
-              ) : (
-                <MenuItem disabled>No results found</MenuItem>
-              )}
-            </Select>
-          </FormControl>
+          {/* Searchable multi-select */}
+          <Autocomplete
+            multiple
+            disableCloseOnSelect
+            options={availableOptions}
+            value={selectedOptions}
+            loading={loading}
+            getOptionLabel={(option) =>
+              option.deal_id
+                ? `${option.ticker} (${option.deal_id})`
+                : option.ticker
+            }
+            isOptionEqualToValue={(option, value) =>
+              option.ticker === value.ticker && option.deal_id === value.deal_id
+            }
+            filterOptions={(opts, state) => {
+              const term = state.inputValue.trim().toLowerCase();
+              if (!term) return opts;
+              return opts
+                .filter(
+                  (opt) =>
+                    opt.ticker.toLowerCase().includes(term) ||
+                    (opt.deal_id ?? "").toLowerCase().includes(term)
+                )
+                .sort((a, b) => {
+                  const aTicker = a.ticker.toLowerCase();
+                  const bTicker = b.ticker.toLowerCase();
+                  const aDeal = (a.deal_id ?? "").toLowerCase();
+                  const bDeal = (b.deal_id ?? "").toLowerCase();
+
+                  // Prioritize ticker startsWith, then deal startsWith, then contains
+                  const rank = (ticker: string, deal: string) => {
+                    if (ticker === term) return 0;
+                    if (ticker.startsWith(term)) return 1;
+                    if (deal.startsWith(term)) return 2;
+                    if (ticker.includes(term)) return 3;
+                    if (deal.includes(term)) return 4;
+                    return 5;
+                  };
+
+                  return rank(aTicker, aDeal) - rank(bTicker, bDeal);
+                });
+            }}
+            onChange={handleSelectionChange}
+            renderTags={() => null} // keep the input clear for typing
+            noOptionsText="No matches"
+            renderOption={(props, option, { selected }) => (
+              <li {...props} key={`${option.ticker}-${option.deal_id}`}>
+                <Checkbox checked={selected} sx={{ mr: 1 }} />
+                <Box>
+                  <Typography fontWeight="bold">{option.ticker}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {option.deal_id}
+                  </Typography>
+                </Box>
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select deals"
+                placeholder="Type ticker or deal id"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loading ? <CircularProgress size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
 
           {/* Chips for selected items */}
           {selected.length > 0 && (
             <Box display="flex" flexWrap="wrap" gap={1}>
-              {selected.map((val) => {
-                const [ticker, dealId] = val.split("|");
+              {selectedOptions.map((opt) => {
+                const val = `${opt.ticker}|${opt.deal_id}`;
                 return (
                   <Chip
                     key={val}
-                    label={`${ticker} (${dealId})`}
+                    label={`${opt.ticker} (${opt.deal_id})`}
                     onDelete={() => handleDelete(val)}
                     color="primary"
                     variant="outlined"

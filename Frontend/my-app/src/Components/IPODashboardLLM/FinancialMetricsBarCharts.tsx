@@ -65,6 +65,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
   const token = localStorage.getItem("access_token");
 
   const [data, setData] = useState<MetricsRow[]>([]);
+  const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [peData, setPeData] = useState<TickerSeries[]>([]);
@@ -166,7 +167,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
   const peChartSection = useMemo(() => {
     if (apiUrl && ticker) {
       return (
-        <Box mt={4}>
+        <Box mt={4} className={includeInPdf ? "" : "pdf-hidden"}>
           <FinancialMetricsPEchart
             // apiUrl={apiUrl}
             // token={token}
@@ -180,7 +181,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
       );
     }
     return null;
-  }, [apiUrl, peData, peError, peLoading, ticker, token]);
+  }, [apiUrl, includeInPdf, peData, peError, peLoading, ticker, token]);
 
   // Loading or error state
   if (loading) {
@@ -212,7 +213,12 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
 
   return (
     <Box display="flex" flexDirection="column" gap={4}>
-      <FinancialMetricsChartsContent ticker={ticker} data={data} />
+      <FinancialMetricsChartsContent
+        ticker={ticker}
+        data={data}
+        includeInPdf={includeInPdf}
+        onIncludeInPdfChange={setIncludeInPdf}
+      />
       {peChartSection}
     </Box>
   );

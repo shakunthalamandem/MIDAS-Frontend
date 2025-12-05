@@ -31,6 +31,7 @@ interface Props {
   ipoData: any; // other IPO data
   showAIComparison: boolean;
   handleAIComparisonClick: () => void;
+  onPageReady?: () => void;
 }
 
 interface DealData {
@@ -42,19 +43,28 @@ interface DealData {
   sector: string;
 }
 
-const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
+const IPODashboardPage4: React.FC<Props> = ({
+  selectedTicker,
+  onPageReady,
+}) => {
   const [dealData, setDealData] = useState<DealData | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [tempScore, setTempScore] = useState<number | "">("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasNotified, setHasNotified] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
   // ✅ Fetch deal data (POST with ticker)
   useEffect(() => {
+    setHasNotified(false);
+  }, [selectedTicker]);
+
+  useEffect(() => {
+    let isActive = true;
     const fetchDealData = async () => {
       if (!apiUrl || !selectedTicker) return;
 
@@ -72,16 +82,27 @@ const IPODashboardPage4: React.FC<Props> = ({ selectedTicker }) => {
         if (!res.ok) throw new Error("Failed to fetch deal data");
 
         const data = await res.json();
-        setDealData(data);
+        if (isActive) setDealData(data);
       } catch (err: any) {
-        setError(err.message || "Error fetching deal data");
+        if (isActive) setError(err.message || "Error fetching deal data");
       } finally {
-        setLoading(false);
+        if (isActive) setLoading(false);
       }
     };
 
     fetchDealData();
-  }, [selectedTicker]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedTicker, apiUrl, token]);
+
+  useEffect(() => {
+    if (!loading && !hasNotified) {
+      onPageReady?.();
+      setHasNotified(true);
+    }
+  }, [loading, hasNotified, onPageReady]);
 
   const handleSaveMonasheeScore = async () => {
     if (!apiUrl || !dealData) return;

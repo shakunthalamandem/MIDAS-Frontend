@@ -5,7 +5,10 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Box,
 } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+
 
 import FinancialTableData from "./FinancialTableData";
 import {
@@ -381,7 +384,7 @@ const IPOFinancialForecastTableMain: React.FC<
       >
         Financial Forecasts (FYE{" "}
         {forecastsTicker?.toUpperCase() === "MH" ? "Mar 31" : "Dec 31"},{" "}
-        Internal Estimates)
+        Internal Estimates) for {defaultTicker}
       </Typography>
 
       {forecastsLoading && <CircularProgress />}
@@ -404,7 +407,10 @@ const IPOFinancialForecastTableMain: React.FC<
             ticker={forecastsTicker}
           />
         )}
-
+<Box display="flex" alignItems="center" justifyContent="center" mt={2}>
+  <InfoIcon sx={{ mr: 1 }} />
+  <Typography>Above values are in local currency</Typography>
+</Box>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
