@@ -225,18 +225,8 @@ const MetricSection: React.FC<MetricSectionProps> = ({
 }) => {
   const regions: RegionKey[] = ["US", "EMEA", "APAC"]
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2,
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: "divider",
-        bgcolor: "white",
-        width: "100%",
-        boxSizing: "border-box",
-      }}
-    >
+
+    <>
       <Typography variant="h6" sx={{ mb: 2,color:'#c00000',fontWeight:'600' }} align="center">
         {title}
       </Typography>
@@ -251,7 +241,7 @@ const MetricSection: React.FC<MetricSectionProps> = ({
           />
         ))}
       </Grid>
-    </Paper>
+      </>
   )
 }
 
@@ -351,7 +341,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
   )
 
   return (
-    <Container maxWidth='xl'>
+    <Container maxWidth='xl' sx={{ mb: 4,mt:4 }}>
     <Card
       elevation={2}
       sx={{
