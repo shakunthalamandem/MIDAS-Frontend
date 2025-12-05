@@ -11,7 +11,6 @@ const apiUrl = process.env.REACT_APP_API_URL as string;
 
 const MattermostChat: React.FC = () => {
   const { stock } = useParams();
-
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -21,23 +20,23 @@ const MattermostChat: React.FC = () => {
       ? localStorage.getItem("access_token")
       : null;
 
-  /** ----------------------------------------------------
-   * AUTO-REFRESH iframe once after MM finishes booting
-   * ---------------------------------------------------*/
+  /** ---------------------------------------------------------
+   * AUTO RELOAD after MM boots fully
+   * --------------------------------------------------------- */
   useEffect(() => {
     if (status !== "ready") return;
 
-    const t = setTimeout(() => {
+    const reloadTimer = setTimeout(() => {
       const iframe = iframeRef.current;
-      if (iframe) iframe.src = iframe.src + ""; // silent reload
-    }, 500);
+      if (iframe) iframe.src = iframe.src; // silent reload
+    }, 600);
 
-    return () => clearTimeout(t);
+    return () => clearTimeout(reloadTimer);
   }, [status]);
 
-  /** ----------------------------------------------------
+  /** ---------------------------------------------------------
    * MAIN LOGIN FLOW
-   * ---------------------------------------------------*/
+   * --------------------------------------------------------- */
   useEffect(() => {
     let cookiePoll: number | undefined;
     let abortController = new AbortController();
@@ -46,7 +45,7 @@ const MattermostChat: React.FC = () => {
       try {
         setStatus("loading");
 
-        /** ------- 1) Get MM credentials from backend ------- */
+        /** 1) Fetch MM USER credentials from backend */
         const credsRes = await fetch(`${apiUrl}/api/mm_discussion_box/`, {
           method: "POST",
           headers: {
@@ -60,7 +59,7 @@ const MattermostChat: React.FC = () => {
 
         const creds = await credsRes.json();
 
-        /** ------- 2) Login proxy ------- */
+        /** 2) Login via proxy */
         const loginRes = await fetch(`${apiUrl}/api/mm_login_proxy/`, {
           method: "POST",
           headers: {
@@ -77,17 +76,17 @@ const MattermostChat: React.FC = () => {
         const data = await loginRes.json();
         const { MMAUTHTOKEN, MMUSERID, MMCSRF } = data.cookies || {};
 
-        /** ------- 3) Set session cookies ------- */
+        /** 3) Apply cookies */
         const opts = "; Path=/; SameSite=Lax";
         document.cookie = `MMAUTHTOKEN=${MMAUTHTOKEN}${opts}`;
         document.cookie = `MMUSERID=${MMUSERID}${opts}`;
         if (MMCSRF) document.cookie = `MMCSRF=${MMCSRF}${opts}`;
 
-        // Always force browser mode → prevents "View in Browser"
+        // Always force browser mode
         document.cookie =
           "MMVIEW_PREFERENCE=browser; Path=/; Max-Age=31536000; SameSite=Lax";
 
-        /** ------- 4) Wait until cookies actually appear ------- */
+        /** 4) Wait for cookies to actually register */
         const start = Date.now();
         cookiePoll = window.setInterval(() => {
           const allSet =
@@ -97,7 +96,17 @@ const MattermostChat: React.FC = () => {
 
           if (allSet) {
             clearInterval(cookiePoll);
-            setTimeout(() => setStatus("ready"), 300);
+
+            // Let Mattermost fully initialize service worker + session
+            setTimeout(() => {
+              setStatus("ready");
+
+              // Force reload AFTER iframe renders so MM uses the session
+              setTimeout(() => {
+                const iframe = iframeRef.current;
+                if (iframe) iframe.src = iframe.src;
+              }, 800);
+            }, 1200);
           } else if (Date.now() - start > 10000) {
             clearInterval(cookiePoll);
             throw new Error("Timeout: cookies not applied");
@@ -117,10 +126,9 @@ const MattermostChat: React.FC = () => {
     };
   }, [accessToken, stock]);
 
-  /** ----------------------------------------------------
+  /** ---------------------------------------------------------
    * UI STATES
-   * ---------------------------------------------------*/
-
+   * --------------------------------------------------------- */
   if (status === "loading") {
     return (
       <div
@@ -153,15 +161,15 @@ const MattermostChat: React.FC = () => {
           color: "#111",
         }}
       >
-        <strong>Chat Loading...</strong>
+        <strong>Chat Loading…</strong>
         <div style={{ marginTop: 6, opacity: 0.8 }}>{error}</div>
       </div>
     );
   }
 
-  /** ----------------------------------------------------
-   * SUCCESS — Render Iframe
-   * ---------------------------------------------------*/
+  /** ---------------------------------------------------------
+   * SUCCESS — Render iframe
+   * --------------------------------------------------------- */
   const channelSlug =
     stock && typeof stock === "string"
       ? `${stock.toLowerCase()}-thoughts`
