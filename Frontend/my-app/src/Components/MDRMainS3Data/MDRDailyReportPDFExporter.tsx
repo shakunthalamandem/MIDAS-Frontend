@@ -214,7 +214,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
 
   return (
     <Box position="relative" display="inline-flex">
-      {/* <Button
+      <Button
         variant="contained"
         onClick={handleExport}
         disabled={loading}
@@ -227,7 +227,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
         }}
       >
         {loading ? "Generating PDF..." : "Generate PDF"}
-      </Button> */}
+      </Button>
       {loading && (
         <Box
           position="absolute"
