@@ -41,17 +41,34 @@ const HEADERS: { key: keyof FundPerformanceRow; label: string; align?: "right" }
     { key: "aum", label: "AUM", align: "right" },
   ]
 
+const toNumeric = (value: string | null) => {
+  if (!value) return NaN
+  const cleaned = value
+    .replace(/[%,$]/g, "")
+    .replace(/,/g, "")
+    .replace(/m/gi, "")
+    .replace(/b/gi, "")
+    .replace(/_/g, "")
+    .trim()
+
+  const num = Number(cleaned)
+  if (Number.isNaN(num)) return NaN
+
+  // If the original string had "b" or "B", assume billions
+  if (/[bB]/.test(value)) return num * 1_000
+  // If it had "m" assume millions
+  if (/[mM]/.test(value)) return num
+
+  return num
+}
+
 const getPerfColor = (value: string | null) => {
   if (!value) return undefined
-  const numeric = Number(
-    value
-      .replace(/%/g, "")
-      .replace(/,/g, "")
-      .trim()
-  )
+  const numeric = toNumeric(value)
   if (Number.isNaN(numeric)) return undefined
-  if (numeric < 0) return "#d32f2f"
-  return undefined
+  if (numeric > 0) return "#1a7f37" // green
+  if (numeric < 0) return "#c62828" // red
+  return "#111827"
 }
 
 const displayValue = (value: string | null) => value ?? "-"
@@ -115,16 +132,16 @@ const MDRFundPerfomanceMain: React.FC = () => {
       <Paper
         elevation={0}
         sx={{
-          border: "1px solid",
-          borderColor: "divider",
+          border: "1px solid #e5e7eb",
           borderRadius: 2,
-          p: 2,
-          backgroundColor: "#f7f8fb",
+          p: 2.5,
+          backgroundColor: "#fff",
         }}
       >
 
-          <Typography variant="h6" sx={{ fontWeight: 700 ,color:'#002060'}} align="center">
-            Fund Performance {asOfDate ? `(as of ${asOfDate})` : ""}
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#14327a",mb:'2' }} align="center">
+            {/* Fund Performance {asOfDate ? `(as of ${asOfDate})` : ""} */}
+            Fund Performance 
           </Typography>
           {loading && (
             <Stack direction="row" spacing={1} alignItems="center">
@@ -145,8 +162,15 @@ const MDRFundPerfomanceMain: React.FC = () => {
           <Alert severity="info">No fund performance data available.</Alert>
         )}
 
-        <TableContainer component={Box} sx={{ border: "1px solid #dcdcdc" }}>
-          <Table size="small" stickyHeader>
+        <TableContainer
+          component={Box}
+          sx={{
+            border: "1px solid #e5e7eb",
+            borderRadius: 1,
+            overflow: "hidden",
+          }}
+        >
+          <Table size="small">
             <TableHead>
               <TableRow>
                 {HEADERS.map((header) => (
@@ -155,8 +179,10 @@ const MDRFundPerfomanceMain: React.FC = () => {
                     align={header.align ?? "left"}
                     sx={{
                       fontWeight: 700,
-                      backgroundColor: "#f5f6fa",
-                      borderBottom: "1px solid #dcdcdc",
+                      backgroundColor: "#eef0ff",
+                      color: "#1f2e78",
+                      borderBottom: "1px solid #d0d7e2",
+                      fontSize: 13,
                     }}
                   >
                     {header.label}
@@ -165,45 +191,88 @@ const MDRFundPerfomanceMain: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.fund}>
-                  <TableCell
+              {rows.map((row) => {
+                const isTotal = row.fund?.toLowerCase?.() === "total"
+                return (
+                  <TableRow
+                    key={row.fund}
                     sx={{
-                      fontWeight: 600,
-                      minWidth: 160,
+                      "&:not(:last-of-type) td": { borderBottom: "1px solid #e5e7eb" },
+                      backgroundColor: isTotal ? "#f7f8ff" : "inherit",
                     }}
                   >
-                    {row.fund}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: getPerfColor(row.dtd) }}
-                  >
-                    {displayValue(row.dtd)}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: getPerfColor(row.mtd) }}
-                  >
-                    {displayValue(row.mtd)}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: getPerfColor(row.ytd) }}
-                  >
-                    {displayValue(row.ytd)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {displayValue(row.long_exposure)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {displayValue(row.short_exposure)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {displayValue(row.aum)}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell
+                      sx={{
+                        fontWeight: isTotal ? 700 : 600,
+                        minWidth: 180,
+                        color: isTotal ? "#111827" : "#1f2937",
+                      }}
+                    >
+                      {row.fund}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.dtd),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.dtd)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.mtd),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.mtd)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.ytd),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.ytd)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.long_exposure),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.long_exposure)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.short_exposure),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.short_exposure)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        color: getPerfColor(row.aum),
+                        fontVariantNumeric: "tabular-nums",
+                        fontWeight: isTotal ? 700 : 500,
+                      }}
+                    >
+                      {displayValue(row.aum)}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </TableContainer>
