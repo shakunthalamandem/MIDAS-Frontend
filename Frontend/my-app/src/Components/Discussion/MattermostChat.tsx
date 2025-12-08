@@ -59,40 +59,45 @@ const MattermostChat: React.FC = () => {
 
         const creds = await credsRes.json();
 
-        /** 2) Login via proxy */
-        const loginRes = await fetch(`${apiUrl}/api/mm_login_proxy/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-          body: JSON.stringify({
-            login_id: creds.mm_login_id,
-            password: creds.mm_password,
-          }),
-          signal: abortController.signal,
-        });
+        /** ---------------------------------------------------------
+         * 2) DIRECT LOGIN TO MATTERMOST (IMPORTANT)
+         *    This sets REAL cookies for midaschat.goldenhillsindia.com
+         * --------------------------------------------------------- */
+        const mmLoginRes = await fetch(
+          `${MATTERMOST_ORIGIN}/api/v4/users/login`,
+          {
+            method: "POST",
+            credentials: "include", // REQUIRED for cookies
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              login_id: creds.mm_login_id,
+              password: creds.mm_password,
+            }),
+            signal: abortController.signal,
+          }
+        );
 
-        const data = await loginRes.json();
-        const { MMAUTHTOKEN, MMUSERID, MMCSRF } = data.cookies || {};
+        if (!mmLoginRes.ok) {
+          throw new Error("Mattermost login failed");
+        }
 
-        /** 3) Apply cookies */
-        const opts = "; Path=/; SameSite=Lax";
-        document.cookie = `MMAUTHTOKEN=${MMAUTHTOKEN}${opts}`;
-        document.cookie = `MMUSERID=${MMUSERID}${opts}`;
-        if (MMCSRF) document.cookie = `MMCSRF=${MMCSRF}${opts}`;
-
-        // Always force browser mode
+        /** ---------------------------------------------------------
+         * 3) SET ONLY MMVIEW_PREFERENCE manually (not HttpOnly)
+         * --------------------------------------------------------- */
         document.cookie =
-          "MMVIEW_PREFERENCE=browser; Path=/; Max-Age=31536000; SameSite=Lax";
+          "MMVIEW_PREFERENCE=browser; Path=/; SameSite=None; Secure; Max-Age=31536000";
 
-        /** 4) Wait for cookies to actually register */
+        /** ---------------------------------------------------------
+         * 4) Wait for cookies to actually appear
+         * --------------------------------------------------------- */
         const start = Date.now();
         cookiePoll = window.setInterval(() => {
+          const cookies = document.cookie;
+
           const allSet =
-            document.cookie.includes("MMAUTHTOKEN=") &&
-            document.cookie.includes("MMUSERID=") &&
-            document.cookie.includes("MMVIEW_PREFERENCE=browser");
+            cookies.includes("MMVIEW_PREFERENCE=browser");
 
           if (allSet) {
             clearInterval(cookiePoll);
@@ -101,18 +106,19 @@ const MattermostChat: React.FC = () => {
             setTimeout(() => {
               setStatus("ready");
 
-              // Force reload AFTER iframe renders so MM uses the session
+              // Reload iframe AFTER cookies exist
               setTimeout(() => {
                 const iframe = iframeRef.current;
                 if (iframe) iframe.src = iframe.src;
               }, 800);
             }, 1200);
-          } else if (Date.now() - start > 10000) {
+          } else if (Date.now() - start > 12000) {
             clearInterval(cookiePoll);
             throw new Error("Timeout: cookies not applied");
           }
         }, 150);
       } catch (err: any) {
+        console.error("Mattermost Login Error:", err);
         setError(err?.message || "Unable to load chat");
         setStatus("error");
       }
