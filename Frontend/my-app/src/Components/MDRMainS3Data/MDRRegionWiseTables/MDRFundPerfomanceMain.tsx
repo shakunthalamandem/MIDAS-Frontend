@@ -71,7 +71,12 @@ const getPerfColor = (value: string | null) => {
   return "#111827"
 }
 
-const displayValue = (value: string | null) => value ?? "-"
+const formatDisplayValue = (value: string | null) => {
+  if (!value) return "-"
+  const trimmed = value.trim()
+  // Normalize suffixes like "m"/"b" to uppercase for consistency (e.g., 14m -> 14M)
+  return trimmed.replace(/([mb])\b/gi, (match) => match.toUpperCase())
+}
 
 const MDRFundPerfomanceMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL ?? ""
@@ -218,7 +223,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.dtd)}
+                      {formatDisplayValue(row.dtd)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -228,7 +233,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.mtd)}
+                      {formatDisplayValue(row.mtd)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -238,7 +243,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.ytd)}
+                      {formatDisplayValue(row.ytd)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -248,7 +253,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.long_exposure)}
+                      {formatDisplayValue(row.long_exposure)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -258,7 +263,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.short_exposure)}
+                      {formatDisplayValue(row.short_exposure)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -268,7 +273,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
                         fontWeight: isTotal ? 700 : 500,
                       }}
                     >
-                      {displayValue(row.aum)}
+                      {formatDisplayValue(row.aum)}
                     </TableCell>
                   </TableRow>
                 )
