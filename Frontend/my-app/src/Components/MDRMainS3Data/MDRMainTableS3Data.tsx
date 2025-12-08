@@ -5,6 +5,7 @@ import MDRCummulativeRegionChartMain from "./MDRCharts/MDRCummulativeRegionChart
 import MDRRegionWiseTablesDataMain from "./MDRRegionWiseTables/MDRRegionWiseTablesDataMain";
 import MDRRegionWiseTopTables from "./MDRCharts/MDRRegionWiseTopTables";
 import MDRDailyReportPDFExporter from "./MDRDailyReportPDFExporter";
+import MDRFundPerfomanceMain from "./MDRRegionWiseTables/MDRFundPerfomanceMain";
 
 const MDRMainTableS3Data = () => {
   const [pdfMode, setPdfMode] = useState(false);
@@ -68,6 +69,9 @@ const MDRMainTableS3Data = () => {
           </Box>
           <Box className="mdr-pdf-section">
             <MDRRegionWiseTablesDataMain />
+          </Box>
+          <Box className="mdr-pdf-section">
+            <MDRFundPerfomanceMain />
           </Box>
           <Box className="mdr-pdf-section">
             <MDRRegionWiseTopTables />
