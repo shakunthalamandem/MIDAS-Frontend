@@ -6,6 +6,7 @@ import { MDRDailyPortfolioRow } from "./MDRDailyPortfolioTypes";
 
 interface MDRDailyPortfolioContainerProps {
   pdfMode?: boolean;
+  actionsSlot?: React.ReactNode;
 }
 
 const parsePercent = (value: any) => {
@@ -58,7 +59,7 @@ const normalizeRow = (raw: any, index: number): MDRDailyPortfolioRow => ({
 
 export const MDRDailyPortfolioContainer: React.FC<
   MDRDailyPortfolioContainerProps
-> = ({ pdfMode = false }) => {
+> = ({ pdfMode = false, actionsSlot }) => {
   const [rows, setRows] = useState<MDRDailyPortfolioRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,6 +135,7 @@ export const MDRDailyPortfolioContainer: React.FC<
         onRefresh={fetchPortfolio}
         tradeDate={tradeDate}
         pdfMode={pdfMode}
+        actionsSlot={actionsSlot}
       />
     </Box>
   );
