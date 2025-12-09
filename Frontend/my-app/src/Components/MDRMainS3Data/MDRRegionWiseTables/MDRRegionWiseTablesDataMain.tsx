@@ -301,13 +301,9 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-      <Box sx={{ p: 3, backgroundColor: "#f5f6fa" }}>
-        {/* mark this as one logical PDF section */}
         <Paper
           elevation={3}
-          className="mdr-pdf-section"
-          data-pdf-break-before="true"
-          sx={{ p: 3, borderRadius: 3, backgroundColor: "#ffffff" }}
+          sx={{ p: 3, borderRadius: 3, backgroundColor: "#f7f8fb" }}
         >
           <Typography
             variant="h6"
@@ -352,7 +348,6 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
             )}
           </Grid>
         </Paper>
-      </Box>
     </Container>
   );
 };
