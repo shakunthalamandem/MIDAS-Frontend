@@ -104,7 +104,7 @@ const MDRCummulativeRegionChart: React.FC<Props> = ({ series }) => {
             label: (item: TooltipItem<"line">) => {
               const label = item.dataset.label || ""
               const value = item.parsed.y
-              return `${label}: ${formatCurrency(value)}`
+              return `${label}: ${formatCurrency(value ?? 0)}`
             },
             title: (items: TooltipItem<"line">[]) =>
               `Date: ${items?.[0]?.label ?? ""}`,

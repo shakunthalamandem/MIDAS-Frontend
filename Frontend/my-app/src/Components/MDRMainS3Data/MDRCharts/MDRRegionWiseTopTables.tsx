@@ -43,6 +43,8 @@ interface RegionTableProps {
   columnLabel: string
   secondaryColumnLabel?: string
   rows: MetricRow[]
+  primaryFormatter?: (value: number | null | undefined) => string
+  secondaryFormatter?: (value: number | null | undefined) => string
 }
 
 interface MetricSectionProps {
@@ -50,6 +52,8 @@ interface MetricSectionProps {
   columnLabel: string
   secondaryColumnLabel?: string
   metricData: MetricData
+  primaryFormatter?: (value: number | null | undefined) => string
+  secondaryFormatter?: (value: number | null | undefined) => string
 }
 
 const formatNumber = (value: number | null | undefined) => {
@@ -60,16 +64,22 @@ const formatNumber = (value: number | null | undefined) => {
   return value.toLocaleString(undefined, { maximumFractionDigits: 2 })
 }
 
-const NumberCell: React.FC<{ value: number | null | undefined }> = ({
-  value,
-}) => {
+const formatFullNumber = (value: number | null | undefined) => {
+  if (value === null || value === undefined || Number.isNaN(value)) return "-"
+  return value.toLocaleString(undefined, { maximumFractionDigits: 0 })
+}
+
+const NumberCell: React.FC<{
+  value: number | null | undefined
+  formatter?: (value: number | null | undefined) => string
+}> = ({ value, formatter = formatNumber }) => {
   const num = value === null || value === undefined ? null : Number(value)
   const color =
     num === null ? "#111827" : num < 0 ? "#c0392b" : num > 0 ? "#0b9a41" : "#111827"
 
   return (
     <Box component="span" sx={{ color }}>
-      {formatNumber(num)}
+      {formatter(num)}
     </Box>
   )
 }
@@ -131,6 +141,8 @@ const RegionTable: React.FC<RegionTableProps> = ({
   columnLabel,
   secondaryColumnLabel,
   rows,
+  primaryFormatter,
+  secondaryFormatter,
 }) => (
   <Grid item xs={12} sm={4}>
     <Paper
@@ -201,11 +213,14 @@ const RegionTable: React.FC<RegionTableProps> = ({
               >
                 <TableCell>{row.ticker}</TableCell>
                 <TableCell align="right">
-                  <NumberCell value={row.primary} />
+                  <NumberCell value={row.primary} formatter={primaryFormatter} />
                 </TableCell>
                 {secondaryColumnLabel && (
                   <TableCell align="right">
-                    <NumberCell value={row.secondary} />
+                    <NumberCell
+                      value={row.secondary}
+                      formatter={secondaryFormatter}
+                    />
                   </TableCell>
                 )}
               </TableRow>
@@ -222,6 +237,8 @@ const MetricSection: React.FC<MetricSectionProps> = ({
   columnLabel,
   secondaryColumnLabel,
   metricData,
+  primaryFormatter,
+  secondaryFormatter,
 }) => {
   const regions: RegionKey[] = ["US", "EMEA", "APAC"]
   return (
@@ -238,6 +255,8 @@ const MetricSection: React.FC<MetricSectionProps> = ({
             columnLabel={columnLabel}
             secondaryColumnLabel={secondaryColumnLabel}
             rows={metricData[region] || []}
+            primaryFormatter={primaryFormatter}
+            secondaryFormatter={secondaryFormatter}
           />
         ))}
       </Grid>
@@ -313,7 +332,17 @@ const MDRRegionWiseTopTables: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const sections = useMemo(
+  type Section = {
+    key: string
+    title: string
+    columnLabel: string
+    secondaryColumnLabel?: string
+    metricData: MetricData
+    primaryFormatter?: (value: number | null | undefined) => string
+    secondaryFormatter?: (value: number | null | undefined) => string
+  }
+
+  const sections: Section[] = useMemo(
     () => [
       {
         key: "days_held",
@@ -321,6 +350,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
         columnLabel: "Days Held",
         secondaryColumnLabel: "P&L",
         metricData: daysHeld,
+        primaryFormatter: formatFullNumber,
       },
       {
         key: "top_pnl",
@@ -379,6 +409,8 @@ const MDRRegionWiseTopTables: React.FC = () => {
                 columnLabel={section.columnLabel}
                 secondaryColumnLabel={section.secondaryColumnLabel}
                 metricData={section.metricData}
+                primaryFormatter={section.primaryFormatter}
+                secondaryFormatter={section.secondaryFormatter}
               />
             </Box>
           ))}

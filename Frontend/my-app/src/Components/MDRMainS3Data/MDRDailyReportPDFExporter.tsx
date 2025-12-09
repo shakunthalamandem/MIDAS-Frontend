@@ -51,6 +51,45 @@ const addFooter = (pdf: jsPDF) => {
   }
 };
 
+// use higher scale so numbers / text look clearer
+const getCanvasScale = () => {
+  if (typeof window === "undefined") return 2;
+  const ratio = window.devicePixelRatio || 1;
+  // keep it reasonable so file size doesn’t explode
+  return Math.min(Math.max(ratio, 1.5), 3);
+};
+
+/**
+ * Deduplicate .mdr-pdf-section elements:
+ * - build a key for each section (dataset.pdfKey, data-pdf-title, heading text, or index)
+ * - keep only the LAST occurrence for each key
+ * This lets us drop the “screen version” of a section and keep the later, clearer PDF version.
+ */
+const dedupePdfSections = (sections: HTMLElement[]): HTMLElement[] => {
+  const seenKeys = new Set<string>();
+  const result: HTMLElement[] = [];
+
+  for (let i = sections.length - 1; i >= 0; i--) {
+    const sec = sections[i];
+
+    const heading =
+      sec.querySelector("h1,h2,h3,h4,h5,h6")?.textContent?.trim() || "";
+    const key =
+      sec.dataset.pdfKey ||
+      sec.getAttribute("data-pdf-title") ||
+      heading ||
+      `__index_${i}`;
+
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      // we’re iterating from the end, so unshift to restore DOM order
+      result.unshift(sec);
+    }
+  }
+
+  return result;
+};
+
 const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
   targetId,
   fileName = "Monashee_Daily_Portfolio_Report.pdf",
@@ -80,22 +119,66 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
       const contentWidth = pdfWidth - marginX * 2;
 
       let cursorY = drawHeader(pdf, headerTitle);
-      const sections =
+
+      // --- FIND & DEDUPE PDF SECTIONS ---
+      const rawSections =
         Array.from(root.querySelectorAll<HTMLElement>(".mdr-pdf-section")) ||
         [];
+
+      const sections = rawSections.length
+        ? dedupePdfSections(rawSections)
+        : [];
+
       const targets = sections.length ? sections : [root];
+      let isFirstSection = true;
 
       for (const section of targets) {
-        const breakBefore =
+        const attrBreakBefore =
           section.dataset.pdfBreakBefore === "true" ||
           section.dataset.pdfBreakBefore === "1";
 
-        if (breakBefore && cursorY > 24) {
+        const minRemainingMm = 30; // guard to avoid crowding footer
+
+        // Estimate section height in mm based on scrollHeight.
+        const pxToMm = 25.4 / 96; // assuming 96dpi
+        const estimatedSectionHeightMm =
+          (section.scrollHeight ||
+            section.getBoundingClientRect().height ||
+            0) * pxToMm;
+        const availableHeightMmBefore = pdfHeight - bottomMargin - cursorY;
+
+        let breakBefore = attrBreakBefore;
+
+        // If the section is tall and we don't have enough room,
+        // force it to start on a new page so it doesn't get awkwardly split.
+        if (
+          !breakBefore &&
+          !isFirstSection &&
+          estimatedSectionHeightMm > 0 &&
+          availableHeightMmBefore > 0 &&
+          availableHeightMmBefore < estimatedSectionHeightMm * 0.9
+        ) {
+          breakBefore = true;
+        }
+
+        // Existing "break before" behaviour
+        if (breakBefore && !isFirstSection) {
+          pdf.addPage();
+          cursorY = drawHeader(pdf, headerTitle);
+        } else if (
+          !breakBefore &&
+          cursorY > pdfHeight - bottomMargin - minRemainingMm
+        ) {
+          // Still keep the simple guard near the footer
           pdf.addPage();
           cursorY = drawHeader(pdf, headerTitle);
         }
 
-        const prevStyles: Array<{ el: HTMLElement; key: string; val: string | null }> = [];
+        const prevStyles: Array<{
+          el: HTMLElement;
+          key: string;
+          val: string | null;
+        }> = [];
         const remember = (el: HTMLElement, key: string, val: string) => {
           prevStyles.push({ el, key, val: (el.style as any)[key] ?? null });
           (el.style as any)[key] = val;
@@ -128,7 +211,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
         relaxLayout(section);
 
         const canvas = await html2canvas(section, {
-          scale: 1.5,
+          scale: getCanvasScale(), // sharper capture
           useCORS: true,
           backgroundColor: "#ffffff",
           windowWidth: section.scrollWidth,
@@ -138,7 +221,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
 
         const mmPerPx = contentWidth / canvas.width;
         const gapMm = 6;
-        const overlapPx = 12;
+        const overlapPx = 40; // more overlap so numbers/rows aren't visually cut
         let offsetPx = 0;
 
         while (offsetPx < canvas.height) {
@@ -152,7 +235,11 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
           }
 
           const availableHeightPx = availableHeightMm / mmPerPx;
-          const sliceHeightPx = Math.min(remainingPx, availableHeightPx);
+          // round slice height a bit to avoid weird partial rows
+          const sliceHeightPx = Math.min(
+            remainingPx,
+            Math.floor(availableHeightPx)
+          );
           if (sliceHeightPx <= 0) break;
 
           const sliceCanvas = document.createElement("canvas");
@@ -187,11 +274,19 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
             "FAST"
           );
 
-          const stepPx = sliceHeightPx - Math.min(overlapPx, sliceHeightPx * 0.25);
-          offsetPx += stepPx > 0 ? stepPx : sliceHeightPx;
+          const isLastSlice = remainingPx <= availableHeightPx;
+          if (isLastSlice) {
+            // Consume remaining pixels; avoid tiny overlapping fragments that draw horizontal lines
+            offsetPx = canvas.height;
+          } else {
+            const stepPx =
+              sliceHeightPx - Math.min(overlapPx, sliceHeightPx * 0.2);
+            offsetPx += stepPx > 0 ? stepPx : sliceHeightPx;
+          }
+
           cursorY += sliceHeightMm + gapMm;
 
-          if (offsetPx < canvas.height && cursorY > pdfHeight - bottomMargin) {
+          if (cursorY > pdfHeight - bottomMargin) {
             pdf.addPage();
             cursorY = drawHeader(pdf, headerTitle);
           }
@@ -200,6 +295,8 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
         prevStyles.forEach(({ el, key, val }) => {
           (el.style as any)[key] = val ?? "";
         });
+
+        isFirstSection = false;
       }
 
       addFooter(pdf);
@@ -214,7 +311,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
 
   return (
     <Box position="relative" display="inline-flex">
-      {/* <Button
+      <Button
         variant="contained"
         onClick={handleExport}
         disabled={loading}
@@ -227,7 +324,7 @@ const MDRDailyReportPDFExporter: React.FC<MDRDailyReportPDFExporterProps> = ({
         }}
       >
         {loading ? "Generating PDF..." : "Generate PDF"}
-      </Button> */}
+      </Button>
       {loading && (
         <Box
           position="absolute"
