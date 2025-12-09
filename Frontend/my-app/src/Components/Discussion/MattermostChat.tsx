@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import env from "../../env";
 
 type Status = "idle" | "loading" | "ready" | "error";
 
-const MATTERMOST_ORIGIN = process.env.REACT_APP_MATTERMOST_ORIGIN as string;
-const MATTERMOST_TEAM = process.env.REACT_APP_MATTERMOST_TEAM as string;
-const DEFAULT_CHANNEL = process.env.REACT_APP_DEFAULT_CHANNEL as string;
-
-const apiUrl = process.env.REACT_APP_API_URL as string;
+const MATTERMOST_ORIGIN = env.mattermostOrigin;
+const MATTERMOST_TEAM = env.mattermostTeam;
+const DEFAULT_CHANNEL = env.defaultChannel;
+const apiUrl = env.apiUrl;
 
 const MattermostChat: React.FC = () => {
   const { stock } = useParams();
@@ -19,6 +19,22 @@ const MattermostChat: React.FC = () => {
     typeof window !== "undefined"
       ? localStorage.getItem("access_token")
       : null;
+
+  const getCookieOptions = () => {
+    if (typeof window === "undefined") return "; Path=/";
+
+    const hostname = window.location.hostname;
+    const isLocal =
+      hostname === "localhost" || hostname === "127.0.0.1";
+
+    // For local: no Domain / Secure flags (browsers often ignore secure cookies over http://localhost)
+    if (isLocal) {
+      return "; Path=/";
+    }
+
+    const domain = env.cookieDomain || ".goldenhillsindia.com";
+    return `; Path=/; Domain=${domain}; SameSite=None; Secure`;
+  };
 
   /** ---------------------------------------------------------
    * AUTO RELOAD after MM boots fully
@@ -39,7 +55,7 @@ const MattermostChat: React.FC = () => {
    * --------------------------------------------------------- */
   useEffect(() => {
     let cookiePoll: number | undefined;
-    let abortController = new AbortController();
+    const abortController = new AbortController();
 
     const login = async () => {
       try {
@@ -73,20 +89,24 @@ const MattermostChat: React.FC = () => {
           signal: abortController.signal,
         });
 
+        if (!loginRes.ok) throw new Error("Login proxy failed");
+
         const data = await loginRes.json();
         const { MMAUTHTOKEN, MMUSERID, MMCSRF } = data.cookies || {};
 
+        if (!MMAUTHTOKEN || !MMUSERID) {
+          throw new Error("Missing auth cookies");
+        }
+
         /** 3) Apply cookies */
-        /** 3) Apply cookies */
-        const opts = "; Path=/; Domain=.goldenhillsindia.com; SameSite=None; Secure";
+        const opts = getCookieOptions();
 
         document.cookie = `MMAUTHTOKEN=${MMAUTHTOKEN}${opts}`;
         document.cookie = `MMUSERID=${MMUSERID}${opts}`;
         if (MMCSRF) document.cookie = `MMCSRF=${MMCSRF}${opts}`;
 
         document.cookie =
-          "MMVIEW_PREFERENCE=browser; Path=/; Domain=.goldenhillsindia.com; SameSite=None; Secure; Max-Age=31536000";
-
+          `MMVIEW_PREFERENCE=browser${opts}; Max-Age=31536000`;
 
         /** 4) Wait for cookies to actually register */
         const start = Date.now();
@@ -126,7 +146,7 @@ const MattermostChat: React.FC = () => {
       abortController.abort();
       if (cookiePoll) clearInterval(cookiePoll);
     };
-  }, [accessToken, stock]);
+  }, [accessToken, stock, apiUrl]);
 
   /** ---------------------------------------------------------
    * UI STATES
