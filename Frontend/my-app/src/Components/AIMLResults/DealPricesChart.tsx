@@ -18,11 +18,11 @@ import {
   ReferenceLine,
   Bar,
   Customized,
-  Legend,
 } from "recharts";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
 
-type TPredictionPolarity = "positive" | "negative" | null;
+// 🔽 adjust this path if needed
 
 interface PriceApiRow {
   fs_ticker: string;
@@ -36,9 +36,6 @@ interface PriceApiRow {
 interface ApiResponse {
   data: PriceApiRow[];
   issue_price: number;
-  t1w_pred: string;
-  t1d_openprice_pred: string;
-  t1m_pred: string;
   stop_loss: number;
 }
 
@@ -91,14 +88,6 @@ const formatFullDate = (value: string): string => {
 const formatPrice = (value: number | null | undefined): string => {
   if (value == null || Number.isNaN(value)) return "-";
   return `$${value.toFixed(2)}`;
-};
-
-const getPolarityFromText = (text?: string): TPredictionPolarity => {
-  if (!text) return null;
-  const lower = text.toLowerCase();
-  if (lower.includes("positive")) return "positive";
-  if (lower.includes("negative")) return "negative";
-  return null;
 };
 
 const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
@@ -241,9 +230,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   const [chartData, setChartData] = useState<DealPoint[]>([]);
   const [issuePrice, setIssuePrice] = useState<number | null>(null);
   const [stopLoss, setStopLoss] = useState<number | null>(null);
-  const [t1mPolarity, setT1mPolarity] = useState<TPredictionPolarity>(null);
-  const [t1wPred, setT1wPred] = useState<string | null>(null);
-  const [t1dOpenPred, setT1dOpenPred] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -260,9 +246,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     setChartData([]);
     setIssuePrice(null);
     setStopLoss(null);
-    setT1mPolarity(null);
-    setT1wPred(null);
-    setT1dOpenPred(null);
     setError(null);
 
     if (!hasSelection) {
@@ -322,9 +305,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         setChartData(processed);
         setIssuePrice(Number(json.issue_price));
         setStopLoss(Number(json.stop_loss));
-        setT1mPolarity(getPolarityFromText(json.t1m_pred));
-        setT1wPred(json.t1w_pred || null);
-        setT1dOpenPred(json.t1d_openprice_pred || null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
       } finally {
@@ -335,13 +315,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     fetchPrices();
   }, [apiUrl, token, ticker, pricingDate, hasSelection]);
 
-  const { yMin, yMax, t1mLineValue, t1mLabel } = useMemo(() => {
+  const { yMin, yMax } = useMemo(() => {
     if (!chartData.length) {
       return {
         yMin: 0,
         yMax: "auto" as number | "auto",
-        t1mLineValue: null as number | null,
-        t1mLabel: "",
       };
     }
 
@@ -358,29 +336,14 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     let max = Math.max(...prices);
     const spread = max - min || 1;
 
-    let lineValue: number | null = null;
-    let label = "";
-
-    // if (t1mPolarity === "positive") {
-    //   max += spread * 0.2;
-    //   lineValue = max - spread * 0.03;
-    //   label = "T+1M (Positive)";
-    // } else if (t1mPolarity === "negative") {
-    //   min -= spread * 0.2;
-    //   lineValue = min + spread * 0.03;
-    //   label = "T+1M (Negative)";
-    // }
-
     const paddedMin = Math.floor(min - spread * 0.05);
     const paddedMax = Math.ceil(max + spread * 0.05);
 
     return {
       yMin: paddedMin,
       yMax: paddedMax,
-      t1mLineValue: lineValue,
-      t1mLabel: label,
     };
-  }, [chartData, issuePrice, stopLoss, t1mPolarity]);
+  }, [chartData, issuePrice, stopLoss]);
 
   const stopLossOffset = useMemo(() => {
     if (issuePrice == null || stopLoss == null) return 0;
@@ -405,9 +368,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
           <Typography variant="h6" gutterBottom>
             Deal Price Timeseries
           </Typography>
-          <Alert severity="info">
-            Select a deal to view its price chart.
-          </Alert>
+          <Alert severity="info">Select a deal to view its price chart.</Alert>
         </Paper>
       </Container>
     );
@@ -416,7 +377,13 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   return (
     <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
       <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom textAlign={"center"} color="#002060" fontWeight={"bold"}>
+        <Typography
+          variant="h6"
+          gutterBottom
+          textAlign={"center"}
+          color="#002060"
+          fontWeight={"bold"}
+        >
           {ticker} – Deal Price Timeseries
         </Typography>
 
@@ -426,38 +393,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
           justifyContent="space-between"
           mb={1}
           sx={{ gap: 1 }}
-        >
-          {/* <Typography variant="body2" color="text.secondary">
-            Candlesticks show Open–High–Low–Close per day.
-          </Typography> */}
-          {/* <Box display="flex" gap={2}>
-            {t1dOpenPred && (
-              <Typography variant="body2" color="error">
-                T+1D (from Open): {t1dOpenPred}
-              </Typography>
-            )}
-            {t1wPred && (
-              <Typography
-                variant="body2"
-                color={
-                  getPolarityFromText(t1wPred) === "positive"
-                    ? "success.main"
-                    : "error.main"
-                }
-              >
-                T+1W: {t1wPred}
-              </Typography>
-            )}
-            {t1mPolarity && (
-              <Typography
-                variant="body2"
-                color={t1mPolarity === "positive" ? "success.main" : "error.main"}
-              >
-                T+1M: {t1mPolarity === "positive" ? "Positive" : "Negative"}
-              </Typography>
-            )}
-          </Box> */}
-        </Box>
+        />
 
         {loading && (
           <Box
@@ -485,8 +421,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   data={chartData}
                   margin={{ top: 10, right: 70, bottom: 20, left: 50 }}
                 >
-                  {/* Grey dotted CartesianGrid removed */}
-
                   <XAxis dataKey="label" />
                   <YAxis
                     yAxisId="price"
@@ -509,7 +443,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   />
 
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend />
 
                   {/* Candlesticks */}
                   <Customized component={<Candles />} />
@@ -530,15 +463,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                       yAxisId="price"
                       stroke="#B00020"
                       strokeWidth={2.25}
-                      strokeDasharray="3 3"
-                    />
-                  )}
-                  {t1mLineValue != null && (
-                    <ReferenceLine
-                      y={t1mLineValue}
-                      yAxisId="price"
-                      stroke="#C56800"
-                      strokeWidth={1.5}
                       strokeDasharray="3 3"
                     />
                   )}
@@ -570,22 +494,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                       }
                     />
                   )}
-                  {t1mLineValue != null && t1mLabel && (
-                    <Customized
-                      component={
-                        <HorizontalLineLabel
-                          yValue={t1mLineValue}
-                          text={t1mLabel}
-                          color="#C56800"
-                        />
-                      }
-                    />
-                  )}
                 </ComposedChart>
               </ResponsiveContainer>
             </Box>
 
-            {/* Colour legend */}
+            {/* Line legend + info note */}
             <Box
               mt={2}
               display="flex"
@@ -593,47 +506,19 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
               justifyContent="center"
               gap={2}
             >
-              {/* <Typography variant="caption">
+              <Typography variant="caption">
                 <Box
                   component="span"
                   sx={{
                     display: "inline-block",
-                    width: 12,
-                    height: 12,
-                    bgcolor: "#008000",
+                    width: 18,
+                    height: 0,
+                    borderTop: "3px dashed #000000",
                     mr: 0.5,
                   }}
                 />
-                Green candle: Close ≥ Open
+                Issue Price
               </Typography>
-
-              <Typography variant="caption">
-                <Box
-                  component="span"
-                  sx={{
-                    display: "inline-block",
-                    width: 12,
-                    height: 12,
-                    bgcolor: "#CC0000",
-                    mr: 0.5,
-                  }}
-                />
-                Red candle: Close &lt; Open
-              </Typography> */}
-
-              <Typography variant="caption">
-                  <Box
-                    component="span"
-                    sx={{
-                      display: "inline-block",
-                      width: 18,
-                      height: 0,
-                      borderTop: "3px dashed #000000",
-                      mr: 0.5,
-                    }}
-                  />
-                  Issue Price
-                </Typography>
 
               <Typography variant="caption">
                 <Box
@@ -648,31 +533,24 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                 />
                 Stop Loss
               </Typography>
+
               <Box display="flex" alignItems="center" mt={0.5}>
-  <InfoOutlinedIcon
-    fontSize="small"
-    sx={{ color: "grey.500", mr: 0.5 }}
-  />
-  <Typography variant="caption" color="text.secondary">
-    Data is from pricing date to one week
-  </Typography>
-</Box>
-
-
-              {/* <Typography variant="caption">
-                <Box
-                  component="span"
-                  sx={{
-                    display: "inline-block",
-                    width: 18,
-                    height: 0,
-                    borderTop: "2px dashed #C56800",
-                    mr: 0.5,
-                  }}
+                <InfoOutlinedIcon
+                  fontSize="small"
+                  sx={{ color: "grey.500", mr: 0.5 }}
                 />
-                T+1M Indicator
-              </Typography> */}
+                <Typography variant="caption" color="text.secondary">
+                  Data is from pricing date to one week
+                </Typography>
+              </Box>
             </Box>
+
+            {/* 🔽 TradingView widget below the chart, using same ticker */}
+            {ticker && (
+              <Box mt={4}>
+                <TradingViewWidget ticker={ticker} />
+              </Box>
+            )}
           </>
         )}
 
