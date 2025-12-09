@@ -19,6 +19,7 @@ import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/Tradin
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 import DropdownTab from "./DropdownTab";
+import ChatBoxButton from "../Main/HomePage/Authentication/ChatBoxButton";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -255,6 +256,7 @@ const NavbarMain: React.FC = () => {
                   path: "/opportunity/equity",
                 },
                 { label: "Past IPOs & FOs", path: "/opportunity/pastdeals" },
+                { label: "Monashee Daily Report", path: "/opportunity/monashee_daily_report" },
                 {
                   label: "High Yields Market Opportunity",
                   path: "/opportunity/high-yield",
@@ -313,9 +315,12 @@ const NavbarMain: React.FC = () => {
             {isLoggedIn && (
               <>
                 {/* 🔔 Notifications */}
+                <ChatBoxButton />
+
                 <NotificationMenu />
               </>
             )}
+
 
             {isLoggedIn && isSuperUser && (
               <Button

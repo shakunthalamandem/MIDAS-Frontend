@@ -80,7 +80,9 @@ import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
+import MattermostChat from "../Components/Discussion/MattermostChat";
 import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
+import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
 
 const AppRouters: React.FC = () => {
   return (
@@ -207,6 +209,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
+        <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MDRMainTableS3Data/></AuthGuard>} />
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
          <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
@@ -254,6 +257,7 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
                 {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
 
+        <Route path="/chat" element={<MattermostChat />} />
 
 
 
