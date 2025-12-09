@@ -59,45 +59,42 @@ const MattermostChat: React.FC = () => {
 
         const creds = await credsRes.json();
 
-        /** ---------------------------------------------------------
-         * 2) DIRECT LOGIN TO MATTERMOST (IMPORTANT)
-         *    This sets REAL cookies for midaschat.goldenhillsindia.com
-         * --------------------------------------------------------- */
-        const mmLoginRes = await fetch(
-          `${MATTERMOST_ORIGIN}/api/v4/users/login`,
-          {
-            method: "POST",
-            credentials: "include", // REQUIRED for cookies
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              login_id: creds.mm_login_id,
-              password: creds.mm_password,
-            }),
-            signal: abortController.signal,
-          }
-        );
+        /** 2) Login via proxy */
+        const loginRes = await fetch(`${apiUrl}/api/mm_login_proxy/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({
+            login_id: creds.mm_login_id,
+            password: creds.mm_password,
+          }),
+          signal: abortController.signal,
+        });
 
-        if (!mmLoginRes.ok) {
-          throw new Error("Mattermost login failed");
-        }
+        const data = await loginRes.json();
+        const { MMAUTHTOKEN, MMUSERID, MMCSRF } = data.cookies || {};
 
-        /** ---------------------------------------------------------
-         * 3) SET ONLY MMVIEW_PREFERENCE manually (not HttpOnly)
-         * --------------------------------------------------------- */
+        /** 3) Apply cookies */
+        /** 3) Apply cookies */
+        const opts = "; Path=/; Domain=.goldenhillsindia.com; SameSite=None; Secure";
+
+        document.cookie = `MMAUTHTOKEN=${MMAUTHTOKEN}${opts}`;
+        document.cookie = `MMUSERID=${MMUSERID}${opts}`;
+        if (MMCSRF) document.cookie = `MMCSRF=${MMCSRF}${opts}`;
+
         document.cookie =
-          "MMVIEW_PREFERENCE=browser; Path=/; SameSite=None; Secure; Max-Age=31536000";
+          "MMVIEW_PREFERENCE=browser; Path=/; Domain=.goldenhillsindia.com; SameSite=None; Secure; Max-Age=31536000";
 
-        /** ---------------------------------------------------------
-         * 4) Wait for cookies to actually appear
-         * --------------------------------------------------------- */
+
+        /** 4) Wait for cookies to actually register */
         const start = Date.now();
         cookiePoll = window.setInterval(() => {
-          const cookies = document.cookie;
-
           const allSet =
-            cookies.includes("MMVIEW_PREFERENCE=browser");
+            document.cookie.includes("MMAUTHTOKEN=") &&
+            document.cookie.includes("MMUSERID=") &&
+            document.cookie.includes("MMVIEW_PREFERENCE=browser");
 
           if (allSet) {
             clearInterval(cookiePoll);
@@ -106,19 +103,18 @@ const MattermostChat: React.FC = () => {
             setTimeout(() => {
               setStatus("ready");
 
-              // Reload iframe AFTER cookies exist
+              // Force reload AFTER iframe renders so MM uses the session
               setTimeout(() => {
                 const iframe = iframeRef.current;
                 if (iframe) iframe.src = iframe.src;
               }, 800);
             }, 1200);
-          } else if (Date.now() - start > 12000) {
+          } else if (Date.now() - start > 10000) {
             clearInterval(cookiePoll);
             throw new Error("Timeout: cookies not applied");
           }
         }, 150);
       } catch (err: any) {
-        console.error("Mattermost Login Error:", err);
         setError(err?.message || "Unable to load chat");
         setStatus("error");
       }
