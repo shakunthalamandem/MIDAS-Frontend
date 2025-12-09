@@ -343,6 +343,26 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
     return false;
   };
 
+
+
+    // Helper: check if the selected ticker (line) has at least one non-null value
+  const metricHasLineDataForSelected = (metric: MetricPrefix): boolean => {
+    if (!selectedCompanyKey) return false;
+
+    const row = dataByTicker.get(selectedCompanyKey);
+    if (!row) return false;
+
+    for (const year of YEARS) {
+      const key = `${metric}_${year}` as keyof MetricsRow;
+      const value = row[key];
+      if (value !== null && value !== undefined) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const handlePeerToggle = useCallback(
     (company: string) => {
       setSelectedPeers((prev) => {
@@ -534,118 +554,129 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
 
         {/* Charts */}
         <Grid container spacing={3}>
-          {METRICS.filter((m) => metricHasData(m.key)).map((metric) => {
-            const chartData = buildMetricChartData(metric.key);
+          {METRICS
+            // Only show charts where the selected ticker's line has data
+            .filter((m) => metricHasLineDataForSelected(m.key))
+            .map((metric) => {
+              const chartData = buildMetricChartData(metric.key);
 
-            return (
-              <Grid item xs={12} md={6} key={metric.key}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: 2,
-                    backgroundColor: "#fafafa",
-                    borderColor: "#e0e0e0",
-                    p: 2,
-                  }}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Typography
-                      variant="subtitle1"
-                      gutterBottom
-                      align="center"
-                      sx={{ fontWeight: 600, color: "#002060" }}
-                    >
-                      {metric.title}
-                    </Typography>
-                    <Box height={320}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart
-                          data={chartData}
-                          margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
-                        >
-                          <XAxis
-                            dataKey="year"
-                            label={{
-                              value: "Year",
-                              position: "insideBottom",
-                              offset: -5,
-                              style: {
-                                fontSize: 11,
-                                fontWeight: 700,
-                                fill: "#002060",
-                              },
+              return (
+                <Grid item xs={12} md={6} key={metric.key}>
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: 2,
+                      backgroundColor: "#fafafa",
+                      borderColor: "#e0e0e0",
+                      p: 2,
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography
+                        variant="subtitle1"
+                        gutterBottom
+                        align="center"
+                        sx={{ fontWeight: 600, color: "#002060" }}
+                      >
+                        {metric.title}
+                      </Typography>
+                      <Box height={320}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart
+                            data={chartData}
+                            margin={{
+                              top: 20,
+                              right: 20,
+                              left: 50,
+                              bottom: 20,
                             }}
-                          />
-                         <YAxis
-                          tickFormatter={(v) => formatAxisTick(v, metric.format)}
-                          allowDecimals={false}
-                          width={90}
-                          tickMargin={8}
-                          label={{
-                            value: metric.yAxisLabel,
-                            angle: -90,
-                            position: "left",
-                            offset: 20,
-                            style: {
-                              fontSize: 11,
-                              fontWeight: 700,
-                              textAnchor: "middle",
-                              fill: "#002060",
-                            },
-                          }}
-                        />
-                          <Tooltip
-                            formatter={(value: any, name: string) => [
-                              formatValueLabel(value, metric.format),
-                              name,
-                            ]}
-                          />
-                          <Legend />
-
-                          {/* Bars for selected peers only */}
-                          {peerCompanies
-                            .filter((company) =>
-                              selectedPeers.includes(company)
-                            )
-                            .map((company) => {
-                              const colorIndex =
-                                peerCompanies.indexOf(company);
-                              const fillColor =
-                                BAR_COLORS[colorIndex % BAR_COLORS.length];
-
-                              return (
-                                <Bar
-                                  key={`${metric.key}-${company}`}
-                                  dataKey={company}
-                                  name={company}
-                                  fill={fillColor}
-                                  barSize={18}
-                                />
-                              );
-                            })}
-
-                          {/* Line for the selected ticker */}
-                          {selectedCompanyKey && (
-                            <Line
-                              type="monotone"
-                              dataKey={selectedCompanyKey}
-                              name={`${selectedCompanyKey}`}
-                              stroke={SELECTED_LINE_COLOR}
-                              strokeWidth={3}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 5 }}
+                          >
+                            <XAxis
+                              dataKey="year"
+                              label={{
+                                value: "Year",
+                                position: "insideBottom",
+                                offset: -5,
+                                style: {
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  fill: "#002060",
+                                },
+                              }}
                             />
-                          )}
-                        </ComposedChart>
-                      </ResponsiveContainer>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
+                            <YAxis
+                              tickFormatter={(v) =>
+                                formatAxisTick(v, metric.format)
+                              }
+                              allowDecimals={false}
+                              width={90}
+                              tickMargin={8}
+                              label={{
+                                value: metric.yAxisLabel,
+                                angle: -90,
+                                position: "left",
+                                offset: 20,
+                                style: {
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  textAnchor: "middle",
+                                  fill: "#002060",
+                                },
+                              }}
+                            />
+                            <Tooltip
+                              formatter={(value: any, name: string) => [
+                                formatValueLabel(value, metric.format),
+                                name,
+                              ]}
+                            />
+                            <Legend />
+
+                            {/* Bars for selected peers only */}
+                            {peerCompanies
+                              .filter((company) =>
+                                selectedPeers.includes(company)
+                              )
+                              .map((company) => {
+                                const colorIndex =
+                                  peerCompanies.indexOf(company);
+                                const fillColor =
+                                  BAR_COLORS[colorIndex % BAR_COLORS.length];
+
+                                return (
+                                  <Bar
+                                    key={`${metric.key}-${company}`}
+                                    dataKey={company}
+                                    name={company}
+                                    fill={fillColor}
+                                    barSize={18}
+                                  />
+                                );
+                              })}
+
+                            {/* Line for the selected ticker */}
+                            {selectedCompanyKey && (
+                              <Line
+                                type="monotone"
+                                dataKey={selectedCompanyKey}
+                                name={`${selectedCompanyKey}`}
+                                stroke={SELECTED_LINE_COLOR}
+                                strokeWidth={3}
+                                dot={{ r: 4 }}
+                                activeDot={{ r: 5 }}
+                              />
+                            )}
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
         </Grid>
+
       </Box>
     </Card>
   );
