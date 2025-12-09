@@ -16,7 +16,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-// import MDRFundRegionWiseFilters from "path-to-your-component";
 
 const PRIMARY_COLOR = "#002060";
 
@@ -57,7 +56,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
   const [data, setData] = useState<FundBlock[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasApplied, setHasApplied] = useState(false); // if you use filters
+  const [hasApplied, setHasApplied] = useState(false);
 
   // 🔹 ROUND OFF values (no decimals)
   const formatPnL = (num: number) => {
@@ -83,8 +82,6 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
               "Content-Type": "application/json",
               Authorization: token ? `Bearer ${token}` : "",
             },
-            // ⛔ No body / payload required by backend
-            // body: JSON.stringify({}),
           }
         );
 
@@ -95,8 +92,6 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
 
         const json: ApiFundsResponse = await response.json();
 
-        // 🔹 Transform { funds: { fund: { region: {DTD,MTD,YTD} } } }
-        //     into FundBlock[] expected by the UI
         const transformed: FundBlock[] = Object.entries(json.funds || {}).map(
           ([fundName, regionsObj]) => {
             const rows: RegionRow[] = REGION_ORDER.map((regionName) => {
@@ -122,7 +117,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
         );
 
         setData(transformed);
-        setHasApplied(true); // optional – if you want "no data" message logic to work
+        setHasApplied(true);
       } catch (err: any) {
         setError(err.message || "An error occurred while fetching data");
         setData([]);
@@ -160,11 +155,20 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
         <TableContainer
           component={Paper}
           elevation={0}
-          sx={{ border: "1px solid #ccc", overflowX: "hidden" }}
+          sx={{
+            border: "1px solid #ccc",
+            // important for html2canvas/pdf: allow full width, don't clip
+            overflowX: "visible",
+          }}
         >
           <Table
             size="small"
-            sx={{ tableLayout: "fixed", width: "100%" }}
+            sx={{
+              tableLayout: "auto",
+              width: "100%",
+              // a bit wider so the right-most (YTD) column has room
+              minWidth: 380,
+            }}
           >
             <TableHead>
               <TableRow>
@@ -172,7 +176,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
                   sx={{
                     width: "34%",
                     fontWeight: 700,
-                    color: "#002060",
+                    color: PRIMARY_COLOR,
                     backgroundColor: "#f0f3ff",
                     borderRight: "1px solid #ccc",
                     borderBottom: "1px solid #ccc",
@@ -186,11 +190,12 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
                   sx={{
                     width: "22%",
                     fontWeight: 700,
-                    color: "#002060",
+                    color: PRIMARY_COLOR,
                     backgroundColor: "#f0f3ff",
                     borderBottom: "1px solid #ccc",
-                    padding: "4px 8px",
+                    padding: "4px 10px 4px 6px",
                     fontVariantNumeric: "tabular-nums",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   DTD
@@ -200,11 +205,12 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
                   sx={{
                     width: "22%",
                     fontWeight: 700,
-                    color: "#002060",
+                    color: PRIMARY_COLOR,
                     backgroundColor: "#f0f3ff",
                     borderBottom: "1px solid #ccc",
-                    padding: "4px 8px",
+                    padding: "4px 10px 4px 6px",
                     fontVariantNumeric: "tabular-nums",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   MTD
@@ -214,11 +220,12 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
                   sx={{
                     width: "22%",
                     fontWeight: 700,
-                    color: "#002060",
+                    color: PRIMARY_COLOR,
                     backgroundColor: "#f0f3ff",
                     borderBottom: "1px solid #ccc",
-                    padding: "4px 8px",
+                    padding: "4px 10px 4px 6px", // a bit more right padding
                     fontVariantNumeric: "tabular-nums",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   YTD
@@ -241,38 +248,44 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
                   >
                     {row.region}
                   </TableCell>
+
                   <TableCell
                     align="right"
                     sx={{
                       width: "22%",
                       color: pnlColor(row.dtd),
                       borderBottom: "1px solid #eee",
-                      padding: "4px 8px",
+                      padding: "4px 10px 4px 6px",
                       fontVariantNumeric: "tabular-nums",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {formatPnL(row.dtd)}
                   </TableCell>
+
                   <TableCell
                     align="right"
                     sx={{
                       width: "22%",
                       color: pnlColor(row.mtd),
                       borderBottom: "1px solid #eee",
-                      padding: "4px 8px",
+                      padding: "4px 10px 4px 6px",
                       fontVariantNumeric: "tabular-nums",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {formatPnL(row.mtd)}
                   </TableCell>
+
                   <TableCell
                     align="right"
                     sx={{
                       width: "22%",
                       color: pnlColor(row.ytd),
                       borderBottom: "1px solid #eee",
-                      padding: "4px 8px",
+                      padding: "4px 10px 4px 6px",
                       fontVariantNumeric: "tabular-nums",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {formatPnL(row.ytd)}
@@ -301,7 +314,6 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
             expenses)
           </Typography>
 
-          {/* Keep this only if you still use filters */}
           {error && (
             <Typography color="error" sx={{ mb: 2 }}>
               {error}
