@@ -27,7 +27,6 @@ const MattermostChat: React.FC = () => {
     const isLocal =
       hostname === "localhost" || hostname === "127.0.0.1";
 
-    // For local: no Domain / Secure flags (browsers often ignore secure cookies over http://localhost)
     if (isLocal) {
       return "; Path=/";
     }
@@ -36,23 +35,23 @@ const MattermostChat: React.FC = () => {
     return `; Path=/; Domain=${domain}; SameSite=None; Secure`;
   };
 
-  /** ---------------------------------------------------------
+  /**
    * AUTO RELOAD after MM boots fully
-   * --------------------------------------------------------- */
+   */
   useEffect(() => {
     if (status !== "ready") return;
 
     const reloadTimer = setTimeout(() => {
       const iframe = iframeRef.current;
       if (iframe) iframe.src = iframe.src; // silent reload
-    }, 600);
+    }, 900); // increased from 600 → more stable
 
     return () => clearTimeout(reloadTimer);
   }, [status]);
 
-  /** ---------------------------------------------------------
+  /**
    * MAIN LOGIN FLOW
-   * --------------------------------------------------------- */
+   */
   useEffect(() => {
     let cookiePoll: number | undefined;
     const abortController = new AbortController();
@@ -101,12 +100,13 @@ const MattermostChat: React.FC = () => {
         /** 3) Apply cookies */
         const opts = getCookieOptions();
 
+        // 🚀 FIX #1 — set view preference FIRST
+        document.cookie = `MMVIEW_PREFERENCE=browser${opts}; Max-Age=31536000`;
+
+        // now set the session cookies
         document.cookie = `MMAUTHTOKEN=${MMAUTHTOKEN}${opts}`;
         document.cookie = `MMUSERID=${MMUSERID}${opts}`;
         if (MMCSRF) document.cookie = `MMCSRF=${MMCSRF}${opts}`;
-
-        document.cookie =
-          `MMVIEW_PREFERENCE=browser${opts}; Max-Age=31536000`;
 
         /** 4) Wait for cookies to actually register */
         const start = Date.now();
@@ -119,16 +119,16 @@ const MattermostChat: React.FC = () => {
           if (allSet) {
             clearInterval(cookiePoll);
 
-            // Let Mattermost fully initialize service worker + session
+            // 🚀 FIX #2 — small delay before ready state
             setTimeout(() => {
               setStatus("ready");
 
-              // Force reload AFTER iframe renders so MM uses the session
+              // reload after iframe mounts
               setTimeout(() => {
                 const iframe = iframeRef.current;
                 if (iframe) iframe.src = iframe.src;
-              }, 800);
-            }, 1200);
+              }, 900); // increased to avoid race
+            }, 500); // slight delay fixes auto-login
           } else if (Date.now() - start > 10000) {
             clearInterval(cookiePoll);
             throw new Error("Timeout: cookies not applied");
@@ -148,9 +148,9 @@ const MattermostChat: React.FC = () => {
     };
   }, [accessToken, stock, apiUrl]);
 
-  /** ---------------------------------------------------------
+  /**
    * UI STATES
-   * --------------------------------------------------------- */
+   */
   if (status === "loading") {
     return (
       <div
@@ -189,9 +189,9 @@ const MattermostChat: React.FC = () => {
     );
   }
 
-  /** ---------------------------------------------------------
+  /**
    * SUCCESS — Render iframe
-   * --------------------------------------------------------- */
+   */
   const channelSlug =
     stock && typeof stock === "string"
       ? `${stock.toLowerCase()}-thoughts`
