@@ -13,6 +13,7 @@ interface MDRDailyPortfolioTableMainS3Props {
   onRefresh?: () => void;
   tradeDate?: string;
   pdfMode?: boolean;
+  actionsSlot?: React.ReactNode;
 }
 
 /* ========= Helpers used by container ========= */
@@ -70,7 +71,15 @@ const formatTradeDateDisplay = (tradeDate?: string): string => {
 
 const MDRDailyPortfolioTableMainS3: React.FC<
   MDRDailyPortfolioTableMainS3Props
-> = ({ rows, loading, error, onRefresh, tradeDate, pdfMode = false }) => {
+> = ({
+  rows,
+  loading,
+  error,
+  onRefresh,
+  tradeDate,
+  pdfMode = false,
+  actionsSlot,
+}) => {
   const [searchText, setSearchText] = useState<string>("");
 
   // Excel export
@@ -119,6 +128,7 @@ const MDRDailyPortfolioTableMainS3: React.FC<
       onSearchTextChange={setSearchText}
       onExport={exportToExcel}
       pdfMode={pdfMode}
+      actionsSlot={actionsSlot}
     />
   );
 };

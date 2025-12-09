@@ -299,6 +299,7 @@ interface MDRDailyPortfolioTableViewProps {
   onSearchTextChange: (value: string) => void;
   onExport: () => void;
   pdfMode?: boolean;
+  actionsSlot?: React.ReactNode;
 }
 
 /* ========= Presentational component ========= */
@@ -314,10 +315,11 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
   onSearchTextChange,
   onExport,
   pdfMode = false,
+  actionsSlot,
 }) => {
   return (
     <Container maxWidth="xl">
-      <Stack spacing={2}>
+      <Stack spacing={2} mt={4}>
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -359,6 +361,8 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
             >
               Export to Excel
             </Button>
+
+            {actionsSlot}
           </Stack>
         </Stack>
 
