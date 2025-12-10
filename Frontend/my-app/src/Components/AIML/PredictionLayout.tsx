@@ -40,12 +40,11 @@ const defaultFOValues = {
   Treasury: "Stable",
   target: "T1D",
 
-  // NEW: fundamentals + feature
   revenue_category: "",
   revenue_growth_category: "",
   net_profit_margin_category: "",
   issue_price: 0,
-  t1d_close_price_category: 0,
+  previous_day_close_price: 0,
   issue_to_pre_day_close_return_category: 0,
   t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
@@ -53,7 +52,6 @@ const defaultFOValues = {
   t1d_open_price: null as number | null,
   t1d_close_price: null as number | null,
 
-  // create new record flag
   request_from: "ai_ml",
   create_new_record: true,
 };
@@ -109,8 +107,8 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoValues, setIpoValues] = useState({ ...defaultIPOValues });
   const [foAutoPredict, setFoAutoPredict] = useState(false);
   const [ipoAutoPredict, setIpoAutoPredict] = useState(false);
-  const [foFormKey, setFoFormKey] = useState(0); // NEW
-  const [ipoFormKey, setIpoFormKey] = useState(0); // NEW
+  const [foFormKey, setFoFormKey] = useState(0);
+  const [ipoFormKey, setIpoFormKey] = useState(0);
   const formRef = useRef<HTMLDivElement>(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -131,61 +129,84 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         pricing_date: item.pricing_date ? new Date(item.pricing_date) : null,
         deal_type: "FO",
         region: item.region || "US",
+
         sponsor_yn_category:
           item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
+
         deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
           item.primary_percentage != null
             ? String(item.primary_percentage)
             : "",
+
         sector_category: item.sector || "",
+
         discount_from_announcement_price_category:
           item.discount_from_announcement_price != null
             ? String(item.discount_from_announcement_price)
             : "",
+
         allocation_deal_size_percentage_category:
           item.allocation_as_percentage_of_deal_size != null
             ? String(item.allocation_as_percentage_of_deal_size)
             : "",
+
         allocation_percentage_category:
           item.allocation_as_percentage_of_ioi != null
             ? String(item.allocation_as_percentage_of_ioi)
             : "",
+
         selected_bank_category: item.lead_bank || "",
         deal_status: item.deal_status || "Announced",
+
         GDP: "Stable",
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
+
         revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
+
+        // numeric base fields
         issue_price:
-          item.issue_price != null
-            ? Number(item.issue_price)
+          item.issue_price != null ? Number(item.issue_price) : 0,
+
+        previous_day_close_price:
+          item.previous_day_close_price != null
+            ? Number(item.previous_day_close_price)
             : 0,
-        t1d_close_price_category:
-          item.t1d_close_price_category != null
-            ? Number(item.t1d_close_price_category)
-            : 0,
+
         issue_to_pre_day_close_return_category:
           item.issue_to_previous_day_close != null
             ? Number(item.issue_to_previous_day_close)
             : 0,
+
+        // new nullable price fields
+        t1d_open_price: toNullableNumber(
+          pick(item, ["t1d_open_price"])
+        ),
+        t1d_close_price: toNullableNumber(
+          pick(item, ["t1d_close_price"])
+        ),
+
+        // returns (nullable)
         t1d_open_return_category: toNullableNumber(
           pick(item, ["t1d_open_return", "t1d_open_return_category"])
         ),
         t1d_return_from_bloomberg_category: toNullableNumber(
-          pick(item, [
-            "t1d_return_from_bloomberg_category",
-          ])
-        ), // may be null
+          pick(item, ["t1d_return_from_bloomberg_category"])
+        ),
+
+        request_from: "ai_ml",
+        create_new_record: true,
       });
+
       setSelectedType("FO");
       setFoAutoPredict(true);
-      setFoFormKey((k) => k + 1); // NEW: remount FO form to clear old state
+      setFoFormKey((k) => k + 1); // remount FO form to clear old internal state
     } else {
       setIpoValues({
         ...defaultIPOValues,
@@ -193,49 +214,66 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
         pricing_date: item.pricing_date ? new Date(item.pricing_date) : null,
         deal_type: "IPO",
         region: item.region || "US",
+
         deal_size_category: item.deal_size ? String(item.deal_size) : "0",
         percentage_primary_category:
           item.primary_percentage != null
             ? String(item.primary_percentage)
             : "",
+
         allocation_deal_size_percentage_category:
           item.allocation_as_percentage_of_deal_size != null
             ? String(item.allocation_as_percentage_of_deal_size)
             : "",
+
         allocation_percentage_category:
           item.allocation_as_percentage_of_ioi != null
             ? String(item.allocation_as_percentage_of_ioi)
             : "",
+
         selected_bank_category: item.lead_bank || "",
         sponsor_yn_category:
           item.sponsor === "Y" ? "Y" : item.sponsor === "N" ? "N" : "",
         sector_category: item.sector || "",
         deal_status: item.deal_status || "Announced",
+
         GDP: "Stable",
         Inflation: "Stable",
         Treasury: "Stable",
         target: "T1D",
+
         revenue_category: item.revenue != null ? String(item.revenue) : "",
         revenue_growth_category:
           item.revenue_growth != null ? String(item.revenue_growth) : "",
         net_profit_margin_category:
           item.net_profit_margin != null ? String(item.net_profit_margin) : "",
-          t1d_open_return_category: toNullableNumber(
+
+        // base price + returns
+        issue_price:
+          item.issue_price != null ? Number(item.issue_price) : 0,
+
+        t1d_open_return_category: toNullableNumber(
           pick(item, ["t1d_open_return", "t1d_open_return_category"])
         ),
-        issue_price:
-          item.issue_price != null
-            ? Number(item.issue_price)
-            : 0,
         t1d_return_from_bloomberg_category: toNullableNumber(
-          pick(item, [
-            "t1d_return_from_bloomberg_category",
-          ])
+          pick(item, ["t1d_return_from_bloomberg_category"])
         ),
+
+        // new price fields for IPO
+        t1d_open_price: toNullableNumber(
+          pick(item, ["t1d_open_price"])
+        ),
+        t1d_close_price: toNullableNumber(
+          pick(item, ["t1d_close_price"])
+        ),
+
+        request_from: "ai_ml",
+        create_new_record: true,
       });
+
       setSelectedType("IPO");
       setIpoAutoPredict(true);
-      setIpoFormKey((k) => k + 1); // NEW: remount IPO form to clear old state
+      setIpoFormKey((k) => k + 1); // remount IPO form to clear old internal state
     }
 
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -262,7 +300,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
           <Box ref={formRef} sx={{ scrollMarginTop: 16 }}>
             {selectedType === "FO" ? (
               <FOForm
-                key={foFormKey} // NEW
+                key={foFormKey}
                 values={foValues}
                 setValues={setFoValues}
                 options={options}
@@ -272,7 +310,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
               />
             ) : (
               <IPOForm
-                key={ipoFormKey} // NEW
+                key={ipoFormKey}
                 values={ipoValues}
                 setValues={setIpoValues}
                 options={options}
@@ -306,4 +344,3 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
 };
 
 export default PredictionLayout;
-  

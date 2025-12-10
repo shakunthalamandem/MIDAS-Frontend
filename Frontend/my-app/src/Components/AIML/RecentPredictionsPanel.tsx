@@ -38,6 +38,10 @@ interface RecentPrediction {
   issue_to_previous_day_close?: number | string | null;
   t1d_open_return_category?: string | null;
   t1d_return_from_bloomberg_category?: string | null;
+  issue_price?: number | string | null;
+  previous_day_close_price?: number | string | null;
+  t1d_open_price?: number | string | null;
+  t1d_close_price?: number | string | null;
 }
 
 interface ApiResponse {
@@ -51,7 +55,20 @@ interface RecentPredictionsPanelProps {
 }
 
 /** ----- helpers ----- */
-const monthShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const monthShort = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 const formatDateShort = (dateString?: string) => {
   if (!dateString) return "N/A";
@@ -75,11 +92,20 @@ const dateKey = (dateLike: string): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-const normalizePrediction = (p?: string | null) => (p || "").trim().toLowerCase();
+const normalizePrediction = (p?: string | null) =>
+  (p || "").trim().toLowerCase();
+
 const hasPrediction = (p?: string | null) => {
   const n = normalizePrediction(p);
-  return n === "positive" || n === "positive return" || n === "negative" || n === "low return" || n === "neutral";
+  return (
+    n === "positive" ||
+    n === "positive return" ||
+    n === "negative" ||
+    n === "low return" ||
+    n === "neutral"
+  );
 };
+
 const mapPredToColor = (p?: string | null) => {
   const n = normalizePrediction(p);
   if (n === "positive" || n === "positive return") return green[600];
@@ -108,33 +134,56 @@ const parseNumberLike = (val?: number | string | null): number | null => {
   const n = parseFloat(String(val).replace(/[^\d.-]/g, ""));
   return Number.isNaN(n) ? null : n;
 };
+
 const fmtMoneyM = (v?: number | string | null) => {
   const n = parseNumberLike(v);
   return n === null ? "N/A" : `$${n.toFixed(1)}M`;
 };
+
 const fmtPct = (v?: number | string | null) => {
   const n = parseNumberLike(v);
   return n === null ? "N/A" : `${n.toFixed(1)}%`;
+};
+
+// simple numeric display for issue price
+const fmtPrice = (v?: number | string | null) => {
+  const n = parseNumberLike(v);
+  return n === null ? "N/A" : n.toFixed(2);
 };
 
 const statusChip = (status?: string) => {
   const s = (status || "").toLowerCase();
   if (s === "issued") return { color: "success" as const, label: "Issued" };
   if (s === "announced") return { color: "info" as const, label: "Announced" };
-  if (s === "price range") return { color: "secondary" as const, label: "Price Range" };
+  if (s === "price range")
+    return { color: "secondary" as const, label: "Price Range" };
   return { color: "default" as const, label: status || "Status" };
 };
 
-const metricRow = (label: string, value: React.ReactNode, tooltip?: string) => (
+const metricRow = (
+  label: string,
+  value: React.ReactNode,
+  tooltip?: string
+) => (
   <Stack direction="row" justifyContent="space-between" alignItems="center">
     {tooltip ? (
       <Tooltip title={tooltip} arrow>
-        <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
+        <Typography variant="body2" sx={{ color: grey[700] }}>
+          {label}
+        </Typography>
       </Tooltip>
     ) : (
-      <Typography variant="body2" sx={{ color: grey[700] }}>{label}</Typography>
+      <Typography variant="body2" sx={{ color: grey[700] }}>
+        {label}
+      </Typography>
     )}
-    <Typography variant="body2" sx={{ fontWeight: 600, color: "#0f172a" }}>{value}</Typography>
+
+    <Typography
+      variant="body2"
+      sx={{ fontWeight: 600, color: "#0f172a" }}
+    >
+      {value}
+    </Typography>
   </Stack>
 );
 
@@ -157,9 +206,8 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
   useEffect(() => {
     let isMounted = true;
-    const ac = new AbortController();
 
-    (async () => {
+    const fetchRecent = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -167,13 +215,14 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
         const token = localStorage.getItem("access_token");
         const res = await fetch(`${apiUrl}/api/recent_predictions/`, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
-          signal: ac.signal,
           keepalive: true,
         });
+
         if (!res.ok) {
           const text = await res.text();
           throw new Error(`HTTP ${res.status}: ${text}`);
         }
+
         const json: ApiResponse = await res.json();
 
         // Sort: pricing_date desc, then ticker asc
@@ -188,17 +237,18 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
         if (isMounted) setAllDeals(sorted);
       } catch (err: any) {
-        if (isMounted && err.name !== "AbortError") {
+        if (isMounted) {
           setError(err.message || "Something went wrong");
         }
       } finally {
         if (isMounted) setLoading(false);
       }
-    })();
+    };
+
+    fetchRecent();
 
     return () => {
       isMounted = false;
-      ac.abort();
     };
   }, [refreshKey]);
 
@@ -211,7 +261,10 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
 
   // Apply IPO/FO filter
   const filteredByType = useMemo(
-    () => allDeals.filter((d) => (d.deal_type || "").toUpperCase() === selectedType),
+    () =>
+      allDeals.filter(
+        (d) => (d.deal_type || "").toUpperCase() === selectedType
+      ),
     [allDeals, selectedType]
   );
 
@@ -250,17 +303,26 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
   // Scroll to the selected card, if any
   useEffect(() => {
     if (selectedCardRef.current) {
-      selectedCardRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      selectedCardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [filteredCards.length]);
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100px"
+      >
         <CircularProgress size={20} />
       </Box>
     );
   }
+
   if (error) {
     return (
       <Typography color="error" textAlign="center" fontSize="0.85rem">
@@ -268,6 +330,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
       </Typography>
     );
   }
+
   if (filteredByType.length === 0) {
     return (
       <Typography textAlign="center" fontSize="0.9rem">
@@ -371,7 +434,9 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                     top: 0,
                     bottom: 0,
                     width: 4,
-                    backgroundColor: isExactSelected ? "primary.main" : ACCENT,
+                    backgroundColor: isExactSelected
+                      ? "primary.main"
+                      : ACCENT,
                     borderTopLeftRadius: 8,
                     borderBottomLeftRadius: 8,
                   },
@@ -380,19 +445,41 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
               >
                 <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
                   {/* Header */}
-                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={1}
+                  >
                     <Typography variant="h6" fontWeight={800} color="#0f172a">
                       {form.ticker}
                     </Typography>
                     {renderPredictionChip(form.t1d_pred)}
                   </Box>
 
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ mb: 1 }}
+                  >
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <Chip size="small" label={stChip.label} color={stChip.color} variant="outlined" />
-                      <Chip size="small" label={(form.deal_type || "N/A").toUpperCase()} variant="outlined" />
+                      <Chip
+                        size="small"
+                        label={stChip.label}
+                        color={stChip.color}
+                        variant="outlined"
+                      />
+                      <Chip
+                        size="small"
+                        label={(form.deal_type || "N/A").toUpperCase()}
+                        variant="outlined"
+                      />
                     </Stack>
-                    <Typography variant="body2" sx={{ color: grey[700], fontWeight: 600 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: grey[700], fontWeight: 600 }}
+                    >
                       {formatDateShort(dateKey(form.pricing_date))}
                     </Typography>
                   </Stack>
@@ -402,11 +489,22 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                   {/* Deal block ONLY */}
                   <Grid container spacing={1.5}>
                     <Grid item xs={12}>
-                      <Typography variant="overline" sx={{ letterSpacing: 0.6, fontWeight: "bold" }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ letterSpacing: 0.6, fontWeight: "bold" }}
+                      >
                         Deal
                       </Typography>
                       <Stack spacing={0.75} sx={{ mt: 0.5 }}>
-                        {metricRow("Deal Size", fmtMoneyM(form.deal_size), "Aggregate offering size")}
+                        {metricRow(
+                          "Deal Size",
+                          fmtMoneyM(form.deal_size),
+                          "Aggregate offering size"
+                        )}
+                        {metricRow(
+                          "Issue Price",
+                          fmtPrice(form.issue_price)
+                        )}
                         {metricRow("Sector", sectorLabel)}
                         {metricRow("Region", form.region || "N/A")}
                       </Stack>
@@ -415,7 +513,10 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                     {/* FO-only block */}
                     {isFO && (
                       <Grid item xs={12}>
-                        <Typography variant="overline" sx={{ color: grey[600], letterSpacing: 0.6 }}>
+                        <Typography
+                          variant="overline"
+                          sx={{ color: grey[600], letterSpacing: 0.6 }}
+                        >
                           Offering Dynamics (FO)
                         </Typography>
                         <Stack spacing={0.75} sx={{ mt: 0.5 }}>
@@ -441,7 +542,10 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
       </Grid>
 
       {!query && !selectedTicker && (
-        <Typography variant="body2" sx={{ mt: 2, textAlign: "center", color: grey[700] }}>
+        <Typography
+          variant="body2"
+          sx={{ mt: 2, textAlign: "center", color: grey[700] }}
+        >
           Showing the latest 5 deals. Search a ticker above to see more details.
         </Typography>
       )}

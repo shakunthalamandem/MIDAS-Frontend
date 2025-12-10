@@ -49,7 +49,7 @@ interface FOFormValues {
   t1d_return_from_bloomberg_category: number | string | null; // %
 
   // NEW: T-1D close price
-  t1d_close_price_category: number | string; // $
+  previous_day_close_price: number | string; // $
 
   // create new record flag
   request_from: string;
@@ -206,9 +206,9 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
     const currentIssuePriceRaw =
       fieldName === "issue_price" ? value : values.issue_price;
     const currentT1CloseRaw =
-      fieldName === "t1d_close_price_category"
+      fieldName === "previous_day_close_price"
         ? value
-        : values.t1d_close_price_category;
+        : values.previous_day_close_price;
     const currentChangePctRaw =
       fieldName === "issue_to_pre_day_close_return_category"
         ? value
@@ -220,7 +220,7 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
 
     // 1) If user changes T-1D close price or Issue Price => recompute change %
     if (
-      (fieldName === "t1d_close_price_category" ||
+      (fieldName === "previous_day_close_price" ||
         fieldName === "issue_price") &&
       issuePrice !== null &&
       issuePrice > 0 &&
@@ -248,7 +248,7 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
         ? Number(computedClose.toFixed(2))
         : "";
 
-      triggerValueChange("t1d_close_price_category", rounded);
+      triggerValueChange("previous_day_close_price", rounded);
     }
   };
 
@@ -352,7 +352,7 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
     },
     {
       label: "T-1D Close Price ($)",
-      name: "t1d_close_price_category",
+      name: "previous_day_close_price",
       type: "number",
       adornment: "$",
       placeholder: "Auto or manual",
