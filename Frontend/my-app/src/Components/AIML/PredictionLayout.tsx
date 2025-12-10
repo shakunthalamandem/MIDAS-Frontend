@@ -50,6 +50,9 @@ const defaultFOValues = {
   t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
 
+  t1d_open_price: null as number | null,
+  t1d_close_price: null as number | null,
+
   // create new record flag
   request_from: "ai_ml",
   create_new_record: true,
@@ -78,6 +81,9 @@ const defaultIPOValues = {
   issue_price: 0,
   t1d_open_return_category: null as number | null,
   t1d_return_from_bloomberg_category: null as number | null,
+
+  t1d_open_price: null as number | null,
+  t1d_close_price: null as number | null,
 
   // create new record flag
   request_from: "ai_ml",
@@ -300,3 +306,4 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
 };
 
 export default PredictionLayout;
+  

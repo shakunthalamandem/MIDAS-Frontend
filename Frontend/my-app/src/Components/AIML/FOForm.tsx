@@ -61,7 +61,7 @@ interface FOFormValues {
   Treasury: string;
   target: string;
 
-  // NEW: fundamentals + feature for APIs
+  // fundamentals + feature for APIs
   revenue_category: string; // e.g. in $M
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // %
@@ -70,6 +70,9 @@ interface FOFormValues {
   issue_to_pre_day_close_return_category: number; // %
   t1d_open_return_category: number | null; // %
   t1d_return_from_bloomberg_category: number | null; // %
+
+  t1d_open_price: number | null; // T+1D open price
+  t1d_close_price: number | null; // T+1D close price
 
   // create new record flag
   request_from: string;
@@ -111,7 +114,7 @@ const FOForm: React.FC<FOFormProps> = ({
     setFormErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // ✅ FOForm: validateForm (t1d_return_from_bloomberg_category is optional; validate only if present)
+  // ✅ FOForm: validateForm
   const validateForm = (): boolean => {
     const errors: { [key: string]: string } = {};
     let isValid = true;
@@ -125,7 +128,9 @@ const FOForm: React.FC<FOFormProps> = ({
       "Inflation",
       "Treasury",
       "t1d_open_return_category",
-      "t1d_return_from_bloomberg_category", // <-- OPTIONAL
+      "t1d_return_from_bloomberg_category", // OPTIONAL
+      "t1d_open_price",
+      "t1d_close_price",
     ]);
 
     // Required fields (except optionalKeys)
@@ -202,7 +207,7 @@ const FOForm: React.FC<FOFormProps> = ({
     return isValid;
   };
 
-  // ✅ FOForm: handlePredict (now includes create_new_record + request_from)
+  // ✅ FOForm: handlePredict
   const handlePredict = async () => {
     if (!validateForm()) {
       setSnackbar({
@@ -225,8 +230,8 @@ const FOForm: React.FC<FOFormProps> = ({
       Inflation: "Stable",
       Treasury: "Stable",
       expectations: ["T1D"],
-      request_from: "ai_ml", // always send this
-      create_new_record: values.create_new_record ?? false, // controlled by checkbox
+      request_from: "ai_ml",
+      create_new_record: values.create_new_record ?? false,
     };
 
     try {
@@ -255,7 +260,14 @@ const FOForm: React.FC<FOFormProps> = ({
     }
   };
 
-  const handleRepredictWithPrice = async (openPrice: number) => {
+  // T+1D OPEN: handler expects { t1dOpenPrice, t1dOpenReturn }
+  const handleRepredictWithPrice = async ({
+    t1dOpenPrice,
+    t1dOpenReturn,
+  }: {
+    t1dOpenPrice: number;
+    t1dOpenReturn: number;
+  }) => {
     setLoading(true);
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
@@ -266,7 +278,10 @@ const FOForm: React.FC<FOFormProps> = ({
       GDP: "Stable",
       Inflation: "Stable",
       Treasury: "Stable",
-      t1d_open_return_category: openPrice,
+
+      t1d_open_return_category: t1dOpenReturn,
+      t1d_open_price: t1dOpenPrice,
+
       expectations: ["T1D"],
       request_from: "ai_ml",
       create_new_record: values.create_new_record ?? false,
@@ -297,22 +312,32 @@ const FOForm: React.FC<FOFormProps> = ({
     }
   };
 
-  const handleWeeklyMonthlyRepredict = async (
-    t1dCloseReturn: number
-  ): Promise<Record<string, PredictionModel>> => {
+  // 1W/1M: handler expects { t1dClosePrice, t1dCloseReturn }
+  const handleWeeklyMonthlyRepredict = async ({
+    t1dClosePrice,
+    t1dCloseReturn,
+  }: {
+    t1dClosePrice: number;
+    t1dCloseReturn: number;
+  }): Promise<Record<string, PredictionModel>> => {
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
+
     const payload = {
       ...values,
       deal_type: "FO",
       GDP: "Stable",
       Inflation: "Stable",
       Treasury: "Stable",
+
       t1d_return_from_bloomberg_category: t1dCloseReturn,
+      t1d_close_price: t1dClosePrice,
+
       expectations: ["T1W", "T1M"],
       request_from: "ai_ml",
       create_new_record: values.create_new_record ?? false,
     };
+
     try {
       const res = await fetch(`${apiUrl}/api/ai_ml_predictions/`, {
         method: "POST",
@@ -323,8 +348,10 @@ const FOForm: React.FC<FOFormProps> = ({
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Weekly/Monthly prediction failed");
+
       const fullResponse = await res.json();
       const fullData = fullResponse.predictions;
+
       const simplified: Record<string, PredictionModel> = {};
       for (const key in fullData) {
         const item = fullData[key] || {};
@@ -342,6 +369,7 @@ const FOForm: React.FC<FOFormProps> = ({
           explanation,
         };
       }
+
       setWeeklyPrediction(simplified);
       onPredicted?.();
       return simplified;
@@ -377,7 +405,6 @@ const FOForm: React.FC<FOFormProps> = ({
       Treasury: "Stable",
       target: "T1D",
 
-      // NEW: reset new fields
       revenue_category: "",
       revenue_growth_category: "",
       net_profit_margin_category: "",
@@ -386,7 +413,9 @@ const FOForm: React.FC<FOFormProps> = ({
       t1d_open_return_category: null,
       t1d_return_from_bloomberg_category: null,
 
-      // NEW: reset create_new_record + request_from
+      t1d_open_price: null,
+      t1d_close_price: null,
+
       create_new_record: false,
       request_from: "ai_ml",
     }));
@@ -396,23 +425,99 @@ const FOForm: React.FC<FOFormProps> = ({
     setSnackbar({ open: false, message: "", severity: "error" });
   };
 
-  /** ----- NEW helper: detect presence, allow 0 as valid ----- */
-  const hasBloombergT1D = () => {
-    const v = values.t1d_return_from_bloomberg_category;
-    return v !== null && v !== undefined && !Number.isNaN(Number(v));
+  /** ----- Helpers to derive (price, return) pairs ----- */
+
+  // T+1D OPEN pair: works if we have either open price or open return
+  const getT1DOpenPair = () => {
+    const issue = values.issue_price;
+    const rawPrice = values.t1d_open_price;
+    const rawReturn = values.t1d_open_return_category;
+
+    let price: number | null = null;
+    let ret: number | null = null;
+
+    if (rawPrice !== null && rawPrice !== undefined && !Number.isNaN(Number(rawPrice))) {
+      price = Number(rawPrice);
+    }
+    if (rawReturn !== null && rawReturn !== undefined && !Number.isNaN(Number(rawReturn))) {
+      ret = Number(rawReturn);
+    }
+
+    // Derive missing piece if possible
+    if (price !== null && ret === null && issue && issue !== 0) {
+      const computed = ((price - issue) / issue) * 100;
+      ret = Number(computed.toFixed(2));
+    } else if (ret !== null && price === null && issue && issue !== 0) {
+      const computed = issue * (1 + ret / 100);
+      price = Number(computed.toFixed(4));
+    }
+
+    if (
+      price !== null &&
+      ret !== null &&
+      Number.isFinite(price) &&
+      Number.isFinite(ret)
+    ) {
+      return { t1dOpenPrice: price, t1dOpenReturn: ret };
+    }
+    return null;
   };
 
-  /** ----- UPDATED: autoPredict chains Weekly/Monthly if bloomberg T1D present ----- */
+  // T+1D CLOSE pair: works if we have either close price or close return
+  const getT1DClosePair = () => {
+    const issue = values.issue_price;
+    const rawPrice = values.t1d_close_price;
+    const rawReturn = values.t1d_return_from_bloomberg_category;
+
+    let price: number | null = null;
+    let ret: number | null = null;
+
+    if (rawPrice !== null && rawPrice !== undefined && !Number.isNaN(Number(rawPrice))) {
+      price = Number(rawPrice);
+    }
+    if (rawReturn !== null && rawReturn !== undefined && !Number.isNaN(Number(rawReturn))) {
+      ret = Number(rawReturn);
+    }
+
+    // Derive missing piece if possible
+    if (price !== null && ret === null && issue && issue !== 0) {
+      const computed = ((price - issue) / issue) * 100;
+      ret = Number(computed.toFixed(2));
+    } else if (ret !== null && price === null && issue && issue !== 0) {
+      const computed = issue * (1 + ret / 100);
+      price = Number(computed.toFixed(4));
+    }
+
+    if (
+      price !== null &&
+      ret !== null &&
+      Number.isFinite(price) &&
+      Number.isFinite(ret)
+    ) {
+      return { t1dClosePrice: price, t1dCloseReturn: ret };
+    }
+    return null;
+  };
+
+  /** ----- UPDATED autoPredict: T1D -> T1D Open -> 1W/1M ----- */
   useEffect(() => {
     if (autoPredict) {
       (async () => {
         const valid = validateForm();
         if (valid) {
-          await handlePredict(); // T+1D
-          if (hasBloombergT1D()) {
-            await handleWeeklyMonthlyRepredict(
-              Number(values.t1d_return_from_bloomberg_category)
-            );
+          // 1) Base T+1D prediction
+          await handlePredict();
+
+          // 2) If we have either open price OR open return, run T+1D recalculation
+          const openPair = getT1DOpenPair();
+          if (openPair) {
+            await handleRepredictWithPrice(openPair);
+          }
+
+          // 3) If we have either close price OR close return, run 1W/1M prediction
+          const closePair = getT1DClosePair();
+          if (closePair) {
+            await handleWeeklyMonthlyRepredict(closePair);
           }
         }
         onAutoPredictComplete && onAutoPredictComplete();
@@ -486,7 +591,6 @@ const FOForm: React.FC<FOFormProps> = ({
             gap: 2,
           }}
         >
-          {/* NEW: Create new record checkbox */}
           <FormControlLabel
             control={
               <Checkbox
@@ -503,7 +607,6 @@ const FOForm: React.FC<FOFormProps> = ({
             label="Create new record"
           />
 
-          {/* Buttons */}
           <Box
             sx={{
               display: "flex",
@@ -540,16 +643,14 @@ const FOForm: React.FC<FOFormProps> = ({
           <FOPredictionResults
             result={prediction}
             onRepredict={handleRepredictWithPrice}
-            // NEW: prefill from the form’s value (number | null)
-            initialT1dOpenReturn={values.t1d_open_return_category ?? null}
+            initialT1dOpenPrice={values.t1d_open_price ?? null}
+            issuePrice={values.issue_price ?? null}
           />
           <FOWeeklyMonthlyPredictionResults
             result={weeklyPrediction}
             onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
-            // NEW: prefill input when backend provided T+1D close return exists
-            initialT1dCloseReturn={
-              values.t1d_return_from_bloomberg_category ?? null
-            }
+            initialT1dClosePrice={values.t1d_close_price ?? null}
+            issuePrice={values.issue_price ?? null}
           />
         </>
       )}

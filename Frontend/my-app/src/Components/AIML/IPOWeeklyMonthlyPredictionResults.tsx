@@ -35,28 +35,50 @@ interface PredictionModel {
 
 interface WeeklyMonthlyPredictionResultsProps {
   result: Record<string, PredictionModel> | null;
-  onWeeklyMonthlyRepredict: (
-    t1dCloseReturn: number
-  ) => Promise<Record<string, PredictionModel>>;
-  /** NEW: prefill input when a T+1D close return is already known (nullable) */
-  initialT1dCloseReturn?: number | null;
+
+  // UPDATED: send both close price & close return
+  onWeeklyMonthlyRepredict: (params: {
+    t1dClosePrice: number;
+    t1dCloseReturn: number;
+  }) => Promise<Record<string, PredictionModel>>;
+
+  /** Prefill input when a T+1D close price is already known (nullable) */
+  initialT1dClosePrice?: number | null;
+
+  /** Issue price to calculate T+1D close return from */
+  issuePrice?: number | null;
 }
 
 const IPOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
-> = ({ result, onWeeklyMonthlyRepredict, initialT1dCloseReturn }) => {
-  const [t1dCloseReturn, setT1dCloseReturn] = useState<number | "">("");
+> = ({
+  result,
+  onWeeklyMonthlyRepredict,
+  initialT1dClosePrice,
+  issuePrice,
+}) => {
+  const [t1dClosePrice, setT1dClosePrice] = useState<number | "">("");
+  const [t1dCloseReturn, setT1dCloseReturn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [predictionResult, setPredictionResult] = useState(result);
 
-  // NEW: prefill input when initialT1dCloseReturn becomes available (and allow 0)
+  // Prefill from props: calculate return from issuePrice + closePrice
   useEffect(() => {
-    if (initialT1dCloseReturn === null || initialT1dCloseReturn === undefined) {
-      setT1dCloseReturn(""); // NEW: clear the input
-    } else {
-      setT1dCloseReturn(initialT1dCloseReturn); // keep allowing 0
+    if (
+      initialT1dClosePrice == null ||
+      issuePrice == null ||
+      issuePrice === 0
+    ) {
+      setT1dClosePrice("");
+      setT1dCloseReturn(null);
+      return;
     }
-  }, [initialT1dCloseReturn]);
+
+    setT1dClosePrice(initialT1dClosePrice);
+
+    const ret = ((initialT1dClosePrice - issuePrice) / issuePrice) * 100;
+    setT1dCloseReturn(Number(ret.toFixed(2)));
+  }, [initialT1dClosePrice, issuePrice]);
 
   useEffect(() => {
     setPredictionResult(result);
@@ -64,14 +86,42 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setT1dCloseReturn(value === "" ? "" : parseFloat(value));
+
+    if (value === "") {
+      setT1dClosePrice("");
+      setT1dCloseReturn(null);
+      return;
+    }
+
+    const numeric = parseFloat(value);
+    if (isNaN(numeric)) {
+      setT1dClosePrice("");
+      setT1dCloseReturn(null);
+      return;
+    }
+
+    setT1dClosePrice(numeric);
+
+    if (issuePrice != null && issuePrice !== 0) {
+      const ret = ((numeric - issuePrice) / issuePrice) * 100;
+      setT1dCloseReturn(Number(ret.toFixed(2)));
+    } else {
+      setT1dCloseReturn(null);
+    }
   };
 
   const handleRepredict = async () => {
-    if (typeof t1dCloseReturn === "number" && onWeeklyMonthlyRepredict) {
+    if (
+      typeof t1dClosePrice === "number" &&
+      t1dCloseReturn != null &&
+      onWeeklyMonthlyRepredict
+    ) {
       setIsLoading(true);
       try {
-        const newResult = await onWeeklyMonthlyRepredict(t1dCloseReturn);
+        const newResult = await onWeeklyMonthlyRepredict({
+          t1dClosePrice,
+          t1dCloseReturn,
+        });
         setPredictionResult(newResult);
       } catch (error) {
         console.error("Reprediction failed:", error);
@@ -286,19 +336,35 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
           </Box>
 
           <Box display="flex" alignItems="flex-end" gap={2}>
-            <TextField
-              label="1st Day Close Return (%)"
-              variant="outlined"
-              size="small"
-              type="number"
-              value={t1dCloseReturn}
-              onChange={handleInputChange}
-              sx={{ minWidth: "220px" }}
-            />
+            <Box>
+              <TextField
+                label="1st Day Close Price"
+                variant="outlined"
+                size="small"
+                type="number"
+                value={t1dClosePrice}
+                onChange={handleInputChange}
+                sx={{ minWidth: "220px" }}
+              />
+              <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
+                Calculated 1st Day Close Return:{" "}
+                {t1dCloseReturn != null
+                  ? `${t1dCloseReturn.toFixed(2)} %`
+                  : "—"}
+              </Typography>
+              {issuePrice != null && (
+                <Typography variant="caption" color="text.secondary">
+                  Issue Price: {issuePrice}
+                </Typography>
+              )}
+            </Box>
+
             <Button
               variant="contained"
               onClick={handleRepredict}
-              disabled={isLoading || t1dCloseReturn === ""}
+              disabled={
+                isLoading || t1dClosePrice === "" || t1dCloseReturn == null
+              }
               sx={{ height: "40px" }}
             >
               {isLoading ? (
@@ -313,9 +379,9 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         <Divider sx={{ my: 3 }} />
         <Box>
           <Typography>
-            A long with the above parameters that are considered for 1st Day, We
-            are adding 1st Day close return as additional parameter for 1 week
-            and 1 Month.
+            Along with the parameters considered for the 1st Day prediction, we
+            additionally use the <b>1st Day Close Price / Return</b> to generate
+            1 Week and 1 Month outcomes.
           </Typography>
         </Box>
         <Divider sx={{ my: 3 }} />
@@ -395,7 +461,7 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                         </TableCell>
                         {timeFrames.map((frame, index) => {
                           const apiKey =
-                            frame.toLowerCase() === "weekly"
+                            frame === "Week"
                               ? modelKeys.weekly
                               : modelKeys.monthly;
                           const modelData = predictionResult?.[apiKey];
@@ -438,8 +504,8 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
                                 >
                                   {renderConfidenceLevel(
                                     modelData.confidence ??
-                                    (modelData as any)?.Confidence ??
-                                    null
+                                      (modelData as any)?.Confidence ??
+                                      null
                                   )}
                                 </Box>
                               </TableCell>
@@ -456,8 +522,8 @@ const IPOWeeklyMonthlyPredictionResults: React.FC<
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" color="text.secondary">
-              Enter the <b>1st Day Close Return (%)</b> to predict the 1W and
-              1M outcomes.
+              Enter the <b>1st Day Close Price</b> to predict the 1W and 1M
+              outcomes.
             </Typography>
           </Box>
         )}
