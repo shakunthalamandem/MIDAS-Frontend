@@ -10,7 +10,11 @@ import {
   Stack,
   Button,
   Container,
+  FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material"
+import { SelectChangeEvent } from "@mui/material/Select"
 import MDRCummulativeRegionChart, {
   RegionPoint,
 } from "./MDRCummulativeRegionChart"
@@ -44,6 +48,8 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
   const [series, setSeries] = useState<RegionPoint[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedFund, setSelectedFund] = useState<string>("All")
+  const [fundOptions, setFundOptions] = useState<string[]>(["All"])
 
   const apiUrl = process.env.REACT_APP_API_URL ?? ""
   const getToken = () => localStorage.getItem("access_token") || ""
@@ -63,12 +69,14 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
       const response = await fetch(
         `${apiUrl}/api/mdr_cummulative_by_region/`,
         {
-          method: "POST", // 👈 changed from GET to POST
+          method: "POST", // dY`^ changed from GET to POST
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({}), // 👈 send an empty JSON body (adjust if API expects payload)
+          body: JSON.stringify({
+            fund: selectedFund || "All",
+          }), // dY`^ send the selected fund
         }
       )
 
@@ -91,7 +99,61 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
   useEffect(() => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFund])
+
+  useEffect(() => {
+    const fetchFunds = async () => {
+      if (!apiUrl) return
+      try {
+        const token = getToken()
+        const res = await fetch(`${apiUrl}/api/funds_daily_trades/`, {
+          method: "GET",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        })
+        if (!res.ok) {
+          console.error("Failed to load funds list")
+          return
+        }
+        const data = await res.json()
+        const list: any[] = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.funds)
+            ? data.funds
+            : []
+        const names: string[] = list
+          .map((item: any) => {
+            if (typeof item === "string") return item
+            return (
+              item?.fund ||
+              item?.name ||
+              item?.fund_name ||
+              item?.fundName ||
+              ""
+            )
+          })
+          .map((name: string) => String(name).trim())
+          .filter(Boolean)
+        if (names.length) {
+          const uniqueNames = Array.from(new Set<string>(names))
+          const options: string[] = ["All", ...uniqueNames]
+          setFundOptions(options)
+          if (!options.includes(selectedFund)) {
+            setSelectedFund(options[0])
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching funds list:", err)
+      }
+    }
+    fetchFunds()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const handleRegionChange = (event: SelectChangeEvent<string>) => {
+    setSelectedFund(String(event.target.value || "All"))
+  }
 
   return (
      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -106,9 +168,29 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
     >
       <CardContent sx={{ p: 3 }}>
 
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }} align="center">
-            MDR Cumulative P&L by Region
-          </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            mb={2}
+            gap={2}
+          >
+            <Box flex={1} />
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }} align="center" flex={1}>
+              MDR Cumulative P&L by Region
+            </Typography>
+            <Box flex={1} display="flex" justifyContent="flex-end">
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <Select value={selectedFund} onChange={handleRegionChange} displayEmpty>
+                  {fundOptions.map((fundName) => (
+                    <MenuItem key={fundName} value={fundName}>
+                      {fundName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
 
 
         {loading && (
