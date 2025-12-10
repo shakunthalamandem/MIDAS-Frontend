@@ -20,7 +20,7 @@ import {
 const PRIMARY_COLOR = "#002060";
 
 // Same order as backend
-const REGION_ORDER = ["US", "AmerExUS", "APAC", "EMEA", "Total"];
+const REGION_ORDER = ["US",  "APAC", "EMEA", "Total"];
 
 interface RegionRow {
   region: string;

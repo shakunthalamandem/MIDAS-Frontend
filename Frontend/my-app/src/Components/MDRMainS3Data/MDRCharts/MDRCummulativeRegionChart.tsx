@@ -50,10 +50,11 @@ const REGION_META: Record<
 }
 
 const formatCurrency = (value: number) => {
+  const sign = value < 0 ? "-" : ""
   const abs = Math.abs(value)
-  if (abs >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`
-  if (abs >= 1_000) return `$${(value / 1_000).toFixed(0)}K`
-  return `$${value.toLocaleString()}`
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(1)}M`
+  if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(0)}K`
+  return `${sign}$${abs.toLocaleString()}`
 }
 
 type Props = {
