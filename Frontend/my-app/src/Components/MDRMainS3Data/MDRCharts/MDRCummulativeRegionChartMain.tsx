@@ -74,6 +74,8 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
       setError(null)
 
       const token = getToken()
+      const requestBody =
+        selectedFund === "All" ? {} : { fund: selectedFund }
 
       const response = await fetch(
         `${apiUrl}/api/mdr_cummulative_by_region/`,
@@ -83,9 +85,7 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({
-            fund: selectedFund || "All",
-          }), // dY`^ send the selected fund
+          body: JSON.stringify(requestBody), // dY`^ send the selected fund (empty for All)
         }
       )
 
