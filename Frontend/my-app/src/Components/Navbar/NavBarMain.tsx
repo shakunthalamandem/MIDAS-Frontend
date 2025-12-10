@@ -19,6 +19,7 @@ import TradingViewTickerTape from "../Main/InvestmentStrategy/Tradingview/Tradin
 import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 import DropdownTab from "./DropdownTab";
+import ChatBoxButton from "../Main/HomePage/Authentication/ChatBoxButton";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -314,9 +315,12 @@ const NavbarMain: React.FC = () => {
             {isLoggedIn && (
               <>
                 {/* 🔔 Notifications */}
+                <ChatBoxButton />
+
                 <NotificationMenu />
               </>
             )}
+
 
             {isLoggedIn && isSuperUser && (
               <Button

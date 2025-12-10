@@ -80,6 +80,7 @@ import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
+import MattermostChat from "../Components/Discussion/MattermostChat";
 import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
 import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
 
@@ -256,6 +257,7 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
                 {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
 
+        <Route path="/chat" element={<MattermostChat />} />
 
 
 

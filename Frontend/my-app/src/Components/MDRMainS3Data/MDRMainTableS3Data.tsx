@@ -10,6 +10,15 @@ import MDRFundPerfomanceMain from "./MDRRegionWiseTables/MDRFundPerfomanceMain";
 const MDRMainTableS3Data = () => {
   const [pdfMode, setPdfMode] = useState(false);
 
+  const pdfButton = (
+    <MDRDailyReportPDFExporter
+      targetId="mdr-pdf-root"
+      headerTitle="Monashee Daily Portfolio Report"
+      fileName="Monashee_Daily_Portfolio_Report.pdf"
+      onTogglePdfMode={setPdfMode}
+    />
+  );
+
   return (
     <>
       <Box>
@@ -39,30 +48,16 @@ const MDRMainTableS3Data = () => {
           Welcome to Monashee Daily Report
         </Typography>
 
-        {/* PDF button aligned RIGHT */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mt: 1, // optional spacing
-            mb: 2
-          }}
-        >
-          <MDRDailyReportPDFExporter
-            targetId="mdr-pdf-root"
-            headerTitle="Monashee Daily Portfolio Report"
-            fileName="Monashee_Daily_Portfolio_Report.pdf"
-            onTogglePdfMode={setPdfMode}
-          />
-        </Box>
-
         {/* PDF Content */}
         <Box
           id="mdr-pdf-root"
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
           <Box className="mdr-pdf-section">
-            <MDRDailyPortfolioContainer pdfMode={pdfMode} />
+            <MDRDailyPortfolioContainer
+              pdfMode={pdfMode}
+              actionsSlot={pdfButton}
+            />
           </Box>
           <Box className="mdr-pdf-section" data-pdf-break-before="true">
             <MDRCummulativeRegionChartMain />
