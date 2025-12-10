@@ -44,11 +44,11 @@ interface FOFormValues {
   revenue_growth_category: string; // %
   net_profit_margin_category: string; // "Negative" | "Positive"
   issue_price: number | string;
-  issue_to_pre_day_close_return_category: number | string; // %
+  issue_to_pre_day_close_return_category: number | string; // % (auto-calculated)
   t1d_open_return_category: number | string | null; // %
   t1d_return_from_bloomberg_category: number | string | null; // %
 
-  // NEW: T-1D close price
+  // T-1D close price
   previous_day_close_price: number | string; // $
 
   // create new record flag
@@ -71,7 +71,6 @@ interface FieldConfig {
   selectOptions?: string[];
   adornment?: string;
   disabled?: boolean;
-  tooltip?: React.ReactNode;
 }
 
 interface SectionProps {
@@ -80,7 +79,7 @@ interface SectionProps {
   renderField: (field: FieldConfig) => React.ReactNode;
 }
 
-// Keep section component stable to avoid remounting inputs (which causes focus/value loss)
+// Keep section component stable to avoid remounting inputs
 const Section: React.FC<SectionProps> = ({ title, fields, renderField }) => (
   <Grid item xs={12}>
     <Box
@@ -209,46 +208,26 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
       fieldName === "previous_day_close_price"
         ? value
         : values.previous_day_close_price;
-    const currentChangePctRaw =
-      fieldName === "issue_to_pre_day_close_return_category"
-        ? value
-        : values.issue_to_pre_day_close_return_category;
 
     const issuePrice = parseNum(currentIssuePriceRaw);
     const t1Close = parseNum(currentT1CloseRaw);
-    const changePct = parseNum(currentChangePctRaw);
 
-    // 1) If user changes T-1D close price or Issue Price => recompute change %
+    // If user changes T-1D close price or Issue Price => recompute change %
     if (
-      (fieldName === "previous_day_close_price" ||
-        fieldName === "issue_price") &&
-      issuePrice !== null &&
-      issuePrice > 0 &&
-      t1Close !== null
+      fieldName === "previous_day_close_price" ||
+      fieldName === "issue_price"
     ) {
-      // ((T-1D Close / Issue Price) - 1) * 100
-      const change = (t1Close / issuePrice - 1) * 100;
-      const rounded = Number.isFinite(change)
-        ? Number(change.toFixed(2))
-        : "";
-
-      triggerValueChange("issue_to_pre_day_close_return_category", rounded);
-    }
-
-    // 2) If user changes change % => recompute T-1D close price
-    if (
-      fieldName === "issue_to_pre_day_close_return_category" &&
-      issuePrice !== null &&
-      issuePrice > 0 &&
-      changePct !== null
-    ) {
-      // From ((C / I) - 1) * 100 = r  =>  C = I * (1 + r/100)
-      const computedClose = issuePrice * (1 + changePct / 100);
-      const rounded = Number.isFinite(computedClose)
-        ? Number(computedClose.toFixed(2))
-        : "";
-
-      triggerValueChange("previous_day_close_price", rounded);
+      if (issuePrice !== null && issuePrice > 0 && t1Close !== null) {
+        // ((T-1D Close / Issue Price) - 1) * 100
+        const change = (t1Close / issuePrice - 1) * 100;
+        const rounded = Number.isFinite(change)
+          ? Number(change.toFixed(2))
+          : "";
+        triggerValueChange("issue_to_pre_day_close_return_category", rounded);
+      } else {
+        // If one of the inputs is invalid/missing, clear the field
+        triggerValueChange("issue_to_pre_day_close_return_category", "");
+      }
     }
   };
 
@@ -357,45 +336,6 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
       adornment: "$",
       placeholder: "Auto or manual",
     },
-    {
-      label: "Change in Price from T-1D to Issue (%)",
-      name: "issue_to_pre_day_close_return_category",
-      type: "number",
-      adornment: "%",
-      placeholder: "e.g., -3.2",
-      tooltip: (
-        <Tooltip
-          title={
-            <Typography variant="body2" sx={{ fontSize: 13, color: "#fff" }}>
-              • Percentage change in price from previous trading day&apos;s
-              close (T-1D) to the issue price. <br />• Formula: ((T-1D Close
-              Price / Issue Price) - 1) * 100
-            </Typography>
-          }
-          arrow
-          placement="top"
-          slotProps={{
-            popper: {
-              sx: {
-                "& .MuiTooltip-tooltip": {
-                  backgroundColor: "#002060",
-                  borderRadius: 2,
-                  padding: "10px 14px",
-                  maxWidth: 320,
-                },
-              },
-            },
-          }}
-        >
-          <IconButton
-            size="small"
-            sx={{ verticalAlign: "middle", color: "primary.main" }}
-          >
-            <InfoOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      ),
-    },
   ];
 
   // ---- RENDER HELPERS ----
@@ -407,13 +347,76 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
         ? new Date(rawValue as any).toISOString().split("T")[0]
         : rawValue;
 
+    // Derived: formatted change line based on stored value
+    const renderChangeLine =
+      field.name === "previous_day_close_price" ? (
+        <Box sx={{ mt: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            Change in Price from T-1D to Issue (%)
+            <Tooltip
+              title={
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: 13, color: "#fff" }}
+                >
+                  • Percentage change in price from previous trading day&apos;s
+                  close (T-1D) to the issue price.
+                  <br />
+                  • Formula: ((T-1D Close Price / Issue Price) - 1) * 100
+                </Typography>
+              }
+              arrow
+              placement="top"
+              slotProps={{
+                popper: {
+                  sx: {
+                    "& .MuiTooltip-tooltip": {
+                      backgroundColor: "#002060",
+                      borderRadius: 2,
+                      padding: "10px 14px",
+                      maxWidth: 320,
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton
+                size="small"
+                sx={{ ml: 0.5, p: 0, color: "primary.main" }}
+              >
+                <InfoOutlinedIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 600, color: "text.primary" }}
+          >
+            {values.issue_to_pre_day_close_return_category === "" ||
+            values.issue_to_pre_day_close_return_category === null ||
+            values.issue_to_pre_day_close_return_category === undefined
+              ? "—"
+              : `${Number(
+                  values.issue_to_pre_day_close_return_category
+                ).toFixed(2)}%`}
+          </Typography>
+        </Box>
+      ) : null;
+
     return (
       <Grid item xs={12} sm={6} key={String(field.name)}>
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
-            alignItems: { sm: "center" },
+            alignItems: { sm: "flex-start" }, // top-align so extra line doesn't look odd
             gap: 1,
           }}
         >
@@ -423,16 +426,12 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
               alignItems: "center",
               width: { xs: "100%", sm: "190px", md: "210px" },
               minWidth: { sm: "190px", md: "210px" },
+              pt: { sm: 0.5 }, // slight top padding for better vertical rhythm
             }}
           >
             <Typography component="span" sx={{ fontWeight: 500 }}>
               {field.label}
             </Typography>
-            {field.tooltip && (
-              <Box component="span" sx={{ ml: 0.5 }}>
-                {field.tooltip}
-              </Box>
-            )}
           </Box>
 
           {field.selectOptions ? (
@@ -461,34 +460,37 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
               ))}
             </TextField>
           ) : (
-            <TextField
-              size="small"
-              name={String(field.name)}
-              type={field.type || "text"}
-              value={value}
-              onChange={handleFieldChange}
-              placeholder={field.placeholder}
-              disabled={!!field.disabled}
-              error={!!formErrors[String(field.name)]}
-              helperText={formErrors[String(field.name)]}
-              fullWidth
-              InputProps={{
-                startAdornment:
-                  field.adornment && field.adornment.startsWith("$") ? (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ) : undefined,
-                endAdornment:
-                  field.adornment &&
-                  (field.adornment === "%" ||
-                    field.adornment === "M" ||
-                    field.adornment.endsWith("%") ||
-                    field.adornment.endsWith("M")) ? (
-                    <InputAdornment position="end">
-                      {field.adornment.replace("$", "")}
-                    </InputAdornment>
-                  ) : undefined,
-              }}
-            />
+            <Box sx={{ width: "100%" }}>
+              <TextField
+                size="small"
+                name={String(field.name)}
+                type={field.type || "text"}
+                value={value}
+                onChange={handleFieldChange}
+                placeholder={field.placeholder}
+                disabled={!!field.disabled}
+                error={!!formErrors[String(field.name)]}
+                helperText={formErrors[String(field.name)]}
+                fullWidth
+                InputProps={{
+                  startAdornment:
+                    field.adornment && field.adornment.startsWith("$") ? (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ) : undefined,
+                  endAdornment:
+                    field.adornment &&
+                    (field.adornment === "%" ||
+                      field.adornment === "M" ||
+                      field.adornment.endsWith("%") ||
+                      field.adornment.endsWith("M")) ? (
+                      <InputAdornment position="end">
+                        {field.adornment.replace("$", "")}
+                      </InputAdornment>
+                    ) : undefined,
+                }}
+              />
+              {renderChangeLine}
+            </Box>
           )}
         </Box>
       </Grid>
