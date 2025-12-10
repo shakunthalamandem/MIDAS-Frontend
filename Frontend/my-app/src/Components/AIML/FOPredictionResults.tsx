@@ -34,38 +34,86 @@ interface PredictionModel {
 
 interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
-  onRepredict?: (t1dOpenPrice: number) => void;
-  /** NEW: prefill the T+1D Open Return input when known from the card */
-  initialT1dOpenReturn?: number | null;
+
+  // UPDATED: send both price & return to parent
+  onRepredict?: (params: {
+    t1dOpenPrice: number;
+    t1dOpenReturn: number;
+  }) => void;
+
+  /** Prefill T+1D Open Price when known */
+  initialT1dOpenPrice?: number | null;
+
+  /** Issue price to calculate return from */
+  issuePrice?: number | null;
 }
 
 const FOPredictionResults: React.FC<PredictionResultsProps> = ({
   result,
   onRepredict,
-  initialT1dOpenReturn,
+  initialT1dOpenPrice,
+  issuePrice,
 }) => {
-  const [price, setPrice] = useState<number | "">("");
+  const [openPrice, setOpenPrice] = useState<number | "">("");
+  const [openReturn, setOpenReturn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // hydrate input whenever prop changes (allow 0; clear when null/undefined)
+  // Hydrate from props whenever they change
   useEffect(() => {
-    if (initialT1dOpenReturn === null || initialT1dOpenReturn === undefined) {
-      setPrice("");
-    } else {
-      setPrice(initialT1dOpenReturn);
+    if (
+      initialT1dOpenPrice == null ||
+      issuePrice == null ||
+      issuePrice === 0
+    ) {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
     }
-  }, [initialT1dOpenReturn]);
+
+    setOpenPrice(initialT1dOpenPrice);
+    const ret =
+      ((initialT1dOpenPrice - issuePrice) / issuePrice) * 100;
+    setOpenReturn(Number(ret.toFixed(2)));
+  }, [initialT1dOpenPrice, issuePrice]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPrice(value === "" ? "" : parseFloat(value));
+
+    if (value === "") {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
+    }
+
+    const numeric = parseFloat(value);
+    if (isNaN(numeric)) {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
+    }
+
+    setOpenPrice(numeric);
+
+    if (issuePrice != null && issuePrice !== 0) {
+      const ret = ((numeric - issuePrice) / issuePrice) * 100;
+      setOpenReturn(Number(ret.toFixed(2)));
+    } else {
+      setOpenReturn(null);
+    }
   };
 
   const handleRepredict = async () => {
-    if (typeof price === "number" && onRepredict) {
+    if (
+      typeof openPrice === "number" &&
+      openReturn != null &&
+      onRepredict
+    ) {
       setIsLoading(true);
       try {
-        await onRepredict(price);
+        await onRepredict({
+          t1dOpenPrice: openPrice,
+          t1dOpenReturn: openReturn,
+        });
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +122,11 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
 
   /** Identify model groups: baseline vs open */
   const modelVersions = Array.from(
-    new Set(Object.keys(result).map((key) => (key.includes("open") ? "t1d_open" : "t1d")))
+    new Set(
+      Object.keys(result).map((key) =>
+        key.includes("open") ? "t1d_open" : "t1d"
+      )
+    )
   );
   const issueVersions = modelVersions.filter((v) => !v.includes("open")); // "T+1D Close from Issue Price"
   const openVersions = modelVersions.filter((v) => v.includes("open")); // "T+1D Close from T+1D Open"
@@ -250,25 +302,50 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
 
           {showRepredictControls && onRepredict && (
             <Box display="flex" alignItems="center">
-              <TextField
-                label="1st Day Open Return (%)"
-                variant="outlined"
-                size="small"
-                value={price}
-                onChange={handlePriceChange}
-                sx={{ mr: 2, width: 220, backgroundColor: "#ede7f6", borderRadius: 1 }}
-                type="number"
-              />
+              <Box mr={2}>
+                <TextField
+                  label="T+1D Open Price"
+                  variant="outlined"
+                  size="small"
+                  value={openPrice}
+                  onChange={handlePriceChange}
+                  sx={{
+                    width: 200,
+                    backgroundColor: "#ede7f6",
+                    borderRadius: 1,
+                  }}
+                  type="number"
+                />
+                <Typography
+                  variant="caption"
+                  sx={{ mt: 0.5, display: "block" }}
+                >
+                  Calculated 1st Day Open Return:{" "}
+                  {openReturn != null ? `${openReturn.toFixed(2)} %` : "—"}
+                </Typography>
+                {issuePrice != null && (
+                  <Typography variant="caption" color="text.secondary">
+                    Issue Price: {issuePrice}
+                  </Typography>
+                )}
+              </Box>
 
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
-                disabled={isLoading || price === ""}
+                disabled={
+                  isLoading ||
+                  openPrice === "" ||
+                  openReturn == null
+                }
                 sx={{
                   backgroundColor: "#ede7f6",
                   color: "#002060",
                   border: "1px solid #B99976",
-                  "&:disabled": { backgroundColor: "#002060", color: "#ccc" },
+                  "&:disabled": {
+                    backgroundColor: "#002060",
+                    color: "#ccc",
+                  },
                 }}
               >
                 {isLoading ? (
@@ -315,14 +392,10 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
                     ? label.open || ""
                     : label.issue || "";
 
-                  const explanation =
-                    result[getModelKey(versions[0].includes("open") ? "t1d" : "t1d", type)]
-                      ?.explanation ||
-                    result[getModelKey(versions[0], type)]?.explanation ||
-                    "";
-
                   const modelKey = getModelKey(versions[0], type);
                   const modelData = result[modelKey];
+
+                  const explanation = modelData?.explanation || "";
 
                   const rendered =
                     type === "main"

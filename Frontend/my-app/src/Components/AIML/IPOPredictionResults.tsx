@@ -35,36 +35,86 @@ interface PredictionModel {
 
 interface PredictionResultsProps {
   result: Record<string, PredictionModel>;
-  onRepredict?: (t1dOpenPrice: number) => void;
-  initialT1dOpenReturn?: number | null;
+
+  // UPDATED: send both open price & open return to parent
+  onRepredict?: (params: {
+    t1dOpenPrice: number;
+    t1dOpenReturn: number;
+  }) => void;
+
+  /** Prefill T+1D Open Price when known */
+  initialT1dOpenPrice?: number | null;
+
+  /** Issue price to calculate return from */
+  issuePrice?: number | null;
 }
 
 const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
   result,
   onRepredict,
-  initialT1dOpenReturn,
+  initialT1dOpenPrice,
+  issuePrice,
 }) => {
-  const [price, setPrice] = useState<number | "">("");
+  const [openPrice, setOpenPrice] = useState<number | "">("");
+  const [openReturn, setOpenReturn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Hydrate from props whenever they change
   useEffect(() => {
-    if (initialT1dOpenReturn === null || initialT1dOpenReturn === undefined) {
-      setPrice("");
-    } else {
-      setPrice(initialT1dOpenReturn);
+    if (
+      initialT1dOpenPrice == null ||
+      issuePrice == null ||
+      issuePrice === 0
+    ) {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
     }
-  }, [initialT1dOpenReturn]);
+
+    setOpenPrice(initialT1dOpenPrice);
+    const ret =
+      ((initialT1dOpenPrice - issuePrice) / issuePrice) * 100;
+    setOpenReturn(Number(ret.toFixed(2)));
+  }, [initialT1dOpenPrice, issuePrice]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPrice(value === "" ? "" : parseFloat(value));
+
+    if (value === "") {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
+    }
+
+    const numeric = parseFloat(value);
+    if (isNaN(numeric)) {
+      setOpenPrice("");
+      setOpenReturn(null);
+      return;
+    }
+
+    setOpenPrice(numeric);
+
+    if (issuePrice != null && issuePrice !== 0) {
+      const ret = ((numeric - issuePrice) / issuePrice) * 100;
+      setOpenReturn(Number(ret.toFixed(2)));
+    } else {
+      setOpenReturn(null);
+    }
   };
 
   const handleRepredict = async () => {
-    if (typeof price === "number" && onRepredict) {
+    if (
+      typeof openPrice === "number" &&
+      openReturn != null &&
+      onRepredict
+    ) {
       setIsLoading(true);
       try {
-        await onRepredict(price);
+        await onRepredict({
+          t1dOpenPrice: openPrice,
+          t1dOpenReturn: openReturn,
+        });
       } finally {
         setIsLoading(false);
       }
@@ -315,24 +365,42 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
           {showRepredict && onRepredict && (
             <Box display="flex" alignItems="center">
-              <TextField
-                label="1st Day Open Return (%)"
-                variant="outlined"
-                value={price}
-                onChange={handlePriceChange}
-                size="small"
-                sx={{
-                  mr: 2,
-                  width: "194px",
-                  backgroundColor: "#ede7f6",
-                  borderRadius: "4px",
-                }}
-                type="number"
-              />
+              <Box mr={2}>
+                <TextField
+                  label="T+1D Open Price"
+                  variant="outlined"
+                  value={openPrice}
+                  onChange={handlePriceChange}
+                  size="small"
+                  sx={{
+                    width: "194px",
+                    backgroundColor: "#ede7f6",
+                    borderRadius: "4px",
+                  }}
+                  type="number"
+                />
+                <Typography
+                  variant="caption"
+                  sx={{ mt: 0.5, display: "block" }}
+                >
+                  Calculated 1st Day Open Return:{" "}
+                  {openReturn != null ? `${openReturn.toFixed(2)} %` : "—"}
+                </Typography>
+                {issuePrice != null && (
+                  <Typography variant="caption" color="text.secondary">
+                    Issue Price: {issuePrice}
+                  </Typography>
+                )}
+              </Box>
+
               <Button
                 variant="outlined"
                 onClick={handleRepredict}
-                disabled={isLoading || price === ""}
+                disabled={
+                  isLoading ||
+                  openPrice === "" ||
+                  openReturn == null
+                }
                 sx={{
                   backgroundColor: "#ede7f6",
                   color: "#002060",
@@ -390,7 +458,6 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
                     {/* Confidence */}
                     <TableCell sx={{ bgcolor: headerBg }}>
                       <Box display="flex" flexDirection="column" gap={1}>
-                        {/* Uncomment if you want accuracy */}
                         {/* {renderAccuracyLevel(modelData?.accuracy)} */}
                         {renderConfidenceLevel(modelData?.confidence)}
                       </Box>
@@ -408,8 +475,6 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
   const hasAnyPrediction =
     result && Object.keys(result).length > 0 && result.constructor === Object;
 
-  // We still detect if open results exist (for nicer handling),
-  // but we ALSO show table 2 whenever onRepredict is available.
   const hasOpenVersion = Object.keys(result || {}).some((key) =>
     key.toLowerCase().includes("open")
   );
@@ -427,11 +492,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
           1
         )}
 
-      {/* Table 2: From T+1D Open (Repredict shown)
-          - Shown if:
-            a) we actually have "open" model keys, OR
-            b) we have an onRepredict handler (so user can input open return)
-      */}
+      {/* Table 2: From T+1D Open (Repredict shown) */}
       {(hasOpenVersion || !!onRepredict) &&
         hasAnyPrediction &&
         renderSingleVersionTable(
