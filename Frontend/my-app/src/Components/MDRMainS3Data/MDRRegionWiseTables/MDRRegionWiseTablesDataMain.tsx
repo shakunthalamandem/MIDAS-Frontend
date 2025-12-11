@@ -308,7 +308,7 @@ const MDRRegionWiseTablesDataMain: React.FC = () => {
           <Typography
             variant="h6"
             align="center"
-            sx={{ mb: 2, fontWeight: 600, color: PRIMARY_COLOR }}
+            sx={{ mb: 2, fontWeight: 600, color: '#c00000' }}
           >
             Region / Fund wise P&amp;L (Net of Hedge, Net of FX, before fees and
             expenses)

@@ -144,9 +144,9 @@ const MDRFundPerfomanceMain: React.FC = () => {
         }}
       >
 
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#14327a",mb:'2' }} align="center">
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#c00000",mb:'2' }} align="center">
             {/* Fund Performance {asOfDate ? `(as of ${asOfDate})` : ""} */}
-            Fund Performance 
+            Fund Wise Performance 
           </Typography>
           {loading && (
             <Stack direction="row" spacing={1} alignItems="center">
