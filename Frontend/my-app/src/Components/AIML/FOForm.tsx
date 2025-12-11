@@ -14,6 +14,8 @@ import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults
 import FOPredictionResults from "./FOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FOFormFieldsSection from "./FOFormFieldsSection";
+import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
+import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 interface PredictionModel {
   prediction: string | null;
@@ -28,6 +30,7 @@ interface FOFormProps {
   values: FOFormValues;
   setValues: React.Dispatch<React.SetStateAction<FOFormValues>>;
   options: OptionsData;
+  sentimentBlocks?: Block[];
   autoPredict?: boolean;
   onAutoPredictComplete?: () => void;
   onPredicted?: () => void;
@@ -83,6 +86,7 @@ const FOForm: React.FC<FOFormProps> = ({
   values,
   setValues,
   options,
+  sentimentBlocks = [],
   autoPredict = false,
   onAutoPredictComplete,
   onPredicted,
@@ -100,6 +104,7 @@ const FOForm: React.FC<FOFormProps> = ({
   const [weeklyPrediction, setWeeklyPrediction] = useState<
     Record<string, PredictionModel> | null
   >(null);
+  const hasSentimentBlocks = sentimentBlocks.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -652,6 +657,34 @@ const FOForm: React.FC<FOFormProps> = ({
             initialT1dClosePrice={values.t1d_close_price ?? null}
             issuePrice={values.issue_price ?? null}
           />
+          {hasSentimentBlocks && (
+            <Paper
+              sx={{
+                p: { xs: 2, md: 3 },
+                mt: 3,
+                borderRadius: 3,
+                boxShadow: 3,
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                flexWrap="wrap"
+                gap={1}
+                mb={2}
+              >
+                <Typography variant="h6" fontWeight={700} color="primary">
+                  Sentiment Highlights
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Generated summary for this deal
+                </Typography>
+              </Box>  
+              <GENAIRenderer blocks={sentimentBlocks} />
+            </Paper>
+          )}
         </>
       )}
     </>

@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
-import { Box, Grid } from "@mui/material";
+import React, { useMemo, useRef, useState } from "react";
+import { Box, Grid, Typography } from "@mui/material";
 import FormSwitcher from "./FormSwitcher";
 import FOForm from "./FOForm";
 import IPOForm from "./IPOForm";
 import RecentPredictionsPanel from "./RecentPredictionsPanel";
+import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 // ---- Helpers ----
 const toNullableNumber = (v: unknown): number | null => {
@@ -18,6 +19,59 @@ const pick = (obj: any, keys: string[]) => {
     if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
   }
   return null;
+};
+
+// Parse sentiment JSON (string or object) into renderer blocks
+const parseSentimentBlocks = (raw: unknown): Block[] => {
+  if (!raw) return [];
+
+  const extractBlocks = (val: any): Block[] => {
+    if (Array.isArray(val)) return val as Block[];
+    if (val && typeof val === "object") {
+      if (Array.isArray((val as any).blocks)) return (val as any).blocks as Block[];
+      if (Array.isArray((val as any).answer)) return (val as any).answer as Block[];
+      if (Array.isArray((val as any).sentiment)) return (val as any).sentiment as Block[];
+      if (Array.isArray((val as any).data)) return (val as any).data as Block[];
+    }
+    return [];
+  };
+
+  // Strings may be plain JSON or a stringified object/array; try parsing, otherwise ignore
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      const blocks = extractBlocks(parsed);
+      if (blocks.length) return blocks;
+    } catch (err) {
+      // Retry with a loose conversion from python-style repr to JSON
+      try {
+        let normalized = raw.trim();
+        normalized = normalized
+          .replace(/\bNone\b/g, "null")
+          .replace(/\bTrue\b/g, "true")
+          .replace(/\bFalse\b/g, "false")
+          .replace(/'/g, '"');
+        const parsed = JSON.parse(normalized);
+        const blocks = extractBlocks(parsed);
+        if (blocks.length) return blocks;
+      } catch (_err) {
+        const trimmed = raw.trim();
+        if (trimmed) {
+          // Fallback: treat plain text as a single text block
+          return [{ type: "text", content: trimmed } as Block];
+        }
+        console.warn("Sentiment string is not JSON; skipping blocks");
+        return [];
+      }
+    }
+  }
+
+  try {
+    return extractBlocks(raw);
+  } catch (err) {
+    console.error("Unable to parse sentiment blocks", err);
+    return [];
+  }
 };
 
 // ---- Defaults ----
@@ -110,9 +164,12 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [foFormKey, setFoFormKey] = useState(0);
   const [ipoFormKey, setIpoFormKey] = useState(0);
   const formRef = useRef<HTMLDivElement>(null);
+  const [sentiment, setSentiment] = useState("");
 
   const [refreshKey, setRefreshKey] = useState(0);
   const bumpRecentRefresh = () => setRefreshKey((k) => k + 1);
+
+  const sentimentBlocks = useMemo(() => parseSentimentBlocks(sentiment), [sentiment]);
 
   const handleTypeChange = (type: "IPO" | "FO") => {
     setSelectedType(type);
@@ -121,6 +178,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   // ---- When a recent card is clicked: prefill + scroll to form ----
   const handlePredictionSelect = (item: any) => {
     const type = (item.deal_type || "").toUpperCase() as "IPO" | "FO";
+    setSentiment(item?.sentiment || "");
 
     if (type === "FO") {
       setFoValues({
@@ -275,6 +333,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
       setIpoAutoPredict(true);
       setIpoFormKey((k) => k + 1); // remount IPO form to clear old internal state
     }
+    setSentiment(item.sentiment)
 
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -304,6 +363,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 values={foValues}
                 setValues={setFoValues}
                 options={options}
+                sentimentBlocks={sentimentBlocks}
                 autoPredict={foAutoPredict}
                 onAutoPredictComplete={() => setFoAutoPredict(false)}
                 onPredicted={bumpRecentRefresh}
@@ -314,6 +374,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
                 values={ipoValues}
                 setValues={setIpoValues}
                 options={options}
+                sentimentBlocks={sentimentBlocks}
                 autoPredict={ipoAutoPredict}
                 onAutoPredictComplete={() => setIpoAutoPredict(false)}
                 onPredicted={bumpRecentRefresh}
