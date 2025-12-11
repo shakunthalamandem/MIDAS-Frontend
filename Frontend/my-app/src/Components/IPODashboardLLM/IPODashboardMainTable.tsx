@@ -115,6 +115,7 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker, onPeersUpdated }) => {
       {/* Bottom View Mode Checkboxes */}
       <Paper
         elevation={3}
+        className="pdf-hidden"
         sx={{
           position: "sticky",
           bottom: 0,
