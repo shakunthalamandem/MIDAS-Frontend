@@ -56,7 +56,7 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
       </Container>
 
       {/* AI COMPARISON */}
-      <Container maxWidth="xl" sx={{ mt: 4 }}>
+      <Container maxWidth="xl" sx={{ mt: 4 }}   className="pdf-hidden">
         <Card
           sx={{
             backgroundColor: "#f4f9ff",
