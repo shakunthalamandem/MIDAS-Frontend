@@ -30,6 +30,11 @@ type RunItem = Deal & {
   note?: string;
 };
 
+type RenderedPdf = {
+  blob: Blob;
+  filename: string;
+};
+
 //   const apiUrl = process.env.REACT_APP_API_URL;
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -89,25 +94,34 @@ const askPerplexity = async (question: string): Promise<Block[]> => {
   return blocks;
 };
 
-const postSentiment = async (
-  ticker: string,
-  unique_deal_id: string,
-  sentimentBlocks: Block[],
-  sentimentPdf?: string | null
-) => {
+const postSentiment = async (ticker: string, unique_deal_id: string, sentimentBlocks: Block[]) => {
   const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ticker,
       unique_deal_id,
-      sentiment: sentimentPdf ?? sentimentBlocks,
-      sentiment_pdf: sentimentPdf ?? null,
+      sentiment: sentimentBlocks,
       sentiment_blocks: sentimentBlocks,
     }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to save sentiment");
+  return data;
+};
+
+const postSentimentPdf = async (ticker: string, unique_deal_id: string, sentimentPdf: RenderedPdf) => {
+  const formData = new FormData();
+  formData.append("ticker", ticker);
+  formData.append("unique_deal_id", unique_deal_id);
+  formData.append("sentiment_pdf", sentimentPdf.blob, sentimentPdf.filename);
+
+  const res = await fetch(`${apiUrl}/api/deal_sentiment_pdf/`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
   return data;
 };
 
@@ -127,7 +141,7 @@ const SentimentAnalysis: React.FC = () => {
   const waitForPaint = () =>
     new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
-  const renderBlocksToPdf = useCallback(async (blocks: Block[], filename?: string) => {
+  const renderBlocksToPdf = useCallback(async (blocks: Block[], filename?: string): Promise<RenderedPdf> => {
     setPdfBlocks(blocks);
     await waitForPaint();
     await wait(500);
@@ -149,7 +163,7 @@ const SentimentAnalysis: React.FC = () => {
 
     const capture = async (): Promise<HTMLCanvasElement> => {
       const canvas = await html2canvas(container, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
         scrollY: -window.scrollY,
@@ -170,7 +184,7 @@ const SentimentAnalysis: React.FC = () => {
       canvas = await capture();
     }
 
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     const mmPerPx = pdfWidth / canvas.width;
@@ -198,23 +212,18 @@ const SentimentAnalysis: React.FC = () => {
         );
       }
 
-      const imgData = sliceCanvas.toDataURL("image/png", 1.0);
+      const imgData = sliceCanvas.toDataURL("image/jpeg", 0.78);
       const sliceHeightMm = sliceHeightPx * mmPerPx;
 
       if (offset > 0) pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, sliceHeightMm);
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, sliceHeightMm, undefined, "FAST");
 
       offset += sliceHeightPx;
     }
 
-    const dataUri = pdf.output("datauristring");
-    try {
-      const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
-      pdf.save(safeName);
-    } catch (err) {
-      console.warn("PDF auto-download failed; continuing without download", err);
-    }
-    return dataUri;
+    const pdfBlob = pdf.output("blob") as Blob;
+    const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
+    return { blob: pdfBlob, filename: safeName };
   }, []);
 
   const progress = useMemo(() => {
@@ -249,19 +258,10 @@ const SentimentAnalysis: React.FC = () => {
 
         try {
           const answerBlocks = await askPerplexity(entry.prompt);
-          let sentimentPdf: string | null = null;
-          try {
-            sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
-          } catch (pdfErr) {
-            console.warn("Sentiment PDF render failed; saving blocks instead", pdfErr);
-            updateStatus(statusIndex, "running", "PDF generation failed; storing blocks only");
-          }
-          await postSentiment(entry.ticker, entry.unique_deal_id, answerBlocks, sentimentPdf);
-          updateStatus(
-            statusIndex,
-            "completed",
-            sentimentPdf ? undefined : "Completed without PDF (stored blocks)"
-          );
+          const sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
+          await postSentiment(entry.ticker, entry.unique_deal_id, answerBlocks);
+          await postSentimentPdf(entry.ticker, entry.unique_deal_id, sentimentPdf);
+          updateStatus(statusIndex, "completed");
         } catch (err: any) {
           updateStatus(statusIndex, "failed", err.message);
           setError(`Failed for ${entry.ticker}: ${err.message}`);
