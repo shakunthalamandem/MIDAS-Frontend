@@ -196,6 +196,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   // Export with dynamic pagination so variable content fits into the PDF cleanly
   const handleExportPDFPaginated = async () => {
     setPdfLoading(true);
+    const shouldIgnoreForPdf = (el: Element) =>
+      !!(el as HTMLElement).classList?.contains("pdf-hidden");
 
     const pages = [
       "ipo-dashboard-page1",
@@ -436,9 +438,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           windowWidth: element.scrollWidth,
           windowHeight: element.scrollHeight,
           backgroundColor: "#ffffff",
-          ignoreElements: isPageOne
-            ? (el) => el.classList?.contains("pdf-hidden")
-            : undefined,
+          ignoreElements: shouldIgnoreForPdf,
         });
 
         paginateCanvas(canvas);

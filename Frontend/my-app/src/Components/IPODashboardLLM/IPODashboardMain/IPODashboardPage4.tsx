@@ -152,7 +152,7 @@ const IPODashboardPage4: React.FC<Props> = ({
           </Grid>
 
           {/* Monashee Score */}
-          <Grid item xs={12}>
+          <Grid item xs={12} className="pdf-hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

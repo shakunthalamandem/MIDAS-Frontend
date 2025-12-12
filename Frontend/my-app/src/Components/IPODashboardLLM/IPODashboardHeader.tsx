@@ -84,6 +84,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
               py: 1,
               minWidth: "130px",
             }}
+            className="pdf-hidden"
             disabled={pdfLoading}
             startIcon={pdfLoading ? <CircularProgress color="inherit" size={18} /> : null}
           >
@@ -95,6 +96,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         <Autocomplete
           size="small"
           options={sortedTickers}
+          className="pdf-hidden"
           getOptionLabel={(option) => {
             let formattedDate = "TBA";
             if (option.pricing_date) {
