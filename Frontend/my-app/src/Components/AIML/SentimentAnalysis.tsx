@@ -11,6 +11,10 @@ import {
   Alert,
   Container,
 } from "@mui/material";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
+import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 type Deal = {
   ticker: string;
@@ -51,26 +55,55 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
   return data?.deals ?? [];
 };
 
-const askPerplexity = async (question: string) => {
-  const res = await fetch(`${apiUrl}/api/perplexity_chat/`, {
+const askPerplexity = async (question: string): Promise<Block[]> => {
+  const res = await fetch(`${apiUrl}/api/test_perplexity_chat/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: question.trim(), history: [] }),
+    body: JSON.stringify({ question: question.trim() }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Perplexity chat failed");
-  if (!Array.isArray(data.answer)) throw new Error("Invalid Perplexity response format");
-  return data.answer;
+  const raw = data?.answer ?? data;
+
+  const normalizeBlocks = (val: any): Block[] => {
+    if (Array.isArray(val)) return val as Block[];
+    if (val && typeof val === "object") {
+      if (Array.isArray(val.blocks)) return val.blocks as Block[];
+      if (Array.isArray(val.answer)) return val.answer as Block[];
+      if (Array.isArray(val.data)) return val.data as Block[];
+    }
+    if (typeof val === "string" && val.trim()) {
+      try {
+        const parsed = JSON.parse(val);
+        const parsedBlocks = normalizeBlocks(parsed);
+        if (parsedBlocks.length) return parsedBlocks;
+      } catch {
+        return [{ type: "text", content: val.trim() } as Block];
+      }
+    }
+    return [];
+  };
+
+  const blocks = normalizeBlocks(raw);
+  if (!blocks.length) throw new Error("Invalid Perplexity response format");
+  return blocks;
 };
 
-const postSentiment = async (ticker: string,unique_deal_id:string, sentiment: any) => {
+const postSentiment = async (
+  ticker: string,
+  unique_deal_id: string,
+  sentimentBlocks: Block[],
+  sentimentPdf?: string | null
+) => {
   const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ticker,
       unique_deal_id,
-      sentiment,
+      sentiment: sentimentPdf ?? sentimentBlocks,
+      sentiment_pdf: sentimentPdf ?? null,
+      sentiment_blocks: sentimentBlocks,
     }),
   });
   const data = await res.json();
@@ -87,6 +120,102 @@ const SentimentAnalysis: React.FC = () => {
   const [currentTicker, setCurrentTicker] = useState<string>("");
   const bootstrapped = useRef(false);
   const [started, setStarted] = useState(false);
+  const pdfContainerRef = useRef<HTMLDivElement | null>(null);
+  const [pdfBlocks, setPdfBlocks] = useState<Block[]>([]);
+
+  const wait = (ms = 200) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  const waitForPaint = () =>
+    new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+  const renderBlocksToPdf = useCallback(async (blocks: Block[], filename?: string) => {
+    setPdfBlocks(blocks);
+    await waitForPaint();
+    await wait(500);
+
+    const container = pdfContainerRef.current;
+    if (!container) throw new Error("PDF container not available");
+    if (container.clientHeight < 10) {
+      await waitForPaint();
+      await wait(300);
+    }
+
+    // Ensure content is actually rendered; retry a few times if height is tiny
+    let tries = 0;
+    while (container.clientHeight < 20 && tries < 4) {
+      await waitForPaint();
+      await wait(250);
+      tries += 1;
+    }
+
+    const capture = async (): Promise<HTMLCanvasElement> => {
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scrollY: -window.scrollY,
+        windowWidth: container.scrollWidth || undefined,
+        windowHeight: container.scrollHeight || undefined,
+      });
+      if (!canvas || canvas.height < 5 || canvas.width < 5) {
+        throw new Error("Failed to render PDF canvas");
+      }
+      return canvas;
+    };
+
+    let canvas: HTMLCanvasElement | null = null;
+    try {
+      canvas = await capture();
+    } catch (_err) {
+      await wait(500);
+      canvas = await capture();
+    }
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const mmPerPx = pdfWidth / canvas.width;
+    const pageHeightPx = pdfHeight / mmPerPx;
+
+    let offset = 0;
+    while (offset < canvas.height) {
+      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - offset);
+      const sliceCanvas = document.createElement("canvas");
+      sliceCanvas.width = canvas.width;
+      sliceCanvas.height = sliceHeightPx;
+
+      const ctx = sliceCanvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(
+          canvas,
+          0,
+          offset,
+          canvas.width,
+          sliceHeightPx,
+          0,
+          0,
+          canvas.width,
+          sliceHeightPx
+        );
+      }
+
+      const imgData = sliceCanvas.toDataURL("image/png", 1.0);
+      const sliceHeightMm = sliceHeightPx * mmPerPx;
+
+      if (offset > 0) pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, sliceHeightMm);
+
+      offset += sliceHeightPx;
+    }
+
+    const dataUri = pdf.output("datauristring");
+    try {
+      const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
+      pdf.save(safeName);
+    } catch (err) {
+      console.warn("PDF auto-download failed; continuing without download", err);
+    }
+    return dataUri;
+  }, []);
 
   const progress = useMemo(() => {
     if (!items.length) return 0;
@@ -120,8 +249,19 @@ const SentimentAnalysis: React.FC = () => {
 
         try {
           const answerBlocks = await askPerplexity(entry.prompt);
-          await postSentiment(entry.ticker, entry.unique_deal_id,answerBlocks);
-          updateStatus(statusIndex, "completed");
+          let sentimentPdf: string | null = null;
+          try {
+            sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
+          } catch (pdfErr) {
+            console.warn("Sentiment PDF render failed; saving blocks instead", pdfErr);
+            updateStatus(statusIndex, "running", "PDF generation failed; storing blocks only");
+          }
+          await postSentiment(entry.ticker, entry.unique_deal_id, answerBlocks, sentimentPdf);
+          updateStatus(
+            statusIndex,
+            "completed",
+            sentimentPdf ? undefined : "Completed without PDF (stored blocks)"
+          );
         } catch (err: any) {
           updateStatus(statusIndex, "failed", err.message);
           setError(`Failed for ${entry.ticker}: ${err.message}`);
@@ -133,7 +273,7 @@ const SentimentAnalysis: React.FC = () => {
       setRunning(false);
       setCurrentTicker("");
     },
-    [items, updateStatus]
+    [items, renderBlocksToPdf, updateStatus]
   );
 
   useEffect(() => {
@@ -279,6 +419,24 @@ const SentimentAnalysis: React.FC = () => {
           </Stack>
         </Stack>
       </Container>
+
+      {/* Hidden renderer for high-quality PDF capture */}
+      <Box
+        ref={pdfContainerRef}
+        sx={{
+          position: "fixed",
+          left: -2000,
+          top: 0,
+          width: 1100,
+          bgcolor: "#ffffff",
+          p: 2,
+          opacity: 1,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <GENAIRenderer blocks={pdfBlocks} renderAll disableMotion />
+      </Box>
     </Box>
   );
 };
