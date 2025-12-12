@@ -257,7 +257,8 @@ const AppRouters: React.FC = () => {
         <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
                 {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
 
-        <Route path="/chat" element={<MattermostChat />} />
+        {/* <Route path="/chat" element={<MattermostChat />} /> */}
+        <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
 
 
 
