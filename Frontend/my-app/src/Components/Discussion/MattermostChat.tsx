@@ -7,13 +7,16 @@ type Status = "idle" | "loading" | "ready" | "error";
 const MATTERMOST_ORIGIN = env.mattermostOrigin;
 const MATTERMOST_TEAM = env.mattermostTeam;
 const DEFAULT_CHANNEL = env.defaultChannel;
-const apiUrl = env.apiUrl;
 
 const MattermostChat: React.FC = () => {
   const { stock } = useParams();
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+
+    const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const accessToken =
     typeof window !== "undefined"
@@ -65,6 +68,7 @@ const MattermostChat: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
             ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
           signal: abortController.signal,
