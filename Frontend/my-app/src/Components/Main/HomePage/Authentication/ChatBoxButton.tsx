@@ -1,17 +1,13 @@
 import React from "react";
-import { IconButton, Zoom } from "@mui/material";
+import { IconButton, Typography, Zoom } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 
 const chatButtonStyle: React.CSSProperties = {
-  // position: "fixed",
-  // bottom: "70px",
-  // right: "10px",
-  backgroundColor: "#002060",
-  color: "#ffffff",
-  borderRadius: "50%",
+  display: "inline-flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 4,
   cursor: "pointer",
-  transition: "opacity 0.3s ease-in-out",
-  // zIndex: 99999,
 };
 
 const ChatBoxButton: React.FC = () => {
@@ -21,15 +17,24 @@ const ChatBoxButton: React.FC = () => {
   };
 
   return (
-    <>
-      <Zoom in={true}>
-        <div role="presentation" onClick={handleOpenChat} style={chatButtonStyle}>
-          <IconButton aria-label="chat">
-            <ChatIcon style={{ color: "#ffffff" }} />
-          </IconButton>
-        </div>
-      </Zoom>
-    </>
+    <Zoom in={true}>
+      <div role="presentation" onClick={handleOpenChat} style={chatButtonStyle}>
+        <IconButton
+          aria-label="chat"
+          sx={{
+            backgroundColor: "#002060",
+            color: "#ffffff",
+            borderRadius: "50%",
+            "&:hover": { backgroundColor: "#002060" },
+          }}
+        >
+          <ChatIcon />
+        </IconButton>
+        <Typography variant="caption" sx={{ color: "#002060" }}>
+          Deal Notes
+        </Typography>
+      </div>
+    </Zoom>
   );
 };
 
