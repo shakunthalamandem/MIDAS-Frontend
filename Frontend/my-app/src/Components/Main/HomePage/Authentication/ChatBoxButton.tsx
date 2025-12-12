@@ -20,6 +20,7 @@ const ChatBoxButton: React.FC = () => {
     <Zoom in={true}>
       <div role="presentation" onClick={handleOpenChat} style={chatButtonStyle}>
         <IconButton
+          size="small"
           aria-label="chat"
           sx={{
             backgroundColor: "#002060",
@@ -28,7 +29,7 @@ const ChatBoxButton: React.FC = () => {
             "&:hover": { backgroundColor: "#002060" },
           }}
         >
-          <ChatIcon />
+          <ChatIcon fontSize="small" />
         </IconButton>
         <Typography variant="caption" sx={{ color: "#002060" }}>
           Deal Notes
