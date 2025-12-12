@@ -92,6 +92,7 @@ const EditableCard: React.FC<EditableCardProps> = ({
               color="primary"
               onClick={() => handleSaveCard(key)}
               size="small"
+              className="pdf-hidden"
             >
               <SaveIcon />
             </IconButton>
@@ -99,6 +100,7 @@ const EditableCard: React.FC<EditableCardProps> = ({
               color="secondary"
               onClick={() => handleCancelCard(key)}
               size="small"
+              className="pdf-hidden"
             >
               <CancelIcon />
             </IconButton>
@@ -109,6 +111,7 @@ const EditableCard: React.FC<EditableCardProps> = ({
               setEditMode((prev) => ({ ...prev, [key]: true }))
             }
             size="small"
+            className="pdf-hidden"
           >
             <EditIcon fontSize="small" />
           </IconButton>
@@ -125,7 +128,7 @@ const EditableCard: React.FC<EditableCardProps> = ({
                 alignItems="flex-start"
                 mb={1}
               >
-                <Box sx={{ mr: 1, mt: 1 }}>
+                <Box className="pdf-hidden" sx={{ mr: 1, mt: 1 }} >
                   <FiberManualRecordIcon
                     sx={{ fontSize: 8, color: "#002060" }}
                   />

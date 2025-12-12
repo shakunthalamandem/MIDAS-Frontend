@@ -240,7 +240,7 @@ useEffect(() => {
 
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 4 }} className="pdf-hidden">
       <Card
         sx={{
           borderRadius: 4,

@@ -54,7 +54,7 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", gap: 1 }}>
+    <Box sx={{ display: "flex", gap: 1 }}  className="pdf-hidden" >
       <Autocomplete
         options={options}
         getOptionLabel={(option: any) => option.ticker}
