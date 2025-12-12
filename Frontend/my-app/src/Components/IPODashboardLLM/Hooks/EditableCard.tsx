@@ -78,7 +78,10 @@ const EditableCard: React.FC<EditableCardProps> = ({
         minHeight: !isExpanded && minHeight ? `${minHeight}px` : "auto", // ✅ Equal height only when collapsed
       }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`${key}-header`}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon className="pdf-hidden" />}
+        id={`${key}-header`}
+      >
         <Typography
           variant="h6"
           align="center"
