@@ -361,10 +361,12 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       const footerReserveMm = 36;
       const topSlicePaddingMm = 8;
       const bottomSlicePaddingMm = 10;
-      const paginateCanvas = (canvas: HTMLCanvasElement) => {
-        const imgWidth = pdfWidth;
-        const mmPerPx = imgWidth / (canvas.width || 1);
-        let consumedPx = 0;
+    const paginateCanvas = (canvas: HTMLCanvasElement) => {
+      if (!canvas.width || !canvas.height) return; // avoid blank pages
+
+      const imgWidth = pdfWidth;
+      const mmPerPx = imgWidth / (canvas.width || 1);
+      let consumedPx = 0;
 
         while (consumedPx < canvas.height) {
           pdf.addPage();
@@ -425,6 +427,12 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         const element = document.getElementById(pageId);
         if (!element) continue;
 
+        const elementHeight =
+          element.scrollHeight ||
+          element.getBoundingClientRect().height ||
+          0;
+        if (!elementHeight) continue; // skip empty sections
+
         const targetDpi = 180;
         const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
         const dynamicScale = Math.max(
@@ -440,7 +448,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           // Force a stable, desktop-sized viewport for capture regardless of user zoom/viewport
           width: captureViewportWidth,
           windowWidth: captureViewportWidth,
-          windowHeight: element.scrollHeight,
+          windowHeight: elementHeight,
           backgroundColor: "#ffffff",
           ignoreElements: shouldIgnoreForPdf,
           onclone: (doc) => {
