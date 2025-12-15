@@ -10,6 +10,7 @@ import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
 import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
+import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 import IPOComparablesAndAISection from "./IPOComparablesAndAISection";
 import IPOFinancialForecastTableMain from "./IPOFinancialForecast/IPOFinancialForecastTableMain";
@@ -725,6 +726,15 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
                   handleItemChange={handleItemChange}
                 />
               )}
+            />
+
+            {/* Page 4: Monashee score (and any additional key metrics) */}
+            <IPODashboardPage4
+              selectedTicker={currentTicker || ""}
+              ipoData={ipoData}
+              showAIComparison={false}
+              handleAIComparisonClick={() => {}}
+              onPageReady={() => markSectionLoaded("page4")}
             />
           </>
         )}
