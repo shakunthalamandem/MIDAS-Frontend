@@ -34,7 +34,7 @@ const IPODashboardPage2: React.FC<Props> = ({
   }, [summaryLoaded, ratingsLoaded, onPageReady]);
 
   return (
-    <div id="ipo-dashboard-page2">
+    <div id="ipo-dashboard-page4">
       <IPODifferenciateSummary
         selectedData={selectedData}
         onLoaded={() => setSummaryLoaded(true)}

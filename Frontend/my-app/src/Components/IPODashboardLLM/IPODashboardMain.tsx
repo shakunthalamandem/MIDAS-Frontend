@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Container, Card, CardContent } from "@mui/material";
 
 import axios from "axios";
 import { cardColors, formatDate } from "./UtilsIPODashboard";
@@ -10,8 +10,9 @@ import monasheeLogo from "../../Assets/images/monashee_logo.png";
 import IPODashboardPage1 from "./IPODashboardMain/IPODashboardPage1";
 import IPODashboardPage2 from "./IPODashboardMain/IPODashboardPage2";
 import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
-import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
+import IPOComparablesAndAISection from "./IPOComparablesAndAISection";
+import IPOFinancialForecastTableMain from "./IPOFinancialForecast/IPOFinancialForecastTableMain";
 import { useLocation } from "react-router-dom";
 
 interface TickerOption {
@@ -43,7 +44,6 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   const [editedContent, setEditedContent] = useState<Record<string, string[]>>(
     {}
   );
-  const [showAIComparison, setShowAIComparison] = useState(false);
   const [expandedPanels, setExpandedPanels] = useState<Record<string, boolean>>(
     {}
   );
@@ -114,10 +114,6 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
     
   }, []);
 
-  const handleAIComparisonClick = () => {
-    setShowAIComparison(true);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -179,6 +175,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         setIpoData(formattedData);
         markSectionLoaded("core");
         markSectionLoaded("page3"); // page 3 is static once base data is ready
+        markSectionLoaded("page4"); // unlock row selection once base data is loaded
       } catch (err) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
@@ -196,14 +193,21 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   // Export with dynamic pagination so variable content fits into the PDF cleanly
   const handleExportPDFPaginated = async () => {
     setPdfLoading(true);
-    const shouldIgnoreForPdf = (el: Element) =>
-      !!(el as HTMLElement).classList?.contains("pdf-hidden");
+    const shouldIgnoreForPdf = (pageId: string) => (el: Element) => {
+      const element = el as HTMLElement;
+      if (element.classList?.contains("pdf-hidden")) return true;
+      // Skip breakout sections unless we are specifically capturing that page id
+      const breakout = element.getAttribute("data-pdf-breakout");
+      if (breakout && pageId !== "ipo-dashboard-financial-metrics") return true;
+      return false;
+    };
 
     const pages = [
-      "ipo-dashboard-page1",
-      "ipo-dashboard-page2",
-      "ipo-dashboard-page3",
-      "ipo-dashboard-page4",
+      "ipo-dashboard-page1", // Fair value, pricing, valuation
+      "ipo-dashboard-page2", // Comparatives + performance metrics + financial forecasts
+      "ipo-dashboard-financial-metrics", // Key Financial Metrics (only if toggled include)
+      "ipo-dashboard-page4", // Differentiated summary + key metrics
+      "ipo-dashboard-page3", // Business overview + supporting cards (last before disclaimer)
     ];
 
     const pdf = new jsPDF({
@@ -361,10 +365,12 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       const footerReserveMm = 36;
       const topSlicePaddingMm = 8;
       const bottomSlicePaddingMm = 10;
-      const paginateCanvas = (canvas: HTMLCanvasElement) => {
-        const imgWidth = pdfWidth;
-        const mmPerPx = imgWidth / (canvas.width || 1);
-        let consumedPx = 0;
+    const paginateCanvas = (canvas: HTMLCanvasElement) => {
+      if (!canvas.width || !canvas.height) return; // avoid blank pages
+
+      const imgWidth = pdfWidth;
+      const mmPerPx = imgWidth / (canvas.width || 1);
+      let consumedPx = 0;
 
         while (consumedPx < canvas.height) {
           pdf.addPage();
@@ -417,17 +423,25 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         }
       };
 
+      // Lock PDF rendering to a consistent virtual viewport so browser zoom/viewport size
+      // does not change the captured resolution.
+      const captureViewportWidth = 1536; // matches MUI xl container width
+
       for (const pageId of pages) {
         const element = document.getElementById(pageId);
         if (!element) continue;
 
-        const elRect = element.getBoundingClientRect();
-        const elCssWidth = elRect.width || element.scrollWidth || 1024;
+        const elementHeight =
+          element.scrollHeight ||
+          element.getBoundingClientRect().height ||
+          0;
+        if (!elementHeight) continue; // skip empty sections
+
         const targetDpi = 180;
         const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
         const dynamicScale = Math.max(
           2,
-          Math.min(4, targetPxWidth / elCssWidth)
+          Math.min(4, targetPxWidth / captureViewportWidth)
         );
         const isPageOne = pageId === "ipo-dashboard-page1";
 
@@ -435,10 +449,20 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           scale: isPageOne ? 2 : dynamicScale,
           useCORS: true,
           scrollY: -window.scrollY,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight,
+          // Force a stable, desktop-sized viewport for capture regardless of user zoom/viewport
+          width: captureViewportWidth,
+          windowWidth: captureViewportWidth,
+          windowHeight: elementHeight,
           backgroundColor: "#ffffff",
-          ignoreElements: shouldIgnoreForPdf,
+          ignoreElements: shouldIgnoreForPdf(pageId),
+          onclone: (doc) => {
+            const cloned = doc.getElementById(pageId);
+            if (cloned) {
+              cloned.style.width = `${captureViewportWidth}px`;
+              cloned.style.maxWidth = `${captureViewportWidth}px`;
+              cloned.style.minWidth = `${captureViewportWidth}px`;
+            }
+          },
         });
 
         paginateCanvas(canvas);
@@ -648,12 +672,40 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               pdfLoading={pdfLoading}
             />
 
+            {/* Page 2: comparatives + performance metrics + financial forecasts */}
+            <div id="ipo-dashboard-page2">
+              <Container maxWidth="xl" sx={{ mt: 4 }}>
+                <IPOComparablesAndAISection
+                  selectedData={{
+                    ticker_name: ipoData?.ticker_name,
+                    company_name: ipoData?.company_name,
+                    exchange: ipoData?.exchange,
+                    valuation: ipoData?.valuation || [],
+                    valuation_image_url: ipoData?.valuation_image_url || "",
+                  }}
+                />
+              </Container>
+
+              <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                  <CardContent>
+                    <IPOFinancialForecastTableMain
+                      defaultTicker={currentTicker || ""}
+                    />
+                  </CardContent>
+                </Card>
+              </Container>
+            </div>
+
+            {/* Page 4: Differentiated Summary + Key Metrics */}
             <IPODashboardPage2
               ipoData={ipoData}
               selectedTicker={currentTicker || ""}
               setIpoData={setIpoData}
               onPageReady={() => markSectionLoaded("page2")}
             />
+
+            {/* Page 3 (rendered last in DOM): Business overview and supporting cards */}
             <IPODashboardPage3
               renderEditableCard={(section, index) => (
                 <EditableCard
@@ -673,14 +725,6 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
                   handleItemChange={handleItemChange}
                 />
               )}
-            />
-
-            <IPODashboardPage4
-              selectedTicker={currentTicker || ""}
-              ipoData={ipoData}
-              showAIComparison={showAIComparison}
-              handleAIComparisonClick={handleAIComparisonClick}
-              onPageReady={() => markSectionLoaded("page4")}
             />
           </>
         )}

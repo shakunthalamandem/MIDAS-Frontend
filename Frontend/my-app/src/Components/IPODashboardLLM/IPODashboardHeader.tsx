@@ -12,8 +12,9 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { format } from "date-fns";
 import IPOdashboardLine from "./IPOdashboardLine";
-import IPODealsS1DealData from "./IPODealsS1DealData";
+import IPODealSummarySection from "./IPODealSummarySection";
 import IPOSummaryTable from "./IPODashboardMain/IPOSummaryTable";
+import IPOValuationSection from "./IPOValuationSection";
 
 interface TickerOption {
   ticker_name: string;
@@ -134,18 +135,28 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
       </Box>
 
       {/* Child Components */}
-<IPOdashboardLine
-  ipodata={ipoData}
-  selectedTicker={selectedTicker || ""}
-  setIpoData={setIpoData}
-/>
+      <IPOdashboardLine
+        ipodata={ipoData}
+        selectedTicker={selectedTicker || ""}
+        setIpoData={setIpoData}
+      />
 
+      {/* Fair value first */}
+      <IPODealSummarySection
+        selectedData={{
+          ticker_name: ipoData?.ticker_name,
+        }}
+      />
+
+      {/* Pricing date / price range next */}
       <IPOSummaryTable
         ipodata={ipoData}
         selectedTicker={selectedTicker || ""}
         setIpoData={setIpoData}
       />
-      <IPODealsS1DealData
+
+      {/* Valuation information */}
+      <IPOValuationSection
         selectedData={{
           ticker_name: ipoData?.ticker_name,
           company_name: ipoData?.company_name,
