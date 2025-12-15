@@ -32,6 +32,7 @@ interface RecentPrediction {
   inflation_rate: string | null;
   treasury_rates: string | null;
   t1d_pred: string | null;
+  sentiment_pdf?: string | null;
   revenue?: number | string | null;
   revenue_growth?: number | string | null;
   net_profit_margin?: number | string | null;
@@ -402,6 +403,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
           const isFO = (form.deal_type || "").toUpperCase() === "FO";
           const stChip = statusChip(form.deal_status);
           const sectorLabel = formatSector(form.sector);
+          const hasSentiment = Boolean((form.sentiment_pdf || "").trim());
 
           const isExactSelected =
             selectedTicker &&
@@ -530,6 +532,22 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                             fmtPct(form.issue_to_previous_day_close),
                             "Relative change from T-1 close to issue price"
                           )}
+                        {metricRow(
+                          "Sentiment Analysis",
+                          hasSentiment ? (
+                            <a
+                              href={(form.sentiment_pdf || "").trim()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: "#1d4ed8", fontWeight: 600 }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Open PDF
+                            </a>
+                          ) : (
+                            "Not Available"
+                          )
+                        )}
                         </Stack>
                       </Grid>
                     )}
