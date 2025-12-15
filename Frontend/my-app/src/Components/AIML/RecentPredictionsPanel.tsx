@@ -533,7 +533,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                             "Relative change from T-1 close to issue price"
                           )}
                         {metricRow(
-                          "Sentiment PDF",
+                          "Sentiment Analysis",
                           hasSentiment ? (
                             <a
                               href={(form.sentiment_pdf || "").trim()}
