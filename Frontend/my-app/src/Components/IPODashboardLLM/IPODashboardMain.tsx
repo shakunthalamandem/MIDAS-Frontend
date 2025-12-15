@@ -175,6 +175,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         setIpoData(formattedData);
         markSectionLoaded("core");
         markSectionLoaded("page3"); // page 3 is static once base data is ready
+        markSectionLoaded("page4"); // unlock row selection once base data is loaded
       } catch (err) {
         console.error("IPO data fetch failed", err);
         setError("Failed to fetch IPO data");
