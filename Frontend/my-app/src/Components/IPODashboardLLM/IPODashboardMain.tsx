@@ -417,17 +417,19 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
         }
       };
 
+      // Lock PDF rendering to a consistent virtual viewport so browser zoom/viewport size
+      // does not change the captured resolution.
+      const captureViewportWidth = 1536; // matches MUI xl container width
+
       for (const pageId of pages) {
         const element = document.getElementById(pageId);
         if (!element) continue;
 
-        const elRect = element.getBoundingClientRect();
-        const elCssWidth = elRect.width || element.scrollWidth || 1024;
         const targetDpi = 180;
         const targetPxWidth = (pdfWidth / 25.4) * targetDpi;
         const dynamicScale = Math.max(
           2,
-          Math.min(4, targetPxWidth / elCssWidth)
+          Math.min(4, targetPxWidth / captureViewportWidth)
         );
         const isPageOne = pageId === "ipo-dashboard-page1";
 
@@ -435,10 +437,20 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           scale: isPageOne ? 2 : dynamicScale,
           useCORS: true,
           scrollY: -window.scrollY,
-          windowWidth: element.scrollWidth,
+          // Force a stable, desktop-sized viewport for capture regardless of user zoom/viewport
+          width: captureViewportWidth,
+          windowWidth: captureViewportWidth,
           windowHeight: element.scrollHeight,
           backgroundColor: "#ffffff",
           ignoreElements: shouldIgnoreForPdf,
+          onclone: (doc) => {
+            const cloned = doc.getElementById(pageId);
+            if (cloned) {
+              cloned.style.width = `${captureViewportWidth}px`;
+              cloned.style.maxWidth = `${captureViewportWidth}px`;
+              cloned.style.minWidth = `${captureViewportWidth}px`;
+            }
+          },
         });
 
         paginateCanvas(canvas);
