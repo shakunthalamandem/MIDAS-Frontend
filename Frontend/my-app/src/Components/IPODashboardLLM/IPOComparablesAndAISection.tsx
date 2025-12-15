@@ -94,13 +94,18 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
         </Card>
       </Container>
 
-      {/* Add a container for Financial Metrics Chart here  */}
-            <Container maxWidth="xl" sx={{ mt: 4 }}>
-              <FinancialMetricsBarCharts
-                ticker={selectedData?.ticker_name ?? ""}
-                refreshToken={chartRefreshToken}
-              />
-            </Container>
+      {/* Financial metrics (breaks out to its own PDF page) */}
+      <Container
+        id="ipo-dashboard-financial-metrics"
+        data-pdf-breakout="financial-metrics"
+        maxWidth="xl"
+        sx={{ mt: 4 }}
+      >
+        <FinancialMetricsBarCharts
+          ticker={selectedData?.ticker_name ?? ""}
+          refreshToken={chartRefreshToken}
+        />
+      </Container>
     </>
   );
 };
