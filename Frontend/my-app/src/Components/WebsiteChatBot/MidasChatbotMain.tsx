@@ -1,6 +1,6 @@
 import React from 'react'
-import MidasChatbotData from './MidasChatbotData'
 import { Container, Typography } from '@mui/material'
+import MidasChatbotData from './MidasChatbotData'
 
 const MidasChatbotMain = () => {
   return (
