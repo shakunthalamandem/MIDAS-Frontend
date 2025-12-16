@@ -10,6 +10,7 @@ type FormState = {
 
 const MidasChatbotIndexer: React.FC = () => {
   const [form, setForm] = useState<FormState>({ page_id: "", url: "", title: "", body: "" });
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +33,16 @@ const MidasChatbotIndexer: React.FC = () => {
       body: form.body.trim(),
     };
 
-    if (!payload.page_id || !payload.url || !payload.title || !payload.body) {
-      setError("All fields are required");
+    const hasFile = !!file;
+    const hasBody = !!payload.body;
+
+    if (!hasFile && !hasBody) {
+      setError("Provide page text in Body or upload a file.");
+      return;
+    }
+
+    if (!hasFile && (!payload.page_id || !payload.url || !payload.title)) {
+      setError("page_id, url, and title are required when no file is uploaded.");
       return;
     }
 
@@ -43,18 +52,24 @@ const MidasChatbotIndexer: React.FC = () => {
     setSuccess(null);
 
     try {
+      const formData = new FormData();
+      if (payload.page_id) formData.append("page_id", payload.page_id);
+      if (payload.url) formData.append("url", payload.url);
+      if (payload.title) formData.append("title", payload.title);
+      if (payload.body) formData.append("body", payload.body);
+      if (file) formData.append("file", file);
+
       const res = await fetch(`${apiUrl}/api/chatbot_index/`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.detail || "Failed to index page");
+        throw new Error(data?.detail || data?.error || "Failed to index page");
       }
 
       setSuccess(`Indexed ${data?.indexed_chunks ?? 0} chunks`);
@@ -83,6 +98,20 @@ const MidasChatbotIndexer: React.FC = () => {
           minRows={6}
           placeholder="Paste the full page text to index"
         />
+        <Button
+          variant="outlined"
+          component="label"
+          disabled={loading}
+        >
+          {file ? `Selected: ${file.name}` : "Upload file (pdf/docx/txt)"}
+          <input
+            type="file"
+            hidden
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+        </Button>
+
         <Button variant="contained" onClick={submit} disabled={loading}>
           {loading ? "Indexing..." : "Index Page"}
         </Button>
