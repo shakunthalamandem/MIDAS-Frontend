@@ -83,6 +83,7 @@ import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
 import MattermostChat from "../Components/Discussion/MattermostChat";
 import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
 import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
+import MidasChatbotMain from "../Components/WebsiteChatBot/MidasChatbotMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -259,6 +260,9 @@ const AppRouters: React.FC = () => {
 
         {/* <Route path="/chat" element={<MattermostChat />} /> */}
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
+
+
+        <Route path="/midas_chat" element={<AuthGuard><MidasChatbotMain /></AuthGuard>} />
 
 
 
