@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Container, TextField, Typography } from "@mui/material";
+import { Box, Container, TextField, Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import * as XLSX from "xlsx";
+
 import NoDataPopup from "../../../../Pages/NoDataPopup";
-import { resetFilters } from "./MDDFilters"; // Assuming resetFilters is the function to reset the filters
+import { resetFilters } from "./MDDFilters";
+
 interface ScreenerDataRow {
   id: number;
   pricing_date: string;
@@ -27,7 +30,6 @@ interface ScreenerDataRow {
   subscription_bid_shares: number;
   allocated_shares: number;
   fo_type: string;
-
 }
 
 const cleanDealSize = (dealSize: any): number => {
@@ -47,40 +49,48 @@ const preprocessRows = (rows: any[]) =>
     ...row,
     t1d_returns: row.t1d_returns ? `${row.t1d_returns.toFixed(2)}%` : "",
     t1m_returns: row.t1m_returns ? `${row.t1m_returns.toFixed(2)}%` : "",
-    percentage_primary: row.percentage_primary
-      ? `${row.percentage_primary.toFixed()}%`
-      : "",
+    percentage_primary: row.percentage_primary ? `${row.percentage_primary.toFixed()}%` : "",
     fo_discount: row.fo_discount ? `${row.fo_discount.toFixed(2)}%` : "",
-    t1m_return_from_bloomberg: row.t1m_return_from_bloomberg ? `${row.t1m_return_from_bloomberg.toFixed(2)}%` : "",
-    t1d_return_from_bloomberg: row.t1d_return_from_bloomberg ? `${row.t1d_return_from_bloomberg.toFixed(2)}%` : "",
-    discount_from_announcement_price: row.discount_from_announcement_price ? `${row.discount_from_announcement_price.toFixed(2)}%` : "",
+    t1m_return_from_bloomberg: row.t1m_return_from_bloomberg
+      ? `${row.t1m_return_from_bloomberg.toFixed(2)}%`
+      : "",
+    t1d_return_from_bloomberg: row.t1d_return_from_bloomberg
+      ? `${row.t1d_return_from_bloomberg.toFixed(2)}%`
+      : "",
+    discount_from_announcement_price: row.discount_from_announcement_price
+      ? `${row.discount_from_announcement_price.toFixed(2)}%`
+      : "",
     allocation_deal_size: row.allocation_deal_size ? `${row.allocation_deal_size.toFixed(2)}%` : "",
     allocation_ioi: row.allocation_ioi ? `${row.allocation_ioi.toFixed(2)}%` : "",
-    allocation_deal_size_percentage: row.allocation_deal_size_percentage && !isNaN(parseFloat(row.allocation_deal_size_percentage))
-      ? `${parseFloat(row.allocation_deal_size_percentage).toFixed(2)}%`
-      : "%",
+    allocation_deal_size_percentage:
+      row.allocation_deal_size_percentage && !isNaN(parseFloat(row.allocation_deal_size_percentage))
+        ? `${parseFloat(row.allocation_deal_size_percentage).toFixed(2)}%`
+        : "%",
     tplus_1d_issueprice: row.tplus_1d_issueprice ? `${row.tplus_1d_issueprice.toFixed(2)}%` : "",
   }));
 
 interface MDDScreenergridProps {
   sectorwiseData: { [key: string]: (string | number)[] };
-  handleCancel: () => void; // Accept handleCancel as a prop here
-
+  handleCancel: () => void;
 }
 
-
-const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handleCancel }) => {
+const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
+  sectorwiseData,
+  handleCancel,
+}) => {
   const [rows, setRows] = useState<ScreenerDataRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [openNoDataPopup, setOpenNoDataPopup] = useState<boolean>(false);
+
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (sectorwiseData) {
       fetchDataFromApi(sectorwiseData);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectorwiseData]);
 
   const fetchDataFromApi = async (data: MDDScreenergridProps["sectorwiseData"]) => {
@@ -95,15 +105,14 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handle
       selected_bank: data.selected_bank,
       year_range: data.years,
       fo_type: data.fo_type,
+      month: data.month,
     };
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
+      if (!apiUrl) throw new Error("API URL is not defined in environment variables");
 
       const response = await fetch(`${apiUrl}/api/mdd_screener/`, {
         method: "POST",
@@ -114,23 +123,22 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handle
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        const fetchedRows = result.data || [];
+      if (!response.ok) throw new Error("Failed to fetch data");
 
-        if (fetchedRows.length === 0) {
-          setOpenNoDataPopup(true);
-        } else {
-          setRows(
-            fetchedRows.map((item: ScreenerDataRow, index: number) => ({
-              ...item,
-              id: index + 1,
-              deal_size: formatDealSize(item.deal_size),
-            }))
-          );
-        }
+      const result = await response.json();
+      const fetchedRows = result.data || [];
+
+      if (fetchedRows.length === 0) {
+        setOpenNoDataPopup(true);
+        setRows([]);
       } else {
-        throw new Error("Failed to fetch data");
+        setRows(
+          fetchedRows.map((item: ScreenerDataRow, index: number) => ({
+            ...item,
+            id: index + 1,
+            deal_size: formatDealSize(item.deal_size) as any,
+          }))
+        );
       }
     } catch (err: any) {
       setError(err.message || "An error occurred while fetching data");
@@ -138,18 +146,18 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({ sectorwiseData,handle
       setLoading(false);
     }
   };
-const handleClosePopup = () => {
+
+  const handleClosePopup = () => {
     setOpenNoDataPopup(false);
-    resetFilters(handleCancel); // Reset filters when closing popup
+    resetFilters(handleCancel);
   };
+
   const formatPercentage = (value: number | null | undefined): string => {
-  if (value == null || isNaN(value)) return "";
-
-  const absVal = Math.abs(value);
-  if (absVal < 0.005) return "0.00%"; 
-
-  return `${value.toFixed(2)}%`;
-};
+    if (value == null || isNaN(value)) return "";
+    const absVal = Math.abs(value);
+    if (absVal < 0.005) return "0.00%";
+    return `${value.toFixed(2)}%`;
+  };
 
   const columns: GridColDef[] = [
     {
@@ -183,11 +191,7 @@ const handleClosePopup = () => {
     },
     { field: "issuer_name", headerName: "Issuer Name", width: 200 },
     { field: "pricing_date", headerName: "Pricing Date", width: 150 },
-    {
-      field: "gics_sector_from_bloomberg",
-      headerName: "Sector",
-      width: 180,
-    },
+    { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
     { field: "broad_region", headerName: "Region", width: 150 },
     { field: "deal_type", headerName: "Deal Type", width: 150 },
     {
@@ -209,14 +213,14 @@ const handleClosePopup = () => {
     },
     {
       field: "t1d_returns",
-      headerName: "T + 1D Return ",
+      headerName: "T + 1D Return",
       width: 220,
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-        {
+    {
       field: "am_return",
-      headerName: "AM Return ",
+      headerName: "AM Return",
       width: 220,
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
@@ -228,10 +232,13 @@ const handleClosePopup = () => {
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
-    { field: "allocation_ioi", headerName: "Allocation as % of IOI", width: 180, 
+    {
+      field: "allocation_ioi",
+      headerName: "Allocation as % of IOI",
+      width: 180,
       renderCell: (params) => formatPercentage(cleanDealSize(params.value)),
-
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2), },
+      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+    },
     {
       field: "average_hold_period",
       headerName: "Average Hold Period",
@@ -254,7 +261,9 @@ const handleClosePopup = () => {
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
     {
-      field: "percentage_primary", headerName: "Primary %", width: 100,
+      field: "percentage_primary",
+      headerName: "Primary %",
+      width: 100,
       renderCell: (params) => `${params.value}`,
       sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
     },
@@ -269,9 +278,8 @@ const handleClosePopup = () => {
         typeof row.ticker === "string"
           ? row.ticker
           : row.ticker != null
-            ? String(row.ticker)
-            : "";
-
+          ? String(row.ticker)
+          : "";
       return tickerValue.toLowerCase().includes(normalizedQuery);
     });
   }, [rows, normalizedQuery]);
@@ -279,18 +287,41 @@ const handleClosePopup = () => {
   const noSearchMatches =
     !loading && rows.length > 0 && normalizedQuery !== "" && filteredRows.length === 0;
 
+  // ✅ Export to Excel (exports filtered rows; change to preprocessRows(rows) if you want all rows always)
+  const exportToExcel = useCallback(() => {
+    const processed = filteredRows; // already processed rows with formatted strings
+
+    const exportData = processed.map((r: any) => {
+      const out: Record<string, any> = {};
+      columns.forEach((col) => {
+        const header = col.headerName || col.field;
+        out[header] = r[col.field];
+      });
+      return out;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "MDD Screener");
+
+    const fileName = `mdd_screener_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  }, [filteredRows]);
+
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
-      <NoDataPopup open={openNoDataPopup}   onClose={handleClosePopup}/>
+      <NoDataPopup open={openNoDataPopup} onClose={handleClosePopup} />
+
       {loading && <Typography>Loading...</Typography>}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       {rows.length > 0 && (
         <div style={{ height: 600, width: "100%" }}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography
               align="left"
               style={{
@@ -302,14 +333,26 @@ const handleClosePopup = () => {
               Total no of deals:{" "}
               <span style={{ color: "#004b33" }}>{filteredRows.length}</span>
             </Typography>
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Search Ticker"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ width: 300 }}
-            />
+
+            {/* ✅ Right controls: Search then Export */}
+            <Box display="flex" alignItems="center" gap={1}>
+              <TextField
+                variant="outlined"
+                size="small"
+                placeholder="Search Ticker"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{ width: 300 }}
+              />
+              <Button
+                variant="contained"
+                onClick={exportToExcel}
+                disabled={loading || filteredRows.length === 0}
+                sx={{ whiteSpace: "nowrap" }}
+              >
+                Export to Excel
+              </Button>
+            </Box>
           </Box>
 
           {noSearchMatches ? (
@@ -359,4 +402,3 @@ const handleClosePopup = () => {
 };
 
 export default MDDScreenergrid;
-
