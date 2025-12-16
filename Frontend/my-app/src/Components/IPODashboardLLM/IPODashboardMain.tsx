@@ -298,8 +298,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       await waitForDOMUpdate(500);
 
       const drawHeader = () => {
-        const logoWidth = 40; // mm
-        const logoHeight = 12; // mm
+        const logoWidth = 55; // mm
+        const logoHeight = 16.5; // mm
         const logoX = pdfWidth - logoWidth - 10;
         const logoY = 10;
         pdf.addImage(
@@ -479,8 +479,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       pdf.addPage();
       const marginX = 12;
       // Header
-      const headerLogoWidth = 40;
-      const headerLogoHeight = 12;
+      const headerLogoWidth = 55;
+      const headerLogoHeight = 16.5;
       const headerLogoX = pdfWidth - headerLogoWidth - 10;
       const headerLogoY = 10;
       const logoImgFinal = new Image();
@@ -548,8 +548,8 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
           drawFooter();
           pdf.addPage();
           // Recreate header and title for continuation
-          const headerLogoWidthC = 40;
-          const headerLogoHeightC = 12;
+          const headerLogoWidthC = 55;
+          const headerLogoHeightC = 16.5;
           const headerLogoXC = pdfWidth - headerLogoWidthC - 10;
           const headerLogoYC = 10;
           pdf.addImage(

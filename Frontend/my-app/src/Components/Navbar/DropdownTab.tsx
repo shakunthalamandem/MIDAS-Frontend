@@ -21,9 +21,15 @@ const DropdownTab: React.FC<DropdownTabProps> = ({ label, menuItems, selectedTab
     localStorage.setItem("selectedTab", label);
   };
 
+  const navigateAndRefresh = (path: string) => {
+    navigate(path);
+    // Force a full reload so the tab always pulls fresh data
+    setTimeout(() => window.location.reload(), 0);
+  };
+
   const handleMenuItemClick = (path: string) => {
     setAnchorEl(null);
-    navigate(path);
+    navigateAndRefresh(path);
   };
 
   const handleClose = () => {

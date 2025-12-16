@@ -150,6 +150,8 @@ const Login: React.FC = () => {
 
       const to = location.state?.from || "/";
       navigate(to, { replace: true });
+      // Reload the app after login so every page starts with fresh data
+      setTimeout(() => window.location.reload(), 0);
     } catch (err: any) {
       const message =
         err?.response?.data?.error ||

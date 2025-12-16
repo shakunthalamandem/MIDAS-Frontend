@@ -55,16 +55,22 @@ const NavbarMain: React.FC = () => {
     }
   }, [location.pathname]);
 
+  const navigateAndRefresh = (path: string) => {
+    navigate(path);
+    // Hard reload to prevent stale cached data when switching tabs
+    setTimeout(() => window.location.reload(), 0);
+  };
+
   const handleTabSelect = (tabName: string) => {
     setSelectedTab(tabName);
     localStorage.setItem("selectedTab", tabName);
 
     switch (tabName) {
       case "P&L Attribution":
-        navigate("/portfolio-attribution");
+        navigateAndRefresh("/portfolio-attribution");
         break;
       case "Data & Analytics":
-        navigate("/data-analytics/writeups");
+        navigateAndRefresh("/data-analytics/writeups");
         break;
       // case "New Deal Form":
       //   navigate("/deals/new_deal_form");
