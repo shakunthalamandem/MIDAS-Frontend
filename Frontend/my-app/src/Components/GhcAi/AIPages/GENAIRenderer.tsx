@@ -57,10 +57,15 @@ const GENAIRenderer: React.FC<{
   blocks: Block[];
   setQuestion?: (q: string) => void;
   handleSubmit?: () => void;
-}> = ({ blocks, setQuestion, handleSubmit }) => {
+  renderAll?: boolean;
+  disableMotion?: boolean;
+}> = ({ blocks, setQuestion, handleSubmit, renderAll = false, disableMotion = false }) => {
   const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);
 
   useEffect(() => {
+    setVisibleBlocks(renderAll ? blocks : []);
+    if (renderAll) return;
+
     let idx = 0;
     const interval = setInterval(() => {
       if (idx >= blocks.length) {
@@ -75,7 +80,7 @@ const GENAIRenderer: React.FC<{
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [blocks]);
+  }, [blocks, renderAll]);
 
   const sortedVisibleBlocks = [...visibleBlocks]
     .filter((block) => block.type !== "suggested_questions")
@@ -120,18 +125,24 @@ const GENAIRenderer: React.FC<{
                 key={idx}
                 sx={{ display: "flex", flexDirection: "column" }}
               >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: idx * 0.05,
-                    duration: 0.4,
-                    ease: "easeOut",
-                  }}
-                  style={{ flexGrow: 1, display: "flex" }}
-                >
-                  {Renderer(block, setQuestion, handleSubmit)}
-                </motion.div>
+                {disableMotion ? (
+                  <Box sx={{ flexGrow: 1, display: "flex" }}>
+                    {Renderer(block, setQuestion, handleSubmit)}
+                  </Box>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: idx * 0.05,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
+                    style={{ flexGrow: 1, display: "flex" }}
+                  >
+                    {Renderer(block, setQuestion, handleSubmit)}
+                  </motion.div>
+                )}
               </Grid>
             );
           })}

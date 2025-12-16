@@ -16,14 +16,16 @@ import SectorWiseDeals from "./NavigationTabs/SectorWiseDeals";
 import YearlySectorChart from "./YearlySectorChart";
 import RegionWiseChart from "./RegionWiseChart";
 import NoDataPopup from "../../../Pages/NoDataPopup";
+import MarketCapitalTable from "./MarketCapitalTable";
 
 interface MarketCapitalMainProps {
-  selectedFilters: Record<string, string | number | (string | number)[]>; 
+  selectedFilters: Record<string, string | number | (string | number)[]>;
   handleReset: () => void;
 }
 
 const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
-  selectedFilters,handleReset
+  selectedFilters,
+  handleReset,
 }) => {
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,7 +54,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
+            Authorization: token ? `Bearer ${token}` : "",
           },
           body: JSON.stringify(selectedFilters),
         });
@@ -81,7 +83,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
   }, [selectedFilters]);
   const handleClosePopup = () => {
     setNoDataPopupOpen(false); // Close the NoDataPopup
-    handleReset(); 
+    handleReset();
   };
 
   return (
@@ -167,9 +169,15 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
               />
             </CardContent>
           </Card>
+          <Box>
+            <MarketCapitalTable
+              selectedFilters={selectedFilters}
+              handleReset={handleReset}
+            />
+          </Box>
         </>
       )}
-     <NoDataPopup
+      <NoDataPopup
         open={noDataPopupOpen}
         onClose={handleClosePopup} // Close the popup and reset filters when the user clicks the close button
       />
