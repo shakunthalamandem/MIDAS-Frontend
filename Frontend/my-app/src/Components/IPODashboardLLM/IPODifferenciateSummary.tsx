@@ -294,6 +294,7 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                       color="primary"
                       onClick={handleSaveDealData}
                       disabled={saving}
+                      className="pdf-hidden"
                     >
                       {saving ? <CircularProgress size={20} /> : <SaveIcon />}
                     </IconButton>
@@ -301,12 +302,13 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                       color="secondary"
                       onClick={handleCancelEdit}
                       disabled={saving}
+                      className="pdf-hidden"
                     >
                       <CancelIcon />
                     </IconButton>
                   </>
                 ) : (
-                  <IconButton color="default" onClick={enterEditMode}>
+                  <IconButton color="default" onClick={enterEditMode} className="pdf-hidden">
                     <EditIcon />
                   </IconButton>
                 )}
