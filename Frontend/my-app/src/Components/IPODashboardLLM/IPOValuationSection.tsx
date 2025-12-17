@@ -198,7 +198,6 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
           background: "linear-gradient(#f0f5ff, #f0f5ff)",
           width: "100%",
           mx: "auto",
-          p: 3,
         }}
       >
         {/* Header */}
