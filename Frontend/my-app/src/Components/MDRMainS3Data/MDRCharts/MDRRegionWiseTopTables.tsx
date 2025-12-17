@@ -62,6 +62,7 @@ interface MetricSectionProps {
 }
 
 const FUND_OPTIONS = [
+  "All",
   "Mission Pure Alpha LP",
   "Monashee Pure Alpha SPV I LP",
   "BEMAP2",
@@ -396,7 +397,20 @@ const MDRRegionWiseTopTables: React.FC = () => {
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          flexWrap="wrap"
+          gap={2}
+          mb={2}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1b2a52" }}>
+            Portfolio Performance Overview for{" "}
+            <Box component="span" sx={{ color: "#0003c0ff" }}>
+              {selectedFund}
+            </Box>
+          </Typography>
           <FormControl size="small" sx={{ minWidth: 260 }}>
             <InputLabel id="fund-select-label">Fund</InputLabel>
             <Select
