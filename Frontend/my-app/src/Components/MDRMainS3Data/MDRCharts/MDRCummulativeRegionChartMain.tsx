@@ -110,6 +110,8 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFund])
 
+  const headingFundLabel = selectedFund === "All" ? "All Funds" : selectedFund
+
   const handleRegionChange = (event: SelectChangeEvent<string>) => {
     setSelectedFund(String(event.target.value || "All"))
   }
@@ -136,7 +138,7 @@ const MDRCummulativeRegionChartMain: React.FC = () => {
           >
             <Box flex={1} />
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }} align="center" flex={1}>
-              MDR Cumulative P&L by Region
+              {`MDR Cumulative P&L by Region for ${headingFundLabel}`}
             </Typography>
             <Box flex={1} display="flex" justifyContent="flex-end">
               <FormControl size="small" sx={{ minWidth: 160 }}>
