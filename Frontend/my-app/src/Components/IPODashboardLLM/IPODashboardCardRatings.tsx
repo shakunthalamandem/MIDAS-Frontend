@@ -254,7 +254,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
             borderRadius: 2,
             background: "#fff",
             boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
-            overflowX: "auto",
+            overflowX: "auto",ml:3,mr:3
           }}
         >
           <CardContent>

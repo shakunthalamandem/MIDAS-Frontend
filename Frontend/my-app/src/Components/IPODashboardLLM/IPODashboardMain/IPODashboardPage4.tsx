@@ -132,6 +132,8 @@ const IPODashboardPage4: React.FC<Props> = ({
   return (
     <div id="ipo-dashboard-page4">
       <Container maxWidth="xl" sx={{ mb: 4 }}>
+                <Card   elevation={0}
+         sx={{  mb: 3, mt: 3, ml: 3, mr: 3 }}>
         <Grid container spacing={3}>
           {/* Monashee Score */}
           <Grid item xs={12}>
@@ -340,6 +342,7 @@ const IPODashboardPage4: React.FC<Props> = ({
             </motion.div>
           </Grid>
         </Grid>
+        </Card>
       </Container>
     </div>
   );
