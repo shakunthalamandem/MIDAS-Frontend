@@ -385,6 +385,8 @@ const MDRRegionWiseTopTables: React.FC = () => {
     [daysHeld, topCumulativePnl, topPnl]
   )
 
+  const headingFundLabel = selectedFund === "All" ? "All Funds" : selectedFund
+
   return (
     <Container maxWidth='xl' sx={{ mb: 4,mt:4 }}>
     <Card
@@ -408,7 +410,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
           <Typography variant="h6" sx={{ fontWeight: 700, color: "#1b2a52" }}>
             Portfolio Performance Overview for{" "}
             <Box component="span" sx={{ color: "#0003c0ff" }}>
-              {selectedFund}
+              {headingFundLabel}
             </Box>
           </Typography>
           <FormControl size="small" sx={{ minWidth: 260 }}>
