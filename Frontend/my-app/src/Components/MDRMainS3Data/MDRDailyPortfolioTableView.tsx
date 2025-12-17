@@ -52,6 +52,11 @@ const formatPercent = (value: number | null | undefined) => {
   return `${formatted}%`;
 };
 
+const formatPercent1Digit = (value: number | null | undefined) => {
+  if (value === null || value === undefined || Number.isNaN(value)) return "-";
+  return `${Number(value).toFixed(1)}%`;
+};
+
 /* ========= Columns ========= */
 
 const columns: GridColDef[] = [
@@ -136,7 +141,7 @@ const columns: GridColDef[] = [
     minWidth: 80,
     align: "center",
     headerAlign: "left",
-    valueFormatter: (params) => formatPercent(params as number),
+    valueFormatter: (params) => formatPercent1Digit(params as number),
   },
   {
     field: "excessReturnPercent",
@@ -251,7 +256,7 @@ const pdfValueFormatters: Partial<
   currentShares: formatInteger,
   currentExposure: formatCurrencyInteger,
   maxPercent: formatPercent,
-  grossPercent: formatPercent,
+  grossPercent: formatPercent1Digit,
   excessReturnPercent: formatPercent,
   dtdPnl: formatCurrencyInteger,
   cumulativeGrossPnl: formatCurrencyInteger,
