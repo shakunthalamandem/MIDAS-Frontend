@@ -688,7 +688,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               </Container>
 
               <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 ,ml:3,mr:3}}>
                   <CardContent>
                     <IPOFinancialForecastTableMain
                       defaultTicker={currentTicker || ""}
