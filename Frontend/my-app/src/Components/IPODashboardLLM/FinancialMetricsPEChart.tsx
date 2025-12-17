@@ -93,7 +93,7 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
     <Container maxWidth={false} disableGutters>
       <Card
         elevation={2}
-        sx={{ backgroundColor: "#f0f3faff", borderRadius: 2, width: "100%" }}
+        sx={{ backgroundColor: "#eceff5ff", borderRadius: 2, width: "100%" }}
       >
         <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
           <Typography
