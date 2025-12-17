@@ -130,7 +130,6 @@ const SentimentAnalysis: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [completed, setCompleted] = useState(0);
   const [currentTicker, setCurrentTicker] = useState<string>("");
   const bootstrapped = useRef(false);
   const [started, setStarted] = useState(false);
@@ -228,8 +227,14 @@ const SentimentAnalysis: React.FC = () => {
 
   const progress = useMemo(() => {
     if (!items.length) return 0;
-    return Math.round((completed / items.length) * 100);
-  }, [completed, items.length]);
+    const completedCount = items.filter((item) => item.status === "completed").length;
+    return Math.round((completedCount / items.length) * 100);
+  }, [items]);
+
+  const completedCount = useMemo(
+    () => items.filter((item) => item.status === "completed").length,
+    [items]
+  );
 
   const updateStatus = useCallback((index: number, status: RunItem["status"], note?: string) => {
     setItems((prev) =>
@@ -245,7 +250,6 @@ const SentimentAnalysis: React.FC = () => {
       setStarted(true);
       setRunning(true);
       setError(null);
-      setCompleted(0);
 
       for (let i = 0; i < workQueue.length; i++) {
         const entry = workQueue[i];
@@ -266,7 +270,6 @@ const SentimentAnalysis: React.FC = () => {
           updateStatus(statusIndex, "failed", err.message);
           setError(`Failed for ${entry.ticker}: ${err.message}`);
         } finally {
-          setCompleted((prev) => prev + 1);
         }
       }
 
@@ -362,7 +365,7 @@ const SentimentAnalysis: React.FC = () => {
             <Box sx={{ mt: 3 }}>
               <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
               <Typography variant="caption" color="text.secondary">
-                {completed}/{items.length} completed
+                {completedCount}/{items.length} completed
               </Typography>
             </Box>
           </Paper>
@@ -406,6 +409,14 @@ const SentimentAnalysis: React.FC = () => {
                       label={item.status}
                     />
                     {item.status === "running" && <CircularProgress size={18} />}
+                    <Button
+                      size="small"
+                      variant="contained"
+                      disabled={running || loading || item.status === "running"}
+                      onClick={() => runAutomation([{ ...item }])}
+                    >
+                      {item.status === "completed" ? "Start Again" : item.status === "running" ? "Running..." : "Start"}
+                    </Button>
                   </Stack>
                 </Stack>
 
