@@ -262,6 +262,8 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/chat" element={<MattermostChat />} /> */}
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
 
+        <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
+
 
 
 
