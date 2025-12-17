@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import {
   Alert,
   Box,
@@ -6,7 +6,12 @@ import {
   CardContent,
   CircularProgress,
   Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -55,6 +60,17 @@ interface MetricSectionProps {
   primaryFormatter?: (value: number | null | undefined) => string
   secondaryFormatter?: (value: number | null | undefined) => string
 }
+
+const FUND_OPTIONS = [
+  "All",
+  "Mission Pure Alpha LP",
+  "Monashee Pure Alpha SPV I LP",
+  "BEMAP2",
+  "GEPT",
+  "BHM",
+  "FMAP",
+  "MPAM",
+]
 
 const formatNumber = (value: number | null | undefined) => {
   if (value === null || value === undefined || Number.isNaN(value)) return "-"
@@ -271,11 +287,11 @@ const MDRRegionWiseTopTables: React.FC = () => {
   const [topCumulativePnl, setTopCumulativePnl] = useState<MetricData>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedFund, setSelectedFund] = useState<string>(FUND_OPTIONS[0])
 
   const apiUrl = process.env.REACT_APP_API_URL ?? ""
-  const getToken = () => localStorage.getItem("access_token") || ""
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!apiUrl) {
       setError("API URL is not defined in environment variables")
       return
@@ -285,7 +301,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
       setLoading(true)
       setError(null)
 
-      const token = getToken()
+      const token = localStorage.getItem("access_token") || ""
       const response = await fetch(
         `${apiUrl}/api/mdr_top_performance_table/`,
         {
@@ -294,7 +310,7 @@ const MDRRegionWiseTopTables: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({ fund: selectedFund }),
         }
       )
 
@@ -325,12 +341,11 @@ const MDRRegionWiseTopTables: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [apiUrl, selectedFund])
 
   useEffect(() => {
     fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fetchData])
 
   type Section = {
     key: string
@@ -370,6 +385,8 @@ const MDRRegionWiseTopTables: React.FC = () => {
     [daysHeld, topCumulativePnl, topPnl]
   )
 
+  const headingFundLabel = selectedFund === "All" ? "All Funds" : selectedFund
+
   return (
     <Container maxWidth='xl' sx={{ mb: 4,mt:4 }}>
     <Card
@@ -382,6 +399,39 @@ const MDRRegionWiseTopTables: React.FC = () => {
       }}
     >
       <CardContent sx={{ p: 3 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          flexWrap="wrap"
+          gap={2}
+          mb={2}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1b2a52" }}>
+            Portfolio Performance Overview for{" "}
+            <Box component="span" sx={{ color: "#0003c0ff" }}>
+              {headingFundLabel}
+            </Box>
+          </Typography>
+          <FormControl size="small" sx={{ minWidth: 260 }}>
+            <InputLabel id="fund-select-label">Fund</InputLabel>
+            <Select
+              labelId="fund-select-label"
+              id="fund-select"
+              value={selectedFund}
+              label="Fund"
+              onChange={(event: SelectChangeEvent<string>) =>
+                setSelectedFund(event.target.value)
+              }
+            >
+              {FUND_OPTIONS.map((fund) => (
+                <MenuItem key={fund} value={fund}>
+                  {fund}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         {loading && (
           <Box display="flex" justifyContent="center" py={4}>
