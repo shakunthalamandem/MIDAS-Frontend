@@ -10,21 +10,13 @@ import {
   TextField,
   Button,
   IconButton,
-  CardHeader,
   CircularProgress,
   Tooltip,
 } from "@mui/material";
 import { FaChartLine } from "react-icons/fa";
-import IPOFinancialTableMain from "../IPOFinancialTableMain";
-import { cardStyle } from "../UtilsIPODashboard";
 import { motion } from "framer-motion";
 import IPOMonasheeScore from "../IPOMonasheeScore";
 import { Edit, InfoOutlined } from "@mui/icons-material";
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import LooksOneIcon from "@mui/icons-material/LooksOne";
-import LooksTwoIcon from "@mui/icons-material/LooksTwo";
-import Looks3Icon from "@mui/icons-material/Looks3";
-import IPOFinancialForecastTableMain from "../IPOFinancialForecast/IPOFinancialForecastTableMain";
 
 interface Props {
   selectedTicker: string;
@@ -141,18 +133,8 @@ const IPODashboardPage4: React.FC<Props> = ({
     <div id="ipo-dashboard-page4">
       <Container maxWidth="xl" sx={{ mb: 4 }}>
         <Grid container spacing={3}>
-          {/* Financial Forecast */}
-          <Grid item xs={12}>
-            <Card sx={{ ...cardStyle, backgroundColor: "#f9fafc" }}>
-              <CardContent>
-                {/* <IPOFinancialTableMain defaultTicker={selectedTicker} /> */}
-                <IPOFinancialForecastTableMain defaultTicker={selectedTicker} />
-              </CardContent>
-            </Card>
-          </Grid>
-
           {/* Monashee Score */}
-          <Grid item xs={12} className="pdf-hidden">
+          <Grid item xs={12}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

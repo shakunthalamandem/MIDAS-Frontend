@@ -254,8 +254,10 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
 
       {/* DIFFERENTIATED SUMMARY */}
       <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
-        <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-          <CardContent sx={{ backgroundColor: "#fff" }}>
+        <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 , background: "linear-gradient(#f0f5ff, #f0f5ff)",
+}} >
+          <CardContent sx={{                            background: "linear-gradient(#f0f5ff, #f0f5ff)",
+ }}>
             {/* Header row */}
             <Box
               display="flex"
@@ -271,6 +273,7 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                   transform: "translateX(-50%)",
                   display: "flex",
                   alignItems: "center",
+
                 }}
               >
                 <FaClipboardList
@@ -294,6 +297,7 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                       color="primary"
                       onClick={handleSaveDealData}
                       disabled={saving}
+                      className="pdf-hidden"
                     >
                       {saving ? <CircularProgress size={20} /> : <SaveIcon />}
                     </IconButton>
@@ -301,12 +305,13 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                       color="secondary"
                       onClick={handleCancelEdit}
                       disabled={saving}
+                      className="pdf-hidden"
                     >
                       <CancelIcon />
                     </IconButton>
                   </>
                 ) : (
-                  <IconButton color="default" onClick={enterEditMode}>
+                  <IconButton color="default" onClick={enterEditMode} className="pdf-hidden">
                     <EditIcon />
                   </IconButton>
                 )}

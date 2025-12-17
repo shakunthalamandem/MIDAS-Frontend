@@ -90,9 +90,12 @@ const FinancialMetricsPEchart: React.FC<Props> = ({ data, loading, error }) => {
   }, [data, monthKeys]);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Card elevation={2} sx={{ backgroundColor: "#FFFFFF", borderRadius: 2 }}>
-        <CardContent sx={{ p: 3 }}>
+    <Container maxWidth={false} disableGutters>
+      <Card
+        elevation={2}
+        sx={{ backgroundColor: "#eceff5ff", borderRadius: 2, width: "100%" }}
+      >
+        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
           <Typography
             variant="h6"
             gutterBottom
