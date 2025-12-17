@@ -254,7 +254,6 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
             background: "linear-gradient(#f0f5ff, #f0f5ff)",
             width: "100%",
             mx: "auto",
-            p: 3,
           }}
         >
           <Box
@@ -262,6 +261,9 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
             alignItems="center"
             mb={2}
             sx={{ position: "relative" }}
+            p={2}
+    
+            
           >
             <Typography
               variant="h6"
@@ -325,7 +327,9 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
                 color: "#333",
                 whiteSpace: "pre-line",
                 mt: 2,
+                p: 2,
               }}
+              align="center"
             >
               {dealData.internal_notes || "No internal notes provided."}
             </Typography>
