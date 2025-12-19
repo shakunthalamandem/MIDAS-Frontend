@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Button } from "@mui/material";
 import FormSwitcher from "./FormSwitcher";
 import FOForm from "./FOForm";
 import IPOForm from "./IPOForm";
@@ -165,6 +165,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const [ipoFormKey, setIpoFormKey] = useState(0);
   const formRef = useRef<HTMLDivElement>(null);
   const [sentiment, setSentiment] = useState("");
+  const [sentimentPdfUrl, setSentimentPdfUrl] = useState("");
 
   const [refreshKey, setRefreshKey] = useState(0);
   const bumpRecentRefresh = () => setRefreshKey((k) => k + 1);
@@ -173,6 +174,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
 
   const handleTypeChange = (type: "IPO" | "FO") => {
     setSelectedType(type);
+    setSentimentPdfUrl("");
   };
 
   // ---- When a recent card is clicked: prefill + scroll to form ----
@@ -334,24 +336,61 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
       setIpoFormKey((k) => k + 1); // remount IPO form to clear old internal state
     }
     setSentiment(item.sentiment)
+    setSentimentPdfUrl((item.sentiment_pdf || "").trim());
 
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const sentimentPdfHref = (sentimentPdfUrl || "").trim();
+  const hasSentimentPdf = Boolean(sentimentPdfHref);
 
   return (
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: { xs: "column", sm: "row" },
           alignItems: "center",
+          justifyContent: "center",
+          gap: 1.5,
           mb: 2,
+          flexWrap: "wrap",
         }}
       >
         <FormSwitcher
           selectedType={selectedType}
           onChangeType={handleTypeChange}
         />
+
+        {hasSentimentPdf && (
+          <Button
+            component="a"
+            href={sentimentPdfHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              textTransform: "none",
+              fontWeight: 800,
+              borderRadius: 999,
+              px: 3,
+              py: 1.05,
+              color: "#fff",
+              backgroundImage:
+                "linear-gradient(135deg, #1f3b8f 0%, #3a6cf6 45%, #2fb5d2 100%)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
+              border: "1px solid rgba(255,255,255,0.22)",
+              position: "relative",
+              top: "-2px",
+              "&:hover": {
+                backgroundImage:
+                  "linear-gradient(135deg, #1c347f 0%, #325fda 45%, #2a9eb7 100%)",
+                boxShadow: "0 6px 14px rgba(0,0,0,0.22)",
+              },
+            }}
+          >
+            Click Here for Sentiment Analysis
+          </Button>
+        )}
       </Box>
 
       <Grid container spacing={2} alignItems="flex-start">
