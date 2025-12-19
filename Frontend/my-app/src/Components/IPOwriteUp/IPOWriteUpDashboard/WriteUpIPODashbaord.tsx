@@ -198,7 +198,7 @@ const WriteUpIPODashbaord: React.FC = () => {
         </Typography>
       </Box>
 
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Box
           sx={{
             backgroundColor: "#f9f9f9",
