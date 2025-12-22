@@ -23,6 +23,7 @@ import {
   TextField,
   InputAdornment,
   MenuItem,            // ⬅️ add this
+  TableSortLabel
 
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -48,6 +49,7 @@ interface IpoData {
 }
 
 type FilterType = "upcoming" | "all";
+type Order = "asc" | "desc";
 
 const WriteUpIPODashbaord: React.FC = () => {
   const { ticker: paramTicker } = useParams<{ ticker: string }>();
@@ -74,6 +76,8 @@ const WriteUpIPODashbaord: React.FC = () => {
     });
     return Array.from(set).sort();
   }, [ipoData]);
+  const [orderBy, setOrderBy] = useState<keyof IpoData>("sector");
+  const [order, setOrder] = useState<Order>("asc");
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -126,6 +130,13 @@ const WriteUpIPODashbaord: React.FC = () => {
     }
   }, [paramTicker]);
 
+  const handleSort = (property: keyof IpoData) => {
+  const isAsc = orderBy === property && order === "asc";
+  setOrder(isAsc ? "desc" : "asc");
+  setOrderBy(property);
+};
+
+
   // Filter by ticker or company name
   const filteredData = useMemo(() => {
     let data = ipoData;
@@ -145,6 +156,53 @@ const WriteUpIPODashbaord: React.FC = () => {
         (row.company_name || "").toLowerCase().includes(q)
     );
   }, [ipoData, searchQuery, regionFilter]);
+
+  const sortedData = useMemo(() => {
+  return [...filteredData].sort((a, b) => {
+    const valA = a[orderBy];
+    const valB = b[orderBy];
+
+    const isEmptyA =
+      valA === null || valA === "" || valA === "To Be Announced";
+    const isEmptyB =
+      valB === null || valB === "" || valB === "To Be Announced";
+
+    // Both empty
+    if (isEmptyA && isEmptyB) return 0;
+
+    // ASC: numbers/dates up, strings/TBA down
+    if (order === "asc") {
+      if (isEmptyA) return 1;
+      if (isEmptyB) return -1;
+    }
+
+    // DESC: strings/TBA up, numbers/dates down
+    if (order === "desc") {
+      if (isEmptyA) return -1;
+      if (isEmptyB) return 1;
+    }
+
+    // 🔢 Number comparison
+    if (typeof valA === "number" && typeof valB === "number") {
+      return order === "asc" ? valA - valB : valB - valA;
+    }
+
+    // 📅 Date comparison (valid date strings only)
+    const dateA = typeof valA === "string" ? Date.parse(valA) : NaN;
+    const dateB = typeof valB === "string" ? Date.parse(valB) : NaN;
+
+    if (!isNaN(dateA) && !isNaN(dateB)) {
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    }
+
+    // 🔤 String comparison (fallback)
+    return order === "asc"
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA));
+  });
+}, [filteredData, order, orderBy]);
+
+
 
   const headerTitle =
     filterType === "all"
@@ -341,18 +399,21 @@ const WriteUpIPODashbaord: React.FC = () => {
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#0b2a6b" }}>
                     {[
-                      "Symbol",
-                      "Company",
-                      "Pricing Date",
-                      "Sector",
-                      "Price Range",
-                      "Exchange",
-                      "Deal Size",
-                    ].map((heading) => (
-                      <TableCell
-                        key={heading}
-                        align="center"
-                        sx={{
+                      { label: "Symbol", key: "ticker" },
+                      { label: "Company", key: "company_name" },
+                      { label: "Pricing Date", key: "pricing_date" },
+                      { label: "Sector", key: "sector" },
+                      { label: "Price Range", key: "pricing_range_max" }, // not sortable
+                      { label: "Exchange", key: "exchange" },
+                      { label: "Deal Size", key: "deal_size" },
+                    ].map((h) => {
+                        const key = h.key as keyof IpoData | undefined;
+
+                      return (
+                        <TableCell
+                          key={h.label}
+                          align="center"
+                          sx={{
                           color: "#fff",
                           fontWeight: 700,
                           fontSize: "0.8rem",
@@ -363,14 +424,32 @@ const WriteUpIPODashbaord: React.FC = () => {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {heading}
-                      </TableCell>
-                    ))}
+                    {key ? (
+                      <TableSortLabel
+                        active={orderBy === key}
+                        direction={orderBy === key ? order : "asc"}
+                        onClick={() => handleSort(key)}
+                      sx={{
+                        color: "#fff !important",
+                          "& .MuiTableSortLabel-icon": {
+                              color: "#fff !important",
+                            },
+                          }}
+                        >
+                        {h.label}
+                  </TableSortLabel>
+                  ) : (
+                  h.label
+                  )}
+                </TableCell>
+              );
+                })}
+
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                {filteredData.map((row, index) => {
+                {sortedData.map((row, index) => {
                   const selected = isRowSelected(row.ticker);
                   const rowDisabled =
                     dashboardLocked && row.ticker !== selectedTicker;
