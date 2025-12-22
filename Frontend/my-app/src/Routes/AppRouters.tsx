@@ -85,6 +85,8 @@ import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
 import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
 import MidasChatbotMain from "../Components/WebsiteChatBot/MidasChatbotMain";
 import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
+import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
+import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
 
 const AppRouters: React.FC = () => {
   return (
@@ -263,6 +265,10 @@ const AppRouters: React.FC = () => {
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
 
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
+        <Route path="/fewshot_analysis" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
+       <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+
+
 
 
 
