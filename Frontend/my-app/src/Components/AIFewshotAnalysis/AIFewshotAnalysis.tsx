@@ -39,69 +39,6 @@ const getAuthHeaders = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const SelectedTickerDetails: React.FC<{ ticker: TickerItem | null }> = ({ ticker }) => (
-  <Card elevation={3} sx={{ borderRadius: 3 }}>
-    <CardHeader
-      title={
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          Selected ticker details
-        </Typography>
-      }
-      subheader={
-        <Typography variant="body2" color="text.secondary">
-          Click a row above to preview the ticker details.
-        </Typography>
-      }
-      sx={{ pb: 0 }}
-    />
-    <CardContent>
-      {ticker ? (
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" }, gap: 2 }}>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Ticker
-            </Typography>
-            <Typography sx={{ fontWeight: 700 }}>{ticker.ticker}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Pricing Date
-            </Typography>
-            <Typography>{formatPricingDate(ticker.pricing_date)}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Deal Colour Present
-            </Typography>
-            <Typography>{ticker.deal_colour_present || "N/A"}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Deal Captain
-            </Typography>
-            <Typography>{ticker.deal_captain || "N/A"}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Deal Type
-            </Typography>
-            <Typography>{ticker.deal_type || "N/A"}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Allocation (% of deal size)
-            </Typography>
-            <Typography>{formatAllocation(ticker.allocation_as_percentage_of_deal_size)}</Typography>
-          </Box>
-        </Box>
-      ) : (
-        <Typography variant="body2" color="text.secondary">
-          No ticker selected yet.
-        </Typography>
-      )}
-    </CardContent>
-  </Card>
-);
 
 const AIFewshotAnalysis: React.FC = () => {
   const API_URL = process.env.REACT_APP_API_URL;
@@ -303,24 +240,10 @@ const AIFewshotAnalysis: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Box sx={{ mt: 3 }}>
-          <SelectedTickerDetails ticker={selectedTicker} />
-        </Box>
 
         <Box sx={{ mt: 3 }}>
           <Card elevation={3} sx={{ borderRadius: 3 }}>
-            <CardHeader
-              title={
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  AI review
-                </Typography>
-              }
-              subheader={
-                <Typography variant="body2" color="text.secondary">
-                  Clicking a ticker above will load the few-shot review from the API.
-                </Typography>
-              }
-            />
+
             <CardContent>
               <AiAnalysis ticker={selectedTicker?.ticker ?? null} />
             </CardContent>
