@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { DataGrid, type GridColDef, type GridRowParams } from "@mui/x-data-grid";
+import AiAnalysis from "./AiAnalysis";
 
 type ApiState = "idle" | "loading" | "success" | "error";
 
@@ -304,6 +305,26 @@ const AIFewshotAnalysis: React.FC = () => {
 
         <Box sx={{ mt: 3 }}>
           <SelectedTickerDetails ticker={selectedTicker} />
+        </Box>
+
+        <Box sx={{ mt: 3 }}>
+          <Card elevation={3} sx={{ borderRadius: 3 }}>
+            <CardHeader
+              title={
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  AI review
+                </Typography>
+              }
+              subheader={
+                <Typography variant="body2" color="text.secondary">
+                  Clicking a ticker above will load the few-shot review from the API.
+                </Typography>
+              }
+            />
+            <CardContent>
+              <AiAnalysis ticker={selectedTicker?.ticker ?? null} />
+            </CardContent>
+          </Card>
         </Box>
       </Box>
     </Box>
