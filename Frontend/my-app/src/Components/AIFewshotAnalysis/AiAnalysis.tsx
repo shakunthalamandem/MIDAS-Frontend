@@ -1,4 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
+import InsightsIcon from "@mui/icons-material/Insights";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ExecutiveSummaryCard from "./AiAnalysisParts/ExecutiveSummaryCard";
 import OutlookSummaryRow from "./AiAnalysisParts/OutlookSummaryRow";
 import ScenarioCards from "./AiAnalysisParts/ScenarioCards";
@@ -50,7 +62,7 @@ const DEFAULT_OUTLOOK: FinalOutlook = {
   confidence: "-",
 };
 
-const textToBullets = (text?: string): string[] => {
+const bulletize = (text?: string): string[] => {
   if (!text) return [];
   const bulletRegex = /^(?:-|\u2022)\s*/;
   return text
@@ -102,13 +114,49 @@ const parseScenarioParts = (text?: string): ScenarioParts => {
 
   if (base || bullish || bearish) return { base, bullish, bearish };
 
-  const lines = textToBullets(text);
+  const lines = bulletize(text);
   return {
     base: lines[0],
     bullish: lines[1],
     bearish: lines[2],
   };
 };
+
+const SectionCard: React.FC<{ title?: string; subheader?: string; children: React.ReactNode }> = ({
+  title,
+  subheader,
+  children,
+}) => (
+  <Card
+    elevation={6}
+    sx={{
+      borderRadius: 3,
+      boxShadow: "0 14px 36px rgba(0,0,0,0.08)",
+      border: "1px solid #e5e7eb",
+      background: "#ffffff",
+    }}
+  >
+    {(title || subheader) && (
+      <CardHeader
+        title={
+          title ? (
+            <Typography variant="h6" sx={{ fontWeight: 800, color: "#1f2937" }}>
+              {title}
+            </Typography>
+          ) : undefined
+        }
+        subheader={
+          subheader ? (
+            <Typography variant="body2" sx={{ color: "#6b7280" }}>
+              {subheader}
+            </Typography>
+          ) : undefined
+        }
+      />
+    )}
+    <CardContent sx={{ pt: title || subheader ? 0 : 2 }}>{children}</CardContent>
+  </Card>
+);
 
 const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
@@ -173,71 +221,89 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
       (analysis?.["Expectation vs Reality ƒ? Predictive Version"] as string),
     [analysis]
   );
-  const fundamentalProfile = analysis?.["Fundamental Profile of the New IPO"] as string | undefined;
-  const riskAssessment = analysis?.["Early Risk Materialization Assessment"] as string | undefined;
 
   if (!ticker) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 text-slate-700">
-        Select a ticker above to view the AI few-shot review.
-      </div>
+      <SectionCard>
+        <Typography color="text.secondary">Select a ticker above to view the AI few-shot review.</Typography>
+      </SectionCard>
     );
   }
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 text-slate-700">
-        Loading AI analysis...
-      </div>
+      <SectionCard>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <CircularProgress size={18} />
+          <Typography color="text.secondary">Loading AI analysis...</Typography>
+        </Box>
+      </SectionCard>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-800">
-        <div className="flex items-center gap-2 font-semibold">
+      <SectionCard>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#b42318" }}>
           <AlertTriangle className="h-5 w-5" />
-          <span>{error}</span>
-        </div>
-      </div>
+          <Typography>{error}</Typography>
+        </Box>
+      </SectionCard>
     );
   }
 
   if (!analysis) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 text-slate-700">
-        AI analysis will be available soon.
-      </div>
+      <SectionCard>
+        <Typography color="text.secondary">AI analysis will be available soon.</Typography>
+      </SectionCard>
     );
   }
 
   return (
-    <div className="space-y-10">
-      <ExecutiveSummaryCard companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
+    <Stack spacing={2}>
+      <SectionCard
+        title={`${ticker} Sentiment Analysis`}
+        subheader="Auto-generated few-shot review based on latest deal data."
+      >
+        <ExecutiveSummaryCard companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
+      </SectionCard>
 
-      <OutlookSummaryRow
-        week={outlook.week}
-        month={outlook.month}
-        volatility={outlook.volatility}
-        confidence={outlook.confidence}
-      />
+      <SectionCard title="Outlook Summary">
+        <OutlookSummaryRow
+          week={outlook.week}
+          month={outlook.month}
+          volatility={outlook.volatility}
+          confidence={outlook.confidence}
+        />
+      </SectionCard>
 
-      <ScenarioCards base={scenarios.base} bullish={scenarios.bullish} bearish={scenarios.bearish} />
+      <SectionCard title="Scenario Analysis">
+        <ScenarioCards base={scenarios.base} bullish={scenarios.bullish} bearish={scenarios.bearish} />
+      </SectionCard>
 
-      {/* <div className="grid gap-4 md:grid-cols-2">
-        <FundamentalProfile text={fundamentalProfile} />
-        <RiskAssessment text={riskAssessment} />
-      </div> */}
+      {/* <SectionCard title="Profile & Risks">
+        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
+          <FundamentalProfile text={analysis["Fundamental Profile of the New IPO"] as string | undefined} />
+          <RiskAssessment text={analysis["Early Risk Materialization Assessment"] as string | undefined} />
+        </Box>
+      </SectionCard> */}
 
-      <OutlookDetailCards
-        weekDetail={analysis["Expected 1-Week Sentiment"] as string | undefined}
-        monthDetail={analysis["Expected 1-Month Sentiment"] as string | undefined}
-      />
+      <SectionCard title="Sentiment Details">
+        <OutlookDetailCards
+          weekDetail={analysis["Expected 1-Week Sentiment"] as string | undefined}
+          monthDetail={analysis["Expected 1-Month Sentiment"] as string | undefined}
+        />
+      </SectionCard>
 
-      <AnalogicalAssessment text={analysis["Case-Based Analogical Assessment"] as string | undefined} />
+      <SectionCard title="Analogical Assessment">
+        <AnalogicalAssessment text={analysis["Case-Based Analogical Assessment"] as string | undefined} />
+      </SectionCard>
 
-      <ExpectationReality text={expectationText} />
-    </div>
+      <SectionCard title="Expectation vs Reality">
+        <ExpectationReality text={expectationText} />
+      </SectionCard>
+    </Stack>
   );
 };
 
