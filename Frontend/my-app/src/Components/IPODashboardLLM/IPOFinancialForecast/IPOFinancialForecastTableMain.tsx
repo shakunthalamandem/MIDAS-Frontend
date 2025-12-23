@@ -407,10 +407,12 @@ const IPOFinancialForecastTableMain: React.FC<
             ticker={forecastsTicker}
           />
         )}
-<Box display="flex" alignItems="center" justifyContent="center" mt={2}>
-  <InfoIcon sx={{ mr: 1 }} />
-  <Typography>Above values are in local currency</Typography>
-</Box>
+      {forecastsTicker.toUpperCase() !== "MINIMAX" && (
+        <Box display="flex" alignItems="center" justifyContent="center" mt={2}>
+          <InfoIcon sx={{ mr: 1 }} />
+          <Typography>Above values are in local currency</Typography>
+        </Box>
+      )}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
