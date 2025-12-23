@@ -112,6 +112,26 @@ const AIFewshotAnalysis: React.FC = () => {
   );
 
   return (
+    <>
+           <Typography
+        variant="body2"
+        sx={{
+          fontWeight: 500,
+          color: "#FFFFFF",
+          fontSize: { xs: "1rem", sm: "1.2rem" },
+          backgroundColor: "#002060",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "4vh",
+          padding: "8px 16px",
+          borderRadius: "8px",
+          textAlign: "center",
+          marginBottom: "20px",
+        }}
+      >
+        Welcome to 📊 AI FewShot Analysis
+      </Typography>
     <Box
       sx={{
         minHeight: "100vh",
@@ -121,6 +141,7 @@ const AIFewshotAnalysis: React.FC = () => {
           "radial-gradient(circle at 10% 20%, rgba(230,240,255,0.65), transparent 35%), radial-gradient(circle at 90% 10%, rgba(255,230,240,0.6), transparent 30%), linear-gradient(180deg, #f7f9fc 0%, #ffffff 45%, #f7f9fc 100%)",
       }}
     >
+
       <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, sm: 3, lg: 4 } }}>
         <Box
           sx={{
@@ -273,6 +294,7 @@ const AIFewshotAnalysis: React.FC = () => {
         </Box>
       </Box>
     </Box>
+    </>
   );
 };
 
