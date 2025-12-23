@@ -40,6 +40,7 @@ const monasheeUploadConfigs = [
   { key: "market_indices", label: "Market Indices", apiEndpoint: "upload_market_index", buttonColor: "success" },
   { key: "DailyNoteUpload", label: "Daily Note Upload", apiEndpoint: "daily_note_deals_upload", buttonColor: "success" },
   { key: "risk_reward_upload", label: "Risk Reward Upload", apiEndpoint: "risk_reward_upload", buttonColor: "success" },
+  { key: "risk_reward_upload", label: "Risk Reward Upload", apiEndpoint: "risk_reward_upload", buttonColor: "success" },
 ];
 
 const MainUpload: React.FC = () => {
