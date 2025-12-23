@@ -134,7 +134,7 @@ const AIFewshotAnalysis: React.FC = () => {
           <CardHeader
             title={
               <Box sx={{ position: "relative", width: "100%" }}>
-  <Typography
+  {/* <Typography
   variant="h6"
   sx={{
     fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
@@ -142,7 +142,7 @@ const AIFewshotAnalysis: React.FC = () => {
   }}
 >
   Few-shot AI Analysis
-</Typography>
+</Typography> */}
 
 </Box>
 
