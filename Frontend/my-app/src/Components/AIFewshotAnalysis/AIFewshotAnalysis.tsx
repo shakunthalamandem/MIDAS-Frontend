@@ -1,21 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
+  Autocomplete,
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
   CircularProgress,
+  TextField,
   Typography,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { DataGrid, type GridColDef, type GridRowParams } from "@mui/x-data-grid";
 import AiAnalysis from "./AiAnalysis";
 
 type ApiState = "idle" | "loading" | "success" | "error";
 
 type TickerItem = {
+  id?: string;
   ticker: string;
   pricing_date?: string | null;
   deal_colour_present?: string;
@@ -27,11 +27,6 @@ type TickerItem = {
 const formatPricingDate = (dateStr?: string | null) => {
   if (!dateStr) return "N/A";
   return dateStr;
-};
-
-const formatAllocation = (value?: number) => {
-  if (value === null || value === undefined) return "N/A";
-  return `${value.toFixed(2)}%`;
 };
 
 const getAuthHeaders = (): Record<string, string> => {
@@ -46,7 +41,7 @@ const AIFewshotAnalysis: React.FC = () => {
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [status, setStatus] = useState<ApiState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | number | null>(null);
+  const [selectedTicker, setSelectedTicker] = useState<TickerItem | null>(null);
 
   const loadTickers = async () => {
     setStatus("loading");
@@ -71,13 +66,21 @@ const AIFewshotAnalysis: React.FC = () => {
 
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;
-
+      
       if (!res.ok) {
         throw new Error(data?.error || data?.detail || "Failed to load tickers");
       }
 
       const items = Array.isArray(data?.tickers) ? (data.tickers as TickerItem[]) : [];
       setTickers(items);
+      setSelectedTicker((prev) => {
+        if (!prev) return prev;
+        return (
+          items.find(
+            (t) => t.ticker === prev.ticker && (t.pricing_date ?? "") === (prev.pricing_date ?? "")
+          ) || null
+        );
+      });
       setStatus("success");
     } catch (error: any) {
       console.error("Error fetching tickers:", error);
@@ -99,46 +102,13 @@ const AIFewshotAnalysis: React.FC = () => {
   const isLoading = status === "loading";
   const hasError = status === "error";
 
-  const rows = useMemo(
+  const options = useMemo(
     () =>
       tickers.map((item, idx) => ({
         id: `${item.ticker}-${item.pricing_date ?? idx}`,
         ...item,
       })),
     [tickers]
-  );
-
-  const columns = useMemo<GridColDef[]>(
-    () => [
-      { field: "ticker", headerName: "Ticker", flex: 1, minWidth: 140 },
-      {
-        field: "pricing_date",
-        headerName: "Pricing Date",
-        flex: 1,
-        minWidth: 140,
-        valueFormatter: (params) => formatPricingDate(params as string | null),
-      },
-      { field: "deal_colour_present", headerName: "Deal Colour Present", flex: 1, minWidth: 170 },
-      { field: "deal_captain", headerName: "Deal Captain", flex: 1, minWidth: 140 },
-      { field: "deal_type", headerName: "Deal Type", flex: 1, minWidth: 120 },
-      {
-        field: "allocation_as_percentage_of_deal_size",
-        headerName: "Allocation (% of deal size)",
-        flex: 1,
-        minWidth: 210,
-        valueFormatter: (params) => formatAllocation(params as number | undefined),
-      },
-    ],
-    []
-  );
-
-  const handleRowClick = (params: GridRowParams) => {
-    setSelectedId(params.id);
-  };
-
-  const selectedTicker = useMemo(
-    () => rows.find((row) => row.id === selectedId) ?? null,
-    [rows, selectedId]
   );
 
   return (
@@ -148,21 +118,34 @@ const AIFewshotAnalysis: React.FC = () => {
         py: 6,
         mt: 5,
         background:
-          "linear-gradient(180deg, rgba(248,250,252,1) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,1) 100%)",
+          "radial-gradient(circle at 10% 20%, rgba(230,240,255,0.65), transparent 35%), radial-gradient(circle at 90% 10%, rgba(255,230,240,0.6), transparent 30%), linear-gradient(180deg, #f7f9fc 0%, #ffffff 45%, #f7f9fc 100%)",
       }}
     >
       <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, sm: 3, lg: 4 } }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            mb: 4,
+            p: { xs: 2, sm: 3 },
+            borderRadius: 4,
+            backdropFilter: "blur(6px)",
+            background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(230,238,255,0.85))",
+            boxShadow: "0 16px 50px rgba(90,125,255,0.18)",
+            border: "1px solid rgba(161, 177, 255, 0.35)",
+          }}
+        >
           <Box
             sx={{
-              height: 44,
-              width: 44,
-              borderRadius: 2,
+              height: 52,
+              width: 52,
+              borderRadius: 3,
               display: "grid",
               placeItems: "center",
-              bgcolor: "primary.main",
-              color: "primary.contrastText",
-              opacity: 0.9,
+              bgcolor: "rgba(244, 67, 54, 0.15)",
+              color: "#c62828",
+              boxShadow: "0 12px 30px rgba(244, 67, 54, 0.15)",
             }}
           >
             <Typography variant="h6" sx={{ fontWeight: 800, color: "inherit" }}>
@@ -175,75 +158,114 @@ const AIFewshotAnalysis: React.FC = () => {
               Few-shot AI Analysis
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1.1 }}>
-              Ticker list
+              Search tickers
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Live data pulled from the unified deal data API, rendered in a table.
+              Pick a ticker to view its few-shot AI sentiment review.
             </Typography>
           </Box>
         </Box>
 
-        <Card elevation={6} sx={{ borderRadius: 3 }}>
+        <Card
+          elevation={0}
+          sx={{
+            borderRadius: 4,
+            border: "1px solid rgba(161, 177, 255, 0.35)",
+            boxShadow: "0 20px 55px rgba(43,71,255,0.12)",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,248,255,0.95))",
+          }}
+        >
           <CardHeader
             title={
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  Available tickers
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                  Search & select ticker
                 </Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={isLoading ? <CircularProgress size={16} /> : <RefreshIcon />}
-                  onClick={loadTickers}
-                  disabled={isLoading}
-                  sx={{ borderRadius: 999 }}
-                >
-                  Refresh
-                </Button>
               </Box>
             }
             sx={{ pb: 0 }}
           />
 
-          <CardContent>
+          <CardContent sx={{ pt: 1, pb: 3 }}>
             {hasError && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {errorMessage}
               </Alert>
             )}
 
-            <Box sx={{ height: 520, width: "100%", mt: 1 }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                loading={isLoading}
-                checkboxSelection={false}
-                onRowClick={handleRowClick}
-                rowHeight={35}
-                disableRowSelectionOnClick
-                getRowClassName={(params) => (selectedId === params.id ? "Mui-selected" : "")}
-                sx={{
-                  "& .MuiDataGrid-container--top [role='row']": {
-                    backgroundColor: "#002060",
-                    color: "#FFFFFF",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#cad0f1ff !important",
-                  },
-                  "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
-                    color: "#FFFFFF",
-                  },
-                  cursor: "pointer",
-                  border: "1px solid #ccccccff",
-                }}
-              />
-            </Box>
+            <Autocomplete
+              options={options}
+              loading={isLoading}
+              value={selectedTicker}
+              onChange={(_, value) => setSelectedTicker(value)}
+              getOptionLabel={(option) =>
+                option.pricing_date ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}` : option.ticker
+              }
+              isOptionEqualToValue={(opt, val) =>
+                opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+              }
+              renderOption={(props, option) => (
+                <li {...props} key={option.id}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography sx={{ fontWeight: 900, color: "#b71c1c" }}>{option.ticker}</Typography>
+                    <Typography variant="caption" sx={{ color: "#6b7280" }}>
+                      {formatPricingDate(option.pricing_date)}
+                    </Typography>
+                  </Box>
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search ticker"
+                  placeholder={isLoading ? "Loading tickers..." : "Type to search..."}
+                  fullWidth
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoading ? <CircularProgress color="inherit" size={18} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2.5,
+                      background: "rgba(255,255,255,0.9)",
+                      transition: "all 180ms ease",
+                      "&:hover": { boxShadow: "0 8px 24px rgba(59,130,246,0.16)" },
+                    },
+                  }}
+                />
+              )}
+              sx={{ mt: 1.5 }}
+            />
           </CardContent>
         </Card>
 
-
         <Box sx={{ mt: 3 }}>
-          <Card elevation={3} sx={{ borderRadius: 3 }}>
-
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 4,
+              boxShadow: "0 26px 60px rgba(57,99,255,0.18)",
+              background: "linear-gradient(145deg, rgba(255,255,255,0.94), rgba(240,245,255,0.92))",
+              border: "1px solid rgba(130, 143, 255, 0.35)",
+            }}
+          >
+            <CardHeader
+              title={
+                <Typography variant="h6" sx={{ fontWeight: 900, color: "#1f2937" }}>
+                  AI Sentiment Review
+                </Typography>
+              }
+              subheader={
+                <Typography variant="body2" color="text.secondary">
+                  Select a ticker above to load its sentiment analysis.
+                </Typography>
+              }
+            />
             <CardContent>
               <AiAnalysis ticker={selectedTicker?.ticker ?? null} />
             </CardContent>
