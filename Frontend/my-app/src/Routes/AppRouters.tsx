@@ -265,7 +265,7 @@ const AppRouters: React.FC = () => {
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
 
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
-        <Route path="/fewshot_analysis" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
+        <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
 
 
