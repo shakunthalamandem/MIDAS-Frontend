@@ -9,6 +9,7 @@ import {
   Paper,
   IconButton,
   Box,
+  Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -47,7 +48,21 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
   const orderedMetrics = getOrderedMetricList(data);
 
   return (
-    <TableContainer component={Paper} elevation={4}>
+    <>
+<Box sx={{ position: "relative" }}>
+  <Typography
+    sx={{
+      position: "absolute",
+      top: -20,
+      right: 0,
+      fontSize: "0.8rem",
+      color: "grey.600",
+      fontStyle: "italic",
+    }}
+  >
+    (Values are in Millions)
+  </Typography> 
+  <TableContainer component={Paper} elevation={4}>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -161,6 +176,9 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
 
       </Table>
     </TableContainer>
+    </Box>
+
+    </>
   );
 };
 
