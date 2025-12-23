@@ -143,50 +143,6 @@ const AIFewshotAnalysis: React.FC = () => {
     >
 
       <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, sm: 3, lg: 4 } }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            mb: 4,
-            p: { xs: 2, sm: 3 },
-            borderRadius: 4,
-            backdropFilter: "blur(6px)",
-            background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(230,238,255,0.85))",
-            boxShadow: "0 16px 50px rgba(90,125,255,0.18)",
-            border: "1px solid rgba(161, 177, 255, 0.35)",
-          }}
-        >
-          <Box
-            sx={{
-              height: 52,
-              width: 52,
-              borderRadius: 3,
-              display: "grid",
-              placeItems: "center",
-              bgcolor: "rgba(244, 67, 54, 0.15)",
-              color: "#c62828",
-              boxShadow: "0 12px 30px rgba(244, 67, 54, 0.15)",
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 800, color: "inherit" }}>
-              AI
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="overline" sx={{ color: "primary.main", fontWeight: 600, letterSpacing: 1 }}>
-              Few-shot AI Analysis
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1.1 }}>
-              Search tickers
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Pick a ticker to view its few-shot AI sentiment review.
-            </Typography>
-          </Box>
-        </Box>
-
         <Card
           elevation={0}
           sx={{
@@ -198,71 +154,86 @@ const AIFewshotAnalysis: React.FC = () => {
         >
           <CardHeader
             title={
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                  Search & select ticker
-                </Typography>
-              </Box>
+              <Box sx={{ position: "relative", width: "100%" }}>
+  {/* <Typography
+  variant="h6"
+  sx={{
+    fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+    fontWeight: 800,
+  }}
+>
+  Few-shot AI Analysis
+</Typography> */}
+
+</Box>
+
             }
             sx={{ pb: 0 }}
           />
 
           <CardContent sx={{ pt: 1, pb: 3 }}>
-            {hasError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {errorMessage}
-              </Alert>
-            )}
+  {hasError && (
+    <Alert severity="error" sx={{ mb: 2 }}>
+      {errorMessage}
+    </Alert>
+  )}
 
-            <Autocomplete
-              options={options}
-              loading={isLoading}
-              value={selectedTicker}
-              onChange={(_, value) => setSelectedTicker(value)}
-              getOptionLabel={(option) =>
-                option.pricing_date ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}` : option.ticker
-              }
-              isOptionEqualToValue={(opt, val) =>
-                opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
-              }
-              renderOption={(props, option) => (
-                <li {...props} key={option.id}>
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Typography sx={{ fontWeight: 900, color: "#b71c1c" }}>{option.ticker}</Typography>
-                    <Typography variant="caption" sx={{ color: "#6b7280" }}>
-                      {formatPricingDate(option.pricing_date)}
-                    </Typography>
-                  </Box>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search ticker"
-                  placeholder={isLoading ? "Loading tickers..." : "Type to search..."}
-                  fullWidth
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoading ? <CircularProgress color="inherit" size={18} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2.5,
-                      background: "rgba(255,255,255,0.9)",
-                      transition: "all 180ms ease",
-                      "&:hover": { boxShadow: "0 8px 24px rgba(59,130,246,0.16)" },
-                    },
-                  }}
-                />
-              )}
-              sx={{ mt: 1.5 }}
-            />
-          </CardContent>
+  <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1.5 }}>
+    <Autocomplete
+      options={options}
+      loading={isLoading}
+      value={selectedTicker}
+      onChange={(_, value) => setSelectedTicker(value)}
+      getOptionLabel={(option) =>
+        option.pricing_date ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}` : option.ticker
+      }
+      isOptionEqualToValue={(opt, val) =>
+        opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+      }
+      renderOption={(props, option) => (
+        <li {...props} key={option.id}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography sx={{ fontWeight: 900, color: "#b71c1c" }}>{option.ticker}</Typography>
+            <Typography variant="caption" sx={{ color: "#6b7280" }}>
+              {formatPricingDate(option.pricing_date)}
+            </Typography>
+          </Box>
+        </li>
+      )}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Search ticker"
+          placeholder={isLoading ? "Loading tickers..." : "Type to search..."}
+          fullWidth
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {isLoading ? <CircularProgress color="inherit" size={18} /> : null}
+                {params.InputProps.endAdornment}
+              </>
+            ),
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2.5,
+              background: "rgba(255,255,255,0.9)",
+              transition: "all 180ms ease",
+              "&:hover": { boxShadow: "0 8px 24px rgba(59,130,246,0.16)" },
+            },
+          }}
+        />
+      )}
+      sx={{
+        mt: 0,
+        width: { xs: "100%", sm: 340 }, // short width on desktop
+        maxWidth: "100%",
+      }}
+    />
+  </Box>
+</CardContent>
+
         </Card>
 
         <Box sx={{ mt: 3 }}>
@@ -275,7 +246,7 @@ const AIFewshotAnalysis: React.FC = () => {
               border: "1px solid rgba(130, 143, 255, 0.35)",
             }}
           >
-            <CardHeader
+            {/* <CardHeader
               title={
                 <Typography variant="h6" sx={{ fontWeight: 900, color: "#1f2937" }}>
                   AI Sentiment Review
@@ -286,7 +257,7 @@ const AIFewshotAnalysis: React.FC = () => {
                   Select a ticker above to load its sentiment analysis.
                 </Typography>
               }
-            />
+            /> */}
             <CardContent>
               <AiAnalysis ticker={selectedTicker?.ticker ?? null} />
             </CardContent>
