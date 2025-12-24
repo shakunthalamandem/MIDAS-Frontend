@@ -262,7 +262,7 @@ const AIFewshotAnalysis: React.FC = () => {
               }
             /> */}
             <CardContent>
-              <AiAnalysis ticker={selectedTicker?.ticker ?? null} />
+              <AiAnalysis ticker={selectedTicker?.ticker ?? null} pricingDate={selectedTicker?.pricing_date ?? null} />
             </CardContent>
           </Card>
         </Box>
