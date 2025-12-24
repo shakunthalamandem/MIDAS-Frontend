@@ -31,7 +31,7 @@ type AiAnalysisRecord = {
   "Expected 1-Month Sentiment"?: string;
   "Scenario Analysis"?: string;
   "Early Risk Materialization Assessment"?: string;
-  "Expectation vs Reality - Predictive Version"?: string;
+  "Expectation vs Reality — Predictive Version"?: string;
   "Expectation vs Reality ƒ? Predictive Version"?: string;
   "Final Sentiment & Volatility Outlook"?: string | Record<string, string>;
 };
@@ -530,7 +530,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
   const expectationText = useMemo(
     () =>
       stripMarkdown(
-        (analysis?.["Expectation vs Reality - Predictive Version"] as string) ??
+        (analysis?.["Expectation vs Reality — Predictive Version"] as string) ??
           (analysis?.["Expectation vs Reality ƒ? Predictive Version"] as string)
       ),
     [analysis]
