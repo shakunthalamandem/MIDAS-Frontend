@@ -82,18 +82,18 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
           },
         }}
       >
-<CardHeader
-  titleTypographyProps={{
-    variant: "h6",
-    sx: { color: palette.titleColor },
-  }}
-  subheaderTypographyProps={{
-    sx: { color: palette.subtitleColor },
-  }}
-  title={title}
-  subheader={subtitle}
-  sx={{ pb: 0 }}
-/>
+        <CardHeader
+          titleTypographyProps={{
+            variant: "h6",
+            sx: { color: palette.titleColor, display: "flex", alignItems: "center", gap: 0.5 },
+          }}
+          subheaderTypographyProps={{
+            sx: { color: palette.subtitleColor, display: "flex", alignItems: "center", gap: 0.5 },
+          }}
+          title={<ReactMarkdown>{title || ""}</ReactMarkdown>}
+          subheader={subtitle ? <ReactMarkdown>{subtitle}</ReactMarkdown> : undefined}
+          sx={{ pb: 0 }}
+        />
 
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography
