@@ -156,6 +156,7 @@ const FewShotAnalysisUpload: React.FC = () => {
 
     const formData = new FormData();
     formData.append("ticker", selectedTicker.ticker);
+    formData.append("pricing_date", selectedTicker.pricing_date ?? "");
     formData.append("pre_listing_file", file);
 
     setSubmitState("loading");

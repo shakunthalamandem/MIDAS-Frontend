@@ -60,6 +60,10 @@ const FooterMain: React.FC = () => {
     fetchVersionInfo();
   }, [navigate]);
 
+  const handleFewshotNavigation = () => {
+    navigate('/fewshot_analysis_upload');
+  };
+
   // Function to format the date to "Month Day, Year" format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -111,7 +115,18 @@ const FooterMain: React.FC = () => {
             color: '#FFFFFF',
           }}
         >
-          © {currentYear} MIDAS, Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
+          © {currentYear}{' '}
+          <Box
+            component="span"
+            onClick={handleFewshotNavigation}
+            sx={{
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            MIDAS
+          </Box>
+          , Developed in Collaboration with Golden Hills Capital India Pvt Ltd.
         </Typography>
         <img
           src={logo}

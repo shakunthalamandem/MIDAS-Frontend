@@ -4,8 +4,6 @@ export function formatFinancialValue(value: number | string): string {
   const num = Number(value);
   if (isNaN(num)) return String(value);
 
-  // NM condition
-  if (num < -100) return "NM";
 
   const rounded = Math.round(num);
   const absValue = Math.abs(rounded).toLocaleString("en-US");

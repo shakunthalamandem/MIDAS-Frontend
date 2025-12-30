@@ -20,6 +20,7 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 
 type AiAnalysisProps = {
   ticker: string | null;
+  pricingDate?: string | null;
 };
 
 type AiAnalysisRecord = {
@@ -30,7 +31,7 @@ type AiAnalysisRecord = {
   "Expected 1-Month Sentiment"?: string;
   "Scenario Analysis"?: string;
   "Early Risk Materialization Assessment"?: string;
-  "Expectation vs Reality - Predictive Version"?: string;
+  "Expectation vs Reality — Predictive Version"?: string;
   "Expectation vs Reality ƒ? Predictive Version"?: string;
   "Final Sentiment & Volatility Outlook"?: string | Record<string, string>;
 };
@@ -460,7 +461,7 @@ const DetailBigCard: React.FC<{
   );
 };
 
-const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
+const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null);
   const [loading, setLoading] = useState(false);
@@ -490,7 +491,10 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
         const res = await fetch(`${API_URL}/api/get_few_shot_review/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticker }),
+          body: JSON.stringify({
+            ticker,
+            pricing_date: pricingDate ?? null,
+          }),
         });
         if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
         const json = (await res.json()) as AiAnalysisApiResponse;
@@ -512,7 +516,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
     return () => {
       cancelled = true;
     };
-  }, [API_URL, ticker]);
+  }, [API_URL, ticker, pricingDate]);
 
   const outlook = useMemo(() => parseFinalOutlook(analysis || undefined), [analysis]);
   const scenarios = useMemo(
@@ -526,7 +530,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker }) => {
   const expectationText = useMemo(
     () =>
       stripMarkdown(
-        (analysis?.["Expectation vs Reality - Predictive Version"] as string) ??
+        (analysis?.["Expectation vs Reality — Predictive Version"] as string) ??
           (analysis?.["Expectation vs Reality ƒ? Predictive Version"] as string)
       ),
     [analysis]
