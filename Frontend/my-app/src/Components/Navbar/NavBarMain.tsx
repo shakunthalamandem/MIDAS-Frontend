@@ -206,12 +206,11 @@ const NavbarMain: React.FC = () => {
               label="New Issue Deals "
               menuItems={[
                 { label: "Dashboard", path: "/deals/dashboard" },
-                { label: "DealTracking", path: "/deals/deal_Tracking" },
+                // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
                 { label: "FO Write-Up", path: "/equity/fo_dashboard" },
                 { label: "New Deal Form", path: "/deals/new_deal_form" },
-                { label: "AI-ML Model", path: "/equity/ai_ml_models" },
-                { label: "ABB Model", path: "/equity/abb_model" },
+                // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -224,10 +223,11 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_models",
                 },
                 { label: "AI-ML Result Dashboard", path: "/equity/ai_ml_results" },
-                { label: "AI FewShot Analysis", path: "/ai_fewshot_analysis" },
-                { label: "Gen AI Tool", path: "/gen_ai_tool" },
-                { label: "Portfolio Sentiment ", path: "/genai_data_set" },
-                { label: "Portfolio  News", path: "/macro/news-summary" },
+                // { label: "AI FewShot Analysis", path: "/ai_fewshot_analysis" },
+                { label: "ABB Model", path: "/equity/abb_model" },
+                // { label: "Gen AI Tool", path: "/gen_ai_tool" },
+                // { label: "Portfolio Sentiment ", path: "/genai_data_set" },
+                // { label: "Portfolio  News", path: "/macro/news-summary" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
