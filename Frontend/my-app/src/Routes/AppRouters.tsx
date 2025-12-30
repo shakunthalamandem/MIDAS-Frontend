@@ -77,6 +77,7 @@ import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiP
 import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
+import ExcelUploads from "../Components/UpcomingDeals/ExcelUploads";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
@@ -177,6 +178,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} /> */}
         <Route path="/fs_upload" element={<AuthGuard><UploadFactSetTickers /></AuthGuard>} />
         <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+        <Route path="/upcoming" element={<AuthGuard><ExcelUploads /></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route
           element={
