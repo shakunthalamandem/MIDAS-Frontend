@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Typography,
-  CircularProgress,
-  Grid,
-} from "@mui/material";
+import { Container, Typography, CircularProgress, Grid } from "@mui/material";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
@@ -12,16 +7,16 @@ import DealColorInfo from "./DealsCyclesSections/DealColorInfo";
 import DealWriteUpInfo from "./DealsCyclesSections/DealWriteUpInfo";
 import DealIoiValuesTable from "./DealsCyclesSections/DealIoiValuesTable";
 import DealInfoContainer from "./DealInfoContainer";
-
-
+import ExpectedPipelineDealsTable from "../../UpcomingPipelineDeals/ExpectedPipelineDealsTable";
 
 const NewDealsUpcomingRecent: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState("Upcoming Deals");
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
+  const [showPipeline, setShowPipeline] = useState(false);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
 
   const fetchData = async (operation: string) => {
     setLoading(true);
@@ -40,16 +35,27 @@ const token = localStorage.getItem("access_token");
         ...item,
       }));
       setRows(formattedRows);
-      setSelectedDeal(null); // clear old selection on filter change
+      setSelectedDeal(null);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData(selectedOp);
   }, [selectedOp]);
+
+  const handleTogglePipeline = () => {
+    setShowPipeline((prev) => !prev);
+    setSelectedDeal(null);
+  };
+
+  const handleOpChange = (value: string) => {
+    setShowPipeline(false);
+    setSelectedOp(value);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
@@ -63,41 +69,46 @@ const token = localStorage.getItem("access_token");
         New Deals - Upcoming & Recent
       </Typography>
 
-      <DealsFilters selectedOp={selectedOp} onChange={setSelectedOp} />
+      <DealsFilters
+        selectedOp={selectedOp}
+        onChange={handleOpChange}
+        onTogglePipeline={handleTogglePipeline}
+        showPipeline={showPipeline}
+      />
 
-      {loading ? (
+      {showPipeline ? (
+        <ExpectedPipelineDealsTable />
+      ) : loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
       ) : (
-  <DealsTable
-  rows={rows}
-  loading={loading}
-  onRowSelect={(row) => setSelectedDeal(row)}
-  selectedOp={selectedOp}   // ✅ add this
-/>
-
+        <DealsTable
+          rows={rows}
+          loading={loading}
+          onRowSelect={(row) => setSelectedDeal(row)}
+          selectedOp={selectedOp}
+        />
       )}
 
-      {selectedDeal && (
-        <><Grid container spacing={2} mt={2}>
-          <Grid item xs={12} md={4}>
-            <DealColorInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <DealWriteUpInfo data={selectedDeal} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <AIMLModelPredictionInfo data={selectedDeal} />
+      {!showPipeline && selectedDeal && (
+        <>
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={12} md={4}>
+              <DealColorInfo data={selectedDeal} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <DealWriteUpInfo data={selectedDeal} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <AIMLModelPredictionInfo data={selectedDeal} />
+            </Grid>
           </Grid>
 
-        </Grid>
-        
           <Grid item xs={12} md={4} mb={4}>
             <DealIoiValuesTable data={selectedDeal} />
             {/* <DealUnifiedSummaryTableDashboard data={selectedDeal} /> */}
-<DealInfoContainer selectedDeal={selectedDeal} />
+            <DealInfoContainer selectedDeal={selectedDeal} />
           </Grid>
-
-  </>
+        </>
       )}
     </Container>
   );

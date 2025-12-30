@@ -77,7 +77,7 @@ import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiP
 import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
-import ExcelUploads from "../Components/UpcomingDeals/ExcelUploads";
+import ExcelUploads from "../Components/UpcomingPipelineDeals/ExcelUploads";
 import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
