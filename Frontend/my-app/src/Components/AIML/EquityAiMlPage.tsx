@@ -179,7 +179,7 @@ const EquityAiMlPage: React.FC = () => {
     <Container maxWidth={false} disableGutters>
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Box sx={{ width: { xs: "96%", sm: "90%", md: "80%" } }}>
-          <Box
+          {/* <Box
             sx={{
               fontWeight: 500,
               color: "#FFFFFF",
@@ -194,7 +194,7 @@ const EquityAiMlPage: React.FC = () => {
           >
             Welcome to the Prediction and AI Dashboard. Use the global ticker search once and jump across
             ML, Few-shot, and Sentiment views without re-entering details.
-          </Box>
+          </Box> */}
 
           <Card sx={{ borderRadius: 2, boxShadow: 4, p: { xs: 2, md: 3 } }}>
             <Stack spacing={2}>
