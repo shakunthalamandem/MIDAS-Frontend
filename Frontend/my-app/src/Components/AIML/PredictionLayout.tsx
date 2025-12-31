@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Grid, Typography, Button } from "@mui/material";
 import FormSwitcher from "./FormSwitcher";
 import FOForm from "./FOForm";
@@ -153,9 +153,13 @@ interface OptionsData {
 
 interface PredictionLayoutProps {
   options: OptionsData;
+  prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
 }
 
-const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
+const PredictionLayout: React.FC<PredictionLayoutProps> = ({
+  options,
+  prefillTicker,
+}) => {
   const [selectedType, setSelectedType] = useState<"IPO" | "FO">("FO");
   const [foValues, setFoValues] = useState({ ...defaultFOValues });
   const [ipoValues, setIpoValues] = useState({ ...defaultIPOValues });
@@ -171,6 +175,13 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({ options }) => {
   const bumpRecentRefresh = () => setRefreshKey((k) => k + 1);
 
   const sentimentBlocks = useMemo(() => parseSentimentBlocks(sentiment), [sentiment]);
+
+  useEffect(() => {
+    if (!prefillTicker?.ticker) return;
+    const trimmedTicker = prefillTicker.ticker.trim();
+    setFoValues((prev) => ({ ...prev, ticker: trimmedTicker }));
+    setIpoValues((prev) => ({ ...prev, ticker: trimmedTicker }));
+  }, [prefillTicker]);
 
   const handleTypeChange = (type: "IPO" | "FO") => {
     setSelectedType(type);

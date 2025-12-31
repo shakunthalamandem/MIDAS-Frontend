@@ -34,7 +34,13 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 
-const AIFewshotAnalysis: React.FC = () => {
+interface AIFewshotAnalysisProps {
+  prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
+}
+
+const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
+  prefillTicker,
+}) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
@@ -109,6 +115,18 @@ const AIFewshotAnalysis: React.FC = () => {
       })),
     [tickers]
   );
+
+  useEffect(() => {
+    if (!prefillTicker?.ticker || !options.length) return;
+    const match = options.find(
+      (opt) =>
+        opt.ticker === prefillTicker.ticker &&
+        (opt.pricing_date ?? "") === (prefillTicker.pricing_date ?? "")
+    );
+    if (match) {
+      setSelectedTicker(match);
+    }
+  }, [prefillTicker, options]);
 
   return (
     <>

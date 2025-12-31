@@ -35,6 +35,10 @@ type RenderedPdf = {
   filename: string;
 };
 
+interface SentimentAnalysisProps {
+  focusTicker?: string | null;
+}
+
 //   const apiUrl = process.env.REACT_APP_API_URL;
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -125,7 +129,7 @@ const postSentimentPdf = async (ticker: string, unique_deal_id: string, sentimen
   return data;
 };
 
-const SentimentAnalysis: React.FC = () => {
+const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) => {
   const [items, setItems] = useState<RunItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
@@ -139,6 +143,15 @@ const SentimentAnalysis: React.FC = () => {
   const wait = (ms = 200) => new Promise<void>((resolve) => setTimeout(resolve, ms));
   const waitForPaint = () =>
     new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+  const normalizeTicker = (val?: string | null) => (val || "").replace(/\s+/g, "").toUpperCase();
+  const matchesFocusTicker = (ticker: string) =>
+    !focusTicker || normalizeTicker(ticker) === normalizeTicker(focusTicker);
+
+  const visibleItems = useMemo(
+    () => items.filter((item) => matchesFocusTicker(item.ticker)),
+    [items, focusTicker]
+  );
 
   const renderBlocksToPdf = useCallback(async (blocks: Block[], filename?: string): Promise<RenderedPdf> => {
     setPdfBlocks(blocks);
@@ -226,14 +239,14 @@ const SentimentAnalysis: React.FC = () => {
   }, []);
 
   const progress = useMemo(() => {
-    if (!items.length) return 0;
-    const completedCount = items.filter((item) => item.status === "completed").length;
-    return Math.round((completedCount / items.length) * 100);
-  }, [items]);
+    if (!visibleItems.length) return 0;
+    const completedCount = visibleItems.filter((item) => item.status === "completed").length;
+    return Math.round((completedCount / visibleItems.length) * 100);
+  }, [visibleItems]);
 
   const completedCount = useMemo(
-    () => items.filter((item) => item.status === "completed").length,
-    [items]
+    () => visibleItems.filter((item) => item.status === "completed").length,
+    [visibleItems]
   );
 
   const updateStatus = useCallback((index: number, status: RunItem["status"], note?: string) => {
@@ -244,7 +257,7 @@ const SentimentAnalysis: React.FC = () => {
 
   const runAutomation = useCallback(
     async (queue?: RunItem[]) => {
-      const workQueue = queue ?? items;
+      const workQueue = queue ?? visibleItems;
       if (!workQueue.length) return;
 
       setStarted(true);
@@ -276,7 +289,7 @@ const SentimentAnalysis: React.FC = () => {
       setRunning(false);
       setCurrentTicker("");
     },
-    [items, renderBlocksToPdf, updateStatus]
+    [items, renderBlocksToPdf, updateStatus, visibleItems]
   );
 
   useEffect(() => {
@@ -305,7 +318,7 @@ const SentimentAnalysis: React.FC = () => {
   }, []);
 
   const retryFailed = () => {
-    const failed = items.filter((item) => item.status === "failed");
+    const failed = visibleItems.filter((item) => item.status === "failed");
     if (!failed.length) return;
     const resetQueue = failed.map((item) => ({ ...item, status: "pending" as const }));
     setItems((prev) =>
@@ -328,7 +341,7 @@ const SentimentAnalysis: React.FC = () => {
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
               <Box>
                 <Typography variant="subtitle1" fontWeight={600}>
-                  {loading ? "Loading IPOs..." : `Ready with ${items.length} IPOs`}
+                  {loading ? "Loading IPOs..." : `Ready with ${visibleItems.length} IPOs`}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {running
@@ -340,21 +353,21 @@ const SentimentAnalysis: React.FC = () => {
               <Stack direction="row" spacing={1}>
                 <Button
                   variant="contained"
-                  disabled={loading || running || !items.length}
-                  onClick={() => runAutomation(items)}
+                  disabled={loading || running || !visibleItems.length}
+                  onClick={() => runAutomation(visibleItems)}
                 >
                   {started ? "Start Again" : "Start"}
                 </Button>
                 <Button
                   variant="contained"
-                  disabled={loading || running || !items.length}
+                  disabled={loading || running || !visibleItems.length}
                   onClick={() => runAutomation()}
                 >
                   {running ? "Running..." : "Run Again"}
                 </Button>
                 <Button
                   variant="outlined"
-                  disabled={running || loading || !items.some((i) => i.status === "failed")}
+                  disabled={running || loading || !visibleItems.some((i) => i.status === "failed")}
                   onClick={retryFailed}
                 >
                   Retry Failed
@@ -365,13 +378,13 @@ const SentimentAnalysis: React.FC = () => {
             <Box sx={{ mt: 3 }}>
               <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
               <Typography variant="caption" color="text.secondary">
-                {completedCount}/{items.length} completed
+                {completedCount}/{visibleItems.length} completed
               </Typography>
             </Box>
           </Paper>
 
           <Stack spacing={2}>
-            {items.map((item, idx) => (
+            {visibleItems.map((item, idx) => (
               <Paper
                 key={`${item.ticker}-${item.unique_deal_id || idx}`}
                 variant="outlined"
