@@ -330,11 +330,11 @@ const NavbarMain: React.FC = () => {
                   path: "/opportunity/equity",
                   icon: <ShowChartOutlinedIcon fontSize="small" />,
                 },
-                {
-                  label: "Past IPOs & FOs",
-                  path: "/opportunity/pastdeals",
-                  icon: <HistoryEduOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Past IPOs & FOs",
+                //   path: "/opportunity/pastdeals",
+                //   icon: <HistoryEduOutlinedIcon fontSize="small" />,
+                // },
                 {
                   label: "Monashee Daily Report",
                   path: "/opportunity/monashee_daily_report",
