@@ -289,7 +289,7 @@ const EquityAiMlPage: React.FC = () => {
                   aria-controls="ai-ml-tabpanel-2"
                   label={
                     <TabLabel
-                      primary="Sentiment Analysis (PDF)"
+                      primary="Sentiment Analysis"
                       secondary="AI View (Outside Sentiment)"
                     />
                   }
