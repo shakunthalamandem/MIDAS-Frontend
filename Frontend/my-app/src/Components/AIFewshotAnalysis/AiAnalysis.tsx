@@ -62,10 +62,18 @@ const DEFAULT_OUTLOOK: FinalOutlook = {
   confidence: "-",
 };
 
-const stripMarkdown = (input?: string): string => {
+const stripMarkdown = (input?: unknown): string => {
   if (!input) return "";
+  const safe = typeof input === "string" ? input : (() => {
+    try {
+      return String(input);
+    } catch {
+      return "";
+    }
+  })();
+
   return (
-    input
+    safe
       .replace(/\*\*(.*?)\*\*/g, "$1")
       .replace(/\*(.*?)\*/g, "$1")
       .replace(/__([^_]+)__/g, "$1")
@@ -124,16 +132,17 @@ const parseFinalOutlook = (record?: AiAnalysisRecord): FinalOutlook => {
   };
 };
 
-const parseScenarioParts = (text?: string): ScenarioParts => {
-  if (!text) return {};
-  const cleaned = stripMarkdown(text);
+const parseScenarioParts = (text?: unknown): ScenarioParts => {
+  const raw = typeof text === "string" ? text : "";
+  if (!raw) return {};
+  const cleaned = stripMarkdown(raw);
 
   const grab = (label: string) => {
     const regex = new RegExp(
       `-\\s*\\*\\*${label}[^*]*\\*\\*:\\s*([\\s\\S]*?)(?=\\n-\\s*\\*\\*|$)`,
       "i"
     );
-    const match = text.match(regex);
+    const match = raw.match(regex);
     return match ? stripMarkdown(match[1].trim()) : undefined;
   };
 
