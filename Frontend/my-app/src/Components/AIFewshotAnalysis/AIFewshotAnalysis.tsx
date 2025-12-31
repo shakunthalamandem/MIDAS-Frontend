@@ -130,7 +130,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
 
   return (
     <>
-           <Typography
+           {/* <Typography
         variant="body2"
         sx={{
           fontWeight: 500,
@@ -148,7 +148,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
         }}
       >
         Welcome to 📊 AI FewShot Analysis
-      </Typography>
+      </Typography> */}
     <Box
       sx={{
         minHeight: "100vh",

@@ -22,11 +22,11 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: 2,
+        p: { xs: 1, md: 1.5 },
         borderRadius: 3,
-        border: "1px solid rgba(0,32,96,0.12)",
-        backgroundColor: "#f7f9ff",
-        boxShadow: "none",
+        border: "1px solid rgba(0,32,96,0.08)",
+        backgroundColor: "#f4f7fb",
+        boxShadow: "0 6px 16px rgba(0,32,96,0.06)",
       }}
     >
       <Stack
@@ -41,42 +41,74 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
         onChange={(_e, value) => value && onChange(value)}
         sx={{
           flexWrap: "wrap",
+          columnGap: { xs: 1, md: 1.5 },
+          rowGap: { xs: 1, md: 1.25 },
           "& .MuiToggleButton-root": {
             textTransform: "none",
-            borderRadius: 2.5,
-            border: "1px solid rgba(0,32,96,0.15)",
-            backgroundColor: "#ffffff",
-            minWidth: 240,
+            borderRadius: 9999,
+            border: "1px solid #002060",
+            backgroundColor: "#e9eef6",
+            minWidth: 200,
             justifyContent: "flex-start",
-            px: 2.4,
-            py: 1.8,
+            px: 1.8,
+            py: 0.75,
             gap: 10,
-            transition: "all 0.25s ease",
-            boxShadow: "0 4px 12px rgba(0,32,96,0.08)",
+            transition: "all 0.2s ease",
+            boxShadow: "0 3px 10px rgba(0,32,96,0.08)",
+            color: "#002060",
           },
           "& .Mui-selected": {
-            borderColor: "rgba(0,32,96,0.28)",
-            background: "linear-gradient(120deg, rgba(0,32,96,0.12), rgba(21,101,192,0.14))",
-            color: "#002060",
-            boxShadow: "0 10px 26px rgba(0,32,96,0.18)",
+            borderColor: "#00133a",
+            background: "linear-gradient(135deg, #0a2b7a 0%, #002060 45%, #001745 100%)",
+            color: "#ffffff",
+            boxShadow: "0 12px 26px rgba(0,32,96,0.32)",
           },
-          "& .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
-            border: "1px solid rgba(0,32,96,0.12)",
-            marginRight: 1.2,
+          "& .Mui-selected .deal-label": {
+            color: "#ffffff",
+          },
+          "& .Mui-selected .deal-helper": {
+            color: "rgba(255,255,255,0.82)",
+          },
+          "& .Mui-selected .deal-icon": {
+            color: "#ffffff",
           },
           "& .MuiToggleButton-root:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: "0 10px 22px rgba(0,32,96,0.16)",
+            transform: "translateY(-1px)",
+            boxShadow: "0 10px 20px rgba(0,32,96,0.18)",
+            backgroundColor: "#dfe7f5",
           },
         }}
       >
         {options.map((option) => (
           <ToggleButton key={option.value} value={option.value}>
               <Stack direction="row" alignItems="center" spacing={1.5}>
-                {option.icon}
+                <Paper
+                  elevation={0}
+                  sx={(theme) => ({
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    backgroundColor: "rgba(0,32,96,0.08)",
+                    border: "1px solid rgba(0,32,96,0.2)",
+                    color: "inherit",
+                    transition: "all 0.2s ease",
+                    ...(theme.palette.mode === "dark" ? { backgroundColor: "rgba(255,255,255,0.08)" } : {}),
+                    ".Mui-selected &": {
+                      backgroundColor: "rgba(255,255,255,0.14)",
+                      borderColor: "rgba(255,255,255,0.5)",
+                      color: "#ffffff",
+                    },
+                  })}
+                >
+                  {option.icon}
+                </Paper>
                 <Stack alignItems="flex-start" spacing={0.25}>
-                <Typography fontWeight={700}>{option.label}</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography className="deal-label" fontWeight={700} color="inherit">
+                  {option.label}
+                </Typography>
+                <Typography className="deal-helper" variant="caption" sx={{ color: "inherit", opacity: 0.75 }}>
                   {option.helper}
                 </Typography>
                 </Stack>
