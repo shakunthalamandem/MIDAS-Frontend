@@ -22,26 +22,43 @@ const actions: Action[] = ["create", "rename", "delete"];
 const actionLabels: Record<Action, string> = {
   create: "Create Channel",
   rename: "Rename Channel",
-  delete: "Delete Channel",
+  delete: "Archive Channel",
 };
 
 const actionDescriptions: Record<Action, string> = {
-  create: "Create a new Mattermost discussion channel for a ticker.",
+  create: "Create a new ticker channel by name (display name not required).",
   rename: "Rename the selected channel to a new ticker/name.",
-  delete: "Delete the selected channel from Mattermost.",
+  delete: "Archive the selected channel using its channel name.",
 };
 
 const endpoints: Record<Action, string> = {
-  create: "/api/create_channel/",
+  create: "/api/create_stock_channel/",
   rename: "/api/rename_channel/",
-  delete: "/api/delete_channel/",
+  delete: "/api/archive_stock_channel/",
 };
 
 const successMessages: Record<Action, string> = {
   create: "Channel created successfully.",
   rename: "Channel renamed successfully.",
-  delete: "Channel deleted successfully.",
+  delete: "Channel archived successfully.",
 };
+
+const ChannelOption: React.FC<{ display: string; name: string }> = ({
+  display,
+  name,
+}) => (
+  <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Typography
+      variant="body1"
+      sx={{ fontWeight: 800, color: "#e0f2fe", lineHeight: 1.1 }}
+    >
+      {display}
+    </Typography>
+    <Typography variant="caption" sx={{ color: "#cbd5f5", letterSpacing: 0.4 }}>
+      {name}
+    </Typography>
+  </Box>
+);
 
 const NotesUI: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -64,6 +81,9 @@ const NotesUI: React.FC = () => {
   } | null>(null);
 
   const activeAction = actions[currentTab];
+  const isCreate = activeAction === "create";
+  const isRename = activeAction === "rename";
+  const isDelete = activeAction === "delete";
 
   useEffect(() => {
     setSelectedChannel(null);
@@ -144,10 +164,15 @@ const NotesUI: React.FC = () => {
       return;
     }
 
-    if (
-      (activeAction === "create" || activeAction === "rename") &&
-      (!formValues.displayName || !formValues.channelName)
-    ) {
+    if (isCreate && !formValues.channelName) {
+      setMessage({
+        type: "error",
+        text: "Channel name (ticker) is required to create a channel.",
+      });
+      return;
+    }
+
+    if (isRename && (!formValues.displayName || !formValues.channelName)) {
       setMessage({
         type: "error",
         text: "Display name and channel name are required.",
@@ -159,17 +184,17 @@ const NotesUI: React.FC = () => {
     setMessage(null);
 
     const payload =
-      activeAction === "create"
-        ? { display_name: formValues.displayName, name: formValues.channelName }
-        : activeAction === "rename"
+      isCreate
+        ? { stock: formValues.channelName, make_favorite: false }
+        : isRename
         ? {
             channel_id: selectedChannel?.id,
             new_display_name: formValues.displayName,
             new_name: formValues.channelName,
           }
-        : { channel_id: selectedChannel?.id };
+        : { channel_name: selectedChannel?.name };
 
-    const method = activeAction === "delete" ? "DELETE" : "POST";
+    const method = "POST";
 
     try {
       const res = await fetch(`${apiUrl}${endpoints[activeAction]}`, {
@@ -206,7 +231,8 @@ const NotesUI: React.FC = () => {
   return (
     <Box
       sx={{
-        background: "linear-gradient(135deg, #0d1b2a, #0b132b)",
+        background:
+          "radial-gradient(circle at 15% 20%, #12366e 0, #0a1226 45%, #050814 80%)",
         minHeight: "100vh",
         p: 3,
       }}
@@ -218,15 +244,17 @@ const NotesUI: React.FC = () => {
           mx: "auto",
           p: 4,
           borderRadius: 3,
-          background: "linear-gradient(135deg, #101727, #0d111c)",
-          color: "#f4f6fb",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+          background:
+            "linear-gradient(135deg, rgba(18,34,60,0.9), rgba(11,18,33,0.9))",
+          border: "1px solid rgba(255,255,255,0.06)",
+          color: "#e9edf5",
+          boxShadow: "0 22px 44px rgba(0,0,0,0.45)",
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
           Mattermost Notes UI
         </Typography>
-        <Typography variant="body2" sx={{ color: "#a0aec0", mb: 3 }}>
+        <Typography variant="body2" sx={{ color: "#c2d4ef", mb: 3 }}>
           Manage ticker-based discussion channels with quick search and
           selection.
         </Typography>
@@ -238,8 +266,13 @@ const NotesUI: React.FC = () => {
           indicatorColor="primary"
           sx={{
             mb: 3,
-            ".MuiTab-root": { textTransform: "none", fontWeight: 600 },
-            ".Mui-selected": { color: "#4dd0e1 !important" },
+            ".MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 700,
+              letterSpacing: 0.2,
+            },
+            ".Mui-selected": { color: "#8de8ff !important" },
+            ".MuiTabs-indicator": { backgroundColor: "#8de8ff" },
           }}
         >
           <Tab label="Create Channel" />
@@ -264,24 +297,33 @@ const NotesUI: React.FC = () => {
             </Alert>
           )}
 
-          <Typography variant="subtitle2" sx={{ color: "#a0aec0" }}>
+          <Typography variant="subtitle2" sx={{ color: "#cbd5f5" }}>
             {actionDescriptions[activeAction]}
           </Typography>
 
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            sx={{
+              background: "rgba(255,255,255,0.03)",
+              borderRadius: 2,
+              p: 2,
+              border: "1px solid rgba(255,255,255,0.05)",
+            }}
+          >
             <TextField
               label="Search ticker or channel"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
-              InputLabelProps={{ sx: { color: "#cbd5e1" } }}
+              InputLabelProps={{ sx: { color: "#dbeafe" } }}
               sx={{
                 flex: 1,
                 "& .MuiOutlinedInput-root": {
                   color: "#f8fafc",
-                  background: "#111827",
-                  "& fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                  "&:hover fieldset": { borderColor: "#4dd0e1" },
+                  background: "rgba(255,255,255,0.04)",
+                  "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+                  "&:hover fieldset": { borderColor: "#9be8ff" },
                 },
               }}
             />
@@ -299,13 +341,13 @@ const NotesUI: React.FC = () => {
                 <TextField
                   {...params}
                   label="Select channel / ticker"
-                  InputLabelProps={{ sx: { color: "#cbd5e1" } }}
+                  InputLabelProps={{ sx: { color: "#dbeafe" } }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       color: "#f8fafc",
-                      background: "#111827",
-                      "& fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                      "&:hover fieldset": { borderColor: "#4dd0e1" },
+                      background: "rgba(255,255,255,0.04)",
+                      "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+                      "&:hover fieldset": { borderColor: "#9be8ff" },
                     },
                   }}
                   InputProps={{
@@ -327,49 +369,43 @@ const NotesUI: React.FC = () => {
                   key={option.id}
                   style={{ paddingTop: 10, paddingBottom: 10 }}
                 >
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Typography
-                      variant="body1"
-                      sx={{ fontWeight: 700, color: "#e2e8f0", lineHeight: 1.1 }}
-                    >
-                      {option.display_name}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "#a0aec0", letterSpacing: 0.3 }}
-                    >
-                      {option.name}
-                    </Typography>
-                  </Box>
+                  <ChannelOption
+                    display={option.display_name}
+                    name={option.name}
+                  />
                 </li>
               )}
             />
           </Stack>
 
-          {(activeAction === "create" || activeAction === "rename") && (
+          {(isCreate || isRename) && (
             <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+              {isRename && (
+                <TextField
+                  label="Display name"
+                  value={formValues.displayName}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      displayName: e.target.value,
+                    }))
+                  }
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#dbeafe" } }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      color: "#f8fafc",
+                      background: "rgba(255,255,255,0.04)",
+                      "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+                      "&:hover fieldset": { borderColor: "#9be8ff" },
+                    },
+                  }}
+                />
+              )}
               <TextField
-                label="Display name"
-                value={formValues.displayName}
-                onChange={(e) =>
-                  setFormValues((prev) => ({
-                    ...prev,
-                    displayName: e.target.value,
-                  }))
+                label={
+                  isCreate ? "Channel / ticker name" : "New channel name (slug)"
                 }
-                fullWidth
-                InputLabelProps={{ sx: { color: "#cbd5e1" } }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    color: "#f8fafc",
-                    background: "#111827",
-                    "& fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                    "&:hover fieldset": { borderColor: "#4dd0e1" },
-                  },
-                }}
-              />
-              <TextField
-                label="Channel name (slug)"
                 value={formValues.channelName}
                 onChange={(e) =>
                   setFormValues((prev) => ({
@@ -378,13 +414,13 @@ const NotesUI: React.FC = () => {
                   }))
                 }
                 fullWidth
-                InputLabelProps={{ sx: { color: "#cbd5e1" } }}
+                InputLabelProps={{ sx: { color: "#dbeafe" } }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     color: "#f8fafc",
-                    background: "#111827",
-                    "& fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                    "&:hover fieldset": { borderColor: "#4dd0e1" },
+                    background: "rgba(255,255,255,0.04)",
+                    "& fieldset": { borderColor: "rgba(255,255,255,0.12)" },
+                    "&:hover fieldset": { borderColor: "#9be8ff" },
                   },
                 }}
                 helperText="Use lowercase and hyphens, e.g., amzn-us-thoughts"
@@ -392,13 +428,13 @@ const NotesUI: React.FC = () => {
             </Stack>
           )}
 
-          {activeAction === "delete" && selectedChannel && (
+          {isDelete && selectedChannel && (
             <Alert
               severity="warning"
               sx={{
-                background: "#33272a",
-                color: "#fef9c3",
-                border: "1px solid rgba(252, 211, 77, 0.4)",
+                background: "rgba(255, 159, 28, 0.08)",
+                color: "#ffd08a",
+                border: "1px solid rgba(255, 159, 28, 0.4)",
               }}
             >
               Deleting <strong>{selectedChannel.display_name}</strong> (
@@ -409,10 +445,18 @@ const NotesUI: React.FC = () => {
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
             <Button
               variant="contained"
-              color={activeAction === "delete" ? "error" : "primary"}
+              color={isDelete ? "error" : "primary"}
               onClick={handleAction}
               disabled={actionLoading}
-              sx={{ minWidth: 180, fontWeight: 700, textTransform: "none" }}
+              sx={{
+                minWidth: 180,
+                fontWeight: 800,
+                textTransform: "none",
+                background: isDelete
+                  ? "linear-gradient(90deg, #f87171, #ef4444)"
+                  : "linear-gradient(90deg, #4fd1c5, #60a5fa)",
+                boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+              }}
             >
               {actionLoading ? "Working..." : actionLabels[activeAction]}
             </Button>
