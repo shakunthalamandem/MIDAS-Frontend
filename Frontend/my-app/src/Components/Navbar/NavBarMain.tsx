@@ -206,10 +206,10 @@ const NavbarMain: React.FC = () => {
               label="New Issue Deals "
               menuItems={[
                 { label: "Dashboard", path: "/deals/dashboard" },
+                { label: "New Deal Form", path: "/deals/new_deal_form" },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
                 { label: "FO Write-Up", path: "/equity/fo_dashboard" },
-                { label: "New Deal Form", path: "/deals/new_deal_form" },
                 // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}
