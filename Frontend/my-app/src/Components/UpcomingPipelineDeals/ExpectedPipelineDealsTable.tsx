@@ -6,12 +6,17 @@ import {
   CardContent,
   CircularProgress,
   Container,
-  MenuItem,
   Stack,
   TextField,
   Typography,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import PublicIcon from "@mui/icons-material/Public";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import TimelineIcon from "@mui/icons-material/Timeline";
 
 type Category = "ipo_international" | "ipo_us" | "fo" | "ipo_europe";
 
@@ -89,11 +94,18 @@ type ApiResponse = {
   ipo_europe: EuropeDeal[];
 };
 
-const categoryOptions: { value: Category; label: string }[] = [
-  { value: "ipo_international", label: "International" },
-  { value: "ipo_us", label: "US IPO" },
-  { value: "fo", label: "US FO" },
-  { value: "ipo_europe", label: "Eur Pipeline" },
+type CategoryOption = {
+  value: Category;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+};
+
+const categoryOptions: CategoryOption[] = [
+  { value: "ipo_international", label: "International", icon: PublicIcon, color: "#1565C0" },
+  { value: "ipo_us", label: "US IPO", icon: ApartmentIcon, color: "#002060" },
+  { value: "fo", label: "US FO", icon: ShowChartIcon, color: "#5D0163" },
+  { value: "ipo_europe", label: "Eur Pipeline", icon: TimelineIcon, color: "#6F1178" },
 ];
 
 const searchFields: Record<Category, string[]> = {
@@ -311,14 +323,7 @@ const columnSets: Record<Category, GridColDef[]> = {
           "-"
         ),
     },
-    {
-      field: "created_at",
-      headerName: "Updated",
-      renderHeader: () => renderHeader("Updated"),
-      flex: 0.8,
-      minWidth: 120,
-      renderCell: (params) => formatDate(params.value),
-    },
+   
   ],
 };
 
@@ -433,19 +438,50 @@ const ExpectedPipelineDealsTable: React.FC = () => {
             justifyContent="space-between"
             sx={{ mb: 2, flexWrap: "wrap", gap: 2 }}
           >
-            <TextField
-              select
-              label="Category"
+            <ToggleButtonGroup
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as Category)}
-              sx={{ minWidth: { xs: "100%", md: 260 } }}
+              exclusive
+              onChange={(_e, val) => val && setSelectedCategory(val as Category)}
+              sx={{
+                flexWrap: "wrap",
+                "& .MuiToggleButton-root": {
+                  border: "1px solid rgba(0,32,96,0.16)",
+                  borderRadius: 20,
+                  textTransform: "none",
+                  px: 2,
+                  py: 1.1,
+                  mr: 1,
+                  mb: 1,
+                  backgroundColor: "#fff",
+                  color: "#002060",
+                  gap: 0.75,
+                  fontWeight: 700,
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#6F1178",
+                  color: "#ffffff",
+                  borderColor: "#6F1178",
+                  boxShadow: "0 8px 18px rgba(0,32,96,0.18)",
+                },
+                "& .MuiToggleButton-root:hover": {
+                  backgroundColor: "rgba(21,101,192,0.08)",
+                },
+              }}
             >
-              {categoryOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              {categoryOptions.map((option) => {
+                const Icon = option.icon;
+                const isActive = selectedCategory === option.value;
+                return (
+                  <ToggleButton key={option.value} value={option.value}>
+                    <Icon
+                      fontSize="small"
+                      sx={{ color: isActive ? "#ffffff" : option.color, transition: "color 0.2s ease" }}
+                    />
+                    {option.label}
+                  </ToggleButton>
+                );
+              })}
+            </ToggleButtonGroup>
 
             <TextField
               label="Search"
