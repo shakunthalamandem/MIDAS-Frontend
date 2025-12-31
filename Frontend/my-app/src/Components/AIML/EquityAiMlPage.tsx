@@ -12,9 +12,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PredictionLayout from "./PredictionLayout";
 import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
 import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 type OptionsData = {
   region: string[];
@@ -56,16 +58,64 @@ const formatPricingDate = (date?: string | null) => {
   return date;
 };
 
-const TabLabel = ({ primary, secondary }: { primary: string; secondary: string }) => (
-  <Box sx={{ textAlign: "left" }}>
-    <Typography sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 14 } }}>
-      {primary}
-    </Typography>
-    <Typography variant="caption" sx={{ color: "text.secondary" }}>
-      {secondary}
-    </Typography>
+const TabLabel = ({
+  icon,
+  primary,
+  secondary,
+}: {
+  icon: React.ReactNode;
+  primary: string;
+  secondary: string;
+}) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+    <Box
+      sx={{
+        width: 32,
+        height: 32,
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(90, 85, 247, 0.12)",
+        color: "inherit",
+        flexShrink: 0,
+      }}
+    >
+      {icon}
+    </Box>
+    <Box sx={{ textAlign: "left" }}>
+      <Typography sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 14 }, lineHeight: 1.2 }}>
+        {primary}
+      </Typography>
+      <Typography variant="caption" sx={{ color: "inherit", opacity: 0.85 }}>
+        {secondary}
+      </Typography>
+    </Box>
   </Box>
 );
+
+const tabStyles = {
+  minHeight: 60,
+  minWidth: { xs: 240, sm: 280 },
+  px: { xs: 1.5, sm: 2.5 },
+  py: 1,
+  mr: { xs: 0, sm: 1 },
+  mb: { xs: 1, sm: 0 },
+  borderRadius: 9999,
+  alignItems: "stretch",
+  justifyContent: "flex-start",
+  textTransform: "none",
+  backgroundColor: "#e9eef6",
+  color: "#002060",
+  border: "1px solid #002060",
+  boxShadow: "0 2px 6px rgba(0, 32, 96, 0.12)",
+  "&:hover": { backgroundColor: "#dce5f2" },
+  "&.Mui-selected": {
+    backgroundColor: "#002060",
+    color: "#ffffff",
+    boxShadow: "0 8px 18px rgba(0, 32, 96, 0.32)",
+  },
+};
 
 const EquityAiMlPage: React.FC = () => {
   const [options, setOptions] = useState<OptionsData | null>(null);
@@ -196,23 +246,69 @@ const EquityAiMlPage: React.FC = () => {
             ML, Few-shot, and Sentiment views without re-entering details.
           </Box> */}
 
-          <Card sx={{ borderRadius: 2, boxShadow: 4, p: { xs: 2, md: 3 } }}>
-            <Stack spacing={2}>
+          {/* <Card sx={{ borderRadius: 2, boxShadow: 4, p: { xs: 2, md: 3 } }}> */}
+            <Stack spacing={2} sx={{ mt: { xs: 1.5, md: 2.5 } }}>
               <Stack
                 direction={{ xs: "column", md: "row" }}
-                spacing={2}
+                spacing={{ xs: 1.5, md: 2 }}
                 alignItems={{ xs: "flex-start", md: "center" }}
                 justifyContent="space-between"
               >
-                <Box>
-                  <Typography variant="h5" fontWeight="bold" color="#002060">
-                    AI Prediction Workbench
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    One search powers all three tabs below.
-                  </Typography>
-                </Box>
-                <Box sx={{ minWidth: { xs: "100%", md: 360 }, width: { xs: "100%", md: 380 } }}>
+                <Tabs
+                  value={activeTab}
+                  onChange={(_, val) => setActiveTab(val)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  aria-label="AI ML tab selector"
+                  sx={{
+                    borderBottom: 0,
+                    ".MuiTabs-flexContainer": {
+                      gap: { xs: 1, sm: 1.5 },
+                      pb: 0.5,
+                    },
+                    ".MuiTabs-indicator": { display: "none" },
+                    maxWidth: { xs: "100%", md: "70%" },
+                  }}
+                  TabIndicatorProps={{ style: { display: "none" } }}
+                >
+                  <Tab
+                    id="ai-ml-tab-0"
+                    aria-controls="ai-ml-tabpanel-0"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="Machine Learning Equity Deal Predictor"
+                        secondary="ML Model (based on 30+ factors)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                  <Tab
+                    id="ai-ml-tab-1"
+                    aria-controls="ai-ml-tabpanel-1"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="Few-shot AI Analysis"
+                        secondary="AI Unsupervised (Past 10+ Deals)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                  <Tab
+                    id="ai-ml-tab-2"
+                    aria-controls="ai-ml-tabpanel-2"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="Sentiment Analysis"
+                        secondary="AI View (Outside Sentiment)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                </Tabs>
+                <Box sx={{ minWidth: { xs: "100%", md: 260 }, width: { xs: "100%", md: 280 } }}>
                   <Autocomplete
                     options={tickerOptions}
                     loading={tickerLoading}
@@ -230,16 +326,29 @@ const EquityAiMlPage: React.FC = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Global ticker search"
-                        placeholder={tickerLoading ? "Loading tickers..." : "Type a ticker"}
+                        label=""
+                        placeholder={tickerLoading ? "Loading..." : "Enter ticker..."}
                         InputProps={{
                           ...params.InputProps,
+                          startAdornment: <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />,
                           endAdornment: (
                             <>
                               {tickerLoading ? <CircularProgress color="inherit" size={16} /> : null}
                               {params.InputProps.endAdornment}
                             </>
                           ),
+                          sx: {
+                            backgroundColor: "#dfe7f2",
+                            borderRadius: 9999,
+                            px: 1.5,
+                            py: 0.25,
+                            "& fieldset": { borderColor: "#c2ccd9" },
+                            "&:hover fieldset": { borderColor: "#b2bfd1" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#002060",
+                              boxShadow: "0 0 0 3px rgba(0, 32, 96, 0.15)",
+                            },
+                          },
                         }}
                       />
                     )}
@@ -251,50 +360,6 @@ const EquityAiMlPage: React.FC = () => {
                   )}
                 </Box>
               </Stack>
-
-              <Tabs
-                value={activeTab}
-                onChange={(_, val) => setActiveTab(val)}
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="AI ML tab selector"
-                sx={{
-                  borderBottom: 1,
-                  borderColor: "divider",
-                  ".MuiTab-root": { textTransform: "none" },
-                }}
-              >
-                <Tab
-                  id="ai-ml-tab-0"
-                  aria-controls="ai-ml-tabpanel-0"
-                  label={
-                    <TabLabel
-                      primary="Machine Learning Equity Deal Predictor"
-                      secondary="ML Model (based on 30+ factors)"
-                    />
-                  }
-                />
-                <Tab
-                  id="ai-ml-tab-1"
-                  aria-controls="ai-ml-tabpanel-1"
-                  label={
-                    <TabLabel
-                      primary="Few-shot AI Analysis"
-                      secondary="AI Unsupervised (Past 10+ Deals)"
-                    />
-                  }
-                />
-                <Tab
-                  id="ai-ml-tab-2"
-                  aria-controls="ai-ml-tabpanel-2"
-                  label={
-                    <TabLabel
-                      primary="Sentiment Analysis"
-                      secondary="AI View (Outside Sentiment)"
-                    />
-                  }
-                />
-              </Tabs>
 
               <TabPanel value={activeTab} index={0}>
                 <Card
@@ -335,7 +400,7 @@ const EquityAiMlPage: React.FC = () => {
                 <ShowSentimentAnalysis focusTicker={selectedTickerPayload?.ticker ?? null} />
               </TabPanel>
             </Stack>
-          </Card>
+          {/* </Card> */}
         </Box>
       </Box>
     </Container>
