@@ -21,6 +21,7 @@ import PNLRiskReportMain from "./RiskReportMain/PNLRiskReportMain";
 const PNLTabMain = () => {
   const navigate = useNavigate();
   const { tab = "summary_pnl" } = useParams(); // Get tab from URL or fallback to default
+  const hideTabs = tab === "pnlfunddeatils" || tab === "pnl_risk_report";
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTab = (event.target as HTMLInputElement).value;
@@ -55,113 +56,81 @@ const PNLTabMain = () => {
         Welcome to Monashee's latest P&L performance overview.
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2, mt: 2 }}>
-        <FormControl>
-          <RadioGroup
-            row
-            value={tab}
-            onChange={handleChange}
-            sx={{
-              gap: 3,
-              "& .MuiFormControlLabel-root": {
-                px: 2,
-                py: 0.5,
-                borderRadius: 2,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  backgroundColor: "#e3f2fd",
+      {!hideTabs && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2, mt: 2 }}>
+          <FormControl>
+            <RadioGroup
+              row
+              value={tab}
+              onChange={handleChange}
+              sx={{
+                gap: 3,
+                "& .MuiFormControlLabel-root": {
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 2,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#e3f2fd",
+                  },
                 },
-              },
-            }}
-          >
-            <FormControlLabel
-              value="summary_pnl"
-              control={
-                <Radio
-                  sx={{
-                    color: "#00796b",
-                    "&.Mui-checked": { color: "#00796b" },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
-                  <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Summary P&L</Typography>
-                </Box>
-              }
-            />
-            <FormControlLabel
-              value="total_pnl_attribution"
-              control={
-                <Radio
-                  sx={{
-                    color: "#00796b",
-                    "&.Mui-checked": { color: "#00796b" },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
-                  <TableRowsIcon fontSize="small" />
-                  <Typography variant="h6">Total P&L Attribution</Typography>
-                </Box>
-              }
-            />
-            <FormControlLabel
-              value="equities__pnl_attribution"
-              control={
-                <Radio
-                  sx={{
-                    color: "#00796b",
-                    "&.Mui-checked": { color: "#00796b" },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
-                  <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Equities P&L Attribution</Typography>
-                </Box>
-              }
-            />
-            <FormControlLabel
-              value="pnlfunddeatils"
-              control={
-                <Radio
-                  sx={{
-                    color: "#00796b",
-                    "&.Mui-checked": { color: "#00796b" },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
-                  <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Daily Note to Fund</Typography>
-                </Box>
-              }
-            />
-             <FormControlLabel
-              value="pnl_risk_report"
-              control={
-                <Radio
-                  sx={{
-                    color: "#00796b",
-                    "&.Mui-checked": { color: "#00796b" },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
-                  <BarChartIcon fontSize="small" />
-                  <Typography variant="h6">Risk Report to Fund</Typography>
-                </Box>
-              }
-            />
-          </RadioGroup>
-        </FormControl>
-      </Box>
+              }}
+            >
+              <FormControlLabel
+                value="summary_pnl"
+                control={
+                  <Radio
+                    sx={{
+                      color: "#00796b",
+                      "&.Mui-checked": { color: "#00796b" },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
+                    <BarChartIcon fontSize="small" />
+                    <Typography variant="h6">Summary P&L</Typography>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="total_pnl_attribution"
+                control={
+                  <Radio
+                    sx={{
+                      color: "#00796b",
+                      "&.Mui-checked": { color: "#00796b" },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
+                    <TableRowsIcon fontSize="small" />
+                    <Typography variant="h6">Total P&L Attribution</Typography>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="equities__pnl_attribution"
+                control={
+                  <Radio
+                    sx={{
+                      color: "#00796b",
+                      "&.Mui-checked": { color: "#00796b" },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#5d0163" }}>
+                    <BarChartIcon fontSize="small" />
+                    <Typography variant="h6">Equities P&L Attribution</Typography>
+                  </Box>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box>
+      )}
 
       {/* Animated Content Switch */}
       <Fade in={tab === "summary_pnl"} timeout={400} mountOnEnter unmountOnExit>

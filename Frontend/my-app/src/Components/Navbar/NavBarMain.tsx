@@ -20,6 +20,26 @@ import Logs from "../Main/HomePage/Authentication/Logs";
 import Logout from "../Main/HomePage/Authentication/Logout";
 import DropdownTab from "./DropdownTab";
 import ChatBoxButton from "../Main/HomePage/Authentication/ChatBoxButton";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import InsightsIcon from "@mui/icons-material/Insights";
+import PsychologyIcon from "@mui/icons-material/Psychology";
+import HubIcon from "@mui/icons-material/Hub";
+import AppsIcon from "@mui/icons-material/Apps";
+import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
+import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
+import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
+import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
+import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
+import HistoryEduOutlinedIcon from "@mui/icons-material/HistoryEduOutlined";
+import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
+import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
+import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
+import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -205,87 +225,155 @@ const NavbarMain: React.FC = () => {
             <DropdownTab
               label="New Issue Deals "
               menuItems={[
-                { label: "Dashboard", path: "/deals/dashboard" },
-                { label: "New Deal Form", path: "/deals/new_deal_form" },
+                {
+                  label: "Dashboard",
+                  path: "/deals/dashboard",
+                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "New Deal Form",
+                  path: "/deals/new_deal_form",
+                  icon: <PostAddOutlinedIcon fontSize="small" />,
+                },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
-                { label: "IPO Write-Up", path: "/equity/ipo_dashboard" },
-                { label: "FO Write-Up", path: "/equity/fo_dashboard" },
+                {
+                  label: "IPO Write-Up",
+                  path: "/equity/ipo_dashboard",
+                  icon: <TrendingUpOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "FO Write-Up",
+                  path: "/equity/fo_dashboard",
+                  icon: <ArticleOutlinedIcon fontSize="small" />,
+                },
                 // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
+              rich
             />
             <DropdownTab
               label="AI-ML"
               menuItems={[
                 {
-                  label: "Prediction",
+                  label: "Automation with AI",
                   path: "/equity/ai_ml_models",
+                  icon: <AutoAwesomeIcon fontSize="small" />,
                 },
-                { label: "AI-ML Result Dashboard", path: "/equity/ai_ml_results" },
-                // { label: "AI FewShot Analysis", path: "/ai_fewshot_analysis" },
-                { label: "ABB Model", path: "/equity/abb_model" },
-                // { label: "Gen AI Tool", path: "/gen_ai_tool" },
+                {
+                  label: "AI-ML Result Dashboard",
+                  path: "/equity/ai_ml_results",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
+                {
+                  label: "ABB Model",
+                  path: "/equity/abb_model",
+                  icon: <HubIcon fontSize="small" />,
+                },
+                // {
+                //   label: "Gen AI Tool",
+                //   path: "/gen_ai_tool",
+                //   icon: <PsychologyIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "AI Few-Shot Analysis",
+                //   path: "/ai_fewshot_analysis",
+                //   icon: <AppsIcon fontSize="small" />,
+                // },
                 // { label: "Portfolio Sentiment ", path: "/genai_data_set" },
                 // { label: "Portfolio  News", path: "/macro/news-summary" },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
+              rich
             />
 
-            <Button
-              onClick={() => handleTabSelect("P&L Attribution")}
-              sx={{
-                color: "#005166",
-                fontWeight: "bold",
-                fontSize: "0.725rem",
-                mx: 1,
-                borderBottom:
-                  selectedTab === "P&L Attribution"
-                    ? "3px solid #005166"
-                    : "3px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  borderBottom: "3px solid #005166",
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              P&L Attribution
-            </Button>
-
             <DropdownTab
-              label="Opportunity & Performance"
+              label="Profit & Loss"
               menuItems={[
-                { label: "Summary Dashboard", path: "/opportunity/summary" },
                 {
-                  label: "Equity Market Opportunity",
-                  path: "/opportunity/equity",
-                },
-                { label: "Past IPOs & FOs", path: "/opportunity/pastdeals" },
-                { label: "Monashee Daily Report", path: "/opportunity/monashee_daily_report" },
-                {
-                  label: "High Yields Market Opportunity",
-                  path: "/opportunity/high-yield",
+                  label: "P&L Attribution",
+                  path: "/portfolio-attribution",
+                  icon: <TimelineOutlinedIcon fontSize="small" />,
                 },
                 {
-                  label: "Converts Market Opportunity",
-                  path: "/opportunity/converts",
+                  label: "Daily Note to Funds",
+                  path: "/portfolio-attribution/pnlfunddeatils",
+                  icon: <DescriptionOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Risk Report to Funds",
+                  path: "/portfolio-attribution/pnl_risk_report",
+                  icon: <SecurityOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Monashee Daily Report",
+                  path: "/opportunity/monashee_daily_report",
+                  icon: <SummarizeOutlinedIcon fontSize="small" />,
                 },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
+              rich
+            />
+
+            <DropdownTab
+              label="Opportunity & Performance"
+              menuItems={[
+                {
+                  label: "Summary Dashboard",
+                  path: "/opportunity/summary",
+                  icon: <GridViewOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Equity Market Opportunity",
+                  path: "/opportunity/equity",
+                  icon: <ShowChartOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Past IPOs & FOs",
+                  path: "/opportunity/pastdeals",
+                  icon: <HistoryEduOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Monashee Daily Report",
+                  path: "/opportunity/monashee_daily_report",
+                  icon: <SummarizeOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "High Yields Market Opportunity",
+                  path: "/opportunity/high-yield",
+                  icon: <EqualizerOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Converts Market Opportunity",
+                  path: "/opportunity/converts",
+                  icon: <AutorenewOutlinedIcon fontSize="small" />,
+                },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              rich
             />
 
             <DropdownTab
               label="Macro (Prime)"
               menuItems={[
-                { label: "Prime", path: "/macro/prime" },
+                {
+                  label: "Prime",
+                  path: "/macro/prime",
+                  icon: <PublicOutlinedIcon fontSize="small" />,
+                },
                 // { label: "News Summary", path: "/macro/news-summary" },
-                { label: "Sector", path: "/macro/sector" },
+                {
+                  label: "Sector",
+                  path: "/macro/sector",
+                  icon: <PieChartOutlineIcon fontSize="small" />,
+                },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
+              rich
             />
 
             <Button
