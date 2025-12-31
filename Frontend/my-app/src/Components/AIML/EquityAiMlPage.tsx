@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PredictionLayout from "./PredictionLayout";
 import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
-import SentimentAnalysis from "./SentimentAnalysis";
+import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
 
 type OptionsData = {
   region: string[];
@@ -332,7 +332,7 @@ const EquityAiMlPage: React.FC = () => {
               </TabPanel>
 
               <TabPanel value={activeTab} index={2}>
-                <SentimentAnalysis focusTicker={selectedTickerPayload?.ticker ?? null} />
+                <ShowSentimentAnalysis focusTicker={selectedTickerPayload?.ticker ?? null} />
               </TabPanel>
             </Stack>
           </Card>
