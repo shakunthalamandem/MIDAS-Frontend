@@ -135,7 +135,11 @@ const formatMillions = (value: number | string | null | undefined, decimals = 0)
   if (value === null || value === undefined || value === "") return "-";
   const num = Number(value);
   if (Number.isNaN(num)) return String(value);
-  return `${num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}m`;
+  const formatted = num.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return `$${formatted}M`;
 };
 
 const formatPercent = (value: number | string | null | undefined, decimals = 1) => {
