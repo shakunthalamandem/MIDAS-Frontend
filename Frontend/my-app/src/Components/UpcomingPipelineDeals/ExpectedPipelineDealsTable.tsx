@@ -158,9 +158,9 @@ const formatDate = (value?: string | null) => {
 const columnSets: Record<Category, GridColDef[]> = {
   fo: [
     { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
-    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
-    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
     { field: "consumer_retail", headerName: "Consumer & Retail", renderHeader: () => renderHeader("Consumer & Retail"), flex: 1, minWidth: 150 },
+    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
     { field: "key_holders", headerName: "Key Holders", renderHeader: () => renderHeader("Key Holders"), flex: 1, minWidth: 150 },
     {
       field: "sell_down_size_m",
@@ -221,9 +221,9 @@ const columnSets: Record<Category, GridColDef[]> = {
   ],
   ipo_international: [
     { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
-    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
-    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
     { field: "backers", headerName: "Backers", renderHeader: () => renderHeader("Backers"), flex: 1, minWidth: 150 },
+    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
     { field: "banks", headerName: "Banks", renderHeader: () => renderHeader("Banks"), flex: 1, minWidth: 150 },
     {
       field: "size_m",
@@ -304,7 +304,7 @@ const columnSets: Record<Category, GridColDef[]> = {
   ],
   ipo_europe: [
     { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
-    { field: "region", headerName: "Region", renderHeader: () => renderHeader("Region"), flex: 0.9, minWidth: 120 },
+    { field: "region", headerName: "Company", renderHeader: () => renderHeader("Company"), flex: 0.9, minWidth: 120 },
     { field: "sector", headerName: "Sector", renderHeader: () => renderHeader("Sector"), flex: 1, minWidth: 130 },
     { field: "sellers", headerName: "Sellers", renderHeader: () => renderHeader("Sellers"), flex: 1.2, minWidth: 160 },
     {
