@@ -233,26 +233,17 @@ const NavbarMain: React.FC = () => {
               setSelectedTab={setSelectedTab}
             />
 
-            <Button
-              onClick={() => handleTabSelect("P&L Attribution")}
-              sx={{
-                color: "#005166",
-                fontWeight: "bold",
-                fontSize: "0.725rem",
-                mx: 1,
-                borderBottom:
-                  selectedTab === "P&L Attribution"
-                    ? "3px solid #005166"
-                    : "3px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  borderBottom: "3px solid #005166",
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              P&L Attribution
-            </Button>
+            <DropdownTab
+              label="Profit & Loss"
+              menuItems={[
+                { label: "P&L Attribution", path: "/portfolio-attribution" },
+                { label: "Daily Note to Funds", path: "/portfolio-attribution/pnlfunddeatils" },
+                { label: "Risk Report to Funds", path: "/portfolio-attribution/pnl_risk_report" },
+                { label: "Monashee Daily Report", path: "/opportunity/monashee_daily_report" },
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
 
             <DropdownTab
               label="Opportunity & Performance"
