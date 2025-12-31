@@ -1,69 +1,79 @@
 import React from "react";
-import { Stack, Checkbox, FormControlLabel, Button } from "@mui/material";
+import {
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  Paper,
+} from "@mui/material";
 
 interface DealsFiltersProps {
   selectedOp: string;
+  options: { value: string; label: string; helper: string }[];
   onChange: (value: string) => void;
-  onTogglePipeline?: () => void;
-  showPipeline?: boolean;
 }
 
 const DealsFilters: React.FC<DealsFiltersProps> = ({
   selectedOp,
+  options,
   onChange,
-  onTogglePipeline,
-  showPipeline,
 }) => {
   return (
-    <Stack
-      direction={{ xs: "column", sm: "row" }}
-      spacing={3}
-      justifyContent="center"
-      alignItems={{ xs: "flex-start", sm: "center" }}
-      sx={{ mb: 2, flexWrap: "wrap", gap: 2 }}
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2,
+        borderRadius: 3,
+        border: "1px solid rgba(0,32,96,0.12)",
+        background:
+          "linear-gradient(135deg, rgba(0,32,96,0.06), rgba(156,32,7,0.06))",
+      }}
     >
-      <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap">
-        {["Upcoming Deals", "Issued September to Date"].map((value) => (
-          <FormControlLabel
-            key={value}
-            control={
-              <Checkbox
-                checked={selectedOp === value}
-                onChange={() => onChange(value)}
-                sx={{
-                  color: "#9c2007",
-                  "&.Mui-checked": {
-                    color: "#9c2007",
-                  },
-                }}
-              />
-            }
-            label={value.replace(/^\w/, (c) => c.toUpperCase())}
-          />
-        ))}
-      </Stack>
-
-      {onTogglePipeline && (
-        <Button
-          variant={showPipeline ? "contained" : "outlined"}
-          onClick={onTogglePipeline}
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+        alignItems="stretch"
+        justifyContent="center"
+      >
+        <ToggleButtonGroup
+          value={selectedOp}
+          exclusive
+          onChange={(_e, value) => value && onChange(value)}
           sx={{
-            borderColor: "#9c2007",
-            color: showPipeline ? "#fff" : "#9c2007",
-            backgroundColor: showPipeline ? "#9c2007" : "transparent",
-            "&:hover": {
-              borderColor: "#7d1b08",
-              backgroundColor: showPipeline ? "#7d1b08" : "rgba(156,32,7,0.08)",
+            flexWrap: "wrap",
+            "& .MuiToggleButton-root": {
+              textTransform: "none",
+              borderRadius: 2,
+              borderColor: "rgba(0,32,96,0.15)",
+              backgroundColor: "#fff",
+              minWidth: 220,
+              justifyContent: "flex-start",
+              px: 2,
+              py: 1.5,
             },
-            fontWeight: 700,
-            textTransform: "none",
-            minWidth: 220,
+            "& .Mui-selected": {
+              borderColor: "#9c2007",
+              backgroundColor: "rgba(156,32,7,0.08)",
+              color: "#002060",
+            },
+            "& .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
+              borderRight: "1px solid rgba(0,32,96,0.15)",
+            },
           }}
         >
-          {showPipeline ? "Back to New Deals" : "View Expected Pipeline Deals"}
-        </Button>
-      )}
-    </Stack>
+          {options.map((option) => (
+            <ToggleButton key={option.value} value={option.value}>
+              <Stack alignItems="flex-start" spacing={0.25}>
+                <Typography fontWeight={700}>{option.label}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {option.helper}
+                </Typography>
+              </Stack>
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
+    </Paper>
   );
 };
 

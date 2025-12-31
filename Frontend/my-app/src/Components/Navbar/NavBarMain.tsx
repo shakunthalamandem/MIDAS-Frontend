@@ -219,7 +219,7 @@ const NavbarMain: React.FC = () => {
               label="AI-ML"
               menuItems={[
                 {
-                  label: "US IPO & FO ML Model",
+                  label: "Prediction",
                   path: "/equity/ai_ml_models",
                 },
                 { label: "AI-ML Result Dashboard", path: "/equity/ai_ml_results" },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress, Grid } from "@mui/material";
+import { Container, Typography, CircularProgress, Grid, Paper } from "@mui/material";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
@@ -12,11 +12,19 @@ import ExpectedPipelineDealsTable from "../../UpcomingPipelineDeals/ExpectedPipe
 const NewDealsUpcomingRecent: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedOp, setSelectedOp] = useState("Upcoming Deals");
+  const tabs = [
+    { value: "live", label: "Live Deals", helper: "Issued within last 30 days" },
+    { value: "upcoming", label: "Upcoming Deals", helper: "Filed but not issued" },
+    { value: "pipeline", label: "Future Pipeline", helper: "Not filed" },
+  ];
+  const [selectedOp, setSelectedOp] = useState<string>(tabs[0].value);
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
-  const [showPipeline, setShowPipeline] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const opMap: Record<string, string> = {
+    live: "Issued September to Date",
+    upcoming: "Upcoming Deals",
+  };
 
   const fetchData = async (operation: string) => {
     setLoading(true);
@@ -44,39 +52,49 @@ const NewDealsUpcomingRecent: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(selectedOp);
+    if (selectedOp === "pipeline") {
+      setRows([]);
+      setSelectedDeal(null);
+      return;
+    }
+    const apiOperation = opMap[selectedOp] || selectedOp;
+    fetchData(apiOperation);
   }, [selectedOp]);
 
-  const handleTogglePipeline = () => {
-    setShowPipeline((prev) => !prev);
-    setSelectedDeal(null);
-  };
-
   const handleOpChange = (value: string) => {
-    setShowPipeline(false);
     setSelectedOp(value);
   };
 
+  const isPipelineView = selectedOp === "pipeline";
+
   return (
     <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        color="#002060"
-        align="center"
-        fontWeight={600}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, md: 3 },
+          mb: 3,
+          borderRadius: 3,
+          border: "1px solid rgba(0,32,96,0.12)",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,248,255,0.96))",
+          boxShadow: "0 14px 40px rgba(0,32,96,0.1)",
+        }}
       >
-        New Deals - Upcoming & Recent
-      </Typography>
+        <Typography
+          variant="h5"
+          gutterBottom
+          color="#002060"
+          align="center"
+          fontWeight={700}
+        >
+          New Deals Lifecycle
+        </Typography>
 
-      <DealsFilters
-        selectedOp={selectedOp}
-        onChange={handleOpChange}
-        onTogglePipeline={handleTogglePipeline}
-        showPipeline={showPipeline}
-      />
+        <DealsFilters selectedOp={selectedOp} onChange={handleOpChange} options={tabs} />
+      </Paper>
 
-      {showPipeline ? (
+      {isPipelineView ? (
         <ExpectedPipelineDealsTable />
       ) : loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
@@ -89,7 +107,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
         />
       )}
 
-      {!showPipeline && selectedDeal && (
+      {!isPipelineView && selectedDeal && (
         <>
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} md={4}>

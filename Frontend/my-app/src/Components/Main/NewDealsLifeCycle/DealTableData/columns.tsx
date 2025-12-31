@@ -32,7 +32,9 @@ export const getColumns = (
   // ✅ Dynamic price/issue price column
   
   const priceOrIssueColumn: GridColDef =
-    selectedOp === "September to Date"
+    ["live", "issued", "september to date"].some((key) =>
+      (selectedOp || "").toString().toLowerCase().includes(key)
+    )
       ? {
           field: "issue_price",
           headerName: "Issue Price",
