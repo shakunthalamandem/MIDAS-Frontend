@@ -123,7 +123,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
                       transform: "translateY(-1px)",
                     },
                   }
-                : { color: "#005166", fontSize: "0.85rem" }
+                : { color: "#005166", fontSize: "0.8rem" }
             }
           >
             {item.icon && (
@@ -135,7 +135,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
                   backgroundColor: "#eef2ff",
                   display: "grid",
                   placeItems: "center",
-                  color: "#4338ca",
+                  color: "#002060",
                   flexShrink: 0,
                 }}
               >
@@ -148,7 +148,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
                 sx={{
                   fontWeight: 700,
                   color: isRichMenu ? "#0b1844" : "#005166",
-                  fontSize: isRichMenu ? "0.95rem" : "0.9rem",
+                  fontSize: isRichMenu ? "0.9rem" : "0.8rem",
                   lineHeight: 1.2,
                 }}
               >
