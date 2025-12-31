@@ -256,7 +256,7 @@ const NavbarMain: React.FC = () => {
               label="AI-ML"
               menuItems={[
                 {
-                  label: "Automation with AI",
+                  label: "US IPO & FO AI-ML Model",
                   path: "/equity/ai_ml_models",
                   icon: <AutoAwesomeIcon fontSize="small" />,
                 },
