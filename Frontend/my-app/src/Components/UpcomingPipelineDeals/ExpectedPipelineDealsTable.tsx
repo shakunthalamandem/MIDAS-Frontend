@@ -488,7 +488,14 @@ const ExpectedPipelineDealsTable: React.FC = () => {
               placeholder="Search ticker, sector, seller..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{ minWidth: { xs: "100%", md: 320 } }}
+              size="small"
+              sx={{
+                minWidth: { xs: "100%", md: 320 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 38,
+                },
+              }}
             />
           </Stack>
 
