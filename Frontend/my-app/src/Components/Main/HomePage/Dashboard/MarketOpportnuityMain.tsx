@@ -51,6 +51,9 @@ const MarketOpportnuityMain: React.FC = () => {
       case "weekly-tracking":
         setValue(5);
         break;
+      case "pastdeals":
+        setValue(6);
+        break;
       // case "gap_report":
       //   setValue(6);
       //   break;
@@ -62,7 +65,11 @@ const MarketOpportnuityMain: React.FC = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
-    const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking","gap_report"];
+    if (newValue === 6) {
+      navigate(`/opportunity/pastdeals`);
+      return;
+    }
+    const tabPaths = ["", "deal-stats", "skew-table", "mdd_deal_stats", "gap-analysis", "weekly-tracking", "gap_report"];
     navigate(`/opportunity/equity/${tabPaths[newValue]}`);
   };
   interface CombinedDataResult {
@@ -224,6 +231,7 @@ const MarketOpportnuityMain: React.FC = () => {
         <Tab label="Monashee Transactions" />
         <Tab label="GAP Analysis" />
         <Tab label="Weekly Tracking" />
+        <Tab label="Past IPOs & FOs" />
         {/* <Tab label="30 Days Gap Report" /> */}
 
       </Tabs>
