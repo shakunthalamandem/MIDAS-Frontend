@@ -335,11 +335,11 @@ const NavbarMain: React.FC = () => {
                 //   path: "/opportunity/pastdeals",
                 //   icon: <HistoryEduOutlinedIcon fontSize="small" />,
                 // },
-                {
-                  label: "Monashee Daily Report",
-                  path: "/opportunity/monashee_daily_report",
-                  icon: <SummarizeOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Monashee Daily Report",
+                //   path: "/opportunity/monashee_daily_report",
+                //   icon: <SummarizeOutlinedIcon fontSize="small" />,
+                // },
                 {
                   label: "High Yields Market Opportunity",
                   path: "/opportunity/high-yield",
