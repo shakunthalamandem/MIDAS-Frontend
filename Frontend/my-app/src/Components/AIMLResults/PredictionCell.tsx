@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  LinearProgress,
-} from "@mui/material";
+import { Box, Typography, LinearProgress } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
@@ -104,14 +100,10 @@ const getPredictionMeta = (
     normalized.includes("up")
   ) {
     return {
-        displayLabel: (
-    <span style={{ fontSize: "10px" }}>
-      Positive Return
-    </span>
-  ),
-  tone: "positive",
-  icon: <TrendingUpIcon fontSize="small" />,
-};
+      displayLabel: <span style={{ fontSize: "10px" }}>Positive Return</span>,
+      tone: "positive",
+      icon: <TrendingUpIcon fontSize="small" />,
+    };
   }
 
   if (
@@ -120,14 +112,10 @@ const getPredictionMeta = (
     normalized.includes("down")
   ) {
     return {
-  displayLabel: (
-    <span style={{ fontSize: "10px" }}>
-      Negative Return
-    </span>
-  ),
-  tone: "negative",
-  icon: <TrendingDownIcon fontSize="small" />,
-};
+      displayLabel: <span style={{ fontSize: "10px" }}>Negative Return</span>,
+      tone: "negative",
+      icon: <TrendingDownIcon fontSize="small" />,
+    };
   }
 
   // Fallback: show the original text nicely
@@ -146,9 +134,11 @@ const getPredictionMeta = (
 const PredictionCell: React.FC<{
   pred: string;
   confidence: number | string;
-}> = ({ pred, confidence }) => {
+  trailingAdornment?: React.ReactNode;
+}> = ({ pred, confidence, trailingAdornment }) => {
   const confRaw = parseConfidence(confidence);
-  const confPct = confRaw !== null ? (confRaw <= 1 ? confRaw * 100 : confRaw) : null;
+  const confPct =
+    confRaw !== null ? (confRaw <= 1 ? confRaw * 100 : confRaw) : null;
   const confClamped =
     confPct !== null ? Math.min(100, Math.max(0, confPct)) : null;
 
@@ -168,67 +158,78 @@ const PredictionCell: React.FC<{
         flexDirection: "column",
         alignItems: "stretch",
         rowGap: 0.75,
-        minWidth: 160,
+        minWidth: 150,
       }}
     >
-      {/* Prediction pill */}
+      {/* Prediction pill + trailing dot */}
       <Box
-        sx={(theme) => {
-          const { palette } = theme;
-
-          let bg = alpha(palette.info.main, 0.08);
-          let border = alpha(palette.info.main, 0.3);
-          let text = palette.info.dark;
-
-          if (tone === "positive") {
-            bg = alpha(palette.success.main, 0.08);
-            border = alpha(palette.success.main, 0.4);
-            text = palette.success.dark;
-          } else if (tone === "negative") {
-            bg = alpha(palette.error.main, 0.08);
-            border = alpha(palette.error.main, 0.4);
-            text = palette.error.dark;
-          } else if (tone === "extreme") {
-            bg = alpha(palette.warning.main, 0.1);
-            border = alpha(palette.warning.main, 0.5);
-            text = palette.warning.dark;
-          }
-
-          return {
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            columnGap: 0.75,
-            paddingX: 1.2,
-            paddingY: 0.4,
-            borderRadius: 999,
-            backgroundColor: bg,
-            border: `1px solid ${border}`,
-          };
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          columnGap: 0.75,
         }}
       >
-        {icon && (
-          <Box
-            sx={{
-              display: "flex",
+        <Box
+          sx={(theme) => {
+            const { palette } = theme;
+
+            let bg = alpha(palette.info.main, 0.08);
+            let border = alpha(palette.info.main, 0.3);
+            let text = palette.info.dark;
+
+            if (tone === "positive") {
+              bg = alpha(palette.success.main, 0.08);
+              border = alpha(palette.success.main, 0.4);
+              text = palette.success.dark;
+            } else if (tone === "negative") {
+              bg = alpha(palette.error.main, 0.08);
+              border = alpha(palette.error.main, 0.4);
+              text = palette.error.dark;
+            } else if (tone === "extreme") {
+              bg = alpha(palette.warning.main, 0.1);
+              border = alpha(palette.warning.main, 0.5);
+              text = palette.warning.dark;
+            }
+
+            return {
+              display: "inline-flex",
               alignItems: "center",
-              mt: "1px",
-            }}
-          >
-            {icon}
-          </Box>
-        )}
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: 0.4,
-            textAlign: "center",
+              justifyContent: "center",
+              columnGap: 0.75,
+              paddingX: 1.2,
+              paddingY: 0.4,
+              borderRadius: 999,
+              backgroundColor: bg,
+              border: `1px solid ${border}`,
+              minWidth: 0,
+            };
           }}
         >
-          {displayLabel}
-        </Typography>
+          {icon && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mt: "1px",
+              }}
+            >
+              {icon}
+            </Box>
+          )}
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: 0.4,
+              textAlign: "center",
+            }}
+          >
+            {displayLabel}
+          </Typography>
+        </Box>
+        {trailingAdornment}
       </Box>
 
       {/* Confidence block */}
@@ -269,7 +270,7 @@ const PredictionCell: React.FC<{
         <Typography variant="caption" color="text.secondary" textAlign="center">
           {hasConf
             ? `${formatPercent(confClamped!)} Confidence`
-            : "Confidence – N/A"}
+            : "Confidence N/A"}
         </Typography>
       </Box>
     </Box>

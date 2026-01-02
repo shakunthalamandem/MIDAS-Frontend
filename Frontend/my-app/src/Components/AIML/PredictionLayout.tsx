@@ -373,7 +373,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
           onChangeType={handleTypeChange}
         />
 
-        {hasSentimentPdf && (
+        {/* {hasSentimentPdf && (
           <Button
             component="a"
             href={sentimentPdfHref}
@@ -401,7 +401,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
           >
             Click Here for Sentiment Analysis
           </Button>
-        )}
+        )} */}
       </Box>
 
       <Grid container spacing={2} alignItems="flex-start">
@@ -447,6 +447,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
             selectedType={selectedType}
             onSelect={handlePredictionSelect}
             refreshKey={refreshKey}
+            prefillTicker={prefillTicker || undefined}
           />
         </Grid>
       </Grid>
