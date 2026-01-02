@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+const ARROW_RIGHT_OFFSET = '20px'; // must match arrow's right
+const ARROW_BOTTOM_OFFSET = '10px'; // must match arrow's bottom
+const ARROW_SIZE_PX = 52; // approx arrow size (adjust only if needed)
+const GAP_ABOVE_ARROW_PX = 8;
+
+// ✅ Increase to move bot further RIGHT
+const HORIZONTAL_NUDGE_PX = 18;
 
 const containerStyle: React.CSSProperties = {
   position: 'fixed',
-  bottom: '10px', // align vertically with scroll-to-top button
-  right: '110px', // sit to the left of the scroll-to-top button without overlap
+  right: ARROW_RIGHT_OFFSET,
+  bottom: `calc(${ARROW_BOTTOM_OFFSET} + ${ARROW_SIZE_PX + GAP_ABOVE_ARROW_PX}px)`,
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center', // keep bubble centered over the avatar
-  gap: '10px',
+  alignItems: 'flex-end',
+  gap: '6px', // ✅ closer like your crop
   zIndex: 1200,
   cursor: 'pointer',
+  transform: `translateX(${HORIZONTAL_NUDGE_PX}px)`,
 };
 
 const bubbleStyle: React.CSSProperties = {
@@ -24,18 +33,20 @@ const bubbleStyle: React.CSSProperties = {
   lineHeight: 1.3,
   boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
   minHeight: '32px',
-  minWidth: '170px', // prevent horizontal shifting while typing
+  minWidth: '170px',
   textAlign: 'center',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
 };
 
 const bubbleTailStyle: React.CSSProperties = {
   position: 'absolute',
   bottom: '-6px',
-  left: '50%',
+  right: '10px', // ✅ tail near right edge like your crop
   width: '12px',
   height: '12px',
   backgroundColor: '#0b284f',
-  transform: 'translateX(-50%) rotate(45deg)',
+  transform: 'rotate(45deg)',
 };
 
 const avatarStyle: React.CSSProperties = {
@@ -59,6 +70,47 @@ const Aibot: React.FC = () => {
   const navigate = useNavigate();
   const videoSrc = `${process.env.PUBLIC_URL || ''}/images/aibot.mp4`;
 
+  const tooltipFullText = 'Hi, I am Gen AI Assistant';
+  const [typedTooltip, setTypedTooltip] = useState<string>('');
+
+  const intervalRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let idx = 0;
+
+    const clearTimers = () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+      intervalRef.current = null;
+      timeoutRef.current = null;
+    };
+
+    const startTyping = () => {
+      clearTimers();
+      setTypedTooltip('');
+      idx = 0;
+
+      intervalRef.current = window.setInterval(() => {
+        idx += 1;
+        setTypedTooltip(tooltipFullText.slice(0, idx));
+
+        if (idx >= tooltipFullText.length) {
+          if (intervalRef.current) window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          timeoutRef.current = window.setTimeout(startTyping, 1200);
+        }
+      }, 50);
+    };
+
+    startTyping();
+
+    return () => {
+      clearTimers();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div
       style={containerStyle}
@@ -74,18 +126,12 @@ const Aibot: React.FC = () => {
       }}
     >
       <div style={bubbleStyle}>
-        Hi, I am Gen AI Assistant
+        {typedTooltip}
         <span aria-hidden="true" style={bubbleTailStyle} />
       </div>
+
       <div style={avatarStyle} aria-label="Gen AI assistant">
-        <video
-          src={videoSrc}
-          style={videoStyle}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
+        <video src={videoSrc} style={videoStyle} autoPlay loop muted playsInline />
       </div>
     </div>
   );
