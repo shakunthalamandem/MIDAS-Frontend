@@ -476,7 +476,14 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         });
 
         const raw = await res.text();
-        if (!res.ok) throw new Error(raw || `Request failed with status ${res.status}`);
+        if (!res.ok) {
+          const friendly = "Data will update soon for this ticker.";
+          if (res.status === 404) {
+            if (!cancelled) setStatus({ kind: "message", text: friendly });
+            return;
+          }
+          throw new Error(raw || `Request failed with status ${res.status}`);
+        }
 
         let json: AiAnalysisApiResponse | string = {};
         try {
@@ -494,7 +501,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           (typeof messageFromApi === "string" && messageFromApi.trim().toLowerCase() === "no data found");
 
         if (noData) {
-          if (!cancelled) setStatus({ kind: "message", text: "We will update this ticker soon." });
+          if (!cancelled) setStatus({ kind: "message", text: "Data will update soon for this ticker." });
           return;
         }
 
@@ -503,11 +510,11 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
         if (!cancelled) {
           if (first) setAnalysis(first);
-          else setStatus({ kind: "message", text: "We will update this ticker soon." });
+          else setStatus({ kind: "message", text: "Data will update soon for this ticker." });
         }
       } catch (err) {
         console.error("Error fetching AI analysis", err);
-        if (!cancelled) setStatus({ kind: "error", text: "Unable to load AI analysis. Please try again." });
+        if (!cancelled) setStatus({ kind: "message", text: "Data will update soon for this ticker." });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -570,7 +577,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
       <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
         <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
         <CardContent sx={{ p: 2.5 }}>
-          <Typography sx={{ color: "grey.700", textAlign: "center", fontWeight: 600 }}>
+          <Typography sx={{ color: "#002060", textAlign: "center", fontWeight: 700 }}>
             {status.text}
           </Typography>
         </CardContent>
