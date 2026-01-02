@@ -6,12 +6,17 @@ import {
   CardContent,
   CircularProgress,
   Container,
-  MenuItem,
   Stack,
   TextField,
   Typography,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import PublicIcon from "@mui/icons-material/Public";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import TimelineIcon from "@mui/icons-material/Timeline";
 
 type Category = "ipo_international" | "ipo_us" | "fo" | "ipo_europe";
 
@@ -89,11 +94,18 @@ type ApiResponse = {
   ipo_europe: EuropeDeal[];
 };
 
-const categoryOptions: { value: Category; label: string }[] = [
-  { value: "ipo_international", label: "International" },
-  { value: "ipo_us", label: "US IPO" },
-  { value: "fo", label: "US FO" },
-  { value: "ipo_europe", label: "Eur Pipeline" },
+type CategoryOption = {
+  value: Category;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+};
+
+const categoryOptions: CategoryOption[] = [
+  { value: "ipo_international", label: "International", icon: PublicIcon, color: "#1565C0" },
+  { value: "ipo_us", label: "US IPO", icon: ApartmentIcon, color: "#002060" },
+  { value: "fo", label: "US FO", icon: ShowChartIcon, color: "#5D0163" },
+  { value: "ipo_europe", label: "Eur Pipeline", icon: TimelineIcon, color: "#6F1178" },
 ];
 
 const searchFields: Record<Category, string[]> = {
@@ -123,7 +135,11 @@ const formatMillions = (value: number | string | null | undefined, decimals = 0)
   if (value === null || value === undefined || value === "") return "-";
   const num = Number(value);
   if (Number.isNaN(num)) return String(value);
-  return `${num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}m`;
+  const formatted = num.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return `$${formatted}M`;
 };
 
 const formatPercent = (value: number | string | null | undefined, decimals = 1) => {
@@ -141,10 +157,10 @@ const formatDate = (value?: string | null) => {
 
 const columnSets: Record<Category, GridColDef[]> = {
   fo: [
-    { field: "ticker", headerName: "Ticker", renderHeader: () => renderHeader("Ticker"), flex: 0.8, minWidth: 110 },
-    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
-    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
     { field: "consumer_retail", headerName: "Consumer & Retail", renderHeader: () => renderHeader("Consumer & Retail"), flex: 1, minWidth: 150 },
+    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
     { field: "key_holders", headerName: "Key Holders", renderHeader: () => renderHeader("Key Holders"), flex: 1, minWidth: 150 },
     {
       field: "sell_down_size_m",
@@ -204,10 +220,10 @@ const columnSets: Record<Category, GridColDef[]> = {
     },
   ],
   ipo_international: [
-    { field: "ticker", headerName: "Ticker", renderHeader: () => renderHeader("Ticker"), flex: 0.8, minWidth: 110 },
-    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
-    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
     { field: "backers", headerName: "Backers", renderHeader: () => renderHeader("Backers"), flex: 1, minWidth: 150 },
+    { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
+    { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },
     { field: "banks", headerName: "Banks", renderHeader: () => renderHeader("Banks"), flex: 1, minWidth: 150 },
     {
       field: "size_m",
@@ -242,7 +258,7 @@ const columnSets: Record<Category, GridColDef[]> = {
     },
   ],
   ipo_us: [
-    { field: "ticker", headerName: "Ticker", renderHeader: () => renderHeader("Ticker"), flex: 0.8, minWidth: 110 },
+    { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
     { field: "company", headerName: "Company", renderHeader: () => renderHeader("Company"), flex: 1.2, minWidth: 150 },
     { field: "sector", headerName: "Sector", renderHeader: () => renderHeader("Sector"), flex: 1, minWidth: 130 },
     {
@@ -287,8 +303,8 @@ const columnSets: Record<Category, GridColDef[]> = {
     },
   ],
   ipo_europe: [
-    { field: "ticker", headerName: "Ticker", renderHeader: () => renderHeader("Ticker"), flex: 0.8, minWidth: 110 },
-    { field: "region", headerName: "Region", renderHeader: () => renderHeader("Region"), flex: 0.9, minWidth: 120 },
+    { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
+    { field: "region", headerName: "Company", renderHeader: () => renderHeader("Company"), flex: 0.9, minWidth: 120 },
     { field: "sector", headerName: "Sector", renderHeader: () => renderHeader("Sector"), flex: 1, minWidth: 130 },
     { field: "sellers", headerName: "Sellers", renderHeader: () => renderHeader("Sellers"), flex: 1.2, minWidth: 160 },
     {
@@ -311,18 +327,19 @@ const columnSets: Record<Category, GridColDef[]> = {
           "-"
         ),
     },
-    {
-      field: "created_at",
-      headerName: "Updated",
-      renderHeader: () => renderHeader("Updated"),
-      flex: 0.8,
-      minWidth: 120,
-      renderCell: (params) => formatDate(params.value),
-    },
+   
   ],
 };
 
-const ExpectedPipelineDealsTable: React.FC = () => {
+type ExpectedPipelineDealsTableProps = {
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
+};
+
+const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
+  searchQuery,
+  onSearchQueryChange,
+}) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [data, setData] = useState<ApiResponse>({
@@ -387,6 +404,12 @@ const ExpectedPipelineDealsTable: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [API_URL]);
 
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setSearchTerm(searchQuery);
+    }
+  }, [searchQuery]);
+
   const rows = useMemo(() => {
     const list = (data[selectedCategory] as any[]) || [];
     const normalized = list.map((item, idx) => ({
@@ -410,10 +433,15 @@ const ExpectedPipelineDealsTable: React.FC = () => {
 
   const isLoading = status === "loading";
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    onSearchQueryChange?.(value);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
       <Typography variant="h5" gutterBottom color="#002060" align="center" fontWeight={600}>
-        Expected Pipeline Deals
+        Future Pipeline Deals
       </Typography>
 
       <Card
@@ -433,26 +461,64 @@ const ExpectedPipelineDealsTable: React.FC = () => {
             justifyContent="space-between"
             sx={{ mb: 2, flexWrap: "wrap", gap: 2 }}
           >
-            <TextField
-              select
-              label="Category"
+            <ToggleButtonGroup
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as Category)}
-              sx={{ minWidth: { xs: "100%", md: 260 } }}
+              exclusive
+              onChange={(_e, val) => val && setSelectedCategory(val as Category)}
+              sx={{
+                flexWrap: "wrap",
+                "& .MuiToggleButton-root": {
+                  border: "1px solid rgba(0,32,96,0.16)",
+                  borderRadius: 20,
+                  textTransform: "none",
+                  px: 2,
+                  py: 1.1,
+                  mr: 1,
+                  mb: 1,
+                  backgroundColor: "#fff",
+                  color: "#002060",
+                  gap: 0.75,
+                  fontWeight: 700,
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#6F1178",
+                  color: "#ffffff",
+                  borderColor: "#6F1178",
+                  boxShadow: "0 8px 18px rgba(0,32,96,0.18)",
+                },
+                "& .MuiToggleButton-root:hover": {
+                  backgroundColor: "rgba(21,101,192,0.08)",
+                },
+              }}
             >
-              {categoryOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              {categoryOptions.map((option) => {
+                const Icon = option.icon;
+                const isActive = selectedCategory === option.value;
+                return (
+                  <ToggleButton key={option.value} value={option.value}>
+                    <Icon
+                      fontSize="small"
+                      sx={{ color: isActive ? "#ffffff" : option.color, transition: "color 0.2s ease" }}
+                    />
+                    {option.label}
+                  </ToggleButton>
+                );
+              })}
+            </ToggleButtonGroup>
 
             <TextField
               label="Search"
               placeholder="Search ticker, sector, seller..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{ minWidth: { xs: "100%", md: 320 } }}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              size="small"
+              sx={{
+                minWidth: { xs: "100%", md: 320 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 38,
+                },
+              }}
             />
           </Stack>
 
@@ -488,6 +554,12 @@ const ExpectedPipelineDealsTable: React.FC = () => {
               //   loadingOverlay: CircularProgress,
               // }}
             />
+          </Box>
+
+          <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
+            <Typography variant="caption" color="text.secondary">
+              The Link column provides direct access to the source in the Bloomberg Terminal.
+            </Typography>
           </Box>
         </CardContent>
       </Card>

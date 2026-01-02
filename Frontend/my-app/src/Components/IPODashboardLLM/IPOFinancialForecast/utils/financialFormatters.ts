@@ -19,6 +19,7 @@ export function formatFinancialMargin(value: number | string): string {
 
   // NM condition
   if (num < -100) return "NM";
+  if (num > 2000) return "NM";
 
   // round and remove decimals
   const rounded = Math.round(num);

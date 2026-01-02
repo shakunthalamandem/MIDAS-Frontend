@@ -1,12 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
+  Autocomplete,
   Box,
   Card,
-  Container,
-  Typography,
   CircularProgress,
+  Container,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
 } from "@mui/material";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PredictionLayout from "./PredictionLayout";
+import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
+import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 type OptionsData = {
   region: string[];
@@ -17,10 +27,107 @@ type OptionsData = {
   deal_status: string[];
 };
 
+type TickerOption = {
+  id: string;
+  ticker: string;
+  pricing_date?: string | null;
+};
+
+interface TabPanelProps {
+  children: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
+  return (
+    <Box
+      role="tabpanel"
+      hidden={value !== index}
+      id={`ai-ml-tabpanel-${index}`}
+      aria-labelledby={`ai-ml-tab-${index}`}
+      sx={{ width: "100%" }}
+    >
+      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
+    </Box>
+  );
+};
+
+const formatPricingDate = (date?: string | null) => {
+  if (!date) return "TBA";
+  return date;
+};
+
+const TabLabel = ({
+  icon,
+  primary,
+  secondary,
+}: {
+  icon: React.ReactNode;
+  primary: string;
+  secondary: string;
+}) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+    <Box
+      sx={{
+        width: 32,
+        height: 32,
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(90, 85, 247, 0.12)",
+        color: "inherit",
+        flexShrink: 0,
+      }}
+    >
+      {icon}
+    </Box>
+    <Box sx={{ textAlign: "left" }}>
+      <Typography sx={{ fontWeight: 700, fontSize: { xs: 13, sm: 14 }, lineHeight: 1.2 }}>
+        {primary}
+      </Typography>
+      <Typography variant="caption" sx={{ color: "inherit", opacity: 0.85 }}>
+        {secondary}
+      </Typography>
+    </Box>
+  </Box>
+);
+
+const tabStyles = {
+  minHeight: 60,
+  minWidth: { xs: 240, sm: 280 },
+  px: { xs: 1.5, sm: 2.5 },
+  py: 1,
+  mr: { xs: 0, sm: 1 },
+  mb: { xs: 1, sm: 0 },
+  borderRadius: 9999,
+  alignItems: "stretch",
+  justifyContent: "flex-start",
+  textTransform: "none",
+  backgroundColor: "#e9eef6",
+  color: "#002060",
+  border: "1px solid #002060",
+  boxShadow: "0 2px 6px rgba(0, 32, 96, 0.12)",
+  "&:hover": { backgroundColor: "#dce5f2" },
+  "&.Mui-selected": {
+    backgroundColor: "#002060",
+    color: "#ffffff",
+    boxShadow: "0 8px 18px rgba(0, 32, 96, 0.32)",
+  },
+};
+
 const EquityAiMlPage: React.FC = () => {
   const [options, setOptions] = useState<OptionsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+
+  const [tickerOptions, setTickerOptions] = useState<TickerOption[]>([]);
+  const [selectedTicker, setSelectedTicker] = useState<TickerOption | null>(null);
+  const [tickerLoading, setTickerLoading] = useState(false);
+  const [tickerErr, setTickerErr] = useState<string | null>(null);
+
+  const [activeTab, setActiveTab] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -52,6 +159,57 @@ const EquityAiMlPage: React.FC = () => {
     })();
   }, [apiUrl]);
 
+  useEffect(() => {
+    const loadTickers = async () => {
+      if (!apiUrl) {
+        setTickerErr("API URL is missing");
+        return;
+      }
+      setTickerLoading(true);
+      setTickerErr(null);
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ type: "ticker_list" }),
+        });
+
+        const text = await res.text();
+        const data = text ? JSON.parse(text) : null;
+        if (!res.ok) {
+          throw new Error(data?.error || data?.detail || "Failed to load tickers");
+        }
+
+        const items = Array.isArray(data?.tickers) ? data.tickers : [];
+        const mapped = items.map((item: any, idx: number) => ({
+          id: `${item.ticker}-${item.pricing_date ?? idx}`,
+          ticker: item.ticker,
+          pricing_date: item.pricing_date ?? null,
+        }));
+        setTickerOptions(mapped);
+      } catch (e: any) {
+        setTickerErr(e.message || "Unable to load ticker list");
+      } finally {
+        setTickerLoading(false);
+      }
+    };
+
+    loadTickers();
+  }, [apiUrl]);
+
+  const selectedTickerPayload = useMemo(
+    () =>
+      selectedTicker
+        ? { ticker: selectedTicker.ticker, pricing_date: selectedTicker.pricing_date ?? null }
+        : null,
+    [selectedTicker]
+  );
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" py={6}>
@@ -68,13 +226,10 @@ const EquityAiMlPage: React.FC = () => {
   }
 
   return (
-    // Full-width container with no default gutters
     <Container maxWidth={false} disableGutters>
-      {/* Centered wrapper with equal margins; ~80% width on desktop */}
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Box sx={{ width: { xs: "96%", sm: "90%", md: "80%" } }}>
-          {/* Hero banner sits inside the centered wrapper */}
-          <Box
+          {/* <Box
             sx={{
               fontWeight: 500,
               color: "#FFFFFF",
@@ -87,40 +242,168 @@ const EquityAiMlPage: React.FC = () => {
               mb: 2,
             }}
           >
-            Welcome to the Prediction Dashboard! Effortlessly input data and track
-            all model outcomes, from feature details to prediction results and
-            confidence levels.
-          </Box>
+            Welcome to the Prediction and AI Dashboard. Use the global ticker search once and jump across
+            ML, Few-shot, and Sentiment views without re-entering details.
+          </Box> */}
 
-          {/* Main working surface inside the same centered wrapper */}
-          <Card
-            sx={{
-              borderRadius: 2,
-              boxShadow: 4,
-              p: { xs: 2, md: 3 },
-            }}
-          >
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              gutterBottom
-              textAlign="center"
-              color="#002060"
-            >
-              🧠 Machine Learning Equity Deal Predictor — US IPO & Follow-ons
-            </Typography>
+          {/* <Card sx={{ borderRadius: 2, boxShadow: 4, p: { xs: 2, md: 3 } }}> */}
+            <Stack spacing={2} sx={{ mt: { xs: 1.5, md: 2.5 } }}>
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={{ xs: 1.5, md: 2 }}
+                alignItems={{ xs: "flex-start", md: "center" }}
+                justifyContent="space-between"
+              >
+                <Tabs
+                  value={activeTab}
+                  onChange={(_, val) => setActiveTab(val)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  aria-label="AI ML tab selector"
+                  sx={{
+                    borderBottom: 0,
+                    ".MuiTabs-flexContainer": {
+                      gap: { xs: 1, sm: 1.5 },
+                      pb: 0.5,
+                    },
+                    ".MuiTabs-indicator": { display: "none" },
+                    maxWidth: { xs: "100%", md: "70%" },
+                  }}
+                  TabIndicatorProps={{ style: { display: "none" } }}
+                >
+                  <Tab
+                    id="ai-ml-tab-0"
+                    aria-controls="ai-ml-tabpanel-0"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="ML Model"
+                        secondary="(Based on 30+ factors)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                 <Tab
+                    id="ai-ml-tab-1"
+                    aria-controls="ai-ml-tabpanel-1"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="AI Unsupervised"
+                        secondary="(Past 10+ Deals)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                  <Tab
+                    id="ai-ml-tab-2"
+                    aria-controls="ai-ml-tabpanel-2"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="AI View "
+                        secondary="(Outside Sentiment)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                   
+                </Tabs>
+                <Box sx={{ minWidth: { xs: "100%", md: 260 }, width: { xs: "100%", md: 280 } }}>
+                  <Autocomplete
+                    options={tickerOptions}
+                    loading={tickerLoading}
+                    value={selectedTicker}
+                    onChange={(_, value) => {
+                      setSelectedTicker(value);
+                    }}
+                    getOptionLabel={(option) =>
+                      option.pricing_date
+                        ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
+                        : option.ticker
+                    }
+                    isOptionEqualToValue={(opt, val) =>
+                      opt.ticker === val.ticker &&
+                      (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label=""
+                        placeholder={tickerLoading ? "Loading..." : "Enter ticker..."}
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />,
+                          endAdornment: (
+                            <>
+                              {tickerLoading ? <CircularProgress color="inherit" size={16} /> : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                          sx: {
+                            backgroundColor: "#dfe7f2",
+                            borderRadius: 9999,
+                            px: 1.5,
+                            py: 0.25,
+                            "& fieldset": { borderColor: "#c2ccd9" },
+                            "&:hover fieldset": { borderColor: "#b2bfd1" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#002060",
+                              boxShadow: "0 0 0 3px rgba(0, 32, 96, 0.15)",
+                            },
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                  {tickerErr && (
+                    <Alert severity="warning" sx={{ mt: 1 }}>
+                      {tickerErr}
+                    </Alert>
+                  )}
+                </Box>
+              </Stack>
 
-            <Typography variant="body1" gutterBottom sx={{ mt: 1, mb: 2 }}>
-              Welcome to the ML-powered equity deal predictor for{" "}
-              <strong>US IPOs & Follow-ons (Marketed & Overnight)</strong>.
-              Input key parameters to forecast deal outcomes.
-            </Typography>
+              <TabPanel value={activeTab} index={0}>
+                <Card
+                  sx={{
+                    borderRadius: 2,
+                    boxShadow: 2,
+                    p: { xs: 2, md: 3 },
+                    backgroundColor: "#f7f9fc",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    gutterBottom
+                    textAlign="center"
+                    color="#002060"
+                  >
+                    Machine Learning Equity Deal Predictor - US IPO & Follow-ons
+                  </Typography>
 
-            {/* Work zone */}
-            <Box sx={{ backgroundColor: "#f7f9fc", p: { xs: 2, md: 3 }, borderRadius: 2 }}>
-              <PredictionLayout options={options} />
-            </Box>
-          </Card>
+                  <Typography variant="body1" gutterBottom sx={{ mt: 1, mb: 2 }}>
+                    Welcome to the ML-powered equity deal predictor for{" "}
+                    <strong>US IPOs and Follow-ons (Marketed and Overnight)</strong>.
+                    Input key parameters to forecast deal outcomes.
+                  </Typography>
+
+                  <Box sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
+                    <PredictionLayout options={options} prefillTicker={selectedTickerPayload} />
+                  </Box>
+                </Card>
+              </TabPanel>
+
+              <TabPanel value={activeTab} index={1}>
+                <AIFewshotAnalysis prefillTicker={selectedTickerPayload} />
+              </TabPanel>
+
+              <TabPanel value={activeTab} index={2}>
+                <ShowSentimentAnalysis focusTicker={selectedTickerPayload?.ticker ?? null} />
+              </TabPanel>
+            </Stack>
+          {/* </Card> */}
         </Box>
       </Box>
     </Container>

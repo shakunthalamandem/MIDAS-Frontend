@@ -53,6 +53,8 @@ interface RecentPredictionsPanelProps {
   selectedType: "IPO" | "FO";
   onSelect: (item: RecentPrediction) => void;
   refreshKey?: number;
+  prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
+  onTypeChange?: (type: "IPO" | "FO") => void;
 }
 
 /** ----- helpers ----- */
@@ -152,6 +154,8 @@ const fmtPrice = (v?: number | string | null) => {
   return n === null ? "N/A" : n.toFixed(2);
 };
 
+const tickerKey = (t?: string) => (t || "").replace(/\s+/g, "").toUpperCase();
+
 const statusChip = (status?: string) => {
   const s = (status || "").toLowerCase();
   if (s === "issued") return { color: "success" as const, label: "Issued" };
@@ -192,6 +196,8 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
   selectedType,
   onSelect,
   refreshKey,
+  prefillTicker,
+  onTypeChange,
 }) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -201,6 +207,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
   const [query, setQuery] = useState<string>("");
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+  const lastAutoSelectKey = useRef<string | null>(null);
 
   // for scroll-to-selected
   const selectedCardRef = useRef<HTMLDivElement | null>(null);
@@ -310,6 +317,49 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
       });
     }
   }, [filteredCards.length]);
+
+  // Auto-select a recent prediction card when a ticker is chosen from the top search
+  useEffect(() => {
+    if (!prefillTicker?.ticker || loading || error) return;
+
+    const targetTicker = prefillTicker.ticker;
+    const targetDateKey = prefillTicker.pricing_date
+      ? dateKey(prefillTicker.pricing_date)
+      : null;
+
+    const candidates = filteredByType.filter((d) => sameTicker(d.ticker, targetTicker));
+
+    // If no match in current type, try switching to the other type if available
+    if (candidates.length === 0) {
+      const fallback = allDeals.find((d) => sameTicker(d.ticker, targetTicker));
+      const fallbackType = (fallback?.deal_type || "").toUpperCase() as "IPO" | "FO" | "";
+      if (fallback && fallbackType && fallbackType !== selectedType) {
+        onTypeChange?.(fallbackType);
+        return; // wait for selectedType to change, then effect reruns
+      }
+      if (!fallback) return;
+      candidates.push(fallback);
+    }
+
+    let chosen = candidates[0];
+    if (targetDateKey) {
+      const exact = candidates.find(
+        (c) => dateKey(c.pricing_date) === targetDateKey
+      );
+      if (exact) chosen = exact;
+    }
+
+    const chosenKey = `${tickerKey(chosen.ticker)}-${dateKey(
+      chosen.pricing_date
+    )}`;
+    if (lastAutoSelectKey.current === chosenKey) return;
+    lastAutoSelectKey.current = chosenKey;
+
+    setSelectedTicker(chosen.ticker);
+    setSelectedDateKey(dateKey(chosen.pricing_date));
+    setQuery(chosen.ticker);
+    onSelect(chosen);
+  }, [prefillTicker, filteredByType, loading, error, onSelect]);
 
   if (loading) {
     return (
@@ -532,7 +582,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                             fmtPct(form.issue_to_previous_day_close),
                             "Relative change from T-1 close to issue price"
                           )}
-                        {metricRow(
+                        {/* {metricRow(
                           "Sentiment Analysis",
                           hasSentiment ? (
                             <a
@@ -547,7 +597,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
                           ) : (
                             "Not Available"
                           )
-                        )}
+                        )} */}
                         </Stack>
                       </Grid>
                     )}

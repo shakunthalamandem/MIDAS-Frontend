@@ -34,7 +34,13 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 
-const AIFewshotAnalysis: React.FC = () => {
+interface AIFewshotAnalysisProps {
+  prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
+}
+
+const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
+  prefillTicker,
+}) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
@@ -110,9 +116,21 @@ const AIFewshotAnalysis: React.FC = () => {
     [tickers]
   );
 
+  useEffect(() => {
+    if (!prefillTicker?.ticker || !options.length) return;
+    const match = options.find(
+      (opt) =>
+        opt.ticker === prefillTicker.ticker &&
+        (opt.pricing_date ?? "") === (prefillTicker.pricing_date ?? "")
+    );
+    if (match) {
+      setSelectedTicker(match);
+    }
+  }, [prefillTicker, options]);
+
   return (
     <>
-           <Typography
+           {/* <Typography
         variant="body2"
         sx={{
           fontWeight: 500,
@@ -130,7 +148,7 @@ const AIFewshotAnalysis: React.FC = () => {
         }}
       >
         Welcome to 📊 AI FewShot Analysis
-      </Typography>
+      </Typography> */}
     <Box
       sx={{
         minHeight: "100vh",
@@ -172,13 +190,13 @@ const AIFewshotAnalysis: React.FC = () => {
                 variant="h6"
                 sx={{
                   fontWeight: 800,
-                  color: "#0f172a",
+                  color: "#002060",
                   letterSpacing: 0.3,
                   textTransform: "uppercase",
                   fontSize: { xs: "1rem", md: "1.1rem" },
                 }}
               >
-                Few-shot AI Analysis
+                AI Unsupervised
               </Typography>
               <Autocomplete
                 options={options}
@@ -196,7 +214,7 @@ const AIFewshotAnalysis: React.FC = () => {
                 renderOption={(props, option) => (
                   <li {...props} key={option.id}>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography sx={{ fontWeight: 900, color: "#b71c1c" }}>{option.ticker}</Typography>
+                      <Typography sx={{ fontWeight: 900, color: "#0e0d0dff" }}>{option.ticker}</Typography>
                       <Typography variant="caption" sx={{ color: "#6b7280" }}>
                         {formatPricingDate(option.pricing_date)}
                       </Typography>

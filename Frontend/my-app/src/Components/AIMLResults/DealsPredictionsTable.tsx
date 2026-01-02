@@ -77,6 +77,65 @@ type DealTypeFilter = "IPO" | "FO";
 // narrower to reduce horizontal scroll
 const PREDICTION_COL_WIDTH = 160;
 
+type ReturnSign = "positive" | "negative" | "neutral" | null;
+
+const getPredictionSign = (pred: string): ReturnSign => {
+  const normalized = pred?.toLowerCase() || "";
+  if (!normalized) return null;
+  if (normalized.includes("positive") || normalized.includes("pos") || normalized.includes("up")) {
+    return "positive";
+  }
+  if (normalized.includes("negative") || normalized.includes("neg") || normalized.includes("down")) {
+    return "negative";
+  }
+  return null;
+};
+
+const getActualSign = (value: number | string): ReturnSign => {
+  if (value === null || value === undefined || value === "") return null;
+  const num = typeof value === "string" ? Number(value) : value;
+  if (Number.isNaN(num)) return null;
+  if (num > 0) return "positive";
+  if (num < 0) return "negative";
+  return "neutral";
+};
+
+const PredictionOutcomeDot: React.FC<{ pred: string; actual: number | string }> = ({
+  pred,
+  actual,
+}) => {
+  const predSign = getPredictionSign(pred);
+  const actualSign = getActualSign(actual);
+
+  const isMismatch =
+    predSign && actualSign && actualSign !== "neutral" && predSign !== actualSign;
+
+  let color = "#9e9e9e";
+  let title = "Missing data";
+
+  if (isMismatch) {
+    color = "#d32f2f";
+    title = "Prediction disagrees with actual";
+  } else if (predSign && actualSign && actualSign !== "neutral") {
+    color = "#2e7d32";
+    title = "Prediction aligns with actual";
+  }
+
+  return (
+    <Box
+      component="span"
+      title={title}
+      sx={(theme) => ({
+        width: 10,
+        height: 10,
+        borderRadius: "50%",
+        backgroundColor: color,
+        boxShadow: `0 0 0 1px ${alpha(theme.palette.getContrastText("#fff"), 0.04)}`,
+      })}
+    />
+  );
+};
+
 const TABLE_COLUMNS: ColumnConfig[] = [
   {
     key: "ticker_issuer",
@@ -125,7 +184,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1d_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionCell pred={row.t1d_pred} confidence={row.t1d_confidence} />
+        <PredictionCell
+          pred={row.t1d_pred}
+          confidence={row.t1d_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1d_pred} actual={row.t1d_actual_return} />
+          }
+        />
       </Box>
     ),
   },
@@ -140,6 +205,12 @@ const TABLE_COLUMNS: ColumnConfig[] = [
         <PredictionCell
           pred={row.t1d_openprice_pred}
           confidence={row.t1d_openprice_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot
+              pred={row.t1d_openprice_pred}
+              actual={row.t1d_openprice_actual_return}
+            />
+          }
         />
       </Box>
     ),
@@ -152,7 +223,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1w_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionCell pred={row.t1w_pred} confidence={row.t1w_confidence} />
+        <PredictionCell
+          pred={row.t1w_pred}
+          confidence={row.t1w_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1w_pred} actual={row.t1w_actual_return} />
+          }
+        />
       </Box>
     ),
   },
@@ -164,7 +241,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1m_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionCell pred={row.t1m_pred} confidence={row.t1m_confidence} />
+        <PredictionCell
+          pred={row.t1m_pred}
+          confidence={row.t1m_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1m_pred} actual={row.t1m_actual_return} />
+          }
+        />
       </Box>
     ),
   },
@@ -188,7 +271,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState(getISODate(7));
+  const [startDate, setStartDate] = useState(getISODate(30));
   const [endDate, setEndDate] = useState(getISODate(0));
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
@@ -706,6 +789,12 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
               </Table>
             </TableContainer>
           </Paper>
+
+          <Box mt={0.75} display="flex" justifyContent="flex-end">
+            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              Dot indicators: green = prediction aligns with actual; red = prediction disagrees with actual; grey = missing or neutral data.
+            </Typography>
+          </Box>
 
           {/* Details panel + prices chart */}
           <Box mt={2}>

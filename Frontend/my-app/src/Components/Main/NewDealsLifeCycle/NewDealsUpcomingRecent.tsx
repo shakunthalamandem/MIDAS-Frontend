@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress, Grid } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import { Container, Typography, CircularProgress, Grid, TextField } from "@mui/material";
+import FlashOnIcon from "@mui/icons-material/FlashOn";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
@@ -12,11 +15,36 @@ import ExpectedPipelineDealsTable from "../../UpcomingPipelineDeals/ExpectedPipe
 const NewDealsUpcomingRecent: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedOp, setSelectedOp] = useState("Upcoming Deals");
+  const tabs = [
+    {
+      value: "upcoming",
+      label: "Upcoming Deals",
+      helper: "Filed but not issued",
+      icon: <EventAvailableIcon fontSize="small" sx={{ color: "inherit" }} />,
+    },
+    {
+      value: "live",
+      label: "Live Deals",
+      helper: "Issued within last 30 days",
+      icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
+    },
+    {
+      value: "pipeline",
+      label: "Future Pipeline",
+      helper: "Not filed",
+      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
+    },
+  ];
+  const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
-  const [showPipeline, setShowPipeline] = useState(false);
+  const [pipelineSearch, setPipelineSearch] = useState("");
+  const [dealSearch, setDealSearch] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const opMap: Record<string, string> = {
+    live: "Issued September to Date",
+    upcoming: "Upcoming Deals",
+  };
 
   const fetchData = async (operation: string) => {
     setLoading(true);
@@ -44,52 +72,112 @@ const NewDealsUpcomingRecent: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(selectedOp);
+    if (selectedOp === "pipeline") {
+      setRows([]);
+      setSelectedDeal(null);
+      return;
+    }
+    const apiOperation = opMap[selectedOp] || selectedOp;
+    fetchData(apiOperation);
   }, [selectedOp]);
 
-  const handleTogglePipeline = () => {
-    setShowPipeline((prev) => !prev);
-    setSelectedDeal(null);
-  };
-
   const handleOpChange = (value: string) => {
-    setShowPipeline(false);
     setSelectedOp(value);
   };
 
+  const isPipelineView = selectedOp === "pipeline";
+
+  useEffect(() => {
+    if (!isPipelineView) {
+      setPipelineSearch("");
+    }
+  }, [isPipelineView]);
+
+  useEffect(() => {
+    if (isPipelineView) {
+      setDealSearch("");
+    }
+  }, [isPipelineView]);
+
+  const filteredRows = useMemo(() => {
+    const term = dealSearch.trim().toLowerCase();
+    if (!term) return rows;
+    return rows.filter((row) => row.ticker?.toString().toLowerCase().includes(term));
+  }, [rows, dealSearch]);
+
   return (
-    <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        color="#002060"
-        align="center"
-        fontWeight={600}
-      >
-        New Deals - Upcoming & Recent
-      </Typography>
+    <Container
+      maxWidth="xl"
+      sx={{
+        mb: 4,
+        mt: 2,
+        position: "relative",
+        pb: 4,
+        px: { xs: 1.5, md: 2 },
+        backgroundColor: "rgba(21,101,192,0.05)",
+      borderRadius: 3,
+      }}
+    >
+  
 
       <DealsFilters
         selectedOp={selectedOp}
         onChange={handleOpChange}
-        onTogglePipeline={handleTogglePipeline}
-        showPipeline={showPipeline}
+        options={tabs}
+        rightContent={
+          isPipelineView ? (
+            <TextField
+              size="small"
+              fullWidth
+              label=""
+              placeholder="Search"
+              value={pipelineSearch}
+              onChange={(e) => setPipelineSearch(e.target.value)}
+              sx={{
+                minWidth: { xs: "100%", md: 180 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 34,
+                },
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          ) : (
+            <TextField
+              size="small"
+              fullWidth
+              label=""
+              placeholder="Search"
+              value={dealSearch}
+              onChange={(e) => setDealSearch(e.target.value)}
+              sx={{
+                minWidth: { xs: "100%", md: 160 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 34,
+                },
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          )
+        }
       />
+      {/* </Paper> */}
 
-      {showPipeline ? (
-        <ExpectedPipelineDealsTable />
+      {isPipelineView ? (
+        <ExpectedPipelineDealsTable searchQuery={pipelineSearch} onSearchQueryChange={setPipelineSearch} />
       ) : loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
       ) : (
         <DealsTable
-          rows={rows}
+          rows={filteredRows}
           loading={loading}
           onRowSelect={(row) => setSelectedDeal(row)}
           selectedOp={selectedOp}
         />
       )}
 
-      {!showPipeline && selectedDeal && (
+      {!isPipelineView && selectedDeal && (
         <>
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} md={4}>

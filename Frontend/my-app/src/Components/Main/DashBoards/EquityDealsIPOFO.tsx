@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import FoPredictionCards from "./Equity/FoPredictionCards";
@@ -12,14 +12,25 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
+  Tabs,
+  Tab,
+  TextField,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 
 // Motion Wrapper
 const MotionPaper = motion(Paper);
 
 // Years for selection
 const EquityDealsIPOFO: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
   const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([
     2024, 2025,
@@ -27,6 +38,10 @@ const EquityDealsIPOFO: React.FC = () => {
   const [selectedFoYears, setSelectedFoYears] = useState<number[]>([
     2024, 2025,
   ]);
+  const [navValue, setNavValue] = useState<number>(6);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [results, setResults] = useState<{ ticker_symbol: string; issuer_name: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleYearToggle = (year: number, isIPO: boolean) => {
     const setSelectedYears = isIPO ? setSelectedIpoYears : setSelectedFoYears;
@@ -78,6 +93,29 @@ const EquityDealsIPOFO: React.FC = () => {
     pdf.save(`${filePrefix}_Region_Wise_${years.join("_")}.pdf`);
   };
 
+  useEffect(() => {
+    setNavValue(6); // ensure Past IPOs & FOs stays highlighted
+  }, []);
+
+  const handleNavChange = (event: React.SyntheticEvent, newValue: number) => {
+    setNavValue(newValue);
+    const tabPaths = [
+      "", // search stays here
+      "/opportunity/equity/deal-stats",
+      "/opportunity/equity/skew-table",
+      "/opportunity/equity/mdd_deal_stats",
+      "/opportunity/equity/gap-analysis",
+      "/opportunity/equity/weekly-tracking",
+      "/opportunity/pastdeals",
+    ];
+    if (newValue === 0) return;
+    navigate(tabPaths[newValue]);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
   const renderHeader = (years: number[], isIPO: boolean) => (
     <Box
       display="flex"
@@ -125,6 +163,133 @@ const EquityDealsIPOFO: React.FC = () => {
 
   return (
     <Box maxWidth="1800px" mx="auto" px={2} py={3}>
+      <Tabs
+        value={navValue}
+        onChange={handleNavChange}
+        centered
+        TabIndicatorProps={{
+          style: { display: "none" },
+        }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          margin: "10px 0",
+          "& .MuiTab-root": {
+            backgroundColor: "#E3E6F0",
+            color: "#002060",
+            borderRadius: "12px",
+            padding: "10px 20px",
+            fontSize: "0.9rem",
+            maxHeight: "50px",
+            fontWeight: "600",
+            margin: "0 5px",
+            textTransform: "none",
+            transition:
+              "transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease",
+            "&:hover": {
+              backgroundColor: "#DCE6F0",
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+            },
+          },
+          "& .Mui-selected": {
+            backgroundColor: "#FF8C00",
+            color: "#ffffff !important",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+          },
+        }}
+      >
+        <Tab
+          sx={{
+            backgroundColor: navValue === 0 ? "#dce6f0" : "#f5f5f5",
+            color: navValue === 0 ? "#fff" : "#777",
+            "&.Mui-selected": { backgroundColor: "#dce6f0", color: "#fff" },
+          }}
+          label={
+            <TextField
+              label=""
+              variant="outlined"
+              value={searchTerm}
+              autoComplete="off"
+              onChange={handleSearchChange}
+              placeholder="Enter ticker..."
+              sx={{
+                marginBottom: "1px",
+                width: "200px",
+                height: "40px",
+                borderRadius: "32px",
+                backgroundColor: "#f4f6f9",
+              }}
+              InputProps={{
+                sx: {
+                  borderRadius: "42px",
+                  width: "200px",
+                  height: "40px",
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#002060",
+                  },
+                },
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#656565" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          }
+        />
+        <Tab label="Deal Stats From Dealogic" />
+        <Tab label="Skew Table" />
+        <Tab label="Monashee Transactions" />
+        <Tab label="GAP Analysis" />
+        <Tab label="Weekly Tracking" />
+        <Tab label="Past IPOs & FOs" />
+      </Tabs>
+
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        searchTerm.length > 0 && (
+          <Box sx={{ marginBottom: "20px", display: "flex", marginLeft: "240px" }}>
+            <Paper
+              elevation={6}
+              style={{
+                padding: "10px",
+                maxWidth: "280px",
+                maxHeight: "300px",
+                overflowY: "auto",
+                backgroundColor: "#ffffff",
+                borderRadius: "8px",
+              }}
+            >
+              {results.length === 0 ? (
+                <Typography variant="body2" color="textSecondary" align="center">
+                  No results found.
+                </Typography>
+              ) : (
+                <List>
+                  {results.map((item, index) => (
+                    <ListItem
+                      key={index}
+                      style={{
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        transition: "background-color 0.3s",
+                      }}
+                    >
+                      <ListItemText
+                        primary={<strong>{item.ticker_symbol}</strong>}
+                        secondary={item.issuer_name}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          </Box>
+        )
+      )}
+
       {/* Toggle Tabs */}
       <Box display="flex" justifyContent="center" mb={3}>
         <Stack direction="row" spacing={2}>

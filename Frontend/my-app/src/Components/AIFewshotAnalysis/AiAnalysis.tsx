@@ -38,6 +38,7 @@ type AiAnalysisRecord = {
 
 type AiAnalysisApiResponse = {
   answer?: AiAnalysisRecord[];
+  message?: string;
 };
 
 type FinalOutlook = {
@@ -53,8 +54,6 @@ type ScenarioParts = {
   bearish?: string;
 };
 
-const APP_FONT = '"Roboto","Helvetica","Arial",sans-serif';
-
 const DEFAULT_OUTLOOK: FinalOutlook = {
   week: "-",
   month: "-",
@@ -62,17 +61,26 @@ const DEFAULT_OUTLOOK: FinalOutlook = {
   confidence: "-",
 };
 
-const stripMarkdown = (input?: string): string => {
+const stripMarkdown = (input?: unknown): string => {
   if (!input) return "";
-  return (
-    input
-      .replace(/\*\*(.*?)\*\*/g, "$1")
-      .replace(/\*(.*?)\*/g, "$1")
-      .replace(/__([^_]+)__/g, "$1")
-      .replace(/_([^_]+)_/g, "$1")
-      .replace(/`+/g, "")
-      .trim()
-  );
+  const safe =
+    typeof input === "string"
+      ? input
+      : (() => {
+          try {
+            return String(input);
+          } catch {
+            return "";
+          }
+        })();
+
+  return safe
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/_([^_]+)_/g, "$1")
+    .replace(/`+/g, "")
+    .trim();
 };
 
 const bulletize = (text?: string): string[] => {
@@ -103,9 +111,14 @@ const parseFinalOutlook = (record?: AiAnalysisRecord): FinalOutlook => {
           (record["Expected 1-Month Sentiment"] as string) ||
           "-"
       ),
-      volatility: stripMarkdown(obj["Expected Volatility"] || obj["expected volatility"] || "-"),
+      volatility: stripMarkdown(
+        obj["Expected Volatility"] || obj["expected volatility"] || "-"
+      ),
       confidence: stripMarkdown(
-        obj["Confidence Level"] || obj["confidence level"] || obj["confidence"] || "-"
+        obj["Confidence Level"] ||
+          obj["confidence level"] ||
+          obj["confidence"] ||
+          "-"
       ),
     };
   }
@@ -116,6 +129,7 @@ const parseFinalOutlook = (record?: AiAnalysisRecord): FinalOutlook => {
     const match = fromFinal.match(regex);
     return stripMarkdown((match && match[1]?.trim()) || fallback || "-");
   };
+
   return {
     week: pick("1-week sentiment", record["Expected 1-Week Sentiment"] as string),
     month: pick("1-month sentiment", record["Expected 1-Month Sentiment"] as string),
@@ -124,16 +138,17 @@ const parseFinalOutlook = (record?: AiAnalysisRecord): FinalOutlook => {
   };
 };
 
-const parseScenarioParts = (text?: string): ScenarioParts => {
-  if (!text) return {};
-  const cleaned = stripMarkdown(text);
+const parseScenarioParts = (text?: unknown): ScenarioParts => {
+  const raw = typeof text === "string" ? text : "";
+  if (!raw) return {};
+  const cleaned = stripMarkdown(raw);
 
   const grab = (label: string) => {
     const regex = new RegExp(
       `-\\s*\\*\\*${label}[^*]*\\*\\*:\\s*([\\s\\S]*?)(?=\\n-\\s*\\*\\*|$)`,
       "i"
     );
-    const match = text.match(regex);
+    const match = raw.match(regex);
     return match ? stripMarkdown(match[1].trim()) : undefined;
   };
 
@@ -154,42 +169,9 @@ const parseScenarioParts = (text?: string): ScenarioParts => {
 /* ---------------- UI atoms ---------------- */
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Typography
-    variant="overline"
-    sx={{
-      fontFamily: APP_FONT,
-      letterSpacing: 2.4,
-      fontWeight: 900,
-      color: "grey.700",
-      px: 0.5,
-    }}
-  >
+  <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
     {children}
   </Typography>
-);
-
-const SoftCard: React.FC<{
-  children: React.ReactNode;
-  accent?: string;
-  bgTint?: string;
-  minHeight?: number;
-}> = ({ children, accent = "#EEF2FF", bgTint = "#FFFFFF", minHeight }) => (
-  <Card
-    elevation={0}
-    sx={{
-      borderRadius: 3,
-      border: "1px solid",
-      borderColor: "grey.200",
-      background: bgTint,
-      boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
-      overflow: "hidden",
-      height: "100%",
-      minHeight,
-    }}
-  >
-    <Box sx={{ height: 6, bgcolor: accent }} />
-    <CardContent sx={{ p: 2.5 }}>{children}</CardContent>
-  </Card>
 );
 
 const IconBubble: React.FC<{ bg: string; color: string; children: React.ReactNode }> = ({
@@ -215,13 +197,7 @@ const IconBubble: React.FC<{ bg: string; color: string; children: React.ReactNod
 );
 
 const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp }) => {
-  if (!text) {
-    return (
-      <Typography sx={{ fontFamily: APP_FONT, color: "grey.600" }} variant="body2">
-        —
-      </Typography>
-    );
-  }
+  if (!text) return <Typography sx={{ color: "grey.600" }} variant="body2">-</Typography>;
 
   const cleaned = stripMarkdown(text);
   const lines = bulletize(cleaned);
@@ -242,10 +218,7 @@ const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp })
                 flex: "0 0 auto",
               }}
             />
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: APP_FONT, color: "grey.700", lineHeight: 1.9 }}
-            >
+            <Typography variant="body2" sx={{ color: "grey.700", lineHeight: 1.9 }}>
               {l}
             </Typography>
           </Box>
@@ -258,7 +231,6 @@ const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp })
     <Typography
       variant="body2"
       sx={{
-        fontFamily: APP_FONT,
         color: "grey.700",
         lineHeight: 1.95,
         whiteSpace: "pre-wrap",
@@ -282,25 +254,23 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
     sx={{
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
-      color: "common.white",
-      boxShadow: "0 18px 50px rgba(2,6,23,0.25)",
-      background:
-        "linear-gradient(135deg, rgba(2,6,23,1) 0%, rgba(10,23,55,1) 45%, rgba(15,23,42,1) 100%)",
-      border: "1px solid rgba(255,255,255,0.08)",
-      fontFamily: APP_FONT,
+      color: "#002060",
+      boxShadow: "0 12px 32px rgba(0,32,96,0.18)",
+      background: "linear-gradient(135deg, #E9F0FF 0%, #D7E3FF 60%, #C3D4FF 100%)",
+      border: "1px solid #D0DAF5",
     }}
   >
-    <Typography variant="overline" sx={{ letterSpacing: 2, opacity: 0.8, fontWeight: 900 }}>
+    <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
       Executive Summary
     </Typography>
     <Typography
       variant="h4"
-      sx={{ mt: 1, fontWeight: 900, lineHeight: 1.12, letterSpacing: -0.6 }}
+      sx={{ mt: 1, fontWeight: 900, lineHeight: 1.12, color: "#002060", textAlign: "center" }}
     >
       {companyName}
     </Typography>
-    <Typography sx={{ mt: 2, color: "rgba(255,255,255,0.86)", lineHeight: 1.85 }} variant="body1">
-      {stripMarkdown(summary) || "—"}
+    <Typography sx={{ mt: 2, color: "#002060", lineHeight: 1.85, textAlign: "center" }} variant="body1">
+      {stripMarkdown(summary) || "-"}
     </Typography>
   </Box>
 );
@@ -312,18 +282,23 @@ const OutlookCard: React.FC<{
   chipBg?: string;
   chipColor?: string;
   accent?: string;
-}> = ({ label, value, mode, chipBg = "#F3F4F6", chipColor = "#334155", accent = "#EEF2FF" }) => {
-  return (
-    <SoftCard accent={accent} minHeight={92}>
-      <Typography
-        variant="overline"
-        sx={{
-          fontFamily: APP_FONT,
-          letterSpacing: 1.8,
-          fontWeight: 900,
-          color: "grey.700",
-        }}
-      >
+}> = ({ label, value, mode, chipBg = "#F3F4F6", chipColor = "#334155", accent = "#EEF2FF" }) => (
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: 3,
+      border: "1px solid",
+      borderColor: "grey.200",
+      background: "#FFFFFF",
+      boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+      overflow: "hidden",
+      height: "100%",
+      minHeight: 92,
+    }}
+  >
+    <Box sx={{ height: 6, bgcolor: accent }} />
+    <CardContent sx={{ p: 2.5 }}>
+      <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
         {label}
       </Typography>
 
@@ -333,7 +308,6 @@ const OutlookCard: React.FC<{
             label={stripMarkdown(value) || "-"}
             size="small"
             sx={{
-              fontFamily: APP_FONT,
               fontWeight: 800,
               bgcolor: chipBg,
               color: chipColor,
@@ -343,17 +317,14 @@ const OutlookCard: React.FC<{
             }}
           />
         ) : (
-          <Typography
-            variant="subtitle1"
-            sx={{ fontFamily: APP_FONT, fontWeight: 500, color: "grey.900" }}
-          >
+          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: "grey.900" }}>
             {stripMarkdown(value) || "-"}
           </Typography>
         )}
       </Box>
-    </SoftCard>
-  );
-};
+    </CardContent>
+  </Card>
+);
 
 const ScenarioCard: React.FC<{
   tone: "bearish" | "base" | "bullish";
@@ -387,26 +358,37 @@ const ScenarioCard: React.FC<{
   const t = map[tone];
 
   return (
-    <SoftCard accent={t.accent} bgTint={t.bg} minHeight={210}>
-      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-        <IconBubble bg={t.iconBg} color={t.iconColor}>
-          {t.icon}
-        </IconBubble>
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid",
+        borderColor: "grey.200",
+        background: t.bg,
+        boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+        overflow: "hidden",
+        height: "100%",
+        minHeight: 210,
+      }}
+    >
+      <Box sx={{ height: 6, bgcolor: t.accent }} />
+      <CardContent sx={{ p: 2.5 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
+          <IconBubble bg={t.iconBg} color={t.iconColor}>
+            {t.icon}
+          </IconBubble>
 
-        <Box sx={{ minWidth: 0 }}>
-          <Typography
-            variant="subtitle1"
-            sx={{ fontFamily: APP_FONT, fontWeight: 800, color: "grey.900" }}
-          >
-            {title}
-          </Typography>
-
-          <Box sx={{ mt: 1 }}>
-            <TextBlock text={text} clamp={7} />
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#002060", textAlign: "center" }}>
+              {title}
+            </Typography>
+            <Box sx={{ mt: 1 }}>
+              <TextBlock text={text} clamp={7} />
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </SoftCard>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -417,76 +399,72 @@ const DetailBigCard: React.FC<{
   iconBg: string;
   iconColor: string;
   text?: string;
-}> = ({ label, icon, accent, iconBg, iconColor, text }) => {
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: "grey.200",
-        boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
-        overflow: "hidden",
-        height: "100%",
-        position: "relative",
-      }}
-    >
-      <Box sx={{ position: "absolute", inset: 0, width: 6, bgcolor: accent }} />
-      <CardContent sx={{ p: 2.75, pl: 3.25 }}>
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-          <IconBubble bg={iconBg} color={iconColor}>
-            {icon}
-          </IconBubble>
+}> = ({ label, icon, accent, iconBg, iconColor, text }) => (
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: 3,
+      border: "1px solid",
+      borderColor: "grey.200",
+      boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+      overflow: "hidden",
+      height: "100%",
+      position: "relative",
+    }}
+  >
+    <Box sx={{ position: "absolute", inset: 0, width: 6, bgcolor: accent }} />
+    <CardContent sx={{ p: 2.75, pl: 3.25 }}>
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
+        <IconBubble bg={iconBg} color={iconColor}>
+          {icon}
+        </IconBubble>
 
-          <Box>
-            <Typography
-              variant="overline"
-              sx={{
-                fontFamily: APP_FONT,
-                letterSpacing: 1.8,
-                fontWeight: 900,
-                color: "grey.700",
-              }}
-            >
-              {label}
-            </Typography>
+        <Box>
+          <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+            {label}
+          </Typography>
 
-            <Box sx={{ mt: 1 }}>
-              <TextBlock text={text} />
-            </Box>
+          <Box sx={{ mt: 1 }}>
+            <TextBlock text={text} />
           </Box>
         </Box>
-      </CardContent>
-    </Card>
-  );
-};
+      </Box>
+    </CardContent>
+  </Card>
+);
+
+type StatusState = { kind: "message"; text: string } | { kind: "error"; text: string } | null;
 
 const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
   const API_URL = process.env.REACT_APP_API_URL;
+
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // ✅ message = plain text UI, error = Alert UI
+  const [status, setStatus] = useState<StatusState>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     if (!ticker) {
       setAnalysis(null);
-      setError(null);
+      setStatus(null);
       setLoading(false);
       return;
     }
 
     if (!API_URL) {
-      setError("REACT_APP_API_URL is not set.");
+      setStatus({ kind: "error", text: "REACT_APP_API_URL is not set." });
       setLoading(false);
       return;
     }
 
     const fetchAnalysis = async () => {
       setLoading(true);
-      setError(null);
+      setStatus(null);
       setAnalysis(null);
+
       try {
         const res = await fetch(`${API_URL}/api/get_few_shot_review/`, {
           method: "POST",
@@ -496,17 +474,47 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
             pricing_date: pricingDate ?? null,
           }),
         });
-        if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
-        const json = (await res.json()) as AiAnalysisApiResponse;
-        const first = Array.isArray(json?.answer) && json.answer.length > 0 ? json.answer[0] : null;
+
+        const raw = await res.text();
+        if (!res.ok) {
+          const friendly = "Data will update soon for this ticker.";
+          if (res.status === 404) {
+            if (!cancelled) setStatus({ kind: "message", text: friendly });
+            return;
+          }
+          throw new Error(raw || `Request failed with status ${res.status}`);
+        }
+
+        let json: AiAnalysisApiResponse | string = {};
+        try {
+          json = raw ? JSON.parse(raw) : {};
+        } catch {
+          json = raw;
+        }
+
+        // ✅ handle both: "No data found" and {"message":"No data found"}
+        const messageFromApi =
+          typeof json === "object" && json !== null ? (json as AiAnalysisApiResponse).message : undefined;
+
+        const noData =
+          (typeof json === "string" && json.trim().toLowerCase() === "no data found") ||
+          (typeof messageFromApi === "string" && messageFromApi.trim().toLowerCase() === "no data found");
+
+        if (noData) {
+          if (!cancelled) setStatus({ kind: "message", text: "Data will update soon for this ticker." });
+          return;
+        }
+
+        const answer = (json as AiAnalysisApiResponse)?.answer;
+        const first = Array.isArray(answer) && answer.length > 0 ? answer[0] : null;
 
         if (!cancelled) {
           if (first) setAnalysis(first);
-          else setError("No analysis available yet.");
+          else setStatus({ kind: "message", text: "Data will update soon for this ticker." });
         }
       } catch (err) {
         console.error("Error fetching AI analysis", err);
-        if (!cancelled) setError("Unable to load AI analysis. Please try again.");
+        if (!cancelled) setStatus({ kind: "message", text: "Data will update soon for this ticker." });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -538,40 +546,69 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
   if (!ticker) {
     return (
-      <SoftCard>
-        <Typography sx={{ fontFamily: APP_FONT, color: "grey.600" }}>
-          Select a ticker above to view the AI analysis.
-        </Typography>
-      </SoftCard>
+      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
+        <CardContent sx={{ p: 2.5 }}>
+          <Typography sx={{ color: "grey.600", textAlign: "center" }}>
+            Select a ticker above to view the AI analysis.
+          </Typography>
+        </CardContent>
+      </Card>
     );
   }
 
   if (loading) {
     return (
-      <SoftCard>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-          <CircularProgress size={18} />
-          <Typography sx={{ fontFamily: APP_FONT, color: "grey.600" }}>Loading AI analysis…</Typography>
-        </Box>
-      </SoftCard>
+      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
+        <CardContent sx={{ p: 2.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, justifyContent: "center" }}>
+            <CircularProgress size={18} />
+            <Typography sx={{ color: "grey.600" }}>Loading AI analysis...</Typography>
+          </Box>
+        </CardContent>
+      </Card>
     );
   }
 
-  if (error) {
+  // ✅ Plain message (no icon, no red box)
+  if (status?.kind === "message") {
     return (
-      <SoftCard accent="#FEE2E2" bgTint="#FFF5F5">
-        <Alert severity="error" variant="outlined">
-          {error}
-        </Alert>
-      </SoftCard>
+      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
+        <CardContent sx={{ p: 2.5 }}>
+          <Typography sx={{ color: "#002060", textAlign: "center", fontWeight: 700 }}>
+            {status.text}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // ✅ Real error only
+  if (status?.kind === "error") {
+    return (
+      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+        <Box sx={{ height: 6, bgcolor: "#FEE2E2" }} />
+        <CardContent sx={{ p: 2.5 }}>
+          <Alert severity="error" variant="outlined">
+            {status.text}
+          </Alert>
+        </CardContent>
+      </Card>
     );
   }
 
   if (!analysis) {
     return (
-      <SoftCard>
-        <Typography sx={{ fontFamily: APP_FONT, color: "grey.600" }}>AI analysis will be available soon.</Typography>
-      </SoftCard>
+      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
+        <CardContent sx={{ p: 2.5 }}>
+          <Typography sx={{ color: "grey.600", textAlign: "center" }}>
+            AI analysis will be available soon.
+          </Typography>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -582,20 +619,13 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
     : { bg: "#E5E7EB", color: "#334155", icon: null as any };
 
   return (
-    <Box sx={{ fontFamily: APP_FONT }}>
+    <Box>
       <Stack spacing={3}>
         <ExecutiveHero companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
 
         <Box>
           <SectionLabel>OUTLOOK SUMMARY</SectionLabel>
-          <Box
-            sx={{
-              mt: 1.25,
-              display: "grid",
-              gap: 2,
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" },
-            }}
-          >
+          <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
             <OutlookCard
               label="1-WEEK SENTIMENT"
               value={outlook.week}
@@ -619,27 +649,14 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
         <Box>
           <SectionLabel>SCENARIO ANALYSIS</SectionLabel>
-          <Box
-            sx={{
-              mt: 1.25,
-              display: "grid",
-              gap: 2,
-              gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" },
-            }}
-          >
+          <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" } }}>
             <ScenarioCard tone="bearish" title="Bearish Scenario" text={scenarios.bearish} />
             <ScenarioCard tone="base" title="Base Case" text={scenarios.base} />
             <ScenarioCard tone="bullish" title="Bullish Scenario" text={scenarios.bullish} />
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: "grid",
-            gap: 2,
-            gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
-          }}
-        >
+        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" } }}>
           <DetailBigCard
             label="1-WEEK OUTLOOK"
             icon={<CalendarMonthRoundedIcon sx={{ fontSize: 18 }} />}
@@ -658,29 +675,28 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           />
         </Box>
 
-        {/* ✅ CHANGED ONLY THIS PART: put them in separate rows */}
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr" }}>
-          <SoftCard accent="#F1F5F9">
-            <Typography
-              variant="overline"
-              sx={{ fontFamily: APP_FONT, letterSpacing: 1.8, fontWeight: 900, color: "grey.700" }}
-            >
-              ANALOGICAL ASSESSMENT
-            </Typography>
-            <Divider sx={{ my: 1.5 }} />
-            <TextBlock text={analogical} />
-          </SoftCard>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+            <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+                ANALOGICAL ASSESSMENT
+              </Typography>
+              <Divider sx={{ my: 1.5 }} />
+              <TextBlock text={analogical} />
+            </CardContent>
+          </Card>
 
-          <SoftCard accent="#EDE9FE">
-            <Typography
-              variant="overline"
-              sx={{ fontFamily: APP_FONT, letterSpacing: 1.8, fontWeight: 900, color: "grey.700" }}
-            >
-              EXPECTATION VS REALITY
-            </Typography>
-            <Divider sx={{ my: 1.5 }} />
-            <TextBlock text={expectationText} />
-          </SoftCard>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+            <Box sx={{ height: 6, bgcolor: "#EDE9FE" }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+                EXPECTATION VS REALITY
+              </Typography>
+              <Divider sx={{ my: 1.5 }} />
+              <TextBlock text={expectationText} />
+            </CardContent>
+          </Card>
         </Box>
       </Stack>
     </Box>

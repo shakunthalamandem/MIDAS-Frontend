@@ -78,6 +78,11 @@ const WriteUpIPODashbaord: React.FC = () => {
   }, [ipoData]);
   const [orderBy, setOrderBy] = useState<keyof IpoData>("sector");
   const [order, setOrder] = useState<Order>("asc");
+  const ellipsisCellSx = {
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  };
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -394,6 +399,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                 sx={{
                   borderCollapse: "collapse",
                   border: "1px solid black",
+                  tableLayout: "fixed",
+                  width: "100%",
                 }}
               >
                 <TableHead>
@@ -422,6 +429,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                           lineHeight: 1.2,
                           backgroundColor: "#0b2a6b",
                           whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
                     {key ? (
@@ -479,6 +488,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             lineHeight: 1.2,
                             color: "#b10f0f",
                             textDecoration: "underline",
+                            ...ellipsisCellSx,
+                            maxWidth: 120,
                           }}
                         >
                           {row.ticker}
@@ -492,6 +503,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
+                            ...ellipsisCellSx,
+                            maxWidth: 260,
                           }}
                         >
                           {row.company_name}
@@ -505,6 +518,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
+                            ...ellipsisCellSx,
+                            maxWidth: 160,
                           }}
                         >
                           {formatDate(row.pricing_date)}
@@ -518,6 +533,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
+                            ...ellipsisCellSx,
+                            maxWidth: 180,
                           }}
                         >
                           {row.sector || "—"}
@@ -531,7 +548,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
-                            whiteSpace: "nowrap",
+                            ...ellipsisCellSx,
+                            maxWidth: 160,
                           }}
                         >
                           {row.pricing_range_min !== null &&
@@ -548,6 +566,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
+                            ...ellipsisCellSx,
+                            maxWidth: 180,
                           }}
                         >
                           {row.exchange || "—"}
@@ -561,7 +581,8 @@ const WriteUpIPODashbaord: React.FC = () => {
                             padding: "7px 8px",
                             border: "1px solid black",
                             lineHeight: 1.2,
-                            whiteSpace: "nowrap",
+                            ...ellipsisCellSx,
+                            maxWidth: 140,
                           }}
                         >
                           {formatDealSize(row.deal_size)}

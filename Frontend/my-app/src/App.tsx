@@ -7,6 +7,7 @@ import ScrollToTopButton from './Components/Main/HomePage/Authentication/ScrollT
 import Box from '@mui/material/Box';
 import SecurityLayer from './Tests/SecurityLayer';
 import ChatBoxButton from './Components/Main/HomePage/Authentication/ChatBoxButton';
+import Aibot from './Components/Main/HomePage/Authentication/Aibot';
 
 const App: React.FC = () => {
   return (
@@ -28,8 +29,10 @@ const App: React.FC = () => {
         >
           <AppRouters />
         </Box>
-        <FooterMain />
+        <FooterMain />  
+        <Aibot />
         <ScrollToTopButton />
+        
         {/* <ChatBoxButton /> */}
 
       </Router>
