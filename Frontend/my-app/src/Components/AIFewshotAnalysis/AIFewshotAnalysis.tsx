@@ -196,7 +196,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                   fontSize: { xs: "1rem", md: "1.1rem" },
                 }}
               >
-                Few-shot AI Analysis
+                AI Unsupervised
               </Typography>
               <Autocomplete
                 options={options}
