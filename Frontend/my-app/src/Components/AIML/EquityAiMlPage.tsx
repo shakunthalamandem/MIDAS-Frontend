@@ -283,7 +283,18 @@ const EquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   />
-                 
+                 <Tab
+                    id="ai-ml-tab-1"
+                    aria-controls="ai-ml-tabpanel-1"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="AI Unsupervised"
+                        secondary="(Past 10+ Deals)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
                   <Tab
                     id="ai-ml-tab-2"
                     aria-controls="ai-ml-tabpanel-2"
@@ -296,18 +307,7 @@ const EquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   />
-                   <Tab
-                    id="ai-ml-tab-1"
-                    aria-controls="ai-ml-tabpanel-1"
-                    label={
-                      <TabLabel
-                        icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="AI Unsupervised"
-                        secondary="(Past 10+ Deals)"
-                      />
-                    }
-                    sx={tabStyles}
-                  />
+                   
                 </Tabs>
                 <Box sx={{ minWidth: { xs: "100%", md: 260 }, width: { xs: "100%", md: 280 } }}>
                   <Autocomplete

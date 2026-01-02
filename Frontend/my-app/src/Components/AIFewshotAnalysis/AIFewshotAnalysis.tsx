@@ -190,7 +190,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                 variant="h6"
                 sx={{
                   fontWeight: 800,
-                  color: "#0f172a",
+                  color: "#002060",
                   letterSpacing: 0.3,
                   textTransform: "uppercase",
                   fontSize: { xs: "1rem", md: "1.1rem" },
@@ -214,7 +214,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                 renderOption={(props, option) => (
                   <li {...props} key={option.id}>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography sx={{ fontWeight: 900, color: "#b71c1c" }}>{option.ticker}</Typography>
+                      <Typography sx={{ fontWeight: 900, color: "#0e0d0dff" }}>{option.ticker}</Typography>
                       <Typography variant="caption" sx={{ color: "#6b7280" }}>
                         {formatPricingDate(option.pricing_date)}
                       </Typography>
