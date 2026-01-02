@@ -448,6 +448,7 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
             onSelect={handlePredictionSelect}
             refreshKey={refreshKey}
             prefillTicker={prefillTicker || undefined}
+            onTypeChange={handleTypeChange}
           />
         </Grid>
       </Grid>

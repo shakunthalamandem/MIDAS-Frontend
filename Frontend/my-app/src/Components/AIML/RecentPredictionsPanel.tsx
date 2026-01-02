@@ -54,6 +54,7 @@ interface RecentPredictionsPanelProps {
   onSelect: (item: RecentPrediction) => void;
   refreshKey?: number;
   prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
+  onTypeChange?: (type: "IPO" | "FO") => void;
 }
 
 /** ----- helpers ----- */
@@ -196,6 +197,7 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
   onSelect,
   refreshKey,
   prefillTicker,
+  onTypeChange,
 }) => {
   const [allDeals, setAllDeals] = useState<RecentPrediction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -325,10 +327,19 @@ const RecentPredictionsPanel: React.FC<RecentPredictionsPanelProps> = ({
       ? dateKey(prefillTicker.pricing_date)
       : null;
 
-    const candidates = filteredByType.filter((d) =>
-      sameTicker(d.ticker, targetTicker)
-    );
-    if (candidates.length === 0) return;
+    const candidates = filteredByType.filter((d) => sameTicker(d.ticker, targetTicker));
+
+    // If no match in current type, try switching to the other type if available
+    if (candidates.length === 0) {
+      const fallback = allDeals.find((d) => sameTicker(d.ticker, targetTicker));
+      const fallbackType = (fallback?.deal_type || "").toUpperCase() as "IPO" | "FO" | "";
+      if (fallback && fallbackType && fallbackType !== selectedType) {
+        onTypeChange?.(fallbackType);
+        return; // wait for selectedType to change, then effect reruns
+      }
+      if (!fallback) return;
+      candidates.push(fallback);
+    }
 
     let chosen = candidates[0];
     if (targetDateKey) {
