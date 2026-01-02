@@ -314,7 +314,10 @@ const EquityAiMlPage: React.FC = () => {
                     options={tickerOptions}
                     loading={tickerLoading}
                     value={selectedTicker}
-                    onChange={(_, value) => setSelectedTicker(value)}
+                    onChange={(_, value) => {
+                      setSelectedTicker(value);
+                      setActiveTab(0); // jump back to ML tab when a ticker is chosen
+                    }}
                     getOptionLabel={(option) =>
                       option.pricing_date
                         ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
