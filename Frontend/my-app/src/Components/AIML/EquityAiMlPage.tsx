@@ -277,32 +277,33 @@ const EquityAiMlPage: React.FC = () => {
                     label={
                       <TabLabel
                         icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="Machine Learning Equity Deal Predictor"
-                        secondary="ML Model (based on 30+ factors)"
+                        primary="ML Model"
+                        secondary="(Based on 30+ factors)"
                       />
                     }
                     sx={tabStyles}
                   />
-                  <Tab
-                    id="ai-ml-tab-1"
-                    aria-controls="ai-ml-tabpanel-1"
-                    label={
-                      <TabLabel
-                        icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="Few-shot AI Analysis"
-                        secondary="AI Unsupervised (Past 10+ Deals)"
-                      />
-                    }
-                    sx={tabStyles}
-                  />
+                 
                   <Tab
                     id="ai-ml-tab-2"
                     aria-controls="ai-ml-tabpanel-2"
                     label={
                       <TabLabel
                         icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="Sentiment Analysis"
-                        secondary="AI View (Outside Sentiment)"
+                        primary="AI View "
+                        secondary="(Outside Sentiment)"
+                      />
+                    }
+                    sx={tabStyles}
+                  />
+                   <Tab
+                    id="ai-ml-tab-1"
+                    aria-controls="ai-ml-tabpanel-1"
+                    label={
+                      <TabLabel
+                        icon={<DescriptionOutlinedIcon fontSize="small" />}
+                        primary="AI Unsupervised"
+                        secondary="(Past 10+ Deals)"
                       />
                     }
                     sx={tabStyles}
