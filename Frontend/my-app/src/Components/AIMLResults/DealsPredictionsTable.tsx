@@ -790,6 +790,12 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
             </TableContainer>
           </Paper>
 
+          <Box mt={0.75} display="flex" justifyContent="flex-end">
+            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              Dot indicators: green = prediction aligns with actual; red = prediction disagrees with actual; grey = missing or neutral data.
+            </Typography>
+          </Box>
+
           {/* Details panel + prices chart */}
           <Box mt={2}>
             <DealDetailsPanel deal={selectedDeal} />
