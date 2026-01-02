@@ -184,8 +184,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1d_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionOutcomeDot pred={row.t1d_pred} actual={row.t1d_actual_return} />
-        <PredictionCell pred={row.t1d_pred} confidence={row.t1d_confidence} />
+        <PredictionCell
+          pred={row.t1d_pred}
+          confidence={row.t1d_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1d_pred} actual={row.t1d_actual_return} />
+          }
+        />
       </Box>
     ),
   },
@@ -197,13 +202,15 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1d_openprice_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionOutcomeDot
-          pred={row.t1d_openprice_pred}
-          actual={row.t1d_openprice_actual_return}
-        />
         <PredictionCell
           pred={row.t1d_openprice_pred}
           confidence={row.t1d_openprice_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot
+              pred={row.t1d_openprice_pred}
+              actual={row.t1d_openprice_actual_return}
+            />
+          }
         />
       </Box>
     ),
@@ -216,8 +223,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1w_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionOutcomeDot pred={row.t1w_pred} actual={row.t1w_actual_return} />
-        <PredictionCell pred={row.t1w_pred} confidence={row.t1w_confidence} />
+        <PredictionCell
+          pred={row.t1w_pred}
+          confidence={row.t1w_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1w_pred} actual={row.t1w_actual_return} />
+          }
+        />
       </Box>
     ),
   },
@@ -229,8 +241,13 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     sortKey: "t1m_confidence",
     render: (row) => (
       <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
-        <PredictionOutcomeDot pred={row.t1m_pred} actual={row.t1m_actual_return} />
-        <PredictionCell pred={row.t1m_pred} confidence={row.t1m_confidence} />
+        <PredictionCell
+          pred={row.t1m_pred}
+          confidence={row.t1m_confidence}
+          trailingAdornment={
+            <PredictionOutcomeDot pred={row.t1m_pred} actual={row.t1m_actual_return} />
+          }
+        />
       </Box>
     ),
   },
