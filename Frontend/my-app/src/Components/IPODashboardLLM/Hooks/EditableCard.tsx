@@ -61,12 +61,39 @@ const EditableCard: React.FC<EditableCardProps> = ({
   const isEditing = editMode[key];
   const isExpanded = expandedPanels[key] || false;
 
+  const toggleAccordion = () =>
+    setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const stopAccordionToggle = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+  };
+
+  const handleEditClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    stopAccordionToggle(event);
+    setEditMode((prev) => ({ ...prev, [key]: true }));
+    setExpandedPanels((prev) => ({ ...prev, [key]: true })); // keep accordion open while editing
+  };
+
+  const handleSaveClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    stopAccordionToggle(event);
+    handleSaveCard(key);
+  };
+
+  const handleCancelClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    stopAccordionToggle(event);
+    handleCancelCard(key);
+  };
+
   return (
     <Accordion
       expanded={isExpanded}
-      onChange={() =>
-        setExpandedPanels((prev) => ({ ...prev, [key]: !prev[key] }))
-      }
+      onChange={toggleAccordion}
       sx={{
         backgroundColor: cardColors[index % cardColors.length],
         borderRadius: 2,
@@ -93,7 +120,8 @@ const EditableCard: React.FC<EditableCardProps> = ({
           <>
             <IconButton
               color="primary"
-              onClick={() => handleSaveCard(key)}
+              onClick={handleSaveClick}
+              onFocus={stopAccordionToggle}
               size="small"
               className="pdf-hidden"
             >
@@ -101,7 +129,8 @@ const EditableCard: React.FC<EditableCardProps> = ({
             </IconButton>
             <IconButton
               color="secondary"
-              onClick={() => handleCancelCard(key)}
+              onClick={handleCancelClick}
+              onFocus={stopAccordionToggle}
               size="small"
               className="pdf-hidden"
             >
@@ -110,9 +139,8 @@ const EditableCard: React.FC<EditableCardProps> = ({
           </>
         ) : (
           <IconButton
-            onClick={() =>
-              setEditMode((prev) => ({ ...prev, [key]: true }))
-            }
+            onClick={handleEditClick}
+            onFocus={stopAccordionToggle}
             size="small"
             className="pdf-hidden"
           >
