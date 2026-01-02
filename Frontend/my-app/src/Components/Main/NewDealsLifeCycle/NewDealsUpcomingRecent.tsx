@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress, Grid, Paper } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import { Container, Typography, CircularProgress, Grid, TextField } from "@mui/material";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -20,23 +20,25 @@ const NewDealsUpcomingRecent: React.FC = () => {
       value: "upcoming",
       label: "Upcoming Deals",
       helper: "Filed but not issued",
-      icon: <EventAvailableIcon fontSize="small" sx={{ color: "#1565C0" }} />,
+      icon: <EventAvailableIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
     {
       value: "live",
       label: "Live Deals",
       helper: "Issued within last 30 days",
-      icon: <FlashOnIcon fontSize="small" sx={{ color: "#002060" }} />,
+      icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
     {
       value: "pipeline",
       label: "Future Pipeline",
       helper: "Not filed",
-      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "#6F1178" }} />,
+      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
   ];
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
+  const [pipelineSearch, setPipelineSearch] = useState("");
+  const [dealSearch, setDealSearch] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
@@ -85,6 +87,24 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   const isPipelineView = selectedOp === "pipeline";
 
+  useEffect(() => {
+    if (!isPipelineView) {
+      setPipelineSearch("");
+    }
+  }, [isPipelineView]);
+
+  useEffect(() => {
+    if (isPipelineView) {
+      setDealSearch("");
+    }
+  }, [isPipelineView]);
+
+  const filteredRows = useMemo(() => {
+    const term = dealSearch.trim().toLowerCase();
+    if (!term) return rows;
+    return rows.filter((row) => row.ticker?.toString().toLowerCase().includes(term));
+  }, [rows, dealSearch]);
+
   return (
     <Container
       maxWidth="xl"
@@ -95,57 +115,62 @@ const NewDealsUpcomingRecent: React.FC = () => {
         pb: 4,
         px: { xs: 1.5, md: 2 },
         backgroundColor: "rgba(21,101,192,0.05)",
-        borderRadius: 3,
+      borderRadius: 3,
       }}
     >
-      {/* <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2, md: 3 },
-          mb: 3,
-          borderRadius: 3,
-          border: "1px solid rgba(0,32,96,0.12)",
-          backgroundColor: "#fff",
-          boxShadow: "0 10px 28px rgba(0,32,96,0.12)",
-        }}
-      > */}
-        {/* <Typography
-          variant="h5"
-          gutterBottom
-          color="#002060"
-          align="center"
-          fontWeight={800}
-          sx={{
-            width: "100%",
-            px: 2,
-            py: 0.75,
-            borderRadius: 2,
-            // backgroundColor: "rgba(0,32,96,0.08)",
-            letterSpacing: "0.02em",
-            textAlign: "center",
-          }}
-        >
-          New Deals Lifecycle
-        </Typography> */}
-        {/* <Typography
-          variant="body2"
-          color="rgba(0,32,96,0.75)"
-          align="center"
-          sx={{ mt: 0.5, mb: 1 }}
-        >
-          Track live, upcoming, and future pipeline activity in one glance.
-        </Typography> */}
+  
 
-        <DealsFilters selectedOp={selectedOp} onChange={handleOpChange} options={tabs} />
+      <DealsFilters
+        selectedOp={selectedOp}
+        onChange={handleOpChange}
+        options={tabs}
+        rightContent={
+          isPipelineView ? (
+            <TextField
+              size="small"
+              fullWidth
+              label=""
+              placeholder="Search"
+              value={pipelineSearch}
+              onChange={(e) => setPipelineSearch(e.target.value)}
+              sx={{
+                minWidth: { xs: "100%", md: 180 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 34,
+                },
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          ) : (
+            <TextField
+              size="small"
+              fullWidth
+              label=""
+              placeholder="Search"
+              value={dealSearch}
+              onChange={(e) => setDealSearch(e.target.value)}
+              sx={{
+                minWidth: { xs: "100%", md: 160 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 34,
+                },
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          )
+        }
+      />
       {/* </Paper> */}
 
       {isPipelineView ? (
-        <ExpectedPipelineDealsTable />
+        <ExpectedPipelineDealsTable searchQuery={pipelineSearch} onSearchQueryChange={setPipelineSearch} />
       ) : loading ? (
         <CircularProgress sx={{ display: "block", mx: "auto" }} />
       ) : (
         <DealsTable
-          rows={rows}
+          rows={filteredRows}
           loading={loading}
           onRowSelect={(row) => setSelectedDeal(row)}
           selectedOp={selectedOp}

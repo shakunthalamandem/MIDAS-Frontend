@@ -331,7 +331,15 @@ const columnSets: Record<Category, GridColDef[]> = {
   ],
 };
 
-const ExpectedPipelineDealsTable: React.FC = () => {
+type ExpectedPipelineDealsTableProps = {
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
+};
+
+const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
+  searchQuery,
+  onSearchQueryChange,
+}) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [data, setData] = useState<ApiResponse>({
@@ -396,6 +404,12 @@ const ExpectedPipelineDealsTable: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [API_URL]);
 
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setSearchTerm(searchQuery);
+    }
+  }, [searchQuery]);
+
   const rows = useMemo(() => {
     const list = (data[selectedCategory] as any[]) || [];
     const normalized = list.map((item, idx) => ({
@@ -418,6 +432,11 @@ const ExpectedPipelineDealsTable: React.FC = () => {
   const columns = useMemo(() => columnSets[selectedCategory], [selectedCategory]);
 
   const isLoading = status === "loading";
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    onSearchQueryChange?.(value);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
@@ -491,7 +510,7 @@ const ExpectedPipelineDealsTable: React.FC = () => {
               label="Search"
               placeholder="Search ticker, sector, seller..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               size="small"
               sx={{
                 minWidth: { xs: "100%", md: 320 },
@@ -535,6 +554,12 @@ const ExpectedPipelineDealsTable: React.FC = () => {
               //   loadingOverlay: CircularProgress,
               // }}
             />
+          </Box>
+
+          <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
+            <Typography variant="caption" color="text.secondary">
+              The Link column provides direct access to the source in the Bloomberg Terminal.
+            </Typography>
           </Box>
         </CardContent>
       </Card>

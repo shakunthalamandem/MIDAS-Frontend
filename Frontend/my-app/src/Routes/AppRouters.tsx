@@ -88,6 +88,7 @@ import MidasChatbotMain from "../Components/WebsiteChatBot/MidasChatbotMain";
 import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
+import NotesUI from "../Components/mattermostupload/NotesUI";
 
 const AppRouters: React.FC = () => {
   return (
@@ -265,6 +266,7 @@ const AppRouters: React.FC = () => {
 
         {/* <Route path="/chat" element={<MattermostChat />} /> */}
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
+        <Route path="/notesui" element={<AuthGuard><NotesUI /></AuthGuard>} />
 
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
