@@ -140,11 +140,9 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({ focusTick
         <CardContent>
           <Box sx={{  mb: 2 }}>
               <Typography variant="h6" fontWeight={700} color="#002060" align="center">
-                Sentiment Analysis
+                Sentiment Analysis for {focusTicker}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {focusTicker ? `Showing sentiment for ${focusTicker}` : "Select a ticker to view sentiment analysis."}
-              </Typography>
+              
           {loading && <CircularProgress size={22} />}
         </Box>
 
