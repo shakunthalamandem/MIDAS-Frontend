@@ -70,7 +70,7 @@ const Aibot: React.FC = () => {
   const navigate = useNavigate();
   const videoSrc = `${process.env.PUBLIC_URL || ''}/images/aibot.mp4`;
 
-  const tooltipFullText = 'Hi, I am Gen AI Assistant';
+  const tooltipFullText = 'Hi, I am Midas AI Assistant';
   const [typedTooltip, setTypedTooltip] = useState<string>('');
 
   const intervalRef = useRef<number | null>(null);
