@@ -1,39 +1,31 @@
 import React from "react";
-import {
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  Paper,
-} from "@mui/material";
+import { Box, Stack, ToggleButton, ToggleButtonGroup, Typography, Paper } from "@mui/material";
 
 interface DealsFiltersProps {
   selectedOp: string;
   options: { value: string; label: string; helper: string; icon?: React.ReactNode }[];
   onChange: (value: string) => void;
+  rightContent?: React.ReactNode;
 }
 
-const DealsFilters: React.FC<DealsFiltersProps> = ({
-  selectedOp,
-  options,
-  onChange,
-}) => {
+const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, options, onChange, rightContent }) => {
   return (
     <Paper
       elevation={0}
       sx={{
         p: { xs: 1, md: 1.5 },
         borderRadius: 3,
-        border: "1px solid rgba(0,32,96,0.08)",
+        // border: "1px solid rgba(0,32,96,0.08)",
         backgroundColor: "#f4f7fb",
-        boxShadow: "0 6px 16px rgba(0,32,96,0.06)",
+        // boxShadow: "0 6px 16px rgba(0,32,96,0.06)",
       }}
     >
       <Stack
         direction={{ xs: "column", md: "row" }}
         spacing={2}
-        alignItems="stretch"
+        alignItems={{ xs: "stretch", md: "center" }}
         justifyContent="center"
+        sx={{ width: "100%" }}
       >
         <ToggleButtonGroup
           value={selectedOp}
@@ -115,7 +107,19 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               </Stack>
             </ToggleButton>
           ))}
-        </ToggleButtonGroup>
+          </ToggleButtonGroup>
+        {rightContent && (
+          <Box
+            sx={{
+              width: { xs: "100%", md: "auto" },
+              alignSelf: { xs: "stretch", md: "center" },
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+            }}
+          >
+            {rightContent}
+          </Box>
+        )}
       </Stack>
     </Paper>
   );
