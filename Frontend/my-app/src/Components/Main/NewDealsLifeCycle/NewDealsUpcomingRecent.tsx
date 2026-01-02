@@ -98,43 +98,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
         borderRadius: 3,
       }}
     >
-      {/* <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2, md: 3 },
-          mb: 3,
-          borderRadius: 3,
-          border: "1px solid rgba(0,32,96,0.12)",
-          backgroundColor: "#fff",
-          boxShadow: "0 10px 28px rgba(0,32,96,0.12)",
-        }}
-      > */}
-        {/* <Typography
-          variant="h5"
-          gutterBottom
-          color="#002060"
-          align="center"
-          fontWeight={800}
-          sx={{
-            width: "100%",
-            px: 2,
-            py: 0.75,
-            borderRadius: 2,
-            // backgroundColor: "rgba(0,32,96,0.08)",
-            letterSpacing: "0.02em",
-            textAlign: "center",
-          }}
-        >
-          New Deals Lifecycle
-        </Typography> */}
-        {/* <Typography
-          variant="body2"
-          color="rgba(0,32,96,0.75)"
-          align="center"
-          sx={{ mt: 0.5, mb: 1 }}
-        >
-          Track live, upcoming, and future pipeline activity in one glance.
-        </Typography> */}
+  
 
         <DealsFilters selectedOp={selectedOp} onChange={handleOpChange} options={tabs} />
       {/* </Paper> */}
