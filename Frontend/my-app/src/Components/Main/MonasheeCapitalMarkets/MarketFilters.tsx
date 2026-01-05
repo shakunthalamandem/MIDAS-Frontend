@@ -25,6 +25,26 @@ interface FilterOption {
   description: string;
 }
 
+const formatDateWithOrdinal = (value: string | null): string | null => {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const day = date.getDate();
+  const daySuffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+      ? "nd"
+      : day % 10 === 3 && day !== 13
+      ? "rd"
+      : "th";
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${day}${daySuffix} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
+
 const MarketFilters: React.FC = () => {
   const [filtersData, setFiltersData] = useState<
     Record<string, FilterOption>[]
@@ -37,6 +57,7 @@ const MarketFilters: React.FC = () => {
   >({});
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Manage Snackbar open state
   const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
+  const [maxPricingDate, setMaxPricingDate] = useState<string | null>(null);
 
   const handleDataLoaded = (data: any) => {
     setFiltersData(data.market_capital);
@@ -73,6 +94,7 @@ const MarketFilters: React.FC = () => {
     setSelectedValues({});
     setAppliedFilters({});
     setSnackbarOpen(false); // Close Snackbar on reset
+    setMaxPricingDate(null);
   };
 
   const handleSnackbarClose = () => {
@@ -109,6 +131,16 @@ const MarketFilters: React.FC = () => {
             direction="row"
             justifyContent="space-between"
           >
+            <Grid item xs={12}>
+              <Box display="flex" justifyContent="flex-end">
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#002060", fontWeight: 700 }}
+                >
+                  Data as of: {formatDateWithOrdinal(maxPricingDate) || "--"}
+                </Typography>
+              </Box>
+            </Grid>
             {filtersData.map((filter, index) => {
               const [key, value] = Object.entries(filter)[0] as [
                 string,
@@ -243,7 +275,13 @@ const MarketFilters: React.FC = () => {
         <Typography align="center">Loading filters...</Typography>
       )}
 
-      {<MarketCapitalMain selectedFilters={appliedFilters} handleReset={handleReset} />}
+      {
+        <MarketCapitalMain
+          selectedFilters={appliedFilters}
+          handleReset={handleReset}
+          onMaxPricingDateChange={setMaxPricingDate}
+        />
+      }
 
       {/* Snackbar for error message */}
       <Snackbar

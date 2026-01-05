@@ -169,7 +169,7 @@ const parseScenarioParts = (text?: unknown): ScenarioParts => {
 /* ---------------- UI atoms ---------------- */
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+  <Typography variant="h5" sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
     {children}
   </Typography>
 );
@@ -255,21 +255,14 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
       color: "#002060",
-      boxShadow: "0 12px 32px rgba(0,32,96,0.18)",
-      background: "linear-gradient(135deg, #E9F0FF 0%, #D7E3FF 60%, #C3D4FF 100%)",
-      border: "1px solid #D0DAF5",
+      bgcolor: "#f7f9fcff",
     }}
   >
-    <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
-      Executive Summary
+    <Typography variant="h6" sx={{ color: "#5D0163",fontWeight:600, textAlign: "center" }}>
+      Executive Summary of   {companyName}
+
     </Typography>
-    <Typography
-      variant="h4"
-      sx={{ mt: 1, fontWeight: 900, lineHeight: 1.12, color: "#002060", textAlign: "center" }}
-    >
-      {companyName}
-    </Typography>
-    <Typography sx={{ mt: 2, color: "#002060", lineHeight: 1.85, textAlign: "center" }} variant="body1">
+    <Typography sx={{ mt: 2, color:'#616161' }} variant="body1" >
       {stripMarkdown(summary) || "-"}
     </Typography>
   </Box>
@@ -282,46 +275,78 @@ const OutlookCard: React.FC<{
   chipBg?: string;
   chipColor?: string;
   accent?: string;
-}> = ({ label, value, mode, chipBg = "#F3F4F6", chipColor = "#334155", accent = "#EEF2FF" }) => (
+  textBg?: string;
+  textColor?: string;
+}> = ({
+  label,
+  value,
+  mode,
+  chipBg = "#F3F4F6",
+  chipColor = "#334155",
+  accent = "#EEF2FF",
+  textBg = "#F8FAFC",
+  textColor = "#0F172A",
+}) => (
   <Card
     elevation={0}
     sx={{
       borderRadius: 3,
       border: "1px solid",
-      borderColor: "grey.200",
-      background: "#FFFFFF",
-      boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
-      overflow: "hidden",
-      height: "100%",
-      minHeight: 92,
+            borderColor: "grey.200",
+            background: "#FFFFFF",
+            boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+            overflow: "hidden",
+            height: "100%",
+            minHeight: 120,
     }}
   >
     <Box sx={{ height: 6, bgcolor: accent }} />
-    <CardContent sx={{ p: 2.5 }}>
-      <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+    <CardContent
+      sx={{
+        p: 2.25,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1,
+      }}
+    >
+      <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
         {label}
       </Typography>
 
-      <Box sx={{ mt: 1 }}>
-        {mode === "chip" ? (
-          <Chip
-            label={stripMarkdown(value) || "-"}
-            size="small"
-            sx={{
-              fontWeight: 800,
-              bgcolor: chipBg,
-              color: chipColor,
-              borderRadius: 2,
-              border: "1px solid rgba(0,0,0,0.04)",
-              px: 0.75,
-            }}
-          />
-        ) : (
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: "grey.900" }}>
-            {stripMarkdown(value) || "-"}
-          </Typography>
-        )}
-      </Box>
+      {mode === "chip" ? (
+        <Chip
+          label={stripMarkdown(value) || "-"}
+          size="small"
+          sx={{
+            height: 32,
+            px: 1.75,
+            bgcolor: chipBg,
+            color: chipColor,
+            borderRadius: 2,
+            border: "1px solid rgba(0,0,0,0.04)",
+            fontWeight: 800,
+          }}
+        />
+      ) : (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 32,
+            px: 1.75,
+            borderRadius: 2,
+            bgcolor: textBg,
+            color: textColor,
+            fontWeight: 700,
+            minWidth: "fit-content",
+          }}
+        >
+          {stripMarkdown(value) || "-"}
+        </Box>
+      )}
     </CardContent>
   </Card>
 );
@@ -373,18 +398,17 @@ const ScenarioCard: React.FC<{
     >
       <Box sx={{ height: 6, bgcolor: t.accent }} />
       <CardContent sx={{ p: 2.5 }}>
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-          <IconBubble bg={t.iconBg} color={t.iconColor}>
-            {t.icon}
-          </IconBubble>
-
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#002060", textAlign: "center" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.25 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.1 }}>
+            <IconBubble bg={t.iconBg} color={t.iconColor}>
+              {t.icon}
+            </IconBubble>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060", textAlign: "center" }}>
               {title}
             </Typography>
-            <Box sx={{ mt: 1 }}>
-              <TextBlock text={text} clamp={7} />
-            </Box>
+          </Box>
+          <Box sx={{ mt: 1, width: "100%" }}>
+            <TextBlock text={text} clamp={7} />
           </Box>
         </Box>
       </CardContent>
@@ -406,6 +430,7 @@ const DetailBigCard: React.FC<{
       borderRadius: 3,
       border: "1px solid",
       borderColor: "grey.200",
+      background: "#f8fbff",
       boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
       overflow: "hidden",
       height: "100%",
@@ -414,19 +439,18 @@ const DetailBigCard: React.FC<{
   >
     <Box sx={{ position: "absolute", inset: 0, width: 6, bgcolor: accent }} />
     <CardContent sx={{ p: 2.75, pl: 3.25 }}>
-      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-        <IconBubble bg={iconBg} color={iconColor}>
-          {icon}
-        </IconBubble>
-
-        <Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25, alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconBubble bg={iconBg} color={iconColor}>
+            {icon}
+          </IconBubble>
           <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
             {label}
           </Typography>
+        </Box>
 
-          <Box sx={{ mt: 1 }}>
-            <TextBlock text={text} />
-          </Box>
+        <Box sx={{ width: "100%" }}>
+          <TextBlock text={text} />
         </Box>
       </Box>
     </CardContent>
@@ -624,10 +648,11 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         <ExecutiveHero companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
 
         <Box>
-          <SectionLabel>OUTLOOK SUMMARY</SectionLabel>
+        <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
+     Outlook Summary </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
             <OutlookCard
-              label="1-WEEK SENTIMENT"
+              label="1-Week Sentiment"
               value={outlook.week}
               mode="chip"
               chipBg={weekChip.bg}
@@ -635,20 +660,35 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
               accent="#F1F5F9"
             />
             <OutlookCard
-              label="1-MONTH SENTIMENT"
+              label="1-Month Sentiment"
               value={outlook.month}
               mode="chip"
               chipBg="#E2E8F0"
               chipColor="#0F172A"
               accent="#F1F5F9"
             />
-            <OutlookCard label="EXPECTED VOLATILITY" value={outlook.volatility} mode="text" accent="#F1F5F9" />
-            <OutlookCard label="CONFIDENCE" value={outlook.confidence} mode="text" accent="#F1F5F9" />
+            <OutlookCard
+              label="Expected Volatility"
+              value={outlook.volatility}
+              mode="text"
+              accent="#F1F5F9"
+              textBg="#E0F2FE"
+              textColor="#075985"
+            />
+            <OutlookCard
+              label="Confidence"
+              value={outlook.confidence}
+              mode="text"
+              accent="#F1F5F9"
+              textBg="#FEF9C3"
+              textColor="#854D0E"
+            />
           </Box>
         </Box>
 
         <Box>
-          <SectionLabel>SCENARIO ANALYSIS</SectionLabel>
+                        <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
+     Scenario Analysis </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" } }}>
             <ScenarioCard tone="bearish" title="Bearish Scenario" text={scenarios.bearish} />
             <ScenarioCard tone="base" title="Base Case" text={scenarios.base} />
@@ -658,7 +698,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" } }}>
           <DetailBigCard
-            label="1-WEEK OUTLOOK"
+            label="1-Week Outlook"
             icon={<CalendarMonthRoundedIcon sx={{ fontSize: 18 }} />}
             accent="#8B5CF6"
             iconBg="#EEF2FF"
@@ -666,7 +706,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
             text={analysis["Expected 1-Week Sentiment"] as string | undefined}
           />
           <DetailBigCard
-            label="1-MONTH OUTLOOK"
+            label="1-Month Outlook"
             icon={<InsightsRoundedIcon sx={{ fontSize: 18 }} />}
             accent="#06B6D4"
             iconBg="#ECFEFF"
@@ -676,22 +716,22 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         </Box>
 
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr" }}>
-          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
-                ANALOGICAL ASSESSMENT
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
+                Analogical Assessment
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <TextBlock text={analogical} />
             </CardContent>
           </Card>
 
-          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#EDE9FE" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
-                EXPECTATION VS REALITY
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
+                Expectation vs Reality
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <TextBlock text={expectationText} />

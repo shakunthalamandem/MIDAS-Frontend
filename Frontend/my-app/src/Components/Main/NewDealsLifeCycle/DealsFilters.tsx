@@ -16,7 +16,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, options, onChan
         p: { xs: 1, md: 1.5 },
         borderRadius: 3,
         // border: "1px solid rgba(0,32,96,0.08)",
-        backgroundColor: "#f4f7fb",
+        // backgroundColor: "#f4f7fb",
         // boxShadow: "0 6px 16px rgba(0,32,96,0.06)",
       }}
     >
