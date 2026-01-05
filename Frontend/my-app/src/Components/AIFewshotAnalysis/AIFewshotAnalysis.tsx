@@ -164,7 +164,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                 align="center"
                 sx={{
                   fontWeight: 900,
-                  color: "#002060",
+                  color: "#5D0163",
                   letterSpacing: 0.3,
                   fontSize: { xs: "1.15rem", md: "1.35rem" },
                 }}

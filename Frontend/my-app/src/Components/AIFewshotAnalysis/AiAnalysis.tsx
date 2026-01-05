@@ -258,7 +258,7 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       bgcolor: "#f7f9fcff",
     }}
   >
-    <Typography variant="h6" sx={{ color: "#002060",fontWeight:600, textAlign: "center" }}>
+    <Typography variant="h6" sx={{ color: "#5D0163",fontWeight:600, textAlign: "center" }}>
       Executive Summary of   {companyName}
 
     </Typography>
@@ -648,7 +648,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         <ExecutiveHero companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
 
         <Box>
-        <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+        <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
      Outlook Summary </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
             <OutlookCard
@@ -687,7 +687,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         </Box>
 
         <Box>
-                        <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+                        <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
      Scenario Analysis </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" } }}>
             <ScenarioCard tone="bearish" title="Bearish Scenario" text={scenarios.bearish} />
@@ -719,7 +719,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
                 Analogical Assessment
               </Typography>
               <Divider sx={{ my: 1.5 }} />
@@ -730,7 +730,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#EDE9FE" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
                 Expectation vs Reality
               </Typography>
               <Divider sx={{ my: 1.5 }} />
