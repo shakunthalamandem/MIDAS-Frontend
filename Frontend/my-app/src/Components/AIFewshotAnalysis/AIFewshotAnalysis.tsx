@@ -241,7 +241,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                 mb: 1.5,
               }}
             >
-              <CardContent sx={{ pb: 1 }}>
+              <CardContent sx={{ pb: 0 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -266,6 +266,8 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                       backgroundColor: "#e7ecfb",
                       "&:hover": { backgroundColor: "#d8e0f8" },
                       borderRadius: 2,
+                      width: 32,
+                      height: 32,
                     }}
                     size="small"
                   >

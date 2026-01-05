@@ -255,11 +255,11 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
       color: "#002060",
-      border: "1px solid #eef1faff",
+      border: "1px solid #dbe3faff",
     }}
   >
     <Typography variant="h6" sx={{ color: "#002060",fontWeight:600, textAlign: "center" }}>
-      Executive Summary of      {companyName}
+      Executive Summary of   {companyName}
 
     </Typography>
     <Typography sx={{ mt: 2, color:'#616161' }} variant="body1" >
