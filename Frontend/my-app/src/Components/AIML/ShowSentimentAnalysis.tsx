@@ -195,21 +195,52 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
                     : option.ticker
                 }
                 isOptionEqualToValue={(opt, val) =>
-                  opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+                  opt.ticker === val.ticker &&
+                  (opt.pricing_date ?? "") === (val.pricing_date ?? "")
                 }
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography sx={{ fontWeight: 900, color: "#0e0d0d" }}>
+                        {option.ticker}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: "#6b7280" }}>
+                        {formatPricingDate(option.pricing_date)}
+                      </Typography>
+                    </Box>
+                  </li>
+                )}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder={loadingTickers ? "Loading..." : "Enter ticker..."}
+                    label="Search ticker"
+                    placeholder={loadingTickers ? "Loading tickers..." : "Type to search..."}
+                    fullWidth
                     InputProps={{
                       ...params.InputProps,
-                      startAdornment: <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />,
+                      startAdornment: (
+                        <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />
+                      ),
                       endAdornment: (
                         <>
-                          {loadingTickers ? <CircularProgress color="inherit" size={16} /> : null}
+                          {loadingTickers ? (
+                            <CircularProgress color="inherit" size={18} />
+                          ) : null}
                           {params.InputProps.endAdornment}
                         </>
                       ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2.5,
+                        background: "#ffffff",
+                        "& fieldset": { borderColor: "#c5cede" },
+                        "&:hover fieldset": { borderColor: "#9aa9c5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#002060",
+                          boxShadow: "0 0 0 2px rgba(0,32,96,0.12)",
+                        },
+                      },
                     }}
                   />
                 )}
