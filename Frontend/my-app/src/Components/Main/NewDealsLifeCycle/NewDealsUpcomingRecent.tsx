@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Container, Typography, CircularProgress, Grid, TextField } from "@mui/material";
+import { Container, Typography, CircularProgress, Grid, TextField, Paper } from "@mui/material";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -58,10 +58,11 @@ const NewDealsUpcomingRecent: React.FC = () => {
         body: JSON.stringify({ operation }),
       });
       const result = await response.json();
-      const formattedRows = result.data.map((item: any, index: number) => ({
-        id: index,
+      const formattedRows = result.data.map((item: any) => ({
+        id: item.ticker, // ✅ stable id
         ...item,
       }));
+
       setRows(formattedRows);
       setSelectedDeal(null);
     } catch (err) {
@@ -99,107 +100,134 @@ const NewDealsUpcomingRecent: React.FC = () => {
     }
   }, [isPipelineView]);
 
+  useEffect(() => {
+    setSelectedDeal(null);
+  }, [dealSearch]);
+
+
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
     if (!term) return rows;
     return rows.filter((row) => row.ticker?.toString().toLowerCase().includes(term));
   }, [rows, dealSearch]);
 
+
   return (
-    <Container
-      maxWidth="xl"
-      sx={{
-        mb: 4,
-        mt: 2,
-        position: "relative",
-        pb: 4,
-        px: { xs: 1.5, md: 2 },
-        backgroundColor: "rgba(21,101,192,0.05)",
-      borderRadius: 3,
-      }}
-    >
-  
-
-      <DealsFilters
-        selectedOp={selectedOp}
-        onChange={handleOpChange}
-        options={tabs}
-        rightContent={
-          isPipelineView ? (
-            <TextField
-              size="small"
-              fullWidth
-              label=""
-              placeholder="Search"
-              value={pipelineSearch}
-              onChange={(e) => setPipelineSearch(e.target.value)}
-              sx={{
-                minWidth: { xs: "100%", md: 180 },
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 999,
-                  height: 34,
-                },
-              }}
-              InputLabelProps={{ shrink: false }}
-            />
-          ) : (
-            <TextField
-              size="small"
-              fullWidth
-              label=""
-              placeholder="Search"
-              value={dealSearch}
-              onChange={(e) => setDealSearch(e.target.value)}
-              sx={{
-                minWidth: { xs: "100%", md: 160 },
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 999,
-                  height: 34,
-                },
-              }}
-              InputLabelProps={{ shrink: false }}
-            />
-          )
-        }
-      />
-      {/* </Paper> */}
-
-      {isPipelineView ? (
-        <ExpectedPipelineDealsTable searchQuery={pipelineSearch} onSearchQueryChange={setPipelineSearch} />
-      ) : loading ? (
-        <CircularProgress sx={{ display: "block", mx: "auto" }} />
-      ) : (
-        <DealsTable
-          rows={filteredRows}
-          loading={loading}
-          onRowSelect={(row) => setSelectedDeal(row)}
+    <>
+      {/* 🔹 TOP CONTAINER: ONLY THREE CARDS */}
+      <Container
+        maxWidth="xl"
+        sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}
+      >
+        <DealsFilters
           selectedOp={selectedOp}
+          onChange={handleOpChange}
+          options={tabs}
         />
-      )}
+      </Container>
 
-      {!isPipelineView && selectedDeal && (
-        <>
-          <Grid container spacing={2} mt={2}>
-            <Grid item xs={12} md={4}>
-              <DealColorInfo data={selectedDeal} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <DealWriteUpInfo data={selectedDeal} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <AIMLModelPredictionInfo data={selectedDeal} />
-            </Grid>
-          </Grid>
+      {/* 🔹 MAIN CONTENT CONTAINER */}
+      <Container
+        maxWidth="xl"
+        sx={{
+          mb: 4,
+          position: "relative",
+          pb: 4,
+          pt: 2,
+          px: { xs: 1.5, md: 2 },
+          backgroundColor: "rgba(21,101,192,0.05)",
+          borderRadius: 3,
+        }}
+      >
+        <Container maxWidth={false} sx={{ mt: 1, px: 0 }}>
+          {/* 🔹 ONE-LINE TEXT (LEFT) + SEARCH (RIGHT) */}
+          {!isPipelineView && (
+            <Container
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 1.5,
+                px: 1,
+                gap: 2,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "1.05rem", md: "1.15rem" },
+                  fontWeight: 600,
+                  color: "#1f2a44",
+                  lineHeight: 1.6,
 
-          <Grid item xs={12} md={4} mb={4}>
-            <DealIoiValuesTable data={selectedDeal} />
-            {/* <DealUnifiedSummaryTableDashboard data={selectedDeal} /> */}
-            <DealInfoContainer selectedDeal={selectedDeal} />
-          </Grid>
-        </>
-      )}
-    </Container>
+                  flexGrow: 1,   // allows text to take available space
+                  pr: 2,         // pushes text slightly left, NOT the search bar
+                  textAlign: "left",
+                }}
+              >
+                Overview of upcoming and live IPO deals with key issuer details,
+                deal metrics, pricing status, and AI-driven insights.
+              </Typography>
+
+              <TextField
+                size="small"
+                placeholder="Search"
+                value={dealSearch}
+                onChange={(e) => setDealSearch(e.target.value)}
+                sx={{
+                  minWidth: 220,
+                  flexShrink: 0,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 999,
+                    height: 34,
+                  },
+                }}
+                InputLabelProps={{ shrink: false }}
+              />
+            </Container>
+          )}
+
+          {/* 🔹 TABLE (UNCHANGED) */}
+          {isPipelineView ? (
+            <ExpectedPipelineDealsTable
+              searchQuery={pipelineSearch}
+              onSearchQueryChange={setPipelineSearch}
+            />
+          ) : loading ? (
+            <CircularProgress sx={{ display: "block", mx: "auto" }} />
+          ) : (
+            <DealsTable
+              rows={filteredRows}
+              loading={loading}
+              onRowSelect={(row) => setSelectedDeal(row)}
+              selectedOp={selectedOp}
+            />
+          )}
+        </Container>
+
+        {!isPipelineView && selectedDeal && (
+          <>
+            <Grid container spacing={2} mt={2}>
+              <Grid item xs={12} md={4}>
+                <DealColorInfo data={selectedDeal} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <DealWriteUpInfo data={selectedDeal} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <AIMLModelPredictionInfo data={selectedDeal} />
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} md={4} mb={4}>
+              <DealIoiValuesTable data={selectedDeal} />
+              <DealInfoContainer selectedDeal={selectedDeal} />
+            </Grid>
+          </>
+        )}
+      </Container>
+    </>
   );
+
 };
 
 export default NewDealsUpcomingRecent;
