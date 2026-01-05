@@ -104,6 +104,12 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
+  const headlineText = useMemo(() => {
+    if (selectedOp === "live") {
+      return "Track IPOs that have been issued or priced within the last 30 days, with real-time deal status and key market details.";
+    }
+    return "Track IPOs that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
+  }, [selectedOp]);
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
@@ -154,7 +160,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
             >
               <Typography
                 sx={{
-                  fontSize: { xs: "1.05rem", md: "1.15rem" },
                   fontWeight: 600,
                   color: "#1f2a44",
                   lineHeight: 1.6,
@@ -164,8 +169,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                   textAlign: "left",
                 }}
               >
-                Overview of upcoming and live IPO deals with key issuer details,
-                deal metrics, pricing status, and AI-driven insights.
+                {headlineText}
               </Typography>
 
               <TextField
