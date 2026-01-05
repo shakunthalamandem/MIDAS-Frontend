@@ -275,7 +275,18 @@ const OutlookCard: React.FC<{
   chipBg?: string;
   chipColor?: string;
   accent?: string;
-}> = ({ label, value, mode, chipBg = "#F3F4F6", chipColor = "#334155", accent = "#EEF2FF" }) => (
+  textBg?: string;
+  textColor?: string;
+}> = ({
+  label,
+  value,
+  mode,
+  chipBg = "#F3F4F6",
+  chipColor = "#334155",
+  accent = "#EEF2FF",
+  textBg = "#F8FAFC",
+  textColor = "#0F172A",
+}) => (
   <Card
     elevation={0}
     sx={{
@@ -290,31 +301,51 @@ const OutlookCard: React.FC<{
     }}
   >
     <Box sx={{ height: 6, bgcolor: accent }} />
-    <CardContent sx={{ p: 2.5 }}>
+    <CardContent
+      sx={{
+        p: 2.5,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1.25,
+      }}
+    >
       <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
         {label}
       </Typography>
 
-      <Box sx={{ mt: 1 }}>
-        {mode === "chip" ? (
-          <Chip
-            label={stripMarkdown(value) || "-"}
-            size="small"
-            sx={{
-              fontWeight: 800,
-              bgcolor: chipBg,
-              color: chipColor,
-              borderRadius: 2,
-              border: "1px solid rgba(0,0,0,0.04)",
-              px: 0.75,
-            }}
-          />
-        ) : (
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: "grey.900" }}>
-            {stripMarkdown(value) || "-"}
-          </Typography>
-        )}
-      </Box>
+      {mode === "chip" ? (
+        <Chip
+          label={stripMarkdown(value) || "-"}
+          size="small"
+          sx={{
+            fontWeight: 800,
+            bgcolor: chipBg,
+            color: chipColor,
+            borderRadius: 2,
+            border: "1px solid rgba(0,0,0,0.04)",
+            px: 1.25,
+          }}
+        />
+      ) : (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 2,
+            bgcolor: textBg,
+            color: textColor,
+            fontWeight: 700,
+            minWidth: "fit-content",
+          }}
+        >
+          {stripMarkdown(value) || "-"}
+        </Box>
+      )}
     </CardContent>
   </Card>
 );
@@ -635,14 +666,28 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
               chipColor="#0F172A"
               accent="#F1F5F9"
             />
-            <OutlookCard label="Expected Volatility" value={outlook.volatility} mode="text" accent="#F1F5F9" />
-            <OutlookCard label="Confidence" value={outlook.confidence} mode="text" accent="#F1F5F9" />
+            <OutlookCard
+              label="Expected Volatility"
+              value={outlook.volatility}
+              mode="text"
+              accent="#F1F5F9"
+              textBg="#E0F2FE"
+              textColor="#075985"
+            />
+            <OutlookCard
+              label="Confidence"
+              value={outlook.confidence}
+              mode="text"
+              accent="#F1F5F9"
+              textBg="#FEF9C3"
+              textColor="#854D0E"
+            />
           </Box>
         </Box>
 
         <Box>
                         <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
-Scenario Analysis </Typography>
+     Scenario Analysis </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" } }}>
             <ScenarioCard tone="bearish" title="Bearish Scenario" text={scenarios.bearish} />
             <ScenarioCard tone="base" title="Base Case" text={scenarios.base} />

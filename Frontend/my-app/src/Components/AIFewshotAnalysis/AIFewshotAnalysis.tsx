@@ -166,12 +166,10 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                   AI Unsupervised 
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, lineHeight: 1.6 }}>
-                  Explore AI-generated few-shot reviews using historical deal context. Select a ticker to
-                  load its unsupervised insights and related analysis.
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6 }}>
-                  This view surfaces narrative-style takeaways and patterns seen across past placements,
-                  powered by our internal AI engine.
+This analysis explains how an IPO is likely to behave in its early trading period rather than predicting exact prices or returns.
+ It evaluates the company's pre-listing fundamentals and compares them with five to ten similar past IPOs that traded under comparable conditions.
+  By reviewing how those IPOs performed in their first week and first month, the analysis identifies common market patterns such as sentiment shifts, volatility, and valuation reassessment. 
+  The output provides a clear, analyst-style view of likely short-term direction and risks, designed to complement quantitative price models and support informed interpretation of early IPO behavior.
                 </Typography>
               </Box>
               <Autocomplete
