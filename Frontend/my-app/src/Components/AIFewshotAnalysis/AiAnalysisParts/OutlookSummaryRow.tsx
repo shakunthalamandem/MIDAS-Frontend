@@ -26,14 +26,14 @@ const OutlookSummaryRow: React.FC<OutlookSummaryRowProps> = ({ week, month, vola
 
   return (
     <section className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-black">Outlook Summary</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#002060]">Outlook Summary</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(({ label, value, isSentiment, icon }) => {
           const tone = sentimentTone(value);
           const isVol = label.toLowerCase().includes("volatility");
           return (
             <div key={label} className="rounded-2xl bg-white shadow-sm border border-slate-100 p-5 flex flex-col gap-3">
-              <p className="text-[14px] font-semibold uppercase tracking-wide text-blue-900">{label}</p>
+              <p className="text-[14px] font-semibold uppercase tracking-wide text-[#002060]">{label}</p>
               {isSentiment ? (
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ${tone.className}`}>
@@ -43,7 +43,7 @@ const OutlookSummaryRow: React.FC<OutlookSummaryRowProps> = ({ week, month, vola
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className={`text-base font-semibold ${isVol ? "text-amber-600" : "text-slate-900"}`}>
+                  <span className={`text-base font-semibold ${isVol ? "text-amber-600" : "text-[#002060]"}`}>
                     {value || "-"}
                   </span>
                 </div>

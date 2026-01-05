@@ -5,6 +5,7 @@ import {
   Box,
   Card,
   CardContent,
+  Container,
   CircularProgress,
   TextField,
   Typography,
@@ -29,14 +30,11 @@ const formatPricingDate = (dateStr?: string | null) => {
   return dateStr;
 };
 
-
 interface AIFewshotAnalysisProps {
   prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
 }
 
-const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
-  prefillTicker,
-}) => {
+const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
@@ -66,7 +64,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
 
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;
-      
+
       if (!res.ok) {
         throw new Error(data?.error || data?.detail || "Failed to load tickers");
       }
@@ -80,12 +78,14 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
         : [];
       setTickers(items);
       setSelectedTicker((prev) => {
-        if (!prev) return prev;
-        return (
-          items.find(
-            (t) => t.ticker === prev.ticker && (t.pricing_date ?? "") === (prev.pricing_date ?? "")
-          ) || null
-        );
+        if (prev) {
+          return (
+            items.find(
+              (t) => t.ticker === prev.ticker && (t.pricing_date ?? "") === (prev.pricing_date ?? "")
+            ) || null
+          );
+        }
+        return items[0] || null;
       });
       setStatus("success");
     } catch (error: any) {
@@ -123,44 +123,15 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
   }, [prefillTicker, options]);
 
   return (
-    <>
-           {/* <Typography
-        variant="body2"
-        sx={{
-          fontWeight: 500,
-          color: "#FFFFFF",
-          fontSize: { xs: "1rem", sm: "1.2rem" },
-          backgroundColor: "#002060",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "4vh",
-          padding: "8px 16px",
-          borderRadius: "8px",
-          textAlign: "center",
-          marginBottom: "20px",
-        }}
-      >
-        Welcome to 📊 AI FewShot Analysis
-      </Typography> */}
-    <Box
-      sx={{
-        minHeight: "100vh",
-        py: 4,
-        mt: 2,
-        background:
-          "radial-gradient(circle at 10% 20%, rgba(230,240,255,0.65), transparent 35%), radial-gradient(circle at 90% 10%, rgba(255,230,240,0.6), transparent 30%), linear-gradient(180deg, #f7f9fc 0%, #ffffff 45%, #f7f9fc 100%)",
-      }}
-    >
 
-      <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, sm: 3, lg: 4 } }}>
+      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 } }}>
         <Card
           elevation={0}
           sx={{
             borderRadius: 4,
-            border: "1px solid rgba(161, 177, 255, 0.35)",
-            boxShadow: "0 20px 55px rgba(43,71,255,0.12)",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,248,255,0.95))",
+            border: "1px solid #c5cede",
+            boxShadow: "0 12px 22px rgba(0,32,96,0.08)",
+            background: "#ffffff",
           }}
         >
           <CardContent sx={{ pt: 3, pb: 3 }}>
@@ -177,25 +148,29 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                 alignItems: { xs: "flex-start", md: "center" },
                 justifyContent: "space-between",
                 gap: { xs: 1.25, md: 2.5 },
-                mt: 0.5,
+                mb: 2.5,
               }}
             >
-              <Box sx={{ maxWidth: { xs: "100%", md: "60%" } }}>
+              <Box sx={{ maxWidth: { xs: "100%", md: "65%" } }}>
                 <Typography
-                  variant="h6"
+                  variant="h5"
                   sx={{
-                    fontWeight: 800,
+                    fontWeight: 900,
                     color: "#002060",
                     letterSpacing: 0.3,
                     textTransform: "uppercase",
-                    fontSize: { xs: "1rem", md: "1.1rem" },
+                    fontSize: { xs: "1.15rem", md: "1.35rem" },
                   }}
                 >
                   AI Unsupervised
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, lineHeight: 1.6 }}>
                   Explore AI-generated few-shot reviews using historical deal context. Select a ticker to
                   load its unsupervised insights and related analysis.
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6 }}>
+                  This view surfaces narrative-style takeaways and patterns seen across past placements,
+                  powered by our internal AI engine.
                 </Typography>
               </Box>
               <Autocomplete
@@ -239,9 +214,13 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2.5,
-                        background: "rgba(255,255,255,0.9)",
-                        transition: "all 180ms ease",
-                        "&:hover": { boxShadow: "0 8px 24px rgba(59,130,246,0.16)" },
+                        background: "#ffffff",
+                        "& fieldset": { borderColor: "#c5cede" },
+                        "&:hover fieldset": { borderColor: "#9aa9c5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#002060",
+                          boxShadow: "0 0 0 2px rgba(0,32,96,0.12)",
+                        },
                       },
                     }}
                   />
@@ -253,40 +232,13 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                 }}
               />
             </Box>
-          </CardContent>
 
-        </Card>
-
-        <Box sx={{ mt: 2.5 }}>
-          <Card
-            elevation={0}
-            sx={{
-              borderRadius: 4,
-              boxShadow: "0 26px 60px rgba(57,99,255,0.18)",
-              background: "linear-gradient(145deg, rgba(255,255,255,0.94), rgba(240,245,255,0.92))",
-              border: "1px solid rgba(130, 143, 255, 0.35)",
-            }}
-          >
-            {/* <CardHeader
-              title={
-                <Typography variant="h6" sx={{ fontWeight: 900, color: "#1f2937" }}>
-                  AI Sentiment Review
-                </Typography>
-              }
-              subheader={
-                <Typography variant="body2" color="text.secondary">
-                  Select a ticker above to load its sentiment analysis.
-                </Typography>
-              }
-            /> */}
-            <CardContent>
+            <Box sx={{ mt: 1 }}>
               <AiAnalysis ticker={selectedTicker?.ticker ?? null} pricingDate={selectedTicker?.pricing_date ?? null} />
-            </CardContent>
-          </Card>
-        </Box>
-      </Box>
-    </Box>
-    </>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
   );
 };
 

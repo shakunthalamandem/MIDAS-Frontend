@@ -255,9 +255,9 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
       color: "#002060",
-      boxShadow: "0 12px 32px rgba(0,32,96,0.18)",
-      background: "linear-gradient(135deg, #E9F0FF 0%, #D7E3FF 60%, #C3D4FF 100%)",
-      border: "1px solid #D0DAF5",
+      boxShadow: "0 8px 20px rgba(0,32,96,0.12)",
+      background: "linear-gradient(135deg, #f4f7ff 0%, #e9efff 100%)",
+      border: "1px solid #dbe4ff",
     }}
   >
     <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
