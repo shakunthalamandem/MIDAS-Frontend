@@ -21,11 +21,13 @@ import MarketCapitalTable from "./MarketCapitalTable";
 interface MarketCapitalMainProps {
   selectedFilters: Record<string, string | number | (string | number)[]>;
   handleReset: () => void;
+  onMaxPricingDateChange: (date: string | null) => void;
 }
 
 const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
   selectedFilters,
   handleReset,
+  onMaxPricingDateChange,
 }) => {
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,6 +43,7 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
       setLoading(true);
       setError(null);
       setNoDataPopupOpen(false); // Close popup if it's already open
+      onMaxPricingDateChange(null); // Clear previous date while loading
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
@@ -61,6 +64,8 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
 
         if (response.ok) {
           const result = await response.json();
+          onMaxPricingDateChange(result?.max_pricing_date ?? null);
+
           if (result.error === "No data found for the given filters.") {
             setNoDataPopupOpen(true); // Open the NoDataPopup if no data is returned
             setApiData(null); // Set data to null
@@ -70,17 +75,19 @@ const MarketCapitalMain: React.FC<MarketCapitalMainProps> = ({
         } else {
           setNoDataPopupOpen(true); // Open the NoDataPopup if fetch fails
           setApiData(null); // Set data to null
+          onMaxPricingDateChange(null);
         }
       } catch (err: any) {
         setNoDataPopupOpen(true); // Open the NoDataPopup if an error occurs
         setApiData(null); // Set data to null
+        onMaxPricingDateChange(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [selectedFilters]);
+  }, [selectedFilters, onMaxPricingDateChange]);
   const handleClosePopup = () => {
     setNoDataPopupOpen(false); // Close the NoDataPopup
     handleReset();
