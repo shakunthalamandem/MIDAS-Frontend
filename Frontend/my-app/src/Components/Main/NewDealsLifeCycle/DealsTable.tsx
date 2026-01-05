@@ -20,6 +20,17 @@ const DealsTable: React.FC<DealsTableProps> = ({
 }) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
 
+  // Clear selection if current rows no longer contain the selected id (e.g., after filtering)
+  useEffect(() => {
+    if (selectedId && !rows.some((row) => row.id === selectedId)) {
+      setSelectedId(null);
+    }
+  }, [rows, selectedId]);
+
+  // Ensure DataGrid never receives a selection model that points to a missing row
+  const selectionModel =
+    selectedId && rows.some((row) => row.id === selectedId) ? [selectedId] : [];
+
   const handleRowClick = (params: any) => {
     setSelectedId(params.id);
 
@@ -47,6 +58,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
           loading={loading}
           checkboxSelection={false}
           onRowClick={handleRowClick}
+          rowSelectionModel={selectionModel}
+          onRowSelectionModelChange={(model) => setSelectedId(model[0] ?? null)}
           disableRowSelectionOnClick
           rowHeight={35}
           getRowClassName={(params) =>
