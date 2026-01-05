@@ -3,8 +3,10 @@ import {
   Alert,
   Autocomplete,
   Box,
+  Button,
   Card,
   CardContent,
+  Collapse,
   Container,
   CircularProgress,
   TextField,
@@ -41,6 +43,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
   const [status, setStatus] = useState<ApiState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<TickerItem | null>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState<boolean>(false);
 
   const loadTickers = async () => {
     setStatus("loading");
@@ -122,6 +125,8 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
     }
   }, [prefillTicker, options]);
 
+  const companyName = selectedTicker?.ticker ?? "the selected company";
+
   return (
 
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 } ,mb:4, mt:2}}>
@@ -154,22 +159,15 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               <Box sx={{ maxWidth: { xs: "100%", md: "65%" } }}>
                 <Typography
                   variant="h5"
-                  align="center"
-                  sx={{
-                    fontWeight: 900,
-                    color: "#002060",
-                    letterSpacing: 0.3,
-                    textTransform: "uppercase",
-                    fontSize: { xs: "1.15rem", md: "1.35rem" },
-                  }}
-                >
-                  AI Unsupervised 
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, lineHeight: 1.6 }}>
-This analysis explains how an IPO is likely to behave in its early trading period rather than predicting exact prices or returns.
- It evaluates the company's pre-listing fundamentals and compares them with five to ten similar past IPOs that traded under comparable conditions.
-  By reviewing how those IPOs performed in their first week and first month, the analysis identifies common market patterns such as sentiment shifts, volatility, and valuation reassessment. 
-  The output provides a clear, analyst-style view of likely short-term direction and risks, designed to complement quantitative price models and support informed interpretation of early IPO behavior.
+                align="center"
+                sx={{
+                  fontWeight: 900,
+                  color: "#002060",
+                  letterSpacing: 0.3,
+                  fontSize: { xs: "1.15rem", md: "1.35rem" },
+                }}
+              >
+                  AI Unsupervised Analysis for {companyName}
                 </Typography>
               </Box>
               <Autocomplete
@@ -231,6 +229,52 @@ This analysis explains how an IPO is likely to behave in its early trading perio
                 }}
               />
             </Box>
+
+            <Card
+              variant="outlined"
+              sx={{
+                borderRadius: 3,
+                borderColor: "#c5cede",
+                background: "#f7f9fd",
+                mb: 2.5,
+              }}
+            >
+              <CardContent sx={{ pb: 1.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 1.5,
+                    mb: 1,
+                  }}
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#002060" }}>
+                    About this analysis
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="text"
+                    onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+                    sx={{ fontWeight: 700, color: "#002060", minWidth: 0, px: 1 }}
+                  >
+                    {isDescriptionExpanded ? "Collapse" : "Expand"}
+                  </Button>
+                </Box>
+                <Collapse in={isDescriptionExpanded} timeout="auto" unmountOnExit>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                    This analysis explains how an IPO is likely to behave in its early trading period rather than
+                    predicting exact prices or returns. It evaluates the company's pre-listing fundamentals and compares
+                    them with five to ten similar past IPOs that traded under comparable conditions. By reviewing how
+                    those IPOs performed in their first week and first month, the analysis identifies common market
+                    patterns such as sentiment shifts, volatility, and valuation reassessment. The output provides a
+                    clear, analyst-style view of likely short-term direction and risks, designed to complement
+                    quantitative price models and support informed interpretation of early IPO behavior.
+                  </Typography>
+                </Collapse>
+              </CardContent>
+            </Card>
+
 
             <Box sx={{ mt: 1 }}>
               <AiAnalysis ticker={selectedTicker?.ticker ?? null} pricingDate={selectedTicker?.pricing_date ?? null} />
