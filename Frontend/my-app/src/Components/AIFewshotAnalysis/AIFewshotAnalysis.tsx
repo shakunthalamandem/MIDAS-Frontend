@@ -124,7 +124,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
 
   return (
 
-      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 } }}>
+      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 } ,mb:4, mt:2}}>
         <Card
           elevation={0}
           sx={{
@@ -154,6 +154,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               <Box sx={{ maxWidth: { xs: "100%", md: "65%" } }}>
                 <Typography
                   variant="h5"
+                  align="center"
                   sx={{
                     fontWeight: 900,
                     color: "#002060",
@@ -162,7 +163,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                     fontSize: { xs: "1.15rem", md: "1.35rem" },
                   }}
                 >
-                  AI Unsupervised
+                  AI Unsupervised 
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, lineHeight: 1.6 }}>
                   Explore AI-generated few-shot reviews using historical deal context. Select a ticker to

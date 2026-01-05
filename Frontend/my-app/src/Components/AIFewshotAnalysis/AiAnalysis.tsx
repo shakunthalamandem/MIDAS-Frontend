@@ -169,7 +169,7 @@ const parseScenarioParts = (text?: unknown): ScenarioParts => {
 /* ---------------- UI atoms ---------------- */
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+  <Typography variant="h5" sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
     {children}
   </Typography>
 );
@@ -255,21 +255,14 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
       color: "#002060",
-      boxShadow: "0 8px 20px rgba(0,32,96,0.12)",
-      background: "linear-gradient(135deg, #f4f7ff 0%, #e9efff 100%)",
-      border: "1px solid #dbe4ff",
+      border: "1px solid #eef1faff",
     }}
   >
-    <Typography sx={{  color: "#002060", textAlign: "center" }}>
-      Executive Summary
+    <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
+      Executive Summary of      {companyName}
+
     </Typography>
-    <Typography
-      variant="h4"
-      sx={{ mt: 1, fontWeight: 900, lineHeight: 1.12, color: "#002060", textAlign: "center" }}
-    >
-      {companyName}
-    </Typography>
-    <Typography sx={{ mt: 2, color: "#002060", lineHeight: 1.85, textAlign: "center" }} variant="body1">
+    <Typography sx={{ mt: 2, color:'#616161' }} variant="body1" >
       {stripMarkdown(summary) || "-"}
     </Typography>
   </Box>
@@ -379,7 +372,7 @@ const ScenarioCard: React.FC<{
           </IconBubble>
 
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#002060", textAlign: "center" }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060", textAlign: "center" }}>
               {title}
             </Typography>
             <Box sx={{ mt: 1 }}>
@@ -624,10 +617,10 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         <ExecutiveHero companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
 
         <Box>
-          <SectionLabel>OUTLOOK SUMMARY</SectionLabel>
+          <SectionLabel>Outlook Summary</SectionLabel>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
             <OutlookCard
-              label="1-WEEK SENTIMENT"
+              label="1-Week Sentiment"
               value={outlook.week}
               mode="chip"
               chipBg={weekChip.bg}
@@ -635,20 +628,21 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
               accent="#F1F5F9"
             />
             <OutlookCard
-              label="1-MONTH SENTIMENT"
+              label="1-Month Sentiment"
               value={outlook.month}
               mode="chip"
               chipBg="#E2E8F0"
               chipColor="#0F172A"
               accent="#F1F5F9"
             />
-            <OutlookCard label="EXPECTED VOLATILITY" value={outlook.volatility} mode="text" accent="#F1F5F9" />
-            <OutlookCard label="CONFIDENCE" value={outlook.confidence} mode="text" accent="#F1F5F9" />
+            <OutlookCard label="Expected Volatility" value={outlook.volatility} mode="text" accent="#F1F5F9" />
+            <OutlookCard label="Confidence" value={outlook.confidence} mode="text" accent="#F1F5F9" />
           </Box>
         </Box>
 
         <Box>
-          <SectionLabel>SCENARIO ANALYSIS</SectionLabel>
+                        <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+Scenario Analysis </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" } }}>
             <ScenarioCard tone="bearish" title="Bearish Scenario" text={scenarios.bearish} />
             <ScenarioCard tone="base" title="Base Case" text={scenarios.base} />
@@ -658,7 +652,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" } }}>
           <DetailBigCard
-            label="1-WEEK OUTLOOK"
+            label="1-Week Outlook"
             icon={<CalendarMonthRoundedIcon sx={{ fontSize: 18 }} />}
             accent="#8B5CF6"
             iconBg="#EEF2FF"
@@ -666,7 +660,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
             text={analysis["Expected 1-Week Sentiment"] as string | undefined}
           />
           <DetailBigCard
-            label="1-MONTH OUTLOOK"
+            label="1-Month Outlook"
             icon={<InsightsRoundedIcon sx={{ fontSize: 18 }} />}
             accent="#06B6D4"
             iconBg="#ECFEFF"
@@ -679,8 +673,8 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
-                ANALOGICAL ASSESSMENT
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+                Analogical Assessment
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <TextBlock text={analogical} />
@@ -690,8 +684,8 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
           <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#EDE9FE" }} />
             <CardContent sx={{ p: 2.5 }}>
-              <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
-                EXPECTATION VS REALITY
+              <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+                Expectation vs Reality
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <TextBlock text={expectationText} />
