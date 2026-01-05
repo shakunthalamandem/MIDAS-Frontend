@@ -255,7 +255,7 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       borderRadius: 5,
       p: { xs: 2.5, md: 4 },
       color: "#002060",
-      border: "1px solid #dbe3faff",
+      bgcolor: "#f7f9fcff",
     }}
   >
     <Typography variant="h6" sx={{ color: "#002060",fontWeight:600, textAlign: "center" }}>
@@ -292,23 +292,23 @@ const OutlookCard: React.FC<{
     sx={{
       borderRadius: 3,
       border: "1px solid",
-      borderColor: "grey.200",
-      background: "#FFFFFF",
-      boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
-      overflow: "hidden",
-      height: "100%",
-      minHeight: 92,
+            borderColor: "grey.200",
+            background: "#FFFFFF",
+            boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+            overflow: "hidden",
+            height: "100%",
+            minHeight: 120,
     }}
   >
     <Box sx={{ height: 6, bgcolor: accent }} />
     <CardContent
       sx={{
-        p: 2.5,
+        p: 2.25,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 1.25,
+        gap: 1,
       }}
     >
       <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
@@ -320,11 +320,13 @@ const OutlookCard: React.FC<{
           label={stripMarkdown(value) || "-"}
           size="small"
           sx={{
+            height: 32,
+            px: 1.75,
             bgcolor: chipBg,
             color: chipColor,
             borderRadius: 2,
             border: "1px solid rgba(0,0,0,0.04)",
-            px: 1.25,
+            fontWeight: 800,
           }}
         />
       ) : (
@@ -333,11 +335,12 @@ const OutlookCard: React.FC<{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            px: 1.5,
-            py: 0.75,
+            height: 32,
+            px: 1.75,
             borderRadius: 2,
             bgcolor: textBg,
             color: textColor,
+            fontWeight: 700,
             minWidth: "fit-content",
           }}
         >
@@ -427,6 +430,7 @@ const DetailBigCard: React.FC<{
       borderRadius: 3,
       border: "1px solid",
       borderColor: "grey.200",
+      background: "#f8fbff",
       boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
       overflow: "hidden",
       height: "100%",
@@ -712,7 +716,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         </Box>
 
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr" }}>
-          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
             <CardContent sx={{ p: 2.5 }}>
               <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
@@ -723,7 +727,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
             </CardContent>
           </Card>
 
-          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
+          <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#f7f9fcff", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
             <Box sx={{ height: 6, bgcolor: "#EDE9FE" }} />
             <CardContent sx={{ p: 2.5 }}>
               <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>

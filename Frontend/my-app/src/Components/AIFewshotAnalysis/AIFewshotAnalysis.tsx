@@ -252,7 +252,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                   }}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060" }}>
-                    About this analysis
+                    About AI Unsupervised Analysis
                   </Typography>
                   <IconButton
                     aria-label={
