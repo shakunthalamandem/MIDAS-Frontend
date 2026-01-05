@@ -387,11 +387,6 @@ const EquityAiMlPage: React.FC = () => {
                   loadingTickers={sentimentLoading}
                   tickerError={sentimentErr}
                 />
-                <Box sx={{ mt: 1.5, p: { xs: 1.5, sm: 2 }, borderRadius: 2, backgroundColor: "#f7f9fc", border: "1px solid #e0e7f1" }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                    A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, which aggregates market data, news sentiment, analyst commentary, and historical IPO performance signals. This ensures analytical consistency across all tickers while allowing deal-specific insights on first-week and first-month IPO performance drivers. The resulting outputs are normalized and stored as structured sentiment assessments for comparative analysis.
-                  </Typography>
-                </Box>
               </TabPanel>
             </Stack>
           {/* </Card> */}
