@@ -19,6 +19,7 @@ import {
   computeGrowthPct,
   computeValueFromGrowth,
   ensureMetricStructure,
+  getMetricKeys,
 } from "./utils/financialHelpers";
 
 interface IPOFinancialForecastTableMainProps {
@@ -92,15 +93,15 @@ const IPOFinancialForecastTableMain: React.FC<
   // ---------------------- Edit ----------------------
   const handleEdit = () => {
     setEditing(true);
-    const copied = JSON.parse(
-      JSON.stringify(forecasts[forecastsTicker.toUpperCase()] || {})
-    );
+    const tickerData = forecasts[forecastsTicker.toUpperCase()] || {};
+    const copied = JSON.parse(JSON.stringify(tickerData || {}));
+    const metricKeys = getMetricKeys(tickerData);
 
     // Ensure only existing metrics are structured
-    Object.keys(copied).forEach((key) => ensureMetricStructure(copied, key));
+    metricKeys.forEach((key) => ensureMetricStructure(copied, key));
 
     // Precompute growth for ONLY backend metrics that have growth pairs
-    for (const base of Object.keys(copied)) {
+    for (const base of metricKeys) {
       const growth = growthPairs[base];
       if (growth && copied[growth]) {
         const prev = safeNumber(copied[base]?.["one_year_before"]);
@@ -270,9 +271,10 @@ const IPOFinancialForecastTableMain: React.FC<
     try {
       const updatedMetrics = editedData?.[forecastsTicker.toUpperCase()];
       if (!updatedMetrics) throw new Error("No edited data found.");
+      const metricNames = getMetricKeys(updatedMetrics);
 
       // ---------------- PATCH financial_forecasts_data_view ----------------
-      for (const metricName in updatedMetrics) {
+      for (const metricName of metricNames) {
         const row = updatedMetrics[metricName];
         const originalRow =
           forecasts?.[forecastsTicker.toUpperCase()]?.[metricName];

@@ -18,7 +18,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import EditableCell from "./EditableCell";
 import {
   forecastYearKeys,
-  forecastYearLabels,
+  getForecastYearLabels,
   getOrderedMetricList,
 } from "./utils/financialHelpers";
 import {
@@ -46,6 +46,7 @@ const FinancialTableData: React.FC<FinancialTableDataProps> = ({
   ticker,
 }) => {
   const orderedMetrics = getOrderedMetricList(data);
+  const forecastYearLabels = getForecastYearLabels(data?.year);
 
   return (
     <>

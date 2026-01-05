@@ -5,7 +5,28 @@ export const forecastYearKeys = [
   "one_year_later",
 ];
 
-export const forecastYearLabels = ["2023 A", "2024 A", "2025 E", "2026 E"];
+const DEFAULT_BASE_YEAR = 2025;
+
+export const getForecastYearLabels = (baseYear?: number) => {
+  const parsedYear = Number(baseYear);
+  const currentYear = Number.isFinite(parsedYear)
+    ? parsedYear
+    : DEFAULT_BASE_YEAR;
+
+  return [
+    `${currentYear - 2} A`,
+    `${currentYear - 1} A`,
+    `${currentYear} E`,
+    `${currentYear + 1} E`,
+  ];
+};
+
+export const forecastYearLabels = getForecastYearLabels(DEFAULT_BASE_YEAR);
+
+export const metaKeys = ["year"];
+
+export const getMetricKeys = (dataObj: any) =>
+  Object.keys(dataObj || {}).filter((key) => !metaKeys.includes(key));
 
 export const priorityOrder = [
   "Sales",
@@ -66,7 +87,7 @@ export const ensureMetricStructure = (data: any, metric: string) => {
 
 export const getOrderedMetricList = (dataObj: any) => {
   if (!dataObj) return [];
-  const existing = new Set(Object.keys(dataObj));
+  const existing = new Set(getMetricKeys(dataObj));
   const ordered: string[] = [];
 
   for (const name of priorityOrder) {
