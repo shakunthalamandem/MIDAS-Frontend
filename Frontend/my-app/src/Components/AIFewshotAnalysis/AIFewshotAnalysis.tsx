@@ -3,15 +3,17 @@ import {
   Alert,
   Autocomplete,
   Box,
-  Button,
   Card,
   CardContent,
   Collapse,
   Container,
   CircularProgress,
+  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AiAnalysis from "./AiAnalysis";
 
 type ApiState = "idle" | "loading" | "success" | "error";
@@ -236,30 +238,39 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                 borderRadius: 3,
                 borderColor: "#c5cede",
                 background: "#f7f9fd",
-                mb: 2.5,
+                mb: 1.5,
               }}
             >
-              <CardContent sx={{ pb: 1.5 }}>
+              <CardContent sx={{ pb: 1 }}>
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    gap: 1.5,
+                    gap: 1,
                     mb: 1,
                   }}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#002060" }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060" }}>
                     About this analysis
                   </Typography>
-                  <Button
-                    size="small"
-                    variant="text"
+                  <IconButton
+                    aria-label={
+                      isDescriptionExpanded
+                        ? "Collapse analysis description"
+                        : "Expand analysis description"
+                    }
                     onClick={() => setIsDescriptionExpanded((prev) => !prev)}
-                    sx={{ fontWeight: 700, color: "#002060", minWidth: 0, px: 1 }}
+                    sx={{
+                      color: "#002060",
+                      backgroundColor: "#e7ecfb",
+                      "&:hover": { backgroundColor: "#d8e0f8" },
+                      borderRadius: 2,
+                    }}
+                    size="small"
                   >
-                    {isDescriptionExpanded ? "Collapse" : "Expand"}
-                  </Button>
+                    {isDescriptionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
                 </Box>
                 <Collapse in={isDescriptionExpanded} timeout="auto" unmountOnExit>
                   <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>

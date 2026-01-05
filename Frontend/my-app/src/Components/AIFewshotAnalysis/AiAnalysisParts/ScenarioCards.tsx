@@ -30,7 +30,11 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
           <div key={title} className={`rounded-2xl border shadow-sm p-5 ${toneStyle(tone)}`}>
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">{icon}</div>
-              <p className="font-semibold text-purple-900"><ReactMarkdown>{title}</ReactMarkdown></p>
+              <ReactMarkdown
+                components={{ p: ({ children }) => <span className="font-semibold text-purple-900">{children}</span> }}
+              >
+                {title}
+              </ReactMarkdown>
             </div>
             <div className="mt-3 text-sm leading-relaxed text-slate-700">
               <p className="whitespace-pre-line leading-relaxed text-slate-700">

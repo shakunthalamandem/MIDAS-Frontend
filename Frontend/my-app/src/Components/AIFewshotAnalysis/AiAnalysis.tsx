@@ -258,7 +258,7 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       border: "1px solid #eef1faff",
     }}
   >
-    <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
+    <Typography variant="h6" sx={{ color: "#002060",fontWeight:600, textAlign: "center" }}>
       Executive Summary of      {companyName}
 
     </Typography>
@@ -311,7 +311,7 @@ const OutlookCard: React.FC<{
         gap: 1.25,
       }}
     >
-      <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+      <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
         {label}
       </Typography>
 
@@ -320,7 +320,6 @@ const OutlookCard: React.FC<{
           label={stripMarkdown(value) || "-"}
           size="small"
           sx={{
-            fontWeight: 800,
             bgcolor: chipBg,
             color: chipColor,
             borderRadius: 2,
@@ -339,7 +338,6 @@ const OutlookCard: React.FC<{
             borderRadius: 2,
             bgcolor: textBg,
             color: textColor,
-            fontWeight: 700,
             minWidth: "fit-content",
           }}
         >
@@ -397,18 +395,17 @@ const ScenarioCard: React.FC<{
     >
       <Box sx={{ height: 6, bgcolor: t.accent }} />
       <CardContent sx={{ p: 2.5 }}>
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-          <IconBubble bg={t.iconBg} color={t.iconColor}>
-            {t.icon}
-          </IconBubble>
-
-          <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.25 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.1 }}>
+            <IconBubble bg={t.iconBg} color={t.iconColor}>
+              {t.icon}
+            </IconBubble>
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060", textAlign: "center" }}>
               {title}
             </Typography>
-            <Box sx={{ mt: 1 }}>
-              <TextBlock text={text} clamp={7} />
-            </Box>
+          </Box>
+          <Box sx={{ mt: 1, width: "100%" }}>
+            <TextBlock text={text} clamp={7} />
           </Box>
         </Box>
       </CardContent>
@@ -438,19 +435,18 @@ const DetailBigCard: React.FC<{
   >
     <Box sx={{ position: "absolute", inset: 0, width: 6, bgcolor: accent }} />
     <CardContent sx={{ p: 2.75, pl: 3.25 }}>
-      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.25 }}>
-        <IconBubble bg={iconBg} color={iconColor}>
-          {icon}
-        </IconBubble>
-
-        <Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25, alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconBubble bg={iconBg} color={iconColor}>
+            {icon}
+          </IconBubble>
           <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
             {label}
           </Typography>
+        </Box>
 
-          <Box sx={{ mt: 1 }}>
-            <TextBlock text={text} />
-          </Box>
+        <Box sx={{ width: "100%" }}>
+          <TextBlock text={text} />
         </Box>
       </Box>
     </CardContent>
@@ -648,7 +644,8 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
         <ExecutiveHero companyName={ticker} summary={analysis["Executive Summary"] as string | undefined} />
 
         <Box>
-          <SectionLabel>Outlook Summary</SectionLabel>
+        <Typography variant="h6" sx={{ fontWeight:'600', color: "#002060", textAlign: "center" }}>
+     Outlook Summary </Typography>
           <Box sx={{ mt: 1.25, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
             <OutlookCard
               label="1-Week Sentiment"
