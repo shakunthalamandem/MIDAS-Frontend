@@ -176,7 +176,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
             }}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="h6" fontWeight={700} color="#002060">
+              <Typography variant="h6" fontWeight={600} color="#002060" align="center">
                 Sentiment Analysis{focusTicker ? ` for ${focusTicker}` : ""}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6 }}>
