@@ -260,7 +260,7 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       border: "1px solid #dbe4ff",
     }}
   >
-    <Typography sx={{ fontWeight: 900, color: "#002060", textAlign: "center" }}>
+    <Typography sx={{  color: "#002060", textAlign: "center" }}>
       Executive Summary
     </Typography>
     <Typography
