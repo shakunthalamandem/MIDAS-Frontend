@@ -33,6 +33,12 @@ type TickerOption = {
   pricing_date?: string | null;
 };
 
+type SentimentTickerOption = {
+  id: string;
+  ticker: string;
+  pricing_date?: string | null;
+};
+
 interface TabPanelProps {
   children: React.ReactNode;
   index: number;
@@ -123,9 +129,13 @@ const EquityAiMlPage: React.FC = () => {
   const [err, setErr] = useState<string | null>(null);
 
   const [tickerOptions, setTickerOptions] = useState<TickerOption[]>([]);
-  const [selectedTicker, setSelectedTicker] = useState<TickerOption | null>(null);
+  const [mlTicker, setMlTicker] = useState<TickerOption | null>(null);
+  const [sentimentOptions, setSentimentOptions] = useState<SentimentTickerOption[]>([]);
+  const [sentimentTicker, setSentimentTicker] = useState<SentimentTickerOption | null>(null);
   const [tickerLoading, setTickerLoading] = useState(false);
   const [tickerErr, setTickerErr] = useState<string | null>(null);
+  const [sentimentLoading, setSentimentLoading] = useState(false);
+  const [sentimentErr, setSentimentErr] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -202,12 +212,56 @@ const EquityAiMlPage: React.FC = () => {
     loadTickers();
   }, [apiUrl]);
 
-  const selectedTickerPayload = useMemo(
+  useEffect(() => {
+    const loadSentimentTickers = async () => {
+      if (!apiUrl) {
+        setSentimentErr("API URL is missing");
+        return;
+      }
+      setSentimentLoading(true);
+      setSentimentErr(null);
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(`${apiUrl}/api/sentiment_tickers/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const text = await res.text();
+        const data = text ? JSON.parse(text) : null;
+        if (!res.ok) {
+          throw new Error(data?.error || data?.detail || "Failed to load sentiment tickers");
+        }
+
+        const items = Array.isArray(data?.tickers)
+          ? (data.tickers as { ticker: string; pricing_date?: string | null }[]).map((t, idx) => ({
+              id: `${t.ticker}-${t.pricing_date ?? idx}`,
+              ticker: t.ticker,
+              pricing_date: t.pricing_date ?? null,
+            }))
+          : [];
+        setSentimentOptions(items);
+        setSentimentTicker((prev) => prev ?? (items[0] || null));
+      } catch (e: any) {
+        setSentimentErr(e.message || "Unable to load sentiment ticker list");
+      } finally {
+        setSentimentLoading(false);
+      }
+    };
+
+    loadSentimentTickers();
+  }, [apiUrl]);
+
+  const selectedMlTickerPayload = useMemo(
     () =>
-      selectedTicker
-        ? { ticker: selectedTicker.ticker, pricing_date: selectedTicker.pricing_date ?? null }
+      mlTicker
+        ? { ticker: mlTicker.ticker, pricing_date: mlTicker.pricing_date ?? null }
         : null,
-    [selectedTicker]
+    [mlTicker]
   );
 
   if (loading) {
@@ -229,31 +283,9 @@ const EquityAiMlPage: React.FC = () => {
     <Container maxWidth={false} disableGutters>
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Box sx={{ width: { xs: "96%", sm: "90%", md: "80%" } }}>
-          {/* <Box
-            sx={{
-              fontWeight: 500,
-              color: "#FFFFFF",
-              fontSize: { xs: "1rem", sm: "1.15rem" },
-              backgroundColor: "#002060",
-              textAlign: "center",
-              py: 1.25,
-              borderRadius: 2,
-              mt: 1.5,
-              mb: 2,
-            }}
-          >
-            Welcome to the Prediction and AI Dashboard. Use the global ticker search once and jump across
-            ML, Few-shot, and Sentiment views without re-entering details.
-          </Box> */}
-
           {/* <Card sx={{ borderRadius: 2, boxShadow: 4, p: { xs: 2, md: 3 } }}> */}
             <Stack spacing={2} sx={{ mt: { xs: 1.5, md: 2.5 } }}>
-              <Stack
-                direction={{ xs: "column", md: "row" }}
-                spacing={{ xs: 1.5, md: 2 }}
-                alignItems={{ xs: "flex-start", md: "center" }}
-                justifyContent="space-between"
-              >
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
                 <Tabs
                   value={activeTab}
                   onChange={(_, val) => setActiveTab(val)}
@@ -267,7 +299,7 @@ const EquityAiMlPage: React.FC = () => {
                       pb: 0.5,
                     },
                     ".MuiTabs-indicator": { display: "none" },
-                    maxWidth: { xs: "100%", md: "70%" },
+                    maxWidth: { xs: "100%", md: "72%" },
                   }}
                   TabIndicatorProps={{ style: { display: "none" } }}
                 >
@@ -283,7 +315,7 @@ const EquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   />
-                 <Tab
+                  <Tab
                     id="ai-ml-tab-1"
                     aria-controls="ai-ml-tabpanel-1"
                     label={
@@ -307,62 +339,8 @@ const EquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   />
-                   
                 </Tabs>
-                <Box sx={{ minWidth: { xs: "100%", md: 260 }, width: { xs: "100%", md: 280 } }}>
-                  <Autocomplete
-                    options={tickerOptions}
-                    loading={tickerLoading}
-                    value={selectedTicker}
-                    onChange={(_, value) => {
-                      setSelectedTicker(value);
-                    }}
-                    getOptionLabel={(option) =>
-                      option.pricing_date
-                        ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
-                        : option.ticker
-                    }
-                    isOptionEqualToValue={(opt, val) =>
-                      opt.ticker === val.ticker &&
-                      (opt.pricing_date ?? "") === (val.pricing_date ?? "")
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label=""
-                        placeholder={tickerLoading ? "Loading..." : "Enter ticker..."}
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />,
-                          endAdornment: (
-                            <>
-                              {tickerLoading ? <CircularProgress color="inherit" size={16} /> : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                          sx: {
-                            backgroundColor: "#dfe7f2",
-                            borderRadius: 9999,
-                            px: 1.5,
-                            py: 0.25,
-                            "& fieldset": { borderColor: "#c2ccd9" },
-                            "&:hover fieldset": { borderColor: "#b2bfd1" },
-                            "&.Mui-focused fieldset": {
-                              borderColor: "#002060",
-                              boxShadow: "0 0 0 3px rgba(0, 32, 96, 0.15)",
-                            },
-                          },
-                        }}
-                      />
-                    )}
-                  />
-                  {tickerErr && (
-                    <Alert severity="warning" sx={{ mt: 1 }}>
-                      {tickerErr}
-                    </Alert>
-                  )}
-                </Box>
-              </Stack>
+              </Box>
 
               <TabPanel value={activeTab} index={0}>
                 <Card
@@ -383,6 +361,7 @@ const EquityAiMlPage: React.FC = () => {
                     Machine Learning Equity Deal Predictor - US IPO & Follow-ons
                   </Typography>
 
+
                   <Typography variant="body1" gutterBottom sx={{ mt: 1, mb: 2 }}>
                     Welcome to the ML-powered equity deal predictor for{" "}
                     <strong>US IPOs and Follow-ons (Marketed and Overnight)</strong>.
@@ -390,17 +369,29 @@ const EquityAiMlPage: React.FC = () => {
                   </Typography>
 
                   <Box sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
-                    <PredictionLayout options={options} prefillTicker={selectedTickerPayload} />
+                    <PredictionLayout options={options} prefillTicker={selectedMlTickerPayload} />
                   </Box>
                 </Card>
               </TabPanel>
 
               <TabPanel value={activeTab} index={1}>
-                <AIFewshotAnalysis prefillTicker={selectedTickerPayload} />
+                <AIFewshotAnalysis />
               </TabPanel>
 
               <TabPanel value={activeTab} index={2}>
-                <ShowSentimentAnalysis focusTicker={selectedTickerPayload?.ticker ?? null} />
+                <ShowSentimentAnalysis
+                  focusTicker={sentimentTicker?.ticker ?? null}
+                  tickerOptions={sentimentOptions}
+                  selectedTicker={sentimentTicker}
+                  onSelectTicker={setSentimentTicker}
+                  loadingTickers={sentimentLoading}
+                  tickerError={sentimentErr}
+                />
+                <Box sx={{ mt: 1.5, p: { xs: 1.5, sm: 2 }, borderRadius: 2, backgroundColor: "#f7f9fc", border: "1px solid #e0e7f1" }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                    A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, which aggregates market data, news sentiment, analyst commentary, and historical IPO performance signals. This ensures analytical consistency across all tickers while allowing deal-specific insights on first-week and first-month IPO performance drivers. The resulting outputs are normalized and stored as structured sentiment assessments for comparative analysis.
+                  </Typography>
+                </Box>
               </TabPanel>
             </Stack>
           {/* </Card> */}
