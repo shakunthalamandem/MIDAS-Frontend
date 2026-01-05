@@ -65,7 +65,7 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
 };
 
 const askPerplexity = async (question: string): Promise<Block[]> => {
-  const res = await fetch(`${apiUrl}/api/test_perplexity_chat/`, {
+  const res = await fetch(`${apiUrl}/api/perplexity_chat/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question: question.trim() }),
