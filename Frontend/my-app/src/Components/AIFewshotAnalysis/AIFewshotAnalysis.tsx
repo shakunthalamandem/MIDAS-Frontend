@@ -14,23 +14,19 @@ import AiAnalysis from "./AiAnalysis";
 type ApiState = "idle" | "loading" | "success" | "error";
 
 type TickerItem = {
-  id?: string;
+  id: string;
   ticker: string;
   pricing_date?: string | null;
-  deal_colour_present?: string;
-  deal_captain?: string;
-  deal_type?: string;
-  allocation_as_percentage_of_deal_size?: number;
-};
-
-const formatPricingDate = (dateStr?: string | null) => {
-  if (!dateStr) return "N/A";
-  return dateStr;
 };
 
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("access_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const formatPricingDate = (dateStr?: string | null) => {
+  if (!dateStr) return "TBA";
+  return dateStr;
 };
 
 
@@ -63,10 +59,9 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
         ...getAuthHeaders(),
       };
 
-      const res = await fetch(`${API_URL}/api/unified_new_deal_data/`, {
-        method: "POST",
+      const res = await fetch(`${API_URL}/api/few_shot_review_tickers/`, {
+        method: "GET",
         headers,
-        body: JSON.stringify({ type: "ticker_list" }),
       });
 
       const text = await res.text();
@@ -76,7 +71,13 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
         throw new Error(data?.error || data?.detail || "Failed to load tickers");
       }
 
-      const items = Array.isArray(data?.tickers) ? (data.tickers as TickerItem[]) : [];
+      const items = Array.isArray(data?.tickers)
+        ? (data.tickers as { ticker: string; pricing_date?: string | null }[]).map((t, idx) => ({
+            ticker: t.ticker,
+            pricing_date: t.pricing_date ?? null,
+            id: `${t.ticker}-${t.pricing_date ?? idx}`,
+          }))
+        : [];
       setTickers(items);
       setSelectedTicker((prev) => {
         if (!prev) return prev;
@@ -107,14 +108,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
   const isLoading = status === "loading";
   const hasError = status === "error";
 
-  const options = useMemo(
-    () =>
-      tickers.map((item, idx) => ({
-        id: `${item.ticker}-${item.pricing_date ?? idx}`,
-        ...item,
-      })),
-    [tickers]
-  );
+  const options = useMemo(() => tickers, [tickers]);
 
   useEffect(() => {
     if (!prefillTicker?.ticker || !options.length) return;
@@ -182,22 +176,28 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({
                 flexDirection: { xs: "column", md: "row" },
                 alignItems: { xs: "flex-start", md: "center" },
                 justifyContent: "space-between",
-                gap: { xs: 1.5, md: 2.5 },
+                gap: { xs: 1.25, md: 2.5 },
                 mt: 0.5,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 800,
-                  color: "#002060",
-                  letterSpacing: 0.3,
-                  textTransform: "uppercase",
-                  fontSize: { xs: "1rem", md: "1.1rem" },
-                }}
-              >
-                AI Unsupervised
-              </Typography>
+              <Box sx={{ maxWidth: { xs: "100%", md: "60%" } }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 800,
+                    color: "#002060",
+                    letterSpacing: 0.3,
+                    textTransform: "uppercase",
+                    fontSize: { xs: "1rem", md: "1.1rem" },
+                  }}
+                >
+                  AI Unsupervised
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.5 }}>
+                  Explore AI-generated few-shot reviews using historical deal context. Select a ticker to
+                  load its unsupervised insights and related analysis.
+                </Typography>
+              </Box>
               <Autocomplete
                 options={options}
                 loading={isLoading}

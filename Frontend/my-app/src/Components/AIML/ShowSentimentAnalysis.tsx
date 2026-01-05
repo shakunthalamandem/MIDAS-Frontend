@@ -1,10 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Box, Card, CardContent, CircularProgress, Typography } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
+const formatPricingDate = (dateStr?: string | null) => {
+  if (!dateStr) return "TBA";
+  return dateStr;
+};
+
 type ShowSentimentAnalysisProps = {
   focusTicker: string | null;
+  tickerOptions?: { id: string; ticker: string; pricing_date?: string | null }[];
+  selectedTicker?: { id: string; ticker: string; pricing_date?: string | null } | null;
+  onSelectTicker?: (val: { id: string; ticker: string; pricing_date?: string | null } | null) => void;
+  loadingTickers?: boolean;
+  tickerError?: string | null;
 };
 
 const parseLooseJson = (value: string): any | null => {
@@ -37,7 +57,14 @@ const normalizeBlocks = (val: any): Block[] => {
   return [];
 };
 
-const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({ focusTicker }) => {
+const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
+  focusTicker,
+  tickerOptions = [],
+  selectedTicker = null,
+  onSelectTicker,
+  loadingTickers = false,
+  tickerError = null,
+}) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);
@@ -138,13 +165,69 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({ focusTick
     <Box sx={{ py: 2 }}>
       <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
         <CardContent>
-          <Box sx={{  mb: 2 }}>
-              <Typography variant="h6" fontWeight={700} color="#002060" align="center">
-                Sentiment Analysis for {focusTicker}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1.5,
+              flexWrap: "wrap",
+              mb: 2,
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="h6" fontWeight={700} color="#002060">
+                Sentiment Analysis{focusTicker ? ` for ${focusTicker}` : ""}
               </Typography>
-              
-          {loading && <CircularProgress size={22} />}
-        </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.5 }}>
+                Track market sentiment and outside-in signals for your selected ticker. Pick a deal to load
+                the latest narrative and analysis.
+              </Typography>
+            </Box>
+            <Box sx={{ minWidth: { xs: "100%", sm: 260 }, width: { xs: "100%", sm: 320 } }}>
+              <Autocomplete
+                options={tickerOptions}
+                loading={loadingTickers}
+                value={selectedTicker}
+                onChange={(_, value) => onSelectTicker?.(value)}
+                getOptionLabel={(option) =>
+                  option.pricing_date
+                    ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
+                    : option.ticker
+                }
+                isOptionEqualToValue={(opt, val) =>
+                  opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={loadingTickers ? "Loading..." : "Enter ticker..."}
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />,
+                      endAdornment: (
+                        <>
+                          {loadingTickers ? <CircularProgress color="inherit" size={16} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+              {tickerError && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  {tickerError}
+                </Alert>
+              )}
+            </Box>
+          </Box>
+
+          {loading && (
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <CircularProgress size={22} />
+            </Box>
+          )}
 
         {status && (
           <Box sx={{ mb: 2 }}>
