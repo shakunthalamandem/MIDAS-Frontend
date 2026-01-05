@@ -247,8 +247,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    gap: 1,
-                    mb: 1,
+              
                   }}
                 >
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#002060" }}>
