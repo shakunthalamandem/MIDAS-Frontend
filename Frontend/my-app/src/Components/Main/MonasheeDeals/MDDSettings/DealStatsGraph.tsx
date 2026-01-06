@@ -182,10 +182,12 @@ const formatChartData = (data: ApiResponse): ChartData[] => {
     "weighted_allocation_deal_size_percentage",
     "weighted_allocation_percentage",
   ].includes(selectedField);
-
-  return Object.keys(data).map((year) => {
-    const categories = data[year];
-    let formatted: ChartData = { year };
+  return Object.keys(data)
+    // ✅ REMOVE only this column from X-axis
+    .filter((year) => year !== "max_pricing_date")
+    .map((year) => {
+      const categories = data[year];
+      let formatted: ChartData = { year };
 
     Object.keys(categories).forEach((category) => {
       // Skip "Block" ONLY if filter is deal_captain AND it's a line chart
