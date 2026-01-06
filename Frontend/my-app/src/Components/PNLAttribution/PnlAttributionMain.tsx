@@ -45,7 +45,7 @@ const PnlAttributionMain: React.FC = () => {
         return (
           <Fade in>
             <Box>
-              <DetailedFundTable />
+              <DetailedFundTable selectedYear={selectedYear} onYearChange={setSelectedYear} />
             </Box>
           </Fade>
         );
@@ -53,7 +53,7 @@ const PnlAttributionMain: React.FC = () => {
         return (
           <Fade in>
             <Box>
-              <RegionWisePnlAttribution />
+              <RegionWisePnlAttribution selectedYear={selectedYear} onYearChange={setSelectedYear} />
             </Box>
           </Fade>
         );

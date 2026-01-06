@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, CircularProgress, Typography, Container, Box
+    Paper, CircularProgress, Typography, Container, Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent
 } from "@mui/material";
 
 
@@ -16,10 +16,19 @@ type ApiResponse = {
     };
 };
 
+type YearlyApiResponse = {
+    [year: string]: ApiResponse;
+};
+
 interface TableRowData {
     fundName: string;
     assetType: string;
     values: { [month: string]: number };
+}
+
+interface DetailedFundTableProps {
+    selectedYear: string;
+    onYearChange: (year: string) => void;
 }
 
 // Custom asset order
@@ -35,7 +44,9 @@ const formatCurrency = (value: number): string => {
     return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const DetailedFundTable: React.FC = () => {
+const yearOptions = ["2025", "2026"];
+
+const DetailedFundTable: React.FC<DetailedFundTableProps> = ({ selectedYear, onYearChange }) => {
     const [data, setData] = useState<TableRowData[]>([]);
     const [months, setMonths] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -51,17 +62,20 @@ const DetailedFundTable: React.FC = () => {
             setLoading(true);
             try {
                 const res = await fetch(`${apiUrl}/api/pnl/fund/`, {
+                    method: "POST",
                     headers: {
                         Authorization: token ? `Bearer ${token}` : "",
                         "Content-Type": "application/json",
                     },
+                    body: JSON.stringify({ year: Number(selectedYear) }),
                 });
-                const result: ApiResponse = await res.json();
+                const result: YearlyApiResponse = await res.json();
+                const yearData = result[selectedYear] || {};
 
                 const rows: TableRowData[] = [];
                 const monthSet: Set<string> = new Set();
 
-                for (const [fundName, assetMap] of Object.entries(result)) {
+                for (const [fundName, assetMap] of Object.entries(yearData)) {
                     for (const [assetType, assetData] of Object.entries(assetMap)) {
                         const { asset_type, ...rest } = assetData;
                         const monthValues = rest as { [month: string]: number };
@@ -92,16 +106,46 @@ const DetailedFundTable: React.FC = () => {
         };
 
         fetchData();
-    }, [apiUrl, token]);
+    }, [apiUrl, token, selectedYear]);
 
     const cellBorder = { border: "1px solid black", textAlign: "center" };
     const overallRowBgColor = "#fde8b7";
 
+    const handleYearChange = (event: SelectChangeEvent<string>) => {
+        onYearChange(event.target.value);
+    };
+
     return (
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h6" sx={{ mt: 1, mb: 1, fontWeight: "bold", color: "#002060", textAlign: "center" }}>
-                Fund-Wise P&L Attribution
-            </Typography>
+            <Box sx={{ position: "relative", mt: 1, mb: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}>
+                    Fund-Wise P&L Attribution
+                </Typography>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        right: 0,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                    }}
+                >
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                        <InputLabel id="detailed-fund-year-select-label">Year</InputLabel>
+                        <Select
+                            labelId="detailed-fund-year-select-label"
+                            value={selectedYear}
+                            label="Year"
+                            onChange={handleYearChange}
+                        >
+                            {yearOptions.map((year) => (
+                                <MenuItem key={year} value={year}>
+                                    {year}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+            </Box>
 
             <TableContainer component={Paper} sx={{ mt: 1, mb: 4, borderRadius: 2, boxShadow: 3, overflow: "auto", border: "1px solid #000" }}>
                 {loading ? (
