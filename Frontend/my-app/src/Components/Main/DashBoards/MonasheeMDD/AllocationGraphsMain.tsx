@@ -101,7 +101,9 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
     const allocation: ChartData[] = [];
     const dealCount: ChartData[] = [];
 
-    Object.keys(data).forEach((year) => {
+    Object.keys(data)
+    .filter((year) => year !== "max_pricing_date")
+    .forEach((year) => {
       const categories = data[year];
       let dealSizeRow: ChartData = { year };
       let allocationRow: ChartData = { year };
