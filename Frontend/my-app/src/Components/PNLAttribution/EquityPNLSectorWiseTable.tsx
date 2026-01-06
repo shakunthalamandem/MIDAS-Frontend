@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Typography, Container, Box, Card
+  Paper, CircularProgress, Typography, Container, Box, Card,
 } from "@mui/material";
 
 type SectorData = {
@@ -12,9 +12,18 @@ type ApiResponse = {
   [sectorName: string]: SectorData;
 };
 
+type YearlyApiResponse = {
+  [year: string]: ApiResponse;
+};
+
 interface TableRowData {
   sectorName: string;
   values: { [month: string]: number };
+}
+
+interface EquityPNLSectorWiseTableProps {
+  selectedYear: string;
+  onYearChange: (year: string) => void;
 }
 
 const formatCurrency = (value: number): string => {
@@ -25,7 +34,10 @@ const formatCurrency = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const EquityPNLSectorWiseTable: React.FC = () => {
+const EquityPNLSectorWiseTable: React.FC<EquityPNLSectorWiseTableProps> = ({
+  selectedYear,
+  onYearChange: _onYearChange,
+}) => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,17 +50,20 @@ const EquityPNLSectorWiseTable: React.FC = () => {
       setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/api/pnl_by_sector/`, {
+          method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ year: Number(selectedYear) }),
         });
-        const result: ApiResponse = await res.json();
+        const result: YearlyApiResponse = await res.json();
+        const yearData = result[selectedYear] || {};
 
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
-        for (const [sectorName, monthValues] of Object.entries(result)) {
+        for (const [sectorName, monthValues] of Object.entries(yearData)) {
           const isAllZero = Object.values(monthValues).every((val) => !val || val === 0);
           if (!isAllZero) {
             Object.keys(monthValues).forEach((m) => monthSet.add(m));
@@ -74,7 +89,7 @@ const EquityPNLSectorWiseTable: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, selectedYear]);
 
   const cellBorder = { border: "1px solid #ccc", textAlign: "center" };
   const totalRowBgColor = "#e0f2f1";
@@ -96,17 +111,18 @@ const EquityPNLSectorWiseTable: React.FC = () => {
           p: 3,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            mb: 3,
-            fontWeight: "bold",
-            color: "#002060",
-            textAlign: "center",
-          }}
-        >
-          Equities Detailed Sector-wise
-        </Typography>
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bold",
+              color: "#002060",
+              textAlign: "center",
+            }}
+          >
+            Equities Detailed Sector-wise
+          </Typography>
+        </Box>
 
         <TableContainer
           component={Paper}
