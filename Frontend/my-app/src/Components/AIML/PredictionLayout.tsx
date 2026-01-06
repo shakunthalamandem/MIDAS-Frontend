@@ -105,6 +105,9 @@ const defaultFOValues = {
 
   t1d_open_price: null as number | null,
   t1d_close_price: null as number | null,
+  t1d_low_price: null as number | null,
+  t1d_high_price: null as number | null,
+  t1d_vwap_price: null as number | null,
 
   request_from: "ai_ml",
   create_new_record: true,
@@ -136,6 +139,9 @@ const defaultIPOValues = {
 
   t1d_open_price: null as number | null,
   t1d_close_price: null as number | null,
+  t1d_low_price: null as number | null,
+  t1d_high_price: null as number | null,
+  t1d_vwap_price: null as number | null,
 
   // create new record flag
   request_from: "ai_ml",

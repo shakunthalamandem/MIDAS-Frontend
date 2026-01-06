@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Paper,
   Typography,
@@ -24,30 +24,32 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
+/* -------------------- Types -------------------- */
+
 interface PredictionModel {
   prediction: string | null;
   accuracy?: number | null;
   confidence?: number | null;
   range?: string | null;
-  model?: string | null;
   explanation?: string | null;
 }
 
 interface WeeklyMonthlyPredictionResultsProps {
   result: Record<string, PredictionModel> | null;
 
-  // UPDATED: send both close price & close return
   onWeeklyMonthlyRepredict: (params: {
     t1dClosePrice: number;
     t1dCloseReturn: number;
+    t1dLowPrice?: number;
+    t1dHighPrice?: number;
+    t1dVWAPPrice?: number;
   }) => Promise<Record<string, PredictionModel>>;
 
-  /** Prefill when a T+1D close price is already known (nullable) */
   initialT1dClosePrice?: number | null;
-
-  /** Issue price to calculate T+1D close return from */
   issuePrice?: number | null;
 }
+
+/* -------------------- Component -------------------- */
 
 const FOWeeklyMonthlyPredictionResults: React.FC<
   WeeklyMonthlyPredictionResultsProps
@@ -57,323 +59,263 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
   initialT1dClosePrice,
   issuePrice,
 }) => {
-  const [t1dClosePrice, setT1dClosePrice] = useState<number | "">("");
-  const [t1dCloseReturn, setT1dCloseReturn] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [prices, setPrices] = useState<{
+    low: number | "";
+    high: number | "";
+    vwap: number | "";
+    close: number | "";
+  }>({
+    low: "",
+    high: "",
+    vwap: "",
+    close: "",
+  });
+
+  const [closeReturn, setCloseReturn] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [predictionResult, setPredictionResult] = useState(result);
 
-  // Prefill from props: calculate return from issuePrice + closePrice
-  useEffect(() => {
-    if (
-      initialT1dClosePrice == null ||
-      issuePrice == null ||
-      issuePrice === 0
-    ) {
-      setT1dClosePrice("");
-      setT1dCloseReturn(null);
-      return;
-    }
-
-    setT1dClosePrice(initialT1dClosePrice);
-    const ret =
-      ((initialT1dClosePrice - issuePrice) / issuePrice) * 100;
-    setT1dCloseReturn(Number(ret.toFixed(2)));
-  }, [initialT1dClosePrice, issuePrice]);
+  /* -------------------- Prefill -------------------- */
 
   useEffect(() => {
     setPredictionResult(result);
-  }, [result]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value === "") {
-      setT1dClosePrice("");
-      setT1dCloseReturn(null);
-      return;
+    if (
+      initialT1dClosePrice != null &&
+      issuePrice != null &&
+      issuePrice !== 0
+    ) {
+      setPrices((p) => ({ ...p, close: initialT1dClosePrice }));
+      const ret =
+        ((initialT1dClosePrice - issuePrice) / issuePrice) * 100;
+      setCloseReturn(Number(ret.toFixed(2)));
     }
+  }, [result, initialT1dClosePrice, issuePrice]);
 
-    const numeric = parseFloat(value);
-    if (isNaN(numeric)) {
-      setT1dClosePrice("");
-      setT1dCloseReturn(null);
-      return;
-    }
+  /* -------------------- Return calc -------------------- */
 
-    setT1dClosePrice(numeric);
-
-    if (issuePrice != null && issuePrice !== 0) {
-      const ret = ((numeric - issuePrice) / issuePrice) * 100;
-      setT1dCloseReturn(Number(ret.toFixed(2)));
+  useEffect(() => {
+    if (
+      typeof prices.close === "number" &&
+      issuePrice != null &&
+      issuePrice !== 0
+    ) {
+      const ret =
+        ((prices.close - issuePrice) / issuePrice) * 100;
+      setCloseReturn(Number(ret.toFixed(2)));
     } else {
-      setT1dCloseReturn(null);
+      setCloseReturn(null);
     }
-  };
+  }, [prices.close, issuePrice]);
+
+  /* -------------------- Predict -------------------- */
 
   const handleRepredict = async () => {
-    if (
-      typeof t1dClosePrice === "number" &&
-      t1dCloseReturn != null &&
-      onWeeklyMonthlyRepredict
-    ) {
-      setIsLoading(true);
-      try {
-        const newResult = await onWeeklyMonthlyRepredict({
-          t1dClosePrice,
-          t1dCloseReturn,
-        });
-        setPredictionResult(newResult);
-      } catch (error) {
-        console.error("Reprediction failed:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    if (typeof prices.close !== "number" || closeReturn == null) return;
+
+    setIsLoading(true);
+    try {
+      const newResult = await onWeeklyMonthlyRepredict({
+        t1dClosePrice: prices.close,
+        t1dCloseReturn: closeReturn,
+        t1dLowPrice:
+          prices.low !== "" ? Number(prices.low) : undefined,
+        t1dHighPrice:
+          prices.high !== "" ? Number(prices.high) : undefined,
+        t1dVWAPPrice:
+          prices.vwap !== "" ? Number(prices.vwap) : undefined,
+      });
+
+      setPredictionResult(newResult);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  /* -------------------- Helpers -------------------- */
+
   const getOutcomeCategory = (
-    prediction: string | null | undefined
+    prediction?: string | null
   ): "Negative" | "Neutral" | "Positive" => {
-    if (!prediction || typeof prediction !== "string") return "Neutral";
-    const lower = prediction.toLowerCase();
-    if (lower.includes("negative")) return "Negative";
-    if (lower.includes("neutral")) return "Neutral";
-    if (lower.includes("positive")) return "Positive";
+    if (!prediction) return "Neutral";
+    const p = prediction.toLowerCase();
+    if (p.includes("negative")) return "Negative";
+    if (p.includes("positive")) return "Positive";
     return "Neutral";
   };
 
-  const renderOutcome = (prediction: string | null | undefined) => {
-    if (!prediction) {
+  const renderOutcome = (prediction?: string | null) => {
+    const type = getOutcomeCategory(prediction);
+    if (type === "Negative")
       return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
+        <Box display="flex" alignItems="center" color="error.main">
+          <TrendingDownIcon sx={{ mr: 1 }} /> Negative
         </Box>
       );
-    }
-    const outcomeCategory = getOutcomeCategory(prediction);
-    switch (outcomeCategory) {
-      case "Negative":
-        return (
-          <Box display="flex" alignItems="center" color="error.main">
-            <TrendingDownIcon sx={{ mr: 1 }} /> Negative Deal
-          </Box>
-        );
-      case "Neutral":
-        return (
-          <Box display="flex" alignItems="center" color="text.secondary">
-            <TrendingFlatIcon sx={{ mr: 1 }} /> Neutral Deal
-          </Box>
-        );
-      case "Positive":
-        return (
-          <Box display="flex" alignItems="center" color="success.main">
-            <TrendingUpIcon sx={{ mr: 1 }} /> Positive Deal
-          </Box>
-        );
-      default:
-        return (
-          <Box display="flex" alignItems="center" color="text.disabled">
-            N/A
-          </Box>
-        );
-    }
+    if (type === "Positive")
+      return (
+        <Box display="flex" alignItems="center" color="success.main">
+          <TrendingUpIcon sx={{ mr: 1 }} /> Positive
+        </Box>
+      );
+    return (
+      <Box display="flex" alignItems="center" color="text.secondary">
+        <TrendingFlatIcon sx={{ mr: 1 }} /> Neutral
+      </Box>
+    );
   };
 
-  const renderBinaryResult = (value: string | null | undefined) => {
-    if (!value) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
-    const isTrue = value.toLowerCase() === "true";
+  const renderBinary = (value?: string | null) => {
+    if (!value) return <Box color="text.disabled">N/A</Box>;
+    const yes = value.toLowerCase() === "true";
     return (
       <Box
         display="flex"
         alignItems="center"
-        color={isTrue ? "success.main" : "error.main"}
+        color={yes ? "success.main" : "error.main"}
       >
-        {isTrue ? (
-          <>
-            <CheckCircleIcon sx={{ mr: 1 }} /> Yes
-          </>
-        ) : (
-          <>
-            <CancelIcon sx={{ mr: 1 }} /> No
-          </>
-        )}
+        {yes ? <CheckCircleIcon sx={{ mr: 1 }} /> : <CancelIcon sx={{ mr: 1 }} />}
+        {yes ? "Yes" : "No"}
       </Box>
     );
   };
 
-  const renderAccuracyLevel = (accuracy: number | null | undefined) => {
-    if (accuracy == null || isNaN(accuracy)) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
-
-    let color = "#f44336";
-    if (accuracy >= 70) color = "#4caf50";
-    else if (accuracy >= 50) color = "#ff9800";
-
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              fontStyle: "italic",
-              ml: 1,
-              color: "text.secondary",
-              fontWeight: "bold",
-            }}
-          >
-            Accuracy - {accuracy.toFixed(1)}%
-          </Typography>
-        </Box>
-      </Box>
-    );
-  };
-
-  const renderConfidenceLevel = (confidence: number | null | undefined) => {
-    if (confidence == null || isNaN(confidence)) {
-      return (
-        <Box display="flex" alignItems="center" color="text.disabled">
-          N/A
-        </Box>
-      );
-    }
+  const renderConfidence = (confidence?: number | null) => {
+    if (confidence == null) return <Box color="text.disabled">N/A</Box>;
 
     let color = "#f44336";
     if (confidence >= 60) color = "#4caf50";
     else if (confidence >= 40) color = "#ff9800";
 
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-        <LinearProgress
-          variant="determinate"
-          value={confidence}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "rgba(0,0,0,0.05)",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
-            },
-          }}
-        />
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography variant="caption" sx={{ fontStyle: "italic", ml: 1 }}>
-            Confidence: {confidence.toFixed(1)}%
-          </Typography>
-        </Box>
-      </Box>
+      <LinearProgress
+        variant="determinate"
+        value={confidence}
+        sx={{
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: "rgba(0,0,0,0.05)",
+          "& .MuiLinearProgress-bar": { backgroundColor: color },
+        }}
+      />
     );
   };
 
-  const rowConfig = [
-    { key: "main_model", label: "Outcome Classification" },
-    { key: "positive_model", label: "High Positive Return Likelihood" },
-    { key: "negative_model", label: "High Negative Return Risk" },
-  ];
-
-  const timeFrames = ["Week", "Month"];
   const showTable =
     predictionResult && Object.keys(predictionResult).length > 0;
 
+  /* -------------------- UI -------------------- */
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
-      <Paper
-        sx={{
-          p: { xs: 2, md: 3 },
-          borderRadius: 3,
-          boxShadow: 3,
-          bgcolor: "background.default",
-        }}
-      >
+      <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
+        {/* Header */}
+        <Box display="flex" alignItems="center" mb={2}>
+          <Box
+            sx={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              bgcolor: "#002060",
+              color: "#fff",
+              fontWeight: "bold",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mr: 2,
+            }}
+          >
+            3
+          </Box>
+          <BarChartIcon sx={{ mr: 1 }} color="primary" />
+          <Typography variant="h6" fontWeight={700} color="primary">
+            1 Week & 1 Month from 1st Day Close – Model Predictions
+          </Typography>
+        </Box>
+
+        {/* Inputs + CTA */}
         <Box
-          display="flex"
-          flexDirection={{ xs: "column", md: "row" }}
-          alignItems={{ md: "center" }}
-          justifyContent="space-between"
-          gap={2}
-          mb={2}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr) auto",
+            },
+            gap: 2,
+            alignItems: "end",
+          }}
         >
-          <Box display="flex" alignItems="center">
-            {/* Number Badge */}
-            <Box
-              sx={{
-                width: 20,
-                height: 20,
-                borderRadius: "50%",
-                bgcolor: "#002060",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-                mr: 2,
-                fontSize: "16px",
-              }}
-            >
-              3
-            </Box>
+          <TextField
+            label="1st Day Low"
+            size="small"
+            type="number"
+            value={prices.low}
+            onChange={(e) =>
+              setPrices((p) => ({
+                ...p,
+                low: e.target.value === "" ? "" : Number(e.target.value),
+              }))
+            }
+          />
 
-            <BarChartIcon color="primary" sx={{ mr: 1.5 }} />
+          <TextField
+            label="1st Day High"
+            size="small"
+            type="number"
+            value={prices.high}
+            onChange={(e) =>
+              setPrices((p) => ({
+                ...p,
+                high: e.target.value === "" ? "" : Number(e.target.value),
+              }))
+            }
+          />
 
-            <Typography
-              variant="h6"
-              component="h2"
-              color="primary.main"
-              fontWeight="bold"
-            >
-              1 Week & 1 Month from 1st Day Close - Model Predictions
+          <TextField
+            label="1st Day VWAP"
+            size="small"
+            type="number"
+            value={prices.vwap}
+            onChange={(e) =>
+              setPrices((p) => ({
+                ...p,
+                vwap: e.target.value === "" ? "" : Number(e.target.value),
+              }))
+            }
+          />
+
+          <Box>
+            <TextField
+              label="1st Day Close"
+              size="small"
+              type="number"
+              value={prices.close}
+              onChange={(e) =>
+                setPrices((p) => ({
+                  ...p,
+                  close:
+                    e.target.value === ""
+                      ? ""
+                      : Number(e.target.value),
+                }))
+              }
+              fullWidth
+            />
+            <Typography variant="caption" color="text.secondary">
+              Close Return:{" "}
+              {closeReturn != null ? `${closeReturn}%` : "—"}
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="flex-end" gap={2}>
-            <Box>
-              <TextField
-                label="1st Day Close Price"
-                variant="outlined"
-                size="small"
-                type="number"
-                value={t1dClosePrice}
-                onChange={handleInputChange}
-                sx={{ minWidth: "220px" }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ mt: 0.5, display: "block" }}
-              >
-                Calculated 1st Day Close Return:{" "}
-                {t1dCloseReturn != null
-                  ? `${t1dCloseReturn.toFixed(2)} %`
-                  : "—"}
-              </Typography>
-              {issuePrice != null && (
-                <Typography variant="caption" color="text.secondary">
-                  Issue Price: {issuePrice}
-                </Typography>
-              )}
-            </Box>
-
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               variant="contained"
               onClick={handleRepredict}
-              disabled={
-                isLoading ||
-                t1dClosePrice === "" ||
-                t1dCloseReturn == null
-              }
-              sx={{ height: "40px" }}
+              disabled={isLoading || closeReturn == null}
+              sx={{ minWidth: 140, height: 40 }}
             >
               {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
+                <CircularProgress size={22} color="inherit" />
               ) : (
                 "Predict"
               )}
@@ -382,160 +324,69 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         </Box>
 
         <Divider sx={{ my: 3 }} />
-        <Box>
-          <Typography>
-            Along with the parameters considered for the 1st Day prediction,
-            we additionally use the <b>1st Day Close Price / Return</b> to
-            generate 1 Week and 1 Month outcomes.
-          </Typography>
-        </Box>
-        <Divider sx={{ my: 3 }} />
 
+        {/* Results Table */}
         {showTable ? (
-          <>
-            <TableContainer>
-              <Table sx={{ minWidth: 800 }}>
-                <TableHead>
-                  <TableRow
-                    sx={{
-                      "& .MuiTableCell-head": {
-                        fontWeight: "bold",
-                      },
-                    }}
-                  >
-                    <TableCell sx={{ minWidth: 100, bgcolor: "#F0F0f0" }}>
-                      Model
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Model</TableCell>
+                  <TableCell>Explanation</TableCell>
+                  <TableCell>Week</TableCell>
+                  <TableCell>Confidence</TableCell>
+                  <TableCell>Month</TableCell>
+                  <TableCell>Confidence</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[
+                  ["main_model", "Outcome"],
+                  ["positive_model", "High Positive"],
+                  ["negative_model", "High Negative"],
+                ].map(([key, label]) => (
+                  <TableRow key={key}>
+                    <TableCell>{label}</TableCell>
+                    <TableCell>
+                      {predictionResult?.[`t1w_${key}`]?.explanation ?? "—"}
                     </TableCell>
-                    <TableCell sx={{ minWidth: 200, bgcolor: "#F0F0f0" }}>
-                      Explanation
+                    <TableCell>
+                      {key === "main_model"
+                        ? renderOutcome(
+                            predictionResult?.[`t1w_${key}`]?.prediction
+                          )
+                        : renderBinary(
+                            predictionResult?.[`t1w_${key}`]?.prediction
+                          )}
                     </TableCell>
-                    {timeFrames.map((frame, index) => (
-                      <React.Fragment key={frame}>
-                        <TableCell
-                          sx={{
-                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
-                          }}
-                        >
-                          1st {frame}(AM) from 1st Day Close
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            bgcolor: index === 0 ? "#e3f2fd" : "#ede7f6",
-                            minWidth: 90,
-                          }}
-                        >
-                          Confidence
-                        </TableCell>
-                      </React.Fragment>
-                    ))}
+                    <TableCell>
+                      {renderConfidence(
+                        predictionResult?.[`t1w_${key}`]?.confidence
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {key === "main_model"
+                        ? renderOutcome(
+                            predictionResult?.[`t1m_${key}`]?.prediction
+                          )
+                        : renderBinary(
+                            predictionResult?.[`t1m_${key}`]?.prediction
+                          )}
+                    </TableCell>
+                    <TableCell>
+                      {renderConfidence(
+                        predictionResult?.[`t1m_${key}`]?.confidence
+                      )}
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rowConfig.map((row) => {
-                    const modelKeys = {
-                      weekly: `t1w_${row.key}`,
-                      monthly: `t1m_${row.key}`,
-                    };
-
-                    const weeklyData = predictionResult?.[modelKeys.weekly];
-                    const monthlyData = predictionResult?.[modelKeys.monthly];
-
-                    if (!weeklyData && !monthlyData) return null;
-
-                    return (
-                      <TableRow
-                        key={row.key}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          sx={{ fontWeight: "medium" }}
-                        >
-                          {row.label}
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ whiteSpace: "pre-line" }}
-                          >
-                            {weeklyData?.explanation ||
-                              (weeklyData as any)?.Explanation ||
-                              monthlyData?.explanation ||
-                              (monthlyData as any)?.Explanation ||
-                              "N/A"}
-                          </Typography>
-                        </TableCell>
-                        {timeFrames.map((frame, index) => {
-                          const apiKey =
-                            frame === "Week"
-                              ? modelKeys.weekly
-                              : modelKeys.monthly;
-                          const modelData = predictionResult?.[apiKey];
-                          const cellBgColor =
-                            index === 0 ? "#e3f2fd" : "#ede7f6";
-
-                          if (!modelData) {
-                            return (
-                              <React.Fragment key={apiKey}>
-                                <TableCell sx={{ bgcolor: cellBgColor }}>
-                                  <Box color="text.disabled">N/A</Box>
-                                </TableCell>
-                                <TableCell sx={{ bgcolor: cellBgColor }}>
-                                  <Box color="text.disabled">N/A</Box>
-                                </TableCell>
-                              </React.Fragment>
-                            );
-                          }
-
-                          const renderResult =
-                            row.key === "main_model"
-                              ? renderOutcome(modelData.prediction)
-                              : renderBinaryResult(modelData.prediction);
-
-                          return (
-                            <React.Fragment key={apiKey}>
-                              <TableCell
-                                sx={{
-                                  bgcolor: cellBgColor,
-                                  fontWeight: "medium",
-                                }}
-                              >
-                                {renderResult}
-                              </TableCell>
-                              <TableCell sx={{ bgcolor: cellBgColor }}>
-                                <Box
-                                  display="flex"
-                                  flexDirection="column"
-                                  gap={1}
-                                >
-                                  {/* {renderAccuracyLevel(modelData.accuracy ?? null)} */}
-                                  {renderConfidenceLevel(
-                                    modelData.confidence ??
-                                      (modelData as any)?.Confidence ??
-                                      null
-                                  )}
-                                </Box>
-                              </TableCell>
-                            </React.Fragment>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         ) : (
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              Enter the <b>1st Day Close Price</b> to predict the 1W and 1M
-              outcomes.
-            </Typography>
-          </Box>
+          <Typography align="center" color="text.secondary">
+            Enter prices to generate Weekly & Monthly predictions.
+          </Typography>
         )}
       </Paper>
     </Container>
