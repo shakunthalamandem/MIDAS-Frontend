@@ -43,6 +43,9 @@ interface RecentPrediction {
   previous_day_close_price?: number | string | null;
   t1d_open_price?: number | string | null;
   t1d_close_price?: number | string | null;
+  t1d_low_price?: number | string | null;
+  t1d_high_price?: number | string | null;
+  t1d_vwap_price?: number | string | null;
 }
 
 interface ApiResponse {
