@@ -89,6 +89,7 @@ import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
+import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -271,6 +272,11 @@ const AppRouters: React.FC = () => {
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+
+
+
+        <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
+
 
 
 
