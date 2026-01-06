@@ -95,6 +95,13 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     if (!selectedData?.financial_highlights) return null;
 
     const highlights = selectedData.financial_highlights;
+    const isCrnx = ticker?.toUpperCase() === "CRNX";
+    const priorPeriodLabel = isCrnx
+      ? "Nine months ended September 30, 2024 ($)"
+      : "2024 ($)";
+    const currentPeriodLabel = isCrnx
+      ? "Nine months ended September 30, 2025 ($)"
+      : "2025 ($)";
 
     const rows = [
       {
@@ -138,8 +145,8 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
           <TableHead sx={{ backgroundColor: "#002060" }}>
             <TableRow>
               <StyledTableCell>Metric</StyledTableCell>
-              <StyledTableCell align="right">2024 ($)</StyledTableCell>
-              <StyledTableCell align="right">2025 ($)</StyledTableCell>
+              <StyledTableCell align="right">{priorPeriodLabel}</StyledTableCell>
+              <StyledTableCell align="right">{currentPeriodLabel}</StyledTableCell>
               <StyledTableCell align="right">YoY Change (%)</StyledTableCell>
             </TableRow>
           </TableHead>
