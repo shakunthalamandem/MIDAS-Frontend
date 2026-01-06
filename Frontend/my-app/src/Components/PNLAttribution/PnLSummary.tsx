@@ -13,6 +13,11 @@ import {
   Alert,
   Container,
   Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
 } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 
@@ -25,6 +30,11 @@ interface PnLData {
 interface PnLApiResponse {
   max_trade_date?: string;
   pnl: PnLData;
+}
+
+interface PnLSummaryProps {
+  selectedYear: string;
+  onYearChange: (year: string) => void;
 }
 
 const timeRanges = ["DTD", "MTD", "QTD", "YTD"];
@@ -55,7 +65,13 @@ const getCellStyle = (value: number | null | undefined) => {
   return { color: "#666" };
 };
 
-const PnLSummary: React.FC = () => {
+type YearlyPnLResponse = {
+  [year: string]: PnLApiResponse;
+};
+
+const yearOptions = ["2025", "2026"];
+
+const PnLSummary: React.FC<PnLSummaryProps> = ({ selectedYear, onYearChange }) => {
   const [data, setData] = useState<PnLApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,14 +90,16 @@ const PnLSummary: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({ year: Number(selectedYear) }),
         });
 
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
 
-        const result: PnLApiResponse = await response.json();
-        setData(result);
+        const result: YearlyPnLResponse = await response.json();
+        const yearData = result[selectedYear] ?? null;
+        setData(yearData);
       } catch (err: any) {
         setError(err.message || "Failed to load data");
       } finally {
@@ -95,7 +113,7 @@ const PnLSummary: React.FC = () => {
       setError("No access token found.");
       setLoading(false);
     }
-  }, [token, apiUrl]);
+  }, [token, apiUrl, selectedYear]);
 
   const calculateTotals = (): { [range: string]: number } => {
     const totals: { [range: string]: number } = {
@@ -159,6 +177,9 @@ const PnLSummary: React.FC = () => {
   const totalsFromApi = data?.pnl?.["Total"];
   const totals = totalsFromApi ?? calculateTotals();
   const formattedAsOfDate = formatAsOfDate(data?.max_trade_date);
+  const handleYearChange = (event: SelectChangeEvent<string>) => {
+    onYearChange(event.target.value);
+  };
 
   return (
     <Container>
@@ -170,21 +191,45 @@ const PnLSummary: React.FC = () => {
           P&L Summary by Asset Class
         </Typography>
 
-        {formattedAsOfDate && (
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: "bold",
-              color: "#740091ff",
-              position: "absolute",
-              right: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-            }}
-          >
-            Data As of: {formattedAsOfDate}
-          </Typography>
-        )}
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel id="pnl-year-select-label">Year</InputLabel>
+            <Select
+              labelId="pnl-year-select-label"
+              value={selectedYear}
+              label="Year"
+              onChange={handleYearChange}
+            >
+              {yearOptions.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {formattedAsOfDate && (
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: "bold",
+                color: "#740091ff",
+              }}
+            >
+              Data As of: {formattedAsOfDate}
+            </Typography>
+          )}
+        </Box>
       </Box>
 
       <Typography variant="body1" align="left" sx={{ color: "#666", mb: 2 }}>

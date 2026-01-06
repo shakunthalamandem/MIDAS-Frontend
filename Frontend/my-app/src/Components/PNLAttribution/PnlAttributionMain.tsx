@@ -28,6 +28,7 @@ const tabConfig: {
 
 const PnlAttributionMain: React.FC = () => {
   const [selectedView, setSelectedView] = useState<ViewOption>("byAsset");
+  const [selectedYear, setSelectedYear] = useState<string>("2026");
 
   const renderContent = () => {
     switch (selectedView) {
@@ -35,8 +36,8 @@ const PnlAttributionMain: React.FC = () => {
         return (
           <Fade in>
             <Box>
-              <PnLSummary />
-              <FundLevelPNLTable />
+              <PnLSummary selectedYear={selectedYear} onYearChange={setSelectedYear} />
+              <FundLevelPNLTable selectedYear={selectedYear} />
             </Box>
           </Fade>
         );
@@ -44,7 +45,7 @@ const PnlAttributionMain: React.FC = () => {
         return (
           <Fade in>
             <Box>
-              <DetailedFundTable />
+              <DetailedFundTable selectedYear={selectedYear} onYearChange={setSelectedYear} />
             </Box>
           </Fade>
         );
@@ -52,7 +53,7 @@ const PnlAttributionMain: React.FC = () => {
         return (
           <Fade in>
             <Box>
-              <RegionWisePnlAttribution />
+              <RegionWisePnlAttribution selectedYear={selectedYear} onYearChange={setSelectedYear} />
             </Box>
           </Fade>
         );
