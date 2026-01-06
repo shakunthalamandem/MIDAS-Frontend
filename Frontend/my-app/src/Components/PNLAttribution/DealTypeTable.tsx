@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Typography, Container, Box, Card
+  Paper, CircularProgress, Typography, Container, Box, Card,
+  FormControl, InputLabel, MenuItem, Select, SelectChangeEvent
 } from "@mui/material";
 
 type StrategyData = {
@@ -12,9 +13,18 @@ type ApiResponse = {
   [strategyName: string]: StrategyData;
 };
 
+type YearlyApiResponse = {
+  [year: string]: ApiResponse;
+};
+
 interface TableRowData {
   strategyName: string;
   values: { [month: string]: number };
+}
+
+interface DealTypeTableProps {
+  selectedYear: string;
+  onYearChange: (year: string) => void;
 }
 
 const formatCurrency = (value: number): string => {
@@ -25,13 +35,14 @@ const formatCurrency = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const DealTypeTable: React.FC = () => {
+const DealTypeTable: React.FC<DealTypeTableProps> = ({ selectedYear, onYearChange }) => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const yearOptions = ["2025", "2026"];
 
   const strategyOrder = [
     "IPO", "FO", "STRATEGIC", "DEC", "Other", "Overlay", "PRIVATE", "Hedging"
@@ -42,12 +53,15 @@ const DealTypeTable: React.FC = () => {
       setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/api/pnl_by_dealtype/`, {
+          method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ year: Number(selectedYear) }),
         });
-        const result: ApiResponse = await res.json();
+        const result: YearlyApiResponse = await res.json();
+        const yearData = result[selectedYear] || {};
 
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
@@ -55,7 +69,7 @@ const DealTypeTable: React.FC = () => {
         const hedgingKeys = ["Hedging_Converts", "Hedging_HY", "Hedging_Other", "Hedging"];
         const hedgingCombined: { [month: string]: number } = {};
 
-        for (const [strategyName, monthValues] of Object.entries(result)) {
+        for (const [strategyName, monthValues] of Object.entries(yearData)) {
           const isAllZero = Object.values(monthValues).every((val) => !val || val === 0);
           if (isAllZero) continue;
 
@@ -93,11 +107,14 @@ const DealTypeTable: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, selectedYear]);
 
   const cellBorder = { border: "1px solid #ccc", textAlign: "center" };
   const totalRowBgColor = "#fde8b7";
   const hedgingRowBgColor = "rgb(145, 206, 137)";
+  const handleYearChange = (event: SelectChangeEvent<string>) => {
+    onYearChange(event.target.value);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mb: 4 }}>
@@ -110,17 +127,42 @@ const DealTypeTable: React.FC = () => {
           p: 3,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            mb: 3,
-            fontWeight: "bold",
-            color: "#002060",
-            textAlign: "center",
-          }}
-        >
-          Equities Detailed Strategy-wise
-        </Typography>
+        <Box sx={{ position: "relative", mb: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bold",
+              color: "#002060",
+              textAlign: "center",
+            }}
+          >
+            Equities Detailed Strategy-wise
+          </Typography>
+          <Box
+            sx={{
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+          >
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel id="dealtype-year-select-label">Year</InputLabel>
+              <Select
+                labelId="dealtype-year-select-label"
+                value={selectedYear}
+                label="Year"
+                onChange={handleYearChange}
+              >
+                {yearOptions.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </Box>
 
         <TableContainer
           component={Paper}
