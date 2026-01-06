@@ -17,6 +17,7 @@ import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { columns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
+import { overflow } from "html2canvas/dist/types/css/property-descriptors/overflow";
 
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
@@ -189,7 +190,7 @@ const MetricsTableMain: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ marginTop: 20 }}>
+    <Box style={{ marginTop: 20, overflow: "auto" }} >
       <Box
         sx={{
           display: "flex",
@@ -301,7 +302,7 @@ const MetricsTableMain: React.FC<Props> = ({
         severity={snackbar.severity}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
-    </div>
+    </Box>
   );
 };
 
