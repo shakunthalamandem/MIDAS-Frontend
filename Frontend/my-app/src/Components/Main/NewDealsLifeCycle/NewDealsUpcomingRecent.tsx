@@ -46,6 +46,11 @@ const NewDealsUpcomingRecent: React.FC = () => {
     upcoming: "Upcoming Deals",
   };
 
+  const [selectedRegion, setSelectedRegion] = useState<
+    "ALL" | "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
+  >("ALL");
+
+
   const fetchData = async (operation: string) => {
     setLoading(true);
     try {
@@ -58,8 +63,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
         body: JSON.stringify({ operation }),
       });
       const result = await response.json();
-      const formattedRows = result.data.map((item: any) => ({
-        id: item.ticker, // ✅ stable id
+      const formattedRows = result.data.map((item: any, index: number) => ({
+        id: `${item.ticker}-${index}`, // ✅ always unique
         ...item,
       }));
 
@@ -104,6 +109,22 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
+  useEffect(() => {
+    setSelectedRegion("ALL");
+  }, [selectedOp]);
+
+  // 🔹 Reset region when switching tabs
+useEffect(() => {
+  setSelectedRegion("ALL");
+}, [selectedOp]);
+
+// 🔹 Reset selected ticker when region changes
+useEffect(() => {
+  setSelectedDeal(null);
+}, [selectedRegion]);
+
+
+
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
       return "Track IPOs that have been issued or priced within the last 30 days, with real-time deal status and key market details.";
@@ -112,10 +133,43 @@ const NewDealsUpcomingRecent: React.FC = () => {
   }, [selectedOp]);
 
   const filteredRows = useMemo(() => {
+    let data = [...rows];
+
+    // 🔹 Search filter
     const term = dealSearch.trim().toLowerCase();
-    if (!term) return rows;
-    return rows.filter((row) => row.ticker?.toString().toLowerCase().includes(term));
-  }, [rows, dealSearch]);
+    if (term) {
+      data = data.filter((row) =>
+        row.ticker?.toString().toLowerCase().includes(term)
+      );
+    }
+
+    // 🔹 Region filter (STRICT)
+    if (selectedOp !== "pipeline" && selectedRegion !== "ALL") {
+      data = data.filter((row) => {
+        const region = row.region?.trim().toUpperCase();
+
+        switch (selectedRegion) {
+          case "US":
+            return region === "US";
+
+          case "APAC":
+            return region === "APAC";
+
+          case "EMEA":
+            return region === "EMEA";
+
+          case "NON_US_AMERICA":
+            return region === "NON-US AMERICA" || region === "LATAM";
+
+          default:
+            return true;
+        }
+      });
+    }
+
+    return data;
+  }, [rows, dealSearch, selectedRegion, selectedOp]);
+
 
 
   return (
@@ -189,6 +243,48 @@ const NewDealsUpcomingRecent: React.FC = () => {
               />
             </Container>
           )}
+
+          {selectedOp !== "pipeline" && (
+            <Container
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mb: 1.5,
+                px: 1,
+                gap: 1,
+                flexWrap: "wrap",
+              }}
+            >
+              {[
+                { label: "All", value: "ALL" },
+                { label: "US", value: "US" },
+                { label: "EMEA", value: "EMEA" },
+                { label: "APAC", value: "APAC" },
+                { label: "Non-US America", value: "NON_US_AMERICA" },
+              ].map((item) => (
+                <Paper
+                  key={item.value}
+                  onClick={() => setSelectedRegion(item.value as any)}
+                  sx={{
+                    px: 2.4,
+                    py: 0.7,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    border: "1px solid rgba(0,32,96,0.25)",
+                    backgroundColor:
+                      selectedRegion === item.value ? "#6F1178" : "#ffffff",
+                    color:
+                      selectedRegion === item.value ? "#ffffff" : "#002060",
+                  }}
+                >
+                  {item.label}
+                </Paper>
+              ))}
+            </Container>
+          )}
+
 
           {/* 🔹 TABLE (UNCHANGED) */}
           {isPipelineView ? (
