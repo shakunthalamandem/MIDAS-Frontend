@@ -32,7 +32,7 @@ export interface DealRecord {
   issuer_name: string;
   deal_type: string;
   fo_type: string;
-  pricing_date: string;
+  trade_date: string;
   region: string;
   sector: string;
   deal_size: number | string;
@@ -162,12 +162,12 @@ const TABLE_COLUMNS: ColumnConfig[] = [
     ),
   },
   {
-    key: "pricing_date",
-    label: "Pricing Date",
+    key: "trade_date",
+    label: "Trade Date",
     align: "center",
     width: 110,
-    sortKey: "pricing_date",
-    render: (row) => (row.pricing_date ? row.pricing_date : "TBD"),
+    sortKey: "trade_date",
+    render: (row) => (row.trade_date ? row.trade_date : "TBD"),
   },
   {
     key: "sector",
@@ -257,7 +257,7 @@ const TABLE_COLUMNS: ColumnConfig[] = [
 
 export interface TickerSelectionPayload {
   ticker: string;
-  pricing_date: string;
+  trade_date: string;
 }
 
 interface DealsPredictionsTableProps {
@@ -276,7 +276,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [selectedDeal, setSelectedDeal] = useState<DealRecord | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: "pricing_date",
+    key: "trade_date",
     direction: "desc",
   });
   const [dealTypeFilter, setDealTypeFilter] = useState<DealTypeFilter>("FO");
@@ -343,7 +343,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
       const endTime = endDate ? Date.parse(endDate) : null;
 
       rows = rows.filter((row) => {
-        const rowTime = row.pricing_date ? Date.parse(row.pricing_date) : null;
+        const rowTime = row.trade_date ? Date.parse(row.trade_date) : null;
         if (rowTime === null || Number.isNaN(rowTime)) {
           return false;
         }
@@ -375,7 +375,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
       return null;
     }
 
-    if (key === "pricing_date") {
+    if (key === "trade_date") {
       const time = new Date(value as string).getTime();
       return Number.isNaN(time) ? null : time;
     }
@@ -441,7 +441,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
     if (onTickerClick) {
       onTickerClick({
         ticker: row.ticker,
-        pricing_date: row.pricing_date,
+        trade_date: row.trade_date,
       });
     }
   };
@@ -722,7 +722,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({
                   {sortedData.map((row, idx) => {
                     const isSelected =
                       selectedDeal?.ticker === row.ticker &&
-                      selectedDeal?.pricing_date === row.pricing_date;
+                      selectedDeal?.trade_date === row.trade_date;
 
                     return (
                       <TableRow

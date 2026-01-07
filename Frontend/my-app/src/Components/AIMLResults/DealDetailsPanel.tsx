@@ -18,7 +18,7 @@ export interface DealRecord {
   issuer_name: string;
   deal_type: string;
   fo_type: string;
-  pricing_date: string;
+  trade_date: string;
   region: string;
   sector: string;
   deal_size: number | string;

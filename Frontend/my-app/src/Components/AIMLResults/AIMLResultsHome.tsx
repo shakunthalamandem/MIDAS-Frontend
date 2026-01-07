@@ -70,7 +70,7 @@ const AIMLResultsHome: React.FC = () => {
           {chartSelection ? (
             <DealPricesChart
               ticker={chartSelection.ticker}
-              pricing_date={chartSelection.pricing_date}
+              trade_date={chartSelection.trade_date}
             />
           ) : (
             <Card

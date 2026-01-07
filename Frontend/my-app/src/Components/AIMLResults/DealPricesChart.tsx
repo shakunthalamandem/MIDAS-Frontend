@@ -51,17 +51,17 @@ interface DealPoint {
 // minimal shape we need for the selected deal
 export interface DealForChart {
   ticker: string;
-  pricing_date: string;
+  trade_date: string;
 }
 
 /**
  * Props:
- * - You can EITHER pass `deal` OR pass `ticker` + `pricing_date`.
+ * - You can EITHER pass `deal` OR pass `ticker` + `trade_date`.
  */
 export interface DealPricesChartProps {
   deal?: DealForChart | null;
   ticker?: string;
-  pricing_date?: string;
+  trade_date?: string;
 }
 
 /* ---------- Helpers ---------- */
@@ -225,7 +225,7 @@ const HorizontalLineLabel: React.FC<any> = (props) => {
 const DealPricesChart: React.FC<DealPricesChartProps> = ({
   deal,
   ticker: tickerProp,
-  pricing_date: pricingDateProp,
+  trade_date: tradeDateProp,
 }) => {
   const [chartData, setChartData] = useState<DealPoint[]>([]);
   const [issuePrice, setIssuePrice] = useState<number | null>(null);
@@ -236,10 +236,10 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // unified source of truth for ticker / pricing_date
+  // unified source of truth for ticker / trade_date
   const ticker = deal?.ticker || tickerProp || "";
-  const pricingDate = deal?.pricing_date || pricingDateProp || "";
-  const hasSelection = !!ticker && !!pricingDate;
+  const tradeDate = deal?.trade_date || tradeDateProp || "";
+  const hasSelection = !!ticker && !!tradeDate;
 
   useEffect(() => {
     // reset state whenever selection changes
@@ -269,7 +269,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
           },
           body: JSON.stringify({
             ticker,
-            pricing_date: pricingDate,
+            trade_date: tradeDate,
           }),
         });
 
@@ -313,7 +313,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     };
 
     fetchPrices();
-  }, [apiUrl, token, ticker, pricingDate, hasSelection]);
+  }, [apiUrl, token, ticker, tradeDate, hasSelection]);
 
   const { yMin, yMax } = useMemo(() => {
     if (!chartData.length) {
