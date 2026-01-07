@@ -35,6 +35,9 @@ export interface DealRecord {
   fs_1m_sentiment: string;
   fs_expected_volatility: number | string;
   fs_confidence_level: number | string;
+
+  one_week_sentiment: string;
+  one_month_sentiment: string;
 }
 
 export type DealTypeFilter = "IPO" | "FO";

@@ -21,7 +21,7 @@ type Align = "left" | "center" | "right";
 
 interface ColumnConfig {
   key: keyof DealRecord | string;
-  label: string; // can contain "\n"
+  label: string;
   align?: Align;
   width?: number;
   render?: (row: DealRecord) => React.ReactNode;
@@ -32,26 +32,19 @@ type ReturnSign = "positive" | "negative" | "neutral" | null;
 
 const PREDICTION_COL_WIDTH = 160;
 const AI_COL_WIDTH = 150;
+const SENTIMENT_COL_WIDTH = 160;
 
-// IMPORTANT for sticky offsets
-const GROUP_HEADER_HEIGHT = 40; // px (merged header row)
-const COLUMN_HEADER_HEIGHT = 58; // px (column header row; adjust if needed)
+// sticky offsets
+const GROUP_HEADER_HEIGHT = 40;
+const COLUMN_HEADER_HEIGHT = 58;
 
 const getPredictionSign = (pred: string): ReturnSign => {
   const normalized = pred?.toLowerCase() || "";
   if (!normalized) return null;
-  if (
-    normalized.includes("positive") ||
-    normalized.includes("pos") ||
-    normalized.includes("up")
-  ) {
+  if (normalized.includes("positive") || normalized.includes("pos") || normalized.includes("up")) {
     return "positive";
   }
-  if (
-    normalized.includes("negative") ||
-    normalized.includes("neg") ||
-    normalized.includes("down")
-  ) {
+  if (normalized.includes("negative") || normalized.includes("neg") || normalized.includes("down")) {
     return "negative";
   }
   return null;
@@ -66,10 +59,10 @@ const getActualSign = (value: number | string): ReturnSign => {
   return "neutral";
 };
 
-const PredictionOutcomeIndicator: React.FC<{
-  pred: string;
-  actual: number | string;
-}> = ({ pred, actual }) => {
+const PredictionOutcomeIndicator: React.FC<{ pred: string; actual: number | string }> = ({
+  pred,
+  actual,
+}) => {
   const predSign = getPredictionSign(pred);
   const actualSign = getActualSign(actual);
 
@@ -80,11 +73,7 @@ const PredictionOutcomeIndicator: React.FC<{
   return (
     <Box
       component="span"
-      title={
-        isMismatch
-          ? "Prediction disagrees with actual"
-          : "Prediction aligns with actual"
-      }
+      title={isMismatch ? "Prediction disagrees with actual" : "Prediction aligns with actual"}
       sx={{
         fontSize: 14,
         fontWeight: 800,
@@ -103,13 +92,7 @@ const renderHeaderLabel = (label: string, align: Align = "center") => {
     <Box
       display="flex"
       flexDirection="column"
-      alignItems={
-        align === "left"
-          ? "flex-start"
-          : align === "right"
-          ? "flex-end"
-          : "center"
-      }
+      alignItems={align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center"}
       sx={{ color: "inherit" }}
     >
       {lines.map((line, idx) => (
@@ -138,14 +121,12 @@ const GroupHeaderCell: React.FC<{
       sx={(theme) => ({
         position: "sticky",
         top: 0,
-        zIndex: 5, // must be >= column header zIndex
+        zIndex: 5,
         height: GROUP_HEADER_HEIGHT,
         py: 0,
         background: `linear-gradient(180deg, #00163f 0%, #001032 100%)`,
         borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.22)}`,
-        borderRight: isLast
-          ? "none"
-          : `1px solid ${alpha(theme.palette.common.white, 0.16)}`,
+        borderRight: isLast ? "none" : `1px solid ${alpha(theme.palette.common.white, 0.16)}`,
       })}
     >
       <Chip
@@ -157,14 +138,8 @@ const GroupHeaderCell: React.FC<{
           letterSpacing: 0.8,
           textTransform: "uppercase",
           fontSize: 11,
-          backgroundColor:
-            tone === "default"
-              ? alpha(theme.palette.common.white, 0.14)
-              : undefined,
-          color:
-            tone === "default"
-              ? theme.palette.common.white
-              : theme.palette.common.white,
+          backgroundColor: tone === "default" ? alpha(theme.palette.common.white, 0.14) : undefined,
+          color: theme.palette.common.white,
           "& .MuiChip-label": { px: 1.2 },
         })}
       />
@@ -181,8 +156,6 @@ interface DealsTableProps {
   onSelectDeal: (row: DealRecord) => void;
 
   onTickerClick?: (payload: { ticker: string; trade_date: string }) => void;
-
-  // ✅ add this
   dealTypeFilter: "IPO" | "FO";
 }
 
@@ -195,7 +168,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
   onTickerClick,
   dealTypeFilter,
 }) => {
-  const showAI = dealTypeFilter === "IPO";
+  const showAIModels = dealTypeFilter === "IPO";
 
   const columns: ColumnConfig[] = useMemo(() => {
     const base: ColumnConfig[] = [
@@ -240,10 +213,39 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
     ];
 
-    const aiCols: ColumnConfig[] = [
+    // ✅ ALWAYS visible
+    const sentimentViewCols: ColumnConfig[] = [
+      {
+        key: "one_week_sentiment",
+        label: "1 Week\nSentiment",
+        align: "center",
+        width: SENTIMENT_COL_WIDTH,
+        sortKey: "one_week_sentiment",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            {row.one_week_sentiment || "—"}
+          </Typography>
+        ),
+      },
+      {
+        key: "one_month_sentiment",
+        label: "1 Month\nSentiment",
+        align: "center",
+        width: SENTIMENT_COL_WIDTH,
+        sortKey: "one_month_sentiment",
+        render: (row) => (
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            {row.one_month_sentiment || "—"}
+          </Typography>
+        ),
+      },
+    ];
+
+    // ✅ IPO-only
+    const aiModelCols: ColumnConfig[] = [
       {
         key: "fs_1w_sentiment",
-        label: "1 Week\nSentiment",
+        label: "1st Week\nSentiment",
         align: "center",
         width: AI_COL_WIDTH,
         sortKey: "fs_1w_sentiment",
@@ -255,7 +257,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
       {
         key: "fs_1m_sentiment",
-        label: "1 Month\nSentiment",
+        label: "1st Month\nSentiment",
         align: "center",
         width: AI_COL_WIDTH,
         sortKey: "fs_1m_sentiment",
@@ -345,15 +347,18 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
     ];
 
-    return showAI ? [...base, ...aiCols, ...mlCols] : [...base, ...mlCols];
-  }, [onTickerClick, showAI]);
+    return showAIModels
+      ? [...base, ...sentimentViewCols, ...aiModelCols, ...mlCols]
+      : [...base, ...sentimentViewCols, ...mlCols];
+  }, [onTickerClick, showAIModels]);
 
   const groupSpans = useMemo(() => {
     const dealDetails = 3;
-    const ai = showAI ? 2 : 0;
+    const sentiment = 2; // always
+    const aiModels = showAIModels ? 2 : 0;
     const ml = 4;
-    return { dealDetails, ai, ml };
-  }, [showAI]);
+    return { dealDetails, sentiment, aiModels, ml };
+  }, [showAIModels]);
 
   return (
     <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
@@ -362,32 +367,18 @@ const DealsTable: React.FC<DealsTableProps> = ({
           <TableHead>
             {/* Group header row (sticky) */}
             <TableRow>
-              <GroupHeaderCell
-                label="Deal Details"
-                colSpan={groupSpans.dealDetails}
-                tone="default"
-                isLast={!showAI && groupSpans.ml === 4 ? false : false}
-              />
-              {showAI && (
-                <GroupHeaderCell
-                  label="AI Models"
-                  colSpan={groupSpans.ai}
-                  tone="secondary"
-                />
+              <GroupHeaderCell label="Deal Details" colSpan={groupSpans.dealDetails} tone="default" />
+              <GroupHeaderCell label="AI Sentiment View" colSpan={groupSpans.sentiment} tone="secondary" />
+              {showAIModels && (
+                <GroupHeaderCell label="AI Models" colSpan={groupSpans.aiModels} tone="secondary" />
               )}
-              <GroupHeaderCell
-                label="ML Models"
-                colSpan={groupSpans.ml}
-                tone="primary"
-                isLast
-              />
+              <GroupHeaderCell label="ML Models" colSpan={groupSpans.ml} tone="primary" isLast />
             </TableRow>
 
-            {/* Column header row (sticky, pushed below group row) */}
+            {/* Column header row */}
             <TableRow>
               {columns.map((col) => {
-                const sortKey =
-                  col.sortKey || (col.key as keyof DealRecord | undefined);
+                const sortKey = col.sortKey || (col.key as keyof DealRecord | undefined);
                 const isSorted = sortKey && sortConfig.key === sortKey;
 
                 return (
@@ -397,24 +388,20 @@ const DealsTable: React.FC<DealsTableProps> = ({
                     sortDirection={isSorted ? sortConfig.direction : false}
                     sx={(theme) => ({
                       position: "sticky",
-                      top: GROUP_HEADER_HEIGHT, // ✅ stick below merged header
+                      top: GROUP_HEADER_HEIGHT,
                       zIndex: 4,
                       height: COLUMN_HEADER_HEIGHT,
-
                       width: col.width,
                       maxWidth: col.width,
                       minWidth: col.width,
-
                       fontWeight: 800,
                       px: 1.2,
                       py: 1.1,
                       whiteSpace: "normal",
                       fontSize: "14px",
                       letterSpacing: "0.2px",
-
                       color: theme.palette.common.white,
                       backgroundColor: "#002060",
-
                       borderBottom: "2px solid #00163f",
                       borderRight: `1px solid ${alpha(theme.palette.common.white, 0.22)}`,
                     })}
@@ -465,14 +452,10 @@ const DealsTable: React.FC<DealsTableProps> = ({
                         : isEven
                         ? theme.palette.background.paper
                         : theme.palette.grey[50],
-
                       boxShadow: isSelected
                         ? `inset 3px 0 0 ${theme.palette.success.main}`
                         : "none",
-
-                      transition:
-                        "background-color 0.2s ease, box-shadow 0.2s ease",
-
+                      transition: "background-color 0.2s ease, box-shadow 0.2s ease",
                       "&:hover": {
                         backgroundColor: isSelected
                           ? alpha(theme.palette.success.main, 0.22)
@@ -483,7 +466,6 @@ const DealsTable: React.FC<DealsTableProps> = ({
                 >
                   {columns.map((col) => {
                     const value = col.render ? col.render(row) : (row as any)[col.key];
-
                     return (
                       <TableCell
                         key={String(col.key)}
