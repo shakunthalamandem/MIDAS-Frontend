@@ -219,6 +219,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({ onTickerC
             selectedDeal={selectedDeal}
             onSelectDeal={setSelectedDeal}
             onTickerClick={onTickerClick}
+            dealTypeFilter={dealTypeFilter}
           />
 
           <Box mt={2}>
