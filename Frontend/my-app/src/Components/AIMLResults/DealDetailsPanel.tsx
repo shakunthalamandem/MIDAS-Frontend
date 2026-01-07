@@ -14,6 +14,49 @@ import PredictionCell, { ActualCell } from "./PredictionCell";
 import DealDetailsHeader from "./DealDetailsHeader";
 import type { DealRecord } from "./types";
 
+interface AIInsightBlockProps {
+  title: string;
+  value: React.ReactNode;
+  subtitle?: string;
+}
+
+const AIInsightBlock: React.FC<AIInsightBlockProps> = ({
+  title,
+  value,
+  subtitle,
+}) => (
+  <Paper
+    elevation={0}
+    sx={(theme) => ({
+      borderRadius: 2,
+      border: `1px solid ${alpha(theme.palette.info.main, 0.35)}`,
+      background:
+        theme.palette.mode === "light"
+          ? alpha(theme.palette.info.main, 0.04)
+          : alpha(theme.palette.info.main, 0.18),
+      padding: 1.25,
+      height: "100%",
+    })}
+  >
+    <Box>
+      <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
+        {title}
+      </Typography>
+      {subtitle && (
+        <Typography variant="caption" color="text.secondary">
+          {subtitle}
+        </Typography>
+      )}
+    </Box>
+
+    <Box mt={1}>
+      <Typography variant="h6" sx={{ fontWeight: 700, textAlign: "center" }}>
+        {value || "—"}
+      </Typography>
+    </Box>
+  </Paper>
+);
+
 const formatNumber = (
   value: number | string | null | undefined,
   options?: { suffix?: string; decimals?: number }
@@ -287,13 +330,19 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   }
                 />
                 {deal.deal_type !== "IPO" &&
-                  formatNumber(deal.discount_from_announcement_price, { suffix: "%", decimals: 2 }) && (
+                  formatNumber(deal.discount_from_announcement_price, {
+                    suffix: "%",
+                    decimals: 2,
+                  }) && (
                     <DetailRow
                       label="Disc vs announcement"
-                      value={formatNumber(deal.discount_from_announcement_price, {
-                        suffix: "%",
-                        decimals: 2,
-                      })}
+                      value={formatNumber(
+                        deal.discount_from_announcement_price,
+                        {
+                          suffix: "%",
+                          decimals: 2,
+                        }
+                      )}
                     />
                   )}
               </SectionCard>
@@ -383,6 +432,74 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
             </Grid>
           </Grid>
         </Box>
+
+        {deal.deal_type === "IPO" && (
+          <>
+            <Divider sx={{ my: 2 }} />
+
+            {/* ROW 3: AI MODEL INSIGHTS */}
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  mb: 1,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.6,
+                  fontSize: 11,
+                  color: "text.secondary",
+                }}
+              >
+                AI model predictions
+              </Typography>
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="1 Week Sentiment"
+                    subtitle="AI sentiment signal"
+                    value={deal.fs_1w_sentiment}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="1 Month Sentiment"
+                    subtitle="AI sentiment signal"
+                    value={deal.fs_1m_sentiment}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="Expected Volatility"
+                    subtitle="AI estimated"
+                    value={
+                      deal.fs_expected_volatility
+                        ? `${formatNumber(deal.fs_expected_volatility, {
+                            decimals: 2,
+                          })}%`
+                        : "—"
+                    }
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="Confidence Level"
+                    subtitle="Model confidence"
+                    value={
+                      deal.fs_confidence_level
+                        ? `${formatNumber(deal.fs_confidence_level, {
+                            decimals: 0,
+                          })}%`
+                        : "—"
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </>
+        )}
       </CardContent>
     </Card>
   );
