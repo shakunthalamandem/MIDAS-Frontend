@@ -37,6 +37,26 @@ interface FiltersProps {
   apiName: string;
 }
 
+const formatDateWithOrdinal = (value: string | null): string | null => {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const day = date.getDate();
+  const daySuffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+      ? "nd"
+      : day % 10 === 3 && day !== 13
+      ? "rd"
+      : "th";
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${day}${daySuffix} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
+
 const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const [loading, setLoading] = useState(false);
 
@@ -53,6 +73,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   }>({});
 
   const [apiData, setApiData] = useState<any>({});
+  const [maxPricingDate, setMaxPricingDate] = useState<string | null>(null);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchKey, setSearchKey] = useState<string | null>(null);
@@ -103,6 +124,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
   const handleSubmit = async (filters = selectedValues) => {
     try {
       setLoading(true);
+      setMaxPricingDate(null);
 
       const outgoing: { [key: string]: (string | number)[] } = {};
       Object.keys(filters).forEach((key) => {
@@ -129,8 +151,16 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
 
       const result = await response.json();
       setApiData(result);
+
+      // Capture max_pricing_date for mdd_deals_graph (if provided)
+      if (apiName === "mdd_deals_graph") {
+        setMaxPricingDate(result?.max_pricing_date ?? null);
+      } else {
+        setMaxPricingDate(null);
+      }
     } catch (error: any) {
       console.error(error.message || "Error while fetching data");
+      setMaxPricingDate(null);
     } finally {
       setLoading(false);
     }
@@ -161,6 +191,7 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
     setAppliedFilters(resetSelectedValues);
     setSearchValue("");
     setSearchKey(null);
+    setMaxPricingDate(null);
     handleSubmit(resetSelectedValues);
   };
 
@@ -424,7 +455,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
                 Monashee Deals Filters
               </Typography>
 
-              <Box display="flex" gap={1.2}>
+              <Box display="flex" alignItems="center" gap={1.2}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: "#002060", whiteSpace: "nowrap" }}
+                >
+                  Data as of: {formatDateWithOrdinal(maxPricingDate) || "--"}
+                </Typography>
+
                 <LoadingButton
                   variant="contained"
                   onClick={() => handleSubmit()}
