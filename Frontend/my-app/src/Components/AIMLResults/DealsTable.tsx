@@ -53,40 +53,32 @@ const getActualSign = (value: number | string): ReturnSign => {
   return "neutral";
 };
 
-const PredictionOutcomeDot: React.FC<{ pred: string; actual: number | string }> = ({
-  pred,
-  actual,
-}) => {
+const PredictionOutcomeIndicator: React.FC<{
+  pred: string;
+  actual: number | string;
+}> = ({ pred, actual }) => {
   const predSign = getPredictionSign(pred);
   const actualSign = getActualSign(actual);
 
-  const isMismatch = predSign && actualSign && actualSign !== "neutral" && predSign !== actualSign;
+  if (!predSign || !actualSign || actualSign === "neutral") return null;
 
-  let color = "#9e9e9e";
-  let title = "Missing data";
-
-  if (isMismatch) {
-    color = "#d32f2f";
-    title = "Prediction disagrees with actual";
-  } else if (predSign && actualSign && actualSign !== "neutral") {
-    color = "#2e7d32";
-    title = "Prediction aligns with actual";
-  }
+  const isMismatch = predSign !== actualSign;
 
   return (
     <Box
       component="span"
-      title={title}
-      sx={(theme) => ({
-        width: 10,
-        height: 10,
-        borderRadius: "50%",
-        backgroundColor: color,
-        boxShadow: `0 0 0 1px ${alpha(theme.palette.getContrastText("#fff"), 0.04)}`,
-      })}
-    />
+      title={isMismatch ? "Prediction disagrees with actual" : "Prediction aligns with actual"}
+      sx={{
+        fontSize: 14,
+        fontWeight: 700,
+        color: isMismatch ? "error.main" : "success.main",
+      }}
+    >
+      {isMismatch ? "✕" : "✓"}
+    </Box>
   );
 };
+
 
 const renderHeaderLabel = (label: string, align: Align = "center") => {
   const lines = label.split("\n");
@@ -198,7 +190,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
       // --- AI models (new) ---
       {
         key: "fs_1w_sentiment",
-        label: "FS 1W\nSentiment",
+        label: "1st Week Sentiment",
         align: "center",
         width: AI_COL_WIDTH,
         sortKey: "fs_1w_sentiment",
@@ -210,7 +202,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
       },
       {
         key: "fs_1m_sentiment",
-        label: "FS 1M\nSentiment",
+        label: "1st Month Sentiment",
         align: "center",
         width: AI_COL_WIDTH,
         sortKey: "fs_1m_sentiment",
@@ -233,7 +225,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
             <PredictionCell
               pred={row.t1d_pred}
               confidence={row.t1d_confidence}
-              trailingAdornment={<PredictionOutcomeDot pred={row.t1d_pred} actual={row.t1d_actual_return} />}
+              trailingAdornment={<PredictionOutcomeIndicator pred={row.t1d_pred} actual={row.t1d_actual_return} />}
             />
           </Box>
         ),
@@ -249,12 +241,6 @@ const DealsTable: React.FC<DealsTableProps> = ({
             <PredictionCell
               pred={row.t1d_openprice_pred}
               confidence={row.t1d_openprice_confidence}
-              trailingAdornment={
-                <PredictionOutcomeDot
-                  pred={row.t1d_openprice_pred}
-                  actual={row.t1d_openprice_actual_return}
-                />
-              }
             />
           </Box>
         ),
@@ -270,7 +256,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
             <PredictionCell
               pred={row.t1w_pred}
               confidence={row.t1w_confidence}
-              trailingAdornment={<PredictionOutcomeDot pred={row.t1w_pred} actual={row.t1w_actual_return} />}
+              trailingAdornment={<PredictionOutcomeIndicator pred={row.t1w_pred} actual={row.t1w_actual_return} />}
             />
           </Box>
         ),
@@ -286,7 +272,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
             <PredictionCell
               pred={row.t1m_pred}
               confidence={row.t1m_confidence}
-              trailingAdornment={<PredictionOutcomeDot pred={row.t1m_pred} actual={row.t1m_actual_return} />}
+              trailingAdornment={<PredictionOutcomeIndicator pred={row.t1m_pred} actual={row.t1m_actual_return} />}
             />
           </Box>
         ),
