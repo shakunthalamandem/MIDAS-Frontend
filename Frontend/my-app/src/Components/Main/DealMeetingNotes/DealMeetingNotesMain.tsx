@@ -8,7 +8,7 @@ const DealMeetingNotesMain: React.FC = () => {
       <Typography
         variant="body2"
         sx={{
-          fontWeight: 500,
+          fontWeight: 600,
           color: "#FFFFFF",
           fontSize: { xs: "1rem", sm: "1.2rem" },
           backgroundColor: "#002060",
@@ -20,9 +20,10 @@ const DealMeetingNotesMain: React.FC = () => {
           borderRadius: "8px",
           textAlign: "center",
           marginBottom: "20px",
+          letterSpacing: 0.2,
         }}
       >
-        Welcome to 📊 Deal Meeting Notes
+        Post-Meeting Notes
       </Typography>
 
       <Container maxWidth="xl">
