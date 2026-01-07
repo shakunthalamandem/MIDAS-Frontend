@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -10,7 +10,10 @@ import {
   TableBody,
   TableContainer,
 } from "@mui/material";
-import { columns } from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
+import {
+  createColumns,
+  ColumnDef,
+} from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
 import CompetitorSearch from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/CompetitorSearch";
 import DeleteConfirmDialog from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DeleteConfirmDialog";
 import MetricsRow from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/MetricsRow";
@@ -35,6 +38,7 @@ const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
   const { forceExpand } = useExportContext();
   const showActions = !forceExpand;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
+  const columns: ColumnDef[] = useMemo(() => createColumns(), []);
   
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({

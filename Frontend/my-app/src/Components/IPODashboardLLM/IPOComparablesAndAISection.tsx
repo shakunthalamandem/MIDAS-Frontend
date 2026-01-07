@@ -41,6 +41,7 @@ const IPOComparablesAndAISection: React.FC<Props> = ({ selectedData }) => {
           >
             <IPODashboardMainTable
               ticker={selectedData?.ticker_name ?? ""}
+              pricingDate={selectedData?.pricing_date}
               onPeersUpdated={handlePeersUpdated}
             />
             <Typography
