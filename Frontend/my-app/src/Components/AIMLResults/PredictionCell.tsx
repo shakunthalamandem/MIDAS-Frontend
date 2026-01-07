@@ -88,7 +88,7 @@ const getPredictionMeta = (
 
   if (normalized.includes("extreme")) {
     return {
-      displayLabel: "Extreme Return",
+      displayLabel: "Extreme",
       tone: "extreme",
       icon: <BoltIcon fontSize="small" />,
     };
@@ -100,7 +100,7 @@ const getPredictionMeta = (
     normalized.includes("up")
   ) {
     return {
-      displayLabel: <span style={{ fontSize: "10px" }}>Positive Return</span>,
+      displayLabel: <span style={{ fontSize: "10px" }}>Positive</span>,
       tone: "positive",
       icon: <TrendingUpIcon fontSize="small" />,
     };
@@ -112,7 +112,7 @@ const getPredictionMeta = (
     normalized.includes("down")
   ) {
     return {
-      displayLabel: <span style={{ fontSize: "10px" }}>Negative Return</span>,
+      displayLabel: <span style={{ fontSize: "10px" }}>Negative</span>,
       tone: "negative",
       icon: <TrendingDownIcon fontSize="small" />,
     };
@@ -269,7 +269,7 @@ const PredictionCell: React.FC<{
         )}
         <Typography variant="caption" color="text.secondary" textAlign="center">
           {hasConf
-            ? `${formatPercent(confClamped!)} Confidence`
+            ? `${formatPercent(confClamped!)}`
             : "Confidence N/A"}
         </Typography>
       </Box>

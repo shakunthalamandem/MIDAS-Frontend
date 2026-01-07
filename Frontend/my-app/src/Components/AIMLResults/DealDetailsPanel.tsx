@@ -12,33 +12,7 @@ import {
 import { alpha } from "@mui/material/styles";
 import PredictionCell, { ActualCell } from "./PredictionCell";
 import DealDetailsHeader from "./DealDetailsHeader";
-
-export interface DealRecord {
-  ticker: string;
-  issuer_name: string;
-  deal_type: string;
-  fo_type: string;
-  trade_date: string;
-  region: string;
-  sector: string;
-  deal_size: number | string;
-  issue_price: number | string;
-  discount_from_announcement_price: number | string;
-  allocation_as_percentage_of_deal_size: number | string;
-  allocation_as_percentage_of_ioi: number | string;
-  t1d_pred: string;
-  t1d_confidence: number | string;
-  t1d_actual_return: number | string;
-  t1d_openprice_pred: string;
-  t1d_openprice_confidence: number | string;
-  t1d_openprice_actual_return: number | string;
-  t1w_pred: string;
-  t1w_confidence: number | string;
-  t1w_actual_return: number | string;
-  t1m_pred: string;
-  t1m_confidence: number | string;
-  t1m_actual_return: number | string;
-}
+import type { DealRecord } from "./types";
 
 const formatNumber = (
   value: number | string | null | undefined,

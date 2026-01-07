@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Box, Card, Container, Typography } from "@mui/material";
-import DealsPredictionsTable, {
-  TickerSelectionPayload,
-} from "./DealsPredictionsTable";
+import { TickerSelectionPayload } from "./types";
 import DealPricesChart from "./DealPricesChart";
+import DealsPredictionsTable from "./DealsPredictionsTable";
 
 const AIMLResultsHome: React.FC = () => {
   const [chartSelection, setChartSelection] =
