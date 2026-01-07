@@ -8,6 +8,10 @@ import {
   Paper,
   Typography,
   Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
 } from "@mui/material";
 import {
   ResponsiveContainer,
@@ -22,7 +26,13 @@ import {
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
 
-// 🔽 adjust this path if needed
+import {
+  PredictionMarkerResolved,
+  markerColor,
+  markerTooltipText,
+  clampIndex,
+} from "./predictionUtils";
+import { PredictionBadges } from "./PredictionBadges";
 
 interface PriceApiRow {
   fs_ticker: string;
@@ -48,16 +58,14 @@ interface DealPoint {
   low: number;
 }
 
-// minimal shape we need for the selected deal
 export interface DealForChart {
   ticker: string;
   trade_date: string;
+  t1d_pred: string;
+  t1w_pred: string;
+  t1m_pred: string;
 }
 
-/**
- * Props:
- * - You can EITHER pass `deal` OR pass `ticker` + `trade_date`.
- */
 export interface DealPricesChartProps {
   deal?: DealForChart | null;
   ticker?: string;
@@ -65,15 +73,6 @@ export interface DealPricesChartProps {
 }
 
 /* ---------- Helpers ---------- */
-
-const formatDateLabel = (value: string): string => {
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "2-digit",
-  }).format(d);
-};
 
 const formatFullDate = (value: string): string => {
   const d = new Date(value);
@@ -90,27 +89,99 @@ const formatPrice = (value: number | null | undefined): string => {
   return `$${value.toFixed(2)}`;
 };
 
-const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
+/**
+ * X-axis labels:
+ * - First tick of a month: "02 Dec"
+ * - Rest of the month: "03", "04", ...
+ * - When month changes, show "01 Jan", then only "02", "03" ...
+ */
+const formatDateLabelSmart = (
+  isoDate: string,
+  prevIsoDate?: string
+): string => {
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return isoDate;
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const mon = new Intl.DateTimeFormat("en-US", { month: "short" }).format(d);
+
+  if (!prevIsoDate) return `${day} ${mon}`;
+
+  const p = new Date(prevIsoDate);
+  if (Number.isNaN(p.getTime())) return `${day} ${mon}`;
+
+  const monthChanged =
+    d.getMonth() !== p.getMonth() || d.getFullYear() !== p.getFullYear();
+
+  return monthChanged ? `${day} ${mon}` : day;
+};
+
+/**
+ * Cleaner tooltip with aligned values (table-like layout)
+ */
+const CustomTooltip: React.FC<any> = ({ active, payload }) => {
   if (!active || !payload || !payload.length) return null;
 
   const point = payload[0].payload as DealPoint;
 
   return (
-    <Paper sx={{ p: 1.5 }}>
-      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-        {formatFullDate(point.date || label)}
+    <Paper
+      elevation={6}
+      sx={{
+        p: 1.25,
+        minWidth: 220,
+        borderRadius: 2,
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ mb: 0.75, fontWeight: 700 }}>
+        {formatFullDate(point.date)}
       </Typography>
-      <Typography variant="body2">Open: {formatPrice(point.open)}</Typography>
-      <Typography variant="body2">High: {formatPrice(point.high)}</Typography>
-      <Typography variant="body2">Low: {formatPrice(point.low)}</Typography>
-      <Typography variant="body2">Close: {formatPrice(point.close)}</Typography>
+
+      <Table size="small" sx={{ "& td": { borderBottom: "none", py: 0.35 } }}>
+        <TableBody>
+          <TableRow>
+            <TableCell
+              sx={{ color: "text.secondary", pr: 1, width: 70 }}
+            >
+              Open
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
+              {formatPrice(point.open)}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
+              High
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
+              {formatPrice(point.high)}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
+              Low
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
+              {formatPrice(point.low)}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
+              Close
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
+              {formatPrice(point.close)}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </Paper>
   );
 };
 
 /**
  * Candlesticks using <Customized>.
- * Each candle is centered on the X-axis tick (vertical grid line).
+ * Each candle is centered on the X-axis tick.
  */
 const Candles: React.FC<any> = (props) => {
   const { xAxisMap, yAxisMap, data } = props;
@@ -134,9 +205,7 @@ const Candles: React.FC<any> = (props) => {
       {candles.map((entry, index) => {
         const { label, open, close, high, low } = entry;
 
-        // Center of band: left edge + bandWidth / 2
         const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
-
         const color = close >= open ? "#008000" : "#CC0000";
 
         const highY = yScale(high);
@@ -151,7 +220,6 @@ const Candles: React.FC<any> = (props) => {
 
         return (
           <g key={index}>
-            {/* Wick */}
             <line
               x1={xCenter}
               x2={xCenter}
@@ -160,7 +228,6 @@ const Candles: React.FC<any> = (props) => {
               stroke={color}
               strokeWidth={1}
             />
-            {/* Body */}
             <rect
               x={xCenter - bodyWidth / 2}
               y={bodyTop}
@@ -177,45 +244,59 @@ const Candles: React.FC<any> = (props) => {
 };
 
 /**
- * Label for a horizontal line:
- * - Y is on the line
- * - X is at the right edge *inside* the chart
+ * OUTSIDE-left label (left of Y-axis, not inside plot area).
  */
-const HorizontalLineLabel: React.FC<any> = (props) => {
-  const {
-    yValue,
-    text,
-    color,
-    yAxisMap,
-    offset,
-    labelYOffset = 0,
-    labelXOffset = 0,
-  } = props;
+const OutsideLeftHorizontalLineLabel: React.FC<any> = (props) => {
+  const { yValue, text, color, yAxisMap, offset, labelYOffset = 0 } = props;
   if (yValue == null || !yAxisMap || !offset) return null;
 
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
-  const y = yScale(yValue); // same coordinates as ReferenceLine
+  const y = yScale(yValue);
   if (y == null) return null;
-  const xRight = offset.left + offset.width;
-  const yPos = y - 6 + labelYOffset; // lift label off the line for readability
-  const xPos = xRight - 4 + labelXOffset;
+
+  const xOutside = Math.max(6, offset.left - 10);
+  const yPos = y - 4 + labelYOffset;
 
   return (
     <text
-      x={xPos}
+      x={xOutside}
       y={yPos}
       textAnchor="end"
       fill={color}
-      stroke="white"
-      strokeWidth={2}
-      paintOrder="stroke"
       fontSize={11}
-      fontWeight={600}
+      fontWeight={700}
       pointerEvents="none"
     >
       {text}
+    </text>
+  );
+};
+
+/**
+ * "Price" label at top-left of Y axis (top corner, near axis).
+ * Placed inside chart SVG, slightly above plot area.
+ */
+const YAxisTopLabel: React.FC<any> = (props) => {
+  const { offset } = props;
+  if (!offset) return null;
+
+  // Position near top-left of plotting area, but left aligned to y-axis region
+  const x = Math.max(6, offset.left - 10);
+  const y = Math.max(12, offset.top - 6);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      textAnchor="end"
+      fill="rgba(0,0,0,0.75)"
+      fontSize={12}
+      fontWeight={800}
+      pointerEvents="none"
+    >
+      Price
     </text>
   );
 };
@@ -236,21 +317,17 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  // unified source of truth for ticker / trade_date
   const ticker = deal?.ticker || tickerProp || "";
   const tradeDate = deal?.trade_date || tradeDateProp || "";
   const hasSelection = !!ticker && !!tradeDate;
 
   useEffect(() => {
-    // reset state whenever selection changes
     setChartData([]);
     setIssuePrice(null);
     setStopLoss(null);
     setError(null);
 
-    if (!hasSelection) {
-      return;
-    }
+    if (!hasSelection) return;
 
     if (!apiUrl) {
       setError("API URL is not configured");
@@ -274,15 +351,12 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         });
 
         if (!res.ok) {
-          // Special-case 404 into a friendly message
           if (res.status === 404) {
             let msg = "No data available for this ticker.";
             try {
               const errJson = await res.json();
               if (typeof errJson?.error === "string") msg = errJson.error;
-            } catch {
-              // ignore parse error, keep default message
-            }
+            } catch {}
             throw new Error(msg);
           }
 
@@ -291,20 +365,31 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
 
         const json: ApiResponse = await res.json();
 
-        const processed: DealPoint[] = (json.data || []).map(
-          (row: PriceApiRow) => ({
-            date: row.date,
-            label: formatDateLabel(row.date),
-            open: Number(row.open_price),
-            close: Number(row.close_price),
-            high: Number(row.high_price),
-            low: Number(row.low_price),
-          })
+        const raw = (json.data || []).map((row) => ({
+          date: row.date,
+          open: Number(row.open_price),
+          close: Number(row.close_price),
+          high: Number(row.high_price),
+          low: Number(row.low_price),
+        }));
+
+        raw.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
+        const processed: DealPoint[] = raw.map((row, idx) => ({
+          ...row,
+          label: formatDateLabelSmart(
+            row.date,
+            idx > 0 ? raw[idx - 1].date : undefined
+          ),
+        }));
+
         setChartData(processed);
-        setIssuePrice(Number(json.issue_price));
-        setStopLoss(Number(json.stop_loss));
+        setIssuePrice(
+          json.issue_price != null ? Number(json.issue_price) : null
+        );
+        setStopLoss(json.stop_loss != null ? Number(json.stop_loss) : null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
       } finally {
@@ -316,12 +401,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   }, [apiUrl, token, ticker, tradeDate, hasSelection]);
 
   const { yMin, yMax } = useMemo(() => {
-    if (!chartData.length) {
-      return {
-        yMin: 0,
-        yMax: "auto" as number | "auto",
-      };
-    }
+    if (!chartData.length) return { yMin: 0, yMax: "auto" as number | "auto" };
 
     const prices: number[] = chartData.flatMap((d) => [
       d.open,
@@ -329,25 +409,24 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
       d.low,
       d.close,
     ]);
+
     if (issuePrice != null) prices.push(issuePrice);
     if (stopLoss != null) prices.push(stopLoss);
 
-    let min = Math.min(...prices);
-    let max = Math.max(...prices);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
     const spread = max - min || 1;
 
-    const paddedMin = Math.floor(min - spread * 0.05);
-    const paddedMax = Math.ceil(max + spread * 0.05);
-
     return {
-      yMin: paddedMin,
-      yMax: paddedMax,
+      yMin: Math.floor(min - spread * 0.05),
+      yMax: Math.ceil(max + spread * 0.05),
     };
   }, [chartData, issuePrice, stopLoss]);
 
   const stopLossOffset = useMemo(() => {
     if (issuePrice == null || stopLoss == null) return 0;
     if (Math.abs(issuePrice - stopLoss) > 1e-6) return 0;
+
     const spread =
       typeof yMax === "number" && typeof yMin === "number" ? yMax - yMin : 0;
     const offset = spread ? spread * 0.01 : 0.05;
@@ -356,12 +435,46 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
 
   const issueLineValue: number | undefined =
     issuePrice != null ? issuePrice : undefined;
-  // Keep stop loss visually below issue price when they are equal
+
   const stopLossLineValue: number | undefined =
     stopLoss != null ? stopLoss - stopLossOffset : undefined;
 
-  // If nothing selected yet, show helper message
-  if (!hasSelection) {
+  const predictionMarkers: PredictionMarkerResolved[] = useMemo(() => {
+    if (!deal || !chartData.length) return [];
+
+    const len = chartData.length;
+    const idx1d = clampIndex(0, len);
+    const idx1w = clampIndex(4, len);
+    const idx1m = clampIndex(21, len);
+
+    const mk = (
+      key: "t1d" | "t1w" | "t1m",
+      title: "1D" | "1W" | "1M",
+      pred: string,
+      index: number
+    ): PredictionMarkerResolved => {
+      const date = chartData[index]?.date ?? chartData[len - 1].date;
+      const p = String(pred ?? "").trim();
+      return {
+        key,
+        title,
+        pred: p,
+        index,
+        date,
+        color: markerColor(key, p),
+        tooltipText: markerTooltipText(key, p),
+      };
+    };
+
+    const out: PredictionMarkerResolved[] = [];
+    if (deal.t1d_pred) out.push(mk("t1d", "1D", deal.t1d_pred, idx1d));
+    if (deal.t1w_pred) out.push(mk("t1w", "1W", deal.t1w_pred, idx1w));
+    if (deal.t1m_pred) out.push(mk("t1m", "1M", deal.t1m_pred, idx1m));
+
+    return out.filter((m) => m.pred && m.pred !== "—");
+  }, [deal, chartData]);
+
+  if (!ticker || !tradeDate) {
     return (
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
         <Paper sx={{ p: 2 }}>
@@ -387,14 +500,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
           {ticker} – Deal Price Timeseries
         </Typography>
 
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="space-between"
-          mb={1}
-          sx={{ gap: 1 }}
-        />
-
         {loading && (
           <Box
             mt={3}
@@ -419,19 +524,18 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={chartData}
-                  margin={{ top: 10, right: 70, bottom: 20, left: 50 }}
+                  margin={{ top: 18, right: 70, bottom: 20, left: 50 }}
+                  style={{ overflow: "visible" }} // allow outside-left labels
                 >
                   <XAxis dataKey="label" />
                   <YAxis
                     yAxisId="price"
                     domain={[yMin, yMax]}
                     tickLine={false}
-                    label={{
-                      value: "Price",
-                      angle: -90,
-                      position: "insideLeft",
-                    }}
                   />
+
+                  {/* ✅ Price label at top-left of the Y axis */}
+                  <Customized component={<YAxisTopLabel />} />
 
                   {/* Hidden series so tooltip works */}
                   <Bar
@@ -447,36 +551,42 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   {/* Candlesticks */}
                   <Customized component={<Candles />} />
 
-                  {/* Horizontal reference lines */}
+                  {/* Prediction badges */}
+                  {predictionMarkers.length > 0 && (
+                    <Customized
+                      component={<PredictionBadges markers={predictionMarkers} />}
+                    />
+                  )}
+
+                  {/* Lighter + thinner reference lines */}
                   {issuePrice != null && (
                     <ReferenceLine
                       y={issueLineValue}
                       yAxisId="price"
-                      stroke="#5B3310"
-                      strokeWidth={2.25}
-                      strokeDasharray="3 3"
+                      stroke="rgba(0,0,0,0.35)"
+                      strokeWidth={1.25}
+                      strokeDasharray="3 4"
                     />
                   )}
                   {stopLoss != null && (
                     <ReferenceLine
                       y={stopLossLineValue}
                       yAxisId="price"
-                      stroke="#B00020"
-                      strokeWidth={2.25}
-                      strokeDasharray="3 3"
+                      stroke="rgba(176,0,32,0.40)"
+                      strokeWidth={1.25}
+                      strokeDasharray="3 4"
                     />
                   )}
 
-                  {/* Labels on those lines */}
+                  {/* Labels OUTSIDE-left of Y-axis */}
                   {issuePrice != null && (
                     <Customized
                       component={
-                        <HorizontalLineLabel
+                        <OutsideLeftHorizontalLineLabel
                           yValue={issueLineValue}
-                          text={`Issue Price = ${issuePrice.toFixed(2)}`}
-                          color="#000000"
-                          labelYOffset={-6}
-                          labelXOffset={-6}
+                          text={`Issue = ${issuePrice.toFixed(2)}`}
+                          color="rgba(0,0,0,0.70)"
+                          labelYOffset={-2}
                         />
                       }
                     />
@@ -484,12 +594,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   {stopLoss != null && (
                     <Customized
                       component={
-                        <HorizontalLineLabel
+                        <OutsideLeftHorizontalLineLabel
                           yValue={stopLossLineValue}
-                          text={`Stop Loss = ${stopLoss.toFixed(2)}`}
-                          color="#B00020"
-                          labelYOffset={10}
-                          labelXOffset={-6}
+                          text={`Stop = ${stopLoss.toFixed(2)}`}
+                          color="rgba(176,0,32,0.75)"
+                          labelYOffset={12}
                         />
                       }
                     />
@@ -498,13 +607,14 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
               </ResponsiveContainer>
             </Box>
 
-            {/* Line legend + info note */}
+            {/* Legend + info note */}
             <Box
               mt={2}
               display="flex"
               flexWrap="wrap"
               justifyContent="center"
               gap={2}
+              alignItems="center"
             >
               <Typography variant="caption">
                 <Box
@@ -513,7 +623,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                     display: "inline-block",
                     width: 18,
                     height: 0,
-                    borderTop: "3px dashed #000000",
+                    borderTop: "2px dashed rgba(0,0,0,0.55)",
                     mr: 0.5,
                   }}
                 />
@@ -527,7 +637,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                     display: "inline-block",
                     width: 18,
                     height: 0,
-                    borderTop: "2px dashed #B00020",
+                    borderTop: "2px dashed rgba(176,0,32,0.55)",
                     mr: 0.5,
                   }}
                 />
@@ -540,12 +650,11 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   sx={{ color: "grey.500", mr: 0.5 }}
                 />
                 <Typography variant="caption" color="text.secondary">
-                  Data is from pricing date to one week
+                  Data is from Trade date to one week
                 </Typography>
               </Box>
             </Box>
 
-            {/* 🔽 TradingView widget below the chart, using same ticker */}
             {ticker && (
               <Box mt={4}>
                 <TradingViewWidget ticker={ticker} />

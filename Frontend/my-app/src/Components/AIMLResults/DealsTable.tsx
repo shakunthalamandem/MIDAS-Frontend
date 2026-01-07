@@ -368,11 +368,12 @@ const DealsTable: React.FC<DealsTableProps> = ({
             {/* Group header row (sticky) */}
             <TableRow>
               <GroupHeaderCell label="Deal Details" colSpan={groupSpans.dealDetails} tone="default" />
+              <GroupHeaderCell label="ML Models" colSpan={groupSpans.ml} tone="primary" isLast />
               <GroupHeaderCell label="AI Sentiment View" colSpan={groupSpans.sentiment} tone="secondary" />
               {showAIModels && (
                 <GroupHeaderCell label="AI Models" colSpan={groupSpans.aiModels} tone="secondary" />
               )}
-              <GroupHeaderCell label="ML Models" colSpan={groupSpans.ml} tone="primary" isLast />
+              
             </TableRow>
 
             {/* Column header row */}
