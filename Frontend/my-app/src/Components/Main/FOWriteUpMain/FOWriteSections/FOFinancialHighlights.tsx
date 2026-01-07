@@ -95,7 +95,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
     if (!selectedData?.financial_highlights) return null;
 
     const highlights = selectedData.financial_highlights;
-    const isCrnx = ticker?.toUpperCase() === "CRNX";
+    const isCrnx = ticker?.toUpperCase() === "CRNX" || "ALMS";
     const priorPeriodLabel = isCrnx
       ? "Nine months ended September 30, 2024 ($)"
       : "2024 ($)";
