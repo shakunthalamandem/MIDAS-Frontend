@@ -95,10 +95,7 @@ const formatPrice = (value: number | null | undefined): string => {
  * - Rest of the month: "03", "04", ...
  * - When month changes, show "01 Jan", then only "02", "03" ...
  */
-const formatDateLabelSmart = (
-  isoDate: string,
-  prevIsoDate?: string
-): string => {
+const formatDateLabelSmart = (isoDate: string, prevIsoDate?: string): string => {
   const d = new Date(isoDate);
   if (Number.isNaN(d.getTime())) return isoDate;
 
@@ -125,14 +122,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
   const point = payload[0].payload as DealPoint;
 
   return (
-    <Paper
-      elevation={6}
-      sx={{
-        p: 1.25,
-        minWidth: 220,
-        borderRadius: 2,
-      }}
-    >
+    <Paper elevation={6} sx={{ p: 1.25, minWidth: 220, borderRadius: 2 }}>
       <Typography variant="subtitle2" sx={{ mb: 0.75, fontWeight: 700 }}>
         {formatFullDate(point.date)}
       </Typography>
@@ -140,9 +130,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
       <Table size="small" sx={{ "& td": { borderBottom: "none", py: 0.35 } }}>
         <TableBody>
           <TableRow>
-            <TableCell
-              sx={{ color: "text.secondary", pr: 1, width: 70 }}
-            >
+            <TableCell sx={{ color: "text.secondary", pr: 1, width: 70 }}>
               Open
             </TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
@@ -150,25 +138,19 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
-              High
-            </TableCell>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>High</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.high)}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
-              Low
-            </TableCell>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>Low</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.low)}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>
-              Close
-            </TableCell>
+            <TableCell sx={{ color: "text.secondary", pr: 1 }}>Close</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.close)}
             </TableCell>
@@ -282,7 +264,6 @@ const YAxisTopLabel: React.FC<any> = (props) => {
   const { offset } = props;
   if (!offset) return null;
 
-  // Position near top-left of plotting area, but left aligned to y-axis region
   const x = Math.max(6, offset.left - 10);
   const y = Math.max(12, offset.top - 6);
 
@@ -373,22 +354,15 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
           low: Number(row.low_price),
         }));
 
-        raw.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
+        raw.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         const processed: DealPoint[] = raw.map((row, idx) => ({
           ...row,
-          label: formatDateLabelSmart(
-            row.date,
-            idx > 0 ? raw[idx - 1].date : undefined
-          ),
+          label: formatDateLabelSmart(row.date, idx > 0 ? raw[idx - 1].date : undefined),
         }));
 
         setChartData(processed);
-        setIssuePrice(
-          json.issue_price != null ? Number(json.issue_price) : null
-        );
+        setIssuePrice(json.issue_price != null ? Number(json.issue_price) : null);
         setStopLoss(json.stop_loss != null ? Number(json.stop_loss) : null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
@@ -403,12 +377,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
   const { yMin, yMax } = useMemo(() => {
     if (!chartData.length) return { yMin: 0, yMax: "auto" as number | "auto" };
 
-    const prices: number[] = chartData.flatMap((d) => [
-      d.open,
-      d.high,
-      d.low,
-      d.close,
-    ]);
+    const prices: number[] = chartData.flatMap((d) => [d.open, d.high, d.low, d.close]);
 
     if (issuePrice != null) prices.push(issuePrice);
     if (stopLoss != null) prices.push(stopLoss);
@@ -427,59 +396,100 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     if (issuePrice == null || stopLoss == null) return 0;
     if (Math.abs(issuePrice - stopLoss) > 1e-6) return 0;
 
-    const spread =
-      typeof yMax === "number" && typeof yMin === "number" ? yMax - yMin : 0;
+    const spread = typeof yMax === "number" && typeof yMin === "number" ? yMax - yMin : 0;
     const offset = spread ? spread * 0.01 : 0.05;
     return offset || 0.05;
   }, [issuePrice, stopLoss, yMin, yMax]);
 
-  const issueLineValue: number | undefined =
-    issuePrice != null ? issuePrice : undefined;
+  const issueLineValue: number | undefined = issuePrice != null ? issuePrice : undefined;
 
   const stopLossLineValue: number | undefined =
     stopLoss != null ? stopLoss - stopLossOffset : undefined;
 
-  const predictionMarkers: PredictionMarkerResolved[] = useMemo(() => {
+  // ✅ 1D close value (used as reference line + anchor for 1W/1M when 1D is Positive)
+  const close1d = useMemo(() => {
+    if (!chartData.length) return null;
+    const len = chartData.length;
+    const idx1d = clampIndex(0, len);
+    return chartData[idx1d]?.close ?? null;
+  }, [chartData]);
+
+  // ✅ Prediction markers with custom Y positioning
+  //    - Badge text should be only Positive/Negative/Neutral (no "1D:" prefix)
+  //    - If 1D is Negative => 1D marker goes under Issue Price
+  //    - If 1D is Positive => 1W/1M markers align to 1D close
+  const predictionMarkers = useMemo(() => {
     if (!deal || !chartData.length) return [];
 
     const len = chartData.length;
+
     const idx1d = clampIndex(0, len);
     const idx1w = clampIndex(4, len);
     const idx1m = clampIndex(21, len);
 
+    const oneDayPredRaw = String(deal.t1d_pred ?? "").trim();
+    const oneDayPred = oneDayPredRaw.toLowerCase();
+
+    const is1dPositive =
+      oneDayPred === "positive" || oneDayPred === "pos" || oneDayPred === "+";
+    const is1dNegative =
+      oneDayPred === "negative" || oneDayPred === "neg" || oneDayPred === "-";
+
+    const spread =
+      typeof yMax === "number" && typeof yMin === "number" ? yMax - yMin : 1;
+    const offsetSmall = Math.max(spread * 0.01, 0.05);
+
+    const oneDayClose = chartData[idx1d]?.close ?? chartData[len - 1].close;
+
+    // We add a `yValue` field for PredictionBadges to use as the vertical anchor.
+    // (PredictionBadges must read marker.yValue if present.)
     const mk = (
       key: "t1d" | "t1w" | "t1m",
       title: "1D" | "1W" | "1M",
       pred: string,
       index: number
-    ): PredictionMarkerResolved => {
+    ) => {
       const date = chartData[index]?.date ?? chartData[len - 1].date;
+
+      // ✅ Only show Positive/Negative/etc in the badge
       const p = String(pred ?? "").trim();
-      return {
+
+      const marker: any = {
         key,
-        title,
+        title, // keep for internal uniqueness/tooltip, but badge should render ONLY `pred`
         pred: p,
         index,
         date,
         color: markerColor(key, p),
         tooltipText: markerTooltipText(key, p),
       };
+
+      // ✅ Positioning rules
+      if (key === "t1d" && is1dNegative && issuePrice != null) {
+        marker.yValue = issuePrice - offsetSmall; // under Issue line
+      } else if ((key === "t1w" || key === "t1m") && is1dPositive) {
+        marker.yValue = oneDayClose + offsetSmall; // based on 1D close
+      } else {
+        marker.yValue = chartData[index]?.close ?? chartData[len - 1].close; // default
+      }
+
+      return marker;
     };
 
-    const out: PredictionMarkerResolved[] = [];
+    const out: any[] = [];
     if (deal.t1d_pred) out.push(mk("t1d", "1D", deal.t1d_pred, idx1d));
     if (deal.t1w_pred) out.push(mk("t1w", "1W", deal.t1w_pred, idx1w));
     if (deal.t1m_pred) out.push(mk("t1m", "1M", deal.t1m_pred, idx1m));
 
     return out.filter((m) => m.pred && m.pred !== "—");
-  }, [deal, chartData]);
+  }, [deal, chartData, issuePrice, yMin, yMax]);
 
   if (!ticker || !tradeDate) {
     return (
       <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
-            Deal Price Timeseries
+            Momentum & Predictions
           </Typography>
           <Alert severity="info">Select a deal to view its price chart.</Alert>
         </Paper>
@@ -525,14 +535,10 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                 <ComposedChart
                   data={chartData}
                   margin={{ top: 18, right: 70, bottom: 20, left: 50 }}
-                  style={{ overflow: "visible" }} // allow outside-left labels
+                  style={{ overflow: "visible" }}
                 >
                   <XAxis dataKey="label" />
-                  <YAxis
-                    yAxisId="price"
-                    domain={[yMin, yMax]}
-                    tickLine={false}
-                  />
+                  <YAxis yAxisId="price" domain={[yMin, yMax]} tickLine={false} />
 
                   {/* ✅ Price label at top-left of the Y axis */}
                   <Customized component={<YAxisTopLabel />} />
@@ -551,14 +557,31 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                   {/* Candlesticks */}
                   <Customized component={<Candles />} />
 
-                  {/* Prediction badges */}
-                  {predictionMarkers.length > 0 && (
-                    <Customized
-                      component={<PredictionBadges markers={predictionMarkers} />}
+                  {/* ✅ 1D Close line (slightly thicker) */}
+                  {close1d != null && (
+                    <ReferenceLine
+                      y={close1d}
+                      yAxisId="price"
+                      stroke="rgba(0,0,0,0.30)"
+                      strokeWidth={2} // slightly thicker
                     />
                   )}
 
-                  {/* Lighter + thinner reference lines */}
+                  {/* Prediction badges */}
+                  {predictionMarkers.length > 0 && (
+                    <Customized
+                      component={
+                        <PredictionBadges
+                          // PredictionBadges should:
+                          // 1) show ONLY marker.pred (no "1D:" prefix)
+                          // 2) use marker.yValue if present to position vertically
+                          markers={predictionMarkers as PredictionMarkerResolved[]}
+                        />
+                      }
+                    />
+                  )}
+
+                  {/* Reference lines */}
                   {issuePrice != null && (
                     <ReferenceLine
                       y={issueLineValue}
@@ -644,11 +667,22 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                 Stop Loss
               </Typography>
 
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <InfoOutlinedIcon
-                  fontSize="small"
-                  sx={{ color: "grey.500", mr: 0.5 }}
+              <Typography variant="caption">
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-block",
+                    width: 18,
+                    height: 0,
+                    borderTop: "2px solid rgba(0,0,0,0.30)",
+                    mr: 0.5,
+                  }}
                 />
+                1D Close
+              </Typography>
+
+              <Box display="flex" alignItems="center" mt={0.5}>
+                <InfoOutlinedIcon fontSize="small" sx={{ color: "grey.500", mr: 0.5 }} />
                 <Typography variant="caption" color="text.secondary">
                   Data is from Trade date to one week
                 </Typography>

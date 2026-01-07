@@ -4,11 +4,15 @@ import React from "react";
 
 interface PredictionMarkerResolved {
   index: number;
-  title: string;
+  title: string; // keep for internal use/tooltips if you want
   pred: string;
   color: string;
   key: string;
   tooltipText: string;
+
+  // ✅ NEW: optional y anchor (price value) to position badge
+  // If not provided, we fall back to candle high (current behavior)
+  yValue?: number;
 }
 
 /**
@@ -53,6 +57,21 @@ export const PredictionBadges: React.FC<any> = (props) => {
   const badgeGap = 4;
   const maxBadgeWidth = Math.max(90, bandWidth * 0.95); // keep readable
 
+  // Helper: choose the anchor Y (in pixels) for the badge stack
+  const getAnchorY = (entry: any, ms: PredictionMarkerResolved[]) => {
+    // If ANY marker has yValue, use the first one’s yValue as the anchor
+    // (they’ll still stack nicely relative to this anchor).
+    const withY = ms.find((m) => typeof m.yValue === "number");
+    if (withY && typeof withY.yValue === "number") {
+      const y = yScale(withY.yValue);
+      return Number.isFinite(y) ? y : null;
+    }
+
+    // fallback: candle high (old behavior)
+    const highY = yScale(entry.high);
+    return Number.isFinite(highY) ? highY : null;
+  };
+
   return (
     <g>
       {Array.from(byIndex.entries()).map(([idx, ms]) => {
@@ -62,16 +81,18 @@ export const PredictionBadges: React.FC<any> = (props) => {
         const label = entry.label;
         const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
 
-        // Place badges above the candle's high
-        const highY = yScale(entry.high);
-        if (!Number.isFinite(highY)) return null;
+        const anchorY = getAnchorY(entry, ms);
+        if (anchorY == null) return null;
 
-        // Stack multiple badges upward
         return (
           <g key={`pred-group-${idx}`}>
             {ms.map((m, j) => {
-              const text = `${m.title}: ${m.pred}`;
-              const y = highY - 10 - j * (badgeHeight + badgeGap);
+              // ✅ CHANGE #1: show ONLY Positive/Negative/etc
+              const text = `${m.pred}`;
+
+              // ✅ CHANGE #2: position relative to anchorY (either yValue or high)
+              // Move badges slightly above the anchor, stack upward
+              const y = anchorY - 10 - j * (badgeHeight + badgeGap);
 
               // approximate text width (simple + safe); prevents huge overflow
               const estWidth = Math.min(
