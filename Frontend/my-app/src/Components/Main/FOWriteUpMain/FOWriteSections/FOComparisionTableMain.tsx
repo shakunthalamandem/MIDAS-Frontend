@@ -7,6 +7,7 @@ import { Card, CardContent, Container } from "@mui/material";
 interface FOComparisionTableMainProps {
   ticker: string;
   deal_id: string;
+  pricingDate?: string | null;
 }
 
 type ComparableMetric = any; // replace with proper type if available
@@ -24,9 +25,17 @@ type ApiResponse = {
   };
 };
 
+const getPricingYearFromDate = (pricingDate?: string | null) => {
+  if (!pricingDate) return undefined;
+  const clean = pricingDate.replace(/(\d+)(st|nd|rd|th)/gi, "$1");
+  const year = new Date(clean).getFullYear();
+  return Number.isFinite(year) ? year : undefined;
+};
+
 const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
   ticker,
   deal_id,
+  pricingDate,
 }) => {
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState(false);
@@ -77,6 +86,7 @@ const FOComparisionTableMain: React.FC<FOComparisionTableMainProps> = ({
             <FOMetricsTableMain
               ticker={ticker}
               data={data}
+              pricingYear={getPricingYearFromDate(pricingDate)}
               onRefresh={fetchData} 
             />
           )}

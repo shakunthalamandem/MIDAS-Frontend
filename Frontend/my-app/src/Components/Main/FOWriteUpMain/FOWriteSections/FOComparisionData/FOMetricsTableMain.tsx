@@ -33,12 +33,13 @@ interface Props {
   ticker: string;
   data: ApiResponse;
   onRefresh?: () => Promise<void> | void;
+  pricingYear?: number;
 }
-const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
+const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh, pricingYear }) => {
   const { forceExpand } = useExportContext();
   const showActions = !forceExpand;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
-  const columns: ColumnDef[] = useMemo(() => createColumns(), []);
+  const columns: ColumnDef[] = useMemo(() => createColumns(pricingYear), [pricingYear]);
   
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({
