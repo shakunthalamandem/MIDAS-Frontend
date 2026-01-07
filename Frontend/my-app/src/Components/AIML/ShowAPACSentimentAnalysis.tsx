@@ -57,7 +57,7 @@ const normalizeBlocks = (val: any): Block[] => {
   return [];
 };
 
-const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
+const ShowAPACSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   focusTicker,
   tickerOptions = [],
   selectedTicker = null,
@@ -94,7 +94,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
       setStatus(null);
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/get_us_sentiment_analysis/`, {
+        const res = await fetch(`${apiUrl}/api/get_apac_sentiment_analysis/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -289,4 +289,4 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   );
 };
 
-export default ShowSentimentAnalysis;
+export default ShowAPACSentimentAnalysis;

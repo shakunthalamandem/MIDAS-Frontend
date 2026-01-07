@@ -38,7 +38,7 @@ interface AIFewshotAnalysisProps {
   prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
 }
 
-const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
+const APACAIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
@@ -62,7 +62,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
         ...getAuthHeaders(),
       };
 
-      const res = await fetch(`${API_URL}/api/us_few_shot_review_tickers/`, {
+      const res = await fetch(`${API_URL}/api/apac_few_shot_review_tickers/`, {
         method: "GET",
         headers,
       });
@@ -297,4 +297,4 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
   );
 };
 
-export default AIFewshotAnalysis;
+export default APACAIFewshotAnalysis;
