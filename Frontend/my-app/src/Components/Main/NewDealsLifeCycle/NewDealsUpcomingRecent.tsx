@@ -47,8 +47,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
   };
 
   const [selectedRegion, setSelectedRegion] = useState<
-    "ALL" | "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
-  >("ALL");
+    "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
+  >("US");
+
 
 
   const fetchData = async (operation: string) => {
@@ -109,19 +110,15 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
+  // 🔹 Reset region when switching tabs
   useEffect(() => {
-    setSelectedRegion("ALL");
+    setSelectedRegion("US");
   }, [selectedOp]);
 
-  // 🔹 Reset region when switching tabs
-useEffect(() => {
-  setSelectedRegion("ALL");
-}, [selectedOp]);
-
-// 🔹 Reset selected ticker when region changes
-useEffect(() => {
-  setSelectedDeal(null);
-}, [selectedRegion]);
+  // 🔹 Reset selected ticker when region changes
+  useEffect(() => {
+    setSelectedDeal(null);
+  }, [selectedRegion]);
 
 
 
@@ -133,43 +130,29 @@ useEffect(() => {
   }, [selectedOp]);
 
   const filteredRows = useMemo(() => {
-    let data = [...rows];
-
-    // 🔹 Search filter
     const term = dealSearch.trim().toLowerCase();
-    if (term) {
-      data = data.filter((row) =>
-        row.ticker?.toString().toLowerCase().includes(term)
-      );
-    }
 
-    // 🔹 Region filter (STRICT)
-    if (selectedOp !== "pipeline" && selectedRegion !== "ALL") {
-      data = data.filter((row) => {
+    return rows.filter((row) => {
+      // 🔹 Search filter
+      if (term && !row.ticker?.toString().toLowerCase().includes(term)) {
+        return false;
+      }
+
+      // 🔹 Region filter (only for non-pipeline)
+      if (selectedOp !== "pipeline") {
         const region = row.region?.trim().toUpperCase();
 
-        switch (selectedRegion) {
-          case "US":
-            return region === "US";
-
-          case "APAC":
-            return region === "APAC";
-
-          case "EMEA":
-            return region === "EMEA";
-
-          case "NON_US_AMERICA":
-            return region === "NON-US AMERICA" || region === "LATAM";
-
-          default:
-            return true;
+        if (selectedRegion === "US") return region === "US";
+        if (selectedRegion === "APAC") return region === "APAC";
+        if (selectedRegion === "EMEA") return region === "EMEA";
+        if (selectedRegion === "NON_US_AMERICA") {
+          return region === "NON-US AMERICA" || region === "LATAM";
         }
-      });
-    }
+      }
 
-    return data;
+      return true;
+    });
   }, [rows, dealSearch, selectedRegion, selectedOp]);
-
 
 
   return (
@@ -244,6 +227,7 @@ useEffect(() => {
             </Container>
           )}
 
+         {/* filters */}
           {selectedOp !== "pipeline" && (
             <Container
               sx={{
@@ -256,11 +240,10 @@ useEffect(() => {
               }}
             >
               {[
-                { label: "All", value: "ALL" },
                 { label: "US", value: "US" },
                 { label: "EMEA", value: "EMEA" },
                 { label: "APAC", value: "APAC" },
-                { label: "Non-US America", value: "NON_US_AMERICA" },
+                { label: "Others", value: "NON_US_AMERICA" },
               ].map((item) => (
                 <Paper
                   key={item.value}
@@ -300,6 +283,7 @@ useEffect(() => {
               loading={loading}
               onRowSelect={(row) => setSelectedDeal(row)}
               selectedOp={selectedOp}
+              hideRegionColumn
             />
           )}
         </Container>
