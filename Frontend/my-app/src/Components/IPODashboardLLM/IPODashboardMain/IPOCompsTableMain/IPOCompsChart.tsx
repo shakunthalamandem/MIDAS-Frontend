@@ -52,6 +52,7 @@ type ApiResponse = {
 interface Props {
   ticker: string;
   data: ApiResponse;
+  pricingYear?: number;
 }
 
 type MetricKey =
@@ -66,22 +67,50 @@ type MetricKey =
   | "sales_growth"
   | "eps_growth";
 
-const METRIC_OPTIONS: Array<{
+type MetricOption = {
   key: MetricKey;
   label: string;
   isPercent?: boolean; // only for formatting, not calculations
-}> = [
-  { key: "market_cap", label: "Market Cap (USDm)" },
-  { key: "ev_usd_million", label: "Enterprise Value (USDm)" },
-  { key: "present_year_ev_sales", label: "2025 EV/Sales" },
-  { key: "one_year_later_ev_sales", label: "2026 EV/Sales" },
-  { key: "present_year_price_earning", label: "2025 P/E" },
-  { key: "one_year_later_price_earning", label: "2026 P/E" },
-  { key: "present_year_ev_ebitda", label: "2025 EV/EBITDA" },
-  { key: "one_year_later_ev_ebitda", label: "2026 EV/EBITDA" },
-  { key: "sales_growth", label: "Sales Growth (25→26)", isPercent: true },
-  { key: "eps_growth", label: "EPS Growth (25→26)", isPercent: true },
-];
+};
+
+const DEFAULT_BASE_YEAR = 2025;
+const getYearParts = (pricingYear?: number) => {
+  const baseYear =
+    typeof pricingYear === "number" && Number.isFinite(pricingYear)
+      ? pricingYear
+      : DEFAULT_BASE_YEAR;
+  const nextYear = baseYear + 1;
+  return {
+    baseYear,
+    nextYear,
+    baseYY: `${baseYear}`.slice(-2),
+    nextYY: `${nextYear}`.slice(-2),
+  };
+};
+
+const getMetricOptions = (pricingYear?: number): MetricOption[] => {
+  const { baseYear, nextYear, baseYY, nextYY } = getYearParts(pricingYear);
+  return [
+    { key: "market_cap", label: "Market Cap (USDm)" },
+    { key: "ev_usd_million", label: "Enterprise Value (USDm)" },
+    { key: "present_year_ev_sales", label: `${baseYear} EV/Sales` },
+    { key: "one_year_later_ev_sales", label: `${nextYear} EV/Sales` },
+    { key: "present_year_price_earning", label: `${baseYear} P/E` },
+    { key: "one_year_later_price_earning", label: `${nextYear} P/E` },
+    { key: "present_year_ev_ebitda", label: `${baseYear} EV/EBITDA` },
+    { key: "one_year_later_ev_ebitda", label: `${nextYear} EV/EBITDA` },
+    {
+      key: "sales_growth",
+      label: `Sales Growth (${baseYY}-${nextYY})`,
+      isPercent: true,
+    },
+    {
+      key: "eps_growth",
+      label: `EPS Growth (${baseYY}-${nextYY})`,
+      isPercent: true,
+    },
+  ];
+};
 
 // Clean NA-like values -> 0 for visualization
 function toNumberOrZero(v: unknown): number {
@@ -151,7 +180,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const IPOCompsChart: React.FC<Props> = ({ ticker, data }) => {
+const IPOCompsChart: React.FC<Props> = ({ ticker, data, pricingYear }) => {
   const [metric, setMetric] = useState<MetricKey>("present_year_ev_sales");
 
   const rows: ComparableMetric[] = useMemo(() => {
@@ -160,7 +189,15 @@ const IPOCompsChart: React.FC<Props> = ({ ticker, data }) => {
     return key ? data[key].data : [];
   }, [data, ticker]);
 
-  const selectedMeta = METRIC_OPTIONS.find((m) => m.key === metric)!;
+  const metricOptions = useMemo(
+    () => getMetricOptions(pricingYear),
+    [pricingYear]
+  );
+
+  const selectedMeta: MetricOption =
+    metricOptions.find((m) => m.key === metric) ??
+    metricOptions[0] ??
+    { key: metric, label: "", isPercent: false };
   const upperTicker = ticker?.toUpperCase?.() ?? "";
 
   // Keep order stable across metric changes.
@@ -302,7 +339,7 @@ const IPOCompsChart: React.FC<Props> = ({ ticker, data }) => {
             rowGap: 0.5,
           }}
         >
-          {METRIC_OPTIONS.map((opt) => (
+          {metricOptions.map((opt) => (
             <Box
               key={opt.key}
               sx={{

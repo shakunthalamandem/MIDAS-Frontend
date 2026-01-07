@@ -46,6 +46,12 @@ const NewDealsUpcomingRecent: React.FC = () => {
     upcoming: "Upcoming Deals",
   };
 
+  const [selectedRegion, setSelectedRegion] = useState<
+    "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
+  >("US");
+
+
+
   const fetchData = async (operation: string) => {
     setLoading(true);
     try {
@@ -58,8 +64,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
         body: JSON.stringify({ operation }),
       });
       const result = await response.json();
-      const formattedRows = result.data.map((item: any) => ({
-        id: item.ticker, // ✅ stable id
+      const formattedRows = result.data.map((item: any, index: number) => ({
+        id: `${item.ticker}-${index}`, // ✅ always unique
         ...item,
       }));
 
@@ -104,6 +110,18 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
+  // 🔹 Reset region when switching tabs
+  useEffect(() => {
+    setSelectedRegion("US");
+  }, [selectedOp]);
+
+  // 🔹 Reset selected ticker when region changes
+  useEffect(() => {
+    setSelectedDeal(null);
+  }, [selectedRegion]);
+
+
+
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
       return "Track IPOs that have been issued or priced within the last 30 days, with real-time deal status and key market details.";
@@ -113,9 +131,28 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
-    if (!term) return rows;
-    return rows.filter((row) => row.ticker?.toString().toLowerCase().includes(term));
-  }, [rows, dealSearch]);
+
+    return rows.filter((row) => {
+      // 🔹 Search filter
+      if (term && !row.ticker?.toString().toLowerCase().includes(term)) {
+        return false;
+      }
+
+      // 🔹 Region filter (only for non-pipeline)
+      if (selectedOp !== "pipeline") {
+        const region = row.region?.trim().toUpperCase();
+
+        if (selectedRegion === "US") return region === "US";
+        if (selectedRegion === "APAC") return region === "APAC";
+        if (selectedRegion === "EMEA") return region === "EMEA";
+        if (selectedRegion === "NON_US_AMERICA") {
+          return region === "NON-US AMERICA" || region === "LATAM";
+        }
+      }
+
+      return true;
+    });
+  }, [rows, dealSearch, selectedRegion, selectedOp]);
 
 
   return (
@@ -190,6 +227,48 @@ const NewDealsUpcomingRecent: React.FC = () => {
             </Container>
           )}
 
+         {/* filters */}
+          {selectedOp !== "pipeline" && (
+            <Container
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                mb: 1.5,
+                px: 1,
+                gap: 1,
+                flexWrap: "wrap",
+              }}
+            >
+              {[
+                { label: "US", value: "US" },
+                { label: "EMEA", value: "EMEA" },
+                { label: "APAC", value: "APAC" },
+                { label: "Others", value: "NON_US_AMERICA" },
+              ].map((item) => (
+                <Paper
+                  key={item.value}
+                  onClick={() => setSelectedRegion(item.value as any)}
+                  sx={{
+                    px: 2.4,
+                    py: 0.7,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    border: "1px solid rgba(0,32,96,0.25)",
+                    backgroundColor:
+                      selectedRegion === item.value ? "#6F1178" : "#ffffff",
+                    color:
+                      selectedRegion === item.value ? "#ffffff" : "#002060",
+                  }}
+                >
+                  {item.label}
+                </Paper>
+              ))}
+            </Container>
+          )}
+
+
           {/* 🔹 TABLE (UNCHANGED) */}
           {isPipelineView ? (
             <ExpectedPipelineDealsTable
@@ -204,6 +283,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               loading={loading}
               onRowSelect={(row) => setSelectedDeal(row)}
               selectedOp={selectedOp}
+              hideRegionColumn
             />
           )}
         </Container>

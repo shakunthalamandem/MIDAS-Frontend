@@ -10,6 +10,7 @@ export interface SelectedData {
   exchange?: string;
   valuation?: string[];
   valuation_image_url?: string;
+   pricing_date?: string;
 }
 
 interface IPODealsS1DealDataProps {

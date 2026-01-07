@@ -44,18 +44,6 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({
 
         const json: FOData[] = await response.json();
         setRows(json);
-
-        // Default selection: prefer prop ticker, otherwise use the first row
-        if (ticker) {
-          const match = json.find((item) => item.ticker === ticker);
-          if (match) {
-            setSelected({ ticker: match.ticker, deal_id: match.deal_id });
-          } else if (json.length > 0) {
-            setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
-          }
-        } else if (json.length > 0) {
-          setSelected({ ticker: json[0].ticker, deal_id: json[0].deal_id });
-        }
       } catch (err) {
         console.error("Error fetching FO data:", err);
       }
@@ -187,13 +175,34 @@ const FOWriteUpDashboardMain: React.FC<FOWriteUpDashboardMainProps> = ({
         </Box>
       </Container>
 
-      {selected && (
+      {!selected ? (
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: "1px dashed #9aa4c0",
+              backgroundColor: "#f8f9fc",
+              textAlign: "center",
+              mb: 4,
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600} color="#002060">
+              Select a ticker to view detailed FO write-up
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Click on any row in the table above to load in-depth insights,
+              valuation, and commentary for that offer.
+            </Typography>
+          </Box>
+        </Container>
+      ) : (
         <Box mt={4}>
           <FOSectionsMain
             ticker={selected.ticker}
             deal_id={selected.deal_id}
             selected={selected}
-            setSelected={setSelected} // 🔥 Pass control down
+            setSelected={setSelected} // dY"? Pass control down
           />
         </Box>
       )}
