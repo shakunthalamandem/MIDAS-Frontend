@@ -124,9 +124,9 @@ const GroupHeaderCell: React.FC<{
         zIndex: 5,
         height: GROUP_HEADER_HEIGHT,
         py: 0,
-        background: `linear-gradient(180deg, #00163f 0%, #001032 100%)`,
-        borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.22)}`,
-        borderRight: isLast ? "none" : `1px solid ${alpha(theme.palette.common.white, 0.16)}`,
+        background: "linear-gradient(180deg, #7189bbff 0%, #1b305cff 100%)",
+        borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.18)}`,
+        borderRight: isLast ? "none" : `1px solid ${alpha(theme.palette.common.white, 0.12)}`,
       })}
     >
       <Chip
@@ -348,8 +348,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
     ];
 
     return showAIModels
-      ? [...base, ...sentimentViewCols, ...aiModelCols, ...mlCols]
-      : [...base, ...sentimentViewCols, ...mlCols];
+      ? [...base, ...mlCols, ...sentimentViewCols, ...aiModelCols]
+      : [...base, ...mlCols, ...sentimentViewCols];
   }, [onTickerClick, showAIModels]);
 
   const groupSpans = useMemo(() => {
@@ -401,8 +401,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
                       fontSize: "14px",
                       letterSpacing: "0.2px",
                       color: theme.palette.common.white,
-                      backgroundColor: "#002060",
-                      borderBottom: "2px solid #00163f",
+                      backgroundColor: "#1c2b4dff", // dark slate
+                      borderBottom: "1px solid #16274bff",
                       borderRight: `1px solid ${alpha(theme.palette.common.white, 0.22)}`,
                     })}
                   >
