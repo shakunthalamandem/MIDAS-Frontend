@@ -260,11 +260,11 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_models",
                   icon: <AutoAwesomeIcon fontSize="small" />,
                 },
-                {
-                  label: "APAC IPO & FO AI-ML Model",
-                  path: "/equity/apac_ai_ml_models",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
+                // {
+                //   label: "APAC IPO & FO AI-ML Model",
+                //   path: "/equity/apac_ai_ml_models",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
                 {
                   label: "AI-ML Result Dashboard",
                   path: "/equity/ai_ml_results",
