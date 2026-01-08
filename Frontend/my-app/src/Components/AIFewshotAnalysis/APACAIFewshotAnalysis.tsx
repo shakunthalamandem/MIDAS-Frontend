@@ -38,7 +38,7 @@ interface AIFewshotAnalysisProps {
   prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
 }
 
-const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
+const APACAIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
@@ -62,7 +62,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
         ...getAuthHeaders(),
       };
 
-      const res = await fetch(`${API_URL}/api/us_few_shot_review_tickers/`, {
+      const res = await fetch(`${API_URL}/api/apac_few_shot_review_tickers/`, {
         method: "GET",
         headers,
       });
@@ -274,7 +274,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                   </IconButton>
                 </Box>
                 <Collapse in={isDescriptionExpanded} timeout="auto" unmountOnExit>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7, color: "rgba(0, 0, 0, 0.92)", }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
                     This analysis explains how an IPO is likely to behave in its early trading period rather than
                     predicting exact prices or returns. It evaluates the company's pre-listing fundamentals and compares
                     them with five to ten similar past IPOs that traded under comparable conditions. By reviewing how
@@ -297,4 +297,4 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
   );
 };
 
-export default AIFewshotAnalysis;
+export default APACAIFewshotAnalysis;

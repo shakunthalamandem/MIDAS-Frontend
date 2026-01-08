@@ -11,6 +11,7 @@ import {
   CircularProgress,
   IconButton,
   TextField,
+  MenuItem,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
@@ -27,6 +28,7 @@ type TickerItem = {
   deal_captain?: string;
   deal_type?: string;
   allocation_as_percentage_of_deal_size?: number;
+  region?: string;
 };
 
 const formatFileSize = (bytes: number) => {
@@ -52,9 +54,13 @@ const getAuthHeaders = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const DEFAULT_REGION_OPTIONS = ["US", "EMEA", "APAC", "Non-US America"];
+
 const FewShotAnalysisUpload: React.FC = () => {
   const API_URL = process.env.REACT_APP_API_URL;
 
+  const [region, setRegion] = useState<string>("US");
+  const [regionOptions, setRegionOptions] = useState<string[]>(DEFAULT_REGION_OPTIONS);
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [tickersState, setTickersState] = useState<ApiState>("idle");
 
@@ -76,7 +82,7 @@ const FewShotAnalysisUpload: React.FC = () => {
     setSnackOpen(true);
   };
 
-  const loadTickers = async () => {
+  const loadTickers = async (regionParam = region) => {
     setTickersState("loading");
     try {
       if (!API_URL) throw new Error("REACT_APP_API_URL is not set.");
@@ -90,7 +96,7 @@ const FewShotAnalysisUpload: React.FC = () => {
       const res = await fetch(`${API_URL}/api/unified_new_deal_data/`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ type: "ticker_list" }),
+        body: JSON.stringify({ type: "ticker_list", region: regionParam }),
       });
 
       // safer parse
@@ -101,13 +107,22 @@ const FewShotAnalysisUpload: React.FC = () => {
 
       const items = Array.isArray(data?.tickers) ? (data.tickers as TickerItem[]) : [];
       setTickers(items);
+      setRegionOptions((prev) => {
+        const next = new Set(prev);
+        if (regionParam) next.add(regionParam);
+        items.forEach((item) => item.region && next.add(item.region));
+        return Array.from(next);
+      });
       setTickersState("success");
 
       // If currently selected ticker no longer exists, clear it
       setSelectedTicker((prev) => {
         if (!prev) return prev;
         const stillExists = items.some(
-          (t) => t.ticker === prev.ticker && (t.pricing_date ?? "") === (prev.pricing_date ?? "")
+          (t) =>
+            t.ticker === prev.ticker &&
+            (t.pricing_date ?? "") === (prev.pricing_date ?? "") &&
+            (t.region ?? "") === (prev.region ?? "")
         );
         return stillExists ? prev : null;
       });
@@ -123,9 +138,13 @@ const FewShotAnalysisUpload: React.FC = () => {
       showToast("REACT_APP_API_URL is not set.", "error");
       return;
     }
-    loadTickers();
+    loadTickers(region);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [API_URL]);
+  }, [API_URL, region]);
+
+  useEffect(() => {
+    setSelectedTicker(null);
+  }, [region]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0];
@@ -156,8 +175,10 @@ const FewShotAnalysisUpload: React.FC = () => {
 
     const formData = new FormData();
     formData.append("ticker", selectedTicker.ticker);
+    formData.append("region", selectedTicker.region ?? region ?? "");
     formData.append("pricing_date", selectedTicker.pricing_date ?? "");
     formData.append("pre_listing_file", file);
+    
 
     setSubmitState("loading");
     setResponseSummary(null);
@@ -199,11 +220,15 @@ const FewShotAnalysisUpload: React.FC = () => {
 
   const fileLabel = useMemo(() => {
     if (!file) return "No file selected";
-    return `${file.name} • ${formatFileSize(file.size)}`;
+    return `${file.name} - ${formatFileSize(file.size)}`;
   }, [file]);
 
   const isSubmitting = submitState === "loading";
   const isTickersLoading = tickersState === "loading";
+  const filteredTickers = useMemo(() => {
+    if (!region) return tickers;
+    return tickers.filter((item) => !item.region || item.region === region);
+  }, [tickers, region]);
 
   return (
     <Box
@@ -267,9 +292,32 @@ const FewShotAnalysisUpload: React.FC = () => {
             >
               {/* Ticker dropdown with search inside + refresh */}
               <Box sx={{ textAlign: "center" }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1.5,
+                  }}
+                >
+                  <TextField
+                    select
+                    label="Region"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                    disabled={isTickersLoading}
+                    sx={{ minWidth: 160, width: { xs: "100%", sm: "auto" } }}
+                  >
+                    {regionOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
                   <Autocomplete
-                    options={tickers}
+                    options={filteredTickers}
                     loading={isTickersLoading}
                     value={selectedTicker}
                     onChange={(_, value) => setSelectedTicker(value)}
@@ -279,20 +327,34 @@ const FewShotAnalysisUpload: React.FC = () => {
                       return options.filter((o) => {
                         const t = (o.ticker || "").toLowerCase();
                         const d = (o.pricing_date || "").toLowerCase();
-                        return t.includes(q) || d.includes(q);
+                        const r = (o.region || "").toLowerCase();
+                        return t.includes(q) || d.includes(q) || r.includes(q);
                       });
                     }}
-                    getOptionLabel={(option) => `${option.ticker} • ${formatPricingDate(option.pricing_date)}`}
+                    getOptionLabel={(option) =>
+                      `${option.ticker} - ${formatPricingDate(option.pricing_date)}${
+                        option.region ? ` - ${option.region}` : ""
+                      }`
+                    }
                     isOptionEqualToValue={(opt, val) =>
-                      opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+                      opt.ticker === val.ticker &&
+                      (opt.pricing_date ?? "") === (val.pricing_date ?? "") &&
+                      (opt.region ?? "") === (val.region ?? "")
                     }
                     renderOption={(props, option) => (
-                      <li {...props} key={`${option.ticker}-${option.pricing_date ?? ""}`}>
+                      <li {...props} key={`${option.ticker}-${option.pricing_date ?? ""}-${option.region ?? ""}`}>
                         <Box sx={{ display: "flex", width: "100%", justifyContent: "space-between", gap: 2 }}>
                           <Typography sx={{ fontWeight: 700 }}>{option.ticker}</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {formatPricingDate(option.pricing_date)}
-                          </Typography>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                            {option.region && (
+                              <Typography variant="body2" color="text.secondary">
+                                {option.region}
+                              </Typography>
+                            )}
+                            <Typography variant="body2" color="text.secondary">
+                              {formatPricingDate(option.pricing_date)}
+                            </Typography>
+                          </Box>
                         </Box>
                       </li>
                     )}
@@ -300,7 +362,7 @@ const FewShotAnalysisUpload: React.FC = () => {
                       <TextField
                         {...params}
                         label="Ticker"
-                        placeholder={isTickersLoading ? "Loading..." : "Search ticker or date..."}
+                        placeholder={isTickersLoading ? "Loading..." : "Search ticker, date, or region..."}
                         fullWidth
                         InputProps={{
                           ...params.InputProps,
@@ -319,7 +381,7 @@ const FewShotAnalysisUpload: React.FC = () => {
 
                   <IconButton
                     aria-label="Refresh ticker list"
-                    onClick={loadTickers}
+                    onClick={() => loadTickers(region)}
                     disabled={isTickersLoading}
                     sx={{ flexShrink: 0 }}
                   >
