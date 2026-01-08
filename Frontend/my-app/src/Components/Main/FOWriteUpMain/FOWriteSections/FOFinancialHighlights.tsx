@@ -321,17 +321,25 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
         <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
           <Grid container spacing={4} mb={4} mt={2}>
             <Grid item xs={12}>
-              <Typography
-                variant="h5"
+              <Box
                 sx={{
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  color: "#026269",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 2,
                 }}
               >
-                Financial Highlights
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    color: "#026269",
+                    flex: 1,
+                  }}
+                >
+                  Financial Highlights
+                </Typography>
                 <IconButton
                   onClick={handleEditToggle}
                   disabled={saving || loading}
