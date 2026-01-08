@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PredictionLayout from "./PredictionLayout";
-import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import APACAIFewshotAnalysis from "../AIFewshotAnalysis/APACAIFewshotAnalysis";
+import ShowAPACSentimentAnalysis from "./ShowAPACSentimentAnalysis";
 
 type OptionsData = {
   region: string[];
@@ -379,7 +379,7 @@ const APACEquityAiMlPage: React.FC = () => {
               </TabPanel>
 
               <TabPanel value={activeTab} index={1}>
-                <ShowSentimentAnalysis
+                <ShowAPACSentimentAnalysis
                   focusTicker={sentimentTicker?.ticker ?? null}
                   tickerOptions={sentimentOptions}
                   selectedTicker={sentimentTicker}

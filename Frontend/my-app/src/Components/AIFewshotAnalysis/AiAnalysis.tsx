@@ -207,18 +207,18 @@ const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp })
       <Stack spacing={1}>
         {lines.map((l, idx) => (
           <Box key={idx} sx={{ display: "flex", gap: 1.25, alignItems: "flex-start" }}>
-            <Box
-              sx={{
-                width: 7,
-                height: 7,
-                mt: "9px",
-                borderRadius: "999px",
-                bgcolor: "grey.700",
-                opacity: 0.55,
-                flex: "0 0 auto",
-              }}
-            />
-            <Typography variant="body2" sx={{ color: "#141414", lineHeight: 1.9 }}>
+              <Box
+                sx={{
+                  width: 7,
+                  height: 7,
+                  mt: "9px",
+                  borderRadius: "999px",
+                  bgcolor: "#000000",
+                  opacity: 1,
+                  flex: "0 0 auto",
+                }}
+              />
+            <Typography variant="body2" sx={{ color: "#000000ff", lineHeight: 1.9 }}>
               {l}
             </Typography>
           </Box>
@@ -720,7 +720,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
             <Box sx={{ height: 6, bgcolor: "#F1F5F9" }} />
             <CardContent sx={{ p: 2.5 }}>
               <Typography variant="h6" sx={{ fontWeight:'600', color: "#5D0163", textAlign: "center" }}>
-                Analogical Assessment
+Comparison with Similar IPOs
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <TextBlock text={analogical} />
