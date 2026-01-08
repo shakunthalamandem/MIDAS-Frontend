@@ -80,7 +80,10 @@ const FOBusinessDetails: React.FC<FOBusinessDetailsProps> = ({
   const handleChange = (key: SectionKey, index: number, val: string) => {
     setValues((prev) => ({
       ...prev,
-      [key]: prev[key].map((s, i) => (i === index ? val : s)),
+      [key]:
+        prev[key].length === 0 && index === 0
+          ? [val]
+          : prev[key].map((s, i) => (i === index ? val : s)),
     }));
   };
 
