@@ -91,6 +91,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
   const [selectedMeetingIndex, setSelectedMeetingIndex] = useState(0);
   const [noDataFound, setNoDataFound] = useState(false);
   const shouldShowEmptyState = noDataFound && meetings.length === 0;
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const applyMeetingToForm = (entry: MeetingEntry) => {
     setMeetingOverview(entry.form.meetingOverview);
@@ -224,7 +225,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
     loadNotes();
     return () => controller.abort();
-  }, [apiUrl, selectedDeal, token]);
+  }, [apiUrl, selectedDeal, token, refreshKey]);
 
   const createNewMeetingFromTemplate = (resetExisting = false) => {
     const templateMeeting: MeetingEntry = {
@@ -331,6 +332,9 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       }
 
       setStatus({ kind: "success", message: "Meeting notes created successfully." });
+      setIsEditing(false);
+      setNoDataFound(false);
+      setRefreshKey((key) => key + 1);
     } catch (err: any) {
       console.error("Failed to submit meeting notes:", err);
       setStatus({ kind: "error", message: err?.message || "Submission failed. Please try again." });
