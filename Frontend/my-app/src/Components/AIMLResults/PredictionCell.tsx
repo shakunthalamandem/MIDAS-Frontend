@@ -88,7 +88,7 @@ const getPredictionMeta = (
 
   if (normalized.includes("extreme")) {
     return {
-      displayLabel: "Extreme Return",
+      displayLabel: "Extreme",
       tone: "extreme",
       icon: <BoltIcon fontSize="small" />,
     };
@@ -100,7 +100,7 @@ const getPredictionMeta = (
     normalized.includes("up")
   ) {
     return {
-      displayLabel: <span style={{ fontSize: "10px" }}>Positive Return</span>,
+      displayLabel: <span style={{ fontSize: "10px" }}>Positive</span>,
       tone: "positive",
       icon: <TrendingUpIcon fontSize="small" />,
     };
@@ -112,7 +112,7 @@ const getPredictionMeta = (
     normalized.includes("down")
   ) {
     return {
-      displayLabel: <span style={{ fontSize: "10px" }}>Negative Return</span>,
+      displayLabel: <span style={{ fontSize: "10px" }}>Negative</span>,
       tone: "negative",
       icon: <TrendingDownIcon fontSize="small" />,
     };
@@ -238,22 +238,14 @@ const PredictionCell: React.FC<{
           <LinearProgress
             variant="determinate"
             value={confClamped!}
-            sx={(theme) => {
-              const { palette } = theme;
+            sx={() => {
 
-              let bar = palette.info.main;
-              let track = alpha(palette.info.main, 0.12);
+              // ✅ Confidence-based color (not prediction-based)
+              const isHigh = confClamped! >= 60;
 
-              if (tone === "positive") {
-                bar = palette.success.main;
-                track = alpha(palette.success.main, 0.12);
-              } else if (tone === "negative") {
-                bar = palette.error.main;
-                track = alpha(palette.error.main, 0.12);
-              } else if (tone === "extreme") {
-                bar = palette.warning.main;
-                track = alpha(palette.warning.main, 0.16);
-              }
+              // const bar = isHigh ? "#2E7D32" : "#ED6C02";
+              const bar = isHigh ? "#2E7D32" : "#546E7A";
+              const track = alpha(bar, isHigh ? 0.12 : 0.16);
 
               return {
                 height: 4,
@@ -268,9 +260,7 @@ const PredictionCell: React.FC<{
           />
         )}
         <Typography variant="caption" color="text.secondary" textAlign="center">
-          {hasConf
-            ? `${formatPercent(confClamped!)} Confidence`
-            : "Confidence N/A"}
+          {hasConf ? `${formatPercent(confClamped!)}` : "Confidence N/A"}
         </Typography>
       </Box>
     </Box>

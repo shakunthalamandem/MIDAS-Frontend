@@ -2,7 +2,7 @@
 import React from "react";
 import { Box, Chip, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import type { DealRecord } from "./DealDetailsPanel";
+import type { DealRecord } from "./types";
 
 const getDaySuffix = (day: number): string => {
   if (day >= 11 && day <= 13) return "th";
@@ -36,7 +36,7 @@ interface DealDetailsHeaderProps {
 }
 
 const DealDetailsHeader: React.FC<DealDetailsHeaderProps> = ({ deal }) => {
-  const pricingDateText = formatPricingDate(deal.pricing_date);
+  const pricingDateText = formatPricingDate(deal.trade_date);
 
   const issuer = deal.issuer_name || "Unknown issuer";
   const ticker = deal.ticker || "";

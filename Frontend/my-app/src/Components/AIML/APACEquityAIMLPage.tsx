@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PredictionLayout from "./PredictionLayout";
-import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
 import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import APACAIFewshotAnalysis from "../AIFewshotAnalysis/APACAIFewshotAnalysis";
 
 type OptionsData = {
   region: string[];
@@ -123,7 +123,7 @@ const tabStyles = {
   },
 };
 
-const EquityAiMlPage: React.FC = () => {
+const APACEquityAiMlPage: React.FC = () => {
   const [options, setOptions] = useState<OptionsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -222,7 +222,7 @@ const EquityAiMlPage: React.FC = () => {
       setSentimentErr(null);
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/us_sentiment_tickers/`, {
+        const res = await fetch(`${apiUrl}/api/apac_sentiment_tickers/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -303,7 +303,7 @@ const EquityAiMlPage: React.FC = () => {
                   }}
                   TabIndicatorProps={{ style: { display: "none" } }}
                 >
-                  <Tab
+                  {/* <Tab
                     id="ai-ml-tab-0"
                     aria-controls="ai-ml-tabpanel-0"
                     label={
@@ -314,7 +314,7 @@ const EquityAiMlPage: React.FC = () => {
                       />
                     }
                     sx={tabStyles}
-                  />
+                  /> */}
                   <Tab
                     id="ai-ml-tab-1"
                     aria-controls="ai-ml-tabpanel-1"
@@ -341,7 +341,7 @@ const EquityAiMlPage: React.FC = () => {
                   />
                 </Tabs>
               </Box>
-
+{/* 
               <TabPanel value={activeTab} index={0}>
                 <Card
                   sx={{
@@ -372,13 +372,13 @@ const EquityAiMlPage: React.FC = () => {
                     <PredictionLayout options={options} prefillTicker={selectedMlTickerPayload} />
                   </Box>
                 </Card>
+              </TabPanel> */}
+
+              <TabPanel value={activeTab} index={0}>
+                <APACAIFewshotAnalysis />
               </TabPanel>
 
               <TabPanel value={activeTab} index={1}>
-                <AIFewshotAnalysis />
-              </TabPanel>
-
-              <TabPanel value={activeTab} index={2}>
                 <ShowSentimentAnalysis
                   focusTicker={sentimentTicker?.ticker ?? null}
                   tickerOptions={sentimentOptions}
@@ -396,4 +396,4 @@ const EquityAiMlPage: React.FC = () => {
   );
 };
 
-export default EquityAiMlPage;
+export default APACEquityAiMlPage;

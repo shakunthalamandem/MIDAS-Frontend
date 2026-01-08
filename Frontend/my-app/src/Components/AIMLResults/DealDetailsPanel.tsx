@@ -12,33 +12,74 @@ import {
 import { alpha } from "@mui/material/styles";
 import PredictionCell, { ActualCell } from "./PredictionCell";
 import DealDetailsHeader from "./DealDetailsHeader";
+import type { DealRecord } from "./types";
 
-export interface DealRecord {
-  ticker: string;
-  issuer_name: string;
-  deal_type: string;
-  fo_type: string;
-  pricing_date: string;
-  region: string;
-  sector: string;
-  deal_size: number | string;
-  issue_price: number | string;
-  discount_from_announcement_price: number | string;
-  allocation_as_percentage_of_deal_size: number | string;
-  allocation_as_percentage_of_ioi: number | string;
-  t1d_pred: string;
-  t1d_confidence: number | string;
-  t1d_actual_return: number | string;
-  t1d_openprice_pred: string;
-  t1d_openprice_confidence: number | string;
-  t1d_openprice_actual_return: number | string;
-  t1w_pred: string;
-  t1w_confidence: number | string;
-  t1w_actual_return: number | string;
-  t1m_pred: string;
-  t1m_confidence: number | string;
-  t1m_actual_return: number | string;
+interface AIInsightBlockProps {
+  title: string;
+  value: React.ReactNode;
+  subtitle?: string;
 }
+
+const AIInsightBlock: React.FC<AIInsightBlockProps> = ({
+  title,
+  value,
+  subtitle,
+}) => (
+  <Paper
+    elevation={0}
+    sx={(theme) => ({
+      borderRadius: 1.5,
+      border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
+      background:
+        theme.palette.mode === "light"
+          ? alpha(theme.palette.info.main, 0.035)
+          : alpha(theme.palette.info.main, 0.15),
+      px: 1.25,
+      py: 0.75, // ⬅️ reduced vertical padding
+      height: "100%",
+    })}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.3, // ⬅️ tighter spacing
+      }}
+    >
+      <Typography
+        variant="caption"
+        sx={{
+          fontWeight: 700,
+          letterSpacing: 0.4,
+          textTransform: "uppercase",
+          color: "text.secondary",
+        }}
+      >
+        {title}
+      </Typography>
+
+      {subtitle && (
+        <Typography
+          variant="caption"
+          sx={{ fontSize: 11, color: "text.secondary" }}
+        >
+          {subtitle}
+        </Typography>
+      )}
+
+      <Typography
+        variant="body1" // ⬅️ smaller than h6
+        sx={{
+          fontWeight: 700,
+          textAlign: "center",
+          mt: 0.25,
+        }}
+      >
+        {value || "—"}
+      </Typography>
+    </Box>
+  </Paper>
+);
 
 const formatNumber = (
   value: number | string | null | undefined,
@@ -109,7 +150,10 @@ const SectionCard: React.FC<SectionCardProps> = ({
         border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
         background:
           theme.palette.mode === "light"
-            ? `linear-gradient(145deg, ${alpha(color, 0.04)}, ${theme.palette.background.paper})`
+            ? `linear-gradient(145deg, ${alpha(
+                color,
+                0.04
+              )}, ${theme.palette.background.paper})`
             : theme.palette.background.paper,
         overflow: "hidden",
         height: "100%",
@@ -152,7 +196,6 @@ interface PredictionBlockProps {
 
 const PredictionBlock: React.FC<PredictionBlockProps> = ({
   title,
-  subtitle,
   pred,
   confidence,
   actual,
@@ -161,74 +204,57 @@ const PredictionBlock: React.FC<PredictionBlockProps> = ({
   <Paper
     elevation={0}
     sx={(theme) => ({
-      borderRadius: 2,
-      border: `1px solid ${alpha(theme.palette[tone].main, 0.4)}`,
+      borderRadius: 1.5,
+      border: `1px solid ${alpha(theme.palette[tone].main, 0.35)}`,
       background:
         theme.palette.mode === "light"
-          ? alpha(theme.palette[tone].main, 0.04)
-          : alpha(theme.palette[tone].main, 0.18),
-      padding: 1.25,
+          ? alpha(theme.palette[tone].main, 0.035)
+          : alpha(theme.palette[tone].main, 0.15),
+      px: 1.25,
+      py: 1, // ✅ smaller than before
       height: "100%",
     })}
   >
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-        gap: 1,
-        mb: 0.75,
-      }}
-    >
-      <Box>
-        <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
+    {/* Title */}
+    <Box sx={{ mb: 0.6 }}>
+      <Typography variant="subtitle2" sx={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2 }}>
+        {title}
+      </Typography>
+    </Box>
+
+    {/* Prediction */}
+    <Box sx={{ mb: 0.75 }}>
+      <Box mt={0.25}>
+        <PredictionCell pred={pred} confidence={confidence} />
       </Box>
     </Box>
 
+    {/* Actual inline right */}
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
-        gap: 0.75,
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 1,
+        pt: 0.6,
+        borderTop: (theme) => `1px solid ${alpha(theme.palette.divider, 0.8)}`,
       }}
     >
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 500 }}
-        >
-          Model prediction
-        </Typography>
-        <Box mt={0.25}>
-          <PredictionCell pred={pred} confidence={confidence} />
-        </Box>
-      </Box>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ fontWeight: 600, letterSpacing: 0.2 }}
+      >
+        Actual return
+      </Typography>
 
-      <Divider sx={{ my: 0.75 }} />
-
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 500 }}
-        >
-          Actual return
-        </Typography>
-        <Box mt={0.25}>
-          <ActualCell value={actual} />
-        </Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", minWidth: 80 }}>
+        <ActualCell value={actual} />
       </Box>
     </Box>
   </Paper>
 );
+
 
 const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
   if (!deal) {
@@ -247,13 +273,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
   }
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        borderRadius: 2,
-        overflow: "hidden",
-      }}
-    >
+    <Card variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
       {/* HEADER */}
       <Box
         sx={(theme) => ({
@@ -271,7 +291,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
       </Box>
 
       <CardContent sx={{ pt: 2.5 }}>
-        {/* ROW 1: DEAL PARAMETER CARDS (HORIZONTAL) */}
+        {/* ROW 1: DEAL PARAMETER CARDS */}
         <Box mb={2}>
           <Typography
             variant="subtitle2"
@@ -313,13 +333,19 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   }
                 />
                 {deal.deal_type !== "IPO" &&
-                  formatNumber(deal.discount_from_announcement_price, { suffix: "%", decimals: 2 }) && (
+                  formatNumber(deal.discount_from_announcement_price, {
+                    suffix: "%",
+                    decimals: 2,
+                  }) && (
                     <DetailRow
                       label="Disc vs announcement"
-                      value={formatNumber(deal.discount_from_announcement_price, {
-                        suffix: "%",
-                        decimals: 2,
-                      })}
+                      value={formatNumber(
+                        deal.discount_from_announcement_price,
+                        {
+                          suffix: "%",
+                          decimals: 2,
+                        }
+                      )}
                     />
                   )}
               </SectionCard>
@@ -331,7 +357,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   label="Alloc as % of deal size"
                   value={formatNumber(
                     deal.allocation_as_percentage_of_deal_size,
-                    { suffix: "%", decimals: 2 }
+                    {
+                      suffix: "%",
+                      decimals: 2,
+                    }
                   )}
                 />
                 <DetailRow
@@ -348,7 +377,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
         <Divider sx={{ my: 2 }} />
 
-        {/* ROW 2: PREDICTION CARDS (HORIZONTAL) */}
+        {/* ROW 2: ML MODEL PREDICTIONS */}
         <Box>
           <Typography
             variant="subtitle2"
@@ -360,14 +389,13 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
               color: "text.secondary",
             }}
           >
-            Model predictions & outcomes
+            ML model predictions & outcomes
           </Typography>
 
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
                 title="1st Day Close from Issue Price"
-                subtitle="From issue price"
                 pred={deal.t1d_pred}
                 confidence={deal.t1d_confidence}
                 actual={deal.t1d_actual_return}
@@ -378,7 +406,6 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
                 title="1st Day Close from Open Price"
-                subtitle="Intraday from open"
                 pred={deal.t1d_openprice_pred}
                 confidence={deal.t1d_openprice_confidence}
                 actual={deal.t1d_openprice_actual_return}
@@ -389,7 +416,6 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
                 title="1 Week Close from 1st Day Close"
-                subtitle="From 1st day close"
                 pred={deal.t1w_pred}
                 confidence={deal.t1w_confidence}
                 actual={deal.t1w_actual_return}
@@ -400,7 +426,6 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
             <Grid item xs={12} sm={6} md={3}>
               <PredictionBlock
                 title="1 Month Close from 1st Day Close"
-                subtitle="From 1st day close"
                 pred={deal.t1m_pred}
                 confidence={deal.t1m_confidence}
                 actual={deal.t1m_actual_return}
@@ -409,6 +434,106 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
             </Grid>
           </Grid>
         </Box>
+
+        {/* ✅ NEW: AI SENTIMENT VIEW (BOTH IPO + FO) */}
+        <Divider sx={{ my: 2 }} />
+
+        <Box>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              mb: 1,
+              textTransform: "uppercase",
+              letterSpacing: 0.6,
+              fontSize: 11,
+              color: "text.secondary",
+            }}
+          >
+            AI sentiment view
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={6}>
+              <AIInsightBlock
+                title="1 Week Sentiment"
+                subtitle="Sentiment signal"
+                value={deal.one_week_sentiment}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
+              <AIInsightBlock
+                title="1 Month Sentiment"
+                subtitle="Sentiment signal"
+                value={deal.one_month_sentiment}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* IPO ONLY: AI MODEL PREDICTIONS */}
+        {deal.deal_type === "IPO" && (
+          <>
+            <Divider sx={{ my: 2 }} />
+
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  mb: 1,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.6,
+                  fontSize: 11,
+                  color: "text.secondary",
+                }}
+              >
+                AI model predictions
+              </Typography>
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="FS 1 Week Sentiment"
+                    subtitle="AI sentiment signal"
+                    value={deal.fs_1w_sentiment}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="FS 1 Month Sentiment"
+                    subtitle="AI sentiment signal"
+                    value={deal.fs_1m_sentiment}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="Expected Volatility"
+                    subtitle="AI estimated"
+                    value={
+                      deal.fs_expected_volatility
+                        ? `${formatNumber(deal.fs_expected_volatility, { decimals: 2 })}%`
+                        : "—"
+                    }
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <AIInsightBlock
+                    title="Confidence Level"
+                    subtitle="Model confidence"
+                    value={
+                      deal.fs_confidence_level
+                        ? `${formatNumber(deal.fs_confidence_level, { decimals: 0 })}%`
+                        : "—"
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </>
+        )}
       </CardContent>
     </Card>
   );
