@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Box, Card, Container, Typography } from "@mui/material";
-import DealsPredictionsTable, {
-  TickerSelectionPayload,
-} from "./DealsPredictionsTable";
+import { TickerSelectionPayload } from "./types";
 import DealPricesChart from "./DealPricesChart";
+import DealsPredictionsTable from "./DealsPredictionsTable";
 
 const AIMLResultsHome: React.FC = () => {
   const [chartSelection, setChartSelection] =
@@ -70,7 +69,7 @@ const AIMLResultsHome: React.FC = () => {
           {chartSelection ? (
             <DealPricesChart
               ticker={chartSelection.ticker}
-              pricing_date={chartSelection.pricing_date}
+              trade_date={chartSelection.trade_date}
             />
           ) : (
             <Card

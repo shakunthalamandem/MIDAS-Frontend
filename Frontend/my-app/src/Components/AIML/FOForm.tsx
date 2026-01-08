@@ -76,6 +76,10 @@ interface FOFormValues {
 
   t1d_open_price: number | null; // T+1D open price
   t1d_close_price: number | null; // T+1D close price
+  t1d_low_price: number | null;
+  t1d_high_price: number | null;
+  t1d_vwap_price: number | null;
+  
 
   // create new record flag
   request_from: string;
@@ -136,6 +140,9 @@ const FOForm: React.FC<FOFormProps> = ({
       "t1d_return_from_bloomberg_category", // OPTIONAL
       "t1d_open_price",
       "t1d_close_price",
+      "t1d_low_price",
+      "t1d_high_price",
+      "t1d_vwap_price",
     ]);
 
     // Required fields (except optionalKeys)
@@ -321,12 +328,22 @@ const FOForm: React.FC<FOFormProps> = ({
   const handleWeeklyMonthlyRepredict = async ({
     t1dClosePrice,
     t1dCloseReturn,
+    t1dLowPrice,
+    t1dHighPrice,
+    t1dVWAPPrice,
   }: {
     t1dClosePrice: number;
     t1dCloseReturn: number;
+    t1dLowPrice?: number;
+    t1dHighPrice?: number;
+    t1dVWAPPrice?: number;
   }): Promise<Record<string, PredictionModel>> => {
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
+
+    if (!values.t1d_open_price) {
+      throw new Error("T+1D Open price missing. Run T+1D repredict first.");
+    }
 
     const payload = {
       ...values,
@@ -337,6 +354,10 @@ const FOForm: React.FC<FOFormProps> = ({
 
       t1d_return_from_bloomberg_category: t1dCloseReturn,
       t1d_close_price: t1dClosePrice,
+      t1d_open_price: values.t1d_open_price,
+      t1d_low_price: t1dLowPrice ?? values.t1d_low_price ?? null,
+      t1d_high_price: t1dHighPrice ?? values.t1d_high_price ?? null,
+      t1d_vwap_price: t1dVWAPPrice ?? values.t1d_vwap_price ?? null,
 
       expectations: ["T1W", "T1M"],
       request_from: "ai_ml",
