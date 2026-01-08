@@ -137,7 +137,7 @@ const DealMeetingNotesMain: React.FC = () => {
         <Box display="flex" justifyContent="center" mb={3}>
           <Box sx={{ width: { xs: "100%", sm: 380, md: 440 } }}>
             <Autocomplete
-              options={allDeals} // ✅ always full list
+              options={allDeals}
               value={selectedDeal}
               inputValue={searchTerm}
               loading={searching}
@@ -159,7 +159,6 @@ const DealMeetingNotesMain: React.FC = () => {
                 setSelectedDeal(value);
                 if (value?.ticker) setSearchTerm(value.ticker);
               }}
-              // ✅ Load ALL tickers in dropdown (and filter by ticker when typing)
               filterOptions={(opts, state) => {
                 const term = norm(state.inputValue || "");
                 const t = (d: DealSearchResult) => norm(d.ticker);
@@ -230,7 +229,6 @@ const DealMeetingNotesMain: React.FC = () => {
                     "& .MuiInputLabel-root": {
                       color: "#0050c8",
                     },
-                    // ✅ typed text color in the search input
                     "& .MuiInputBase-input": {
                       color: "#002060",
                     },
@@ -247,17 +245,35 @@ const DealMeetingNotesMain: React.FC = () => {
           </Box>
         </Box>
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 3 },
-            borderRadius: 3,
-            backgroundColor: "rgba(0,32,96,0.05)",
-            border: "1px solid rgba(0,32,96,0.12)",
-          }}
-        >
-          <MeetingDealNoteCreate selectedDeal={selectedDeal} />
-        </Paper>
+        {/* ✅ Show ONLY the upper message box when no ticker is selected */}
+        {!selectedDeal ? (
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, md: 3 },
+              borderRadius: 3,
+              backgroundColor: "rgba(0,32,96,0.05)",
+              border: "1px dashed rgba(0,32,96,0.35)",
+              textAlign: "center",
+            }}
+          >
+            <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+              Select a ticker for the meeting notes
+            </Typography>
+          </Paper>
+        ) : (
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, md: 3 },
+              borderRadius: 3,
+              backgroundColor: "rgba(0,32,96,0.05)",
+              border: "1px solid rgba(0,32,96,0.12)",
+            }}
+          >
+            <MeetingDealNoteCreate selectedDeal={selectedDeal} />
+          </Paper>
+        )}
       </Container>
     </>
   );
