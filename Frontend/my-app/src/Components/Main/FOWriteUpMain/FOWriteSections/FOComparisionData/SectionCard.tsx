@@ -46,6 +46,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
 }) => {
   const { forceExpand } = useExportContext();
   const [expanded, setExpanded] = useState(false);
+  const renderValues = values.length || !isEditing ? values : [""];
 
   useEffect(() => {
     if (isEditing) {
@@ -155,7 +156,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
             {isLoading && <LinearProgress sx={{ mb: 2, borderRadius: 1 }} />}
 
             <Box mt={1} display="flex" flexDirection="column" gap={1} flexGrow={1}>
-              {values.map((sentence, idx) => (
+              {renderValues.map((sentence, idx) => (
                 <SectionEditor
                   key={idx}
                   sentence={sentence}

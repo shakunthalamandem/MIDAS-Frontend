@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -10,7 +10,10 @@ import {
   TableBody,
   TableContainer,
 } from "@mui/material";
-import { columns } from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
+import {
+  createColumns,
+  ColumnDef,
+} from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
 import CompetitorSearch from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/CompetitorSearch";
 import DeleteConfirmDialog from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DeleteConfirmDialog";
 import MetricsRow from "../../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/MetricsRow";
@@ -30,11 +33,13 @@ interface Props {
   ticker: string;
   data: ApiResponse;
   onRefresh?: () => Promise<void> | void;
+  pricingYear?: number;
 }
-const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh }) => {
+const FOMetricsTableMain: React.FC<Props> = ({ ticker, data, onRefresh, pricingYear }) => {
   const { forceExpand } = useExportContext();
   const showActions = !forceExpand;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
+  const columns: ColumnDef[] = useMemo(() => createColumns(pricingYear), [pricingYear]);
   
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({

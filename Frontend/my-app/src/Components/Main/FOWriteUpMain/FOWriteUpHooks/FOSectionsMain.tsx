@@ -214,7 +214,11 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
       </div>
       <div id="fo-page3">
         <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
-        <FOComparisionTableMain ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+        <FOComparisionTableMain
+          ticker={selected?.ticker || ""}
+          deal_id={selected?.deal_id || ""}
+          pricingDate={ipoData?.pricing_date ?? null}
+        />
       </div>
     </ExportProvider>
   );

@@ -68,6 +68,7 @@ import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteU
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
+import FOFinancialForecastUpload from "../Components/Main/FOWriteUpMain/FOWriteUpUploads/FOFinancialForecastUpload";
 import DealsTabsLayout from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout";
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
 
@@ -90,6 +91,7 @@ import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalys
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
+import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -256,6 +258,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
          <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+        <Route path="/fo_financial_forecasts_upload" element={<AuthGuard><FOFinancialForecastUpload /></AuthGuard>} />
 
 
 
@@ -273,6 +276,11 @@ const AppRouters: React.FC = () => {
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+
+
+
+        <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
+
 
 
 

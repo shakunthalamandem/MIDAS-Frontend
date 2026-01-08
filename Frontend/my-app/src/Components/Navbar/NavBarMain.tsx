@@ -246,6 +246,12 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/fo_dashboard",
                   icon: <ArticleOutlinedIcon fontSize="small" />,
                 },
+
+                // {
+                //   label: "Meeting Notes",
+                //   path: "/deal_meeting_notes",
+                //   icon: <ArticleOutlinedIcon fontSize="small" />,
+                // },
                 // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}

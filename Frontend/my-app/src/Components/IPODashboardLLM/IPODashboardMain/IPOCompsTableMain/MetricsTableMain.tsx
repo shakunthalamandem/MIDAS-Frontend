@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -14,9 +14,10 @@ import CompetitorSearch from "./CompetitorSearch";
 import MetricsRow from "./MetricsRow";
 import SnackbarAlert from "./SnackbarAlert";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
-import { columns } from "./columns";
+import { createColumns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
+import { overflow } from "html2canvas/dist/types/css/property-descriptors/overflow";
 
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
@@ -29,6 +30,7 @@ interface Props {
   data: ApiResponse;
   onRefresh?: () => Promise<void> | void;
   onPeersUpdated?: () => void;
+  pricingYear?: number;
 }
 
 const MetricsTableMain: React.FC<Props> = ({
@@ -36,6 +38,7 @@ const MetricsTableMain: React.FC<Props> = ({
   data,
   onRefresh,
   onPeersUpdated,
+  pricingYear,
 }) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -188,8 +191,10 @@ const MetricsTableMain: React.FC<Props> = ({
     }
   };
 
+  const tableColumns = useMemo(() => createColumns(pricingYear), [pricingYear]);
+
   return (
-    <div style={{ marginTop: 20 }}>
+    <Box style={{ marginTop: 20, overflow: "auto" }} >
       <Box
         sx={{
           display: "flex",
@@ -208,7 +213,7 @@ const MetricsTableMain: React.FC<Props> = ({
         <Table size="small">
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
-              {columns.map((col) => (
+              {tableColumns.map((col) => (
                 <TableCell
                   key={col.key}
                   sx={{
@@ -240,7 +245,7 @@ const MetricsTableMain: React.FC<Props> = ({
                 onSave={handleSave}
                 onDelete={handleDeleteRow}
                 onChangeCell={handleChangeCell}
-                columns={columns}
+                columns={tableColumns}
                 formatValue={formatValue}
               />
             ))}
@@ -248,7 +253,7 @@ const MetricsTableMain: React.FC<Props> = ({
             {data[ticker]?.Averages &&
               ["average", "median"].map((type) => (
                 <TableRow key={type} sx={{ backgroundColor: "#f5f5f5" }}>
-                  {columns.map((col, colIdx) => {
+                  {tableColumns.map((col, colIdx) => {
                     if (colIdx === 0) {
                       return (
                         <TableCell
@@ -301,7 +306,7 @@ const MetricsTableMain: React.FC<Props> = ({
         severity={snackbar.severity}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
-    </div>
+    </Box>
   );
 };
 

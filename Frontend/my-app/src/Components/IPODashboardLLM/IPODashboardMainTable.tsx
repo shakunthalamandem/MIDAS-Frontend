@@ -39,15 +39,28 @@ type ApiResponse = {
 interface Props {
   ticker: string;
   onPeersUpdated?: () => void;
+  pricingDate?: string | null;
 }
 
 type ViewMode = "table" | "chart";
 
-const IPODashboardMainTable: React.FC<Props> = ({ ticker, onPeersUpdated }) => {
+const getPricingYearFromDate = (pricingDate?: string | null) => {
+  if (!pricingDate) return undefined;
+  const clean = pricingDate.replace(/(\d+)(st|nd|rd|th)/gi, "$1");
+  const parsedYear = new Date(clean).getFullYear();
+  return Number.isFinite(parsedYear) ? parsedYear : undefined;
+};
+
+const IPODashboardMainTable: React.FC<Props> = ({
+  ticker,
+  onPeersUpdated,
+  pricingDate,
+}) => {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewMode>("table");
+  const pricingYear = getPricingYearFromDate(pricingDate);
 
   const fetchData = useCallback(
     async (customTicker?: string) => {
@@ -105,10 +118,13 @@ const IPODashboardMainTable: React.FC<Props> = ({ ticker, onPeersUpdated }) => {
               data={data}
               onRefresh={fetchData}
               onPeersUpdated={onPeersUpdated}
+              pricingYear={pricingYear}
             />
           )}
 
-          {view === "chart" && <IPOCompsChart ticker={ticker} data={data} />}
+          {view === "chart" && (
+            <IPOCompsChart ticker={ticker} data={data} pricingYear={pricingYear} />
+          )}
         </Box>
       )}
 
