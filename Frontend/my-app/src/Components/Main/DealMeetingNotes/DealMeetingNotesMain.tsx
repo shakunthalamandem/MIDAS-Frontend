@@ -17,6 +17,16 @@ export interface DealSearchResult {
   name?: string; // only for display
   dealId?: string;
   pricingDate?: string;
+  id?: number | string;
+  fsTicker?: string | null;
+  sector?: string;
+  region?: string;
+  dealType?: string;
+  foType?: string | null;
+  ipoType?: string;
+  issuerName?: string;
+  dealCaptain?: string;
+  flagForWriteup?: string | null;
 }
 
 const DealMeetingNotesMain: React.FC = () => {
@@ -56,57 +66,74 @@ const DealMeetingNotesMain: React.FC = () => {
     }
 
     const controller = new AbortController();
+    const handle = window.setTimeout(() => {
+      const fetchDeals = async () => {
+        setSearching(true);
+        setSearchError(null);
 
-    const fetchDeals = async () => {
-      setSearching(true);
-      setSearchError(null);
+        try {
+          const trimmed = searchTerm.trim();
+          const query = trimmed ? `?search=${encodeURIComponent(trimmed)}` : "";
+          const url = `${apiUrl}/api/get_deal_unified_data/${query}`;
+          const response = await fetch(url, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            signal: controller.signal,
+          });
 
-      try {
-        const url = `${apiUrl}/api/get_deal_unified_data/`;
-        const response = await fetch(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          signal: controller.signal,
-        });
+          if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message || `Request failed with status ${response.status}`);
+          }
 
-        if (!response.ok) {
-          const message = await response.text();
-          throw new Error(message || `Request failed with status ${response.status}`);
+          const json = await response.json();
+          const payload = Array.isArray(json)
+            ? json
+            : Array.isArray(json?.data)
+            ? json.data
+            : Array.isArray(json?.results)
+            ? json.results
+            : [];
+
+          const normalized = (payload as any[])
+            .map((item) => ({
+              ticker: item?.ticker || item?.symbol || "",
+              name: item?.issuer_name || item?.company_name || item?.name,
+              dealId: item?.deal_id || item?.dealId || item?.id,
+              pricingDate: item?.pricing_date || item?.pricingDate || item?.pricingdate,
+              id: item?.id,
+              fsTicker: item?.fs_ticker ?? null,
+              sector: item?.sector,
+              region: item?.region,
+              dealType: item?.deal_type,
+              foType: item?.fo_type ?? null,
+              ipoType: item?.ipo_type,
+              issuerName: item?.issuer_name || item?.company_name || item?.name,
+              dealCaptain: item?.deal_captain,
+              flagForWriteup: item?.flag_for_writeup ?? null,
+            }))
+            .filter((item) => item.ticker);
+
+          setAllDeals(normalized);
+        } catch (err: any) {
+          if (err.name === "AbortError") return;
+          console.error("Error fetching deals:", err);
+          setSearchError("Unable to fetch deals. Please try again.");
+        } finally {
+          setSearching(false);
         }
+      };
 
-        const json = await response.json();
-        const payload = Array.isArray(json)
-          ? json
-          : Array.isArray(json?.data)
-          ? json.data
-          : Array.isArray(json?.results)
-          ? json.results
-          : [];
+      fetchDeals();
+    }, 250);
 
-        const normalized = (payload as any[])
-          .map((item) => ({
-            ticker: item?.ticker || item?.symbol || "",
-            name: item?.issuer_name || item?.company_name || item?.name,
-            dealId: item?.deal_id || item?.dealId || item?.id,
-            pricingDate: item?.pricing_date || item?.pricingDate || item?.pricingdate,
-          }))
-          .filter((item) => item.ticker);
-
-        setAllDeals(normalized);
-      } catch (err: any) {
-        if (err.name === "AbortError") return;
-        console.error("Error fetching deals:", err);
-        setSearchError("Unable to fetch deals. Please try again.");
-      } finally {
-        setSearching(false);
-      }
+    return () => {
+      controller.abort();
+      window.clearTimeout(handle);
     };
-
-    fetchDeals();
-    return () => controller.abort();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, searchTerm]);
 
   const norm = (s: string) => (s || "").replace(/\s+/g, "").trim().toLowerCase();
 
@@ -142,7 +169,7 @@ const DealMeetingNotesMain: React.FC = () => {
               inputValue={searchTerm}
               loading={searching}
               autoHighlight
-              noOptionsText={searchTerm ? "No matches found" : "Type a ticker to search"}
+              noOptionsText={searchTerm ? "No matches found" : "Type a ticker or company name"}
               getOptionLabel={(option) => {
                 const dateLabel = formatPricingDate(option.pricingDate);
                 return `${option.ticker}${dateLabel ? ` (${dateLabel})` : ""}`;
@@ -153,6 +180,7 @@ const DealMeetingNotesMain: React.FC = () => {
               onInputChange={(_, value, reason) => {
                 if (reason === "input" || reason === "clear") {
                   setSearchTerm(value || "");
+                  setAllDeals([]);
                 }
               }}
               onChange={(_, value) => {
@@ -167,20 +195,7 @@ const DealMeetingNotesMain: React.FC = () => {
                   return [...opts].sort((a, b) => t(a).localeCompare(t(b)));
                 }
 
-                const exact = opts.filter((d) => t(d) === term);
-                if (exact.length) {
-                  return exact.sort((a, b) => t(a).localeCompare(t(b)));
-                }
-
-                const starts = opts.filter((d) => t(d).startsWith(term));
-                const includes = opts.filter(
-                  (d) => !t(d).startsWith(term) && t(d).includes(term)
-                );
-
-                const sortedStarts = starts.sort((a, b) => t(a).localeCompare(t(b)));
-                const sortedIncludes = includes.sort((a, b) => t(a).localeCompare(t(b)));
-
-                return [...sortedStarts, ...sortedIncludes];
+                return opts;
               }}
               renderOption={(props, option) => (
                 <li {...props} key={`${option.ticker}-${option.dealId ?? option.name ?? "deal"}`}>
