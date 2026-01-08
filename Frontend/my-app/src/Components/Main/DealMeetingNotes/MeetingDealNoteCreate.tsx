@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Stack } from "@mui/material";
+import { Alert, Button, Paper, Stack, Typography } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
@@ -89,6 +89,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
   const [backupState, setBackupState] = useState<FormState | null>(null);
   const [meetings, setMeetings] = useState<MeetingEntry[]>([]);
   const [selectedMeetingIndex, setSelectedMeetingIndex] = useState(0);
+  const [noDataFound, setNoDataFound] = useState(false);
+  const shouldShowEmptyState = noDataFound && meetings.length === 0;
 
   const applyMeetingToForm = (entry: MeetingEntry) => {
     setMeetingOverview(entry.form.meetingOverview);
@@ -183,6 +185,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     const loadNotes = async () => {
       try {
         setStatus(null);
+        setNoDataFound(false);
         const response = await fetch(`${apiUrl}/api/get_deal_meeting_notes/`, {
           method: "POST",
           headers: {
@@ -199,6 +202,12 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         }
 
         const data = await response.json();
+        if (data?.message && typeof data.message === "string") {
+          setNoDataFound(true);
+          setMeetings([]);
+          return;
+        }
+
         const items = Array.isArray(data) ? data : [data];
         const normalized = items.flatMap(normalizeRecordToMeetings);
         setMeetings(normalized);
@@ -216,6 +225,28 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     loadNotes();
     return () => controller.abort();
   }, [apiUrl, selectedDeal, token]);
+
+  const createNewMeetingFromTemplate = (resetExisting = false) => {
+    const templateMeeting: MeetingEntry = {
+      form: {
+        meetingOverview: {
+          ...initialMeetingOverview,
+          ticker: selectedDeal?.ticker?.toUpperCase() || "",
+          date: selectedDeal?.pricingDate || "",
+        },
+        investmentSnapshot: initialInvestmentSnapshot,
+        businessStrategy: initialBusinessStrategy,
+        capitalStructure: initialCapitalStructure,
+      },
+      isNew: true,
+    };
+    const updated = resetExisting ? [templateMeeting] : [...meetings, templateMeeting];
+    setMeetings(updated);
+    setSelectedMeetingIndex(updated.length - 1);
+    applyMeetingToForm(templateMeeting);
+    setIsEditing(true);
+    setNoDataFound(false);
+  };
 
   const startEdit = () => {
     setBackupState({
@@ -337,31 +368,17 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
           ))}
           <Button
             variant="outlined"
-            onClick={() => {
-              const newMeeting: MeetingEntry = {
-                form: {
-                  meetingOverview: initialMeetingOverview,
-                  investmentSnapshot: initialInvestmentSnapshot,
-                  businessStrategy: initialBusinessStrategy,
-                  capitalStructure: initialCapitalStructure,
-                },
-                isNew: true,
-              };
-              const updated = [...meetings, newMeeting];
-              setMeetings(updated);
-              setSelectedMeetingIndex(updated.length - 1);
-              applyMeetingToForm(newMeeting);
-            }}
+            onClick={() => createNewMeetingFromTemplate()}
             sx={{
               borderRadius: 999,
               textTransform: "none",
               px: 2,
               borderColor: "#f28c28",
-              color: "#f28c28",
-            }}
-          >
-            + New Meeting Note
-          </Button>
+                color: "#f28c28",
+              }}
+            >
+              + New Meeting Note
+            </Button>
           {meetings[selectedMeetingIndex]?.isNew ? (
             <Button
               variant="text"
@@ -393,87 +410,127 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         </Stack>
       ) : null}
 
-      <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
-        {!isEditing ? (
-          <Button
-            variant="contained"
-            startIcon={<EditOutlinedIcon />}
-            onClick={startEdit}
-            sx={{
-              background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-              color: "#fff",
-              borderRadius: 999,
-              px: 2.5,
-            }}
-          >
-            Edit
-          </Button>
-        ) : (
-          <>
+      {noDataFound ? (
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 2.5,
+            borderRadius: 2,
+            borderColor: "rgba(0,80,200,0.25)",
+            background: "linear-gradient(90deg, rgba(0,98,255,0.06), rgba(0,194,162,0.06))",
+          }}
+        >
+          <Stack spacing={1.5} direction={{ xs: "column", sm: "row" }} alignItems="center">
+            <Stack flex={1} spacing={0.5}>
+              <Typography fontWeight={700} color="#002060">
+                Meeting notes do not exist for this ticker.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Create a new meeting note using the latest template.
+              </Typography>
+            </Stack>
             <Button
               variant="contained"
-              startIcon={<SaveOutlinedIcon />}
-              onClick={handleSubmit}
-              disabled={submitting}
+              onClick={() => createNewMeetingFromTemplate(true)}
               sx={{
                 background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
                 color: "#fff",
                 borderRadius: 999,
                 px: 2.5,
-                boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
+                textTransform: "none",
               }}
             >
-              Save Changes
+              Create Meeting Note
             </Button>
-            <Button
-              variant="outlined"
-              startIcon={<CloseOutlinedIcon />}
-              onClick={handleCancel}
-              disabled={submitting}
-              sx={{
-                borderColor: "#0050c8",
-                color: "#0050c8",
-                borderRadius: 999,
-                px: 2.5,
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ReplayOutlinedIcon />}
-              onClick={handleReset}
-              disabled={submitting}
-              sx={{
-                borderColor: "#f28c28",
-                color: "#f28c28",
-                borderRadius: 999,
-                px: 2.5,
-              }}
-            >
-              Reset
-            </Button>
-          </>
-        )}
-      </Stack>
-
-      {status ? (
-        <Alert severity={status.kind} onClose={() => setStatus(null)}>
-          {status.message}
-        </Alert>
+          </Stack>
+        </Paper>
       ) : null}
 
-      <MeetingNoteForm
-        meetingOverview={meetingOverview}
-        setMeetingOverview={setMeetingOverview}
-        investmentSnapshot={investmentSnapshot}
-        setInvestmentSnapshot={setInvestmentSnapshot}
-        businessStrategy={businessStrategy}
-        setBusinessStrategy={setBusinessStrategy}
-        capitalStructure={capitalStructure}
-        setCapitalStructure={setCapitalStructure}
-        isEditing={isEditing}
-      />
+      {!shouldShowEmptyState ? (
+        <>
+          <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
+            {!isEditing ? (
+              <Button
+                variant="contained"
+                startIcon={<EditOutlinedIcon />}
+                onClick={startEdit}
+                sx={{
+                  background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
+                  color: "#fff",
+                  borderRadius: 999,
+                  px: 2.5,
+                }}
+              >
+                Edit
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="contained"
+                  startIcon={<SaveOutlinedIcon />}
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  sx={{
+                    background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
+                    color: "#fff",
+                    borderRadius: 999,
+                    px: 2.5,
+                    boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
+                  }}
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CloseOutlinedIcon />}
+                  onClick={handleCancel}
+                  disabled={submitting}
+                  sx={{
+                    borderColor: "#0050c8",
+                    color: "#0050c8",
+                    borderRadius: 999,
+                    px: 2.5,
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ReplayOutlinedIcon />}
+                  onClick={handleReset}
+                  disabled={submitting}
+                  sx={{
+                    borderColor: "#f28c28",
+                    color: "#f28c28",
+                    borderRadius: 999,
+                    px: 2.5,
+                  }}
+                >
+                  Reset
+                </Button>
+              </>
+            )}
+          </Stack>
+
+          {status ? (
+            <Alert severity={status.kind} onClose={() => setStatus(null)}>
+              {status.message}
+            </Alert>
+          ) : null}
+
+          <MeetingNoteForm
+            meetingOverview={meetingOverview}
+            setMeetingOverview={setMeetingOverview}
+            investmentSnapshot={investmentSnapshot}
+            setInvestmentSnapshot={setInvestmentSnapshot}
+            businessStrategy={businessStrategy}
+            setBusinessStrategy={setBusinessStrategy}
+            capitalStructure={capitalStructure}
+            setCapitalStructure={setCapitalStructure}
+            isEditing={isEditing}
+          />
+        </>
+      ) : null}
     </Stack>
   );
 };

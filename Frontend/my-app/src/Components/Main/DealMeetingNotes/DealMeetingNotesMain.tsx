@@ -141,7 +141,7 @@ const DealMeetingNotesMain: React.FC = () => {
               value={selectedDeal}
               inputValue={searchTerm}
               loading={searching}
-              autoHighlight // ✅ highlights first match like "find"
+              autoHighlight
               noOptionsText={searchTerm ? "No matches found" : "Type a ticker to search"}
               getOptionLabel={(option) => {
                 const dateLabel = formatPricingDate(option.pricingDate);
@@ -151,7 +151,6 @@ const DealMeetingNotesMain: React.FC = () => {
                 option.ticker === value.ticker && (option.dealId ?? "") === (value.dealId ?? "")
               }
               onInputChange={(_, value, reason) => {
-                // ✅ same pattern as your RecentSearchBar
                 if (reason === "input" || reason === "clear") {
                   setSearchTerm(value || "");
                 }
@@ -160,12 +159,14 @@ const DealMeetingNotesMain: React.FC = () => {
                 setSelectedDeal(value);
                 if (value?.ticker) setSearchTerm(value.ticker);
               }}
-              // ✅ TICKER ONLY: exact > startsWith > includes. If no match => []
+              // ✅ Load ALL tickers in dropdown (and filter by ticker when typing)
               filterOptions={(opts, state) => {
                 const term = norm(state.inputValue || "");
-                if (!term) return [];
-
                 const t = (d: DealSearchResult) => norm(d.ticker);
+
+                if (!term) {
+                  return [...opts].sort((a, b) => t(a).localeCompare(t(b)));
+                }
 
                 const exact = opts.filter((d) => t(d) === term);
                 if (exact.length) {
@@ -177,9 +178,6 @@ const DealMeetingNotesMain: React.FC = () => {
                   (d) => !t(d).startsWith(term) && t(d).includes(term)
                 );
 
-                // If nothing matches ticker, return NOTHING (no other tickers)
-                if (!starts.length && !includes.length) return [];
-
                 const sortedStarts = starts.sort((a, b) => t(a).localeCompare(t(b)));
                 const sortedIncludes = includes.sort((a, b) => t(a).localeCompare(t(b)));
 
@@ -188,12 +186,16 @@ const DealMeetingNotesMain: React.FC = () => {
               renderOption={(props, option) => (
                 <li {...props} key={`${option.ticker}-${option.dealId ?? option.name ?? "deal"}`}>
                   <Box display="flex" flexDirection="column">
-                    <Typography fontWeight={700}>
+                    <Typography fontWeight={700} sx={{ color: "#002060" }}>
                       {option.ticker}
                       {option.pricingDate ? ` (${formatPricingDate(option.pricingDate)})` : ""}
                     </Typography>
                     {option.name ? (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontSize: "0.7rem" }}
+                      >
                         {option.name}
                       </Typography>
                     ) : null}
@@ -227,6 +229,10 @@ const DealMeetingNotesMain: React.FC = () => {
                     },
                     "& .MuiInputLabel-root": {
                       color: "#0050c8",
+                    },
+                    // ✅ typed text color in the search input
+                    "& .MuiInputBase-input": {
+                      color: "#002060",
                     },
                   }}
                 />
