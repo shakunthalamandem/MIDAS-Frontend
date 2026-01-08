@@ -64,11 +64,11 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
   return data?.deals ?? [];
 };
 
-const askPerplexity = async (question: string): Promise<Block[]> => {
-  const res = await fetch(`${apiUrl}/api/perplexity_chat/`, {
+const askPerplexity = async (question: string, uniqueDealId: string): Promise<Block[]> => {
+  const res = await fetch(`${apiUrl}/api/sentiment_perplexity_chat/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: question.trim() }),
+    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Perplexity chat failed");
@@ -274,7 +274,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
         updateStatus(statusIndex, "running");
 
         try {
-          const answerBlocks = await askPerplexity(entry.prompt);
+          const answerBlocks = await askPerplexity(entry.prompt, entry.unique_deal_id);
           const sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
           await postSentiment(entry.ticker, entry.unique_deal_id, answerBlocks);
           await postSentimentPdf(entry.ticker, entry.unique_deal_id, sentimentPdf);
@@ -444,7 +444,6 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
         </Stack>
       </Container>
 
-      {/* Hidden renderer for high-quality PDF capture */}
       <Box
         ref={pdfContainerRef}
         sx={{

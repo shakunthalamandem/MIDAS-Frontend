@@ -27,6 +27,14 @@ type ApiResponse = {
   };
 };
 
+type YearlyApiResponse = {
+  [year: string]: ApiResponse;
+};
+
+interface FundLevelPNLTableProps {
+  selectedYear: string;
+}
+
 interface TableRowData {
   assetType: string;
   fundName: string;
@@ -42,7 +50,7 @@ const formatCurrency = (value: number): string => {
   return `${value < 0 ? "-" : ""}$${formatted}${suffix}`;
 };
 
-const FundLevelPNLTable: React.FC = () => {
+const FundLevelPNLTable: React.FC<FundLevelPNLTableProps> = ({ selectedYear }) => {
   const [data, setData] = useState<TableRowData[]>([]);
   const [months, setMonths] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -75,18 +83,21 @@ const FundLevelPNLTable: React.FC = () => {
       setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/api/fund_level_pnl/`, {
+          method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ year: Number(selectedYear) }),
         });
 
-        const result: ApiResponse = await res.json();
+        const result: YearlyApiResponse = await res.json();
+        const yearData = result[selectedYear] || {};
 
         const rows: TableRowData[] = [];
         const monthSet: Set<string> = new Set();
 
-        Object.entries(result).forEach(([assetType, funds]) => {
+        Object.entries(yearData).forEach(([assetType, funds]) => {
           Object.entries(funds).forEach(([fundName, fundData]) => {
             const { asset_type, ...rest } = fundData;
             const monthValues = rest as { [month: string]: number };
@@ -135,7 +146,7 @@ const FundLevelPNLTable: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, selectedYear]);
 
   const cellBorder = { border: "1px solid black", textAlign: "center" };
   const totalRowBgColor = "rgb(145, 206, 137)";

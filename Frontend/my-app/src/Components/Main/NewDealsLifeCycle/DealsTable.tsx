@@ -10,6 +10,7 @@ interface DealsTableProps {
   loading: boolean;
   onRowSelect: (row: any) => void;
   selectedOp: string;
+  hideRegionColumn?: boolean;
 }
 
 const DealsTable: React.FC<DealsTableProps> = ({
@@ -17,6 +18,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
   loading,
   onRowSelect,
   selectedOp,
+  hideRegionColumn = false,
 }) => {
   const [selectedId, setSelectedId] = useState<number | string | null>(null);
 
@@ -48,13 +50,30 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
 
   const columns = getColumns(selectedOp, selectedId);
+  const visibleColumns = columns.filter((col) => {
+  // hide region column if needed
+  if (hideRegionColumn && col.field === "region") return false;
+
+  // hide First Trade Date for Upcoming
+  if (selectedOp === "upcoming" && col.field === "trade_date") {
+    return false;
+  }
+
+  // hide Pricing Date for Live
+  if (selectedOp === "live" && col.field === "pricing_date") {
+    return false;
+  }
+
+  return true;
+});
+
 
   return (
     <Container maxWidth={false} sx={{ mt: 2, mb: 4, px: 0 }}>
       <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
         <DataGrid
           rows={rows}
-          columns={columns}
+          columns={visibleColumns}
           loading={loading}
           checkboxSelection={false}
           onRowClick={handleRowClick}

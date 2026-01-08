@@ -218,7 +218,7 @@ const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp })
                 flex: "0 0 auto",
               }}
             />
-            <Typography variant="body2" sx={{ color: "grey.700", lineHeight: 1.9 }}>
+            <Typography variant="body2" sx={{ color: "#141414", lineHeight: 1.9 }}>
               {l}
             </Typography>
           </Box>
@@ -231,7 +231,7 @@ const TextBlock: React.FC<{ text?: string; clamp?: number }> = ({ text, clamp })
     <Typography
       variant="body2"
       sx={{
-        color: "grey.700",
+        color: "#141414",
         lineHeight: 1.95,
         whiteSpace: "pre-wrap",
         ...(clamp
@@ -262,7 +262,7 @@ const ExecutiveHero: React.FC<{ companyName: string; summary?: string }> = ({ co
       Executive Summary of   {companyName}
 
     </Typography>
-    <Typography sx={{ mt: 2, color:'#616161' }} variant="body1" >
+    <Typography sx={{ mt: 2, color:'#141414' }} variant="body1" >
       {stripMarkdown(summary) || "-"}
     </Typography>
   </Box>

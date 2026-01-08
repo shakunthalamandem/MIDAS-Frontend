@@ -33,6 +33,7 @@ const PNLPagesMain = () => {
   const [options, setOptions] = useState<FilterOptions | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string>("2026");
 
   const [tempFilters, setTempFilters] = useState({
     funds: [] as string[],
@@ -297,8 +298,8 @@ const PNLPagesMain = () => {
       
       </Box>
     </Container>
-      <DealTypeTable />
-        <EquityPNLSectorWiseTable />
+      <DealTypeTable selectedYear={selectedYear} onYearChange={setSelectedYear} />
+        <EquityPNLSectorWiseTable selectedYear={selectedYear} onYearChange={setSelectedYear} />
     </>
   );
 };
