@@ -68,6 +68,7 @@ import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteU
 import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
 import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
 import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
+import FOFinancialForecastUpload from "../Components/Main/FOWriteUpMain/FOWriteUpUploads/FOFinancialForecastUpload";
 import DealsTabsLayout from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout";
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
 
@@ -257,6 +258,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
          <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+        <Route path="/fo_financial_forecasts_upload" element={<AuthGuard><FOFinancialForecastUpload /></AuthGuard>} />
 
 
 
