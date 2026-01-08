@@ -73,7 +73,7 @@ type MetricOption = {
   isPercent?: boolean; // only for formatting, not calculations
 };
 
-const DEFAULT_BASE_YEAR = 2025;
+const DEFAULT_BASE_YEAR = 2026;
 const getYearParts = (pricingYear?: number) => {
   const baseYear =
     typeof pricingYear === "number" && Number.isFinite(pricingYear)

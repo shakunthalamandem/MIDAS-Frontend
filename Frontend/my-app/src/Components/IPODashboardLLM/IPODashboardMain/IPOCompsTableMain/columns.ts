@@ -1,6 +1,6 @@
 export type ColumnDef = { key: string; label: string; minWidth?: number };
 
-const DEFAULT_BASE_YEAR = 2025;
+const DEFAULT_BASE_YEAR = 2026;
 
 const getYearParts = (pricingYear?: number) => {
   const baseYear =
