@@ -130,7 +130,7 @@ const DealMeetingNotesMain: React.FC = () => {
           letterSpacing: 0.2,
         }}
       >
-        Post-Meeting Notes
+        Deal Meeting Notes  📊
       </Typography>
 
       <Container maxWidth={false} sx={{ px: { xs: 1.5, md: 3 }, maxWidth: 1600 }}>
