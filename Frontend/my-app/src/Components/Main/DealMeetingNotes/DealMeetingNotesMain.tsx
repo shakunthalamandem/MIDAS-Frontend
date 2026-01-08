@@ -187,7 +187,7 @@ const DealMeetingNotesMain: React.FC = () => {
                   <Box display="flex" flexDirection="column">
                     <Typography fontWeight={700} sx={{ color: "#002060" }}>
                       {option.ticker}
-                      {option.pricingDate ? ` (${formatPricingDate(option.pricingDate)})` : ""}
+                     <span style={{fontSize:'13px',color:'#5D0163'}}>{option.pricingDate ? ` (${formatPricingDate(option.pricingDate)})` : ""}</span> 
                     </Typography>
                     {option.name ? (
                       <Typography
