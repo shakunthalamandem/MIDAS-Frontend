@@ -12,7 +12,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import MeetingDealNoteCreate from "./MeetingDealNoteCreate";
 
-interface DealSearchResult {
+export interface DealSearchResult {
   ticker: string;
   name?: string;
   dealId?: string;
@@ -227,7 +227,7 @@ const DealMeetingNotesMain: React.FC = () => {
             border: "1px solid rgba(0,32,96,0.12)",
           }}
         >
-          <MeetingDealNoteCreate />
+          <MeetingDealNoteCreate selectedDeal={selectedDeal} />
         </Paper>
       </Container>
     </>
