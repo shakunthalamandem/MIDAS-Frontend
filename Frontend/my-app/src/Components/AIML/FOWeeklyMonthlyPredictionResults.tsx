@@ -40,6 +40,9 @@ interface WeeklyMonthlyPredictionResultsProps {
   onWeeklyMonthlyRepredict: (params: {
     t1dClosePrice: number;
     t1dCloseReturn: number;
+    t1dLowPrice?: number;
+    t1dHighPrice?: number;
+    t1dVWAPPrice?: number;
   }) => Promise<Record<string, PredictionModel>>;
 
   /** Prefill when a T+1D close price is already known (nullable) */
@@ -59,6 +62,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
 }) => {
   const [t1dClosePrice, setT1dClosePrice] = useState<number | "">("");
   const [t1dCloseReturn, setT1dCloseReturn] = useState<number | null>(null);
+  const [t1dLowPrice, setT1dLowPrice] = useState<number | "">("");
+  const [t1dHighPrice, setT1dHighPrice] = useState<number | "">("");
+  const [t1dVWAPPrice, setT1dVWAPPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [predictionResult, setPredictionResult] = useState(result);
 
@@ -110,6 +116,18 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
     }
   };
 
+  const handlePriceFieldChange =
+    (setter: (value: number | "") => void) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (value === "") {
+        setter("");
+        return;
+      }
+      const numeric = parseFloat(value);
+      setter(isNaN(numeric) ? "" : numeric);
+    };
+
   const handleRepredict = async () => {
     if (
       typeof t1dClosePrice === "number" &&
@@ -121,6 +139,12 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         const newResult = await onWeeklyMonthlyRepredict({
           t1dClosePrice,
           t1dCloseReturn,
+          t1dLowPrice:
+            typeof t1dLowPrice === "number" ? t1dLowPrice : undefined,
+          t1dHighPrice:
+            typeof t1dHighPrice === "number" ? t1dHighPrice : undefined,
+          t1dVWAPPrice:
+            typeof t1dVWAPPrice === "number" ? t1dVWAPPrice : undefined,
         });
         setPredictionResult(newResult);
       } catch (error) {
@@ -335,8 +359,50 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="flex-end" gap={2}>
-            <Box>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: "1px solid #e2e8f0",
+              background:
+                "linear-gradient(180deg, rgba(248,251,255,0.9) 0%, rgba(244,248,255,0.9) 100%)",
+            }}
+          >
+            <Box
+              display="grid"
+              gridTemplateColumns={{
+                xs: "1fr",
+                sm: "repeat(2, minmax(0, 1fr)) auto",
+              }}
+              columnGap={1.5}
+              rowGap={1}
+              alignItems="center"
+              mb={1.5}
+            >
+              <TextField
+                label="1st Day Low Price"
+                variant="outlined"
+                size="small"
+                type="number"
+                value={t1dLowPrice}
+                onChange={handlePriceFieldChange(setT1dLowPrice)}
+              />
+              <TextField
+                label="1st Day High Price"
+                variant="outlined"
+                size="small"
+                type="number"
+                value={t1dHighPrice}
+                onChange={handlePriceFieldChange(setT1dHighPrice)}
+              />
+              <TextField
+                label="1st Day VWAP"
+                variant="outlined"
+                size="small"
+                type="number"
+                value={t1dVWAPPrice}
+                onChange={handlePriceFieldChange(setT1dVWAPPrice)}
+              />
               <TextField
                 label="1st Day Close Price"
                 variant="outlined"
@@ -344,40 +410,54 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
                 type="number"
                 value={t1dClosePrice}
                 onChange={handleInputChange}
-                sx={{ minWidth: "220px" }}
               />
-              <Typography
-                variant="caption"
-                sx={{ mt: 0.5, display: "block" }}
+              <Button
+                variant="contained"
+                onClick={handleRepredict}
+                disabled={
+                  isLoading || t1dClosePrice === "" || t1dCloseReturn == null
+                }
+                sx={{
+                  height: 40,
+                  px: 3,
+                  gridRow: { sm: "1 / span 2" },
+                  gridColumn: { sm: 3 },
+                  alignSelf: "center",
+                  justifySelf: { xs: "stretch", sm: "end" },
+                  mt: { xs: 1, sm: 0 },
+                }}
               >
-                Calculated 1st Day Close Return:{" "}
-                {t1dCloseReturn != null
-                  ? `${t1dCloseReturn.toFixed(2)} %`
-                  : "—"}
-              </Typography>
-              {issuePrice != null && (
-                <Typography variant="caption" color="text.secondary">
-                  Issue Price: {issuePrice}
-                </Typography>
-              )}
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Predict"
+                )}
+              </Button>
             </Box>
 
-            <Button
-              variant="contained"
-              onClick={handleRepredict}
-              disabled={
-                isLoading ||
-                t1dClosePrice === "" ||
-                t1dCloseReturn == null
-              }
-              sx={{ height: "40px" }}
+            <Box
+              display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              justifyContent="space-between"
+              gap={1.5}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Predict"
-              )}
-            </Button>
+              <Box>
+                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+                  {issuePrice != null && (
+                    <Typography variant="caption" color="text.secondary">
+                      Issue Price: {issuePrice}
+                    </Typography>
+                  )}
+                  <Typography variant="caption">
+                    Calculated 1st Day Close Return:{" "}
+                    {t1dCloseReturn != null
+                      ? `${t1dCloseReturn.toFixed(2)} %`
+                      : "N/A"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
           </Box>
         </Box>
 

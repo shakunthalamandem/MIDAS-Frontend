@@ -110,7 +110,10 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
   const handleChange = (key: SectionKey, index: number, val: string) => {
     setValues((prev) => ({
       ...prev,
-      [key]: prev[key].map((s, i) => (i === index ? val : s)),
+      [key]:
+        prev[key].length === 0 && index === 0
+          ? [val]
+          : prev[key].map((s, i) => (i === index ? val : s)),
     }));
   };
 
@@ -181,6 +184,8 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
                 const isEditing = editing[key];
                 const isLoading = loading[key];
                 const state = status[key];
+                const renderValues =
+                  values[key].length || !isEditing ? values[key] : [""];
 
                 return (
                   <Box
@@ -240,7 +245,7 @@ const FOValuationWriteup: React.FC<ValuationWriteupProps> = ({
                     )}
 
                     <Box mt={1} display="flex" flexDirection="column" gap={1}>
-                      {values[key].map((sentence, idx) => (
+                      {renderValues.map((sentence, idx) => (
                         <Box
                           key={idx}
                           display="flex"

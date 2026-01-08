@@ -61,6 +61,9 @@ interface IPOFormValues {
 
   t1d_open_price: number | null;
   t1d_close_price: number | null;
+  t1d_low_price: number | null;
+  t1d_high_price: number | null;
+  t1d_vwap_price: number | null;
 
   // create new record flag
   request_from: string;
@@ -93,12 +96,14 @@ const IPOForm: React.FC<IPOFormProps> = ({
     message: string;
     severity: "error" | "success";
   }>({ open: false, message: "", severity: "error" });
-  const [prediction, setPrediction] = useState<
-    Record<string, PredictionModel> | null
-  >(null);
-  const [weeklyPrediction, setWeeklyPrediction] = useState<
-    Record<string, PredictionModel> | null
-  >(null);
+  const [prediction, setPrediction] = useState<Record<
+    string,
+    PredictionModel
+  > | null>(null);
+  const [weeklyPrediction, setWeeklyPrediction] = useState<Record<
+    string,
+    PredictionModel
+  > | null>(null);
   const hasSentimentBlocks = sentimentBlocks.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,6 +136,9 @@ const IPOForm: React.FC<IPOFormProps> = ({
       "t1d_return_from_bloomberg_category", // OPTIONAL
       "t1d_open_price",
       "t1d_close_price",
+      "t1d_low_price",
+      "t1d_high_price",
+      "t1d_vwap_price",
     ]);
 
     // Required fields (except optionalKeys)
@@ -313,12 +321,23 @@ const IPOForm: React.FC<IPOFormProps> = ({
   const handleWeeklyMonthlyRepredict = async ({
     t1dClosePrice,
     t1dCloseReturn,
+    t1dLowPrice,
+    t1dHighPrice,
+    t1dVWAPPrice,
   }: {
     t1dClosePrice: number;
     t1dCloseReturn: number;
+    t1dLowPrice?: number;
+    t1dHighPrice?: number;
+    t1dVWAPPrice?: number;
   }): Promise<Record<string, PredictionModel>> => {
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
+
+    // 🚨 Defensive check — this should NEVER fail now
+    if (!values.t1d_open_price) {
+      throw new Error("T+1D Open price missing. Run T+1D repredict first.");
+    }
 
     const payload = {
       ...values,
@@ -327,11 +346,15 @@ const IPOForm: React.FC<IPOFormProps> = ({
       Inflation: "Stable",
       Treasury: "Stable",
 
-      // RETURN (%) field (existing)
+      /* ---------- RETURNS ---------- */
       t1d_return_from_bloomberg_category: t1dCloseReturn,
 
-      // actual T+1D close PRICE
+      /* ---------- PRICES ---------- */
+      t1d_open_price: values.t1d_open_price,
       t1d_close_price: t1dClosePrice,
+      t1d_low_price: t1dLowPrice ?? values.t1d_low_price ?? null,
+      t1d_high_price: t1dHighPrice ?? values.t1d_high_price ?? null,
+      t1d_vwap_price: t1dVWAPPrice ?? values.t1d_vwap_price ?? null,
 
       expectations: ["T1W", "T1M"],
       request_from: "ai_ml",
@@ -347,26 +370,22 @@ const IPOForm: React.FC<IPOFormProps> = ({
         },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) throw new Error("Weekly/Monthly prediction failed");
 
-      const fullResponse = await res.json();
-      const fullData = fullResponse.predictions;
-
+      const response = await res.json();
+      const fullData = response.predictions || {};
       const simplified: Record<string, PredictionModel> = {};
+
       for (const key in fullData) {
         const item = fullData[key] || {};
-        const prediction = item.prediction ?? item.Prediction ?? null;
-        const accuracy = item.Accuracy ?? item.accuracy ?? null;
-        const confidence = item.Confidence ?? item.confidence ?? null;
-        const range = item.range ?? item.Range ?? null;
-        const explanation = item.explanation ?? item.Explanation ?? null;
         simplified[key] = {
-          prediction,
-          accuracy,
-          confidence,
+          prediction: item.prediction ?? null,
+          accuracy: item.accuracy ?? null,
+          confidence: item.confidence ?? null,
+          range: item.range ?? null,
+          explanation: item.explanation ?? null,
           model: "",
-          range,
-          explanation,
         };
       }
 
@@ -430,10 +449,18 @@ const IPOForm: React.FC<IPOFormProps> = ({
     let price: number | null = null;
     let ret: number | null = null;
 
-    if (rawPrice !== null && rawPrice !== undefined && !Number.isNaN(Number(rawPrice))) {
+    if (
+      rawPrice !== null &&
+      rawPrice !== undefined &&
+      !Number.isNaN(Number(rawPrice))
+    ) {
       price = Number(rawPrice);
     }
-    if (rawReturn !== null && rawReturn !== undefined && !Number.isNaN(Number(rawReturn))) {
+    if (
+      rawReturn !== null &&
+      rawReturn !== undefined &&
+      !Number.isNaN(Number(rawReturn))
+    ) {
       ret = Number(rawReturn);
     }
 
@@ -466,10 +493,18 @@ const IPOForm: React.FC<IPOFormProps> = ({
     let price: number | null = null;
     let ret: number | null = null;
 
-    if (rawPrice !== null && rawPrice !== undefined && !Number.isNaN(Number(rawPrice))) {
+    if (
+      rawPrice !== null &&
+      rawPrice !== undefined &&
+      !Number.isNaN(Number(rawPrice))
+    ) {
       price = Number(rawPrice);
     }
-    if (rawReturn !== null && rawReturn !== undefined && !Number.isNaN(Number(rawReturn))) {
+    if (
+      rawReturn !== null &&
+      rawReturn !== undefined &&
+      !Number.isNaN(Number(rawReturn))
+    ) {
       ret = Number(rawReturn);
     }
 

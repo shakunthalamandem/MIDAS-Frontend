@@ -89,6 +89,7 @@ import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
+import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 
 const AppRouters: React.FC = () => {
@@ -103,6 +104,7 @@ const AppRouters: React.FC = () => {
         <Route path="/user_log" element={<Logs />} />
         
         <Route path="/equity/ai_ml_models" element={<AuthGuard><EquityAiMlPage /></AuthGuard>} />
+        <Route path='/equity/apac_ai_ml_models'element={<AuthGuard><APACEquityAiMlPage /></AuthGuard>} />
         <Route path="/equity/ai_ml_results" element={<AuthGuard><AIMLResultsHome /></AuthGuard>} />
 
 

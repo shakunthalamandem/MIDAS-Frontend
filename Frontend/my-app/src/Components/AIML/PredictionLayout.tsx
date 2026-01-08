@@ -105,6 +105,9 @@ const defaultFOValues = {
 
   t1d_open_price: null as number | null,
   t1d_close_price: null as number | null,
+  t1d_low_price: null as number | null,
+  t1d_high_price: null as number | null,
+  t1d_vwap_price: null as number | null,
 
   request_from: "ai_ml",
   create_new_record: true,
@@ -136,6 +139,9 @@ const defaultIPOValues = {
 
   t1d_open_price: null as number | null,
   t1d_close_price: null as number | null,
+  t1d_low_price: null as number | null,
+  t1d_high_price: null as number | null,
+  t1d_vwap_price: null as number | null,
 
   // create new record flag
   request_from: "ai_ml",
@@ -262,6 +268,15 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
         t1d_close_price: toNullableNumber(
           pick(item, ["t1d_close_price"])
         ),
+        t1d_low_price: toNullableNumber(
+          pick(item, ["t1d_low_price"])
+        ),
+        t1d_high_price: toNullableNumber(
+          pick(item, ["t1d_high_price"])
+        ),
+        t1d_vwap_price: toNullableNumber(
+          pick(item, ["t1d_vwap_price"])
+        ),
 
         // returns (nullable)
         t1d_open_return_category: toNullableNumber(
@@ -336,6 +351,15 @@ const PredictionLayout: React.FC<PredictionLayoutProps> = ({
         ),
         t1d_close_price: toNullableNumber(
           pick(item, ["t1d_close_price"])
+        ),
+        t1d_low_price: toNullableNumber(
+          pick(item, ["t1d_low_price"])
+        ),
+        t1d_high_price: toNullableNumber(
+          pick(item, ["t1d_high_price"])
+        ),
+        t1d_vwap_price: toNullableNumber(
+          pick(item, ["t1d_vwap_price"])
         ),
 
         request_from: "ai_ml",
