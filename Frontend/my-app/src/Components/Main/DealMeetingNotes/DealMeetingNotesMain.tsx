@@ -14,7 +14,7 @@ import MeetingDealNoteCreate from "./MeetingDealNoteCreate";
 
 export interface DealSearchResult {
   ticker: string;
-  name?: string;
+  name?: string; // only for display
   dealId?: string;
   pricingDate?: string;
 }
@@ -44,7 +44,7 @@ const DealMeetingNotesMain: React.FC = () => {
   };
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [options, setOptions] = useState<DealSearchResult[]>([]);
+  const [allDeals, setAllDeals] = useState<DealSearchResult[]>([]);
   const [selectedDeal, setSelectedDeal] = useState<DealSearchResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -60,15 +60,9 @@ const DealMeetingNotesMain: React.FC = () => {
     const fetchDeals = async () => {
       setSearching(true);
       setSearchError(null);
-      try {
-        const term = searchTerm.trim();
-        const params = new URLSearchParams();
-        if (term) params.set("search", term);
-        const url =
-          params.toString().length > 0
-            ? `${apiUrl}/api/get_deal_unified_data/?${params.toString()}`
-            : `${apiUrl}/api/get_deal_unified_data/`;
 
+      try {
+        const url = `${apiUrl}/api/get_deal_unified_data/`;
         const response = await fetch(url, {
           headers: {
             "Content-Type": "application/json",
@@ -100,22 +94,21 @@ const DealMeetingNotesMain: React.FC = () => {
           }))
           .filter((item) => item.ticker);
 
-        setOptions(normalized);
+        setAllDeals(normalized);
       } catch (err: any) {
         if (err.name === "AbortError") return;
-        console.error("Error searching deals:", err);
+        console.error("Error fetching deals:", err);
         setSearchError("Unable to fetch deals. Please try again.");
       } finally {
         setSearching(false);
       }
     };
 
-    const debounceId = setTimeout(fetchDeals, 400);
-    return () => {
-      clearTimeout(debounceId);
-      controller.abort();
-    };
-  }, [apiUrl, token, searchTerm]);
+    fetchDeals();
+    return () => controller.abort();
+  }, [apiUrl, token]);
+
+  const norm = (s: string) => (s || "").replace(/\s+/g, "").trim().toLowerCase();
 
   return (
     <>
@@ -144,8 +137,12 @@ const DealMeetingNotesMain: React.FC = () => {
         <Box display="flex" justifyContent="center" mb={3}>
           <Box sx={{ width: { xs: "100%", sm: 380, md: 440 } }}>
             <Autocomplete
-              options={options}
+              options={allDeals} // ✅ always full list
               value={selectedDeal}
+              inputValue={searchTerm}
+              loading={searching}
+              autoHighlight // ✅ highlights first match like "find"
+              noOptionsText={searchTerm ? "No matches found" : "Type a ticker to search"}
               getOptionLabel={(option) => {
                 const dateLabel = formatPricingDate(option.pricingDate);
                 return `${option.ticker}${dateLabel ? ` (${dateLabel})` : ""}`;
@@ -153,16 +150,41 @@ const DealMeetingNotesMain: React.FC = () => {
               isOptionEqualToValue={(option, value) =>
                 option.ticker === value.ticker && (option.dealId ?? "") === (value.dealId ?? "")
               }
-              inputValue={searchTerm}
-              onInputChange={(_, value) => setSearchTerm(value)}
-              onChange={(_, value) => {
-                setSelectedDeal(value);
-                if (value?.ticker) {
-                  setSearchTerm(value.ticker);
+              onInputChange={(_, value, reason) => {
+                // ✅ same pattern as your RecentSearchBar
+                if (reason === "input" || reason === "clear") {
+                  setSearchTerm(value || "");
                 }
               }}
-              loading={searching}
-              noOptionsText="No matches found"
+              onChange={(_, value) => {
+                setSelectedDeal(value);
+                if (value?.ticker) setSearchTerm(value.ticker);
+              }}
+              // ✅ TICKER ONLY: exact > startsWith > includes. If no match => []
+              filterOptions={(opts, state) => {
+                const term = norm(state.inputValue || "");
+                if (!term) return [];
+
+                const t = (d: DealSearchResult) => norm(d.ticker);
+
+                const exact = opts.filter((d) => t(d) === term);
+                if (exact.length) {
+                  return exact.sort((a, b) => t(a).localeCompare(t(b)));
+                }
+
+                const starts = opts.filter((d) => t(d).startsWith(term));
+                const includes = opts.filter(
+                  (d) => !t(d).startsWith(term) && t(d).includes(term)
+                );
+
+                // If nothing matches ticker, return NOTHING (no other tickers)
+                if (!starts.length && !includes.length) return [];
+
+                const sortedStarts = starts.sort((a, b) => t(a).localeCompare(t(b)));
+                const sortedIncludes = includes.sort((a, b) => t(a).localeCompare(t(b)));
+
+                return [...sortedStarts, ...sortedIncludes];
+              }}
               renderOption={(props, option) => (
                 <li {...props} key={`${option.ticker}-${option.dealId ?? option.name ?? "deal"}`}>
                   <Box display="flex" flexDirection="column">
@@ -210,6 +232,7 @@ const DealMeetingNotesMain: React.FC = () => {
                 />
               )}
             />
+
             {searchError ? (
               <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
                 {searchError}
