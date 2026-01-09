@@ -61,6 +61,8 @@ export type FormState = {
 };
 
 type MeetingEntry = {
+  id?: number | string;
+  meetingKey: string;
   form: FormState;
   isNew?: boolean;
 };
@@ -89,15 +91,33 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
   const [backupState, setBackupState] = useState<FormState | null>(null);
   const [meetings, setMeetings] = useState<MeetingEntry[]>([]);
   const [selectedMeetingIndex, setSelectedMeetingIndex] = useState(0);
+  const [currentMeetingId, setCurrentMeetingId] = useState<number | string | null>(null);
+  const [currentMeetingKey, setCurrentMeetingKey] = useState<string>("meeting_overview");
+  const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [noDataFound, setNoDataFound] = useState(false);
   const shouldShowEmptyState = noDataFound && meetings.length === 0;
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const getNextMeetingKey = () => {
+    if (meetings.length === 0) return "meeting_overview";
+    const regex = /^meeting_overview(\d+)?$/i;
+    const maxIndex = meetings.reduce((max, entry) => {
+      const match = entry.meetingKey.match(regex);
+      if (!match) return max;
+      const num = match[1] ? parseInt(match[1], 10) : 1;
+      return Number.isNaN(num) ? max : Math.max(max, num);
+    }, 1);
+    const nextIndex = maxIndex + 1;
+    return nextIndex === 1 ? "meeting_overview" : `meeting_overview${nextIndex}`;
+  };
 
   const applyMeetingToForm = (entry: MeetingEntry) => {
     setMeetingOverview(entry.form.meetingOverview);
     setInvestmentSnapshot(entry.form.investmentSnapshot);
     setBusinessStrategy(entry.form.businessStrategy);
     setCapitalStructure(entry.form.capitalStructure);
+    setCurrentMeetingId(entry.id ?? null);
+    setCurrentMeetingKey(entry.meetingKey);
     setIsEditing(false);
     setBackupState(null);
   };
@@ -109,6 +129,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     strategy: any,
     capStruct: any
   ): MeetingEntry => ({
+    id: record?.id ?? record?.pk ?? null,
+    meetingKey: overview?.__key ?? "meeting_overview",
     form: {
       meetingOverview: {
         ticker: (record?.ticker || selectedDeal?.ticker || "").toUpperCase(),
@@ -161,8 +183,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       return [buildMeetingFromOverview({}, record, snapshot, strategy, capStruct)];
     }
 
-    return overviewEntries.map(([, overview]) =>
-      buildMeetingFromOverview(overview, record, snapshot, strategy, capStruct)
+    return overviewEntries.map(([key, overview]) =>
+      buildMeetingFromOverview({ ...(overview as any), __key: key }, record, snapshot, strategy, capStruct)
     );
   };
 
@@ -185,6 +207,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     const controller = new AbortController();
     const loadNotes = async () => {
       try {
+        setLoadingMeetings(true);
         setStatus(null);
         setNoDataFound(false);
         const response = await fetch(`${apiUrl}/api/get_deal_meeting_notes/`, {
@@ -206,6 +229,9 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         if (data?.message && typeof data.message === "string") {
           setNoDataFound(true);
           setMeetings([]);
+          setCurrentMeetingId(null);
+          setCurrentMeetingKey("meeting_overview");
+          setLoadingMeetings(false);
           return;
         }
 
@@ -220,6 +246,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         if (err.name === "AbortError") return;
         console.error("Failed to load meeting notes:", err);
         setStatus({ kind: "error", message: err?.message || "Unable to load meeting notes." });
+      } finally {
+        setLoadingMeetings(false);
       }
     };
 
@@ -228,7 +256,9 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
   }, [apiUrl, selectedDeal, token, refreshKey]);
 
   const createNewMeetingFromTemplate = (resetExisting = false) => {
+    const meetingKey = getNextMeetingKey();
     const templateMeeting: MeetingEntry = {
+      meetingKey,
       form: {
         meetingOverview: {
           ...initialMeetingOverview,
@@ -245,6 +275,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     setMeetings(updated);
     setSelectedMeetingIndex(updated.length - 1);
     applyMeetingToForm(templateMeeting);
+    setCurrentMeetingId(null);
     setIsEditing(true);
     setNoDataFound(false);
   };
@@ -275,6 +306,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     setInvestmentSnapshot(initialInvestmentSnapshot);
     setBusinessStrategy(initialBusinessStrategy);
     setCapitalStructure(initialCapitalStructure);
+    setCurrentMeetingKey("meeting_overview");
   };
 
   const handleSubmit = async () => {
@@ -284,8 +316,13 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       return;
     }
 
+    const currentEntry = meetings[selectedMeetingIndex];
+    const isNewMeeting = currentEntry?.isNew ?? meetings.length === 0;
+    const hasExistingMeetingInDb = meetings.some((m) => !m.isNew);
+    const shouldCreate = isNewMeeting && !hasExistingMeetingInDb;
+
     const normalizedTicker = meetingOverview.ticker.trim();
-    const pricingDate = meetingOverview.date || selectedDeal?.pricingDate || "";
+    const pricingDate = selectedDeal?.pricingDate || meetingOverview.date || "";
 
     if (!normalizedTicker) {
       setStatus({ kind: "error", message: "Ticker is required (select from search)." });
@@ -301,7 +338,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       ticker: normalizedTicker,
       pricing_date: pricingDate,
       description: {
-        meeting_overview: {
+        [currentMeetingKey]: {
           name: meetingOverview.name,
           date: meetingOverview.date,
           location: meetingOverview.location,
@@ -315,9 +352,17 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       },
     };
 
+    if (!isNewMeeting && currentMeetingId) {
+      (payload as any).id = currentMeetingId;
+    }
+
+    const endpoint = shouldCreate
+      ? `${apiUrl}/api/create_deal_meeting_notes/`
+      : `${apiUrl}/api/update_deal_meeting_notes/`;
+
     try {
       setSubmitting(true);
-      const response = await fetch(`${apiUrl}/api/create_deal_meeting_notes/`, {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -328,16 +373,27 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Failed to create meeting notes");
+        throw new Error(
+          errorText ||
+            (isNewMeeting ? "Failed to create meeting notes" : "Failed to update meeting notes")
+        );
       }
 
-      setStatus({ kind: "success", message: "Meeting notes created successfully." });
+      setStatus({
+        kind: "success",
+        message: shouldCreate
+          ? "Meeting notes created successfully."
+          : "Meeting notes updated successfully.",
+      });
       setIsEditing(false);
       setNoDataFound(false);
       setRefreshKey((key) => key + 1);
     } catch (err: any) {
       console.error("Failed to submit meeting notes:", err);
-      setStatus({ kind: "error", message: err?.message || "Submission failed. Please try again." });
+      setStatus({
+        kind: "error",
+        message: err?.message || "Submission failed. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -396,6 +452,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
                   applyMeetingToForm(updated[0]);
                 } else {
                   applyMeetingToForm({
+                    meetingKey: "meeting_overview",
                     form: {
                       meetingOverview: initialMeetingOverview,
                       investmentSnapshot: initialInvestmentSnapshot,
@@ -450,7 +507,24 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         </Paper>
       ) : null}
 
-      {!shouldShowEmptyState ? (
+      {loadingMeetings ? (
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 2.5,
+            borderRadius: 2,
+            borderColor: "rgba(0,80,200,0.15)",
+            background: "rgba(0,32,96,0.03)",
+            textAlign: "center",
+          }}
+        >
+          <Typography fontWeight={700} color="#002060">
+            Loading meeting notes...
+          </Typography>
+        </Paper>
+      ) : null}
+
+      {!loadingMeetings && !shouldShowEmptyState ? (
         <>
           <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
             {!isEditing ? (
