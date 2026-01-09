@@ -162,6 +162,26 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     );
   };
 
+  const parseKeyLevel = (value: string) => {
+    if (!value) return { comparator: "", amount: "" };
+    const parts = value.trim().split(/\s+/);
+    const first = parts[0]?.toLowerCase();
+    if (first === "greater" || first === "lesser") {
+      return { comparator: first, amount: parts.slice(1).join(" ") };
+    }
+    return { comparator: "", amount: value };
+  };
+
+  const buildKeyLevel = (comparator: string, amount: string) => {
+    if (!comparator && !amount) return "";
+    if (!comparator) return amount;
+    return amount ? `${comparator} ${amount}` : comparator;
+  };
+
+  const { comparator: keyLevelComparator, amount: keyLevelAmount } = parseKeyLevel(
+    investmentSnapshot.keyLevel
+  );
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} md={6}>
@@ -238,9 +258,43 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
-              {renderField("Key level", investmentSnapshot.keyLevel, (val) =>
-                setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
-              )}
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="Key level"
+                    value={keyLevelComparator}
+                    onChange={(e) =>
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        keyLevel: buildKeyLevel(e.target.value, keyLevelAmount),
+                      }))
+                    }
+                    fullWidth
+                    size="small"
+                    disabled={!isEditing}
+                  >
+                    <MenuItem value="greater">greater</MenuItem>
+                    <MenuItem value="lesser">lesser</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Value"
+                    value={keyLevelAmount}
+                    onChange={(e) =>
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        keyLevel: buildKeyLevel(keyLevelComparator, e.target.value),
+                      }))
+                    }
+                    fullWidth
+                    size="small"
+                    type="number"
+                    disabled={!isEditing}
+                  />
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField("Possible size", investmentSnapshot.possibleSize, (val) =>
@@ -249,10 +303,10 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             </Grid>
             <Grid item xs={12}>
               {renderField(
-                "Results",
+                "Results date",
                 investmentSnapshot.results,
                 (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
-                { multiline: true }
+                { type: "date" }
               )}
             </Grid>
           </Grid>
@@ -297,12 +351,23 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
             </Grid>
             <Grid item xs={12}>
-              {renderField(
-                "Possible opportunistic deal",
-                businessStrategy.opportunisticDeal,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
-                { multiline: true }
-              )}
+              <TextField
+                select
+                label="Possible opportunistic deal"
+                value={businessStrategy.opportunisticDeal}
+                onChange={(e) =>
+                  setBusinessStrategy((prev) => ({
+                    ...prev,
+                    opportunisticDeal: e.target.value,
+                  }))
+                }
+                fullWidth
+                size="small"
+                disabled={!isEditing}
+              >
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </TextField>
             </Grid>
           </Grid>
         </Paper>
