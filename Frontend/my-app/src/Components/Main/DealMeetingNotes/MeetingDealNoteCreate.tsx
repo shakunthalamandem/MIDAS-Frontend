@@ -278,7 +278,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         meetingOverview: {
           ...initialMeetingOverview,
           ticker: selectedDeal?.ticker?.toUpperCase() || "",
-          date: selectedDeal?.pricingDate || "",
+          date: "",
         },
         investmentSnapshot: initialInvestmentSnapshot,
         businessStrategy: initialBusinessStrategy,
@@ -382,6 +382,16 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
     if (!normalizedTicker) {
       setStatus({ kind: "error", message: "Ticker is required (select from search)." });
+      return;
+    }
+
+    if (!meetingOverview.name.trim()) {
+      setStatus({ kind: "error", message: "Meeting name is required." });
+      return;
+    }
+
+    if (!meetingOverview.date.trim()) {
+      setStatus({ kind: "error", message: "Meeting date is required." });
       return;
     }
 
