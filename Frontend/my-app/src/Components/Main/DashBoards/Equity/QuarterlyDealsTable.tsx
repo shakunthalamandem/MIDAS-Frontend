@@ -183,7 +183,7 @@ const QuarterlyDealsTable = () => {
               p: 1.5,
             }}
           >
-            Skew Table - IPO and FO Deals from 2023 to 2025 for H1
+            Skew Table - IPO and FO Deals from 2023 to 2025 
           </Typography>
 
           {/* <style>
