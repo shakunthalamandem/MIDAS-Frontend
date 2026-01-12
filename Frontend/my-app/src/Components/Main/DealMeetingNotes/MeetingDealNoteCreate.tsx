@@ -1,19 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { Alert, Paper, Stack } from "@mui/material";
 import type { DealSearchResult } from "./DealMeetingNotesMain";
 import MeetingNoteForm, {
   type MeetingOverview,
@@ -21,6 +7,10 @@ import MeetingNoteForm, {
   type BusinessStrategy,
   type CapitalStructure,
 } from "./MeetingNoteForm";
+import MeetingTabsBar from "./MeetingTabsBar";
+import MeetingStatusPanels from "./MeetingStatusPanels";
+import MeetingEditorActions from "./MeetingEditorActions";
+import UnsavedChangesDialog from "./UnsavedChangesDialog";
 
 type Status =
   | { kind: "success"; message: string }
@@ -495,198 +485,57 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
   return (
     <Stack spacing={3}>
-      {meetings.length > 0 ? (
-        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-          {meetings.map((_, idx) => (
-            <Button
-              key={`meeting-${idx}`}
-              variant={idx === selectedMeetingIndex ? "contained" : "outlined"}
-              onClick={() => {
-                requestDiscardConfirm(() => {
-                  setSelectedMeetingIndex(idx);
-                  applyMeetingToForm(meetings[idx]);
-                });
-              }}
-              sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                px: 2,
-                background:
-                  idx === selectedMeetingIndex
-                    ? "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)"
-                    : undefined,
-                color: idx === selectedMeetingIndex ? "#fff" : undefined,
-                borderColor: idx === selectedMeetingIndex ? "transparent" : "#0062ff",
-              }}
-            >
-              {`Meeting ${idx + 1}`}
-            </Button>
-          ))}
-          <Button
-            variant="outlined"
-            onClick={() => createNewMeetingFromTemplate()}
-            sx={{
-              borderRadius: 999,
-              textTransform: "none",
-              px: 2,
-              borderColor: "#f28c28",
-                color: "#f28c28",
-              }}
-            >
-              + New Meeting Note
-            </Button>
-          {meetings[selectedMeetingIndex]?.isNew ? (
-            <Button
-              variant="text"
-              color="error"
-              onClick={() => {
-                requestDiscardConfirm(() => {
-                  const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
-                  setMeetings(updated);
-                  const nextIndex = updated.length > 0 ? 0 : 0;
-                  setSelectedMeetingIndex(nextIndex);
-                  if (updated[0]) {
-                    applyMeetingToForm(updated[0]);
-                  } else {
-                    applyMeetingToForm({
-                      meetingKey: "meeting1",
-                      form: {
-                        meetingOverview: initialMeetingOverview,
-                        investmentSnapshot: initialInvestmentSnapshot,
-                        businessStrategy: initialBusinessStrategy,
-                        capitalStructure: initialCapitalStructure,
-                      },
-                      isNew: true,
-                    });
-                  }
-                });
-              }}
-              sx={{ textTransform: "none" }}
-            >
-              Cancel New Meeting
-            </Button>
-          ) : null}
-        </Stack>
-      ) : null}
+      <MeetingTabsBar
+        totalMeetings={meetings.length}
+        selectedIndex={selectedMeetingIndex}
+        onSelectIndex={(idx) =>
+          requestDiscardConfirm(() => {
+            setSelectedMeetingIndex(idx);
+            applyMeetingToForm(meetings[idx]);
+          })
+        }
+        onAddNew={() => createNewMeetingFromTemplate()}
+        showCancelNew={Boolean(meetings[selectedMeetingIndex]?.isNew)}
+        onCancelNew={() => {
+          requestDiscardConfirm(() => {
+            const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
+            setMeetings(updated);
+            const nextIndex = updated.length > 0 ? 0 : 0;
+            setSelectedMeetingIndex(nextIndex);
+            if (updated[0]) {
+              applyMeetingToForm(updated[0]);
+            } else {
+              applyMeetingToForm({
+                meetingKey: "meeting1",
+                form: {
+                  meetingOverview: initialMeetingOverview,
+                  investmentSnapshot: initialInvestmentSnapshot,
+                  businessStrategy: initialBusinessStrategy,
+                  capitalStructure: initialCapitalStructure,
+                },
+                isNew: true,
+              });
+            }
+          });
+        }}
+      />
 
-      {noDataFound ? (
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2.5,
-            borderRadius: 2,
-            borderColor: "rgba(0,80,200,0.25)",
-            background: "linear-gradient(90deg, rgba(0,98,255,0.06), rgba(0,194,162,0.06))",
-          }}
-        >
-          <Stack spacing={1.5} direction={{ xs: "column", sm: "row" }} alignItems="center">
-            <Stack flex={1} spacing={0.5}>
-              <Typography fontWeight={700} color="#002060">
-                Meeting notes do not exist for this ticker.
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Create a new meeting note using the latest template.
-              </Typography>
-            </Stack>
-            <Button
-              variant="contained"
-              onClick={() => createNewMeetingFromTemplate(true)}
-              sx={{
-                background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                color: "#fff",
-                borderRadius: 999,
-                px: 2.5,
-                textTransform: "none",
-              }}
-            >
-              Create Meeting Note
-            </Button>
-          </Stack>
-        </Paper>
-      ) : null}
-
-      {loadingMeetings ? (
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2.5,
-            borderRadius: 2,
-            borderColor: "rgba(0,80,200,0.15)",
-            background: "rgba(0,32,96,0.03)",
-            textAlign: "center",
-          }}
-        >
-          <Typography fontWeight={700} color="#002060">
-            Loading meeting notes...
-          </Typography>
-        </Paper>
-      ) : null}
+      <MeetingStatusPanels
+        noDataFound={noDataFound}
+        loading={loadingMeetings}
+        onCreateNew={() => createNewMeetingFromTemplate(true)}
+      />
 
       {!loadingMeetings && !shouldShowEmptyState ? (
         <>
-          <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
-            {!isEditing ? (
-              <Button
-                variant="contained"
-                startIcon={<EditOutlinedIcon />}
-                onClick={startEdit}
-                sx={{
-                  background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                  color: "#fff",
-                  borderRadius: 999,
-                  px: 2.5,
-                }}
-              >
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveOutlinedIcon />}
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  sx={{
-                    background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                    color: "#fff",
-                    borderRadius: 999,
-                    px: 2.5,
-                    boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
-                  }}
-                >
-                  Save Changes
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<CloseOutlinedIcon />}
-                  onClick={handleCancel}
-                  disabled={submitting}
-                  sx={{
-                    borderColor: "#0050c8",
-                    color: "#0050c8",
-                    borderRadius: 999,
-                    px: 2.5,
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<ReplayOutlinedIcon />}
-                  onClick={handleReset}
-                  disabled={submitting}
-                  sx={{
-                    borderColor: "#f28c28",
-                    color: "#f28c28",
-                    borderRadius: 999,
-                    px: 2.5,
-                  }}
-                >
-                  Reset
-                </Button>
-              </>
-            )}
-          </Stack>
+          <MeetingEditorActions
+            isEditing={isEditing}
+            submitting={submitting}
+            onEdit={startEdit}
+            onSave={handleSubmit}
+            onCancel={handleCancel}
+            onReset={handleReset}
+          />
 
           {status ? (
             <Alert severity={status.kind} onClose={() => setStatus(null)}>
@@ -707,25 +556,11 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
           />
         </>
       ) : null}
-      <Dialog
+      <UnsavedChangesDialog
         open={confirmOpen}
         onClose={handleConfirmClose}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle><Typography color="#002060" variant="h6" align="center">Unsaved Changes</Typography></DialogTitle>
-        <DialogContent>
-          <Typography>You have unsaved changes. Do you want to discard them?</Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleConfirmClose} variant="outlined">
-            Keep Editing
-          </Button>
-          <Button onClick={handleConfirmDiscard} variant="contained" color="error">
-            Discard Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onDiscard={handleConfirmDiscard}
+      />
     </Stack>
   );
 };
