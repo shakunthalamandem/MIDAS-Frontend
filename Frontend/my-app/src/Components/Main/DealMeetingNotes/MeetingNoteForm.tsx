@@ -73,6 +73,7 @@ const sectionCardSx = {
   backgroundColor: "#ffffff",
   boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
   height: "100%",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
 };
@@ -316,7 +317,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+        <Grid item xs={12} md={4} sx={{ display: "flex", mb: { xs: 2, md: 0 } }}>
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
