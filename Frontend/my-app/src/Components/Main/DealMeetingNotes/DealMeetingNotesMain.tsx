@@ -160,7 +160,7 @@ const DealMeetingNotesMain: React.FC = () => {
         Deal Meeting Notes  📊
       </Typography>
 
-      <Container maxWidth={false} sx={{ px: { xs: 1.5, md: 3 }, maxWidth: 1600 }}>
+      <Container maxWidth="xl" style={{marginBottom:'10px'}}>
         <Box display="flex" justifyContent="center" mb={3}>
           <Box sx={{ width: { xs: "100%", sm: 380, md: 440 } }}>
             <Autocomplete
