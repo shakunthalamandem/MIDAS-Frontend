@@ -1,5 +1,14 @@
 import React from "react";
-import { Grid, Paper, TextField, Typography } from "@mui/material";
+import {
+  Checkbox,
+  Grid,
+  ListItemText,
+  MenuItem,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 export type MeetingOverview = {
   ticker: string;
   name: string;
@@ -45,6 +54,25 @@ const baseCardStyles = {
   boxShadow: "0 10px 22px rgba(0,0,0,0.08)",
 };
 
+const reasonOptions = [
+  "Pre earnings cash burn",
+  "de-leverage",
+  "debt expiry",
+  "growth capex",
+  "acquisition",
+];
+
+const catalystOptions = ["announcement", "Trial results"];
+
+const potentialSellerOptions = [
+  "Chairman",
+  "PE",
+  "Pre IPO",
+  "Cross shareholding",
+  "Existing substantial shareholder",
+  "Lock up expiry",
+];
+
 type FormProps = {
   meetingOverview: MeetingOverview;
   setMeetingOverview: React.Dispatch<React.SetStateAction<MeetingOverview>>;
@@ -87,6 +115,71 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       InputProps={options?.readOnly ? { readOnly: true } : undefined}
       disabled={!isEditing && !options?.readOnly}
     />
+  );
+
+  const renderMultiSelectField = (
+    label: string,
+    value: string,
+    onChange: (val: string) => void,
+    options: string[]
+  ) => {
+    const selectedValues = value
+      ? value
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+      : [];
+
+    const handleChange = (event: SelectChangeEvent<string[]>) => {
+      const selected = Array.isArray(event.target.value)
+        ? event.target.value
+        : (event.target.value as string).split(",");
+      const normalized = selected.map((item) => item.trim()).filter(Boolean);
+      onChange(normalized.join(", "));
+    };
+
+    return (
+      <TextField
+        select
+        label={label}
+        value={selectedValues}
+        onChange={(event) => handleChange(event as SelectChangeEvent<string[]>)}
+        SelectProps={{
+          multiple: true,
+          renderValue: (selected) => (selected as string[]).join(", "),
+        }}
+        fullWidth
+        size="small"
+        disabled={!isEditing}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            <Checkbox checked={selectedValues.includes(option)} />
+            <ListItemText primary={option} />
+          </MenuItem>
+        ))}
+      </TextField>
+    );
+  };
+
+  const parseKeyLevel = (value: string) => {
+    if (!value) return { comparator: "", amount: "" };
+    const parts = value.trim().split(/\s+/);
+    const first = parts[0]?.toLowerCase();
+    if (first === "greater" || first === "lesser") {
+      return { comparator: first, amount: parts.slice(1).join(" ") };
+    }
+    return { comparator: "", amount: value };
+  };
+
+  const buildKeyLevel = (comparator: string, amount: string) => {
+    if (!comparator && !amount) return "";
+    if (!comparator) return amount;
+    return amount ? `${comparator} ${amount}` : comparator;
+  };
+
+  const { comparator: keyLevelComparator, amount: keyLevelAmount } = parseKeyLevel(
+    investmentSnapshot.keyLevel
   );
 
   return (
@@ -165,9 +258,43 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
-              {renderField("Key level", investmentSnapshot.keyLevel, (val) =>
-                setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
-              )}
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="Key level"
+                    value={keyLevelComparator}
+                    onChange={(e) =>
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        keyLevel: buildKeyLevel(e.target.value, keyLevelAmount),
+                      }))
+                    }
+                    fullWidth
+                    size="small"
+                    disabled={!isEditing}
+                  >
+                    <MenuItem value="greater">greater</MenuItem>
+                    <MenuItem value="lesser">lesser</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Value"
+                    value={keyLevelAmount}
+                    onChange={(e) =>
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        keyLevel: buildKeyLevel(keyLevelComparator, e.target.value),
+                      }))
+                    }
+                    fullWidth
+                    size="small"
+                    type="number"
+                    disabled={!isEditing}
+                  />
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField("Possible size", investmentSnapshot.possibleSize, (val) =>
@@ -176,10 +303,10 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             </Grid>
             <Grid item xs={12}>
               {renderField(
-                "Results",
+                "Results date",
                 investmentSnapshot.results,
                 (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
-                { multiline: true }
+                { type: "date" }
               )}
             </Grid>
           </Grid>
@@ -201,11 +328,11 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
             </Grid>
             <Grid item xs={12}>
-              {renderField(
-                "Catalysts (announcements, trial results)",
+              {renderMultiSelectField(
+                "Catalysts",
                 businessStrategy.catalysts,
                 (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
-                { multiline: true }
+                catalystOptions
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -216,19 +343,31 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
-              {renderField(
-                "Reason for raise (cash burn, deleveraging, capex, acquisition)",
+              {renderMultiSelectField(
+                "Reason for raise",
                 businessStrategy.reasonForRaise,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val }))
+                (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val })),
+                reasonOptions
               )}
             </Grid>
             <Grid item xs={12}>
-              {renderField(
-                "Possible opportunistic deal",
-                businessStrategy.opportunisticDeal,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
-                { multiline: true }
-              )}
+              <TextField
+                select
+                label="Possible opportunistic deal"
+                value={businessStrategy.opportunisticDeal}
+                onChange={(e) =>
+                  setBusinessStrategy((prev) => ({
+                    ...prev,
+                    opportunisticDeal: e.target.value,
+                  }))
+                }
+                fullWidth
+                size="small"
+                disabled={!isEditing}
+              >
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </TextField>
             </Grid>
           </Grid>
         </Paper>
@@ -241,8 +380,11 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              {renderField("Potential sellers", capitalStructure.potentialSellers, (val) =>
-                setCapitalStructure((prev) => ({ ...prev, potentialSellers: val }))
+              {renderMultiSelectField(
+                "Potential sellers",
+                capitalStructure.potentialSellers,
+                (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
+                potentialSellerOptions
               )}
             </Grid>
             <Grid item xs={12} sm={6}>

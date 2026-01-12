@@ -456,12 +456,14 @@ const MDDFilters: React.FC<FiltersProps> = ({ filtersData, apiName }) => {
               </Typography>
 
               <Box display="flex" alignItems="center" gap={1.2}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: "#002060", whiteSpace: "nowrap" }}
-                >
-                  Data as of: {formatDateWithOrdinal(maxPricingDate) || "--"}
-                </Typography>
+                {apiName !== "gap_analysis" ? (
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "#002060", whiteSpace: "nowrap" }}
+                  >
+                    Data as of: {formatDateWithOrdinal(maxPricingDate) || "--"}
+                  </Typography>
+                ) : null}
 
                 <LoadingButton
                   variant="contained"
