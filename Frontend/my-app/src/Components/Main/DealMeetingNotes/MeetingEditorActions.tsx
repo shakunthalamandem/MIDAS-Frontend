@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Stack } from "@mui/material";
+import { Button, Paper, Stack } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
@@ -12,6 +12,7 @@ type MeetingEditorActionsProps = {
   onSave: () => void;
   onCancel: () => void;
   onReset: () => void;
+  container?: boolean;
 };
 
 const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
@@ -21,8 +22,9 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
   onSave,
   onCancel,
   onReset,
+  container = true,
 }) => {
-  return (
+  const content = (
     <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
       {!isEditing ? (
         <Button
@@ -34,6 +36,11 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
             color: "#fff",
             borderRadius: 999,
             px: 2.5,
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            "&:hover": {
+              transform: "translateY(-1px)",
+              boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
+            },
           }}
         >
           Edit
@@ -51,6 +58,11 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
               borderRadius: 999,
               px: 2.5,
               boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 8px 16px rgba(0,0,0,0.16)",
+              },
             }}
           >
             Save Changes
@@ -65,6 +77,11 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
               color: "#0050c8",
               borderRadius: 999,
               px: 2.5,
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
+              },
             }}
           >
             Cancel
@@ -79,6 +96,11 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
               color: "#f28c28",
               borderRadius: 999,
               px: 2.5,
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 6px 12px rgba(0,0,0,0.08)",
+              },
             }}
           >
             Reset
@@ -86,6 +108,22 @@ const MeetingEditorActions: React.FC<MeetingEditorActionsProps> = ({
         </>
       )}
     </Stack>
+  );
+
+  if (!container) return content;
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.5,
+        borderRadius: 999,
+        border: "1px solid #d8deef",
+        backgroundColor: "rgba(0,32,96,0.04)",
+      }}
+    >
+      {content}
+    </Paper>
   );
 };
 

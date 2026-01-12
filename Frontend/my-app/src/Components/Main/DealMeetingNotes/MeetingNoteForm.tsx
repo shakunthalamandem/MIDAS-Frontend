@@ -67,11 +67,14 @@ type FormProps = {
 };
 
 const sectionCardSx = {
-  p: { xs: 2, md: 2.5 },
-  borderRadius: 2.5,
+  p: { xs: 1.5, md: 2 },
+  borderRadius: 2,
   border: "1px solid #d9deeb",
   backgroundColor: "#ffffff",
-  boxShadow: "0 10px 20px rgba(0,0,0,0.08)",
+  boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
 };
 
 const reasonOptions = [
@@ -213,37 +216,41 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       >
         {icon}
       </Box>
-      <Typography variant="h6" fontWeight={700} color="#002060">
+      <Typography variant="h6" fontWeight={700} color="#002060" sx={{ fontSize: "1rem" }}>
         {title}
       </Typography>
     </Stack>
   );
 
   return (
-    <Stack spacing={3}>
-      <Typography variant="h6" fontWeight={700} color="#1c2a4d">
-        Meeting Notes
-      </Typography>
+    <Stack spacing={2}>
+              {/* <Typography fontWeight={600} color="#002060" variant="h6" align="center">
+                Meeting notes for this Ticker {meetingOverview.ticker || "--"}
+              </Typography> */}
       <Divider />
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={sectionCardSx}>
+      <Grid
+        container
+        spacing={1}
+        columnSpacing={{ xs: 1, md: 1 }}
+        rowSpacing={{ xs: 1, md: 1 }}
+        alignItems="stretch"
+      >
+        <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+          <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
                 backgroundColor: "rgba(0,80,200,0.12)",
-                borderRadius: 2,
-                py: 1,
-                px: 1.5,
+                borderRadius: 1.5,
+                py: 0.75,
+                px: 1,
               }}
             >
               {sectionHeader(<EventNoteOutlinedIcon fontSize="small" />, "Meeting Information")}
             </Box>
-            <Divider sx={{ my: 1.5 }} />
-            <Stack spacing={1.5}>
-              <Typography fontWeight={600} color="#1c2a4d">
-                Meeting notes for this Ticker {meetingOverview.ticker || "--"}
-              </Typography>
+            <Divider sx={{ my: 1 }} />
+            <Stack spacing={1}>
+
               {renderField(
                 "Date",
                 meetingOverview.date,
@@ -283,172 +290,179 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Paper sx={sectionCardSx}>
+        <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+          <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
                 backgroundColor: "rgba(0,80,200,0.12)",
-                borderRadius: 2,
-                py: 1,
-                px: 1.5,
+                borderRadius: 1.5,
+                py: 0.75,
+                px: 1,
               }}
             >
               {sectionHeader(<PeopleAltOutlinedIcon fontSize="small" />, "Attendees")}
             </Box>
-            <Divider sx={{ my: 1.5 }} />
-            <Stack spacing={1.5}>
-              {renderField("Management", meetingOverview.attendees, (val) =>
-                setMeetingOverview((prev) => ({ ...prev, attendees: val }))
+            <Divider sx={{ my: 1 }} />
+            <Stack spacing={1} sx={{ flex: 1 }}>
+              {renderField(
+                "Management",
+                meetingOverview.attendees,
+                (val) => setMeetingOverview((prev) => ({ ...prev, attendees: val })),
+                { multiline: true }
               )}
-              {renderField("Banker", "", () => undefined, { readOnly: true })}
-              {renderField("Others", "", () => undefined, { readOnly: true })}
+              {renderField("Banker", "", () => undefined, { readOnly: true, multiline: true })}
+              {renderField("Others", "", () => undefined, { readOnly: true, multiline: true })}
             </Stack>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Stack spacing={2}>
-            <Paper sx={sectionCardSx}>
-              <Box
-                sx={{
-                  backgroundColor: "rgba(0,80,200,0.12)",
-                  borderRadius: 2,
-                  py: 1,
-                  px: 1.5,
-                }}
-              >
-                {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
-              </Box>
-              <Divider sx={{ my: 1.5 }} />
-              <Stack spacing={1.5}>
-                {renderField(
-                  "One-line Summary",
-                  investmentSnapshot.oneLineSummary,
-                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
-                  { multiline: true, placeholder: "One-line summary" }
+        <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+          <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
+            <Box
+              sx={{
+                backgroundColor: "rgba(0,80,200,0.12)",
+                borderRadius: 1.5,
+                py: 0.75,
+                px: 1,
+              }}
+            >
+              {sectionHeader(<AnalyticsOutlinedIcon fontSize="small" />, "Deal Metrics")}
+            </Box>
+            <Divider sx={{ my: 1 }} />
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={6}>
+                {renderField("Key Level", investmentSnapshot.keyLevel, (val) =>
+                  setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
                 )}
-                {renderField(
-                  "Executive Summary",
-                  investmentSnapshot.executiveSummary,
-                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
-                  { multiline: true, placeholder: "Executive summary" }
-                )}
-                {renderField(
-                  "Meeting Notes",
-                  businessStrategy.meetingNotes,
-                  (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
-                  { multiline: true, placeholder: "Meeting notes" }
-                )}
-              </Stack>
-            </Paper>
-
-            <Paper sx={sectionCardSx}>
-              <Box
-                sx={{
-                  backgroundColor: "rgba(0,80,200,0.12)",
-                  borderRadius: 2,
-                  py: 1,
-                  px: 1.5,
-                }}
-              >
-                {sectionHeader(<AnalyticsOutlinedIcon fontSize="small" />, "Deal Metrics")}
-              </Box>
-              <Divider sx={{ my: 1.5 }} />
-              <Grid container spacing={1.5}>
-                <Grid item xs={12} sm={6}>
-                  {renderField("Key Level", investmentSnapshot.keyLevel, (val) =>
-                    setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderField("Possible Deal Size", investmentSnapshot.possibleSize, (val) =>
-                    setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderSelectField(
-                    "Primary Raise",
-                    businessStrategy.likelihoodPrimaryRaise,
-                    (val) => setBusinessStrategy((prev) => ({ ...prev, likelihoodPrimaryRaise: val })),
-                    ["High", "Medium", "Low"]
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderSelectField(
-                    "Opportunistic Deal",
-                    businessStrategy.opportunisticDeal,
-                    (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
-                    ["Yes", "No"]
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderField(
-                    "IPO Lock up Expiry",
-                    capitalStructure.ipoLockupExpiry,
-                    (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
-                    { type: "date" }
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderField(
-                    "Last deal lock up expiry",
-                    capitalStructure.lastDealLockupExpiry,
-                    (val) =>
-                      setCapitalStructure((prev) => ({
-                        ...prev,
-                        lastDealLockupExpiry: val,
-                      })),
-                    { type: "date" }
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderField(
-                    "Results",
-                    investmentSnapshot.results,
-                    (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
-                    { type: "date" }
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {renderSelectField(
-                    "Catalyst",
-                    businessStrategy.catalysts,
-                    (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
-                    catalystOptions
-                  )}
-                </Grid>
-                <Grid item xs={12}>
-                  {renderMultiSelectField(
-                    "Potential sellers",
-                    capitalStructure.potentialSellers,
-                    (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
-                    potentialSellerOptions
-                  )}
-                </Grid>
-                <Grid item xs={12}>
-                  {renderField("Historical sellers", capitalStructure.historicalSellers, (val) =>
-                    setCapitalStructure((prev) => ({ ...prev, historicalSellers: val }))
-                  )}
-                </Grid>
               </Grid>
-            </Paper>
-          </Stack>
+              <Grid item xs={12} sm={6}>
+                {renderField("Possible Deal Size", investmentSnapshot.possibleSize, (val) =>
+                  setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderSelectField(
+                  "Primary Raise",
+                  businessStrategy.likelihoodPrimaryRaise,
+                  (val) => setBusinessStrategy((prev) => ({ ...prev, likelihoodPrimaryRaise: val })),
+                  ["High", "Medium", "Low"]
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderSelectField(
+                  "Opportunistic Deal",
+                  businessStrategy.opportunisticDeal,
+                  (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
+                  ["Yes", "No"]
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderField(
+                  "IPO Lock up Expiry",
+                  capitalStructure.ipoLockupExpiry,
+                  (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderField(
+                  "Last deal lock up expiry",
+                  capitalStructure.lastDealLockupExpiry,
+                  (val) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      lastDealLockupExpiry: val,
+                    })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderField(
+                  "Results",
+                  investmentSnapshot.results,
+                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                {renderSelectField(
+                  "Catalyst",
+                  businessStrategy.catalysts,
+                  (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
+                  catalystOptions
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                {renderMultiSelectField(
+                  "Potential sellers",
+                  capitalStructure.potentialSellers,
+                  (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
+                  potentialSellerOptions
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                {renderField("Historical sellers", capitalStructure.historicalSellers, (val) =>
+                  setCapitalStructure((prev) => ({ ...prev, historicalSellers: val }))
+                )}
+              </Grid>
+            </Grid>
+          </Paper>
         </Grid>
       </Grid>
 
-      <Paper sx={{ ...sectionCardSx, p: { xs: 2, md: 3 } }}>
+      <Paper sx={sectionCardSx}>
         <Box
           sx={{
             backgroundColor: "rgba(0,80,200,0.12)",
-            borderRadius: 2,
-            py: 1,
-            px: 1.5,
+            borderRadius: 1.5,
+            py: 0.75,
+            px: 1,
+          }}
+        >
+          {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
+        </Box>
+        <Divider sx={{ my: 1 }} />
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={4}>
+            {renderField(
+              "One-line Summary",
+              investmentSnapshot.oneLineSummary,
+              (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
+              { multiline: true, placeholder: "One-line summary" }
+            )}
+          </Grid>
+          <Grid item xs={12} md={4}>
+            {renderField(
+              "Executive Summary",
+              investmentSnapshot.executiveSummary,
+              (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
+              { multiline: true, placeholder: "Executive summary" }
+            )}
+          </Grid>
+          <Grid item xs={12} md={4}>
+            {renderField(
+              "Meeting Notes",
+              businessStrategy.meetingNotes,
+              (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
+              { multiline: true, placeholder: "Meeting notes" }
+            )}
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Paper sx={{ ...sectionCardSx, p: { xs: 1.5, md: 2 } }}>
+        <Box
+          sx={{
+            backgroundColor: "rgba(0,80,200,0.12)",
+            borderRadius: 1.5,
+            py: 0.75,
+            px: 1,
           }}
         >
           {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Integration")}
         </Box>
-        <Divider sx={{ my: 1.5 }} />
-        <Stack spacing={2}>
+        <Divider sx={{ my: 1 }} />
+        <Stack spacing={1.5}>
           <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center">
             <Typography fontWeight={600} color="#1c2a4d">
               Send Emails To:
