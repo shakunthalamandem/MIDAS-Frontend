@@ -162,7 +162,7 @@ useEffect(() => {
               cursor: "pointer",
             }}
           >
-            Region-wise Skew Table - IPO and FO Deals for 2025 with{" "}
+            Region-wise Skew Table - IPO and FO Deals for 2025 with Top Highlights{" "}
             <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
         </Box>

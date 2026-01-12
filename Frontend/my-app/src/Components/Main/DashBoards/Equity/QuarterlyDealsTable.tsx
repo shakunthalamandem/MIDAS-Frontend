@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Table,
   TableBody,
@@ -17,6 +16,9 @@ type QuarterData = {
   Total_Deal_Count: number;
   Total_Deal_Volume: number;
   Positively_Performing_Deals_Percentage: number;
+  Negatively_Performing_Deals_Percentage: number;
+  Average_T1M_Abs_Return_of_Positively: number;
+  Average_T1M_Abs_Return_of_Negatively: number;
   Expected_Returns_Excess: number;
   Long_Opportunity_Value: number;
 };
@@ -77,7 +79,7 @@ const QuarterlyDealsTable = () => {
         filters: {
           year_range: [2023, 2025],
           region: ["Non-US America", "US", "EMEA", "APAC"],
-          year_period: "HalfYearly", // <-- Changed to HalfYearly
+          year_period: "Yearly",
         },
       };
 
@@ -103,25 +105,7 @@ const QuarterlyDealsTable = () => {
       };
 
       const processData = (yearwise: { [key: string]: QuarterData }) => {
-
-        // Helper to build list of H1 keys for 2023-2025
-      const getFirstHalfLabel = (): string[] => {
-        const years = ["2023", "2024", "2025"];
-        return years.map((year) => `${year} H1`);
-      };
-
-      // const getLastCompletedQuarterIn2025 = (): string => {
-      //     const now = new Date();
-      //     const year = now.getFullYear();
-      //     const month = now.getMonth(); // 0 = Jan
-
-      //     const quarter = Math.floor(month / 3); // 0 = Q1
-      //     const completedQuarter = quarter === 0 ? 4 : quarter;
-      //     const targetQuarter = year === 2025 ? completedQuarter : 4;
-
-      //     return `Q${targetQuarter}`;
-      //   };
-        const labels = getFirstHalfLabel();
+        const labels = ["2023", "2024", "2025"];
 
         return labels
           .map((label) => {
@@ -204,7 +188,7 @@ const QuarterlyDealsTable = () => {
           <TableHead sx={{ backgroundColor: "#f5f5f5",border: "1px solid #000" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold", minWidth: "80px", py: 2, border: "1px solid #000" }}>
-                HalfYearly
+                Year
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", border: "1px solid #000" }}>
                 Total Deal Count
