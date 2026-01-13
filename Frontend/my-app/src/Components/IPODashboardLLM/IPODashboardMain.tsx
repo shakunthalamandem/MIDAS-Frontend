@@ -682,7 +682,11 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
                     company_name: ipoData?.company_name,
                     exchange: ipoData?.exchange,
                     valuation: ipoData?.valuation || [],
-                    valuation_image_url: ipoData?.valuation_image_url || "",
+                    valuation_image_url:
+                      ipoData?.valuation_image_url ||
+                      ipoData?.valuation_image ||
+                      ipoData?.valuation_image_id ||
+                      "",
                     pricing_date: ipoData?.pricing_date,
                   }}
                 />

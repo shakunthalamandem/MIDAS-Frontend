@@ -683,6 +683,9 @@ const IPOForm: React.FC<IPOFormProps> = ({
             result={weeklyPrediction}
             onWeeklyMonthlyRepredict={handleWeeklyMonthlyRepredict}
             initialT1dClosePrice={values.t1d_close_price ?? null}
+            initialT1dLowPrice={values.t1d_low_price ?? null}
+            initialT1dHighPrice={values.t1d_high_price ?? null}
+            initialT1dVWAPPrice={values.t1d_vwap_price ?? null}
             issuePrice={values.issue_price ?? null}
           />
           {hasSentimentBlocks && (

@@ -1,9 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Paper, Stack, Typography } from "@mui/material";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { Alert, Box, Paper, Stack } from "@mui/material";
 import type { DealSearchResult } from "./DealMeetingNotesMain";
 import MeetingNoteForm, {
   type MeetingOverview,
@@ -11,6 +7,10 @@ import MeetingNoteForm, {
   type BusinessStrategy,
   type CapitalStructure,
 } from "./MeetingNoteForm";
+import MeetingTabsBar from "./MeetingTabsBar";
+import MeetingStatusPanels from "./MeetingStatusPanels";
+import MeetingEditorActions from "./MeetingEditorActions";
+import UnsavedChangesDialog from "./UnsavedChangesDialog";
 
 type Status =
   | { kind: "success"; message: string }
@@ -92,23 +92,48 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
   const [meetings, setMeetings] = useState<MeetingEntry[]>([]);
   const [selectedMeetingIndex, setSelectedMeetingIndex] = useState(0);
   const [currentMeetingId, setCurrentMeetingId] = useState<number | string | null>(null);
-  const [currentMeetingKey, setCurrentMeetingKey] = useState<string>("meeting_overview");
+  const [currentMeetingKey, setCurrentMeetingKey] = useState<string>("meeting1");
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [noDataFound, setNoDataFound] = useState(false);
   const shouldShowEmptyState = noDataFound && meetings.length === 0;
   const [refreshKey, setRefreshKey] = useState(0);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<null | (() => void)>(null);
 
   const getNextMeetingKey = () => {
-    if (meetings.length === 0) return "meeting_overview";
-    const regex = /^meeting_overview(\d+)?$/i;
+    if (meetings.length === 0) return "meeting1";
+    const regex = /^meeting(\d+)$/i;
     const maxIndex = meetings.reduce((max, entry) => {
       const match = entry.meetingKey.match(regex);
       if (!match) return max;
-      const num = match[1] ? parseInt(match[1], 10) : 1;
+      const num = parseInt(match[1], 10);
       return Number.isNaN(num) ? max : Math.max(max, num);
     }, 1);
-    const nextIndex = maxIndex + 1;
-    return nextIndex === 1 ? "meeting_overview" : `meeting_overview${nextIndex}`;
+    return `meeting${maxIndex + 1}`;
+  };
+
+  const formatAttendeesString = (value?: any) => {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    const parts = [
+      ...(value?.management || []),
+      ...(value?.banker || []),
+      ...(value?.others || []),
+    ];
+    return parts.filter(Boolean).join(", ");
+  };
+
+  const buildAttendeesPayload = (value: string) => {
+    const entries = (value || "")
+      .split(/,|;/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    return {
+      banker: [],
+      management: [],
+      others: entries,
+    };
   };
 
   const applyMeetingToForm = (entry: MeetingEntry) => {
@@ -120,49 +145,44 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     setCurrentMeetingKey(entry.meetingKey);
     setIsEditing(false);
     setBackupState(null);
+    setHasUnsavedChanges(false);
   };
 
-  const buildMeetingFromOverview = (
-    overview: any,
-    record: any,
-    snapshot: any,
-    strategy: any,
-    capStruct: any
-  ): MeetingEntry => ({
+  const buildMeetingFromOverview = (overview: any, record: any): MeetingEntry => ({
     id: record?.id ?? record?.pk ?? null,
-    meetingKey: overview?.__key ?? "meeting_overview",
+    meetingKey: overview?.__key ?? "meeting1",
     form: {
       meetingOverview: {
-        ticker: (record?.ticker || selectedDeal?.ticker || "").toUpperCase(),
+        ticker: (overview?.ticker || record?.ticker || selectedDeal?.ticker || "").toUpperCase(),
         name: overview?.name || "",
         date: overview?.date || record?.pricing_date || selectedDeal?.pricingDate || "",
         location: overview?.location || "",
         reason: overview?.reason || "",
         broker: overview?.broker || "",
-        attendees: overview?.attendees || "",
+        attendees: formatAttendeesString(overview?.attendees),
       },
       investmentSnapshot: {
-        oneLineSummary: snapshot?.oneLineSummary || "",
-        executiveSummary: snapshot?.executiveSummary || "",
-        keyLevel: snapshot?.keyLevel || "",
-        possibleSize: snapshot?.possibleSize || "",
-        results: snapshot?.results || "",
+        oneLineSummary: overview?.one_line_summary || "",
+        executiveSummary: overview?.executive_summary || "",
+        keyLevel: overview?.key_level || "",
+        possibleSize: overview?.possible_size || "",
+        results: overview?.results || "",
       },
       businessStrategy: {
-        meetingNotes: strategy?.meetingNotes || "",
-        catalysts: strategy?.catalysts || "",
-        likelihoodPrimaryRaise: strategy?.likelihoodPrimaryRaise || "",
-        reasonForRaise: strategy?.reasonForRaise || "",
-        opportunisticDeal: strategy?.opportunisticDeal || "",
+        meetingNotes: overview?.meeting_notes || "",
+        catalysts: overview?.catalyst || "",
+        likelihoodPrimaryRaise: overview?.likelihood_of_primary_raise || "",
+        reasonForRaise: overview?.likelihood_reason || "",
+        opportunisticDeal: overview?.possible_opportunistic_deal || "",
       },
       capitalStructure: {
-        potentialSellers: capStruct?.potentialSellers || "",
-        ipoLockupExpiry: capStruct?.ipoLockupExpiry || "",
-        lastDealLockupExpiry: capStruct?.lastDealLockupExpiry || "",
-        historicalSellers: capStruct?.historicalSellers || "",
-        followUpQuestions: capStruct?.followUpQuestions || "",
-        managementEmailFeedback: capStruct?.managementEmailFeedback || "",
-        bankerFollowUpFeedback: capStruct?.bankerFollowUpFeedback || "",
+        potentialSellers: overview?.potential_sellers || "",
+        ipoLockupExpiry: overview?.ipo_lockup_expiry || "",
+        lastDealLockupExpiry: overview?.last_deal_lockup_expiry || "",
+        historicalSellers: overview?.historical_sellers || "",
+        followUpQuestions: overview?.follow_up_question_for_management || "",
+        managementEmailFeedback: overview?.management_email_follow_up_feedback || "",
+        bankerFollowUpFeedback: overview?.banker_email_follow_up_call_feedback || "",
       },
     },
     isNew: false,
@@ -170,21 +190,16 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
   const normalizeRecordToMeetings = (record: any): MeetingEntry[] => {
     const desc = record?.description || {};
-    const snapshot = desc.investment_snapshot || {};
-    const strategy = desc.business_strategy || {};
-    const capStruct = desc.capital_structure || {};
-
-    // Collect any meeting_overview-like entries (meeting_overview, meeting_overview2, ...)
-    const overviewEntries = Object.entries(desc).filter(
-      ([key]) => key.toLowerCase().startsWith("meeting_overview")
+    const meetingEntries = Object.entries(desc).filter(([key]) =>
+      key.toLowerCase().startsWith("meeting")
     );
 
-    if (overviewEntries.length === 0) {
-      return [buildMeetingFromOverview({}, record, snapshot, strategy, capStruct)];
+    if (meetingEntries.length === 0) {
+      return [buildMeetingFromOverview({}, record)];
     }
 
-    return overviewEntries.map(([key, overview]) =>
-      buildMeetingFromOverview({ ...(overview as any), __key: key }, record, snapshot, strategy, capStruct)
+    return meetingEntries.map(([key, overview]) =>
+      buildMeetingFromOverview({ ...(overview as any), __key: key }, record)
     );
   };
 
@@ -230,7 +245,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
           setNoDataFound(true);
           setMeetings([]);
           setCurrentMeetingId(null);
-          setCurrentMeetingKey("meeting_overview");
+          setCurrentMeetingKey("meeting1");
           setLoadingMeetings(false);
           return;
         }
@@ -263,7 +278,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         meetingOverview: {
           ...initialMeetingOverview,
           ticker: selectedDeal?.ticker?.toUpperCase() || "",
-          date: selectedDeal?.pricingDate || "",
+          date: "",
         },
         investmentSnapshot: initialInvestmentSnapshot,
         businessStrategy: initialBusinessStrategy,
@@ -288,6 +303,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       capitalStructure,
     });
     setIsEditing(true);
+    setHasUnsavedChanges(false);
   };
 
   const handleCancel = () => {
@@ -299,6 +315,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     }
     setIsEditing(false);
     setStatus(null);
+    setHasUnsavedChanges(false);
   };
 
   const handleReset = () => {
@@ -306,7 +323,46 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     setInvestmentSnapshot(initialInvestmentSnapshot);
     setBusinessStrategy(initialBusinessStrategy);
     setCapitalStructure(initialCapitalStructure);
-    setCurrentMeetingKey("meeting_overview");
+    setCurrentMeetingKey("meeting1");
+    setHasUnsavedChanges(true);
+  };
+
+  useEffect(() => {
+    if (!isEditing || !backupState) return;
+    const isChanged =
+      JSON.stringify(backupState.meetingOverview) !== JSON.stringify(meetingOverview) ||
+      JSON.stringify(backupState.investmentSnapshot) !== JSON.stringify(investmentSnapshot) ||
+      JSON.stringify(backupState.businessStrategy) !== JSON.stringify(businessStrategy) ||
+      JSON.stringify(backupState.capitalStructure) !== JSON.stringify(capitalStructure);
+    setHasUnsavedChanges(isChanged);
+  }, [
+    isEditing,
+    backupState,
+    meetingOverview,
+    investmentSnapshot,
+    businessStrategy,
+    capitalStructure,
+  ]);
+
+  const requestDiscardConfirm = (action: () => void) => {
+    if (!isEditing || !hasUnsavedChanges) {
+      action();
+      return;
+    }
+    setPendingAction(() => action);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+    setPendingAction(null);
+  };
+
+  const handleConfirmDiscard = () => {
+    if (pendingAction) {
+      pendingAction();
+    }
+    handleConfirmClose();
   };
 
   const handleSubmit = async () => {
@@ -329,31 +385,69 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       return;
     }
 
+    if (!meetingOverview.name.trim()) {
+      setStatus({ kind: "error", message: "Meeting name is required." });
+      return;
+    }
+
+    if (!meetingOverview.date.trim()) {
+      setStatus({ kind: "error", message: "Meeting date is required." });
+      return;
+    }
+
     if (!pricingDate) {
       setStatus({ kind: "error", message: "Pricing date is required (from search selection)." });
       return;
     }
 
-    const payload = {
+    const meetingPayload = {
+      date: meetingOverview.date,
+      name: meetingOverview.name,
+      broker: meetingOverview.broker,
+      reason: meetingOverview.reason,
+      ticker: meetingOverview.ticker,
+      results: investmentSnapshot.results,
+      catalyst: businessStrategy.catalysts,
+      location: meetingOverview.location,
+      attendees: buildAttendeesPayload(meetingOverview.attendees),
+      key_level: investmentSnapshot.keyLevel,
+      meeting_notes: businessStrategy.meetingNotes,
+      possible_size: investmentSnapshot.possibleSize,
+      one_line_summary: investmentSnapshot.oneLineSummary,
+      executive_summary: investmentSnapshot.executiveSummary,
+      ipo_lockup_expiry: capitalStructure.ipoLockupExpiry,
+      likelihood_reason: businessStrategy.reasonForRaise,
+      potential_sellers: capitalStructure.potentialSellers,
+      historical_sellers: capitalStructure.historicalSellers,
+      last_deal_lockup_expiry: capitalStructure.lastDealLockupExpiry,
+      likelihood_of_primary_raise: businessStrategy.likelihoodPrimaryRaise,
+      possible_opportunistic_deal: businessStrategy.opportunisticDeal,
+      follow_up_question_for_management: capitalStructure.followUpQuestions,
+      management_email_follow_up_feedback: capitalStructure.managementEmailFeedback,
+      banker_email_follow_up_call_feedback: capitalStructure.bankerFollowUpFeedback,
+    };
+
+    const payload: any = {
       ticker: normalizedTicker,
+      fs_ticker: selectedDeal?.fsTicker ?? null,
       pricing_date: pricingDate,
+      deal_id: selectedDeal?.dealId ?? null,
+      sector: selectedDeal?.sector ?? null,
+      region: selectedDeal?.region ?? null,
+      deal_type: selectedDeal?.dealType ?? null,
+      fo_type: selectedDeal?.foType ?? null,
+      ipo_type: selectedDeal?.ipoType ?? null,
+      issuer_name: selectedDeal?.issuerName ?? meetingOverview.name ?? null,
+      deal_captain: selectedDeal?.dealCaptain ?? null,
       description: {
-        [currentMeetingKey]: {
-          name: meetingOverview.name,
-          date: meetingOverview.date,
-          location: meetingOverview.location,
-          reason: meetingOverview.reason,
-          broker: meetingOverview.broker,
-          attendees: meetingOverview.attendees,
-        },
-        investment_snapshot: investmentSnapshot,
-        business_strategy: businessStrategy,
-        capital_structure: capitalStructure,
+        [currentMeetingKey]: meetingPayload,
       },
     };
 
-    if (!isNewMeeting && currentMeetingId) {
-      (payload as any).id = currentMeetingId;
+    const existingRecordId =
+      currentMeetingId ?? meetings.find((entry) => !entry.isNew && entry.id)?.id ?? null;
+    if (!shouldCreate && existingRecordId) {
+      payload.id = existingRecordId;
     }
 
     const endpoint = shouldCreate
@@ -401,49 +495,42 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
   return (
     <Stack spacing={3}>
-      {meetings.length > 0 ? (
-        <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
-          {meetings.map((_, idx) => (
-            <Button
-              key={`meeting-${idx}`}
-              variant={idx === selectedMeetingIndex ? "contained" : "outlined"}
-              onClick={() => {
+      <Paper
+        elevation={0}
+        sx={{
+          p: 1.5,
+          borderRadius: 999,
+          border: "1px solid #d8deef",
+          backgroundColor: "rgba(0,32,96,0.06)",
+          "@keyframes slideIn": {
+            from: { opacity: 0, transform: "translateY(-6px)" },
+            to: { opacity: 1, transform: "translateY(0)" },
+          },
+          animation: "slideIn 0.3s ease",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <MeetingTabsBar
+            totalMeetings={meetings.length}
+            selectedIndex={selectedMeetingIndex}
+            onSelectIndex={(idx) =>
+              requestDiscardConfirm(() => {
                 setSelectedMeetingIndex(idx);
                 applyMeetingToForm(meetings[idx]);
-              }}
-              sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                px: 2,
-                background:
-                  idx === selectedMeetingIndex
-                    ? "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)"
-                    : undefined,
-                color: idx === selectedMeetingIndex ? "#fff" : undefined,
-                borderColor: idx === selectedMeetingIndex ? "transparent" : "#0062ff",
-              }}
-            >
-              {`Meeting ${idx + 1}`}
-            </Button>
-          ))}
-          <Button
-            variant="outlined"
-            onClick={() => createNewMeetingFromTemplate()}
-            sx={{
-              borderRadius: 999,
-              textTransform: "none",
-              px: 2,
-              borderColor: "#f28c28",
-                color: "#f28c28",
-              }}
-            >
-              + New Meeting Note
-            </Button>
-          {meetings[selectedMeetingIndex]?.isNew ? (
-            <Button
-              variant="text"
-              color="error"
-              onClick={() => {
+              })
+            }
+            onAddNew={() => createNewMeetingFromTemplate()}
+            showCancelNew={Boolean(meetings[selectedMeetingIndex]?.isNew)}
+            onCancelNew={() => {
+              requestDiscardConfirm(() => {
                 const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
                 setMeetings(updated);
                 const nextIndex = updated.length > 0 ? 0 : 0;
@@ -452,7 +539,7 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
                   applyMeetingToForm(updated[0]);
                 } else {
                   applyMeetingToForm({
-                    meetingKey: "meeting_overview",
+                    meetingKey: "meeting1",
                     form: {
                       meetingOverview: initialMeetingOverview,
                       investmentSnapshot: initialInvestmentSnapshot,
@@ -462,134 +549,30 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
                     isNew: true,
                   });
                 }
-              }}
-              sx={{ textTransform: "none" }}
-            >
-              Cancel New Meeting
-            </Button>
-          ) : null}
-        </Stack>
-      ) : null}
+              });
+            }}
+            container={false}
+          />
+          <MeetingEditorActions
+            isEditing={isEditing}
+            submitting={submitting}
+            onEdit={startEdit}
+            onSave={handleSubmit}
+            onCancel={handleCancel}
+            onReset={handleReset}
+            container={false}
+          />
+        </Box>
+      </Paper>
 
-      {noDataFound ? (
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2.5,
-            borderRadius: 2,
-            borderColor: "rgba(0,80,200,0.25)",
-            background: "linear-gradient(90deg, rgba(0,98,255,0.06), rgba(0,194,162,0.06))",
-          }}
-        >
-          <Stack spacing={1.5} direction={{ xs: "column", sm: "row" }} alignItems="center">
-            <Stack flex={1} spacing={0.5}>
-              <Typography fontWeight={700} color="#002060">
-                Meeting notes do not exist for this ticker.
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Create a new meeting note using the latest template.
-              </Typography>
-            </Stack>
-            <Button
-              variant="contained"
-              onClick={() => createNewMeetingFromTemplate(true)}
-              sx={{
-                background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                color: "#fff",
-                borderRadius: 999,
-                px: 2.5,
-                textTransform: "none",
-              }}
-            >
-              Create Meeting Note
-            </Button>
-          </Stack>
-        </Paper>
-      ) : null}
-
-      {loadingMeetings ? (
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 2.5,
-            borderRadius: 2,
-            borderColor: "rgba(0,80,200,0.15)",
-            background: "rgba(0,32,96,0.03)",
-            textAlign: "center",
-          }}
-        >
-          <Typography fontWeight={700} color="#002060">
-            Loading meeting notes...
-          </Typography>
-        </Paper>
-      ) : null}
+      <MeetingStatusPanels
+        noDataFound={noDataFound}
+        loading={loadingMeetings}
+        onCreateNew={() => createNewMeetingFromTemplate(true)}
+      />
 
       {!loadingMeetings && !shouldShowEmptyState ? (
         <>
-          <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
-            {!isEditing ? (
-              <Button
-                variant="contained"
-                startIcon={<EditOutlinedIcon />}
-                onClick={startEdit}
-                sx={{
-                  background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                  color: "#fff",
-                  borderRadius: 999,
-                  px: 2.5,
-                }}
-              >
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  startIcon={<SaveOutlinedIcon />}
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  sx={{
-                    background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
-                    color: "#fff",
-                    borderRadius: 999,
-                    px: 2.5,
-                    boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
-                  }}
-                >
-                  Save Changes
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<CloseOutlinedIcon />}
-                  onClick={handleCancel}
-                  disabled={submitting}
-                  sx={{
-                    borderColor: "#0050c8",
-                    color: "#0050c8",
-                    borderRadius: 999,
-                    px: 2.5,
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<ReplayOutlinedIcon />}
-                  onClick={handleReset}
-                  disabled={submitting}
-                  sx={{
-                    borderColor: "#f28c28",
-                    color: "#f28c28",
-                    borderRadius: 999,
-                    px: 2.5,
-                  }}
-                >
-                  Reset
-                </Button>
-              </>
-            )}
-          </Stack>
-
           {status ? (
             <Alert severity={status.kind} onClose={() => setStatus(null)}>
               {status.message}
@@ -609,6 +592,11 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
           />
         </>
       ) : null}
+      <UnsavedChangesDialog
+        open={confirmOpen}
+        onClose={handleConfirmClose}
+        onDiscard={handleConfirmDiscard}
+      />
     </Stack>
   );
 };

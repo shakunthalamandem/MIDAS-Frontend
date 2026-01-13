@@ -322,7 +322,7 @@ const APACEquityAiMlPage: React.FC = () => {
                       <TabLabel
                         icon={<DescriptionOutlinedIcon fontSize="small" />}
                         primary="AI Unsupervised"
-                        secondary="(Past 10+ Deals)"
+                        secondary=""
                       />
                     }
                     sx={tabStyles}
