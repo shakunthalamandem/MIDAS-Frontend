@@ -248,10 +248,10 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {sectionHeader(<EventNoteOutlinedIcon fontSize="small" />, "Meeting Information")}
             </Box>
             <Divider sx={{ my: 1 }} />
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{padding:2}}>
 
               {renderField(
-                "Date",
+                "Meeting Date",
                 meetingOverview.date,
                 (val) => setMeetingOverview((prev) => ({ ...prev, date: val })),
                 {
@@ -302,7 +302,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {sectionHeader(<PeopleAltOutlinedIcon fontSize="small" />, "Attendees")}
             </Box>
             <Divider sx={{ my: 1 }} />
-            <Stack spacing={1} sx={{ flex: 1 }}>
+            <Stack spacing={1}  sx={{padding:2,flex: 1}}>
               {renderField(
                 "Management",
                 meetingOverview.attendees,
@@ -328,7 +328,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {sectionHeader(<AnalyticsOutlinedIcon fontSize="small" />, "Deal Metrics")}
             </Box>
             <Divider sx={{ my: 1 }} />
-            <Grid container spacing={1}>
+            <Grid container spacing={1} sx={{padding:2}}>
               <Grid item xs={12} sm={6}>
                 {renderField("Key Level", investmentSnapshot.keyLevel, (val) =>
                   setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
@@ -421,7 +421,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
         </Box>
         <Divider sx={{ my: 1 }} />
-        <Grid container spacing={1}>
+        <Grid container spacing={1} sx={{padding:2}}>
           <Grid item xs={12} md={4}>
             {renderField(
               "One-line Summary",
@@ -462,7 +462,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Integration")}
         </Box>
         <Divider sx={{ my: 1 }} />
-        <Stack spacing={1.5}>
+        <Stack spacing={1.5} sx={{padding:2}}>
           <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center">
             <Typography fontWeight={600} color="#1c2a4d">
               Send Emails To:
@@ -513,7 +513,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               </Stack>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Stack spacing={1.5}>
+              <Stack spacing={1.5} sx={{padding:2}}>
                 <Typography fontWeight={600} color="#1c2a4d">
                   Follow-up &amp; Status
                 </Typography>
