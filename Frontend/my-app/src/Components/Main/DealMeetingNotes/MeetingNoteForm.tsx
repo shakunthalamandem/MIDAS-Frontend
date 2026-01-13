@@ -17,6 +17,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import { Padding } from "@mui/icons-material";
 
 export type MeetingOverview = {
   ticker: string;
@@ -67,7 +68,7 @@ type FormProps = {
 };
 
 const sectionCardSx = {
-  p: { xs: 1.5, md: 2 },
+  Padding: 2,
   borderRadius: 2,
   border: "1px solid #d9deeb",
   backgroundColor: "#ffffff",
@@ -225,9 +226,6 @@ const MeetingNoteForm: React.FC<FormProps> = ({
 
   return (
     <Stack spacing={2}>
-              {/* <Typography fontWeight={600} color="#002060" variant="h6" align="center">
-                Meeting notes for this Ticker {meetingOverview.ticker || "--"}
-              </Typography> */}
       <Divider />
 
       <Grid
@@ -451,13 +449,14 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         </Grid>
       </Paper>
 
-      <Paper sx={{ ...sectionCardSx, p: { xs: 1.5, md: 2 } }}>
+      <Paper sx={{ ...sectionCardSx}}>
         <Box
           sx={{
             backgroundColor: "rgba(0,80,200,0.12)",
             borderRadius: 1.5,
-            py: 0.75,
+                        py: 0.75,
             px: 1,
+
           }}
         >
           {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Integration")}
