@@ -284,6 +284,13 @@ const FOForm: React.FC<FOFormProps> = ({
     const apiUrl = process.env.REACT_APP_API_URL!;
     const token = localStorage.getItem("access_token");
 
+    // Persist the open price/return so later steps (1W/1M) have it.
+    setValues((prev) => ({
+      ...prev,
+      t1d_open_price: t1dOpenPrice,
+      t1d_open_return_category: t1dOpenReturn,
+    }));
+
     const payload = {
       ...values,
       deal_type: "FO",
@@ -397,6 +404,15 @@ const FOForm: React.FC<FOFormProps> = ({
       }
 
       setWeeklyPrediction(simplified);
+      // Persist close price/return so future calls reuse it.
+      setValues((prev) => ({
+        ...prev,
+        t1d_close_price: t1dClosePrice,
+        t1d_return_from_bloomberg_category: t1dCloseReturn,
+        t1d_low_price: t1dLowPrice ?? prev.t1d_low_price ?? null,
+        t1d_high_price: t1dHighPrice ?? prev.t1d_high_price ?? null,
+        t1d_vwap_price: t1dVWAPPrice ?? prev.t1d_vwap_price ?? null,
+      }));
       onPredicted?.();
       return simplified;
     } catch (error) {
