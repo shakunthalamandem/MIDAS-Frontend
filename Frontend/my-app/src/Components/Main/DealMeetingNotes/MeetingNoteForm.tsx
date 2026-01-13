@@ -79,6 +79,13 @@ const sectionCardSx = {
   flexDirection: "column",
 };
 
+const checkboxSx = {
+  color: "#002060",
+  "&.Mui-checked": {
+    color: "#002060",
+  },
+};
+
 const reasonOptions = [
   "Pre earnings cash burn",
   "de-leverage",
@@ -194,7 +201,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>
-            <Checkbox checked={selectedValues.includes(option)} />
+            <Checkbox checked={selectedValues.includes(option)} sx={checkboxSx} />
             {option}
           </MenuItem>
         ))}
@@ -468,10 +475,22 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               Send Emails To:
             </Typography>
             <Stack direction="row" spacing={2} flexWrap="wrap">
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Management" />
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Banker" />
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Internal Team" />
-              <FormControlLabel control={<Checkbox defaultChecked />} label="CC Deal Captain" />
+              <FormControlLabel
+                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                label="Management"
+              />
+              <FormControlLabel
+                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                label="Banker"
+              />
+              <FormControlLabel
+                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                label="Internal Team"
+              />
+              <FormControlLabel
+                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                label="CC Deal Captain"
+              />
             </Stack>
           </Stack>
 
@@ -503,13 +522,34 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             </Grid>
             <Grid item xs={12} md={3}>
               <Stack spacing={1.5}>
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Include in Email" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="One-line Summary" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Executive Summary" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Meeting Notes" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Key Levels" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Deal Size" />
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Follow-up Question" />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Include in Email"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="One-line Summary"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Executive Summary"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Meeting Notes"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Key Levels"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Deal Size"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Follow-up Question"
+                />
               </Stack>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -521,6 +561,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   control={
                     <Checkbox
                       checked={Boolean(capitalStructure.followUpQuestions)}
+                      sx={checkboxSx}
                       onChange={(e) =>
                         setCapitalStructure((prev) => ({
                           ...prev,
