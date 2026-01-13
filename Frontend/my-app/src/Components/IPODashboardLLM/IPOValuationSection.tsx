@@ -131,11 +131,13 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       if (newImageId) {
         selectedData.valuation_image_url = newImageId;
       }
-      setValuationImageId(newImageId);
+      setValuationImageId((prev) => newImageId ?? prev ?? null);
 
       setEditValuationMode(false);
       setUploadError(null);
-      setImageFile(null);
+      if (newImageId) {
+        setImageFile(null);
+      }
     } catch (err: any) {
       setUploadError(err.message || "Unknown error occurred");
     } finally {
