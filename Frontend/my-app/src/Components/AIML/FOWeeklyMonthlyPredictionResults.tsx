@@ -48,6 +48,11 @@ interface WeeklyMonthlyPredictionResultsProps {
   /** Prefill when a T+1D close price is already known (nullable) */
   initialT1dClosePrice?: number | null;
 
+  /** Prefill optional T+1D low/high/VWAP values (nullable) */
+  initialT1dLowPrice?: number | null;
+  initialT1dHighPrice?: number | null;
+  initialT1dVWAPPrice?: number | null;
+
   /** Issue price to calculate T+1D close return from */
   issuePrice?: number | null;
 }
@@ -58,6 +63,9 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
   result,
   onWeeklyMonthlyRepredict,
   initialT1dClosePrice,
+  initialT1dLowPrice,
+  initialT1dHighPrice,
+  initialT1dVWAPPrice,
   issuePrice,
 }) => {
   const [t1dClosePrice, setT1dClosePrice] = useState<number | "">("");
@@ -67,6 +75,13 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
   const [t1dVWAPPrice, setT1dVWAPPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [predictionResult, setPredictionResult] = useState(result);
+
+  // Prefill low/high/VWAP from props
+  useEffect(() => {
+    setT1dLowPrice(initialT1dLowPrice ?? "");
+    setT1dHighPrice(initialT1dHighPrice ?? "");
+    setT1dVWAPPrice(initialT1dVWAPPrice ?? "");
+  }, [initialT1dLowPrice, initialT1dHighPrice, initialT1dVWAPPrice]);
 
   // Prefill from props: calculate return from issuePrice + closePrice
   useEffect(() => {
