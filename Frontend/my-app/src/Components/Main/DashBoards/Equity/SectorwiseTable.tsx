@@ -177,7 +177,7 @@ const SectorwiseTable: React.FC = () => {
               p: 1.5,
             }}
           >
-            Sector-wise Skew Table for 2025 (H1) –{" "}
+            Sector-wise Skew Table for 2025  –{" "}
             <span style={{ color: "red" }}>Highlighted Key Sectors</span>
           </Typography>
         </Box>
