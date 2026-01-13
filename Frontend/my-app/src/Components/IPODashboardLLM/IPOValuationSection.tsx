@@ -34,13 +34,27 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const initialValuationImageId =
+    selectedData.valuation_image_url ??
+    selectedData.valuation_image ??
+    selectedData.valuation_image_id ??
+    null;
   const [valuationImageId, setValuationImageId] = useState<string | null>(
-    selectedData.valuation_image_url ?? null
+    initialValuationImageId
   );
 
   useEffect(() => {
-    setValuationImageId(selectedData?.valuation_image_url ?? null);
-  }, [selectedData?.valuation_image_url]);
+    setValuationImageId(
+      selectedData?.valuation_image_url ??
+        selectedData?.valuation_image ??
+        selectedData?.valuation_image_id ??
+        null
+    );
+  }, [
+    selectedData?.valuation_image_url,
+    selectedData?.valuation_image,
+    selectedData?.valuation_image_id,
+  ]);
 
   const handleAddValuationLine = (index: number) => {
     const updated = [...editedValuation];
@@ -108,10 +122,16 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
       selectedData.valuation = cleaned;
 
       // If backend returns a new image ID, save it back
-      if (resJson.valuation_image_url) {
-        selectedData.valuation_image_url = resJson.valuation_image_url;
+      const newImageId =
+        resJson.valuation_image_url ??
+        resJson.valuation_image ??
+        resJson.valuation_image_id ??
+        null;
+
+      if (newImageId) {
+        selectedData.valuation_image_url = newImageId;
       }
-      setValuationImageId(resJson.valuation_image_url ?? null);
+      setValuationImageId(newImageId);
 
       setEditValuationMode(false);
       setUploadError(null);

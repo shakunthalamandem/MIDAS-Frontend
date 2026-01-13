@@ -162,7 +162,11 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           company_name: ipoData?.company_name,
           exchange: ipoData?.exchange,
           valuation: ipoData?.valuation || [],
-          valuation_image_url: ipoData?.valuation_image_url || "",
+          valuation_image_url:
+            ipoData?.valuation_image_url ||
+            ipoData?.valuation_image ||
+            ipoData?.valuation_image_id ||
+            "",
         }}
       />
     </Container>
