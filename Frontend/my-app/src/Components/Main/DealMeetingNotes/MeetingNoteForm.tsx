@@ -17,7 +17,6 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import { Padding } from "@mui/icons-material";
 
 export type MeetingOverview = {
   ticker: string;
