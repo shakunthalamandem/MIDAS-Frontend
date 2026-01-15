@@ -37,6 +37,8 @@ export const priorityOrder = [
   "Gross Profit Margin",
   "EBIT",
   "EBIT Margin",
+  "Net Operating Income",
+  "Net Operating Income Growth",
   "NII after provision for credit losses",
   "NII after provision for credit losses Growth",
   "EBITDA",
@@ -51,6 +53,7 @@ export const priorityOrder = [
 
 export const growthPairs: Record<string, string> = {
   "Sales": "Sales Growth",
+  "Net Operating Income": "Net Operating Income Growth",
   "Net Interest Income": "Net Interest Income Growth",
   "NII after provision for credit losses": "NII after provision for credit losses Growth",
 };
