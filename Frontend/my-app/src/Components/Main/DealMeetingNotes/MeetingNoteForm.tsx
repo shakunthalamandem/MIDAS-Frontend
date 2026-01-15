@@ -267,18 +267,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 }
               )}
 
-              {renderField(
-                "Meeting Date",
-                meetingOverview.date,
-                (val) => setMeetingOverview((prev) => ({ ...prev, date: val })),
-                {
-                  type: "date",
-                  required: true,
-                  error: isEditing && !meetingOverview.date.trim(),
-                  helperText:
-                    isEditing && !meetingOverview.date.trim() ? "Meeting date is required." : "",
-                }
-              )}
+
               {renderField(
                 "Meeting Name",
                 meetingOverview.name,
@@ -290,14 +279,27 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                     isEditing && !meetingOverview.name.trim() ? "Meeting name is required." : "",
                 }
               )}
-              {renderSelectField(
+                            {renderField(
+                "Meeting Date",
+                meetingOverview.date,
+                (val) => setMeetingOverview((prev) => ({ ...prev, date: val })),
+                {
+                  type: "date",
+                  required: true,
+                  error: isEditing && !meetingOverview.date.trim(),
+                  helperText:
+                    isEditing && !meetingOverview.date.trim() ? "Meeting date is required." : "",
+                }
+              )}
+
+              {renderField("Location", meetingOverview.location, (val) =>
+                setMeetingOverview((prev) => ({ ...prev, location: val }))
+              )}
+                            {renderSelectField(
                 "Reason",
                 meetingOverview.reason,
                 (val) => setMeetingOverview((prev) => ({ ...prev, reason: val })),
                 reasonOptions
-              )}
-              {renderField("Location", meetingOverview.location, (val) =>
-                setMeetingOverview((prev) => ({ ...prev, location: val }))
               )}
               {renderField("Broker", meetingOverview.broker, (val) =>
                 setMeetingOverview((prev) => ({ ...prev, broker: val }))
