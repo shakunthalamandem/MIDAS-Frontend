@@ -330,6 +330,24 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               )}
               {renderField("Banker", "", () => undefined, { readOnly: true, multiline: true })}
               {renderField("Others", "", () => undefined, { readOnly: true, multiline: true })}
+              <Divider sx={{ my: 0.5 }} />
+              <Typography fontWeight={600} color="#1c2a4d">
+                Follow-up mail
+              </Typography>
+              <Stack direction="row" spacing={2} flexWrap="wrap">
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Management"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Banker"
+                />
+                <FormControlLabel
+                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  label="Others"
+                />
+              </Stack>
             </Stack>
           </Paper>
         </Grid>
