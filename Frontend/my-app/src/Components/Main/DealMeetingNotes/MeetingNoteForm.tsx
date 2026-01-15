@@ -256,6 +256,17 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             </Box>
             <Divider sx={{ my: 1 }} />
             <Stack spacing={1} sx={{padding:2}}>
+                            {renderField(
+                "Ticker",
+                meetingOverview.ticker,
+                (val) => setMeetingOverview((prev) => ({ ...prev, ticker: val })),
+                {
+                  required: true,
+                  error: isEditing && !meetingOverview.ticker.trim(),
+                  helperText:
+                    isEditing && !meetingOverview.ticker.trim() ? "Ticker is required." : "",
+                }
+              )}
 
               {renderField(
                 "Meeting Date",
