@@ -208,6 +208,70 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     );
   };
 
+  const renderListField = (
+    label: string,
+    value: string,
+    onChange: (val: string) => void,
+    placeholder?: string
+  ) => {
+    const items = value ? value.split("\n") : [""];
+    const safeItems = items.length ? items : [""];
+
+    const updateItem = (index: number, nextValue: string) => {
+      const nextItems = [...safeItems];
+      nextItems[index] = nextValue;
+      onChange(nextItems.join("\n"));
+    };
+
+    const addItem = () => {
+      onChange([...safeItems, ""].join("\n"));
+    };
+
+    const removeItem = (index: number) => {
+      if (safeItems.length <= 1) {
+        onChange("");
+        return;
+      }
+      const nextItems = safeItems.filter((_, idx) => idx !== index);
+      onChange(nextItems.join("\n"));
+    };
+
+    return (
+      <Stack spacing={0.75}>
+        <Typography fontWeight={600} color="#1c2a4d">
+          {label}
+        </Typography>
+        {safeItems.map((item, index) => (
+          <Stack key={`${label}-${index}`} direction="row" spacing={1} alignItems="center">
+            <TextField
+              value={item}
+              onChange={(e) => updateItem(index, e.target.value)}
+              fullWidth
+              size="small"
+              placeholder={placeholder}
+              disabled={!isEditing}
+            />
+            {isEditing && (
+              <Stack direction="row" spacing={0.5}>
+                <Button variant="outlined" size="small" onClick={addItem}>
+                  +
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => removeItem(index)}
+                  disabled={items.length === 1}
+                >
+                  -
+                </Button>
+              </Stack>
+            )}
+          </Stack>
+        ))}
+      </Stack>
+    );
+  };
+
   const sectionHeader = (icon: React.ReactNode, title: string) => (
     <Stack direction="row" alignItems="center" spacing={1} justifyContent="center">
       <Box
@@ -458,32 +522,26 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
         </Box>
         <Divider sx={{ my: 1 }} />
-        <Grid container spacing={1} sx={{padding:2}}>
-          <Grid item xs={12} md={4}>
-            {renderField(
-              "One-line Summary",
-              investmentSnapshot.oneLineSummary,
-              (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
-              { multiline: true, placeholder: "One-line summary" }
-            )}
-          </Grid>
-          <Grid item xs={12} md={4}>
-            {renderField(
-              "Executive Summary",
-              investmentSnapshot.executiveSummary,
-              (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
-              { multiline: true, placeholder: "Executive summary" }
-            )}
-          </Grid>
-          <Grid item xs={12} md={4}>
-            {renderField(
-              "Meeting Notes",
-              businessStrategy.meetingNotes,
-              (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
-              { multiline: true, placeholder: "Meeting notes" }
-            )}
-          </Grid>
-        </Grid>
+        <Stack spacing={1} sx={{ padding: 2 }}>
+          {renderListField(
+            "One-line Summary",
+            investmentSnapshot.oneLineSummary,
+            (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
+            "One-line summary"
+          )}
+          {renderListField(
+            "Executive Summary",
+            investmentSnapshot.executiveSummary,
+            (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
+            "Executive summary"
+          )}
+          {renderListField(
+            "Meeting Notes",
+            businessStrategy.meetingNotes,
+            (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
+            "Meeting notes"
+          )}
+        </Stack>
       </Paper>
 
       <Paper sx={{ ...sectionCardSx}}>
