@@ -52,6 +52,27 @@ export type CapitalStructure = {
   followUpQuestions: string;
   managementEmailFeedback: string;
   bankerFollowUpFeedback: string;
+  emailSendToManagement: boolean;
+  emailSendToBanker: boolean;
+  emailSendToInternalTeam: boolean;
+  emailSendToDealCaptain: boolean;
+  emailIncludeInEmail: boolean;
+  emailIncludeOneLineSummary: boolean;
+  emailIncludeExecutiveSummary: boolean;
+  emailIncludeMeetingNotes: boolean;
+  emailIncludeKeyLevels: boolean;
+  emailIncludeDealSize: boolean;
+  emailIncludeFollowUpQuestion: boolean;
+  ipoLockupExpiryAutomate: boolean;
+  ipoLockupExpiryEmailTwoWeeks: boolean;
+  ipoLockupExpiryEmailOnDay: boolean;
+  lastDealLockupExpiryAutomate: boolean;
+  lastDealLockupExpiryEmailTwoWeeks: boolean;
+  lastDealLockupExpiryEmailOnDay: boolean;
+  resultsAutomate: boolean;
+  resultsEmailTwoWeeks: boolean;
+  resultsEmailOnDay: boolean;
+  opportunisticDealEmailOnTrigger: boolean;
 };
 
 type FormProps = {
@@ -148,29 +169,6 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     />
   );
 
-  const renderSelectField = (
-    label: string,
-    value: string,
-    onChange: (val: string) => void,
-    options: string[]
-  ) => (
-    <TextField
-      select
-      label={label}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      fullWidth
-      size="small"
-      disabled={!isEditing}
-    >
-      {options.map((option) => (
-        <MenuItem key={option} value={option}>
-          {option}
-        </MenuItem>
-      ))}
-    </TextField>
-  );
-
   const renderMultiSelectField = (
     label: string,
     value: string,
@@ -206,6 +204,20 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         ))}
       </TextField>
     );
+  };
+
+  const getKeyLevelParts = (value: string) => {
+    const trimmed = value.trim();
+    const match = trimmed.match(/^([<>])\s*(.*)$/);
+    if (match) {
+      return { operator: match[1], level: match[2] };
+    }
+    return { operator: ">", level: trimmed };
+  };
+
+  const updateKeyLevel = (operator: string, level: string) => {
+    const normalized = `${operator} ${level}`.trim();
+    setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: normalized }));
   };
 
   const renderListField = (
@@ -294,6 +306,8 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     </Stack>
   );
 
+  const keyLevelParts = getKeyLevelParts(investmentSnapshot.keyLevel);
+
   return (
     <Stack spacing={2}>
       <Divider />
@@ -359,11 +373,10 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {renderField("Location", meetingOverview.location, (val) =>
                 setMeetingOverview((prev) => ({ ...prev, location: val }))
               )}
-                            {renderSelectField(
-                "Reason",
+              {renderField(
+                "Meeting Reason",
                 meetingOverview.reason,
-                (val) => setMeetingOverview((prev) => ({ ...prev, reason: val })),
-                reasonOptions
+                (val) => setMeetingOverview((prev) => ({ ...prev, reason: val }))
               )}
               {renderField("Broker", meetingOverview.broker, (val) =>
                 setMeetingOverview((prev) => ({ ...prev, broker: val }))
@@ -441,15 +454,15 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 )}
               </Grid>
               <Grid item xs={12} sm={6}>
-                {renderSelectField(
-                  "Primary Raise",
-                  businessStrategy.likelihoodPrimaryRaise,
-                  (val) => setBusinessStrategy((prev) => ({ ...prev, likelihoodPrimaryRaise: val })),
-                  ["High", "Medium", "Low"]
+                {renderMultiSelectField(
+                  "Reason (Dropdown)",
+                  businessStrategy.reasonForRaise,
+                  (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val })),
+                  reasonOptions
                 )}
               </Grid>
               <Grid item xs={12} sm={6}>
-                {renderSelectField(
+                {renderMultiSelectField(
                   "Opportunistic Deal",
                   businessStrategy.opportunisticDeal,
                   (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
@@ -485,7 +498,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 )}
               </Grid>
               <Grid item xs={12} sm={6}>
-                {renderSelectField(
+                {renderMultiSelectField(
                   "Catalyst",
                   businessStrategy.catalysts,
                   (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
@@ -564,19 +577,67 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             </Typography>
             <Stack direction="row" spacing={2} flexWrap="wrap">
               <FormControlLabel
-                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                control={
+                  <Checkbox
+                    checked={capitalStructure.emailSendToManagement}
+                    sx={checkboxSx}
+                    disabled={!isEditing}
+                    onChange={(e) =>
+                      setCapitalStructure((prev) => ({
+                        ...prev,
+                        emailSendToManagement: e.target.checked,
+                      }))
+                    }
+                  />
+                }
                 label="Management"
               />
               <FormControlLabel
-                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                control={
+                  <Checkbox
+                    checked={capitalStructure.emailSendToBanker}
+                    sx={checkboxSx}
+                    disabled={!isEditing}
+                    onChange={(e) =>
+                      setCapitalStructure((prev) => ({
+                        ...prev,
+                        emailSendToBanker: e.target.checked,
+                      }))
+                    }
+                  />
+                }
                 label="Banker"
               />
               <FormControlLabel
-                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                control={
+                  <Checkbox
+                    checked={capitalStructure.emailSendToInternalTeam}
+                    sx={checkboxSx}
+                    disabled={!isEditing}
+                    onChange={(e) =>
+                      setCapitalStructure((prev) => ({
+                        ...prev,
+                        emailSendToInternalTeam: e.target.checked,
+                      }))
+                    }
+                  />
+                }
                 label="Internal Team"
               />
               <FormControlLabel
-                control={<Checkbox defaultChecked sx={checkboxSx} />}
+                control={
+                  <Checkbox
+                    checked={capitalStructure.emailSendToDealCaptain}
+                    sx={checkboxSx}
+                    disabled={!isEditing}
+                    onChange={(e) =>
+                      setCapitalStructure((prev) => ({
+                        ...prev,
+                        emailSendToDealCaptain: e.target.checked,
+                      }))
+                    }
+                  />
+                }
                 label="CC Deal Captain"
               />
             </Stack>
@@ -602,6 +663,44 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   placeholder: "internal emails...",
                 })}
                 {renderField(
+                  "Likelihood of Primary Raise (%)",
+                  businessStrategy.likelihoodPrimaryRaise,
+                  (val) => setBusinessStrategy((prev) => ({ ...prev, likelihoodPrimaryRaise: val })),
+                  { type: "number", placeholder: "0-100" }
+                )}
+                <Stack spacing={0.75}>
+                  <Typography fontWeight={600} color="#1c2a4d">
+                    Key Level Alert
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <TextField
+                      select
+                      size="small"
+                      value={keyLevelParts.operator}
+                      onChange={(e) => updateKeyLevel(e.target.value, keyLevelParts.level)}
+                      disabled={!isEditing}
+                      sx={{ minWidth: 120 }}
+                    >
+                      <MenuItem value="<">Less than</MenuItem>
+                      <MenuItem value=">">Greater than</MenuItem>
+                    </TextField>
+                    <TextField
+                      value={keyLevelParts.level}
+                      onChange={(e) => updateKeyLevel(keyLevelParts.operator, e.target.value)}
+                      size="small"
+                      type="number"
+                      placeholder="Price level"
+                      disabled={!isEditing}
+                      fullWidth
+                    />
+                  </Stack>
+                </Stack>
+                {renderField(
+                  "Possible Deal Size",
+                  investmentSnapshot.possibleSize,
+                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+                )}
+                {renderField(
                   "Email Subject",
                   meetingOverview.name,
                   (val) => setMeetingOverview((prev) => ({ ...prev, name: val }))
@@ -611,31 +710,115 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             <Grid item xs={12} md={3}>
               <Stack spacing={1.5}>
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeInEmail}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeInEmail: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Include in Email"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeOneLineSummary}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeOneLineSummary: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="One-line Summary"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeExecutiveSummary}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeExecutiveSummary: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Executive Summary"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeMeetingNotes}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeMeetingNotes: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Meeting Notes"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeKeyLevels}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeKeyLevels: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Key Levels"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeDealSize}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeDealSize: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Deal Size"
                 />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked sx={checkboxSx} />}
+                  control={
+                    <Checkbox
+                      checked={capitalStructure.emailIncludeFollowUpQuestion}
+                      sx={checkboxSx}
+                      disabled={!isEditing}
+                      onChange={(e) =>
+                        setCapitalStructure((prev) => ({
+                          ...prev,
+                          emailIncludeFollowUpQuestion: e.target.checked,
+                        }))
+                      }
+                    />
+                  }
                   label="Follow-up Question"
                 />
               </Stack>
@@ -672,6 +855,216 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               </Stack>
             </Grid>
           </Grid>
+
+          <Stack spacing={1} sx={{ pt: 1 }}>
+            <Typography fontWeight={600} color="#1c2a4d">
+              Email Automation
+            </Typography>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={12} md={3}>
+                <Typography fontWeight={600} color="#1c2a4d">
+                  Event
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography fontWeight={600} color="#1c2a4d">
+                  Date
+                </Typography>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Typography fontWeight={600} color="#1c2a4d">
+                  Automate?
+                </Typography>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Typography fontWeight={600} color="#1c2a4d">
+                  2 weeks before
+                </Typography>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Typography fontWeight={600} color="#1c2a4d">
+                  On day
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <Typography color="#1c2a4d">IPO lockup expiry?</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                {renderField(
+                  "Date",
+                  capitalStructure.ipoLockupExpiry,
+                  (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.ipoLockupExpiryAutomate}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      ipoLockupExpiryAutomate: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.ipoLockupExpiryEmailTwoWeeks}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      ipoLockupExpiryEmailTwoWeeks: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.ipoLockupExpiryEmailOnDay}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      ipoLockupExpiryEmailOnDay: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <Typography color="#1c2a4d">Last deal lockup expiry?</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                {renderField(
+                  "Date",
+                  capitalStructure.lastDealLockupExpiry,
+                  (val) => setCapitalStructure((prev) => ({ ...prev, lastDealLockupExpiry: val })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.lastDealLockupExpiryAutomate}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      lastDealLockupExpiryAutomate: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.lastDealLockupExpiryEmailTwoWeeks}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      lastDealLockupExpiryEmailTwoWeeks: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.lastDealLockupExpiryEmailOnDay}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      lastDealLockupExpiryEmailOnDay: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <Typography color="#1c2a4d">Results?</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                {renderField(
+                  "Date",
+                  investmentSnapshot.results,
+                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
+                  { type: "date" }
+                )}
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.resultsAutomate}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      resultsAutomate: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.resultsEmailTwoWeeks}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      resultsEmailTwoWeeks: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <Checkbox
+                  checked={capitalStructure.resultsEmailOnDay}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      resultsEmailOnDay: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <Typography color="#1c2a4d">Possible opportunistic deal?</Typography>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Typography color="#47516b">If yes</Typography>
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <Checkbox
+                  checked={capitalStructure.opportunisticDealEmailOnTrigger}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      opportunisticDealEmailOnTrigger: e.target.checked,
+                    }))
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <Typography color="#47516b">2 sigma price move</Typography>
+              </Grid>
+              <Grid item xs={12} md={2} />
+            </Grid>
+          </Stack>
 
           <Stack direction="row" spacing={1.5} justifyContent="flex-end">
             <Button variant="outlined">Preview Email</Button>

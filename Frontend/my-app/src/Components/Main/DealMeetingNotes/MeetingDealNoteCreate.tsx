@@ -51,6 +51,27 @@ export const initialCapitalStructure: CapitalStructure = {
   followUpQuestions: "",
   managementEmailFeedback: "",
   bankerFollowUpFeedback: "",
+  emailSendToManagement: false,
+  emailSendToBanker: false,
+  emailSendToInternalTeam: false,
+  emailSendToDealCaptain: false,
+  emailIncludeInEmail: false,
+  emailIncludeOneLineSummary: false,
+  emailIncludeExecutiveSummary: false,
+  emailIncludeMeetingNotes: false,
+  emailIncludeKeyLevels: false,
+  emailIncludeDealSize: false,
+  emailIncludeFollowUpQuestion: false,
+  ipoLockupExpiryAutomate: false,
+  ipoLockupExpiryEmailTwoWeeks: false,
+  ipoLockupExpiryEmailOnDay: false,
+  lastDealLockupExpiryAutomate: false,
+  lastDealLockupExpiryEmailTwoWeeks: false,
+  lastDealLockupExpiryEmailOnDay: false,
+  resultsAutomate: false,
+  resultsEmailTwoWeeks: false,
+  resultsEmailOnDay: false,
+  opportunisticDealEmailOnTrigger: false,
 };
 
 export type FormState = {
@@ -136,6 +157,9 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     };
   };
 
+  const toBool = (value: any) =>
+    value === true || value === "true" || value === 1 || value === "1";
+
   const applyMeetingToForm = (entry: MeetingEntry) => {
     setMeetingOverview(entry.form.meetingOverview);
     setInvestmentSnapshot(entry.form.investmentSnapshot);
@@ -183,6 +207,31 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         followUpQuestions: overview?.follow_up_question_for_management || "",
         managementEmailFeedback: overview?.management_email_follow_up_feedback || "",
         bankerFollowUpFeedback: overview?.banker_email_follow_up_call_feedback || "",
+        emailSendToManagement: toBool(overview?.email_send_to_management),
+        emailSendToBanker: toBool(overview?.email_send_to_banker),
+        emailSendToInternalTeam: toBool(overview?.email_send_to_internal_team),
+        emailSendToDealCaptain: toBool(overview?.email_send_to_deal_captain),
+        emailIncludeInEmail: toBool(overview?.email_include_in_email),
+        emailIncludeOneLineSummary: toBool(overview?.email_include_one_line_summary),
+        emailIncludeExecutiveSummary: toBool(overview?.email_include_executive_summary),
+        emailIncludeMeetingNotes: toBool(overview?.email_include_meeting_notes),
+        emailIncludeKeyLevels: toBool(overview?.email_include_key_levels),
+        emailIncludeDealSize: toBool(overview?.email_include_deal_size),
+        emailIncludeFollowUpQuestion: toBool(overview?.email_include_follow_up_question),
+        ipoLockupExpiryAutomate: toBool(overview?.ipo_lockup_expiry_automate),
+        ipoLockupExpiryEmailTwoWeeks: toBool(overview?.ipo_lockup_expiry_email_two_weeks),
+        ipoLockupExpiryEmailOnDay: toBool(overview?.ipo_lockup_expiry_email_on_day),
+        lastDealLockupExpiryAutomate: toBool(overview?.last_deal_lockup_expiry_automate),
+        lastDealLockupExpiryEmailTwoWeeks: toBool(
+          overview?.last_deal_lockup_expiry_email_two_weeks
+        ),
+        lastDealLockupExpiryEmailOnDay: toBool(
+          overview?.last_deal_lockup_expiry_email_on_day
+        ),
+        resultsAutomate: toBool(overview?.results_automate),
+        resultsEmailTwoWeeks: toBool(overview?.results_email_two_weeks),
+        resultsEmailOnDay: toBool(overview?.results_email_on_day),
+        opportunisticDealEmailOnTrigger: toBool(overview?.opportunistic_deal_email_on_trigger),
       },
     },
     isNew: false,
@@ -425,6 +474,28 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       follow_up_question_for_management: capitalStructure.followUpQuestions,
       management_email_follow_up_feedback: capitalStructure.managementEmailFeedback,
       banker_email_follow_up_call_feedback: capitalStructure.bankerFollowUpFeedback,
+      email_send_to_management: capitalStructure.emailSendToManagement,
+      email_send_to_banker: capitalStructure.emailSendToBanker,
+      email_send_to_internal_team: capitalStructure.emailSendToInternalTeam,
+      email_send_to_deal_captain: capitalStructure.emailSendToDealCaptain,
+      email_include_in_email: capitalStructure.emailIncludeInEmail,
+      email_include_one_line_summary: capitalStructure.emailIncludeOneLineSummary,
+      email_include_executive_summary: capitalStructure.emailIncludeExecutiveSummary,
+      email_include_meeting_notes: capitalStructure.emailIncludeMeetingNotes,
+      email_include_key_levels: capitalStructure.emailIncludeKeyLevels,
+      email_include_deal_size: capitalStructure.emailIncludeDealSize,
+      email_include_follow_up_question: capitalStructure.emailIncludeFollowUpQuestion,
+      ipo_lockup_expiry_automate: capitalStructure.ipoLockupExpiryAutomate,
+      ipo_lockup_expiry_email_two_weeks: capitalStructure.ipoLockupExpiryEmailTwoWeeks,
+      ipo_lockup_expiry_email_on_day: capitalStructure.ipoLockupExpiryEmailOnDay,
+      last_deal_lockup_expiry_automate: capitalStructure.lastDealLockupExpiryAutomate,
+      last_deal_lockup_expiry_email_two_weeks:
+        capitalStructure.lastDealLockupExpiryEmailTwoWeeks,
+      last_deal_lockup_expiry_email_on_day: capitalStructure.lastDealLockupExpiryEmailOnDay,
+      results_automate: capitalStructure.resultsAutomate,
+      results_email_two_weeks: capitalStructure.resultsEmailTwoWeeks,
+      results_email_on_day: capitalStructure.resultsEmailOnDay,
+      opportunistic_deal_email_on_trigger: capitalStructure.opportunisticDealEmailOnTrigger,
     };
 
     const payload: any = {
