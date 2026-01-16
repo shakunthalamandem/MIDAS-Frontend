@@ -2,7 +2,6 @@ import React from "react";
 import {
   Box,
   Checkbox,
-  Divider,
   Grid,
   MenuItem,
   Paper,
@@ -81,7 +80,9 @@ type FormProps = {
   meetingOverview: MeetingOverview;
   setMeetingOverview: React.Dispatch<React.SetStateAction<MeetingOverview>>;
   investmentSnapshot: InvestmentSnapshot;
-  setInvestmentSnapshot: React.Dispatch<React.SetStateAction<InvestmentSnapshot>>;
+  setInvestmentSnapshot: React.Dispatch<
+    React.SetStateAction<InvestmentSnapshot>
+  >;
   businessStrategy: BusinessStrategy;
   setBusinessStrategy: React.Dispatch<React.SetStateAction<BusinessStrategy>>;
   capitalStructure: CapitalStructure;
@@ -223,7 +224,10 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>
-              <Checkbox checked={selectedValues.includes(option)} sx={checkboxSx} />
+              <Checkbox
+                checked={selectedValues.includes(option)}
+                sx={checkboxSx}
+              />
               {option}
             </MenuItem>
           ))}
@@ -252,7 +256,11 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         }}
       >
         <Grid item xs={12} md={3}>
-          <Typography fontWeight={400} color={headingColor} sx={{ textAlign: { xs: "left", md: "left" } }}>
+          <Typography
+            fontWeight={400}
+            color={headingColor}
+            sx={{ textAlign: { xs: "left", md: "left" } }}
+          >
             {label}
           </Typography>
         </Grid>
@@ -289,7 +297,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
   };
 
   const sectionHeader = (icon: React.ReactNode, title: string) => (
-    <Stack direction="row" alignItems="center" spacing={1} justifyContent="center">
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      justifyContent="center"
+    >
       <Box
         sx={{
           width: 28,
@@ -304,7 +317,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       >
         {icon}
       </Box>
-      <Typography variant="h6" fontWeight={700} color="#ffffff" sx={{ fontSize: "1rem" }}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        color="#ffffff"
+        sx={{ fontSize: "1rem" }}
+      >
         {title}
       </Typography>
     </Stack>
@@ -312,8 +330,6 @@ const MeetingNoteForm: React.FC<FormProps> = ({
 
   return (
     <Stack spacing={2}>
-      <Divider />
-
       <Grid
         container
         spacing={1}
@@ -331,22 +347,26 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 px: 1,
               }}
             >
-              {sectionHeader(<EventNoteOutlinedIcon fontSize="small" />, "Meeting Information")}
+              {sectionHeader(
+                <EventNoteOutlinedIcon fontSize="small" />,
+                "Meeting Information"
+              )}
             </Box>
-            <Divider sx={{ my: 1 }} />
-            <Stack spacing={1} sx={{padding:2}}>
-                            {renderField(
+            <Stack spacing={1} sx={{ padding: 2 }}>
+              {renderField(
                 "Ticker",
                 meetingOverview.ticker,
-                (val) => setMeetingOverview((prev) => ({ ...prev, ticker: val })),
+                (val) =>
+                  setMeetingOverview((prev) => ({ ...prev, ticker: val })),
                 {
                   required: true,
                   error: isEditing && !meetingOverview.ticker.trim(),
                   helperText:
-                    isEditing && !meetingOverview.ticker.trim() ? "Ticker is required." : "",
+                    isEditing && !meetingOverview.ticker.trim()
+                      ? "Ticker is required."
+                      : "",
                 }
               )}
-
 
               {renderField(
                 "Meeting Name",
@@ -356,10 +376,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   required: true,
                   error: isEditing && !meetingOverview.name.trim(),
                   helperText:
-                    isEditing && !meetingOverview.name.trim() ? "Meeting name is required." : "",
+                    isEditing && !meetingOverview.name.trim()
+                      ? "Meeting name is required."
+                      : "",
                 }
               )}
-                            {renderField(
+              {renderField(
                 "Meeting Date",
                 meetingOverview.date,
                 (val) => setMeetingOverview((prev) => ({ ...prev, date: val })),
@@ -368,17 +390,17 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   required: true,
                   error: isEditing && !meetingOverview.date.trim(),
                   helperText:
-                    isEditing && !meetingOverview.date.trim() ? "Meeting date is required." : "",
+                    isEditing && !meetingOverview.date.trim()
+                      ? "Meeting date is required."
+                      : "",
                 }
               )}
 
               {renderField("Location", meetingOverview.location, (val) =>
                 setMeetingOverview((prev) => ({ ...prev, location: val }))
               )}
-              {renderField(
-                "Meeting Reason",
-                meetingOverview.reason,
-                (val) => setMeetingOverview((prev) => ({ ...prev, reason: val }))
+              {renderField("Meeting Reason", meetingOverview.reason, (val) =>
+                setMeetingOverview((prev) => ({ ...prev, reason: val }))
               )}
               {renderField("Broker", meetingOverview.broker, (val) =>
                 setMeetingOverview((prev) => ({ ...prev, broker: val }))
@@ -397,45 +419,66 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 px: 1,
               }}
             >
-              {sectionHeader(<PeopleAltOutlinedIcon fontSize="small" />, "Attendees")}
+              {sectionHeader(
+                <PeopleAltOutlinedIcon fontSize="small" />,
+                "Attendees"
+              )}
             </Box>
-            <Divider sx={{ my: 1 }} />
-            <Stack spacing={1}  sx={{padding:2,flex: 1}}>
+            <Stack spacing={1} sx={{ padding: 2, flex: 1 }}>
               {renderField(
                 "Management",
                 meetingOverview.attendees,
-                (val) => setMeetingOverview((prev) => ({ ...prev, attendees: val })),
+                (val) =>
+                  setMeetingOverview((prev) => ({ ...prev, attendees: val })),
                 { multiline: true }
               )}
               {renderField(
                 "Banker",
                 meetingOverview.bankerAttendees,
-                (val) => setMeetingOverview((prev) => ({ ...prev, bankerAttendees: val })),
+                (val) =>
+                  setMeetingOverview((prev) => ({
+                    ...prev,
+                    bankerAttendees: val,
+                  })),
                 { multiline: true }
               )}
               {renderMultiSelectField(
                 "Reason (Dropdown)",
                 businessStrategy.reasonForRaise,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val })),
+                (val) =>
+                  setBusinessStrategy((prev) => ({
+                    ...prev,
+                    reasonForRaise: val,
+                  })),
                 reasonOptions
               )}
               {renderMultiSelectField(
                 "Opportunistic Deal",
                 businessStrategy.opportunisticDeal,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
+                (val) =>
+                  setBusinessStrategy((prev) => ({
+                    ...prev,
+                    opportunisticDeal: val,
+                  })),
                 ["Yes", "No"]
               )}
               {renderMultiSelectField(
                 "Catalyst",
                 businessStrategy.catalysts,
-                (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
+                (val) =>
+                  setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
                 catalystOptions
               )}
             </Stack>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4} sx={{ display: "flex", mb: { xs: 2, md: 0 } }}>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          sx={{ display: "flex", mb: { xs: 2, md: 0 } }}
+        >
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
@@ -445,17 +488,29 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 px: 1,
               }}
             >
-              {sectionHeader(<AnalyticsOutlinedIcon fontSize="small" />, "Deal Metrics")}
+              {sectionHeader(
+                <AnalyticsOutlinedIcon fontSize="small" />,
+                "Deal Metrics"
+              )}
             </Box>
-            <Divider sx={{ my: 1 }} />
             <Stack spacing={1} sx={{ padding: 2 }}>
-              {renderField("Possible Deal Size", investmentSnapshot.possibleSize, (val) =>
-                setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+              {renderField(
+                "Possible Deal Size",
+                investmentSnapshot.possibleSize,
+                (val) =>
+                  setInvestmentSnapshot((prev) => ({
+                    ...prev,
+                    possibleSize: val,
+                  }))
               )}
               {renderField(
                 "IPO Lock up Expiry",
                 capitalStructure.ipoLockupExpiry,
-                (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
+                (val) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    ipoLockupExpiry: val,
+                  })),
                 { type: "date" }
               )}
               {renderField(
@@ -471,17 +526,28 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {renderField(
                 "Results",
                 investmentSnapshot.results,
-                (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
+                (val) =>
+                  setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
                 { type: "date" }
               )}
               {renderMultiSelectField(
                 "Potential sellers",
                 capitalStructure.potentialSellers,
-                (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
+                (val) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    potentialSellers: val,
+                  })),
                 potentialSellerOptions
               )}
-              {renderField("Historical sellers", capitalStructure.historicalSellers, (val) =>
-                setCapitalStructure((prev) => ({ ...prev, historicalSellers: val }))
+              {renderField(
+                "Historical sellers",
+                capitalStructure.historicalSellers,
+                (val) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    historicalSellers: val,
+                  }))
               )}
             </Stack>
           </Paper>
@@ -497,32 +563,47 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             px: 1,
           }}
         >
-          {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
+          {sectionHeader(
+            <LightbulbOutlinedIcon fontSize="small" />,
+            "Key Insights"
+          )}
         </Box>
-        <Divider sx={{ my: 1 }} />
         <Stack spacing={1.5} sx={{ padding: 2 }}>
           {renderInsightField(
             "One-line Summary",
             investmentSnapshot.oneLineSummary,
-            (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
+            (val) =>
+              setInvestmentSnapshot((prev) => ({
+                ...prev,
+                oneLineSummary: val,
+              })),
             "One-line summary"
           )}
           {renderInsightField(
             "Executive Summary",
             investmentSnapshot.executiveSummary,
-            (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
+            (val) =>
+              setInvestmentSnapshot((prev) => ({
+                ...prev,
+                executiveSummary: val,
+              })),
             "Executive summary"
           )}
           {renderInsightField(
             "Meeting Notes",
             businessStrategy.meetingNotes,
-            (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
+            (val) =>
+              setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
             "Meeting notes"
           )}
           {renderInsightField(
             "Follow-up Questions",
             capitalStructure.followUpQuestions,
-            (val) => setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val })),
+            (val) =>
+              setCapitalStructure((prev) => ({
+                ...prev,
+                followUpQuestions: val,
+              })),
             "Follow-up questions"
           )}
         </Stack>
@@ -537,25 +618,32 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             px: 1,
           }}
         >
-          {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Automation")}
+          {sectionHeader(
+            <EmailOutlinedIcon fontSize="small" />,
+            "Email Automation"
+          )}
         </Box>
-        <Divider sx={{ my: 1 }} />
-      <Paper
-        variant="outlined"
-        sx={{
-          borderColor: "#d9deeb",
-          borderRadius: 2,
-          p: { xs: 1.5, md: 2 },
-          background:
-            "linear-gradient(135deg, rgba(11,42,111,0.06) 0%, rgba(255,255,255,0.92) 70%)",
-        }}
-      >
+        <Paper
+          variant="outlined"
+          sx={{
+            borderColor: "#d9deeb",
+            borderRadius: 2,
+            p: { xs: 1.5, md: 2 },
+            background:
+              "linear-gradient(135deg, rgba(11,42,111,0.06) 0%, rgba(255,255,255,0.92) 70%)",
+          }}
+        >
           <Stack spacing={1.25}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="space-between"
-              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+              sx={{
+                borderRadius: 1.5,
+                backgroundColor: "#ffffff",
+                px: 1.5,
+                py: 1,
+              }}
             >
               <Typography color="#1c2a4d">IPO lockup expiry?</Typography>
               <Checkbox
@@ -574,7 +662,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               direction="row"
               alignItems="center"
               justifyContent="space-between"
-              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+              sx={{
+                borderRadius: 1.5,
+                backgroundColor: "#ffffff",
+                px: 1.5,
+                py: 1,
+              }}
             >
               <Typography color="#1c2a4d">Last deal lockup expiry?</Typography>
               <Checkbox
@@ -593,7 +686,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               direction="row"
               alignItems="center"
               justifyContent="space-between"
-              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+              sx={{
+                borderRadius: 1.5,
+                backgroundColor: "#ffffff",
+                px: 1.5,
+                py: 1,
+              }}
             >
               <Typography color="#1c2a4d">Results?</Typography>
               <Checkbox
@@ -613,7 +711,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               alignItems={{ xs: "flex-start", md: "center" }}
               justifyContent="space-between"
               spacing={1}
-              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+              sx={{
+                borderRadius: 1.5,
+                backgroundColor: "#ffffff",
+                px: 1.5,
+                py: 1,
+              }}
             >
               <Typography color="#1c2a4d">Key Level</Typography>
               <Stack
