@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Box, Paper, Stack } from "@mui/material";
 import type { DealSearchResult } from "./DealMeetingNotesMain";
-import MeetingNoteForm, {
-  type MeetingOverview,
-  type InvestmentSnapshot,
-  type BusinessStrategy,
-  type CapitalStructure,
-} from "./MeetingNoteForm";
+import MeetingNoteForm from "./MeetingNoteForm";
+import type {
+  MeetingOverview,
+  InvestmentSnapshot,
+  BusinessStrategy,
+  CapitalStructure,
+} from "./MeetingNoteFormTypes";
 import MeetingTabsBar from "./MeetingTabsBar";
 import MeetingStatusPanels from "./MeetingStatusPanels";
 import MeetingEditorActions from "./MeetingEditorActions";
