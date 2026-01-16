@@ -582,75 +582,77 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
 
   return (
     <Stack spacing={3}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 1.5,
-          borderRadius: 999,
-          border: "1px solid #d8deef",
-          backgroundColor: "rgba(0,32,96,0.06)",
-          "@keyframes slideIn": {
-            from: { opacity: 0, transform: "translateY(-6px)" },
-            to: { opacity: 1, transform: "translateY(0)" },
-          },
-          animation: "slideIn 0.3s ease",
-        }}
-      >
-        <Box
+      {!shouldShowEmptyState ? (
+        <Paper
+          elevation={0}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            flexWrap: "wrap",
+            p: 1.5,
+            borderRadius: 999,
+            border: "1px solid #d8deef",
+            backgroundColor: "rgba(0,32,96,0.06)",
+            "@keyframes slideIn": {
+              from: { opacity: 0, transform: "translateY(-6px)" },
+              to: { opacity: 1, transform: "translateY(0)" },
+            },
+            animation: "slideIn 0.3s ease",
           }}
         >
-          <MeetingTabsBar
-            totalMeetings={meetings.length}
-            selectedIndex={selectedMeetingIndex}
-            onSelectIndex={(idx) =>
-              requestDiscardConfirm(() => {
-                setSelectedMeetingIndex(idx);
-                applyMeetingToForm(meetings[idx]);
-              })
-            }
-            onAddNew={() => createNewMeetingFromTemplate()}
-            showCancelNew={Boolean(meetings[selectedMeetingIndex]?.isNew)}
-            onCancelNew={() => {
-              requestDiscardConfirm(() => {
-                const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
-                setMeetings(updated);
-                const nextIndex = updated.length > 0 ? 0 : 0;
-                setSelectedMeetingIndex(nextIndex);
-                if (updated[0]) {
-                  applyMeetingToForm(updated[0]);
-                } else {
-                  applyMeetingToForm({
-                    meetingKey: "meeting1",
-                    form: {
-                      meetingOverview: initialMeetingOverview,
-                      investmentSnapshot: initialInvestmentSnapshot,
-                      businessStrategy: initialBusinessStrategy,
-                      capitalStructure: initialCapitalStructure,
-                    },
-                    isNew: true,
-                  });
-                }
-              });
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 2,
+              flexWrap: "wrap",
             }}
-            container={false}
-          />
-          <MeetingEditorActions
-            isEditing={isEditing}
-            submitting={submitting}
-            onEdit={startEdit}
-            onSave={handleSubmit}
-            onCancel={handleCancel}
-            onReset={handleReset}
-            container={false}
-          />
-        </Box>
-      </Paper>
+          >
+            <MeetingTabsBar
+              totalMeetings={meetings.length}
+              selectedIndex={selectedMeetingIndex}
+              onSelectIndex={(idx) =>
+                requestDiscardConfirm(() => {
+                  setSelectedMeetingIndex(idx);
+                  applyMeetingToForm(meetings[idx]);
+                })
+              }
+              onAddNew={() => createNewMeetingFromTemplate()}
+              showCancelNew={Boolean(meetings[selectedMeetingIndex]?.isNew)}
+              onCancelNew={() => {
+                requestDiscardConfirm(() => {
+                  const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
+                  setMeetings(updated);
+                  const nextIndex = updated.length > 0 ? 0 : 0;
+                  setSelectedMeetingIndex(nextIndex);
+                  if (updated[0]) {
+                    applyMeetingToForm(updated[0]);
+                  } else {
+                    applyMeetingToForm({
+                      meetingKey: "meeting1",
+                      form: {
+                        meetingOverview: initialMeetingOverview,
+                        investmentSnapshot: initialInvestmentSnapshot,
+                        businessStrategy: initialBusinessStrategy,
+                        capitalStructure: initialCapitalStructure,
+                      },
+                      isNew: true,
+                    });
+                  }
+                });
+              }}
+              container={false}
+            />
+            <MeetingEditorActions
+              isEditing={isEditing}
+              submitting={submitting}
+              onEdit={startEdit}
+              onSave={handleSubmit}
+              onCancel={handleCancel}
+              onReset={handleReset}
+              container={false}
+            />
+          </Box>
+        </Paper>
+      ) : null}
 
       <MeetingStatusPanels
         noDataFound={noDataFound}
