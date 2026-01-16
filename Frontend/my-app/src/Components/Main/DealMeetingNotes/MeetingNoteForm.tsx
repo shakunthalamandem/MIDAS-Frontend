@@ -248,8 +248,8 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             placeholder={placeholder}
             disabled={!isEditing}
             multiline
-            minRows={3}
-            maxRows={6}
+            minRows={1}
+            maxRows={4}
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: 1,
@@ -259,8 +259,8 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             InputProps={{
               sx: {
                 "& textarea": {
-                  minHeight: 80,
-                  maxHeight: 200,
+                  minHeight: 44,
+                  maxHeight: 120,
                   overflow: "auto",
                 },
               },
