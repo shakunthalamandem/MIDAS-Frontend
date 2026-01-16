@@ -49,6 +49,9 @@ export type CapitalStructure = {
   lastDealLockupExpiry: string;
   historicalSellers: string;
   followUpQuestions: string;
+  keyValueAmount: string;
+  keyValueComparator: string;
+  keyValueAutomate: boolean;
   managementEmailFeedback: string;
   bankerFollowUpFeedback: string;
   emailSendToManagement: boolean;
@@ -213,20 +216,6 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     );
   };
 
-  const getKeyLevelParts = (value: string) => {
-    const trimmed = value.trim();
-    const match = trimmed.match(/^([<>])\s*(.*)$/);
-    if (match) {
-      return { operator: match[1], level: match[2] };
-    }
-    return { operator: ">", level: trimmed };
-  };
-
-  const updateKeyLevel = (operator: string, level: string) => {
-    const normalized = `${operator} ${level}`.trim();
-    setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: normalized }));
-  };
-
   const renderInsightField = (
     label: string,
     value: string,
@@ -237,7 +226,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       <Grid
         container
         spacing={2}
-        alignItems="flex-start"
+        alignItems="center"
         sx={{
           borderRadius: 2,
           border: "1px solid #e3e8f5",
@@ -247,7 +236,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         }}
       >
         <Grid item xs={12} md={3}>
-          <Typography fontWeight={600} color="#1c2a4d">
+          <Typography fontWeight={600} color="#1c2a4d" sx={{ textAlign: { xs: "left", md: "left" } }}>
             {label}
           </Typography>
         </Grid>
@@ -259,12 +248,22 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             placeholder={placeholder}
             disabled={!isEditing}
             multiline
-            minRows={2}
+            minRows={3}
+            maxRows={6}
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: 1,
               width: { xs: "100%", md: "80%" },
               mx: "auto",
+            }}
+            InputProps={{
+              sx: {
+                "& textarea": {
+                  minHeight: 80,
+                  maxHeight: 200,
+                  overflow: "auto",
+                },
+              },
             }}
           />
         </Grid>
@@ -279,22 +278,20 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           width: 28,
           height: 28,
           borderRadius: "50%",
-          backgroundColor: "rgba(0,80,200,0.12)",
+          backgroundColor: "rgba(255,255,255,0.2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#002060",
+          color: "#ffffff",
         }}
       >
         {icon}
       </Box>
-      <Typography variant="h6" fontWeight={700} color="#002060" sx={{ fontSize: "1rem" }}>
+      <Typography variant="h6" fontWeight={700} color="#ffffff" sx={{ fontSize: "1rem" }}>
         {title}
       </Typography>
     </Stack>
   );
-
-  const keyLevelParts = getKeyLevelParts(investmentSnapshot.keyLevel);
 
   return (
     <Stack spacing={2}>
@@ -311,7 +308,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "rgba(0,80,200,0.12)",
+                backgroundColor: "#3b66d6",
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -377,7 +374,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "rgba(0,80,200,0.12)",
+                backgroundColor: "#3b66d6",
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -394,8 +391,24 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 { multiline: true }
               )}
               {renderField("Banker", "", () => undefined, { readOnly: true, multiline: true })}
-              {renderField("Others", "", () => undefined, { readOnly: true, multiline: true })}
-            
+              {renderMultiSelectField(
+                "Reason (Dropdown)",
+                businessStrategy.reasonForRaise,
+                (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val })),
+                reasonOptions
+              )}
+              {renderMultiSelectField(
+                "Opportunistic Deal",
+                businessStrategy.opportunisticDeal,
+                (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
+                ["Yes", "No"]
+              )}
+              {renderMultiSelectField(
+                "Catalyst",
+                businessStrategy.catalysts,
+                (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
+                catalystOptions
+              )}
             </Stack>
           </Paper>
         </Grid>
@@ -404,7 +417,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "rgba(0,80,200,0.12)",
+                backgroundColor: "#3b66d6",
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -413,83 +426,42 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               {sectionHeader(<AnalyticsOutlinedIcon fontSize="small" />, "Deal Metrics")}
             </Box>
             <Divider sx={{ my: 1 }} />
-            <Grid container spacing={1} sx={{padding:2}}>
-              <Grid item xs={12} sm={6}>
-                {renderField("Key Level", investmentSnapshot.keyLevel, (val) =>
-                  setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderField("Possible Deal Size", investmentSnapshot.possibleSize, (val) =>
-                  setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderMultiSelectField(
-                  "Reason (Dropdown)",
-                  businessStrategy.reasonForRaise,
-                  (val) => setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val })),
-                  reasonOptions
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderMultiSelectField(
-                  "Opportunistic Deal",
-                  businessStrategy.opportunisticDeal,
-                  (val) => setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val })),
-                  ["Yes", "No"]
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderField(
-                  "IPO Lock up Expiry",
-                  capitalStructure.ipoLockupExpiry,
-                  (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
-                  { type: "date" }
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderField(
-                  "Last deal lock up expiry",
-                  capitalStructure.lastDealLockupExpiry,
-                  (val) =>
-                    setCapitalStructure((prev) => ({
-                      ...prev,
-                      lastDealLockupExpiry: val,
-                    })),
-                  { type: "date" }
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderField(
-                  "Results",
-                  investmentSnapshot.results,
-                  (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
-                  { type: "date" }
-                )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {renderMultiSelectField(
-                  "Catalyst",
-                  businessStrategy.catalysts,
-                  (val) => setBusinessStrategy((prev) => ({ ...prev, catalysts: val })),
-                  catalystOptions
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                {renderMultiSelectField(
-                  "Potential sellers",
-                  capitalStructure.potentialSellers,
-                  (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
-                  potentialSellerOptions
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                {renderField("Historical sellers", capitalStructure.historicalSellers, (val) =>
-                  setCapitalStructure((prev) => ({ ...prev, historicalSellers: val }))
-                )}
-              </Grid>
-            </Grid>
+            <Stack spacing={1} sx={{ padding: 2 }}>
+              {renderField("Possible Deal Size", investmentSnapshot.possibleSize, (val) =>
+                setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+              )}
+              {renderField(
+                "IPO Lock up Expiry",
+                capitalStructure.ipoLockupExpiry,
+                (val) => setCapitalStructure((prev) => ({ ...prev, ipoLockupExpiry: val })),
+                { type: "date" }
+              )}
+              {renderField(
+                "Last deal lock up expiry",
+                capitalStructure.lastDealLockupExpiry,
+                (val) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    lastDealLockupExpiry: val,
+                  })),
+                { type: "date" }
+              )}
+              {renderField(
+                "Results",
+                investmentSnapshot.results,
+                (val) => setInvestmentSnapshot((prev) => ({ ...prev, results: val })),
+                { type: "date" }
+              )}
+              {renderMultiSelectField(
+                "Potential sellers",
+                capitalStructure.potentialSellers,
+                (val) => setCapitalStructure((prev) => ({ ...prev, potentialSellers: val })),
+                potentialSellerOptions
+              )}
+              {renderField("Historical sellers", capitalStructure.historicalSellers, (val) =>
+                setCapitalStructure((prev) => ({ ...prev, historicalSellers: val }))
+              )}
+            </Stack>
           </Paper>
         </Grid>
       </Grid>
@@ -497,7 +469,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       <Paper sx={sectionCardSx}>
         <Box
           sx={{
-            backgroundColor: "rgba(0,80,200,0.12)",
+            backgroundColor: "#3b66d6",
             borderRadius: 1.5,
             py: 0.75,
             px: 1,
@@ -537,7 +509,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       <Paper sx={{ ...sectionCardSx }}>
         <Box
           sx={{
-            backgroundColor: "rgba(0,80,200,0.12)",
+            backgroundColor: "#3b66d6",
             borderRadius: 1.5,
             py: 0.75,
             px: 1,
@@ -557,9 +529,6 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           }}
         >
           <Stack spacing={1.25}>
-            <Typography fontWeight={700} color="#1c2a4d">
-              Automate email reminders
-            </Typography>
             <Stack
               direction="row"
               alignItems="center"
@@ -616,6 +585,62 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   }))
                 }
               />
+            </Stack>
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              alignItems={{ xs: "flex-start", md: "center" }}
+              justifyContent="space-between"
+              spacing={1}
+              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+            >
+              <Typography color="#1c2a4d">Key Level</Typography>
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                alignItems={{ xs: "stretch", md: "center" }}
+                spacing={1}
+                sx={{ width: { xs: "100%", md: "auto" } }}
+              >
+                <TextField
+                  value={capitalStructure.keyValueAmount}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      keyValueAmount: e.target.value,
+                    }))
+                  }
+                  size="small"
+                  placeholder="$0"
+                  disabled={!isEditing}
+                  sx={{ minWidth: { xs: "100%", md: 140 } }}
+                />
+                <TextField
+                  select
+                  value={capitalStructure.keyValueComparator}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      keyValueComparator: e.target.value,
+                    }))
+                  }
+                  size="small"
+                  disabled={!isEditing}
+                  sx={{ minWidth: { xs: "100%", md: 160 } }}
+                >
+                  <MenuItem value="greater">Greater than</MenuItem>
+                  <MenuItem value="lesser">Lesser than</MenuItem>
+                </TextField>
+                <Checkbox
+                  checked={capitalStructure.keyValueAutomate}
+                  sx={checkboxSx}
+                  disabled={!isEditing}
+                  onChange={(e) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      keyValueAutomate: e.target.checked,
+                    }))
+                  }
+                />
+              </Stack>
             </Stack>
           </Stack>
         </Paper>
