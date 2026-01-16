@@ -121,7 +121,7 @@ const readOnlyFieldSx = {
 
 const headingColor = "#0b2a6f";
 const headerBg = "#0b2a6f";
-const uiFontFamily = "'Poppins', 'Segoe UI', Arial, sans-serif";
+const uiFontFamily = "'Inter', system-ui, sans-serif";
 
 const reasonOptions = [
   "Pre earnings cash burn",
@@ -182,13 +182,19 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         type={options?.type}
         InputProps={{
           readOnly: !isEditing || options?.readOnly,
+          sx: { fontFamily: uiFontFamily },
         }}
         placeholder={options?.placeholder}
         required={options?.required}
         error={options?.error}
         helperText={options?.helperText}
         disabled={options?.readOnly}
-        sx={readOnlyFieldSx}
+        sx={{
+          ...readOnlyFieldSx,
+          "& .MuiInputBase-input": {
+            fontFamily: uiFontFamily,
+          },
+        }}
       />
     </Stack>
   );
@@ -222,7 +228,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           fullWidth
           size="small"
           disabled={!isEditing}
-          sx={readOnlyFieldSx}
+          sx={{
+            ...readOnlyFieldSx,
+            "& .MuiInputBase-input": {
+              fontFamily: uiFontFamily,
+            },
+          }}
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>
@@ -276,6 +287,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             InputProps={{
               readOnly: !isEditing,
               sx: {
+                fontFamily: uiFontFamily,
                 "& textarea": {
                   minHeight: 44,
                   maxHeight: textareaMaxHeight,
@@ -291,6 +303,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               borderRadius: 1,
               width: "100%",
               ...readOnlyFieldSx,
+              "& .MuiInputBase-input": {
+                fontFamily: uiFontFamily,
+              },
             }}
           />
         </Grid>
@@ -651,7 +666,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 py: 1,
               }}
             >
-              <Typography color="#1c2a4d">IPO lockup expiry?</Typography>
+              <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
+                IPO lockup expiry?
+              </Typography>
               <Checkbox
                 checked={capitalStructure.ipoLockupExpiryAutomate}
                 sx={checkboxSx}
@@ -675,7 +692,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 py: 1,
               }}
             >
-              <Typography color="#1c2a4d">Last deal lockup expiry?</Typography>
+              <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
+                Last deal lockup expiry?
+              </Typography>
               <Checkbox
                 checked={capitalStructure.lastDealLockupExpiryAutomate}
                 sx={checkboxSx}
@@ -699,7 +718,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 py: 1,
               }}
             >
-              <Typography color="#1c2a4d">Results?</Typography>
+              <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
+                Results?
+              </Typography>
               <Checkbox
                 checked={capitalStructure.resultsAutomate}
                 sx={checkboxSx}
@@ -724,7 +745,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 py: 1,
               }}
             >
-              <Typography color="#1c2a4d">Key Level</Typography>
+              <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
+                Key Level
+              </Typography>
               <Stack
                 direction={{ xs: "column", md: "row" }}
                 alignItems={{ xs: "stretch", md: "center" }}
@@ -742,7 +765,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   size="small"
                   placeholder="$0"
                   disabled={!isEditing}
-                  sx={{ minWidth: { xs: "100%", md: 140 } }}
+                  sx={{
+                    minWidth: { xs: "100%", md: 140 },
+                    "& .MuiInputBase-input": {
+                      fontFamily: uiFontFamily,
+                    },
+                  }}
                 />
                 <TextField
                   select
@@ -755,7 +783,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   }
                   size="small"
                   disabled={!isEditing}
-                  sx={{ minWidth: { xs: "100%", md: 160 } }}
+                  sx={{
+                    minWidth: { xs: "100%", md: 160 },
+                    "& .MuiInputBase-input": {
+                      fontFamily: uiFontFamily,
+                    },
+                  }}
                 >
                   <MenuItem value="greater">Greater than</MenuItem>
                   <MenuItem value="lesser">Lesser than</MenuItem>
