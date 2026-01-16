@@ -92,7 +92,7 @@ type FormProps = {
 const sectionCardSx = {
   Padding: 2,
   borderRadius: 2,
-  border: "1px solid #d9deeb",
+  border: "1px solid #d3dbf0",
   backgroundColor: "#ffffff",
   boxShadow: "0 6px 14px rgba(0,0,0,0.06)",
   height: "100%",
@@ -102,20 +102,23 @@ const sectionCardSx = {
 };
 
 const checkboxSx = {
-  color: "#002060",
+  color: "#0b2a6f",
   "&.Mui-checked": {
-    color: "#002060",
+    color: "#0b2a6f",
   },
 };
 
 const readOnlyFieldSx = {
   "& .MuiInputBase-root.Mui-disabled": {
-    color: "#1c2a4d",
-    WebkitTextFillColor: "#1c2a4d",
+    color: "#1a2b5a",
+    WebkitTextFillColor: "#1a2b5a",
     opacity: 1,
     backgroundColor: "#ffffff",
   },
 };
+
+const headingColor = "#0b2a6f";
+const headerBg = "#0b2a6f";
 
 const reasonOptions = [
   "Pre earnings cash burn",
@@ -162,7 +165,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     }
   ) => (
     <Stack spacing={0.5}>
-      <Typography fontWeight={400} color="#1c2a4d">
+      <Typography fontWeight={400} color={headingColor}>
         {label}
         {options?.required ? " *" : ""}
       </Typography>
@@ -202,7 +205,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
 
     return (
       <Stack spacing={0.5}>
-        <Typography fontWeight={400} color="#1c2a4d">
+        <Typography fontWeight={400} color={headingColor}>
           {label}
         </Typography>
         <TextField
@@ -249,7 +252,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         }}
       >
         <Grid item xs={12} md={3}>
-          <Typography fontWeight={400} color="#1c2a4d" sx={{ textAlign: { xs: "left", md: "left" } }}>
+          <Typography fontWeight={400} color={headingColor} sx={{ textAlign: { xs: "left", md: "left" } }}>
             {label}
           </Typography>
         </Grid>
@@ -292,7 +295,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           width: 28,
           height: 28,
           borderRadius: "50%",
-          backgroundColor: "rgba(255,255,255,0.2)",
+          backgroundColor: "rgba(255,255,255,0.18)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -322,7 +325,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "#3b66d6",
+                backgroundColor: headerBg,
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -388,7 +391,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "#3b66d6",
+                backgroundColor: headerBg,
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -436,7 +439,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           <Paper sx={{ ...sectionCardSx, minHeight: { xs: 420, md: 460 } }}>
             <Box
               sx={{
-                backgroundColor: "#3b66d6",
+                backgroundColor: headerBg,
                 borderRadius: 1.5,
                 py: 0.75,
                 px: 1,
@@ -488,7 +491,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       <Paper sx={sectionCardSx}>
         <Box
           sx={{
-            backgroundColor: "#3b66d6",
+            backgroundColor: headerBg,
             borderRadius: 1.5,
             py: 0.75,
             px: 1,
@@ -528,7 +531,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       <Paper sx={{ ...sectionCardSx }}>
         <Box
           sx={{
-            backgroundColor: "#3b66d6",
+            backgroundColor: headerBg,
             borderRadius: 1.5,
             py: 0.75,
             px: 1,
@@ -537,16 +540,16 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Automation")}
         </Box>
         <Divider sx={{ my: 1 }} />
-        <Paper
-          variant="outlined"
-          sx={{
-            borderColor: "#d9deeb",
-            borderRadius: 2,
-            p: { xs: 1.5, md: 2 },
-            background:
-              "linear-gradient(135deg, rgba(0,80,200,0.08) 0%, rgba(255,255,255,0.9) 70%)",
-          }}
-        >
+      <Paper
+        variant="outlined"
+        sx={{
+          borderColor: "#d9deeb",
+          borderRadius: 2,
+          p: { xs: 1.5, md: 2 },
+          background:
+            "linear-gradient(135deg, rgba(11,42,111,0.06) 0%, rgba(255,255,255,0.92) 70%)",
+        }}
+      >
           <Stack spacing={1.25}>
             <Stack
               direction="row"
