@@ -3,7 +3,6 @@ import {
   Box,
   Checkbox,
   Divider,
-  FormControlLabel,
   Grid,
   MenuItem,
   Paper,
@@ -25,6 +24,7 @@ export type MeetingOverview = {
   reason: string;
   broker: string;
   attendees: string;
+  bankerAttendees: string;
 };
 
 export type InvestmentSnapshot = {
@@ -108,6 +108,15 @@ const checkboxSx = {
   },
 };
 
+const readOnlyFieldSx = {
+  "& .MuiInputBase-root.Mui-disabled": {
+    color: "#1c2a4d",
+    WebkitTextFillColor: "#1c2a4d",
+    opacity: 1,
+    backgroundColor: "#ffffff",
+  },
+};
+
 const reasonOptions = [
   "Pre earnings cash burn",
   "de-leverage",
@@ -153,7 +162,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     }
   ) => (
     <Stack spacing={0.5}>
-      <Typography fontWeight={600} color="#1c2a4d">
+      <Typography fontWeight={400} color="#1c2a4d">
         {label}
         {options?.required ? " *" : ""}
       </Typography>
@@ -165,12 +174,15 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         multiline={options?.multiline}
         minRows={options?.multiline ? 2 : undefined}
         type={options?.type}
-        InputProps={options?.readOnly ? { readOnly: true } : undefined}
+        InputProps={{
+          readOnly: !isEditing || options?.readOnly,
+        }}
         placeholder={options?.placeholder}
         required={options?.required}
         error={options?.error}
         helperText={options?.helperText}
-        disabled={!isEditing && !options?.readOnly}
+        disabled={options?.readOnly}
+        sx={readOnlyFieldSx}
       />
     </Stack>
   );
@@ -190,7 +202,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
 
     return (
       <Stack spacing={0.5}>
-        <Typography fontWeight={600} color="#1c2a4d">
+        <Typography fontWeight={400} color="#1c2a4d">
           {label}
         </Typography>
         <TextField
@@ -204,6 +216,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           fullWidth
           size="small"
           disabled={!isEditing}
+          sx={readOnlyFieldSx}
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>
@@ -236,7 +249,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         }}
       >
         <Grid item xs={12} md={3}>
-          <Typography fontWeight={600} color="#1c2a4d" sx={{ textAlign: { xs: "left", md: "left" } }}>
+          <Typography fontWeight={400} color="#1c2a4d" sx={{ textAlign: { xs: "left", md: "left" } }}>
             {label}
           </Typography>
         </Grid>
@@ -246,7 +259,16 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             onChange={(e) => onChange(e.target.value)}
             size="small"
             placeholder={placeholder}
-            disabled={!isEditing}
+            InputProps={{
+              readOnly: !isEditing,
+              sx: {
+                "& textarea": {
+                  minHeight: 44,
+                  maxHeight: 120,
+                  overflow: "auto",
+                },
+              },
+            }}
             multiline
             minRows={1}
             maxRows={4}
@@ -255,15 +277,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               borderRadius: 1,
               width: { xs: "100%", md: "80%" },
               mx: "auto",
-            }}
-            InputProps={{
-              sx: {
-                "& textarea": {
-                  minHeight: 44,
-                  maxHeight: 120,
-                  overflow: "auto",
-                },
-              },
+              ...readOnlyFieldSx,
             }}
           />
         </Grid>
@@ -390,7 +404,12 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 (val) => setMeetingOverview((prev) => ({ ...prev, attendees: val })),
                 { multiline: true }
               )}
-              {renderField("Banker", "", () => undefined, { readOnly: true, multiline: true })}
+              {renderField(
+                "Banker",
+                meetingOverview.bankerAttendees,
+                (val) => setMeetingOverview((prev) => ({ ...prev, bankerAttendees: val })),
+                { multiline: true }
+              )}
               {renderMultiSelectField(
                 "Reason (Dropdown)",
                 businessStrategy.reasonForRaise,

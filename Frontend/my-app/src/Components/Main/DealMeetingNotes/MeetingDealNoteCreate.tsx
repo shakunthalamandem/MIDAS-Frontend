@@ -25,6 +25,7 @@ export const initialMeetingOverview: MeetingOverview = {
   reason: "",
   broker: "",
   attendees: "",
+  bankerAttendees: "",
 };
 
 export const initialInvestmentSnapshot: InvestmentSnapshot = {
@@ -137,26 +138,25 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     return `meeting${maxIndex + 1}`;
   };
 
-  const formatAttendeesString = (value?: any) => {
+  const formatAttendeeGroup = (value: any, group: "management" | "banker") => {
     if (!value) return "";
     if (typeof value === "string") return value;
-    const parts = [
-      ...(value?.management || []),
-      ...(value?.banker || []),
-      ...(value?.others || []),
-    ];
-    return parts.filter(Boolean).join(", ");
+    const entries = Array.isArray(value?.[group]) ? value[group] : [];
+    return entries.filter(Boolean).join(", ");
   };
 
-  const buildAttendeesPayload = (value: string) => {
-    const entries = (value || "")
-      .split(/,|;/)
-      .map((item) => item.trim())
-      .filter(Boolean);
+  const buildAttendeesPayload = (managementValue: string, bankerValue: string) => {
+    const normalize = (input: string) =>
+      (input || "")
+        .split(/,|;/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    const management = normalize(managementValue);
+    const banker = normalize(bankerValue);
     return {
-      banker: [],
-      management: [],
-      others: entries,
+      banker,
+      management,
+      others: [],
     };
   };
 
@@ -186,7 +186,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
         location: overview?.location || "",
         reason: overview?.reason || "",
         broker: overview?.broker || "",
-        attendees: formatAttendeesString(overview?.attendees),
+        attendees: formatAttendeeGroup(overview?.attendees, "management"),
+        bankerAttendees: formatAttendeeGroup(overview?.attendees, "banker"),
       },
       investmentSnapshot: {
         oneLineSummary: overview?.one_line_summary || "",
@@ -464,7 +465,10 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
       results: investmentSnapshot.results,
       catalyst: businessStrategy.catalysts,
       location: meetingOverview.location,
-      attendees: buildAttendeesPayload(meetingOverview.attendees),
+      attendees: buildAttendeesPayload(
+        meetingOverview.attendees,
+        meetingOverview.bankerAttendees
+      ),
       key_level: investmentSnapshot.keyLevel,
       meeting_notes: businessStrategy.meetingNotes,
       possible_size: investmentSnapshot.possibleSize,
