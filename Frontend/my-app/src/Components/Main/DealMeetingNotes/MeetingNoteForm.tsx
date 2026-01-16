@@ -121,6 +121,7 @@ const readOnlyFieldSx = {
 
 const headingColor = "#0b2a6f";
 const headerBg = "#0b2a6f";
+const uiFontFamily = "'Poppins', 'Segoe UI', Arial, sans-serif";
 
 const reasonOptions = [
   "Pre earnings cash burn",
@@ -167,7 +168,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     }
   ) => (
     <Stack spacing={0.5}>
-      <Typography fontWeight={400} color={headingColor}>
+      <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
         {label}
         {options?.required ? " *" : ""}
       </Typography>
@@ -207,7 +208,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
 
     return (
       <Stack spacing={0.5}>
-        <Typography fontWeight={400} color={headingColor}>
+        <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
           {label}
         </Typography>
         <TextField
@@ -259,9 +260,9 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       >
         <Grid item xs={12} md={2}>
           <Typography
-            fontWeight={400}
+            fontWeight={600}
             color={headingColor}
-            sx={{ textAlign: { xs: "left", md: "left" } }}
+            sx={{ textAlign: { xs: "left", md: "left" }, fontFamily: uiFontFamily }}
           >
             {label}
           </Typography>
@@ -322,7 +323,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
         variant="h6"
         fontWeight={700}
         color="#ffffff"
-        sx={{ fontSize: "1rem" }}
+        sx={{ fontSize: "1rem", fontFamily: uiFontFamily }}
       >
         {title}
       </Typography>
@@ -444,7 +445,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 { multiline: true }
               )}
               {renderMultiSelectField(
-                "Reason (Dropdown)",
+                "Reason",
                 businessStrategy.reasonForRaise,
                 (val) =>
                   setBusinessStrategy((prev) => ({
