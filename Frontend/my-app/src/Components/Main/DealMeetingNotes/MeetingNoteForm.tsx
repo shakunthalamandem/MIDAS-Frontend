@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  Button,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -9,11 +8,6 @@ import {
   MenuItem,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,10 +16,6 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import ScheduleOutlinedIcon from "@mui/icons-material/ScheduleOutlined";
-import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
-import SyncOutlinedIcon from "@mui/icons-material/SyncOutlined";
 
 export type MeetingOverview = {
   ticker: string;
@@ -159,23 +149,27 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       helperText?: string;
     }
   ) => (
-    <TextField
-      label={label}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      fullWidth
-      size="small"
-      multiline={options?.multiline}
-      minRows={options?.multiline ? 2 : undefined}
-      type={options?.type}
-      InputLabelProps={options?.type === "date" ? { shrink: true } : undefined}
-      InputProps={options?.readOnly ? { readOnly: true } : undefined}
-      placeholder={options?.placeholder}
-      required={options?.required}
-      error={options?.error}
-      helperText={options?.helperText}
-      disabled={!isEditing && !options?.readOnly}
-    />
+    <Stack spacing={0.5}>
+      <Typography fontWeight={600} color="#1c2a4d">
+        {label}
+        {options?.required ? " *" : ""}
+      </Typography>
+      <TextField
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        fullWidth
+        size="small"
+        multiline={options?.multiline}
+        minRows={options?.multiline ? 2 : undefined}
+        type={options?.type}
+        InputProps={options?.readOnly ? { readOnly: true } : undefined}
+        placeholder={options?.placeholder}
+        required={options?.required}
+        error={options?.error}
+        helperText={options?.helperText}
+        disabled={!isEditing && !options?.readOnly}
+      />
+    </Stack>
   );
 
   const renderMultiSelectField = (
@@ -192,26 +186,30 @@ const MeetingNoteForm: React.FC<FormProps> = ({
       : [];
 
     return (
-      <TextField
-        select
-        label={label}
-        value={selectedValues}
-        onChange={(e) => {
-          const next = Array.isArray(e.target.value) ? e.target.value : [];
-          onChange(next.join(", "));
-        }}
-        SelectProps={{ multiple: true }}
-        fullWidth
-        size="small"
-        disabled={!isEditing}
-      >
-        {options.map((option) => (
-          <MenuItem key={option} value={option}>
-            <Checkbox checked={selectedValues.includes(option)} sx={checkboxSx} />
-            {option}
-          </MenuItem>
-        ))}
-      </TextField>
+      <Stack spacing={0.5}>
+        <Typography fontWeight={600} color="#1c2a4d">
+          {label}
+        </Typography>
+        <TextField
+          select
+          value={selectedValues}
+          onChange={(e) => {
+            const next = Array.isArray(e.target.value) ? e.target.value : [];
+            onChange(next.join(", "));
+          }}
+          SelectProps={{ multiple: true }}
+          fullWidth
+          size="small"
+          disabled={!isEditing}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox checked={selectedValues.includes(option)} sx={checkboxSx} />
+              {option}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
     );
   };
 
@@ -229,70 +227,48 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: normalized }));
   };
 
-  const renderListField = (
+  const renderInsightField = (
     label: string,
     value: string,
     onChange: (val: string) => void,
     placeholder?: string
   ) => {
-    const items = value ? value.split("\n") : [""];
-    const safeItems = items.length ? items : [""];
-
-    const updateItem = (index: number, nextValue: string) => {
-      const nextItems = [...safeItems];
-      nextItems[index] = nextValue;
-      onChange(nextItems.join("\n"));
-    };
-
-    const addItem = () => {
-      onChange([...safeItems, ""].join("\n"));
-    };
-
-    const removeItem = (index: number) => {
-      if (safeItems.length <= 1) {
-        onChange("");
-        return;
-      }
-      const nextItems = safeItems.filter((_, idx) => idx !== index);
-      onChange(nextItems.join("\n"));
-    };
-
     return (
-      <Stack spacing={0.75}>
-        <Typography fontWeight={600} color="#1c2a4d" align="center">
-          {label}
-        </Typography>
-        {safeItems.map((item, index) => (
-          <Stack key={`${label}-${index}`} direction="row" spacing={1} alignItems="center">
-            <Typography color="#1c2a4d">.</Typography>
-            <TextField
-              value={item}
-              onChange={(e) => updateItem(index, e.target.value)}
-              fullWidth
-              size="small"
-              placeholder={placeholder}
-              disabled={!isEditing}
-              variant="standard"
-              InputProps={{ disableUnderline: true }}
-            />
-            {isEditing && (
-              <Stack direction="row" spacing={0.5}>
-                <Button variant="outlined" size="small" onClick={addItem}>
-                  +
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => removeItem(index)}
-                  disabled={items.length === 1}
-                >
-                  -
-                </Button>
-              </Stack>
-            )}
-          </Stack>
-        ))}
-      </Stack>
+      <Grid
+        container
+        spacing={2}
+        alignItems="flex-start"
+        sx={{
+          borderRadius: 2,
+          border: "1px solid #e3e8f5",
+          backgroundColor: "#f7f9ff",
+          px: { xs: 1.5, md: 2 },
+          py: 1.5,
+        }}
+      >
+        <Grid item xs={12} md={3}>
+          <Typography fontWeight={600} color="#1c2a4d">
+            {label}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={9}>
+          <TextField
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            size="small"
+            placeholder={placeholder}
+            disabled={!isEditing}
+            multiline
+            minRows={2}
+            sx={{
+              backgroundColor: "#ffffff",
+              borderRadius: 1,
+              width: { xs: "100%", md: "80%" },
+              mx: "auto",
+            }}
+          />
+        </Grid>
+      </Grid>
     );
   };
 
@@ -530,221 +506,119 @@ const MeetingNoteForm: React.FC<FormProps> = ({
           {sectionHeader(<LightbulbOutlinedIcon fontSize="small" />, "Key Insights")}
         </Box>
         <Divider sx={{ my: 1 }} />
-        <Stack spacing={1} sx={{ padding: 2 }}>
-          {renderListField(
+        <Stack spacing={1.5} sx={{ padding: 2 }}>
+          {renderInsightField(
             "One-line Summary",
             investmentSnapshot.oneLineSummary,
             (val) => setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val })),
             "One-line summary"
           )}
-          {renderListField(
+          {renderInsightField(
             "Executive Summary",
             investmentSnapshot.executiveSummary,
             (val) => setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val })),
             "Executive summary"
           )}
-          {renderListField(
+          {renderInsightField(
             "Meeting Notes",
             businessStrategy.meetingNotes,
             (val) => setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
             "Meeting notes"
           )}
+          {renderInsightField(
+            "Follow-up Questions",
+            capitalStructure.followUpQuestions,
+            (val) => setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val })),
+            "Follow-up questions"
+          )}
         </Stack>
       </Paper>
 
-      <Paper sx={{ ...sectionCardSx}}>
-
+      <Paper sx={{ ...sectionCardSx }}>
+        <Box
+          sx={{
+            backgroundColor: "rgba(0,80,200,0.12)",
+            borderRadius: 1.5,
+            py: 0.75,
+            px: 1,
+          }}
+        >
+          {sectionHeader(<EmailOutlinedIcon fontSize="small" />, "Email Automation")}
+        </Box>
         <Divider sx={{ my: 1 }} />
-
-
-          <Stack spacing={1} sx={{ pt: 1 }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  backgroundColor: "rgba(0,80,200,0.12)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#002060",
-                }}
-              >
-                <EmailOutlinedIcon fontSize="small" />
-              </Box>
-              <Typography fontWeight={700} color="#002060">
-                Email Automation
-              </Typography>
-            </Stack>
-            <Paper
-              variant="outlined"
-              sx={{
-                borderColor: "#d9deeb",
-                borderRadius: 2,
-                overflow: "hidden",
-              }}
+        <Paper
+          variant="outlined"
+          sx={{
+            borderColor: "#d9deeb",
+            borderRadius: 2,
+            p: { xs: 1.5, md: 2 },
+            background:
+              "linear-gradient(135deg, rgba(0,80,200,0.08) 0%, rgba(255,255,255,0.9) 70%)",
+          }}
+        >
+          <Stack spacing={1.25}>
+            <Typography fontWeight={700} color="#1c2a4d">
+              Automate email reminders
+            </Typography>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
             >
-              <Table size="small">
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "rgba(0,80,200,0.08)" }}>
-                    <TableCell sx={{ fontWeight: 700, color: "#002060" }}>Event</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: "#002060" }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: "#002060" }}>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <SyncOutlinedIcon fontSize="small" />
-                        <span>Automate</span>
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: "#002060" }}>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <ScheduleOutlinedIcon fontSize="small" />
-                        <span>2 weeks before</span>
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: "#002060" }}>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <EventAvailableOutlinedIcon fontSize="small" />
-                        <span>On day</span>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell sx={{ color: "#1c2a4d" }}>IPO lockup expiry?</TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.ipoLockupExpiryAutomate}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            ipoLockupExpiryAutomate: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.ipoLockupExpiryEmailTwoWeeks}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            ipoLockupExpiryEmailTwoWeeks: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.ipoLockupExpiryEmailOnDay}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            ipoLockupExpiryEmailOnDay: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell sx={{ color: "#1c2a4d" }}>Last deal lockup expiry?</TableCell>
-
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.lastDealLockupExpiryAutomate}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            lastDealLockupExpiryAutomate: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.lastDealLockupExpiryEmailTwoWeeks}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            lastDealLockupExpiryEmailTwoWeeks: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.lastDealLockupExpiryEmailOnDay}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            lastDealLockupExpiryEmailOnDay: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell sx={{ color: "#1c2a4d" }}>Results?</TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.resultsAutomate}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            resultsAutomate: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.resultsEmailTwoWeeks}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            resultsEmailTwoWeeks: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={capitalStructure.resultsEmailOnDay}
-                        sx={checkboxSx}
-                        disabled={!isEditing}
-                        onChange={(e) =>
-                          setCapitalStructure((prev) => ({
-                            ...prev,
-                            resultsEmailOnDay: e.target.checked,
-                          }))
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-
-                </TableBody>
-              </Table>
-            </Paper>
+              <Typography color="#1c2a4d">IPO lockup expiry?</Typography>
+              <Checkbox
+                checked={capitalStructure.ipoLockupExpiryAutomate}
+                sx={checkboxSx}
+                disabled={!isEditing}
+                onChange={(e) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    ipoLockupExpiryAutomate: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+            >
+              <Typography color="#1c2a4d">Last deal lockup expiry?</Typography>
+              <Checkbox
+                checked={capitalStructure.lastDealLockupExpiryAutomate}
+                sx={checkboxSx}
+                disabled={!isEditing}
+                onChange={(e) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    lastDealLockupExpiryAutomate: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ borderRadius: 1.5, backgroundColor: "#ffffff", px: 1.5, py: 1 }}
+            >
+              <Typography color="#1c2a4d">Results?</Typography>
+              <Checkbox
+                checked={capitalStructure.resultsAutomate}
+                sx={checkboxSx}
+                disabled={!isEditing}
+                onChange={(e) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    resultsAutomate: e.target.checked,
+                  }))
+                }
+              />
+            </Stack>
           </Stack>
-
-         
+        </Paper>
       </Paper>
     </Stack>
   );
