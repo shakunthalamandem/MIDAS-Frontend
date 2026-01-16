@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   Checkbox,
   Divider,
   Grid,
@@ -49,6 +50,7 @@ export type CapitalStructure = {
   lastDealLockupExpiry: string;
   historicalSellers: string;
   followUpQuestions: string;
+  attachments: File[];
   keyValueAmount: string;
   keyValueComparator: string;
   keyValueAutomate: boolean;
@@ -309,6 +311,62 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               },
             }}
           />
+        </Grid>
+      </Grid>
+    );
+  };
+
+  const renderAttachmentField = (
+    label: string,
+    files: File[],
+    onChange: (nextFiles: File[]) => void
+  ) => {
+    const names = files.length ? files.map((file) => file.name).join(", ") : "No files selected";
+
+    return (
+      <Grid
+        container
+        spacing={1}
+        alignItems="center"
+        sx={{
+          px: { xs: 0.5, md: 1 },
+          py: 0.5,
+        }}
+      >
+        <Grid item xs={12} md={2}>
+          <Typography
+            fontWeight={600}
+            color={headingColor}
+            sx={{ textAlign: { xs: "left", md: "left" }, fontFamily: uiFontFamily }}
+          >
+            {label}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={10}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={1}
+            alignItems={{ xs: "flex-start", md: "center" }}
+          >
+            <Button
+              component="label"
+              variant="outlined"
+              size="small"
+              disabled={!isEditing}
+              sx={{ fontFamily: uiFontFamily, textTransform: "none" }}
+            >
+              Upload attachments
+              <input
+                type="file"
+                hidden
+                multiple
+                onChange={(e) => onChange(Array.from(e.target.files || []))}
+              />
+            </Button>
+            <Typography color="#1a2b5a" sx={{ fontFamily: uiFontFamily }}>
+              {names}
+            </Typography>
+          </Stack>
         </Grid>
       </Grid>
     );
@@ -627,6 +685,13 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                 followUpQuestions: val,
               })),
             "Follow-up questions"
+          )}
+          <Divider sx={{ borderColor: "#d9deeb" }} />
+          {renderAttachmentField("Attachments", capitalStructure.attachments, (nextFiles) =>
+            setCapitalStructure((prev) => ({
+              ...prev,
+              attachments: nextFiles,
+            }))
           )}
         </Stack>
       </Paper>
