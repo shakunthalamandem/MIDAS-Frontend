@@ -52,6 +52,7 @@ export type CapitalStructure = {
   keyValueAmount: string;
   keyValueComparator: string;
   keyValueAutomate: boolean;
+  emailRecipients: string;
   managementEmailFeedback: string;
   bankerFollowUpFeedback: string;
   emailSendToManagement: boolean;
@@ -805,6 +806,40 @@ const MeetingNoteForm: React.FC<FormProps> = ({
                   }
                 />
               </Stack>
+            </Stack>
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              alignItems={{ xs: "flex-start", md: "center" }}
+              justifyContent="space-between"
+              spacing={1}
+              sx={{
+                borderRadius: 1.5,
+                backgroundColor: "#ffffff",
+                px: 1.5,
+                py: 1,
+              }}
+            >
+              <Typography fontWeight={600} color={headingColor} sx={{ fontFamily: uiFontFamily }}>
+                Whom to send to Email?
+              </Typography>
+              <TextField
+                value={capitalStructure.emailRecipients}
+                onChange={(e) =>
+                  setCapitalStructure((prev) => ({
+                    ...prev,
+                    emailRecipients: e.target.value,
+                  }))
+                }
+                size="small"
+                placeholder="Enter email recipients"
+                disabled={!isEditing}
+                sx={{
+                  minWidth: { xs: "100%", md: 260 },
+                  "& .MuiInputBase-input": {
+                    fontFamily: uiFontFamily,
+                  },
+                }}
+              />
             </Stack>
           </Stack>
         </Paper>
