@@ -2,6 +2,7 @@ import React from "react";
 import {
   Box,
   Checkbox,
+  Divider,
   Grid,
   MenuItem,
   Paper,
@@ -240,22 +241,23 @@ const MeetingNoteForm: React.FC<FormProps> = ({
     label: string,
     value: string,
     onChange: (val: string) => void,
-    placeholder?: string
+    placeholder?: string,
+    options?: {
+      maxHeight?: number;
+    }
   ) => {
+    const textareaMaxHeight = options?.maxHeight ?? 120;
     return (
       <Grid
         container
-        spacing={2}
+        spacing={1}
         alignItems="center"
         sx={{
-          borderRadius: 2,
-          border: "1px solid #e3e8f5",
-          backgroundColor: "#f7f9ff",
-          px: { xs: 1.5, md: 2 },
-          py: 1.5,
+          px: { xs: 0.5, md: 1 },
+          py: 0.5,
         }}
       >
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2}>
           <Typography
             fontWeight={400}
             color={headingColor}
@@ -264,7 +266,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             {label}
           </Typography>
         </Grid>
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} md={10}>
           <TextField
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -275,7 +277,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               sx: {
                 "& textarea": {
                   minHeight: 44,
-                  maxHeight: 120,
+                  maxHeight: textareaMaxHeight,
                   overflow: "auto",
                 },
               },
@@ -286,8 +288,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             sx={{
               backgroundColor: "#ffffff",
               borderRadius: 1,
-              width: { xs: "100%", md: "80%" },
-              mx: "auto",
+              width: "100%",
               ...readOnlyFieldSx,
             }}
           />
@@ -568,7 +569,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
             "Key Insights"
           )}
         </Box>
-        <Stack spacing={1.5} sx={{ padding: 2 }}>
+        <Stack spacing={1} sx={{ padding: 2 }}>
           {renderInsightField(
             "One-line Summary",
             investmentSnapshot.oneLineSummary,
@@ -579,6 +580,7 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               })),
             "One-line summary"
           )}
+          <Divider sx={{ borderColor: "#d9deeb" }} />
           {renderInsightField(
             "Executive Summary",
             investmentSnapshot.executiveSummary,
@@ -589,13 +591,16 @@ const MeetingNoteForm: React.FC<FormProps> = ({
               })),
             "Executive summary"
           )}
+          <Divider sx={{ borderColor: "#d9deeb" }} />
           {renderInsightField(
             "Meeting Notes",
             businessStrategy.meetingNotes,
             (val) =>
               setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val })),
-            "Meeting notes"
+            "Meeting notes",
+            { maxHeight: 500 }
           )}
+          <Divider sx={{ borderColor: "#d9deeb" }} />
           {renderInsightField(
             "Follow-up Questions",
             capitalStructure.followUpQuestions,
