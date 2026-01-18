@@ -8,9 +8,11 @@ import { getColumns } from "./DealTableData/columns";
 interface DealsTableProps {
   rows: any[];
   loading: boolean;
-  onRowSelect: (row: any) => void;
+  onRowSelect: (row: any, rowId: number | string | null) => void;
   selectedOp: string;
   hideRegionColumn?: boolean;
+  selectedRowId?: number | string | null;
+  onSelectedRowIdChange?: (rowId: number | string | null) => void;
 }
 
 const DealsTable: React.FC<DealsTableProps> = ({
@@ -19,8 +21,21 @@ const DealsTable: React.FC<DealsTableProps> = ({
   onRowSelect,
   selectedOp,
   hideRegionColumn = false,
+  selectedRowId,
+  onSelectedRowIdChange,
 }) => {
-  const [selectedId, setSelectedId] = useState<number | string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<
+    number | string | null
+  >(null);
+  const selectedId =
+    selectedRowId !== undefined ? selectedRowId : internalSelectedId;
+  const setSelectedId = (rowId: number | string | null) => {
+    if (onSelectedRowIdChange) {
+      onSelectedRowIdChange(rowId);
+      return;
+    }
+    setInternalSelectedId(rowId);
+  };
 
   // Clear selection if current rows no longer contain the selected id (e.g., after filtering)
   useEffect(() => {
@@ -38,13 +53,16 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
     const { ticker, deal_type, region, fo_type, sector } = params.row;
 
-    onRowSelect({
+    onRowSelect(
+      {
       ticker,
       deal_type,
       region,
       fo_type,
       sector,
-    });
+    },
+      params.id
+    );
 
   };
 

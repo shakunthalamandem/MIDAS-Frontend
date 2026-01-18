@@ -53,6 +53,15 @@ const NewDealsUpcomingRecent: React.FC = () => {
   ];
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
+  const [selectedUpcomingDatedId, setSelectedUpcomingDatedId] = useState<
+    number | string | null
+  >(null);
+  const [selectedUpcomingTbaId, setSelectedUpcomingTbaId] = useState<
+    number | string | null
+  >(null);
+  const [selectedSingleTableId, setSelectedSingleTableId] = useState<
+    number | string | null
+  >(null);
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [dealSearch, setDealSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
@@ -170,6 +179,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
       setRows(formattedRows);
       setSelectedDeal(null);
+      setSelectedUpcomingDatedId(null);
+      setSelectedUpcomingTbaId(null);
+      setSelectedSingleTableId(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -181,6 +193,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
     if (selectedOp === "pipeline") {
       setRows([]);
       setSelectedDeal(null);
+      setSelectedUpcomingDatedId(null);
+      setSelectedUpcomingTbaId(null);
+      setSelectedSingleTableId(null);
       return;
     }
     const apiOperation = opMap[selectedOp] || selectedOp;
@@ -207,11 +222,17 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   useEffect(() => {
     setSelectedDeal(null);
+    setSelectedUpcomingDatedId(null);
+    setSelectedUpcomingTbaId(null);
+    setSelectedSingleTableId(null);
   }, [dealSearch]);
 
   // dY"1 Reset selected ticker when region changes
   useEffect(() => {
     setSelectedDeal(null);
+    setSelectedUpcomingDatedId(null);
+    setSelectedUpcomingTbaId(null);
+    setSelectedSingleTableId(null);
   }, [selectedRegion]);
 
   const headlineText = useMemo(() => {
@@ -514,7 +535,7 @@ console.log("Filtered rows:", filteredRows);
           ) : selectedOp === "upcoming" ? (
             <>
               <Container sx={{ px: 1, mb: 1 }}>
-                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }}>
+                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
                   Upcoming Deals (Pricing Date Available) - {selectedDealType}
                 </Typography>
               </Container>
@@ -522,9 +543,20 @@ console.log("Filtered rows:", filteredRows);
                 <DealsTable
                   rows={upcomingDatedRows}
                   loading={loading}
-                  onRowSelect={(row) => setSelectedDeal(row)}
+                  onRowSelect={(row, rowId) => {
+                    setSelectedDeal(row);
+                    setSelectedUpcomingDatedId(rowId);
+                    setSelectedUpcomingTbaId(null);
+                  }}
                   selectedOp={selectedOp}
                   hideRegionColumn
+                  selectedRowId={selectedUpcomingDatedId}
+                  onSelectedRowIdChange={(rowId) => {
+                    setSelectedUpcomingDatedId(rowId);
+                    if (rowId != null) {
+                      setSelectedUpcomingTbaId(null);
+                    }
+                  }}
                 />
               ) : (
                 <Container
@@ -547,7 +579,7 @@ console.log("Filtered rows:", filteredRows);
               )}
 
               <Container sx={{ px: 1, mt: 2, mb: 1 }}>
-                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }}>
+                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
                   Upcoming Deals (To Be Announced) - {selectedDealType}
                 </Typography>
               </Container>
@@ -555,9 +587,20 @@ console.log("Filtered rows:", filteredRows);
                 <DealsTable
                   rows={upcomingTbaRows}
                   loading={loading}
-                  onRowSelect={(row) => setSelectedDeal(row)}
+                  onRowSelect={(row, rowId) => {
+                    setSelectedDeal(row);
+                    setSelectedUpcomingTbaId(rowId);
+                    setSelectedUpcomingDatedId(null);
+                  }}
                   selectedOp={selectedOp}
                   hideRegionColumn
+                  selectedRowId={selectedUpcomingTbaId}
+                  onSelectedRowIdChange={(rowId) => {
+                    setSelectedUpcomingTbaId(rowId);
+                    if (rowId != null) {
+                      setSelectedUpcomingDatedId(null);
+                    }
+                  }}
                 />
               ) : (
                 <Container
@@ -601,9 +644,14 @@ console.log("Filtered rows:", filteredRows);
             <DealsTable
               rows={filteredRows}
               loading={loading}
-              onRowSelect={(row) => setSelectedDeal(row)}
+              onRowSelect={(row, rowId) => {
+                setSelectedDeal(row);
+                setSelectedSingleTableId(rowId);
+              }}
               selectedOp={selectedOp}
               hideRegionColumn
+              selectedRowId={selectedSingleTableId}
+              onSelectedRowIdChange={setSelectedSingleTableId}
             />
           )}
         </Container>
