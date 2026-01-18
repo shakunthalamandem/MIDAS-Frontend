@@ -256,6 +256,7 @@ console.log("Filtered rows:", filteredRows);
       >
         {selectedOp !== "pipeline" && (
           <Container
+            maxWidth="xl"
             sx={{
               display: "flex",
               alignItems: "center",
@@ -323,9 +324,10 @@ console.log("Filtered rows:", filteredRows);
           borderRadius: 3,
         }}
       >
-        <Container maxWidth={false} sx={{ mt: 1, px: 0 }}>
+        <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
           {/* dY"1 ONE-LINE TEXT (LEFT) + SEARCH (RIGHT) */}
           <Container
+            maxWidth="xl"
             sx={{
               display: "flex",
               alignItems: "center",
@@ -336,7 +338,10 @@ console.log("Filtered rows:", filteredRows);
               flexWrap: "wrap",
             }}
           >
-            <Container sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
+            <Container
+              maxWidth="xl"
+              sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}
+            >
               <DealsFilters
                 selectedOp={selectedOp}
                 onChange={handleOpChange}
@@ -346,12 +351,14 @@ console.log("Filtered rows:", filteredRows);
           </Container>
 
           <Container
+            maxWidth="xl"
             sx={{
               mb: 1.5,
               px: 1,
               display: "flex",
               alignItems: "center",
               gap: 2,
+              justifyContent: "space-between",
               flexWrap: { xs: "wrap", md: "nowrap" },
             }}
           >
@@ -407,6 +414,7 @@ console.log("Filtered rows:", filteredRows);
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   flexGrow: 1,
+                  mx: { xs: 0, md: 2 },
                 }}
               >
                 {headlineText}
@@ -425,6 +433,7 @@ console.log("Filtered rows:", filteredRows);
                   display: "inline-flex",
                   gap: 0.5,
                   flexShrink: 0,
+                  ml: "auto",
                   "& .MuiToggleButtonGroup-grouped": {
                     border: 0,
                   },
