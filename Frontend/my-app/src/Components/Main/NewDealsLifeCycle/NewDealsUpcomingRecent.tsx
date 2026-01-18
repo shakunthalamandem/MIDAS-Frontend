@@ -64,7 +64,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   };
 
   const [selectedRegion, setSelectedRegion] = useState<
-    "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
+    "US" | "EMEA" | "APAC" | "Non-US America"
   >("US");
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
@@ -232,7 +232,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
           if (selectedRegion === "US" && region !== "US") return false;
           if (selectedRegion === "APAC" && region !== "APAC") return false;
           if (selectedRegion === "EMEA" && region !== "EMEA") return false;
-          if (selectedRegion === "NON_US_AMERICA") {
+          if (selectedRegion === "Non-US America") {
             if (region !== "NON-US AMERICA" && region !== "LATAM") return false;
           }
         }
@@ -270,7 +270,7 @@ console.log("Filtered rows:", filteredRows);
               { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
               { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
               { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-              { label: "Others", value: "NON_US_AMERICA", icon: <Diversity3Icon fontSize="small" /> },
+              { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
             ].map((item) => {
               const isSelected = selectedRegion === item.value;
 
@@ -421,6 +421,7 @@ console.log("Filtered rows:", filteredRows);
                   backgroundColor: "#f2f4f8",
                   p: 0.4,
                   borderRadius: 9999,
+                  border: "1px solid #d7ddea",
                   display: "inline-flex",
                   gap: 0.5,
                   flexShrink: 0,

@@ -10,18 +10,29 @@ const chatButtonStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-const ChatBoxButton: React.FC = () => {
+interface ChatBoxButtonProps {
+  label?: string;
+  onClick?: () => void;
+  icon?: React.ReactNode;
+}
+
+const ChatBoxButton: React.FC<ChatBoxButtonProps> = ({
+  label = "Deal Notes",
+  onClick,
+  icon,
+}) => {
   const handleOpenChat = () => {
     const chatUrl = `${window.location.origin}/chat`;
     window.open(chatUrl, "_blank", "noopener,noreferrer");
   };
+  const handleClick = onClick ?? handleOpenChat;
 
   return (
     <Zoom in={true}>
-      <div role="presentation" onClick={handleOpenChat} style={chatButtonStyle}>
+      <div role="presentation" onClick={handleClick} style={chatButtonStyle}>
         <IconButton
           size="small"
-          aria-label="chat"
+          aria-label={label}
           sx={{
             backgroundColor: "#002060",
             color: "#ffffff",
@@ -29,10 +40,10 @@ const ChatBoxButton: React.FC = () => {
             "&:hover": { backgroundColor: "#002060" },
           }}
         >
-          <ChatIcon fontSize="small" />
+          {icon ?? <ChatIcon fontSize="small" />}
         </IconButton>
         <Typography variant="caption" sx={{ color: "#002060" }}>
-          Deal Notes
+          {label}
         </Typography>
       </div>
     </Zoom>
