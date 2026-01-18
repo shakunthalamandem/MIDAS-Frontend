@@ -162,6 +162,45 @@ const NewDealsUpcomingRecent: React.FC = () => {
         maxWidth="xl"
         sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}
       >
+        {selectedOp !== "pipeline" && (
+          <Container
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 1.5,
+              px: 1,
+              gap: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              { label: "US", value: "US" },
+              { label: "EMEA", value: "EMEA" },
+              { label: "APAC", value: "APAC" },
+              { label: "Others", value: "NON_US_AMERICA" },
+            ].map((item) => (
+              <Paper
+                key={item.value}
+                onClick={() => setSelectedRegion(item.value as any)}
+                sx={{
+                  px: 2.4,
+                  py: 0.7,
+                  borderRadius: 999,
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  border: "1px solid rgba(0,32,96,0.25)",
+                  backgroundColor:
+                    selectedRegion === item.value ? "#6F1178" : "#ffffff",
+                  color:
+                    selectedRegion === item.value ? "#ffffff" : "#002060",
+                }}
+              >
+                {item.label}
+              </Paper>
+            ))}
+          </Container>
+        )}
         <DealsFilters
           selectedOp={selectedOp}
           onChange={handleOpChange}
@@ -227,46 +266,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
             </Container>
           )}
 
-         {/* filters */}
-          {selectedOp !== "pipeline" && (
-            <Container
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                mb: 1.5,
-                px: 1,
-                gap: 1,
-                flexWrap: "wrap",
-              }}
-            >
-              {[
-                { label: "US", value: "US" },
-                { label: "EMEA", value: "EMEA" },
-                { label: "APAC", value: "APAC" },
-                { label: "Others", value: "NON_US_AMERICA" },
-              ].map((item) => (
-                <Paper
-                  key={item.value}
-                  onClick={() => setSelectedRegion(item.value as any)}
-                  sx={{
-                    px: 2.4,
-                    py: 0.7,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    fontWeight: 700,
-                    fontSize: "0.8rem",
-                    border: "1px solid rgba(0,32,96,0.25)",
-                    backgroundColor:
-                      selectedRegion === item.value ? "#6F1178" : "#ffffff",
-                    color:
-                      selectedRegion === item.value ? "#ffffff" : "#002060",
-                  }}
-                >
-                  {item.label}
-                </Paper>
-              ))}
-            </Container>
-          )}
 
 
           {/* 🔹 TABLE (UNCHANGED) */}
