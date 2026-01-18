@@ -77,6 +77,17 @@ const DealsTable: React.FC<DealsTableProps> = ({
     return false;
   }
 
+  if (
+    selectedOp === "upcoming" &&
+    (col.field === "deal_type" ||
+      col.field === "fo_type" ||
+      col.field === "deal_size" ||
+      col.field === "price_range" ||
+      col.field === "deal_status")
+  ) {
+    return false;
+  }
+
   // hide Pricing Date for Live
   if (selectedOp === "live" && col.field === "pricing_date") {
     return false;

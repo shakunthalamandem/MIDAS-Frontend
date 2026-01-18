@@ -533,95 +533,98 @@ console.log("Filtered rows:", filteredRows);
           ) : loading ? (
             <CircularProgress sx={{ display: "block", mx: "auto" }} />
           ) : selectedOp === "upcoming" ? (
-            <>
-              <Container sx={{ px: 1, mb: 1 }}>
-                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
-                  Upcoming Deals (Pricing Date Available) - {selectedDealType}
-                </Typography>
-              </Container>
-              {upcomingDatedRows.length > 0 ? (
-                <DealsTable
-                  rows={upcomingDatedRows}
-                  loading={loading}
-                  onRowSelect={(row, rowId) => {
-                    setSelectedDeal(row);
-                    setSelectedUpcomingDatedId(rowId);
-                    setSelectedUpcomingTbaId(null);
-                  }}
-                  selectedOp={selectedOp}
-                  hideRegionColumn
-                  selectedRowId={selectedUpcomingDatedId}
-                  onSelectedRowIdChange={(rowId) => {
-                    setSelectedUpcomingDatedId(rowId);
-                    if (rowId != null) {
+            <Grid container spacing={2} sx={{ px: 1 }}>
+              <Grid item xs={12} lg={6}>
+                <Container sx={{ px: 0, mb: 1 }}>
+                  <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
+                    Upcoming Deals (Pricing Date Available) - {selectedDealType}
+                  </Typography>
+                </Container>
+                {upcomingDatedRows.length > 0 ? (
+                  <DealsTable
+                    rows={upcomingDatedRows}
+                    loading={loading}
+                    onRowSelect={(row, rowId) => {
+                      setSelectedDeal(row);
+                      setSelectedUpcomingDatedId(rowId);
                       setSelectedUpcomingTbaId(null);
-                    }
-                  }}
-                />
-              ) : (
-                <Container
-                  sx={{
-                    px: 2,
-                    py: 3,
-                    borderRadius: 2,
-                    border: "1px dashed #cbd5e1",
-                    backgroundColor: "#ffffff",
-                    textAlign: "center",
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }}>
-                    No deals available
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    There are no upcoming deals with pricing dates for this filter.
+                    }}
+                    selectedOp={selectedOp}
+                    hideRegionColumn
+                    selectedRowId={selectedUpcomingDatedId}
+                    onSelectedRowIdChange={(rowId) => {
+                      setSelectedUpcomingDatedId(rowId);
+                      if (rowId != null) {
+                        setSelectedUpcomingTbaId(null);
+                      }
+                    }}
+                  />
+                ) : (
+                  <Container
+                    sx={{
+                      px: 2,
+                      py: 3,
+                      borderRadius: 2,
+                      border: "1px dashed #cbd5e1",
+                      backgroundColor: "#ffffff",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                      No deals available
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      There are no upcoming deals with pricing dates for this filter.
+                    </Typography>
+                  </Container>
+                )}
+              </Grid>
+              <Grid item xs={12} lg={6}>
+                <Container sx={{ px: 0, mb: 1 }}>
+                  <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
+                    Upcoming Deals (To Be Announced) - {selectedDealType}
                   </Typography>
                 </Container>
-              )}
-
-              <Container sx={{ px: 1, mt: 2, mb: 1 }}>
-                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
-                  Upcoming Deals (To Be Announced) - {selectedDealType}
-                </Typography>
-              </Container>
-              {upcomingTbaRows.length > 0 ? (
-                <DealsTable
-                  rows={upcomingTbaRows}
-                  loading={loading}
-                  onRowSelect={(row, rowId) => {
-                    setSelectedDeal(row);
-                    setSelectedUpcomingTbaId(rowId);
-                    setSelectedUpcomingDatedId(null);
-                  }}
-                  selectedOp={selectedOp}
-                  hideRegionColumn
-                  selectedRowId={selectedUpcomingTbaId}
-                  onSelectedRowIdChange={(rowId) => {
-                    setSelectedUpcomingTbaId(rowId);
-                    if (rowId != null) {
+                {upcomingTbaRows.length > 0 ? (
+                  <DealsTable
+                    rows={upcomingTbaRows}
+                    loading={loading}
+                    onRowSelect={(row, rowId) => {
+                      setSelectedDeal(row);
+                      setSelectedUpcomingTbaId(rowId);
                       setSelectedUpcomingDatedId(null);
-                    }
-                  }}
-                />
-              ) : (
-                <Container
-                  sx={{
-                    px: 2,
-                    py: 3,
-                    borderRadius: 2,
-                    border: "1px dashed #cbd5e1",
-                    backgroundColor: "#ffffff",
-                    textAlign: "center",
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }}>
-                    No deals available
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    There are no to-be-announced deals for this filter.
-                  </Typography>
-                </Container>
-              )}
-            </>
+                    }}
+                    selectedOp={selectedOp}
+                    hideRegionColumn
+                    selectedRowId={selectedUpcomingTbaId}
+                    onSelectedRowIdChange={(rowId) => {
+                      setSelectedUpcomingTbaId(rowId);
+                      if (rowId != null) {
+                        setSelectedUpcomingDatedId(null);
+                      }
+                    }}
+                  />
+                ) : (
+                  <Container
+                    sx={{
+                      px: 2,
+                      py: 3,
+                      borderRadius: 2,
+                      border: "1px dashed #cbd5e1",
+                      backgroundColor: "#ffffff",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                      No deals available
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      There are no to-be-announced deals for this filter.
+                    </Typography>
+                  </Container>
+                )}
+              </Grid>
+            </Grid>
           ) : filteredRows.length === 0 ? (
             <Container
               sx={{
