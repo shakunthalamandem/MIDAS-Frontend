@@ -1,5 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Container, Typography, CircularProgress, Grid, TextField, Paper } from "@mui/material";
+import {
+  Container,
+  Typography,
+  CircularProgress,
+  Grid,
+  TextField,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
+  Stack,
+} from "@mui/material";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -39,6 +49,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [dealSearch, setDealSearch] = useState("");
+  const [selectedUsDealType, setSelectedUsDealType] = useState<"IPO" | "FO">("IPO");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
@@ -120,6 +131,12 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [selectedRegion]);
 
+  useEffect(() => {
+    if (selectedRegion !== "US") {
+      setSelectedUsDealType("IPO");
+    }
+  }, [selectedRegion]);
+
 
 
   const headlineText = useMemo(() => {
@@ -133,26 +150,33 @@ const NewDealsUpcomingRecent: React.FC = () => {
     const term = dealSearch.trim().toLowerCase();
 
     return rows.filter((row) => {
-      // 🔹 Search filter
+      // dY"1 Search filter
       if (term && !row.ticker?.toString().toLowerCase().includes(term)) {
         return false;
       }
 
-      // 🔹 Region filter (only for non-pipeline)
+      // dY"1 Region filter (only for non-pipeline)
       if (selectedOp !== "pipeline") {
         const region = row.region?.trim().toUpperCase();
 
-        if (selectedRegion === "US") return region === "US";
-        if (selectedRegion === "APAC") return region === "APAC";
-        if (selectedRegion === "EMEA") return region === "EMEA";
+        if (selectedRegion === "US" && region !== "US") return false;
+        if (selectedRegion === "APAC" && region !== "APAC") return false;
+        if (selectedRegion === "EMEA" && region !== "EMEA") return false;
         if (selectedRegion === "NON_US_AMERICA") {
-          return region === "NON-US AMERICA" || region === "LATAM";
+          if (region !== "NON-US AMERICA" && region !== "LATAM") return false;
+        }
+      }
+
+      if (selectedRegion === "US") {
+        const dealType = row.deal_type?.toString().toUpperCase();
+        if (dealType && dealType !== selectedUsDealType) {
+          return false;
         }
       }
 
       return true;
     });
-  }, [rows, dealSearch, selectedRegion, selectedOp]);
+  }, [rows, dealSearch, selectedRegion, selectedOp, selectedUsDealType]);
 
 
   return (
@@ -175,8 +199,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
           >
             {[
               { label: "US", value: "US" },
-              { label: "EMEA", value: "EMEA" },
               { label: "APAC", value: "APAC" },
+              { label: "EMEA", value: "EMEA" },
               { label: "Others", value: "NON_US_AMERICA" },
             ].map((item) => (
               <Paper
@@ -201,11 +225,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
             ))}
           </Container>
         )}
-        <DealsFilters
-          selectedOp={selectedOp}
-          onChange={handleOpChange}
-          options={tabs}
-        />
       </Container>
 
       {/* 🔹 MAIN CONTENT CONTAINER */}
@@ -222,16 +241,51 @@ const NewDealsUpcomingRecent: React.FC = () => {
         }}
       >
         <Container maxWidth={false} sx={{ mt: 1, px: 0 }}>
-          {/* 🔹 ONE-LINE TEXT (LEFT) + SEARCH (RIGHT) */}
+          {/* dY"1 ONE-LINE TEXT (LEFT) + SEARCH (RIGHT) */}
+          <Container
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 1.5,
+              px: 1,
+              gap: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <Container sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
+              <DealsFilters
+                selectedOp={selectedOp}
+                onChange={handleOpChange}
+                options={tabs}
+              />
+            </Container>
+            <TextField
+              size="small"
+              placeholder="Search"
+              value={isPipelineView ? pipelineSearch : dealSearch}
+              onChange={(e) =>
+                isPipelineView
+                  ? setPipelineSearch(e.target.value)
+                  : setDealSearch(e.target.value)
+              }
+              sx={{
+                minWidth: 220,
+                flexShrink: 0,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 34,
+                },
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          </Container>
+
           {!isPipelineView && (
             <Container
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
                 mb: 1.5,
                 px: 1,
-                gap: 2,
               }}
             >
               <Typography
@@ -239,40 +293,65 @@ const NewDealsUpcomingRecent: React.FC = () => {
                   fontWeight: 600,
                   color: "#1f2a44",
                   lineHeight: 1.6,
-
-                  flexGrow: 1,   // allows text to take available space
-                  pr: 2,         // pushes text slightly left, NOT the search bar
                   textAlign: "left",
                 }}
               >
                 {headlineText}
               </Typography>
-
-              <TextField
-                size="small"
-                placeholder="Search"
-                value={dealSearch}
-                onChange={(e) => setDealSearch(e.target.value)}
-                sx={{
-                  minWidth: 220,
-                  flexShrink: 0,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 999,
-                    height: 34,
-                  },
-                }}
-                InputLabelProps={{ shrink: false }}
-              />
             </Container>
           )}
-
-
+          {!isPipelineView && selectedRegion === "US" && (
+            <Container sx={{ px: 1, mb: 1.5 }}>
+              <ToggleButtonGroup
+                value={selectedUsDealType}
+                exclusive
+                onChange={(_e, value) => value && setSelectedUsDealType(value)}
+                sx={{
+                  "& .MuiToggleButton-root": {
+                    textTransform: "none",
+                    borderRadius: 9999,
+                    border: "1px solid #002060",
+                    backgroundColor: "#ffffff",
+                    px: 2.4,
+                    py: 0.6,
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    color: "#002060",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 3px 10px rgba(0,32,96,0.08)",
+                  },
+                  "& .Mui-selected": {
+                    borderColor: "#00133a",
+                    background: "linear-gradient(135deg, #0a2b7a 0%, #002060 45%, #001745 100%)",
+                    color: "#ffffff",
+                    boxShadow: "0 12px 26px rgba(0,32,96,0.32)",
+                  },
+                }}
+              >
+                <ToggleButton value="IPO">
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography fontWeight={700} color="inherit">
+                      US IPO
+                    </Typography>
+                  </Stack>
+                </ToggleButton>
+                <ToggleButton value="FO">
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography fontWeight={700} color="inherit">
+                      US FO
+                    </Typography>
+                  </Stack>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Container>
+          )}
 
           {/* 🔹 TABLE (UNCHANGED) */}
           {isPipelineView ? (
             <ExpectedPipelineDealsTable
               searchQuery={pipelineSearch}
               onSearchQueryChange={setPipelineSearch}
+              showSearch={false}
             />
           ) : loading ? (
             <CircularProgress sx={{ display: "block", mx: "auto" }} />

@@ -169,7 +169,7 @@ const DealMeetingNotesMain: React.FC = () => {
               inputValue={searchTerm}
               loading={searching}
               autoHighlight
-              noOptionsText={searchTerm ? "No matches found" : "Type a ticker or company name"}
+              noOptionsText={searchTerm ? "No matches found and Create this Ticker in the New Deal Form" : "Type a ticker or company name"}
               getOptionLabel={(option) => {
                 const dateLabel = formatPricingDate(option.pricingDate);
                 return `${option.ticker}${dateLabel ? ` (${dateLabel})` : ""}`;

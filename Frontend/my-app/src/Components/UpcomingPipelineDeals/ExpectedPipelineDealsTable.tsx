@@ -102,10 +102,10 @@ type CategoryOption = {
 };
 
 const categoryOptions: CategoryOption[] = [
-  { value: "ipo_international", label: "International", icon: PublicIcon, color: "#1565C0" },
+  { value: "ipo_international", label: "APAC", icon: PublicIcon, color: "#1565C0" },
   { value: "ipo_us", label: "US IPO", icon: ApartmentIcon, color: "#002060" },
   { value: "fo", label: "US FO", icon: ShowChartIcon, color: "#5D0163" },
-  { value: "ipo_europe", label: "Eur Pipeline", icon: TimelineIcon, color: "#6F1178" },
+  { value: "ipo_europe", label: "EMEA", icon: TimelineIcon, color: "#6F1178" },
 ];
 
 const searchFields: Record<Category, string[]> = {
@@ -334,11 +334,13 @@ const columnSets: Record<Category, GridColDef[]> = {
 type ExpectedPipelineDealsTableProps = {
   searchQuery?: string;
   onSearchQueryChange?: (value: string) => void;
+  showSearch?: boolean;
 };
 
 const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
   searchQuery,
   onSearchQueryChange,
+  showSearch = true,
 }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -506,7 +508,8 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
               })}
             </ToggleButtonGroup>
 
-            <TextField
+            {showSearch && (
+<TextField
               label="Search"
               placeholder="Search ticker, sector, seller..."
               value={searchTerm}
@@ -520,6 +523,9 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
                 },
               }}
             />
+
+
+            )}
           </Stack>
 
           {error && (
