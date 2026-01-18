@@ -66,6 +66,12 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<
     "US" | "EMEA" | "APAC" | "Non-US America"
   >("US");
+  const regionTabs = [
+    { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
+    { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
+    { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
+    { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
+  ] as const;
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
     setLoading(true);
@@ -254,61 +260,54 @@ console.log("Filtered rows:", filteredRows);
         maxWidth="xl"
         sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}
       >
-        {selectedOp !== "pipeline" && (
-          <Container
-            maxWidth="xl"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mb: 1.5,
-              px: 1,
-              gap: 1,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
-              { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
-              { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-              { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
-            ].map((item) => {
-              const isSelected = selectedRegion === item.value;
+        <Container
+          maxWidth="xl"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 1.5,
+            px: 1,
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
+          {regionTabs.map((item) => {
+            const isSelected = selectedRegion === item.value;
 
-              return (
-                <Paper
-                  key={item.value}
-                  onClick={() => setSelectedRegion(item.value as any)}
-                  sx={{
-                    px: 2,
-                    py: 0.6,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: "0.8rem",
-                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
-                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
-                    color: isSelected ? "#ffffff" : "#1f2a44",
-                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
-                    transition: "all 0.2s ease",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    "&:hover": {
-                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
-                    },
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={0.75}>
-                    {item.icon}
-                    <Typography fontWeight={600} color="inherit">
-                      {item.label}
-                    </Typography>
-                  </Stack>
-                </Paper>
-              );
-            })}
-          </Container>
-        )}
+            return (
+              <Paper
+                key={item.value}
+                onClick={() => setSelectedRegion(item.value as any)}
+                sx={{
+                  px: 2,
+                  py: 0.6,
+                  borderRadius: 999,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
+                  backgroundColor: isSelected ? "#2b146f" : "#ffffff",
+                  color: isSelected ? "#ffffff" : "#1f2a44",
+                  boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
+                  transition: "all 0.2s ease",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  "&:hover": {
+                    backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
+                  },
+                }}
+              >
+                <Stack direction="row" alignItems="center" spacing={0.75}>
+                  {item.icon}
+                  <Typography fontWeight={600} color="inherit">
+                    {item.label}
+                  </Typography>
+                </Stack>
+              </Paper>
+            );
+          })}
+        </Container>
       </Container>
 
       {/* dY"1 MAIN CONTENT CONTAINER */}
@@ -478,6 +477,7 @@ console.log("Filtered rows:", filteredRows);
             <ExpectedPipelineDealsTable
               searchQuery={pipelineSearch}
               onSearchQueryChange={setPipelineSearch}
+              selectedRegion={selectedRegion}
               showSearch={false}
             />
           ) : loading ? (
