@@ -9,10 +9,16 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Stack,
+  InputAdornment,
 } from "@mui/material";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import PublicIcon from "@mui/icons-material/Public";
+import LanguageIcon from "@mui/icons-material/Language";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import Diversity3Icon from "@mui/icons-material/Diversity3";
+import SearchIcon from "@mui/icons-material/Search";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
@@ -61,8 +67,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
     "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
   >("US");
 
-
-
   const fetchData = async (operation: string) => {
     setLoading(true);
     try {
@@ -76,7 +80,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
       });
       const result = await response.json();
       const formattedRows = result.data.map((item: any, index: number) => ({
-        id: `${item.ticker}-${index}`, // ✅ always unique
+        id: `${item.ticker}-${index}`, // ?. always unique
         ...item,
       }));
 
@@ -121,12 +125,12 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
-  // 🔹 Reset region when switching tabs
+  // dY"1 Reset region when switching tabs
   useEffect(() => {
     setSelectedRegion("US");
   }, [selectedOp]);
 
-  // 🔹 Reset selected ticker when region changes
+  // dY"1 Reset selected ticker when region changes
   useEffect(() => {
     setSelectedDeal(null);
   }, [selectedRegion]);
@@ -136,8 +140,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
       setSelectedUsDealType("IPO");
     }
   }, [selectedRegion]);
-
-
 
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
@@ -178,10 +180,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
     });
   }, [rows, dealSearch, selectedRegion, selectedOp, selectedUsDealType]);
 
-
   return (
     <>
-      {/* 🔹 TOP CONTAINER: ONLY THREE CARDS */}
+      {/* dY"1 TOP CONTAINER: ONLY THREE CARDS */}
       <Container
         maxWidth="xl"
         sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}
@@ -191,6 +192,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
             sx={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               mb: 1.5,
               px: 1,
               gap: 1,
@@ -198,36 +200,50 @@ const NewDealsUpcomingRecent: React.FC = () => {
             }}
           >
             {[
-              { label: "US", value: "US" },
-              { label: "APAC", value: "APAC" },
-              { label: "EMEA", value: "EMEA" },
-              { label: "Others", value: "NON_US_AMERICA" },
-            ].map((item) => (
-              <Paper
-                key={item.value}
-                onClick={() => setSelectedRegion(item.value as any)}
-                sx={{
-                  px: 2.4,
-                  py: 0.7,
-                  borderRadius: 999,
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  fontSize: "0.8rem",
-                  border: "1px solid rgba(0,32,96,0.25)",
-                  backgroundColor:
-                    selectedRegion === item.value ? "#6F1178" : "#ffffff",
-                  color:
-                    selectedRegion === item.value ? "#ffffff" : "#002060",
-                }}
-              >
-                {item.label}
-              </Paper>
-            ))}
+              { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
+              { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
+              { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
+              { label: "Others", value: "NON_US_AMERICA", icon: <Diversity3Icon fontSize="small" /> },
+            ].map((item) => {
+              const isSelected = selectedRegion === item.value;
+
+              return (
+                <Paper
+                  key={item.value}
+                  onClick={() => setSelectedRegion(item.value as any)}
+                  sx={{
+                    px: 2,
+                    py: 0.6,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: "0.8rem",
+                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
+                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
+                    color: isSelected ? "#ffffff" : "#1f2a44",
+                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
+                    transition: "all 0.2s ease",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    "&:hover": {
+                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
+                    },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.75}>
+                    {item.icon}
+                    <Typography fontWeight={600} color="inherit">
+                      {item.label}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              );
+            })}
           </Container>
         )}
       </Container>
 
-      {/* 🔹 MAIN CONTENT CONTAINER */}
+      {/* dY"1 MAIN CONTENT CONTAINER */}
       <Container
         maxWidth="xl"
         sx={{
@@ -260,6 +276,18 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 options={tabs}
               />
             </Container>
+          </Container>
+
+          <Container
+            sx={{
+              mb: 1.5,
+              px: 1,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              flexWrap: { xs: "wrap", md: "nowrap" },
+            }}
+          >
             <TextField
               size="small"
               placeholder="Search"
@@ -274,57 +302,80 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 flexShrink: 0,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 999,
-                  height: 34,
+                  height: 36,
+                  backgroundColor: "#ffffff",
+                  "& fieldset": {
+                    borderColor: "#cfd6e4",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#bfc7da",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#b0b9cf",
+                  },
                 },
+                "& .MuiInputBase-input::placeholder": {
+                  color: "#8a94a8",
+                  opacity: 1,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                  </InputAdornment>
+                ),
               }}
               InputLabelProps={{ shrink: false }}
             />
-          </Container>
-
-          {!isPipelineView && (
-            <Container
-              sx={{
-                mb: 1.5,
-                px: 1,
-              }}
-            >
+            {!isPipelineView && (
               <Typography
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: 400,
                   color: "#1f2a44",
-                  lineHeight: 1.6,
+                  lineHeight: 1.4,
                   textAlign: "left",
+                  fontSize: { xs: "0.82rem", md: "0.88rem" },
+                  whiteSpace: { xs: "normal", md: "nowrap" },
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  flexGrow: 1,
                 }}
               >
                 {headlineText}
               </Typography>
-            </Container>
-          )}
-          {!isPipelineView && selectedRegion === "US" && (
-            <Container sx={{ px: 1, mb: 1.5 }}>
+            )}
+            {!isPipelineView && selectedRegion === "US" && (
               <ToggleButtonGroup
                 value={selectedUsDealType}
                 exclusive
                 onChange={(_e, value) => value && setSelectedUsDealType(value)}
                 sx={{
+                  backgroundColor: "#f2f4f8",
+                  p: 0.4,
+                  borderRadius: 9999,
+                  display: "inline-flex",
+                  gap: 0.5,
+                  flexShrink: 0,
+                  "& .MuiToggleButtonGroup-grouped": {
+                    border: 0,
+                  },
                   "& .MuiToggleButton-root": {
                     textTransform: "none",
                     borderRadius: 9999,
-                    border: "1px solid #002060",
-                    backgroundColor: "#ffffff",
-                    px: 2.4,
-                    py: 0.6,
+                    border: 0,
+                    px: 2,
+                    py: 0.5,
                     fontWeight: 700,
                     fontSize: "0.8rem",
-                    color: "#002060",
+                    color: "#6a7286",
+                    backgroundColor: "transparent",
                     transition: "all 0.2s ease",
-                    boxShadow: "0 3px 10px rgba(0,32,96,0.08)",
                   },
                   "& .Mui-selected": {
-                    borderColor: "#00133a",
-                    background: "linear-gradient(135deg, #0a2b7a 0%, #002060 45%, #001745 100%)",
+                    backgroundColor: "#2b146f",
                     color: "#ffffff",
-                    boxShadow: "0 12px 26px rgba(0,32,96,0.32)",
+                    boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
                   },
                 }}
               >
@@ -343,10 +394,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
                   </Stack>
                 </ToggleButton>
               </ToggleButtonGroup>
-            </Container>
-          )}
-
-          {/* 🔹 TABLE (UNCHANGED) */}
+            )}
+          </Container>
+          {/* dY"1 TABLE (UNCHANGED) */}
           {isPipelineView ? (
             <ExpectedPipelineDealsTable
               searchQuery={pipelineSearch}
@@ -389,7 +439,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
       </Container>
     </>
   );
-
 };
 
 export default NewDealsUpcomingRecent;
