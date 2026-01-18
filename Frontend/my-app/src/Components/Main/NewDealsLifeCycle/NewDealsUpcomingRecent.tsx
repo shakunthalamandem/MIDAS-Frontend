@@ -55,7 +55,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [selectedDeal, setSelectedDeal] = useState<any | null>(null);
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [dealSearch, setDealSearch] = useState("");
-  const [selectedUsDealType, setSelectedUsDealType] = useState<"IPO" | "FO">("IPO");
+  const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
@@ -67,7 +67,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
     "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
   >("US");
 
-  const fetchData = async (operation: string, region: string) => {
+  const fetchData = async (operation: string, region: string, dealType: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
@@ -76,7 +76,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ operation, region }),
+        body: JSON.stringify({ operation, region, deal_type: dealType }),
       });
       const result = await response.json();
       const payload = result?.data ?? result?.Data ?? [];
@@ -89,10 +89,77 @@ const NewDealsUpcomingRecent: React.FC = () => {
             if (section && typeof section === "object") return Object.values(section);
             return [];
           });
-      const formattedRows = rowsSource.map((item: any, index: number) => ({
-        id: `${item?.ticker ?? "row"}-${index}`, // ?. always unique
-        ...item,
-      }));
+      const fieldOrder = [
+        "ticker",
+        "region",
+        "sector",
+        "issuer_name",
+        "deal_size",
+        "trade_date",
+        "pricing_date",
+        "deal_type",
+        "fo_type",
+        "issue_price",
+        "price_range",
+        "writeup_available",
+        "deal_status",
+        "t1d_pred",
+      ];
+
+      const formattedRows = rowsSource.flatMap((item: any, index: number) => {
+        if (Array.isArray(item)) {
+          const mapped: Record<string, any> = {};
+          item.forEach((value, idx) => {
+            const key = fieldOrder[idx];
+            if (key) mapped[key] = value;
+          });
+          return [
+            {
+              id: `${mapped.ticker ?? "row"}-${index}`,
+              ...mapped,
+            },
+          ];
+        }
+
+        if (item && typeof item === "object") {
+          const numericKeys = Object.keys(item).filter((key) => /^\d+$/.test(key));
+          if (numericKeys.length > 0) {
+            const numericValues = numericKeys
+              .sort((a, b) => Number(a) - Number(b))
+              .map((key) => (item as Record<string, any>)[key])
+              .filter((value) => value !== undefined && value !== null);
+
+            const objectValues = numericValues.filter(
+              (value) => value && typeof value === "object" && !Array.isArray(value)
+            );
+            if (objectValues.length > 0) {
+              return objectValues.map((rowItem: any, innerIndex: number) => ({
+                id: `${rowItem?.ticker ?? "row"}-${index}-${innerIndex}`,
+                ...rowItem,
+              }));
+            }
+
+            const mapped: Record<string, any> = {};
+            numericValues.forEach((value, idx) => {
+              const key = fieldOrder[idx];
+              if (key) mapped[key] = value;
+            });
+            return [
+              {
+                id: `${mapped.ticker ?? "row"}-${index}`,
+                ...mapped,
+              },
+            ];
+          }
+        }
+
+        return [
+          {
+            id: `${item?.ticker ?? "row"}-${index}`, // ?. always unique
+            ...item,
+          },
+        ];
+      });
       console.log("Formatted rows:", formattedRows);
 
       setRows(formattedRows);
@@ -111,8 +178,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
       return;
     }
     const apiOperation = opMap[selectedOp] || selectedOp;
-    fetchData(apiOperation, selectedRegion);
-  }, [selectedOp, selectedRegion]);
+    fetchData(apiOperation, selectedRegion, selectedDealType);
+  }, [selectedOp, selectedRegion, selectedDealType]);
 
   const handleOpChange = (value: string) => {
     setSelectedOp(value);
@@ -136,20 +203,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedDeal(null);
   }, [dealSearch]);
 
-  // dY"1 Reset region when switching tabs
-  useEffect(() => {
-    setSelectedRegion("US");
-  }, [selectedOp]);
-
   // dY"1 Reset selected ticker when region changes
   useEffect(() => {
     setSelectedDeal(null);
-  }, [selectedRegion]);
-
-  useEffect(() => {
-    if (selectedRegion !== "US") {
-      setSelectedUsDealType("IPO");
-    }
   }, [selectedRegion]);
 
   const headlineText = useMemo(() => {
@@ -170,7 +226,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
       // dY"1 Region filter (only for non-pipeline)
       if (selectedOp !== "pipeline") {
-        const region = row.region?.trim().toUpperCase();
+        const region = row.region != null ? String(row.region).trim().toUpperCase() : "";
 
         if (region) {
           if (selectedRegion === "US" && region !== "US") return false;
@@ -182,17 +238,15 @@ const NewDealsUpcomingRecent: React.FC = () => {
         }
       }
 
-      if (selectedRegion === "US") {
-        const dealType = row.deal_type?.toString().toUpperCase();
-        if (dealType && dealType !== selectedUsDealType) {
-          return false;
-        }
+      const dealType = row.deal_type?.toString().toUpperCase();
+      if (dealType && dealType !== selectedDealType) {
+        return false;
       }
 
       return true;
     });
-  }, [rows, dealSearch, selectedRegion, selectedOp, selectedUsDealType]);
-
+  }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType]);
+console.log("Filtered rows:", filteredRows);
   return (
     <>
       {/* dY"1 TOP CONTAINER: ONLY THREE CARDS */}
@@ -358,11 +412,11 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 {headlineText}
               </Typography>
             )}
-            {!isPipelineView && selectedRegion === "US" && (
+            {!isPipelineView && (
               <ToggleButtonGroup
-                value={selectedUsDealType}
+                value={selectedDealType}
                 exclusive
-                onChange={(_e, value) => value && setSelectedUsDealType(value)}
+                onChange={(_e, value) => value && setSelectedDealType(value)}
                 sx={{
                   backgroundColor: "#f2f4f8",
                   p: 0.4,
@@ -395,14 +449,14 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 <ToggleButton value="IPO">
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Typography fontWeight={700} color="inherit">
-                      US IPO
+                      IPO
                     </Typography>
                   </Stack>
                 </ToggleButton>
                 <ToggleButton value="FO">
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Typography fontWeight={700} color="inherit">
-                      US FO
+                      FO
                     </Typography>
                   </Stack>
                 </ToggleButton>
