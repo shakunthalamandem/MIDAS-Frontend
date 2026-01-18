@@ -457,7 +457,6 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {showSearch && (
           <TextField
             placeholder="Search"
             value={searchTerm}
@@ -494,7 +493,7 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
             }}
             InputLabelProps={{ shrink: false }}
           />
-        )}
+     
         <Typography
           variant="h6"
           color="#002060"
