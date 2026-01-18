@@ -252,6 +252,24 @@ const NewDealsUpcomingRecent: React.FC = () => {
       return true;
     });
   }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType]);
+
+  const [upcomingDatedRows, upcomingTbaRows] = useMemo(() => {
+    if (selectedOp !== "upcoming") return [filteredRows, []];
+    const hasPricingDate = (value: any) => {
+      if (!value) return false;
+      const normalized = String(value).trim().toLowerCase();
+      if (!normalized) return false;
+      if (normalized === "tbd") return false;
+      if (normalized === "to be announced") return false;
+      if (normalized === "to be announce") return false;
+      return true;
+    };
+    const withPricing = filteredRows.filter((row) =>
+      hasPricingDate(row.pricing_date)
+    );
+    const tba = filteredRows.filter((row) => !hasPricingDate(row.pricing_date));
+    return [withPricing, tba];
+  }, [filteredRows, selectedOp]);
 console.log("Filtered rows:", filteredRows);
   return (
     <>
@@ -264,49 +282,62 @@ console.log("Filtered rows:", filteredRows);
           maxWidth="xl"
           sx={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             mb: 1.5,
             px: 1,
-            gap: 1,
+            gap: 1.25,
             flexWrap: "wrap",
           }}
         >
-          {regionTabs.map((item) => {
-            const isSelected = selectedRegion === item.value;
+          <Typography
+            sx={{
+              fontWeight: 700,
+              color: "#002060",
+              textAlign: "center",
+              fontSize: "1rem",
+            }}
+          >
+            {tabs.find((tab) => tab.value === selectedOp)?.label} · {selectedRegion}
+          </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
+            {regionTabs.map((item) => {
+              const isSelected = selectedRegion === item.value;
 
-            return (
-              <Paper
-                key={item.value}
-                onClick={() => setSelectedRegion(item.value as any)}
-                sx={{
-                  px: 2,
-                  py: 0.6,
-                  borderRadius: 999,
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: "0.8rem",
-                  border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
-                  backgroundColor: isSelected ? "#2b146f" : "#ffffff",
-                  color: isSelected ? "#ffffff" : "#1f2a44",
-                  boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
-                  transition: "all 0.2s ease",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  "&:hover": {
-                    backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
-                  },
-                }}
-              >
-                <Stack direction="row" alignItems="center" spacing={0.75}>
-                  {item.icon}
-                  <Typography fontWeight={600} color="inherit">
-                    {item.label}
-                  </Typography>
-                </Stack>
-              </Paper>
-            );
-          })}
+              return (
+                <Paper
+                  key={item.value}
+                  onClick={() => setSelectedRegion(item.value as any)}
+                  sx={{
+                    px: 2,
+                    py: 0.6,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: "0.8rem",
+                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
+                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
+                    color: isSelected ? "#ffffff" : "#1f2a44",
+                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
+                    transition: "all 0.2s ease",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    "&:hover": {
+                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
+                    },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.75}>
+                    {item.icon}
+                    <Typography fontWeight={600} color="inherit">
+                      {item.label}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              );
+            })}
+          </Stack>
         </Container>
       </Container>
 
@@ -480,6 +511,92 @@ console.log("Filtered rows:", filteredRows);
             />
           ) : loading ? (
             <CircularProgress sx={{ display: "block", mx: "auto" }} />
+          ) : selectedOp === "upcoming" ? (
+            <>
+              <Container sx={{ px: 1, mb: 1 }}>
+                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }}>
+                  Upcoming Deals (Pricing Date Available) - {selectedDealType}
+                </Typography>
+              </Container>
+              {upcomingDatedRows.length > 0 ? (
+                <DealsTable
+                  rows={upcomingDatedRows}
+                  loading={loading}
+                  onRowSelect={(row) => setSelectedDeal(row)}
+                  selectedOp={selectedOp}
+                  hideRegionColumn
+                />
+              ) : (
+                <Container
+                  sx={{
+                    px: 2,
+                    py: 3,
+                    borderRadius: 2,
+                    border: "1px dashed #cbd5e1",
+                    backgroundColor: "#ffffff",
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                    No deals available
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    There are no upcoming deals with pricing dates for this filter.
+                  </Typography>
+                </Container>
+              )}
+
+              <Container sx={{ px: 1, mt: 2, mb: 1 }}>
+                <Typography sx={{ fontWeight: 600, color: "#1f2a44" }}>
+                  Upcoming Deals (To Be Announced) - {selectedDealType}
+                </Typography>
+              </Container>
+              {upcomingTbaRows.length > 0 ? (
+                <DealsTable
+                  rows={upcomingTbaRows}
+                  loading={loading}
+                  onRowSelect={(row) => setSelectedDeal(row)}
+                  selectedOp={selectedOp}
+                  hideRegionColumn
+                />
+              ) : (
+                <Container
+                  sx={{
+                    px: 2,
+                    py: 3,
+                    borderRadius: 2,
+                    border: "1px dashed #cbd5e1",
+                    backgroundColor: "#ffffff",
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                    No deals available
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    There are no to-be-announced deals for this filter.
+                  </Typography>
+                </Container>
+              )}
+            </>
+          ) : filteredRows.length === 0 ? (
+            <Container
+              sx={{
+                px: 2,
+                py: 4,
+                borderRadius: 2,
+                border: "1px dashed #cbd5e1",
+                backgroundColor: "#ffffff",
+                textAlign: "center",
+              }}
+            >
+              <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                No deals available
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                There are no deals for this filter selection.
+              </Typography>
+            </Container>
           ) : (
             <DealsTable
               rows={filteredRows}
