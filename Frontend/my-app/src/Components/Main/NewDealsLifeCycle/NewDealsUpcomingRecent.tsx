@@ -175,7 +175,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
           },
         ];
       });
-      console.log("Formatted rows:", formattedRows);
 
       setRows(formattedRows);
       setSelectedDeal(null);
@@ -291,7 +290,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
     const tba = filteredRows.filter((row) => !hasPricingDate(row.pricing_date));
     return [withPricing, tba];
   }, [filteredRows, selectedOp]);
-console.log("Filtered rows:", filteredRows);
   return (
     <>
       {/* dY"1 TOP CONTAINER: ONLY THREE CARDS */}
@@ -312,7 +310,7 @@ console.log("Filtered rows:", filteredRows);
             flexWrap: "wrap",
           }}
         >
-          <Typography
+          {/* <Typography
             sx={{
               fontWeight: 700,
               color: "#002060",
@@ -321,7 +319,7 @@ console.log("Filtered rows:", filteredRows);
             }}
           >
             {tabs.find((tab) => tab.value === selectedOp)?.label} · {selectedRegion}
-          </Typography>
+          </Typography> */}
           <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
             {regionTabs.map((item) => {
               const isSelected = selectedRegion === item.value;
@@ -596,6 +594,7 @@ console.log("Filtered rows:", filteredRows);
                     }}
                     selectedOp={selectedOp}
                     hideRegionColumn
+                    hidePricingDate
                     selectedRowId={selectedUpcomingTbaId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingTbaId(rowId);

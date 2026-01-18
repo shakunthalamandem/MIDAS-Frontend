@@ -11,6 +11,7 @@ interface DealsTableProps {
   onRowSelect: (row: any, rowId: number | string | null) => void;
   selectedOp: string;
   hideRegionColumn?: boolean;
+  hidePricingDate?: boolean;
   selectedRowId?: number | string | null;
   onSelectedRowIdChange?: (rowId: number | string | null) => void;
 }
@@ -21,6 +22,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
   onRowSelect,
   selectedOp,
   hideRegionColumn = false,
+  hidePricingDate = false,
   selectedRowId,
   onSelectedRowIdChange,
 }) => {
@@ -83,13 +85,14 @@ const DealsTable: React.FC<DealsTableProps> = ({
       col.field === "fo_type" ||
       col.field === "deal_size" ||
       col.field === "price_range" ||
+      col.field === "t1d_pred" ||
       col.field === "deal_status")
   ) {
     return false;
   }
 
-  // hide Pricing Date for Live
-  if (selectedOp === "live" && col.field === "pricing_date") {
+  // hide Pricing Date for Live or when explicitly requested
+  if ((selectedOp === "live" || hidePricingDate) && col.field === "pricing_date") {
     return false;
   }
 
