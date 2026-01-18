@@ -64,7 +64,7 @@ const WriteUpIPODashbaord: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [filterType, setFilterType] = useState<FilterType>("upcoming");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [regionFilter, setRegionFilter] = useState<string>("all"); // ⬅️ new
+  const [regionFilter, setRegionFilter] = useState<string>("US");
   const [dashboardLocked, setDashboardLocked] = useState<boolean>(
     Boolean(paramTicker)
   );
