@@ -67,7 +67,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
     "US" | "EMEA" | "APAC" | "NON_US_AMERICA"
   >("US");
 
-  const fetchData = async (operation: string) => {
+  const fetchData = async (operation: string, region: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
@@ -76,13 +76,24 @@ const NewDealsUpcomingRecent: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ operation }),
+        body: JSON.stringify({ operation, region }),
       });
       const result = await response.json();
-      const formattedRows = result.data.map((item: any, index: number) => ({
-        id: `${item.ticker}-${index}`, // ?. always unique
+      const payload = result?.data ?? result?.Data ?? [];
+      const sectionKey = selectedOp === "live" ? "Live" : "Upcoming";
+      const rowsSource = Array.isArray(payload)
+        ? payload
+        : Object.values(payload).flatMap((regionBucket: any) => {
+            const section = regionBucket?.[sectionKey] ?? regionBucket;
+            if (Array.isArray(section)) return section;
+            if (section && typeof section === "object") return Object.values(section);
+            return [];
+          });
+      const formattedRows = rowsSource.map((item: any, index: number) => ({
+        id: `${item?.ticker ?? "row"}-${index}`, // ?. always unique
         ...item,
       }));
+      console.log("Formatted rows:", formattedRows);
 
       setRows(formattedRows);
       setSelectedDeal(null);
@@ -100,8 +111,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
       return;
     }
     const apiOperation = opMap[selectedOp] || selectedOp;
-    fetchData(apiOperation);
-  }, [selectedOp]);
+    fetchData(apiOperation, selectedRegion);
+  }, [selectedOp, selectedRegion]);
 
   const handleOpChange = (value: string) => {
     setSelectedOp(value);
@@ -161,11 +172,13 @@ const NewDealsUpcomingRecent: React.FC = () => {
       if (selectedOp !== "pipeline") {
         const region = row.region?.trim().toUpperCase();
 
-        if (selectedRegion === "US" && region !== "US") return false;
-        if (selectedRegion === "APAC" && region !== "APAC") return false;
-        if (selectedRegion === "EMEA" && region !== "EMEA") return false;
-        if (selectedRegion === "NON_US_AMERICA") {
-          if (region !== "NON-US AMERICA" && region !== "LATAM") return false;
+        if (region) {
+          if (selectedRegion === "US" && region !== "US") return false;
+          if (selectedRegion === "APAC" && region !== "APAC") return false;
+          if (selectedRegion === "EMEA" && region !== "EMEA") return false;
+          if (selectedRegion === "NON_US_AMERICA") {
+            if (region !== "NON-US AMERICA" && region !== "LATAM") return false;
+          }
         }
       }
 
