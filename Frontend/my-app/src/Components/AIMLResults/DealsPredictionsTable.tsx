@@ -4,7 +4,7 @@ import { Alert, Box, CircularProgress } from "@mui/material";
 
 import DealDetailsPanel from "./DealDetailsPanel";
 import DealPricesChart from "./DealPricesChart";
-import DealsTable from "./DealsTable";
+import MLDealsTable from "./MLDealsTable";
 import DealsPredictionsHeader from "./DealsPredictionsHeader";
 
 import { DealRecord, DealTypeFilter, SortConfig, TickerSelectionPayload } from "./types";
@@ -212,7 +212,7 @@ const DealsPredictionsTable: React.FC<DealsPredictionsTableProps> = ({ onTickerC
 
       {!loading && !error && sortedData.length > 0 && (
         <>
-          <DealsTable
+          <MLDealsTable
             rows={sortedData}
             sortConfig={sortConfig}
             onSortChange={handleSortChange}

@@ -1,4 +1,4 @@
-// DealsTable.tsx
+// MLDealsTable.tsx
 import React, { useMemo } from "react";
 import {
   Box,
@@ -147,7 +147,7 @@ const GroupHeaderCell: React.FC<{
   );
 };
 
-interface DealsTableProps {
+interface MLDealsTableProps {
   rows: DealRecord[];
   sortConfig: SortConfig;
   onSortChange: (sortKey: keyof DealRecord) => void;
@@ -159,7 +159,7 @@ interface DealsTableProps {
   dealTypeFilter: "IPO" | "FO";
 }
 
-const DealsTable: React.FC<DealsTableProps> = ({
+const MLDealsTable: React.FC<MLDealsTableProps> = ({
   rows,
   sortConfig,
   onSortChange,
@@ -502,4 +502,4 @@ const DealsTable: React.FC<DealsTableProps> = ({
   );
 };
 
-export default DealsTable;
+export default MLDealsTable;

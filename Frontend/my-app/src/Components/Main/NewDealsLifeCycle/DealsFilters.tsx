@@ -8,16 +8,18 @@ interface DealsFiltersProps {
   rightContent?: React.ReactNode;
 }
 
-const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, options, onChange, rightContent }) => {
+const DealsFilters: React.FC<DealsFiltersProps> = ({
+  selectedOp,
+  options,
+  onChange,
+  rightContent,
+}) => {
   return (
     <Paper
       elevation={0}
       sx={{
         p: { xs: 1, md: 1.5 },
         borderRadius: 3,
-        // border: "1px solid rgba(0,32,96,0.08)",
-        // backgroundColor: "#f4f7fb",
-        // boxShadow: "0 6px 16px rgba(0,32,96,0.06)",
       }}
     >
       <Stack
@@ -30,84 +32,82 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({ selectedOp, options, onChan
         <ToggleButtonGroup
           value={selectedOp}
           exclusive
-        onChange={(_e, value) => value && onChange(value)}
-        sx={{
-          flexWrap: "wrap",
-          columnGap: { xs: 1, md: 1.5 },
-          rowGap: { xs: 1, md: 1.25 },
-          "& .MuiToggleButton-root": {
-            textTransform: "none",
-            borderRadius: 9999,
-            border: "1px solid #002060",
-            backgroundColor: "#e9eef6",
-            minWidth: 200,
-            justifyContent: "flex-start",
-            px: 1.8,
-            py: 0.75,
-            gap: 10,
-            transition: "all 0.2s ease",
-            boxShadow: "0 3px 10px rgba(0,32,96,0.08)",
-            color: "#002060",
-          },
-          "& .Mui-selected": {
-            borderColor: "#00133a",
-            background: "linear-gradient(135deg, #0a2b7a 0%, #002060 45%, #001745 100%)",
-            color: "#ffffff",
-            boxShadow: "0 12px 26px rgba(0,32,96,0.32)",
-          },
-          "& .Mui-selected .deal-label": {
-            color: "#ffffff",
-          },
-          "& .Mui-selected .deal-helper": {
-            color: "rgba(255,255,255,0.82)",
-          },
-          "& .Mui-selected .deal-icon": {
-            color: "#ffffff",
-          },
-          "& .MuiToggleButton-root:hover": {
-            transform: "translateY(-1px)",
-            boxShadow: "0 10px 20px rgba(0,32,96,0.18)",
-            backgroundColor: "#dfe7f5",
-          },
-        }}
-      >
-        {options.map((option) => (
-          <ToggleButton key={option.value} value={option.value}>
+          onChange={(_e, value) => value && onChange(value)}
+          sx={{
+            flexWrap: "wrap",
+            columnGap: { xs: 1, md: 1.5 },
+            rowGap: { xs: 1, md: 1.25 },
+            "& .MuiToggleButton-root": {
+              textTransform: "none",
+              borderRadius: 2,
+              border: "1px solid #e1e5ef",
+              backgroundColor: "#ffffff",
+              minWidth: 210,
+              justifyContent: "flex-start",
+              px: 2,
+              py: 1,
+              color: "#1f2a44",
+              position: "relative",
+              overflow: "hidden",
+              boxShadow: "0 1px 2px rgba(15,23,42,0.05)",
+              transition: "all 0.2s ease",
+            },
+            "& .MuiToggleButton-root:hover": {
+              backgroundColor: "#f6f8fc",
+            },
+            "& .Mui-selected": {
+              borderColor: "#c8c1e5",
+              boxShadow: "0 10px 24px rgba(44,24,93,0.12)",
+            },
+            "& .MuiToggleButton-root.Mui-selected:after": {
+              content: '""',
+              position: "absolute",
+              left: "22%",
+              right: "22%",
+              bottom: 0,
+              height: 3,
+              borderRadius: 999,
+              backgroundColor: "#2b146f",
+            },
+            "& .deal-icon-box": {
+              width: 34,
+              height: 34,
+              borderRadius: 2,
+              display: "grid",
+              placeItems: "center",
+              backgroundColor: "#eef1f6",
+              color: "#5b6476",
+              transition: "all 0.2s ease",
+            },
+            "& .Mui-selected .deal-icon-box": {
+              backgroundColor: "#ece7f8",
+              color: "#2b146f",
+            },
+            "& .deal-label": {
+              fontWeight: 700,
+              color: "inherit",
+            },
+            "& .deal-helper": {
+              color: "#6a7286",
+            },
+          }}
+        >
+          {options.map((option) => (
+            <ToggleButton key={option.value} value={option.value}>
               <Stack direction="row" alignItems="center" spacing={1.5}>
-                <Paper
-                  elevation={0}
-                  sx={(theme) => ({
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    display: "grid",
-                    placeItems: "center",
-                    backgroundColor: "rgba(0,32,96,0.08)",
-                    border: "1px solid rgba(0,32,96,0.2)",
-                    color: "inherit",
-                    transition: "all 0.2s ease",
-                    ...(theme.palette.mode === "dark" ? { backgroundColor: "rgba(255,255,255,0.08)" } : {}),
-                    ".Mui-selected &": {
-                      backgroundColor: "rgba(255,255,255,0.14)",
-                      borderColor: "rgba(255,255,255,0.5)",
-                      color: "#ffffff",
-                    },
-                  })}
-                >
-                  {option.icon}
-                </Paper>
-                <Stack alignItems="flex-start" spacing={0.25}>
-                <Typography className="deal-label" fontWeight={700} color="inherit">
-                  {option.label}
-                </Typography>
-                <Typography className="deal-helper" variant="caption" sx={{ color: "inherit", opacity: 0.75 }}>
-                  {option.helper}
-                </Typography>
-                </Stack>
+                {option.icon && <Box className="deal-icon-box">{option.icon}</Box>}
+                <Box>
+                  <Typography className="deal-label">{option.label}</Typography>
+                  {option.helper && (
+                    <Typography className="deal-helper" variant="caption">
+                      {option.helper}
+                    </Typography>
+                  )}
+                </Box>
               </Stack>
             </ToggleButton>
           ))}
-          </ToggleButtonGroup>
+        </ToggleButtonGroup>
         {rightContent && (
           <Box
             sx={{

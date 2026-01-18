@@ -8,9 +8,12 @@ import { getColumns } from "./DealTableData/columns";
 interface DealsTableProps {
   rows: any[];
   loading: boolean;
-  onRowSelect: (row: any) => void;
+  onRowSelect: (row: any, rowId: number | string | null) => void;
   selectedOp: string;
   hideRegionColumn?: boolean;
+  hidePricingDate?: boolean;
+  selectedRowId?: number | string | null;
+  onSelectedRowIdChange?: (rowId: number | string | null) => void;
 }
 
 const DealsTable: React.FC<DealsTableProps> = ({
@@ -19,8 +22,22 @@ const DealsTable: React.FC<DealsTableProps> = ({
   onRowSelect,
   selectedOp,
   hideRegionColumn = false,
+  hidePricingDate = false,
+  selectedRowId,
+  onSelectedRowIdChange,
 }) => {
-  const [selectedId, setSelectedId] = useState<number | string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = useState<
+    number | string | null
+  >(null);
+  const selectedId =
+    selectedRowId !== undefined ? selectedRowId : internalSelectedId;
+  const setSelectedId = (rowId: number | string | null) => {
+    if (onSelectedRowIdChange) {
+      onSelectedRowIdChange(rowId);
+      return;
+    }
+    setInternalSelectedId(rowId);
+  };
 
   // Clear selection if current rows no longer contain the selected id (e.g., after filtering)
   useEffect(() => {
@@ -38,13 +55,16 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
     const { ticker, deal_type, region, fo_type, sector } = params.row;
 
-    onRowSelect({
+    onRowSelect(
+      {
       ticker,
       deal_type,
       region,
       fo_type,
       sector,
-    });
+    },
+      params.id
+    );
 
   };
 
@@ -59,8 +79,20 @@ const DealsTable: React.FC<DealsTableProps> = ({
     return false;
   }
 
-  // hide Pricing Date for Live
-  if (selectedOp === "live" && col.field === "pricing_date") {
+  if (
+    selectedOp === "upcoming" &&
+    (col.field === "deal_type" ||
+      col.field === "fo_type" ||
+      col.field === "deal_size" ||
+      col.field === "price_range" ||
+      col.field === "t1d_pred" ||
+      col.field === "deal_status")
+  ) {
+    return false;
+  }
+
+  // hide Pricing Date for Live or when explicitly requested
+  if ((selectedOp === "live" || hidePricingDate) && col.field === "pricing_date") {
     return false;
   }
 

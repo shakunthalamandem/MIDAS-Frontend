@@ -247,11 +247,11 @@ const NavbarMain: React.FC = () => {
                   icon: <ArticleOutlinedIcon fontSize="small" />,
                 },
 
-                {
-                  label: "Meeting Notes",
-                  path: "/deal_meeting_notes",
-                  icon: <ArticleOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Meeting Notes",
+                //   path: "/deal_meeting_notes",
+                //   icon: <ArticleOutlinedIcon fontSize="small" />,
+                // },
                 // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
               ]}
               selectedTab={selectedTab}
@@ -422,6 +422,11 @@ const NavbarMain: React.FC = () => {
               <>
                 {/* 🔔 Notifications */}
                 <ChatBoxButton />
+                <ChatBoxButton
+                  label="Meeting Notes"
+                  icon={<HistoryEduOutlinedIcon fontSize="small" />}
+                  onClick={() => navigate("/deal_meeting_notes")}
+                />
 
                 <NotificationMenu />
               </>
