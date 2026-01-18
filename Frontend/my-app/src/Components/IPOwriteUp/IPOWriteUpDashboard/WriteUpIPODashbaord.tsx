@@ -264,7 +264,7 @@ const WriteUpIPODashbaord: React.FC = () => {
           variant="subtitle1"
           sx={{ fontWeight: 600, letterSpacing: 0.2 }}
         >
-          IPO Insights — {selectedTicker || "Select a symbol"}
+Welcome to detailed Insights on IPO Write-Ups!
         </Typography>
       </Box>
 
