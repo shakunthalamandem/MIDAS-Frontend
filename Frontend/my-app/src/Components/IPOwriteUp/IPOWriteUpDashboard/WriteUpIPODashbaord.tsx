@@ -22,12 +22,14 @@ import {
   Stack,
   TextField,
   InputAdornment,
-  MenuItem,            // ⬅️ add this
   TableSortLabel
-
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import PublicIcon from "@mui/icons-material/Public";
+import LanguageIcon from "@mui/icons-material/Language";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import Diversity3Icon from "@mui/icons-material/Diversity3";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatDealSize } from "./IPOWriteUpUtils";
 
@@ -69,13 +71,6 @@ const WriteUpIPODashbaord: React.FC = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const regionOptions = useMemo(() => {
-    const set = new Set<string>();
-    ipoData.forEach((row) => {
-      if (row.region) set.add(row.region);
-    });
-    return Array.from(set).sort();
-  }, [ipoData]);
   const [orderBy, setOrderBy] = useState<keyof IpoData>("sector");
   const [order, setOrder] = useState<Order>("asc");
   const ellipsisCellSx = {
@@ -148,7 +143,19 @@ const WriteUpIPODashbaord: React.FC = () => {
 
     // ✅ region filter
     if (regionFilter !== "all") {
-      data = data.filter((row) => row.region === regionFilter);
+      const normalizedFilter =
+        regionFilter === "NON_US_AMERICA"
+          ? "NON-US AMERICA"
+          : regionFilter.toUpperCase();
+      data = data.filter((row) => {
+        const normalizedRow = row.region
+          ? String(row.region).trim().toUpperCase()
+          : "";
+        if (normalizedFilter === "NON-US AMERICA") {
+          return normalizedRow === "NON-US AMERICA" || normalizedRow === "LATAM";
+        }
+        return normalizedRow === normalizedFilter;
+      });
     }
 
     // existing search filter
@@ -272,6 +279,54 @@ const WriteUpIPODashbaord: React.FC = () => {
             mb: 4,
           }}
         >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ mb: 2, flexWrap: "wrap" }}
+          >
+            {[
+              { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
+              { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
+              { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
+              { label: "Others", value: "NON_US_AMERICA", icon: <Diversity3Icon fontSize="small" /> },
+            ].map((item) => {
+              const isSelected = regionFilter === item.value;
+              return (
+                <Paper
+                  key={item.value}
+                  onClick={() => setRegionFilter(item.value)}
+                  sx={{
+                    px: 2,
+                    py: 0.6,
+                    borderRadius: 999,
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: "0.8rem",
+                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
+                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
+                    color: isSelected ? "#ffffff" : "#1f2a44",
+                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
+                    transition: "all 0.2s ease",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    "&:hover": {
+                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
+                    },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.75}>
+                    {item.icon}
+                    <Typography fontWeight={600} color="inherit">
+                      {item.label}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              );
+            })}
+          </Stack>
+
           {/* Top controls: title | toggle + search */}
           <Stack
             direction={{ xs: "column", md: "row" }}
@@ -322,27 +377,6 @@ const WriteUpIPODashbaord: React.FC = () => {
                 <ToggleButton value="upcoming">Upcoming</ToggleButton>
                 <ToggleButton value="all">All</ToggleButton>
               </ToggleButtonGroup>
-
-              {/* ⬇️ New Region filter (dropdown) */}
-              <TextField
-                select
-                size="small"
-                label="Region"
-                value={regionFilter}
-                onChange={(e) => setRegionFilter(e.target.value)}
-                sx={{
-                  minWidth: 150,
-                  backgroundColor: "#fff",
-                  borderRadius: 1,
-                }}
-              >
-                <MenuItem value="all">All Regions</MenuItem>
-                {regionOptions.map((region) => (
-                  <MenuItem key={region} value={region}>
-                    {region}
-                  </MenuItem>
-                ))}
-              </TextField>
 
               <TextField
                 placeholder="Search ticker or company…"
