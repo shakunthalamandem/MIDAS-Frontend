@@ -361,46 +361,44 @@ console.log("Filtered rows:", filteredRows);
               flexWrap: { xs: "wrap", md: "nowrap" },
             }}
           >
-            <TextField
-              size="small"
-              placeholder="Search"
-              value={isPipelineView ? pipelineSearch : dealSearch}
-              onChange={(e) =>
-                isPipelineView
-                  ? setPipelineSearch(e.target.value)
-                  : setDealSearch(e.target.value)
-              }
-              sx={{
-                minWidth: 220,
-                flexShrink: 0,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 999,
-                  height: 36,
-                  backgroundColor: "#ffffff",
-                  "& fieldset": {
-                    borderColor: "#cfd6e4",
+            {!isPipelineView && (
+              <TextField
+                size="small"
+                placeholder="Search"
+                value={dealSearch}
+                onChange={(e) => setDealSearch(e.target.value)}
+                sx={{
+                  minWidth: 220,
+                  flexShrink: 0,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 999,
+                    height: 36,
+                    backgroundColor: "#ffffff",
+                    "& fieldset": {
+                      borderColor: "#cfd6e4",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#bfc7da",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#b0b9cf",
+                    },
                   },
-                  "&:hover fieldset": {
-                    borderColor: "#bfc7da",
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#8a94a8",
+                    opacity: 1,
                   },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#b0b9cf",
-                  },
-                },
-                "& .MuiInputBase-input::placeholder": {
-                  color: "#8a94a8",
-                  opacity: 1,
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                  </InputAdornment>
-                ),
-              }}
-              InputLabelProps={{ shrink: false }}
-            />
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: false }}
+              />
+            )}
             {!isPipelineView && (
               <Typography
                 sx={{
