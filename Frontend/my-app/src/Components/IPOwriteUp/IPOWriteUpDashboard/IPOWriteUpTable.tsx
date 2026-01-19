@@ -133,20 +133,26 @@ const IPOWriteUpTable: React.FC<IPOWriteUpTableProps> = ({
                   .filter(Boolean)
                   .join(" ");
               }}
-            sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
-            },
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
-            },
-            "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
-              color: "#FFFFFF",
-            },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
-          }}
+              sx={{
+                "& .MuiDataGrid-container--top [role='row']": {
+                  backgroundColor: "#002060",
+                  color: "#FFFFFF",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#cad0f1ff !important",
+                },
+                "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+                  color: "#FFFFFF",
+                },
+                "& .MuiDataGrid-row.row-selected, & .MuiDataGrid-row.row-selected .MuiDataGrid-cell": {
+                  backgroundColor: "#bdf2b2 !important",
+                },
+                "& .MuiDataGrid-row.row-selected:hover, & .MuiDataGrid-row.row-selected:hover .MuiDataGrid-cell": {
+                  backgroundColor: "#bdf2b2 !important",
+                },
+                cursor: "pointer",
+                border: "1px solid #ccccccff",
+              }}
             />
           </Box>
         </Paper>
