@@ -244,7 +244,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
 
-    return rows.filter((row) => {
+    const nextRows = rows.filter((row) => {
       // dY"1 Search filter
       if (term && !row.ticker?.toString().toLowerCase().includes(term)) {
         return false;
@@ -271,6 +271,18 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
       return true;
     });
+
+    if (selectedOp === "live") {
+      const parsePricingDate = (value: any) => {
+        const parsed = Date.parse(String(value));
+        return Number.isNaN(parsed) ? -Infinity : parsed;
+      };
+      return nextRows.sort(
+        (a, b) => parsePricingDate(b.pricing_date) - parsePricingDate(a.pricing_date)
+      );
+    }
+
+    return nextRows;
   }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType]);
 
   const [upcomingDatedRows, upcomingTbaRows] = useMemo(() => {
