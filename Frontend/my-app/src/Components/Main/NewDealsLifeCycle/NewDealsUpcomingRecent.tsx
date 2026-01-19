@@ -11,6 +11,10 @@ import {
   Stack,
   InputAdornment,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -65,6 +69,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [dealSearch, setDealSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
@@ -208,6 +214,18 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const isPipelineView = selectedOp === "pipeline";
 
   useEffect(() => {
+    if (selectedOp === "live") {
+      const end = dayjs().startOf("day");
+      const start = end.subtract(30, "day");
+      setStartDate(start);
+      setEndDate(end);
+      return;
+    }
+    setStartDate(null);
+    setEndDate(null);
+  }, [selectedOp]);
+
+  useEffect(() => {
     if (!isPipelineView) {
       setPipelineSearch("");
     }
@@ -243,6 +261,15 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
+    const parseDateValue = (value: any) => {
+      if (!value) return null;
+      const raw = String(value).trim();
+      if (!raw) return null;
+      const cleaned = raw.replace(/(\d{1,2})(st|nd|rd|th)/i, "$1");
+      const parsed = dayjs(cleaned);
+      return parsed.isValid() ? parsed.startOf("day") : null;
+    };
+    const hasDateFilter = selectedOp === "live" && startDate && endDate;
 
     return rows.filter((row) => {
       // dY"1 Search filter
@@ -269,9 +296,17 @@ const NewDealsUpcomingRecent: React.FC = () => {
         return false;
       }
 
+      if (hasDateFilter) {
+        const dateValue = row.trade_date ?? row.pricing_date;
+        const rowDate = parseDateValue(dateValue);
+        if (!rowDate) return false;
+        if (rowDate.isBefore(startDate, "day")) return false;
+        if (rowDate.isAfter(endDate, "day")) return false;
+      }
+
       return true;
     });
-  }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType]);
+  }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType, startDate, endDate]);
 
   const [upcomingDatedRows, upcomingTbaRows] = useMemo(() => {
     if (selectedOp !== "upcoming") return [filteredRows, []];
@@ -489,42 +524,110 @@ const NewDealsUpcomingRecent: React.FC = () => {
               </Typography>
             )}
                  {!isPipelineView && (
-              <TextField
-                size="small"
-                placeholder="Search"
-                value={dealSearch}
-                onChange={(e) => setDealSearch(e.target.value)}
-                sx={{
-                  minWidth: 220,
-                  flexShrink: 0,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 999,
-                    height: 36,
-                    backgroundColor: "#ffffff",
-                    "& fieldset": {
-                      borderColor: "#cfd6e4",
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                flexWrap="wrap"
+                sx={{ ml: "auto" }}
+              >
+                {selectedOp === "live" && (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Start date"
+                      format="DD-MM-YYYY"
+                      value={startDate}
+                      onChange={(value) => {
+                        const next = value?.startOf("day") ?? null;
+                        setStartDate(next);
+                        if (next && endDate && next.isAfter(endDate, "day")) {
+                          setEndDate(next);
+                        }
+                      }}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          sx: {
+                            minWidth: 150,
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 999,
+                              height: 36,
+                              backgroundColor: "#ffffff",
+                              "& fieldset": { borderColor: "#cfd6e4" },
+                              "&:hover fieldset": { borderColor: "#bfc7da" },
+                              "&.Mui-focused fieldset": { borderColor: "#b0b9cf" },
+                            },
+                          },
+                        },
+                      }}
+                    />
+                    <DatePicker
+                      label="End date"
+                      format="DD-MM-YYYY"
+                      value={endDate}
+                      onChange={(value) => {
+                        const next = value?.startOf("day") ?? null;
+                        setEndDate(next);
+                        if (next && startDate && next.isBefore(startDate, "day")) {
+                          setStartDate(next);
+                        }
+                      }}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          sx: {
+                            minWidth: 150,
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 999,
+                              height: 36,
+                              backgroundColor: "#ffffff",
+                              "& fieldset": { borderColor: "#cfd6e4" },
+                              "&:hover fieldset": { borderColor: "#bfc7da" },
+                              "&.Mui-focused fieldset": { borderColor: "#b0b9cf" },
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                )}
+                <TextField
+                  size="small"
+                  placeholder="Search"
+                  value={dealSearch}
+                  onChange={(e) => setDealSearch(e.target.value)}
+                  sx={{
+                    minWidth: 220,
+                    flexShrink: 0,
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 999,
+                      height: 36,
+                      backgroundColor: "#ffffff",
+                      "& fieldset": {
+                        borderColor: "#cfd6e4",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#bfc7da",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#b0b9cf",
+                      },
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#bfc7da",
+                    "& .MuiInputBase-input::placeholder": {
+                      color: "#8a94a8",
+                      opacity: 1,
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#b0b9cf",
-                    },
-                  },
-                  "& .MuiInputBase-input::placeholder": {
-                    color: "#8a94a8",
-                    opacity: 1,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ shrink: false }}
-              />
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{ shrink: false }}
+                />
+              </Stack>
             )}
  
           </Container>
