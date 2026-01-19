@@ -75,10 +75,10 @@ const PredictionOutcomeIndicator: React.FC<{ pred: string; actual: number | stri
       component="span"
       title={isMismatch ? "Prediction disagrees with actual" : "Prediction aligns with actual"}
       sx={{
-        fontSize: 14,
+        fontSize: isMismatch ? 11 : 15,
         fontWeight: 800,
         lineHeight: 1,
-        color: isMismatch ? "error.main" : "success.main",
+        color: "#000",
       }}
     >
       {isMismatch ? "✕" : "✓"}

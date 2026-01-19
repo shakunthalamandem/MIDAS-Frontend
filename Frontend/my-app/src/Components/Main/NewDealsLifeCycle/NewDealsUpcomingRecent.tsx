@@ -19,6 +19,10 @@ import LanguageIcon from "@mui/icons-material/Language";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import SearchIcon from "@mui/icons-material/Search";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs, { Dayjs } from "dayjs";
 import DealsFilters from "./DealsFilters";
 import DealsTable from "./DealsTable";
 import AIMLModelPredictionInfo from "./DealsCyclesSections/AIMLModelPredictionInfo";
@@ -65,6 +69,10 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [dealSearch, setDealSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
+    dayjs().subtract(30, "day")
+  );
+  const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
@@ -234,9 +242,16 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedSingleTableId(null);
   }, [selectedRegion]);
 
+  useEffect(() => {
+    if (selectedOp === "live") {
+      setLiveStartDate(dayjs().subtract(30, "day"));
+      setLiveEndDate(dayjs());
+    }
+  }, [selectedOp]);
+
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
-      return "Track IPOs that have been issued or priced within the last 30 days, with real-time deal status and key market details.";
+      return "Track IPOs that have been issued or priced within the last 31 days, with real-time deal status and key market details.";
     }
     return "Track IPOs that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
   }, [selectedOp]);
@@ -273,17 +288,35 @@ const NewDealsUpcomingRecent: React.FC = () => {
     });
 
     if (selectedOp === "live") {
+      const start = liveStartDate?.startOf("day") ?? null;
+      const end = liveEndDate?.endOf("day") ?? null;
+      const inRange = (value: any) => {
+        const parsed = dayjs(value);
+        if (!parsed.isValid()) return false;
+        if (start && parsed.isBefore(start)) return false;
+        if (end && parsed.isAfter(end)) return false;
+        return true;
+      };
+      const ranged = nextRows.filter((row) => inRange(row.pricing_date));
       const parsePricingDate = (value: any) => {
         const parsed = Date.parse(String(value));
         return Number.isNaN(parsed) ? -Infinity : parsed;
       };
-      return nextRows.sort(
+      return ranged.sort(
         (a, b) => parsePricingDate(b.pricing_date) - parsePricingDate(a.pricing_date)
       );
     }
 
     return nextRows;
-  }, [rows, dealSearch, selectedRegion, selectedOp, selectedDealType]);
+  }, [
+    rows,
+    dealSearch,
+    selectedRegion,
+    selectedOp,
+    selectedDealType,
+    liveStartDate,
+    liveEndDate,
+  ]);
 
   const [upcomingDatedRows, upcomingTbaRows] = useMemo(() => {
     if (selectedOp !== "upcoming") return [filteredRows, []];
@@ -308,6 +341,39 @@ const NewDealsUpcomingRecent: React.FC = () => {
     const tba = filteredRows.filter((row) => !hasPricingDate(row.pricing_date));
     return [withPricing, tba];
   }, [filteredRows, selectedOp]);
+
+  useEffect(() => {
+    if (selectedOp === "upcoming") {
+      if (
+        selectedUpcomingDatedId != null &&
+        !upcomingDatedRows.some((row) => row.id === selectedUpcomingDatedId)
+      ) {
+        setSelectedUpcomingDatedId(null);
+      }
+      if (
+        selectedUpcomingTbaId != null &&
+        !upcomingTbaRows.some((row) => row.id === selectedUpcomingTbaId)
+      ) {
+        setSelectedUpcomingTbaId(null);
+      }
+      return;
+    }
+
+    if (
+      selectedSingleTableId != null &&
+      !filteredRows.some((row) => row.id === selectedSingleTableId)
+    ) {
+      setSelectedSingleTableId(null);
+    }
+  }, [
+    selectedOp,
+    filteredRows,
+    upcomingDatedRows,
+    upcomingTbaRows,
+    selectedUpcomingDatedId,
+    selectedUpcomingTbaId,
+    selectedSingleTableId,
+  ]);
   return (
     <>
       {/* dY"1 TOP CONTAINER: ONLY THREE CARDS */}
@@ -429,7 +495,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               flexWrap: { xs: "wrap", md: "nowrap" },
             }}
           >
-                       {!isPipelineView && (
+            {!isPipelineView && (
               <ToggleButtonGroup
                 value={selectedDealType}
                 exclusive
@@ -500,7 +566,70 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 {headlineText}
               </Typography>
             )}
-                 {!isPipelineView && (
+
+            {selectedOp === "live" && (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{ flexShrink: 0 }}
+                >
+                  <DatePicker
+                    label="Start date"
+                    value={liveStartDate}
+                    format="DD-MM-YYYY"
+                    onChange={(value) => {
+                      setLiveStartDate(value);
+                      if (value && liveEndDate && value.isAfter(liveEndDate)) {
+                        setLiveEndDate(value);
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        placeholder: "dd-mm-yyyy",
+                        sx: {
+                          minWidth: 160,
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 999,
+                            height: 36,
+                            backgroundColor: "#ffffff",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                  <DatePicker
+                    label="End date"
+                    value={liveEndDate}
+                    format="DD-MM-YYYY"
+                    onChange={(value) => {
+                      setLiveEndDate(value);
+                      if (value && liveStartDate && value.isBefore(liveStartDate)) {
+                        setLiveStartDate(value);
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        placeholder: "dd-mm-yyyy",
+                        sx: {
+                          minWidth: 160,
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 999,
+                            height: 36,
+                            backgroundColor: "#ffffff",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </Stack>
+              </LocalizationProvider>
+            )}
+
+            {!isPipelineView && (
               <TextField
                 size="small"
                 placeholder="Search"
