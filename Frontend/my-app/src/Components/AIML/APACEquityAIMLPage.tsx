@@ -315,7 +315,7 @@ const APACEquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   /> */}
-                  <Tab
+                  {/* <Tab
                     id="ai-ml-tab-1"
                     aria-controls="ai-ml-tabpanel-1"
                     label={
@@ -326,10 +326,10 @@ const APACEquityAiMlPage: React.FC = () => {
                       />
                     }
                     sx={tabStyles}
-                  />
+                  /> */}
                   <Tab
-                    id="ai-ml-tab-2"
-                    aria-controls="ai-ml-tabpanel-2"
+                    id="ai-ml-tab-1"
+                    aria-controls="ai-ml-tabpanel-1"
                     label={
                       <TabLabel
                         icon={<DescriptionOutlinedIcon fontSize="small" />}
@@ -374,11 +374,11 @@ const APACEquityAiMlPage: React.FC = () => {
                 </Card>
               </TabPanel> */}
 
-              <TabPanel value={activeTab} index={0}>
+              {/* <TabPanel value={activeTab} index={0}>
                 <APACAIFewshotAnalysis />
-              </TabPanel>
+              </TabPanel> */}
 
-              <TabPanel value={activeTab} index={1}>
+              <TabPanel value={activeTab} index={0}>
                 <ShowAPACSentimentAnalysis
                   focusTicker={sentimentTicker?.ticker ?? null}
                   tickerOptions={sentimentOptions}
