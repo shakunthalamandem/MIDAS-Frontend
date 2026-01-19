@@ -537,7 +537,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               <Grid item xs={12} lg={6}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
-                    Upcoming Deals (Pricing Date Available) - {selectedDealType}
+                    Upcoming Deals (Pricing Range Available) - {selectedDealType}
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
