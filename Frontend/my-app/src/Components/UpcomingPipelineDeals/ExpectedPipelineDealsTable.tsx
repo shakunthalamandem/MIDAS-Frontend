@@ -457,55 +457,8 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
           WebkitOverflowScrolling: "touch",
         }}
       >
-          <TextField
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            size="small"
-            sx={{
-              minWidth: 220,
-              flexShrink: 0,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 999,
-                height: 36,
-                backgroundColor: "#ffffff",
-                "& fieldset": {
-                  borderColor: "#cfd6e4",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#bfc7da",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#b0b9cf",
-                },
-              },
-              "& .MuiInputBase-input::placeholder": {
-                color: "#8a94a8",
-                opacity: 1,
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                </InputAdornment>
-              ),
-            }}
-            InputLabelProps={{ shrink: false }}
-          />
-     
-        <Typography
-          variant="h6"
-          color="#002060"
-          sx={{
-            fontWeight: 700,
-            textAlign: "center",
-            flexGrow: 1,
-          }}
-        >
-          Future Pipeline Deals
-        </Typography>
-        <ToggleButtonGroup
+
+                  <ToggleButtonGroup
           value={selectedDealType}
           exclusive
           onChange={(_e, val) => val && setSelectedDealType(val)}
@@ -547,6 +500,55 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
             FO
           </ToggleButton>
         </ToggleButtonGroup>
+     
+        <Typography
+          variant="h6"
+          color="#002060"
+          sx={{
+            fontWeight: 700,
+            textAlign: "center",
+            flexGrow: 1,
+          }}
+        >
+          Future Pipeline Deals
+        </Typography>
+                  <TextField
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            size="small"
+            sx={{
+              minWidth: 220,
+              flexShrink: 0,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 999,
+                height: 36,
+                backgroundColor: "#ffffff",
+                "& fieldset": {
+                  borderColor: "#cfd6e4",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#bfc7da",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#b0b9cf",
+                },
+              },
+              "& .MuiInputBase-input::placeholder": {
+                color: "#8a94a8",
+                opacity: 1,
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                </InputAdornment>
+              ),
+            }}
+            InputLabelProps={{ shrink: false }}
+          />
+
       </Container>
 
       <Card
