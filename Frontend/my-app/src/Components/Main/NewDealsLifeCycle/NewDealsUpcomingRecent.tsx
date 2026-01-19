@@ -411,63 +411,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               flexWrap: { xs: "wrap", md: "nowrap" },
             }}
           >
-            {!isPipelineView && (
-              <TextField
-                size="small"
-                placeholder="Search"
-                value={dealSearch}
-                onChange={(e) => setDealSearch(e.target.value)}
-                sx={{
-                  minWidth: 220,
-                  flexShrink: 0,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 999,
-                    height: 36,
-                    backgroundColor: "#ffffff",
-                    "& fieldset": {
-                      borderColor: "#cfd6e4",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#bfc7da",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#b0b9cf",
-                    },
-                  },
-                  "& .MuiInputBase-input::placeholder": {
-                    color: "#8a94a8",
-                    opacity: 1,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ shrink: false }}
-              />
-            )}
-            {!isPipelineView && (
-              <Typography
-                sx={{
-                  fontWeight: 400,
-                  color: "#1f2a44",
-                  lineHeight: 1.4,
-                  textAlign: "left",
-                  fontSize: { xs: "0.82rem", md: "0.88rem" },
-                  whiteSpace: { xs: "normal", md: "nowrap" },
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  flexGrow: 1,
-                  mx: { xs: 0, md: 2 },
-                }}
-              >
-                {headlineText}
-              </Typography>
-            )}
-            {!isPipelineView && (
+                       {!isPipelineView && (
               <ToggleButtonGroup
                 value={selectedDealType}
                 exclusive
@@ -519,6 +463,64 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
             )}
+       
+            {!isPipelineView && (
+              <Typography
+                sx={{
+                  fontWeight: 400,
+                  color: "#1f2a44",
+                  lineHeight: 1.4,
+                  textAlign: "left",
+                  fontSize: { xs: "0.82rem", md: "0.88rem" },
+                  whiteSpace: { xs: "normal", md: "nowrap" },
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  flexGrow: 1,
+                  mx: { xs: 0, md: 2 },
+                }}
+              >
+                {headlineText}
+              </Typography>
+            )}
+                 {!isPipelineView && (
+              <TextField
+                size="small"
+                placeholder="Search"
+                value={dealSearch}
+                onChange={(e) => setDealSearch(e.target.value)}
+                sx={{
+                  minWidth: 220,
+                  flexShrink: 0,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 999,
+                    height: 36,
+                    backgroundColor: "#ffffff",
+                    "& fieldset": {
+                      borderColor: "#cfd6e4",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#bfc7da",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#b0b9cf",
+                    },
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#8a94a8",
+                    opacity: 1,
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: false }}
+              />
+            )}
+ 
           </Container>
           {/* dY"1 TABLE (UNCHANGED) */}
           {isPipelineView ? (
