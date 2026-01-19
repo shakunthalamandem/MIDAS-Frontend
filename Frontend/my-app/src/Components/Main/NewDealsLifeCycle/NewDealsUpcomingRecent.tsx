@@ -40,8 +40,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
     },
     {
       value: "live",
-      label: "Live Deals",
-      helper: "Issued within last 30 days",
+      label: "Recently Listed Deals",
+      helper: "Issued Deals",
       icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
     {
