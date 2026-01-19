@@ -87,7 +87,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
     selectedOp === "upcoming" &&
     (col.field === "deal_type" ||
       col.field === "fo_type" ||
-      col.field === "deal_size" ||
+      // col.field === "deal_size" ||
       col.field === "price_range" ||
       col.field === "t1d_pred" ||
       col.field === "deal_status")

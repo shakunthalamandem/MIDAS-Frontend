@@ -17,7 +17,7 @@ interface ChatBoxButtonProps {
 }
 
 const ChatBoxButton: React.FC<ChatBoxButtonProps> = ({
-  label = "Deal Notes",
+  label = "Discussion",
   onClick,
   icon,
 }) => {
