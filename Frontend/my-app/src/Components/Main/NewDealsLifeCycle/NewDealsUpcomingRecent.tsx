@@ -242,9 +242,16 @@ const NewDealsUpcomingRecent: React.FC = () => {
     setSelectedSingleTableId(null);
   }, [selectedRegion]);
 
+  useEffect(() => {
+    if (selectedOp === "live") {
+      setLiveStartDate(dayjs().subtract(30, "day"));
+      setLiveEndDate(dayjs());
+    }
+  }, [selectedOp]);
+
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
-      return "Track IPOs that have been issued or priced within the last 30 days, with real-time deal status and key market details.";
+      return "Track IPOs that have been issued or priced within the last 31 days, with real-time deal status and key market details.";
     }
     return "Track IPOs that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
   }, [selectedOp]);
@@ -334,6 +341,39 @@ const NewDealsUpcomingRecent: React.FC = () => {
     const tba = filteredRows.filter((row) => !hasPricingDate(row.pricing_date));
     return [withPricing, tba];
   }, [filteredRows, selectedOp]);
+
+  useEffect(() => {
+    if (selectedOp === "upcoming") {
+      if (
+        selectedUpcomingDatedId != null &&
+        !upcomingDatedRows.some((row) => row.id === selectedUpcomingDatedId)
+      ) {
+        setSelectedUpcomingDatedId(null);
+      }
+      if (
+        selectedUpcomingTbaId != null &&
+        !upcomingTbaRows.some((row) => row.id === selectedUpcomingTbaId)
+      ) {
+        setSelectedUpcomingTbaId(null);
+      }
+      return;
+    }
+
+    if (
+      selectedSingleTableId != null &&
+      !filteredRows.some((row) => row.id === selectedSingleTableId)
+    ) {
+      setSelectedSingleTableId(null);
+    }
+  }, [
+    selectedOp,
+    filteredRows,
+    upcomingDatedRows,
+    upcomingTbaRows,
+    selectedUpcomingDatedId,
+    selectedUpcomingTbaId,
+    selectedSingleTableId,
+  ]);
   return (
     <>
       {/* dY"1 TOP CONTAINER: ONLY THREE CARDS */}
