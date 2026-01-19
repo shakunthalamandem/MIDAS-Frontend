@@ -174,6 +174,7 @@ const DealUnifiedSummaryTableDashboard: React.FC<
             columns={columns}
             loading={loading}
             checkboxSelection={false}
+            sortingOrder={["asc", "desc"]}
             rowHeight={35}
             sx={{
               "& .MuiDataGrid-container--top [role='row']": {
