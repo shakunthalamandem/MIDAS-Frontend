@@ -292,6 +292,7 @@ return (
           rows={filteredRows}
           columns={columns}
           pageSizeOptions={[25, 50, 100]}
+          sortingOrder={["asc", "desc"]}
           disableRowSelectionOnClick
           rowHeight={35}
 
