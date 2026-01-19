@@ -292,40 +292,23 @@ return (
           rows={filteredRows}
           columns={columns}
           pageSizeOptions={[25, 50, 100]}
+          sortingOrder={["asc", "desc"]}
           disableRowSelectionOnClick
           rowHeight={35}
 
-          sx={{
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "transparent",
-              fontWeight: "bold",
-              color: "#002060",
+       sx={{
+            "& .MuiDataGrid-container--top [role='row']": {
+              backgroundColor: "#002060",
+              color: "#FFFFFF",
             },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "12px",
+            "& .Mui-selected": {
+              backgroundColor: "#cad0f1ff !important",
             },
-            "& .MuiDataGrid-cell": {
-              color: "#000000",
-              fontSize: "12px",
-              padding: "4px",
+            "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
+              color: "#FFFFFF",
             },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: "#F5F5F5",
-            },
-            "& .first-column-border": {
-              borderLeft: "2px solid rgb(110, 110, 110)",
-            },
-            "& .last-columns-border": {
-              borderRight: "2px solid rgb(110, 110, 110)",
-            },
-            "& .highlight-cell": {
-              backgroundColor: "#F8F9CD",
-            },
-            "& .ticker-cell": {
-              fontWeight: "bold",
-              color: "#96000A",
-            },
+            cursor: "pointer",
+            border: "1px solid #ccccccff",
           }}
         />
       </Box>

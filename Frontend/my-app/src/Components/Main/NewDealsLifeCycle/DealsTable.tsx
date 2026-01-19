@@ -12,6 +12,7 @@ interface DealsTableProps {
   selectedOp: string;
   hideRegionColumn?: boolean;
   hidePricingDate?: boolean;
+  showAllColumns?: boolean;
   selectedRowId?: number | string | null;
   onSelectedRowIdChange?: (rowId: number | string | null) => void;
 }
@@ -23,6 +24,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
   selectedOp,
   hideRegionColumn = false,
   hidePricingDate = false,
+  showAllColumns = false,
   selectedRowId,
   onSelectedRowIdChange,
 }) => {
@@ -70,7 +72,9 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
 
   const columns = getColumns(selectedOp, selectedId);
-  const visibleColumns = columns.filter((col) => {
+  const visibleColumns = showAllColumns
+    ? columns
+    : columns.filter((col) => {
   // hide region column if needed
   if (hideRegionColumn && col.field === "region") return false;
 
@@ -102,12 +106,20 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
   return (
     <Container maxWidth={false} sx={{ mt: 2, mb: 4, px: 0 }}>
-      <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
+<div
+  style={{
+    width: "100%",
+    height: rows.length > 6 ? 450 : "auto",
+    maxHeight: rows.length > 6 ? 450 : "none",
+    overflowY: rows.length > 6 ? "auto" : "hidden",
+  }}
+>
         <DataGrid
           rows={rows}
           columns={visibleColumns}
           loading={loading}
           checkboxSelection={false}
+          sortingOrder={["asc", "desc"]}
           onRowClick={handleRowClick}
           rowSelectionModel={selectionModel}
           onRowSelectionModelChange={(model) => setSelectedId(model[0] ?? null)}
