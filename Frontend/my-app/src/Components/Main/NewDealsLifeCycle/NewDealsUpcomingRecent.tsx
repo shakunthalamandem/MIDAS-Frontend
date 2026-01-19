@@ -70,7 +70,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [dealSearch, setDealSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
-    dayjs().subtract(29, "day")
+    dayjs().subtract(30, "day")
   );
   const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const apiUrl = process.env.REACT_APP_API_URL;
