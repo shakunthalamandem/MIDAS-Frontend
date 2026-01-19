@@ -114,11 +114,12 @@ const DealsTable: React.FC<DealsTableProps> = ({
     overflowY: rows.length > 6 ? "auto" : "hidden",
   }}
 >
-     <DataGrid
+        <DataGrid
           rows={rows}
           columns={visibleColumns}
           loading={loading}
           checkboxSelection={false}
+          sortingOrder={["asc", "desc"]}
           onRowClick={handleRowClick}
           rowSelectionModel={selectionModel}
           onRowSelectionModelChange={(model) => setSelectedId(model[0] ?? null)}
