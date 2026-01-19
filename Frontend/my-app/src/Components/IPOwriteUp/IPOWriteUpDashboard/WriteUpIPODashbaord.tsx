@@ -9,50 +9,19 @@ import {
   Box,
   Container,
   Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   CircularProgress,
-  ToggleButton,
-  ToggleButtonGroup,
-  Stack,
-  TextField,
-  InputAdornment,
-  TableSortLabel,
   Grid
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import SearchIcon from "@mui/icons-material/Search";
-import PublicIcon from "@mui/icons-material/Public";
-import LanguageIcon from "@mui/icons-material/Language";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
-import Diversity3Icon from "@mui/icons-material/Diversity3";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatDate, formatDealSize } from "./IPOWriteUpUtils";
+import IPOWriteUpControls from "./IPOWriteUpControls";
+import IPOWriteUpTable from "./IPOWriteUpTable";
+import { FilterType, IpoData } from "./types";
 
 // ✅ Lazy-load the heavy dashboard to keep initial load blazing fast
 const IPODashboardMain = React.lazy(
   () => import("../../IPODashboardLLM/IPODashboardMain")
 );
-
-interface IpoData {
-  ticker: string;
-  company_name: string;
-  sector: string | null;
-  region: string | null;
-  pricing_date: string | null;
-  pricing_range_min: number | null;
-  pricing_range_max: number | null;
-  exchange: string | null;
-  deal_size: number | null;
-}
-
-type FilterType = "upcoming" | "all";
-type Order = "asc" | "desc";
 
 const WriteUpIPODashbaord: React.FC = () => {
   const { ticker: paramTicker } = useParams<{ ticker: string }>();
@@ -72,13 +41,6 @@ const WriteUpIPODashbaord: React.FC = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
-  const [orderBy, setOrderBy] = useState<keyof IpoData>("sector");
-  const [order, setOrder] = useState<Order>("asc");
-  const ellipsisCellSx = {
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  };
 
   useEffect(() => {
     const fetchIpoData = async () => {
@@ -131,13 +93,6 @@ const WriteUpIPODashbaord: React.FC = () => {
     }
   }, [paramTicker]);
 
-  const handleSort = (property: keyof IpoData) => {
-  const isAsc = orderBy === property && order === "asc";
-  setOrder(isAsc ? "desc" : "asc");
-  setOrderBy(property);
-};
-
-
   // Filter by ticker or company name
   const filteredData = useMemo(() => {
     let data = ipoData;
@@ -170,90 +125,8 @@ const WriteUpIPODashbaord: React.FC = () => {
     );
   }, [ipoData, searchQuery, regionFilter]);
 
-  const sortedData = useMemo(() => {
-  return [...filteredData].sort((a, b) => {
-    const valA = a[orderBy];
-    const valB = b[orderBy];
-
-    const isEmptyA =
-      valA === null || valA === "" || valA === "To Be Announced";
-    const isEmptyB =
-      valB === null || valB === "" || valB === "To Be Announced";
-
-    // Both empty
-    if (isEmptyA && isEmptyB) return 0;
-
-    // ASC: numbers/dates up, strings/TBA down
-    if (order === "asc") {
-      if (isEmptyA) return 1;
-      if (isEmptyB) return -1;
-    }
-
-    // DESC: strings/TBA up, numbers/dates down
-    if (order === "desc") {
-      if (isEmptyA) return -1;
-      if (isEmptyB) return 1;
-    }
-
-    // 🔢 Number comparison
-    if (typeof valA === "number" && typeof valB === "number") {
-      return order === "asc" ? valA - valB : valB - valA;
-    }
-
-    // 📅 Date comparison (valid date strings only)
-    const dateA = typeof valA === "string" ? Date.parse(valA) : NaN;
-    const dateB = typeof valB === "string" ? Date.parse(valB) : NaN;
-
-    if (!isNaN(dateA) && !isNaN(dateB)) {
-      return order === "asc" ? dateA - dateB : dateB - dateA;
-    }
-
-    // 🔤 String comparison (fallback)
-    return order === "asc"
-      ? String(valA).localeCompare(String(valB))
-      : String(valB).localeCompare(String(valA));
-  });
-}, [filteredData, order, orderBy]);
 
   const [pricingDatedRows, pricingTbaRows] = useMemo(() => {
-    const sortRows = (rows: IpoData[]) =>
-      [...rows].sort((a, b) => {
-        const valA = a[orderBy];
-        const valB = b[orderBy];
-
-        const isEmptyA =
-          valA === null || valA === "" || valA === "To Be Announced";
-        const isEmptyB =
-          valB === null || valB === "" || valB === "To Be Announced";
-
-        if (isEmptyA && isEmptyB) return 0;
-
-        if (order === "asc") {
-          if (isEmptyA) return 1;
-          if (isEmptyB) return -1;
-        }
-
-        if (order === "desc") {
-          if (isEmptyA) return -1;
-          if (isEmptyB) return 1;
-        }
-
-        if (typeof valA === "number" && typeof valB === "number") {
-          return order === "asc" ? valA - valB : valB - valA;
-        }
-
-        const dateA = typeof valA === "string" ? Date.parse(valA) : NaN;
-        const dateB = typeof valB === "string" ? Date.parse(valB) : NaN;
-
-        if (!isNaN(dateA) && !isNaN(dateB)) {
-          return order === "asc" ? dateA - dateB : dateB - dateA;
-        }
-
-        return order === "asc"
-          ? String(valA).localeCompare(String(valB))
-          : String(valB).localeCompare(String(valA));
-      });
-
     const hasPricingDate = (value: string | null) => {
       if (!value) return false;
       const normalized = String(value).trim().toLowerCase();
@@ -266,8 +139,8 @@ const WriteUpIPODashbaord: React.FC = () => {
 
     const dated = filteredData.filter((row) => hasPricingDate(row.pricing_date));
     const tba = filteredData.filter((row) => !hasPricingDate(row.pricing_date));
-    return [sortRows(dated), sortRows(tba)];
-  }, [filteredData, order, orderBy]);
+    return [dated, tba];
+  }, [filteredData]);
 
 
 
@@ -298,212 +171,6 @@ const WriteUpIPODashbaord: React.FC = () => {
       setDashboardLocked(false);
     },
     []
-  );
-
-  const isRowSelected = (ticker: string) => ticker === selectedTicker;
-  const tableHeaders = [
-    { label: "Symbol", key: "ticker" },
-    { label: "Company", key: "company_name" },
-    { label: "Pricing Date", key: "pricing_date" },
-    { label: "Sector", key: "sector" },
-    { label: "Price Range", key: "pricing_range_max" }, // not sortable
-    { label: "Exchange", key: "exchange" },
-    { label: "Deal Size", key: "deal_size" },
-  ];
-  const renderTable = (rows: IpoData[]) => (
-    <TableContainer
-      component={Paper}
-      sx={{ borderRadius: 2, maxHeight: 380, overflow: "auto" }}
-    >
-      <Table
-        stickyHeader
-        sx={{
-          borderCollapse: "collapse",
-          border: "1px solid black",
-          tableLayout: "fixed",
-          width: "100%",
-        }}
-      >
-        <TableHead>
-          <TableRow sx={{ backgroundColor: "#0b2a6b" }}>
-            {tableHeaders.map((h) => {
-              const key = h.key as keyof IpoData | undefined;
-
-              return (
-                <TableCell
-                  key={h.label}
-                  align="center"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    fontSize: "0.8rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    backgroundColor: "#0b2a6b",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {key ? (
-                    <TableSortLabel
-                      active={orderBy === key}
-                      direction={orderBy === key ? order : "asc"}
-                      onClick={() => handleSort(key)}
-                      sx={{
-                        color: "#fff !important",
-                        "& .MuiTableSortLabel-icon": {
-                          color: "#fff !important",
-                        },
-                      }}
-                    >
-                      {h.label}
-                    </TableSortLabel>
-                  ) : (
-                    h.label
-                  )}
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {rows.map((row, index) => {
-            const selected = isRowSelected(row.ticker);
-            const rowDisabled = dashboardLocked && row.ticker !== selectedTicker;
-            return (
-              <TableRow
-                key={`${row.ticker}_${row.pricing_date}_${index}`}
-                hover
-                onClick={() => handleRowClick(row.ticker)}
-                sx={{
-                  cursor: rowDisabled ? "not-allowed" : "pointer",
-                  opacity: rowDisabled ? 0.55 : 1,
-                  backgroundColor: selected ? "#81e67eff" : "inherit",
-                  "&:hover": {
-                    backgroundColor: selected ? "#ffe9c2" : "#f3f8ff",
-                  },
-                  border: "1px solid black",
-                }}
-              >
-                {/* Symbol */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    color: "#b10f0f",
-                    textDecoration: "underline",
-                    ...ellipsisCellSx,
-                    maxWidth: 120,
-                  }}
-                >
-                  {row.ticker}
-                </TableCell>
-
-                {/* Company */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 260,
-                  }}
-                >
-                  {row.company_name}
-                </TableCell>
-
-                {/* Pricing Date */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 160,
-                  }}
-                >
-                  {formatDate(row.pricing_date)}
-                </TableCell>
-
-                {/* Sector */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 180,
-                  }}
-                >
-                  {row.sector || ""}
-                </TableCell>
-
-                {/* Price Range */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 160,
-                  }}
-                >
-                  {row.pricing_range_min !== null &&
-                  row.pricing_range_max !== null
-                  ? `$${row.pricing_range_min} - $${row.pricing_range_max}`
-                    : "TBA"}
-                </TableCell>
-
-                {/* Exchange */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 180,
-                  }}
-                >
-                  {row.exchange || ""}
-                </TableCell>
-
-                {/* Deal Size */}
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontSize: "0.82rem",
-                    padding: "7px 8px",
-                    border: "1px solid black",
-                    lineHeight: 1.2,
-                    ...ellipsisCellSx,
-                    maxWidth: 140,
-                  }}
-                >
-                  {formatDealSize(row.deal_size)}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
   );
 
   return (
@@ -538,122 +205,15 @@ Welcome to detailed Insights on IPO Write-Ups!
             mb: 4,
           }}
         >
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ mb: 2, flexWrap: "wrap" }}
-          >
-            {[
-              { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
-              { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
-              { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-              { label: "Others", value: "NON_US_AMERICA", icon: <Diversity3Icon fontSize="small" /> },
-            ].map((item) => {
-              const isSelected = regionFilter === item.value;
-              return (
-                <Paper
-                  key={item.value}
-                  onClick={() => setRegionFilter(item.value)}
-                  sx={{
-                    px: 2,
-                    py: 0.6,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: "0.8rem",
-                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
-                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
-                    color: isSelected ? "#ffffff" : "#1f2a44",
-                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
-                    transition: "all 0.2s ease",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    "&:hover": {
-                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
-                    },
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={0.75}>
-                    {item.icon}
-                    <Typography fontWeight={600} color="inherit">
-                      {item.label}
-                    </Typography>
-                  </Stack>
-                </Paper>
-              );
-            })}
-          </Stack>
-
-          {/* Top controls: title | toggle + search */}
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={2}
-            mb={2}
-            alignItems={{ xs: "stretch", md: "center" }}
-            justifyContent="space-between"
-          >
-            {/* Heading */}
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              color="#0b2a6b"
-              sx={{ lineHeight: 1 }}
-            >
-              {headerTitle}
-            </Typography>
-
-            {/* Right controls: Toggle + Search */}
-            <Stack
-              direction="row"
-              spacing={1.5}
-              alignItems="center"
-              justifyContent="flex-end"
-              sx={{ width: { xs: "100%", md: "auto" } }}
-            >
-              <ToggleButtonGroup
-                value={filterType}
-                exclusive
-                size="small"
-                onChange={(_, v: FilterType | null) => v && setFilterType(v)}
-                sx={{
-                  borderRadius: 2,
-                  "& .MuiToggleButton-root": {
-                    px: 1.5,
-                    py: 0.9,
-                    fontSize: "0.8rem",
-                    textTransform: "none",
-                    borderColor: "#cbd5e1",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#0b2a6b !important",
-                    color: "#fff !important",
-                    borderColor: "#0b2a6b !important",
-                  },
-                }}
-              >
-                <ToggleButton value="upcoming">Upcoming</ToggleButton>
-                <ToggleButton value="all">All</ToggleButton>
-              </ToggleButtonGroup>
-
-              <TextField
-                placeholder="Search ticker or company…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                size="small"
-                sx={{ minWidth: 260, backgroundColor: "#fff", borderRadius: 1 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Stack>
-
-          </Stack>
+          <IPOWriteUpControls
+            headerTitle={headerTitle}
+            regionFilter={regionFilter}
+            onRegionChange={setRegionFilter}
+            filterType={filterType}
+            onFilterTypeChange={setFilterType}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+          />
 
           {loading ? (
             <Box
@@ -685,268 +245,28 @@ Welcome to detailed Insights on IPO Write-Ups!
           ) : (
             <>
               <Grid container spacing={2}>
-                <Grid item xs={12} lg={6}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight={700}
-                    color="#0b2a6b"
-                    sx={{ mb: 1 }}
-                  >
-                    Pricing Date Available
-                  </Typography>
-                  {pricingDatedRows.length > 0 ? (
-                    renderTable(pricingDatedRows)
-                  ) : (
-                    <Box
-                      sx={{
-                        py: 6,
-                        textAlign: "center",
-                        color: "text.secondary",
-                        border: "1px dashed #cbd5e1",
-                        borderRadius: 2,
-                        backgroundColor: "#fff",
-                      }}
-                    >
-                      <Typography variant="body2">
-                        No IPOs with pricing dates for this filter.
-                      </Typography>
-                    </Box>
-                  )}
+                <Grid item xs={12}>
+                  <IPOWriteUpTable
+                    title="Pricing Date Available"
+                    rows={pricingDatedRows}
+                    emptyMessage="No IPOs with pricing dates for this filter."
+                    selectedTicker={selectedTicker}
+                    dashboardLocked={dashboardLocked}
+                    onRowSelect={handleRowClick}
+                  />
                 </Grid>
-                <Grid item xs={12} lg={6}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight={700}
-                    color="#0b2a6b"
-                    sx={{ mb: 1 }}
-                  >
-                    To Be Announced
-                  </Typography>
-                  {pricingTbaRows.length > 0 ? (
-                    renderTable(pricingTbaRows)
-                  ) : (
-                    <Box
-                      sx={{
-                        py: 6,
-                        textAlign: "center",
-                        color: "text.secondary",
-                        border: "1px dashed #cbd5e1",
-                        borderRadius: 2,
-                        backgroundColor: "#fff",
-                      }}
-                    >
-                      <Typography variant="body2">
-                        No TBA IPOs for this filter.
-                      </Typography>
-                    </Box>
-                  )}
+                <Grid item xs={12}>
+                  <IPOWriteUpTable
+                    title="To Be Announced"
+                    rows={pricingTbaRows}
+                    emptyMessage="No TBA IPOs for this filter."
+                    selectedTicker={selectedTicker}
+                    dashboardLocked={dashboardLocked}
+                    onRowSelect={handleRowClick}
+                  />
                 </Grid>
               </Grid>
-              {false && (
-            <TableContainer
-              component={Paper}
-              sx={{ borderRadius: 2, maxHeight: 380, overflow: "auto" }}
-            >
-              <Table
-                stickyHeader
-                sx={{
-                  borderCollapse: "collapse",
-                  border: "1px solid black",
-                  tableLayout: "fixed",
-                  width: "100%",
-                }}
-              >
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#0b2a6b" }}>
-                    {[
-                      { label: "Symbol", key: "ticker" },
-                      { label: "Company", key: "company_name" },
-                      { label: "Pricing Date", key: "pricing_date" },
-                      { label: "Sector", key: "sector" },
-                      { label: "Price Range", key: "pricing_range_max" }, // not sortable
-                      { label: "Exchange", key: "exchange" },
-                      { label: "Deal Size", key: "deal_size" },
-                    ].map((h) => {
-                        const key = h.key as keyof IpoData | undefined;
 
-                      return (
-                        <TableCell
-                          key={h.label}
-                          align="center"
-                          sx={{
-                          color: "#fff",
-                          fontWeight: 700,
-                          fontSize: "0.8rem",
-                          padding: "7px 8px",
-                          border: "1px solid black",
-                          lineHeight: 1.2,
-                          backgroundColor: "#0b2a6b",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                    {key ? (
-                      <TableSortLabel
-                        active={orderBy === key}
-                        direction={orderBy === key ? order : "asc"}
-                        onClick={() => handleSort(key)}
-                      sx={{
-                        color: "#fff !important",
-                          "& .MuiTableSortLabel-icon": {
-                              color: "#fff !important",
-                            },
-                          }}
-                        >
-                        {h.label}
-                  </TableSortLabel>
-                  ) : (
-                  h.label
-                  )}
-                </TableCell>
-              );
-                })}
-
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                {sortedData.map((row, index) => {
-                  const selected = isRowSelected(row.ticker);
-                  const rowDisabled =
-                    dashboardLocked && row.ticker !== selectedTicker;
-                  return (
-                    <TableRow
-                      key={`${row.ticker}_${row.pricing_date}_${index}`}
-                      hover
-                      onClick={() => handleRowClick(row.ticker)}
-                      sx={{
-                        cursor: rowDisabled ? "not-allowed" : "pointer",
-                        opacity: rowDisabled ? 0.55 : 1,
-                        backgroundColor: selected ? "#81e67eff" : "inherit",
-                        "&:hover": {
-                          backgroundColor: selected ? "#ffe9c2" : "#f3f8ff",
-                        },
-                          border: "1px solid black",
-                        }}
-                      >
-                        {/* Symbol */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            fontWeight: 700,
-                            lineHeight: 1.2,
-                            color: "#b10f0f",
-                            textDecoration: "underline",
-                            ...ellipsisCellSx,
-                            maxWidth: 120,
-                          }}
-                        >
-                          {row.ticker}
-                        </TableCell>
-
-                        {/* Company */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 260,
-                          }}
-                        >
-                          {row.company_name}
-                        </TableCell>
-
-                        {/* Pricing Date */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 160,
-                          }}
-                        >
-                          {formatDate(row.pricing_date)}
-                        </TableCell>
-
-                        {/* Sector */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 180,
-                          }}
-                        >
-                          {row.sector || "—"}
-                        </TableCell>
-
-                        {/* Price Range */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 160,
-                          }}
-                        >
-                          {row.pricing_range_min !== null &&
-                            row.pricing_range_max !== null
-                            ? `$${row.pricing_range_min} – $${row.pricing_range_max}`
-                            : "TBA"}
-                        </TableCell>
-
-                        {/* Exchange */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 180,
-                          }}
-                        >
-                          {row.exchange || "—"}
-                        </TableCell>
-
-                        {/* Deal Size */}
-                        <TableCell
-                          align="center"
-                          sx={{
-                            fontSize: "0.82rem",
-                            padding: "7px 8px",
-                            border: "1px solid black",
-                            lineHeight: 1.2,
-                            ...ellipsisCellSx,
-                            maxWidth: 140,
-                          }}
-                        >
-                          {formatDealSize(row.deal_size)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-              )}
             </>
           )}
         </Box>
