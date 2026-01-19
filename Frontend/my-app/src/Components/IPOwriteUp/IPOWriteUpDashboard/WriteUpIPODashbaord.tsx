@@ -1,16 +1,10 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Container,
   Typography,
   CircularProgress,
-  Grid
+  Grid,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useNavigate, useParams } from "react-router-dom";
@@ -61,7 +55,6 @@ const WriteUpIPODashbaord: React.FC = () => {
         const json = await response.json();
         const data: IpoData[] = json.results || [];
 
-        // De-dup by ticker + pricing_date
         const uniqueRows = Array.from(
           new Map(
             data.map((item) => [`${item.ticker}_${item.pricing_date}`, item])
@@ -70,7 +63,6 @@ const WriteUpIPODashbaord: React.FC = () => {
 
         setIpoData(uniqueRows);
 
-        // Keep URL param behaviour, but do NOT auto-select first row.
         if (paramTicker) {
           setSelectedTicker(paramTicker);
         }
@@ -82,7 +74,6 @@ const WriteUpIPODashbaord: React.FC = () => {
     };
 
     fetchIpoData();
-    // Note: exclude selectedTicker from deps to avoid re-fetch loops
   }, [apiUrl, token, paramTicker, filterType]);
 
   useEffect(() => {
@@ -93,11 +84,15 @@ const WriteUpIPODashbaord: React.FC = () => {
     }
   }, [paramTicker]);
 
-  // Filter by ticker or company name
+  useEffect(() => {
+    if (!paramTicker) {
+      setSelectedTicker("");
+    }
+  }, [regionFilter, paramTicker]);
+
   const filteredData = useMemo(() => {
     let data = ipoData;
 
-    // ✅ region filter
     if (regionFilter !== "all") {
       const normalizedFilter =
         regionFilter === "NON_US_AMERICA"
@@ -114,7 +109,6 @@ const WriteUpIPODashbaord: React.FC = () => {
       });
     }
 
-    // existing search filter
     const q = searchQuery.trim().toLowerCase();
     if (!q) return data;
 
@@ -124,7 +118,6 @@ const WriteUpIPODashbaord: React.FC = () => {
         (row.company_name || "").toLowerCase().includes(q)
     );
   }, [ipoData, searchQuery, regionFilter]);
-
 
   const [pricingDatedRows, pricingTbaRows] = useMemo(() => {
     const hasPricingDate = (value: string | null) => {
@@ -142,7 +135,15 @@ const WriteUpIPODashbaord: React.FC = () => {
     return [dated, tba];
   }, [filteredData]);
 
-
+  const allRowsSorted = useMemo(() => {
+    const parsePricingDate = (value: string | null) => {
+      const parsed = Date.parse(String(value));
+      return Number.isNaN(parsed) ? -Infinity : parsed;
+    };
+    return [...filteredData].sort(
+      (a, b) => parsePricingDate(b.pricing_date) - parsePricingDate(a.pricing_date)
+    );
+  }, [filteredData]);
 
   const headerTitle =
     filterType === "all"
@@ -175,7 +176,6 @@ const WriteUpIPODashbaord: React.FC = () => {
 
   return (
     <>
-      {/* Header bar (simple, clean) */}
       <Box
         sx={{
           backgroundColor: "#0b2a6b",
@@ -190,7 +190,7 @@ const WriteUpIPODashbaord: React.FC = () => {
           variant="subtitle1"
           sx={{ fontWeight: 600, letterSpacing: 0.2 }}
         >
-Welcome to detailed Insights on IPO Write-Ups!
+          Welcome to detailed Insights on IPO Write-Ups!
         </Typography>
       </Box>
 
@@ -243,31 +243,43 @@ Welcome to detailed Insights on IPO Write-Ups!
               </Typography>
             </Box>
           ) : (
-            <>
-              <Grid container spacing={2}>
+            <Grid container spacing={2}>
+              {filterType === "all" ? (
                 <Grid item xs={12}>
                   <IPOWriteUpTable
-                    title=" Upcoming Pricing Range Available Deals (But Not Yet Listed)"
-                    rows={pricingDatedRows}
-                    emptyMessage="No IPOs with pricing dates for this filter."
+                    title="All Deals (Pricing Date Latest)"
+                    rows={allRowsSorted}
+                    emptyMessage="No IPOs found for this filter."
                     selectedTicker={selectedTicker}
                     dashboardLocked={dashboardLocked}
                     onRowSelect={handleRowClick}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <IPOWriteUpTable
-                    title="Upcoming Pricing Range Not Available Deals (TBA)"
-                    rows={pricingTbaRows}
-                    emptyMessage="No TBA IPOs for this filter."
-                    selectedTicker={selectedTicker}
-                    dashboardLocked={dashboardLocked}
-                    onRowSelect={handleRowClick}
-                  />
-                </Grid>
-              </Grid>
-
-            </>
+              ) : (
+                <>
+                  <Grid item xs={12}>
+                    <IPOWriteUpTable
+                      title="Upcoming Pricing Range Available Deals (But Not Yet Listed)"
+                      rows={pricingDatedRows}
+                      emptyMessage="No IPOs with pricing dates for this filter."
+                      selectedTicker={selectedTicker}
+                      dashboardLocked={dashboardLocked}
+                      onRowSelect={handleRowClick}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <IPOWriteUpTable
+                      title="Upcoming Pricing Range Not Available Deals (TBA)"
+                      rows={pricingTbaRows}
+                      emptyMessage="No TBA IPOs for this filter."
+                      selectedTicker={selectedTicker}
+                      dashboardLocked={dashboardLocked}
+                      onRowSelect={handleRowClick}
+                    />
+                  </Grid>
+                </>
+              )}
+            </Grid>
           )}
         </Box>
 
