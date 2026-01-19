@@ -569,6 +569,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                     }}
                     selectedOp={selectedOp}
                     showAllColumns
+                    hideFoTypeColumn={selectedDealType === "IPO"}
                     selectedRowId={selectedUpcomingDatedId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingDatedId(rowId);
@@ -614,6 +615,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                     }}
                     selectedOp={selectedOp}
                     showAllColumns
+                    hideFoTypeColumn={selectedDealType === "IPO"}
                     selectedRowId={selectedUpcomingTbaId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingTbaId(rowId);
@@ -671,6 +673,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               }}
               selectedOp={selectedOp}
               showAllColumns
+              hideFoTypeColumn={selectedDealType === "IPO"}
               selectedRowId={selectedSingleTableId}
               onSelectedRowIdChange={setSelectedSingleTableId}
             />
