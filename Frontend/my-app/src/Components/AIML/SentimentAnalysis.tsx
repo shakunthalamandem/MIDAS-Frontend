@@ -51,7 +51,7 @@ const formatDate = (date: Date) => {
 
 const buildPrompt = (ticker: string) => {
   const today = formatDate(new Date());
-  return `As of ${today}, how did ${ticker} IPO perform in the US, what was the market reaction, and which variables influenced its performance over the first 30 days? What is the expected IPO performance for ${ticker} coming up in the US market—specifically, is the IPO likely to do well in the first week and first month? Provide a detailed, evidence-backed assessment.`;
+  return `what is the investor sentiment for  ${ticker} IPO and tell me the likely trading prospects for this ${ticker} ipo over the next one week and one month `
 };
 
 const fetchIpoTickers = async (): Promise<Deal[]> => {
