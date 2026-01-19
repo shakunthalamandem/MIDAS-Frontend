@@ -683,8 +683,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
-                    Upcoming Deals (Pricing Range Available) - {selectedDealType}
+                  <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
+                    Upcoming Pricing Range Available Deals (But Not Yet Listed)) - {selectedDealType}
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
@@ -698,6 +698,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                     }}
                     selectedOp={selectedOp}
                     showAllColumns
+                    hideFoTypeColumn={selectedDealType === "IPO"}
                     selectedRowId={selectedUpcomingDatedId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingDatedId(rowId);
@@ -728,8 +729,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
-                    Upcoming Deals (To Be Announced) - {selectedDealType}
+                  <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
+                    Upcoming Pricing Range Not Available Deals (TBA) - {selectedDealType}
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
@@ -743,6 +744,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                     }}
                     selectedOp={selectedOp}
                     showAllColumns
+                    hideFoTypeColumn={selectedDealType === "IPO"}
                     selectedRowId={selectedUpcomingTbaId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingTbaId(rowId);
@@ -800,6 +802,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               }}
               selectedOp={selectedOp}
               showAllColumns
+              hideFoTypeColumn={selectedDealType === "IPO"}
               selectedRowId={selectedSingleTableId}
               onSelectedRowIdChange={setSelectedSingleTableId}
             />

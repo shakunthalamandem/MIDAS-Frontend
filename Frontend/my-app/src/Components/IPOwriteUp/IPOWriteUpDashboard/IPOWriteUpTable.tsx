@@ -89,6 +89,16 @@ const IPOWriteUpTable: React.FC<IPOWriteUpTableProps> = ({
     []
   );
 
+  const sortedRows = useMemo(() => {
+    const parsePricingDate = (value: string | null) => {
+      const parsed = Date.parse(String(value));
+      return Number.isNaN(parsed) ? -Infinity : parsed;
+    };
+    return [...rows].sort(
+      (a, b) => parsePricingDate(b.pricing_date) - parsePricingDate(a.pricing_date)
+    );
+  }, [rows]);
+
   const handleRowClick = (row: IpoData) => {
     if (dashboardLocked && row.ticker !== selectedTicker) return;
     if (row.ticker === selectedTicker) return;
@@ -117,7 +127,7 @@ const IPOWriteUpTable: React.FC<IPOWriteUpTableProps> = ({
   }}
 >
             <DataGrid
-              rows={rows}
+              rows={sortedRows}
               columns={columns}
               getRowId={(row) => `${row.ticker}_${row.pricing_date ?? "tba"}`}
               sortingOrder={["asc", "desc"]}
