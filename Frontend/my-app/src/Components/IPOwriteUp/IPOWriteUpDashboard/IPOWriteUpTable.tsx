@@ -98,10 +98,11 @@ const IPOWriteUpTable: React.FC<IPOWriteUpTableProps> = ({
   return (
     <Box sx={{ mb: 2 }}>
       <Typography
-        variant="subtitle2"
+        variant="h6"
         fontWeight={700}
-        color="#0b2a6b"
+        color="#f18900ff"
         sx={{ mb: 1 }}
+        align="center"
       >
         {title}
       </Typography>

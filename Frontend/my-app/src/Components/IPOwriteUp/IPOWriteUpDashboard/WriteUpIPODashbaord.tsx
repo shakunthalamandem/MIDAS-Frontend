@@ -247,7 +247,7 @@ Welcome to detailed Insights on IPO Write-Ups!
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <IPOWriteUpTable
-                    title="Pricing Date Available"
+                    title=" Upcoming Pricing Range Available Deals (But Not Yet Listed)"
                     rows={pricingDatedRows}
                     emptyMessage="No IPOs with pricing dates for this filter."
                     selectedTicker={selectedTicker}
@@ -257,7 +257,7 @@ Welcome to detailed Insights on IPO Write-Ups!
                 </Grid>
                 <Grid item xs={12}>
                   <IPOWriteUpTable
-                    title="To Be Announced"
+                    title="Upcoming Pricing Range Not Available Deals (TBA)"
                     rows={pricingTbaRows}
                     emptyMessage="No TBA IPOs for this filter."
                     selectedTicker={selectedTicker}
