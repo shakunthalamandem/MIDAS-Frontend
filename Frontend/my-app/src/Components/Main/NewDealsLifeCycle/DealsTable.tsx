@@ -106,8 +106,15 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
   return (
     <Container maxWidth={false} sx={{ mt: 2, mb: 4, px: 0 }}>
-      <div style={{ width: "100%", height: 450, maxHeight: "450px" }}>
-        <DataGrid
+<div
+  style={{
+    width: "100%",
+    height: rows.length > 6 ? 450 : "auto",
+    maxHeight: rows.length > 6 ? 450 : "none",
+    overflowY: rows.length > 6 ? "auto" : "hidden",
+  }}
+>
+     <DataGrid
           rows={rows}
           columns={visibleColumns}
           loading={loading}
