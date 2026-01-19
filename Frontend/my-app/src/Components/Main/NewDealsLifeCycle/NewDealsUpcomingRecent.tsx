@@ -284,9 +284,15 @@ const NewDealsUpcomingRecent: React.FC = () => {
       if (normalized === "to be announce") return false;
       return true;
     };
-    const withPricing = filteredRows.filter((row) =>
-      hasPricingDate(row.pricing_date)
-    );
+    const parsePricingDate = (value: any) => {
+      const parsed = Date.parse(String(value));
+      return Number.isNaN(parsed) ? -Infinity : parsed;
+    };
+    const withPricing = filteredRows
+      .filter((row) => hasPricingDate(row.pricing_date))
+      .sort(
+        (a, b) => parsePricingDate(b.pricing_date) - parsePricingDate(a.pricing_date)
+      );
     const tba = filteredRows.filter((row) => !hasPricingDate(row.pricing_date));
     return [withPricing, tba];
   }, [filteredRows, selectedOp]);
@@ -534,7 +540,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
             <CircularProgress sx={{ display: "block", mx: "auto" }} />
           ) : selectedOp === "upcoming" ? (
             <Grid container spacing={2} sx={{ px: 1 }}>
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
                     Upcoming Deals (Pricing Range Available) - {selectedDealType}
@@ -550,7 +556,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                       setSelectedUpcomingTbaId(null);
                     }}
                     selectedOp={selectedOp}
-                    hideRegionColumn
+                    showAllColumns
                     selectedRowId={selectedUpcomingDatedId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingDatedId(rowId);
@@ -579,7 +585,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                   </Container>
                 )}
               </Grid>
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontWeight: 600, color: "#1f2a44" }} align="center">
                     Upcoming Deals (To Be Announced) - {selectedDealType}
@@ -595,8 +601,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                       setSelectedUpcomingDatedId(null);
                     }}
                     selectedOp={selectedOp}
-                    hideRegionColumn
-                    hidePricingDate
+                    showAllColumns
                     selectedRowId={selectedUpcomingTbaId}
                     onSelectedRowIdChange={(rowId) => {
                       setSelectedUpcomingTbaId(rowId);
@@ -653,7 +658,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
                 setSelectedSingleTableId(rowId);
               }}
               selectedOp={selectedOp}
-              hideRegionColumn
+              showAllColumns
               selectedRowId={selectedSingleTableId}
               onSelectedRowIdChange={setSelectedSingleTableId}
             />

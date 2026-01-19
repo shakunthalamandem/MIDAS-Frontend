@@ -12,6 +12,7 @@ interface DealsTableProps {
   selectedOp: string;
   hideRegionColumn?: boolean;
   hidePricingDate?: boolean;
+  showAllColumns?: boolean;
   selectedRowId?: number | string | null;
   onSelectedRowIdChange?: (rowId: number | string | null) => void;
 }
@@ -23,6 +24,7 @@ const DealsTable: React.FC<DealsTableProps> = ({
   selectedOp,
   hideRegionColumn = false,
   hidePricingDate = false,
+  showAllColumns = false,
   selectedRowId,
   onSelectedRowIdChange,
 }) => {
@@ -70,7 +72,9 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
 
   const columns = getColumns(selectedOp, selectedId);
-  const visibleColumns = columns.filter((col) => {
+  const visibleColumns = showAllColumns
+    ? columns
+    : columns.filter((col) => {
   // hide region column if needed
   if (hideRegionColumn && col.field === "region") return false;
 
