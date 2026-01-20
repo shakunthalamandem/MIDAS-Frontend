@@ -92,6 +92,7 @@ import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis
 import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
+import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
 
 const AppRouters: React.FC = () => {
   return (
@@ -280,6 +281,9 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
+
+
+        <Route path="/deals/new_dashboard" element={<AuthGuard><NewDashboardLifeCycleMain /></AuthGuard>} />
 
 
 

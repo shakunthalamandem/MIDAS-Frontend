@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Import the dropdown arrow icon
 
 export interface DropdownMenuItem {
@@ -27,7 +27,12 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const location = useLocation();
   const isRichMenu = rich ?? menuItems.some((item) => item.icon);
+  const isMenuItemActive = (path: string) =>
+    Boolean(matchPath({ path, end: false }, location.pathname));
+  const isTabActive =
+    selectedTab === label || menuItems.some((item) => isMenuItemActive(item.path));
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -60,7 +65,7 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
           fontWeight: "bold",
           fontSize: "0.725rem",
           mx: 1,
-          borderBottom: selectedTab === label ? "3px solid #005166" : "3px solid transparent",
+          borderBottom: isTabActive ? "3px solid #005166" : "3px solid transparent",
           borderRadius: 0,
           "&:hover": {
             borderBottom: "3px solid #005166",
@@ -103,60 +108,64 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
         }}
         MenuListProps={isRichMenu ? { sx: { py: 1 } } : undefined}
       >
-        {menuItems.map((item) => (
-          <MenuItem
-            key={item.label}
-            onClick={() => handleMenuItemClick(item.path)}
-            sx={
-              isRichMenu
-                ? {
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.25,
-                    py: 1.25,
-                    px: 1.5,
-                    borderRadius: 1.5,
-                    transition:
-                      "background-color 150ms ease, transform 150ms ease",
-                    "&:hover": {
-                      backgroundColor: "#f3f6ff",
-                      transform: "translateY(-1px)",
-                    },
-                  }
-                : { color: "#005166", fontSize: "0.8rem" }
-            }
-          >
-            {item.icon && (
-              <Box
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "12px",
-                  backgroundColor: "#eef2ff",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "#002060",
-                  flexShrink: 0,
-                }}
-              >
-                {item.icon}
+        {menuItems.map((item) => {
+          const isActive = isMenuItemActive(item.path);
+          return (
+            <MenuItem
+              key={item.label}
+              onClick={() => handleMenuItemClick(item.path)}
+              sx={
+                isRichMenu
+                  ? {
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.25,
+                      py: 1.25,
+                      px: 1.5,
+                      borderRadius: 1.5,
+                      transition:
+                        "background-color 150ms ease, transform 150ms ease",
+                      backgroundColor: isActive ? "#e8efff" : "transparent",
+                      "&:hover": {
+                        backgroundColor: "#f3f6ff",
+                        transform: "translateY(-1px)",
+                      },
+                    }
+                  : { color: "#005166", fontSize: "0.8rem" }
+              }
+            >
+              {item.icon && (
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: "12px",
+                    backgroundColor: isActive ? "#dbe7ff" : "#eef2ff",
+                    display: "grid",
+                    placeItems: "center",
+                    color: "#002060",
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.icon}
+                </Box>
+              )}
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 700,
+                    color: isRichMenu ? "#0b1844" : "#005166",
+                    fontSize: isRichMenu ? "0.9rem" : "0.8rem",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {item.label}
+                </Typography>
               </Box>
-            )}
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 700,
-                  color: isRichMenu ? "#0b1844" : "#005166",
-                  fontSize: isRichMenu ? "0.9rem" : "0.8rem",
-                  lineHeight: 1.2,
-                }}
-              >
-                {item.label}
-              </Typography>
-            </Box>
-          </MenuItem>
-        ))}
+            </MenuItem>
+          );
+        })}
       </Menu>
     </>
   );

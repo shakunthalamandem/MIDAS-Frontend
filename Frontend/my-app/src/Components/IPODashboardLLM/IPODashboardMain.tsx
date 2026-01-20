@@ -69,7 +69,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   useEffect(() => {
     if (selectedTicker !== undefined) {
       setCurrentTicker(selectedTicker ?? null);
-      setSearchText(selectedTicker ?? "");
+      setSearchText("");
     }
   }, [selectedTicker]);
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Container, TextField, IconButton } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,8 +25,8 @@ interface TradingDetails {
 }
 
 interface CombinedProps {
-  shareData: SharePricePerformance;
-  tradingData: TradingDetails;
+  shareData?: SharePricePerformance;
+  tradingData?: TradingDetails;
   ticker: string;
 }
 
@@ -57,10 +57,18 @@ const formatValue = (value: any, suffix?: string) => {
 };
 
 const FOCombined: React.FC<CombinedProps> = ({ shareData, tradingData, ticker }) => {
-  const [shareLocal, setShareLocal] = useState<SharePricePerformance>(shareData);
-  const [tradingLocal, setTradingLocal] = useState<TradingDetails>(tradingData);
+  const [shareLocal, setShareLocal] = useState<SharePricePerformance>(shareData ?? {});
+  const [tradingLocal, setTradingLocal] = useState<TradingDetails>(tradingData ?? {});
   const [editShare, setEditShare] = useState(false);
   const [editTrading, setEditTrading] = useState(false);
+
+  useEffect(() => {
+    setShareLocal(shareData ?? {});
+  }, [shareData]);
+
+  useEffect(() => {
+    setTradingLocal(tradingData ?? {});
+  }, [tradingData]);
 
   const handleChange = (key: string, value: string, type: "share" | "trading") => {
     const parsed = parseFloat(value);

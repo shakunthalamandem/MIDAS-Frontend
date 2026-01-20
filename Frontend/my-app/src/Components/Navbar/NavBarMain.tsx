@@ -237,15 +237,20 @@ const NavbarMain: React.FC = () => {
                 },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
-                  label: "IPO Write-Up",
-                  path: "/equity/ipo_dashboard",
-                  icon: <TrendingUpOutlinedIcon fontSize="small" />,
+                  label:"New Dashboard",
+                  path:"/deals/new_dashboard",
+                  icon:<SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
-                {
-                  label: "FO Write-Up",
-                  path: "/equity/fo_dashboard",
-                  icon: <ArticleOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "IPO Write-Up",
+                //   path: "/equity/ipo_dashboard",
+                //   icon: <TrendingUpOutlinedIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "FO Write-Up",
+                //   path: "/equity/fo_dashboard",
+                //   icon: <ArticleOutlinedIcon fontSize="small" />,
+                // },
 
                 // {
                 //   label: "Meeting Notes",
@@ -381,13 +386,18 @@ const NavbarMain: React.FC = () => {
                   path: "/macro/sector",
                   icon: <PieChartOutlineIcon fontSize="small" />,
                 },
+                                {
+                  label: "Data & Analytics",
+                  path: "/data-analytics/writeups",
+                  icon: <DescriptionOutlinedIcon fontSize="small" />,
+                },
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
               rich
             />
 
-            <Button
+            {/* <Button
               onClick={() => handleTabSelect("Data & Analytics")}
               sx={{
                 color: "#005166",
@@ -406,7 +416,7 @@ const NavbarMain: React.FC = () => {
               }}
             >
               Data & Analytics
-            </Button>
+            </Button> */}
           </Box>
 
           {/* Right Side */}

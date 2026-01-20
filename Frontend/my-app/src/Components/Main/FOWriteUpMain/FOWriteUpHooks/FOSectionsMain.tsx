@@ -63,7 +63,18 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
 
         if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
         const data: TickerData[] = await response.json();
-        setSortedTickers(data);
+        const sorted = [...data].sort((a, b) => {
+          const aTime = a.pricing_date ? Date.parse(a.pricing_date) : NaN;
+          const bTime = b.pricing_date ? Date.parse(b.pricing_date) : NaN;
+          const aValid = !Number.isNaN(aTime);
+          const bValid = !Number.isNaN(bTime);
+
+          if (!aValid && !bValid) return 0;
+          if (!aValid) return 1;
+          if (!bValid) return -1;
+          return bTime - aTime;
+        });
+        setSortedTickers(sorted);
       } catch (error) {
         console.error("Failed to fetch tickers:", error);
       }
@@ -96,7 +107,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   useEffect(() => {
     if (selected?.ticker) {
       fetchIpoDetails(selected.ticker);
-      setSearchText(selected.ticker);
+      setSearchText("");
     } else if (ticker) {
       fetchIpoDetails(ticker);
     }
@@ -184,6 +195,7 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
           }}
           value={sortedTickers.find((t) => t.ticker === selected?.ticker) || null}
           onChange={handleAutocompleteChange}
+          onOpen={() => setSearchText("")}
           inputValue={searchText}
           onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
           sx={{ width: { xs: "100%", sm: "300px" } }}
