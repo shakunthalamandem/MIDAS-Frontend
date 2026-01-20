@@ -286,6 +286,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/deals/new_dashboard" element={<AuthGuard><NewDashboardLifeCycleMain /></AuthGuard>} />
+        <Route path='page_under_development' element={<AuthGuard><PageUnderDevelopment /></AuthGuard>} />
 
 
 

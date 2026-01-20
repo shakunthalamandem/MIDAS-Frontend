@@ -1,5 +1,15 @@
 import React from "react";
-import { Box, Chip, Container, Grid, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Tabs,
+  Tab,
+  Typography,
+} from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
@@ -7,12 +17,35 @@ import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
+import SentimentSatisfiedAltOutlinedIcon from "@mui/icons-material/SentimentSatisfiedAltOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate, formatDealSize, formatPriceValue } from "./NewDashboardLifeCycleUtils";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
+  const [tabValue, setTabValue] = React.useState(0);
+
+  const tabItems = [
+    { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
+    { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
+    { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
+    { label: "AI- Sentiment", icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" /> },
+    { label: "Ai View", icon: <VisibilityOutlinedIcon fontSize="small" /> },
+    { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
+    { label: "Peer Deals Performance", icon: <InsightsOutlinedIcon fontSize="small" /> },
+  ];
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+    navigate("/page_under_development");
+  };
 
   if (!payload) {
     return (
@@ -79,6 +112,48 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             {subtitle}
           </Typography>
         )}
+
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            mb: 3,
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#3b2a7a",
+              height: 3,
+              borderRadius: 999,
+            },
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#475569",
+              minHeight: 44,
+              px: 2,
+            },
+            "& .Mui-selected": {
+              color: "#3b2a7a",
+            },
+          }}
+        >
+          {tabItems.map((item) => (
+            <Tab
+              key={item.label}
+              icon={item.icon}
+              iconPosition="start"
+              label={item.label}
+              sx={{
+                borderRadius: 999,
+                backgroundColor: "#f1f5ff",
+                mr: 1,
+                "&.Mui-selected": {
+                  backgroundColor: "#e0e7ff",
+                },
+              }}
+            />
+          ))}
+        </Tabs>
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
