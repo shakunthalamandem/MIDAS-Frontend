@@ -12,6 +12,18 @@ export const formatDate = (value: any): string => {
   return parsed.isValid() ? parsed.format("DD MMM YYYY") : String(value);
 };
 
+export const formatDateISO = (value: any): string => {
+  if (!value) return "TBA";
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.format("YYYY-MM-DD") : String(value);
+};
+
+export const formatTwoDecimals = (value: any): string => {
+  if (value == null || value === "") return "N/A";
+  const num = Number(value);
+  if (Number.isNaN(num)) return String(value);
+  return num.toFixed(2);
+};
 export const formatDealSize = (value: any): string => {
   if (value == null || value === "") return "TBA";
   const num = Number(value);

@@ -18,7 +18,8 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import { formatDate } from "./NewDashboardLifeCycleUtils";
+import { formatDate, formatTwoDecimals } from "./NewDashboardLifeCycleUtils";
+import NewDashboardLifeCycleComparableTable from "./NewDashboardLifeCycleComparableTable";
 
 type OverviewResponse = {
   data?: {
@@ -40,25 +41,25 @@ const splitBullets = (value?: string | null) => {
     .filter(Boolean);
 };
 
-const formatNumber = (value: any, options?: Intl.NumberFormatOptions) => {
-  if (value === null || value === undefined) return "N/A";
-  const num = Number(value);
+  const formatNumber = (value: any, options?: Intl.NumberFormatOptions) => {
+    if (value === null || value === undefined) return "N/A";
+    const num = Number(value);
   if (Number.isNaN(num)) return "N/A";
   return new Intl.NumberFormat("en-US", options).format(num);
 };
 
-const formatCurrency = (value: any) =>
+  const formatCurrency = (value: any) =>
   formatNumber(value, {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 2,
   });
 
-const formatPercent = (value: any) => {
+  const formatPercent = (value: any) => {
   if (value === null || value === undefined) return "N/A";
   const num = Number(value);
   if (Number.isNaN(num)) return "N/A";
-  return `${num}%`;
+  return `${formatTwoDecimals(num)}%`;
 };
 
 const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOProps> = ({
@@ -351,46 +352,7 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
           </Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        <Grid container spacing={2}>
-          {comparables.slice(0, 6).map((row, idx) => (
-            <Grid item xs={12} sm={6} md={4} key={`${row.competitor}-${idx}`}>
-              <Card
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#f8fafc",
-                }}
-              >
-                <CardContent sx={{ p: 2 }}>
-                  <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        backgroundColor: "#e8efff",
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
-                      <InsightsOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                      {row.competitor}
-                    </Typography>
-                  </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    EV/Sales: {row.present_year_ev_sales ?? "N/A"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    EV/EBITDA: {row.present_year_ev_ebitda ?? "N/A"}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <NewDashboardLifeCycleComparableTable rows={comparables} />
       </Paper>
     </Stack>
   );

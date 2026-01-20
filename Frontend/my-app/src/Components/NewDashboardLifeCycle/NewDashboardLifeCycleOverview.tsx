@@ -1,23 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Chip,
   CircularProgress,
   Divider,
   Grid,
   Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
-import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
-import { formatDate } from "./NewDashboardLifeCycleUtils";
+import { formatDate, formatDateISO, formatTwoDecimals } from "./NewDashboardLifeCycleUtils";
+import NewDashboardLifeCycleComparableTable from "./NewDashboardLifeCycleComparableTable";
 
 type OverviewResponse = {
   data?: {
@@ -105,6 +107,13 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
     ];
   }, [dealData, ticker, dealType]);
 
+  const dateTimeline = [
+    { label: "Filed Date", value: dealData?.filed_date },
+    { label: "Pricing Range Date", value: dealData?.term_date },
+    { label: "Pricing Date", value: dealData?.pricing_date },
+    { label: "First Trade Date", value: dealData?.trade_date },
+  ];
+
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -154,6 +163,46 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
             />
           ))}
         </Stack>
+        <Box
+          sx={{
+            mt: 2.5,
+            px: { xs: 0, md: 2 },
+            position: "relative",
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: 22,
+              left: 8,
+              right: 8,
+              height: 2,
+              backgroundColor: "#c7d2fe",
+            }}
+          />
+          <Grid container spacing={2} justifyContent="space-between" sx={{ position: "relative" }}>
+            {dateTimeline.map((item) => (
+              <Grid item xs={6} md={3} key={item.label}>
+                <Stack spacing={0.5} alignItems="center">
+                  <Box
+                    sx={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      backgroundColor: "#1e3a8a",
+                    }}
+                  />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#0b1844" }}>
+                    {item.label}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#334155" }}>
+                    {formatDateISO(item.value)}
+                  </Typography>
+                </Stack>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </Paper>
 
       <Grid container spacing={2}>
@@ -246,46 +295,26 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
             Financial Forecasts
           </Typography>
         </Box>
-        <Grid container spacing={2}>
-          {financialForecasts.slice(0, 6).map((item, idx) => (
-            <Grid item xs={12} sm={6} md={4} key={`${item.metric_name}-${idx}`}>
-              <Card
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#f8fafc",
-                }}
-              >
-                <CardContent sx={{ p: 2 }}>
-                  <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        backgroundColor: "#e8efff",
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
-                      <TrendingUpOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                      {item.metric_name}
-                    </Typography>
-                  </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    Current: {item.current_year ?? "N/A"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Next: {item.one_year_later ?? "N/A"}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#f1f5ff" }}>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>Metric</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>Current Year</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>1Y Later</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>2Y Later</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {financialForecasts.map((item, idx) => (
+              <TableRow key={`${item.metric_name}-${idx}`}>
+                <TableCell sx={{ fontWeight: 600 }}>{item.metric_name || "N/A"}</TableCell>
+                <TableCell>{formatTwoDecimals(item.current_year)}</TableCell>
+                <TableCell>{formatTwoDecimals(item.one_year_later)}</TableCell>
+                <TableCell>{formatTwoDecimals(item.two_years_later)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
@@ -298,46 +327,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           </Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        <Grid container spacing={2}>
-          {comparables.slice(0, 6).map((row, idx) => (
-            <Grid item xs={12} sm={6} md={4} key={`${row.competitor}-${idx}`}>
-              <Card
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#f8fafc",
-                }}
-              >
-                <CardContent sx={{ p: 2 }}>
-                  <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        backgroundColor: "#e8efff",
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
-                      <InsightsOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                      {row.competitor}
-                    </Typography>
-                  </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    EV/Sales: {row.present_year_ev_sales ?? "N/A"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    EV/EBITDA: {row.present_year_ev_ebitda ?? "N/A"}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <NewDashboardLifeCycleComparableTable rows={comparables} />
       </Paper>
     </Stack>
   );
