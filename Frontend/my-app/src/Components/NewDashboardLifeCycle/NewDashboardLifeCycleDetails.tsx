@@ -30,6 +30,7 @@ import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSear
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
 import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
+import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -204,16 +205,26 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
         <Box sx={{ mb: 3 }}>
           {tabItems[tabValue]?.label === "Overview" ? (
-            <NewDashboardLifeCycleOverview
-              ticker={activePayload.ticker}
-              pricingDate={activePayload.pricing_date}
-              dealType={activePayload.deal_type}
-            />
+            isIpo ? (
+              <NewDashboardLifeCycleOverview
+                ticker={activePayload.ticker}
+                pricingDate={activePayload.pricing_date}
+                dealType={activePayload.deal_type}
+              />
+            ) : (
+              <NewDashboardLifeCycleOverviewFO
+                ticker={activePayload.ticker}
+                pricingDate={activePayload.pricing_date}
+              />
+            )
           ) : tabItems[tabValue]?.label === "Write up" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
-              <FOWriteUpDashboardMain ticker={activePayload.ticker} />
+              <FOWriteUpDashboardMain
+                ticker={activePayload.ticker}
+                deal_id={activePayload.deal_id}
+              />
             )
           ) : (
             <PageUnderDevelopment />
