@@ -148,8 +148,9 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
         sx={{
           p: 2.5,
           borderRadius: 3,
-          background: "linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%)",
+          background: "#ffffff",
           border: "1px solid #e2e8f0",
+          boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844", mb: 1 }}>
@@ -169,11 +170,22 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={7}>
-          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
+          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
             <Stack spacing={1.5}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                Company Overview
-              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: "#eef2ff",
+                  borderRadius: 2,
+                  py: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+                >
+                  Company Overview
+                </Typography>
+              </Box>
               {overviewLines.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   Overview not available.
@@ -191,11 +203,22 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
           </Paper>
         </Grid>
         <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
+          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
             <Stack spacing={1.5}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                Business Highlights
-              </Typography>
+              <Box
+                sx={{
+                  backgroundColor: "#eef2ff",
+                  borderRadius: 2,
+                  py: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+                >
+                  Business Highlights
+                </Typography>
+              </Box>
               {highlightLines.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   Highlights not available.
@@ -214,10 +237,22 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 2 }}>
-          Deal Snapshot
-        </Typography>
+      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+        <Box
+          sx={{
+            backgroundColor: "#eef2ff",
+            borderRadius: 2,
+            py: 1,
+            mb: 2,
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+          >
+            Deal Snapshot
+          </Typography>
+        </Box>
         <Grid container spacing={2}>
           {[
             {
@@ -271,9 +306,20 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
                   height: "100%",
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ p: 2 }}>
                   <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    {item.icon}
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        backgroundColor: "#e8efff",
+                        display: "grid",
+                        placeItems: "center",
+                      }}
+                    >
+                      {React.cloneElement(item.icon, { sx: { color: "#2f6fed" } })}
+                    </Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {item.label}
                     </Typography>
@@ -288,10 +334,22 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
         </Grid>
       </Paper>
 
-      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 1 }}>
-          Comparable Metrics
-        </Typography>
+      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+        <Box
+          sx={{
+            backgroundColor: "#eef2ff",
+            borderRadius: 2,
+            py: 1,
+            mb: 1,
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+          >
+            Comparable Metrics
+          </Typography>
+        </Box>
         <Divider sx={{ mb: 2 }} />
         <Grid container spacing={2}>
           {comparables.slice(0, 6).map((row, idx) => (
@@ -304,9 +362,20 @@ const NewDashboardLifeCycleOverviewFO: React.FC<NewDashboardLifeCycleOverviewFOP
                   backgroundColor: "#f8fafc",
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ p: 2 }}>
                   <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <InsightsOutlinedIcon fontSize="small" />
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        backgroundColor: "#e8efff",
+                        display: "grid",
+                        placeItems: "center",
+                      }}
+                    >
+                      <InsightsOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
+                    </Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {row.competitor}
                     </Typography>

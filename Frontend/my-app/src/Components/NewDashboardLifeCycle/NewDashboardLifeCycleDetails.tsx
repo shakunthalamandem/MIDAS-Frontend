@@ -168,20 +168,26 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           scrollButtons="auto"
           sx={{
             mb: 3,
+            backgroundColor: "#ffffff",
+            borderRadius: 999,
+            p: 0.5,
+            boxShadow: "0 6px 16px rgba(15, 23, 42, 0.08)",
+            border: "1px solid #e2e8f0",
             "& .MuiTabs-indicator": {
-              backgroundColor: "#3b2a7a",
-              height: 3,
-              borderRadius: 999,
+              display: "none",
             },
             "& .MuiTab-root": {
               textTransform: "none",
               fontWeight: 600,
-              color: "#475569",
+              color: "#64748b",
               minHeight: 44,
               px: 2,
+              borderRadius: 999,
             },
             "& .Mui-selected": {
-              color: "#3b2a7a",
+              color: "#ffffff",
+              backgroundColor: "#2f6fed",
+              boxShadow: "0 6px 12px rgba(47, 111, 237, 0.28)",
             },
           }}
         >

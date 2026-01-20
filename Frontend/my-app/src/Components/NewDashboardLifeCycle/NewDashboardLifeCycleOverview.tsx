@@ -37,7 +37,7 @@ const splitBullets = (value?: string | null) => {
   if (!value) return [];
   return value
     .split(/\r?\n/)
-    .map((line) => line.replace(/^[-•\s]+/, "").trim())
+    .map((line) => line.replace(/^[-\s]+/, "").trim())
     .filter(Boolean);
 };
 
@@ -132,8 +132,9 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
         sx={{
           p: 2.5,
           borderRadius: 3,
-          background: "linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%)",
+          background: "#ffffff",
           border: "1px solid #e2e8f0",
+          boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844", mb: 1 }}>
@@ -157,11 +158,16 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={7}>
-          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
+          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
             <Stack spacing={1.5}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                Company Overview
-              </Typography>
+              <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+                >
+                  Company Overview
+                </Typography>
+              </Box>
               {overviewLines.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   Overview not available.
@@ -170,7 +176,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                 <Stack spacing={1}>
                   {overviewLines.map((line, idx) => (
                     <Typography key={idx} variant="body2" sx={{ color: "#334155" }}>
-                      • {line}
+                      - {line}
                     </Typography>
                   ))}
                 </Stack>
@@ -179,11 +185,16 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           </Paper>
         </Grid>
         <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
+          <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
             <Stack spacing={1.5}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                Differentiated Summary
-              </Typography>
+              <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+                >
+                  Differentiated Summary
+                </Typography>
+              </Box>
               {summaryLines.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   Summary not available.
@@ -192,7 +203,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                 <Stack spacing={1}>
                   {summaryLines.slice(0, 6).map((line, idx) => (
                     <Typography key={idx} variant="body2" sx={{ color: "#334155" }}>
-                      • {line}
+                      - {line}
                     </Typography>
                   ))}
                 </Stack>
@@ -202,10 +213,15 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 1 }}>
-          Valuation Highlights
-        </Typography>
+      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+        <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1, mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+          >
+            Valuation Highlights
+          </Typography>
+        </Box>
         {valuationLines.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             Valuation data not available.
@@ -214,17 +230,22 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           <Stack spacing={1}>
             {valuationLines.map((line, idx) => (
               <Typography key={idx} variant="body2" sx={{ color: "#334155" }}>
-                • {line}
+                - {line}
               </Typography>
             ))}
           </Stack>
         )}
       </Paper>
 
-      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 1 }}>
-          Financial Forecasts
-        </Typography>
+      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+        <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1, mb: 2 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+          >
+            Financial Forecasts
+          </Typography>
+        </Box>
         <Grid container spacing={2}>
           {financialForecasts.slice(0, 6).map((item, idx) => (
             <Grid item xs={12} sm={6} md={4} key={`${item.metric_name}-${idx}`}>
@@ -236,9 +257,20 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                   backgroundColor: "#f8fafc",
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ p: 2 }}>
                   <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <TrendingUpOutlinedIcon fontSize="small" />
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        backgroundColor: "#e8efff",
+                        display: "grid",
+                        placeItems: "center",
+                      }}
+                    >
+                      <TrendingUpOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
+                    </Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {item.metric_name}
                     </Typography>
@@ -256,10 +288,15 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
         </Grid>
       </Paper>
 
-      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 1 }}>
-          Comparable Metrics
-        </Typography>
+      <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+        <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1, mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
+          >
+            Comparable Metrics
+          </Typography>
+        </Box>
         <Divider sx={{ mb: 2 }} />
         <Grid container spacing={2}>
           {comparables.slice(0, 6).map((row, idx) => (
@@ -272,9 +309,20 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                   backgroundColor: "#f8fafc",
                 }}
               >
-                <CardContent>
+                <CardContent sx={{ p: 2 }}>
                   <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                    <InsightsOutlinedIcon fontSize="small" />
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        backgroundColor: "#e8efff",
+                        display: "grid",
+                        placeItems: "center",
+                      }}
+                    >
+                      <InsightsOutlinedIcon fontSize="small" sx={{ color: "#2f6fed" }} />
+                    </Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {row.competitor}
                     </Typography>
