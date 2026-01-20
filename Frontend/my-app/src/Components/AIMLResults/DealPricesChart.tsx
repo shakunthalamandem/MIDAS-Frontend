@@ -423,9 +423,13 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
 
     const len = chartData.length;
 
-    const idx1d = clampIndex(0, len);
-    const idx1w = clampIndex(4, len);
-    const idx1m = clampIndex(21, len);
+    const desiredIdx1d = 0;
+    const desiredIdx1w = 4;
+    const desiredIdx1m = 21;
+
+    const idx1d = clampIndex(desiredIdx1d, len);
+    const idx1w = clampIndex(desiredIdx1w, len);
+    const idx1m = clampIndex(desiredIdx1m, len);
 
     const oneDayPredRaw = String(deal.t1d_pred ?? "").trim();
     const oneDayPred = oneDayPredRaw.toLowerCase();
@@ -447,8 +451,9 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
       key: "t1d" | "t1w" | "t1m",
       title: "1D" | "1W" | "1M",
       pred: string,
-      index: number
+      desiredIndex: number
     ) => {
+      const index = clampIndex(desiredIndex, len);
       const date = chartData[index]?.date ?? chartData[len - 1].date;
 
       // ✅ Only show Positive/Negative/etc in the badge
@@ -458,6 +463,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         key,
         title, // keep for internal uniqueness/tooltip, but badge should render ONLY `pred`
         pred: p,
+        displayText: p ? `${title} ${p}` : title,
         index,
         date,
         color: markerColor(key, p),
@@ -473,6 +479,14 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
         marker.yValue = chartData[index]?.close ?? chartData[len - 1].close; // default
       }
 
+      const resolvesToLastBar = index === len - 1;
+      const targetBeyondEnd = desiredIndex >= len;
+      const isShortSeries = len <= 5; // 1 bar or 5 bars case called out
+      if (key !== "t1d" && resolvesToLastBar && (targetBeyondEnd || isShortSeries)) {
+        // shift future markers to the right of the last candle for clarity
+        marker.horizontalOffsetBands = key === "t1m" ? 2 : 1;
+      }
+
       return marker;
     };
 
@@ -481,7 +495,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     if (deal.t1w_pred) out.push(mk("t1w", "1W", deal.t1w_pred, idx1w));
     if (deal.t1m_pred) out.push(mk("t1m", "1M", deal.t1m_pred, idx1m));
 
-    return out.filter((m) => m.pred && m.pred !== "—");
+    return out.filter((m) => m.pred && m.pred !== "");
   }, [deal, chartData, issuePrice, yMin, yMax]);
 
   if (!ticker || !tradeDate) {
