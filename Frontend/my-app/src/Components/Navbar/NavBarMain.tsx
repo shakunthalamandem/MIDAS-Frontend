@@ -40,6 +40,7 @@ import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
 import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
+import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -237,9 +238,9 @@ const NavbarMain: React.FC = () => {
                 },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
-                  label:"New Dashboard",
-                  path:"/deals/new_dashboard",
-                  icon:<SpaceDashboardOutlinedIcon fontSize="small" />,
+                  label: "New Dashboard",
+                  path: "/deals/new_dashboard",
+                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
                 // {
                 //   label: "IPO Write-Up",
@@ -386,7 +387,12 @@ const NavbarMain: React.FC = () => {
                   path: "/macro/sector",
                   icon: <PieChartOutlineIcon fontSize="small" />,
                 },
-                                {
+                {
+                  label: "AI News",
+                  path: "/macro/news-summary",
+                  icon: <AutoStoriesOutlinedIcon fontSize="small" />,
+                },
+                {
                   label: "Data & Analytics",
                   path: "/data-analytics/writeups",
                   icon: <DescriptionOutlinedIcon fontSize="small" />,
@@ -441,7 +447,6 @@ const NavbarMain: React.FC = () => {
                 <NotificationMenu />
               </>
             )}
-
 
             {isLoggedIn && isSuperUser && (
               <Button

@@ -112,7 +112,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
 
   const goToNews = (t?: string | null) => {
     const tt = t || normalizedTicker;
-    navigate(`/news${tt ? `?ticker=${encodeURIComponent(tt)}` : ""}`);
+    navigate(`/macro/news-summary/${tt ? `?ticker=${encodeURIComponent(tt)}` : ""}`);
   };
 
   const openModal = (news: ApiNewsItem) => {

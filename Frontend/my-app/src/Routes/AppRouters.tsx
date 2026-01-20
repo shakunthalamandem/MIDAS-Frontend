@@ -30,7 +30,7 @@ import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilte
 import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
 import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
 import MacroMain from "../Components/Macro/MacroMain";
-import News from "../Components/Macro/News";
+import StockTickerNews from "../Components/Macro/StockTickerNews";
 import ConvertsMain from "../Components/Converts/ConvertsMain";
 import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
 import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
@@ -112,7 +112,6 @@ const AppRouters: React.FC = () => {
 
 
 
-
         <Route path="/opportunity/equity" element={<AuthGuard><MarketOpportnuityMain /></AuthGuard>} >
           <Route path="search" element={<CombinedSelectedTicker ticker={'AS'} />} />
           <Route path="deal-stats" element={<MarketFilters />} />
@@ -174,7 +173,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/macro/sector" element={<AuthGuard><MacroMain /></AuthGuard>} />
-        <Route path="/macro/news-summary" element={<AuthGuard><News /></AuthGuard>} />
+        <Route path="/macro/news-summary" element={<AuthGuard><StockTickerNews /></AuthGuard>} />
 
 
 
