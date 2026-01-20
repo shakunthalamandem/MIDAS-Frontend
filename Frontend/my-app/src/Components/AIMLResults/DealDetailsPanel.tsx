@@ -309,20 +309,10 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   color: "text.secondary",
                 }}
               >
-                Deal parameters
+                Deal parameters & market sentiment
               </Typography>
 
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
-                  <SectionCard title="Deal classification" accent="info">
-                    <DetailRow
-                      label="Deal type"
-                      value={deal.deal_type || "—"}
-                    />
-                    <DetailRow label="FO type" value={deal.fo_type || "—"} />
-                  </SectionCard>
-                </Grid>
-
                 <Grid item xs={12} md={4}>
                   <SectionCard title="Deal economics" accent="primary">
                     <DetailRow
@@ -347,7 +337,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                         decimals: 2,
                       }) && (
                         <DetailRow
-                          label="Disc vs announcement"
+                          label="Disc from announcement"
                           value={formatNumber(
                             deal.discount_from_announcement_price,
                             {
@@ -381,6 +371,19 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                           decimals: 2,
                         }
                       )}
+                    />
+                  </SectionCard>
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <SectionCard title="Market sentiment" accent="info">
+                    <DetailRow
+                      label="1W sentiment"
+                      value={deal.one_week_sentiment || "—"}
+                    />
+                    <DetailRow
+                      label="1M sentiment"
+                      value={deal.one_month_sentiment || "—"}
                     />
                   </SectionCard>
                 </Grid>
@@ -446,43 +449,6 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 </Grid>
               </Grid>
             </Box>
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* AI SENTIMENT VIEW */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  mb: 1,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.6,
-                  fontSize: 11,
-                  color: "text.secondary",
-                }}
-              >
-                AI sentiment view
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={6}>
-                  <AIInsightBlock
-                    title="1 Week Sentiment"
-                    subtitle="Sentiment signal"
-                    value={deal.one_week_sentiment}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={6}>
-                  <AIInsightBlock
-                    title="1 Month Sentiment"
-                    subtitle="Sentiment signal"
-                    value={deal.one_month_sentiment}
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-
             {/* IPO ONLY: AI MODEL PREDICTIONS */}
             {deal.deal_type === "IPO" && (
               <>
