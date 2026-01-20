@@ -25,6 +25,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate, formatDealSize, formatPriceValue } from "./NewDashboardLifeCycleUtils";
+import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +45,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    navigate("/page_under_development");
   };
 
   if (!payload) {
@@ -154,6 +154,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
           ))}
         </Tabs>
+
+        <Box sx={{ mb: 3 }}>
+          <PageUnderDevelopment />
+        </Box>
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
