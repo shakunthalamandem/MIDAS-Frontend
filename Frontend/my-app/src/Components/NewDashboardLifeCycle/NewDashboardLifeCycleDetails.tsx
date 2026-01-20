@@ -97,9 +97,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={8}>
               <Stack spacing={0.6}>
-                <Typography variant="subtitle2" sx={{ color: "#64748b", fontWeight: 700 }}>
-                  Basic Information
-                </Typography>
                 <Stack direction="row" spacing={2} flexWrap="wrap">
                   <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
                     Ticker: {activePayload.ticker || "N/A"}
