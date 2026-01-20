@@ -49,10 +49,15 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
 }) => {
   // ✅ Sort tickers: no date → top, then newest first
   const sortedTickers = [...allIpoTickers].sort((a, b) => {
-    if (!a.pricing_date && !b.pricing_date) return 0;
-    if (!a.pricing_date) return -1;
-    if (!b.pricing_date) return 1;
-    return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
+    const aTime = a.pricing_date ? Date.parse(a.pricing_date) : NaN;
+    const bTime = b.pricing_date ? Date.parse(b.pricing_date) : NaN;
+    const aValid = !Number.isNaN(aTime);
+    const bValid = !Number.isNaN(bTime);
+
+    if (!aValid && !bValid) return 0;
+    if (!aValid) return 1;
+    if (!bValid) return -1;
+    return bTime - aTime;
   });
 
   return (
@@ -112,7 +117,7 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
           value={sortedTickers.find((t) => t.ticker_name === selectedTicker) || null}
           onChange={(_, newValue) => {
             setSelectedTicker(newValue ? newValue.ticker_name : null);
-            setSearchText(newValue ? newValue.ticker_name : "");
+            setSearchText("");
           }}
           inputValue={searchText}
           onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
