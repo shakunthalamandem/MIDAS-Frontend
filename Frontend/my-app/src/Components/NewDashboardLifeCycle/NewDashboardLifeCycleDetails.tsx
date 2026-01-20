@@ -26,11 +26,13 @@ import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate, formatDealSize, formatPriceValue } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
+import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
+  const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
@@ -71,8 +73,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     );
   }
 
-  const title = payload.ticker || payload.company || "Deal Details";
-  const subtitle = payload.issuer_name || payload.company_name || payload.company || "";
+  const activePayload = selectedOption || payload;
+  const title = activePayload.ticker || activePayload.company || "Deal Details";
+  const subtitle =
+    activePayload.issuer_name || activePayload.company_name || activePayload.company || "";
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
@@ -94,15 +98,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Typography variant="h5" sx={{ fontWeight: 700, color: "#0b1844" }}>
             {title}
           </Typography>
-          {payload.deal_type && (
+          {activePayload.deal_type && (
             <Chip
-              label={String(payload.deal_type).toUpperCase()}
+              label={String(activePayload.deal_type).toUpperCase()}
               sx={{ bgcolor: "#e0f2fe", color: "#0b3d91", fontWeight: 600 }}
             />
           )}
-          {payload.deal_status && (
+          {activePayload.deal_status && (
             <Chip
-              label={String(payload.deal_status)}
+              label={String(activePayload.deal_status)}
               sx={{ bgcolor: "#ecfccb", color: "#3f6212", fontWeight: 600 }}
             />
           )}
@@ -113,6 +117,40 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             {subtitle}
           </Typography>
         )}
+
+        <Paper
+          sx={{
+            mb: 3,
+            p: 2,
+            borderRadius: 3,
+            backgroundColor: "#f8fafc",
+          }}
+        >
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Stack spacing={0.5}>
+                <Typography variant="subtitle2" sx={{ color: "#64748b" }}>
+                  Basic Information
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
+                  Ticker: {activePayload.ticker || "N/A"}
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600, fontSize: "0.7rem" }}>
+                  Pricing Date: {formatDate(activePayload.pricing_date)}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Region: {activePayload.region || activePayload.country || "N/A"}
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <NewDashboardLifeCycleTickerSearch
+                selectedTicker={activePayload.ticker}
+                onSelect={setSelectedOption}
+              />
+            </Grid>
+          </Grid>
+        </Paper>
 
         <Tabs
           value={tabValue}
