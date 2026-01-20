@@ -414,6 +414,28 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     return chartData[idx1d]?.close ?? null;
   }, [chartData]);
 
+  const desiredIdx1d = 0;
+  const desiredIdx1w = 4;
+  const desiredIdx1m = 21;
+
+  const show1WInBox = chartData.length < desiredIdx1w + 1 && !!deal?.t1w_pred;
+  const show1MInBox = chartData.length < desiredIdx1m + 1 && !!deal?.t1m_pred;
+  const showPredictionBox = show1WInBox || show1MInBox;
+
+  const predictionBoxItems = useMemo(() => {
+    if (!deal) return [];
+    const items: { key: string; text: string; color: string }[] = [];
+    if (show1WInBox && deal.t1w_pred) {
+      const p = String(deal.t1w_pred ?? "").trim();
+      items.push({ key: "1w", text: `1W ${p}`, color: markerColor("t1w", p) });
+    }
+    if (show1MInBox && deal.t1m_pred) {
+      const p = String(deal.t1m_pred ?? "").trim();
+      items.push({ key: "1m", text: `1M ${p}`, color: markerColor("t1m", p) });
+    }
+    return items;
+  }, [deal, show1WInBox, show1MInBox]);
+
   // ✅ Prediction markers with custom Y positioning
   //    - Badge text should be only Positive/Negative/Neutral (no "1D:" prefix)
   //    - If 1D is Negative => 1D marker goes under Issue Price
@@ -422,10 +444,6 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
     if (!deal || !chartData.length) return [];
 
     const len = chartData.length;
-
-    const desiredIdx1d = 0;
-    const desiredIdx1w = 4;
-    const desiredIdx1m = 21;
 
     const idx1d = clampIndex(desiredIdx1d, len);
     const idx1w = clampIndex(desiredIdx1w, len);
@@ -544,7 +562,54 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
 
         {!loading && !error && chartData.length > 0 && (
           <>
-            <Box sx={{ mt: 3, height: 420 }}>
+            <Box sx={{ mt: 3, height: 420, position: "relative" }}>
+              {showPredictionBox && predictionBoxItems.length > 0 && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 12,
+                    zIndex: 2,
+                    bgcolor: "rgba(255,255,255,0.96)",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    borderRadius: 1.5,
+                    p: 1.25,
+                    boxShadow: 1,
+                    minWidth: 140,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", fontWeight: 700, color: "text.secondary", mb: 0.5 }}
+                  >
+                    Future predictions
+                  </Typography>
+                  {predictionBoxItems.map((item) => (
+                    <Box
+                      key={item.key}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      gap={1}
+                      sx={{ mt: 0.25 }}
+                    >
+                      <Box
+                        component="span"
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: "50%",
+                          backgroundColor: item.color,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                        {item.text}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={chartData}
