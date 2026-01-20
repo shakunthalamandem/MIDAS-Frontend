@@ -34,6 +34,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
+    { label: "Overview", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
@@ -74,7 +75,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const subtitle = payload.issuer_name || payload.company_name || payload.company || "";
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
       <Paper
         sx={{
           p: 3,
