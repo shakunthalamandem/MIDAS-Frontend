@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, CircularProgress, Container, Grid, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -24,6 +25,7 @@ import {
 } from "./NewDashboardLifeCycleUtils";
 
 const NewDealsLifecycleCards: React.FC = () => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
@@ -368,17 +370,22 @@ const NewDealsLifecycleCards: React.FC = () => {
               lg={4}
               key={row.id ?? `${row.ticker}-${row.pricing_date}`}
             >
-              <DealCard
-                title={row.ticker || "N/A"}
-                subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
-                secondaryTag={writeupTag}
-                meta={meta}
-                tags={[
-                  { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
-                  { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
-                  ...displayTags,
-                ]}
-              />
+            <DealCard
+              title={row.ticker || "N/A"}
+              subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
+              secondaryTag={writeupTag}
+              meta={meta}
+              tags={[
+                { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
+                { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
+                ...displayTags,
+              ]}
+              onViewDetails={() =>
+                navigate("/deals/new_dashboard/details", {
+                  state: { payload: row },
+                })
+              }
+            />
             </Grid>
           );
         })}
@@ -444,6 +451,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                     color: "#1d4ed8",
                   },
                 ]}
+                onViewDetails={() =>
+                  navigate("/deals/new_dashboard/details", {
+                    state: { payload: row, pipelineCategory },
+                  })
+                }
               />
             </Grid>
           );

@@ -23,6 +23,7 @@ type DealCardProps = {
   meta: DealCardMeta[];
   tags?: DealCardTag[];
   secondaryTag?: DealCardTag;
+  onViewDetails?: () => void;
 };
 
 const DealCard: React.FC<DealCardProps> = ({
@@ -31,6 +32,7 @@ const DealCard: React.FC<DealCardProps> = ({
   meta,
   tags,
   secondaryTag,
+  onViewDetails,
 }) => (
   <Card
     elevation={0}
@@ -49,7 +51,10 @@ const DealCard: React.FC<DealCardProps> = ({
         alignItems="center"
         spacing={1}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, color: "#0b1844", wordBreak: "break-word" }}
+        >
           {title}
         </Typography>
         {tags?.length ? (
@@ -77,7 +82,10 @@ const DealCard: React.FC<DealCardProps> = ({
       {(subtitle || secondaryTag) && (
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
           {subtitle ? (
-            <Typography variant="body2" sx={{ color: "#475569", fontWeight: 500 }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "#475569", fontWeight: 500, wordBreak: "break-word" }}
+            >
               {subtitle}
             </Typography>
           ) : null}
@@ -131,6 +139,26 @@ const DealCard: React.FC<DealCardProps> = ({
           </Grid>
         ))}
       </Grid>
+      {onViewDetails && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Box
+            component="button"
+            onClick={onViewDetails}
+            type="button"
+            style={{
+              border: "none",
+              borderRadius: "999px",
+              background: "#3b2a7a",
+              color: "#ffffff",
+              padding: "6px 16px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            View Details
+          </Box>
+        </Box>
+      )}
     </CardContent>
   </Card>
 );

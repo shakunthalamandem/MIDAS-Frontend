@@ -71,6 +71,7 @@ import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
 import FOFinancialForecastUpload from "../Components/Main/FOWriteUpMain/FOWriteUpUploads/FOFinancialForecastUpload";
 import DealsTabsLayout from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout";
 import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
+import NewDashboardLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleDetails";
 
 import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers";
@@ -225,6 +226,7 @@ const AppRouters: React.FC = () => {
        
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
          <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
+        <Route path="/deals/new_dashboard/details" element={<AuthGuard><NewDashboardLifeCycleDetails /></AuthGuard>} />
 
 
 
