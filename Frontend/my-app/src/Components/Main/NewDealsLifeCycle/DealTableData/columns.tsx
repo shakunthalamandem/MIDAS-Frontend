@@ -178,6 +178,8 @@ const formatDealSize = (value: any): string => {
         return params.value?.toString().toLowerCase() === "yes" ? (
           <Link
             to={link}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               color: "#002060",
               fontWeight: "bold",
