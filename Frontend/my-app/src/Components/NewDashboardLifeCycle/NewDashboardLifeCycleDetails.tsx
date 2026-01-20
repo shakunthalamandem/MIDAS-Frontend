@@ -29,6 +29,7 @@ import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
+import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -103,6 +104,12 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <Grid item xs={12} md={8}>
               <Stack spacing={0.6}>
                 <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                  <Chip
+                    icon={<ArrowBackIcon />}
+                    label="Back"
+                    onClick={() => navigate("/deals/new_dashboard")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                  />
                   <Chip
                     label={activePayload.ticker || "N/A"}
                     sx={{
@@ -196,7 +203,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Tabs>
 
         <Box sx={{ mb: 3 }}>
-          {tabItems[tabValue]?.label === "Write up" ? (
+          {tabItems[tabValue]?.label === "Overview" ? (
+            <NewDashboardLifeCycleOverview
+              ticker={activePayload.ticker}
+              pricingDate={activePayload.pricing_date}
+              dealType={activePayload.deal_type}
+            />
+          ) : tabItems[tabValue]?.label === "Write up" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
