@@ -41,6 +41,9 @@ interface SentimentAnalysisProps {
 
 //   const apiUrl = process.env.REACT_APP_API_URL;
 const apiUrl = process.env.REACT_APP_API_URL;
+const defaultOperation = "Upcoming Deals";
+// const defaultRegion = "US";
+// const defaultDealType = "IPO";
 
 const formatDate = (date: Date) => {
   const y = date.getFullYear();
@@ -49,19 +52,40 @@ const formatDate = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
-const buildPrompt = (ticker: string) => {
+const buildPrompt = (ticker: string, dealType?: string) => {
   const today = formatDate(new Date());
-  return `what is the investor sentiment for  ${ticker} IPO and tell me the likely trading prospects for this ${ticker} ipo over the next one week and one month `
+  const normalizedType = (dealType || "deal").toUpperCase();
+  return `what is the investor sentiment for ${ticker} ${normalizedType} and tell me the likely trading prospects for this ${ticker} ${normalizedType} over the next one week and one month `;
 };
 
-const fetchIpoTickers = async (): Promise<Deal[]> => {
-  const res = await fetch(`${apiUrl}/api/sentiment_analysis/`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+const fetchIpoTickers = async (
+  operation = defaultOperation,
+  // region = defaultRegion,
+  // dealType = defaultDealType
+): Promise<Deal[]> => {
+  const token = localStorage.getItem("access_token");
+  const res = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({ operation, }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to fetch IPO tickers");
-  return data?.deals ?? [];
+  const payload = data?.data ?? data?.Data ?? [];
+  const rows = Array.isArray(payload) ? payload : Object.values(payload);
+  return rows
+    .filter((item: any) => item && typeof item === "object")
+    .map((item: any) => ({
+      ticker: String(item.ticker ?? "").trim(),
+      unique_deal_id: item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      deal_type: item.deal_type ?? "",
+      fo_type: item.fo_type ?? undefined,
+      region: item.region ?? undefined,
+    }))
+    .filter((item: Deal) => item.ticker);
 };
 
 const askPerplexity = async (question: string, uniqueDealId: string): Promise<Block[]> => {
@@ -303,7 +327,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
         const deals = await fetchIpoTickers();
         const prepared = deals.map((deal) => ({
           ...deal,
-          prompt: buildPrompt(deal.ticker),
+          prompt: buildPrompt(deal.ticker, deal.deal_type),
           status: "pending" as const,
         }));
         setItems(prepared);
