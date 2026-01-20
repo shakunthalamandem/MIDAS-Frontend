@@ -241,16 +241,16 @@ const NavbarMain: React.FC = () => {
                   path:"/deals/new_dashboard",
                   icon:<SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
-                {
-                  label: "IPO Write-Up",
-                  path: "/equity/ipo_dashboard",
-                  icon: <TrendingUpOutlinedIcon fontSize="small" />,
-                },
-                {
-                  label: "FO Write-Up",
-                  path: "/equity/fo_dashboard",
-                  icon: <ArticleOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "IPO Write-Up",
+                //   path: "/equity/ipo_dashboard",
+                //   icon: <TrendingUpOutlinedIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "FO Write-Up",
+                //   path: "/equity/fo_dashboard",
+                //   icon: <ArticleOutlinedIcon fontSize="small" />,
+                // },
 
                 // {
                 //   label: "Meeting Notes",
