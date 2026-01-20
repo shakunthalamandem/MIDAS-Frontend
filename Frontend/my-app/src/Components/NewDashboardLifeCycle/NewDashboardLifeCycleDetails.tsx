@@ -12,6 +12,10 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
@@ -90,34 +94,53 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             mb: 3,
             p: 2,
             borderRadius: 3,
-            backgroundColor: "#f8fafc",
+            background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
             border: "1px solid #e2e8f0",
+            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
           }}
         >
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={8}>
               <Stack spacing={0.6}>
-                <Stack direction="row" spacing={2} flexWrap="wrap">
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                    Ticker: {activePayload.ticker || "N/A"}
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                    Company: {activePayload.company_name || activePayload.issuer_name || "N/A"}
-                  </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                  <Chip
+                    label={activePayload.ticker || "N/A"}
+                    sx={{
+                      bgcolor: "#e2e8f0",
+                      color: "#0f172a",
+                      fontWeight: 700,
+                    }}
+                  />
+                  <Chip
+                    label={activePayload.company_name || activePayload.issuer_name || "N/A"}
+                    sx={{
+                      bgcolor: "#eef2ff",
+                      color: "#1d4ed8",
+                      fontWeight: 600,
+                    }}
+                  />
                 </Stack>
-                <Stack direction="row" spacing={2} flexWrap="wrap">
-                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
-                    Pricing Date: {formatDate(activePayload.pricing_date)}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
-                    Deal Type: {activePayload.deal_type || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
-                    Region: {activePayload.region || activePayload.country || "N/A"}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
-                    Sector: {activePayload.sector || activePayload.sectors || "N/A"}
-                  </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                  <Chip
+                    label={formatDate(activePayload.pricing_date)}
+                    icon={<CalendarMonthOutlinedIcon fontSize="small" />}
+                    sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 600 }}
+                  />
+                  <Chip
+                    label={activePayload.deal_type || "N/A"}
+                    icon={<LocalOfferOutlinedIcon fontSize="small" />}
+                    sx={{ bgcolor: "#f0fdf4", color: "#166534", fontWeight: 600 }}
+                  />
+                  <Chip
+                    label={activePayload.region || activePayload.country || "N/A"}
+                    icon={<BusinessOutlinedIcon fontSize="small" />}
+                    sx={{ bgcolor: "#ecfeff", color: "#0f766e", fontWeight: 600 }}
+                  />
+                  <Chip
+                    label={activePayload.sector || activePayload.sectors || "N/A"}
+                    icon={<CategoryOutlinedIcon fontSize="small" />}
+                    sx={{ bgcolor: "#fdf4ff", color: "#7c3aed", fontWeight: 600 }}
+                  />
                 </Stack>
               </Stack>
             </Grid>
