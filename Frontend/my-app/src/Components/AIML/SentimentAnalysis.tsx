@@ -122,13 +122,19 @@ const askPerplexity = async (question: string, uniqueDealId: string): Promise<Bl
   return blocks;
 };
 
-const postSentiment = async (ticker: string, unique_deal_id: string, sentimentBlocks: Block[]) => {
+const postSentiment = async (
+  ticker: string,
+  unique_deal_id: string,
+  region: string | undefined,
+  sentimentBlocks: Block[]
+) => {
   const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ticker,
       unique_deal_id,
+      region,
       sentiment: sentimentBlocks,
       sentiment_blocks: sentimentBlocks,
     }),
@@ -300,7 +306,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
         try {
           const answerBlocks = await askPerplexity(entry.prompt, entry.unique_deal_id);
           const sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
-          await postSentiment(entry.ticker, entry.unique_deal_id, answerBlocks);
+          await postSentiment(entry.ticker, entry.unique_deal_id, entry.region, answerBlocks);
           await postSentimentPdf(entry.ticker, entry.unique_deal_id, sentimentPdf);
           updateStatus(statusIndex, "completed");
         } catch (err: any) {
