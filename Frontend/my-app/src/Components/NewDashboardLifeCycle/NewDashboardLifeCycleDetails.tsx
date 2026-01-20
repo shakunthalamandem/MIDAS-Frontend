@@ -11,12 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
-import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
@@ -24,9 +20,11 @@ import SentimentSatisfiedAltOutlinedIcon from "@mui/icons-material/SentimentSati
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
-import { formatDate, formatDealSize, formatPriceValue } from "./NewDashboardLifeCycleUtils";
+import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
+import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
+import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +34,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
-    { label: "Overview", icon: <FindInPageOutlinedIcon fontSize="small" /> },
+    { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
@@ -74,9 +72,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   }
 
   const activePayload = selectedOption || payload;
-  const title = activePayload.ticker || activePayload.company || "Deal Details";
-  const subtitle =
-    activePayload.issuer_name || activePayload.company_name || activePayload.company || "";
+  const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
@@ -88,35 +84,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
         }}
       >
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-          <Chip
-            icon={<ArrowBackIcon />}
-            label="Back"
-            onClick={() => navigate(-1)}
-            sx={{ cursor: "pointer", fontWeight: 600 }}
-          />
-          <Typography variant="h5" sx={{ fontWeight: 700, color: "#0b1844" }}>
-            {title}
-          </Typography>
-          {activePayload.deal_type && (
-            <Chip
-              label={String(activePayload.deal_type).toUpperCase()}
-              sx={{ bgcolor: "#e0f2fe", color: "#0b3d91", fontWeight: 600 }}
-            />
-          )}
-          {activePayload.deal_status && (
-            <Chip
-              label={String(activePayload.deal_status)}
-              sx={{ bgcolor: "#ecfccb", color: "#3f6212", fontWeight: 600 }}
-            />
-          )}
-        </Stack>
-
-        {subtitle && (
-          <Typography variant="body1" sx={{ color: "#475569", fontWeight: 500, mb: 3 }}>
-            {subtitle}
-          </Typography>
-        )}
 
         <Paper
           sx={{
@@ -124,23 +91,37 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             p: 2,
             borderRadius: 3,
             backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
           }}
         >
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={8}>
-              <Stack spacing={0.5}>
-                <Typography variant="subtitle2" sx={{ color: "#64748b" }}>
+              <Stack spacing={0.6}>
+                <Typography variant="subtitle2" sx={{ color: "#64748b", fontWeight: 700 }}>
                   Basic Information
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                  Ticker: {activePayload.ticker || "N/A"}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600, fontSize: "0.7rem" }}>
-                  Pricing Date: {formatDate(activePayload.pricing_date)}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Region: {activePayload.region || activePayload.country || "N/A"}
-                </Typography>
+                <Stack direction="row" spacing={2} flexWrap="wrap">
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
+                    Ticker: {activePayload.ticker || "N/A"}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
+                    Company: {activePayload.company_name || activePayload.issuer_name || "N/A"}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" spacing={2} flexWrap="wrap">
+                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
+                    Pricing Date: {formatDate(activePayload.pricing_date)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
+                    Deal Type: {activePayload.deal_type || "N/A"}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
+                    Region: {activePayload.region || activePayload.country || "N/A"}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 600 }}>
+                    Sector: {activePayload.sector || activePayload.sectors || "N/A"}
+                  </Typography>
+                </Stack>
               </Stack>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -195,95 +176,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Tabs>
 
         <Box sx={{ mb: 3 }}>
-          <PageUnderDevelopment />
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, borderRadius: 3, backgroundColor: "#f8fafc" }}>
-              <Stack spacing={1}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                  Deal Snapshot
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <CalendarMonthOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">
-                    Pricing Date: {formatDate(payload.pricing_date)}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <CalendarMonthOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">
-                    Trade Date: {formatDate(payload.trade_date)}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <PaidOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">
-                    Deal Size: {formatDealSize(payload.deal_size)}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <LocalOfferOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">Price: {formatPriceValue(payload)}</Typography>
-                </Stack>
-              </Stack>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, borderRadius: 3, backgroundColor: "#f8fafc" }}>
-              <Stack spacing={1}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a" }}>
-                  Classification
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <BusinessOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">
-                    Region: {payload.region || payload.country || "N/A"}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <CategoryOutlinedIcon fontSize="small" />
-                  <Typography variant="body2">
-                    Sector: {payload.sector || payload.sectors || "N/A"}
-                  </Typography>
-                </Stack>
-                {payload.exchange && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <BusinessOutlinedIcon fontSize="small" />
-                    <Typography variant="body2">Exchange: {payload.exchange}</Typography>
-                  </Stack>
-                )}
-                {payload.fo_type && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <BusinessOutlinedIcon fontSize="small" />
-                    <Typography variant="body2">FO Type: {payload.fo_type}</Typography>
-                  </Stack>
-                )}
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
-
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#0f172a", mb: 1 }}>
-            Raw Payload
-          </Typography>
-          <Paper
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              backgroundColor: "#0f172a",
-              color: "#e2e8f0",
-              fontFamily: "Consolas, Menlo, Monaco, monospace",
-              fontSize: "0.85rem",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            {JSON.stringify(payload, null, 2)}
-          </Paper>
+          {tabItems[tabValue]?.label === "Write up" ? (
+            isIpo ? (
+              <WriteUpIPODashbaord ticker={activePayload.ticker} />
+            ) : (
+              <FOWriteUpDashboardMain ticker={activePayload.ticker} />
+            )
+          ) : (
+            <PageUnderDevelopment />
+          )}
         </Box>
       </Paper>
     </Container>

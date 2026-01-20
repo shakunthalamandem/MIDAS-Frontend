@@ -6,9 +6,13 @@ const IPODashboardMain = React.lazy(
   () => import("../../IPODashboardLLM/IPODashboardMain")
 );
 
-const WriteUpIPODashbaord: React.FC = () => {
+interface WriteUpIPODashbaordProps {
+  ticker?: string;
+}
+
+const WriteUpIPODashbaord: React.FC<WriteUpIPODashbaordProps> = ({ ticker }) => {
   const { ticker: paramTicker } = useParams<{ ticker: string }>();
-  const selectedTicker = paramTicker ?? "";
+  const selectedTicker = ticker ?? paramTicker ?? "";
 
   return (
     <>

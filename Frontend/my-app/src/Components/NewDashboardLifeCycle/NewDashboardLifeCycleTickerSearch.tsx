@@ -98,6 +98,20 @@ const NewDashboardLifeCycleTickerSearch: React.FC<
         size="small"
         options={sortedOptions}
         loading={loading}
+        filterOptions={(options, state) => {
+          const query = state.inputValue.trim().toLowerCase();
+          if (!query) return options;
+          return options.filter((option) => {
+            const ticker = option.ticker?.toLowerCase() ?? "";
+            const date = option.pricing_date?.toLowerCase() ?? "";
+            const issuer = option.issuer_name?.toLowerCase() ?? "";
+            return (
+              ticker.includes(query) ||
+              date.includes(query) ||
+              issuer.includes(query)
+            );
+          });
+        }}
         value={sortedOptions.find((opt) => opt.ticker === selectedTicker) || null}
         onChange={(_, newValue) => {
           onSelect(newValue);
@@ -111,7 +125,7 @@ const NewDashboardLifeCycleTickerSearch: React.FC<
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder="Search ABB Deals"
+            placeholder="Search Company or Ticker..."
             InputProps={{
               ...params.InputProps,
               startAdornment: (

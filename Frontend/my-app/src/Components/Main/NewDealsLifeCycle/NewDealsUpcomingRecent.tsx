@@ -251,9 +251,9 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   const headlineText = useMemo(() => {
     if (selectedOp === "live") {
-      return "Track IPOs that have been issued or priced within the last 31 days, with real-time deal status and key market details.";
+      return ".";
     }
-    return "Track IPOs that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
+    return "Track Deals that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
   }, [selectedOp]);
 
   const filteredRows = useMemo(() => {
