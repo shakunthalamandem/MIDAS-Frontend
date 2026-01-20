@@ -139,31 +139,35 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
             backgroundColor: alpha(theme.palette.info.main, 0.06),
             borderBottom: `1px solid ${theme.palette.divider}`,
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center", // ✅ key fix
             justifyContent: "space-between",
           })}
         >
-          <Box>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                textTransform: "uppercase",
-                letterSpacing: 0.7,
-                fontSize: 11,
-                fontWeight: 900,
-                color: "text.secondary",
-              }}
-            >
-              Latest News for {normalizedTicker ?? "—"}
-            </Typography>
-          </Box>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textTransform: "uppercase",
+              letterSpacing: 0.7,
+              fontSize: 11,
+              fontWeight: 600,
+              color: "text.secondary",
+              lineHeight: 1, // ✅ visual alignment
+            }}
+          >
+            Latest News for {normalizedTicker ?? "—"}
+          </Typography>
 
           <Button
             size="small"
             variant="text"
             onClick={() => goToNews(normalizedTicker)}
             disabled={!normalizedTicker}
-            sx={{ minWidth: 0, px: 1, fontWeight: 600 }}
+            sx={{
+              minWidth: 0,
+              px: 1,
+              fontWeight: 600,
+              lineHeight: 1, // optional but helps
+            }}
             endIcon={<OpenInNewIcon fontSize="small" />}
           >
             View all
@@ -239,7 +243,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
                         color={tone === "default" ? undefined : tone}
                         variant={tone === "default" ? "outlined" : "filled"}
                         sx={{
-                          fontWeight: 900,
+                          fontWeight: 600,
                           borderRadius: 2,
                           height: 22,
                         }}
@@ -250,7 +254,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ mt: 0.6, fontWeight: 700 }}
+                      sx={{ mt: 0.6, fontWeight: 600 }}
                     >
                       {ts}
                     </Typography>
@@ -268,7 +272,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
                         size="small"
                         variant="text"
                         onClick={() => openModal(n)}
-                        sx={{ px: 1, fontWeight: 900 }}
+                        sx={{ px: 1, fontWeight: 600 }}
                         endIcon={<ChevronRightIcon />}
                       >
                         Show more
