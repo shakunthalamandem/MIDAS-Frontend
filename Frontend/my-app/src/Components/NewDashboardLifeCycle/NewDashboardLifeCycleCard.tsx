@@ -22,9 +22,16 @@ type DealCardProps = {
   subtitle?: string;
   meta: DealCardMeta[];
   tags?: DealCardTag[];
+  secondaryTag?: DealCardTag;
 };
 
-const DealCard: React.FC<DealCardProps> = ({ title, subtitle, meta, tags }) => (
+const DealCard: React.FC<DealCardProps> = ({
+  title,
+  subtitle,
+  meta,
+  tags,
+  secondaryTag,
+}) => (
   <Card
     elevation={0}
     sx={{
@@ -67,11 +74,26 @@ const DealCard: React.FC<DealCardProps> = ({ title, subtitle, meta, tags }) => (
           </Stack>
         ) : null}
       </Stack>
-      {subtitle ? (
-        <Typography variant="body2" sx={{ color: "#475569", fontWeight: 500 }}>
-          {subtitle}
-        </Typography>
-      ) : null}
+      {(subtitle || secondaryTag) && (
+        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+          {subtitle ? (
+            <Typography variant="body2" sx={{ color: "#475569", fontWeight: 500 }}>
+              {subtitle}
+            </Typography>
+          ) : null}
+          {secondaryTag ? (
+            <Chip
+              label={secondaryTag.label}
+              size="small"
+              sx={{
+                bgcolor: secondaryTag.bg ?? "#eef2ff",
+                color: secondaryTag.color ?? "#1d4ed8",
+                fontWeight: 600,
+              }}
+            />
+          ) : null}
+        </Stack>
+      )}
       <Divider />
       <Grid container spacing={1.5}>
         {meta.map((item) => (

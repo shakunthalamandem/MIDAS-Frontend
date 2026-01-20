@@ -322,100 +322,134 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [pipelineData, pipelineCategory, pipelineSearch]);
 
   const renderCards = (list: any[]) => (
-    <Grid container spacing={2}>
-      {list.map((row) => {
-        const meta: DealCardMeta[] = [
-          {
-            label: "Pricing Date",
-            value: formatDate(row.pricing_date),
-            icon: <CalendarMonthOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Deal Size",
-            value: formatDealSize(row.deal_size),
-            icon: <PaidOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Price",
-            value: formatPriceValue(row),
-            icon: <LocalOfferOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Trade Date",
-            value: formatDate(row.trade_date),
-            icon: <EventAvailableIcon fontSize="small" />,
-          },
-        ];
-        return (
-          <Grid item xs={12} md={6} lg={4} key={row.id ?? `${row.ticker}-${row.pricing_date}`}>
-            <DealCard
-              title={row.ticker || "N/A"}
-              subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
-              meta={meta}
-              tags={[
-                { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
-                { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
-                ...buildCardTags(row),
-              ]}
-            />
-          </Grid>
-        );
-      })}
-    </Grid>
+    <Box
+      sx={{
+        maxHeight: list.length > 9 ? 500 : "none",
+        overflowY: list.length > 9 ? "auto" : "visible",
+        pr: list.length > 9 ? 0.5 : 0,
+      }}
+    >
+      <Grid container spacing={2}>
+        {list.map((row) => {
+          const meta: DealCardMeta[] = [
+            {
+              label: "Pricing Date",
+              value: formatDate(row.pricing_date),
+              icon: <CalendarMonthOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Deal Size",
+              value: formatDealSize(row.deal_size),
+              icon: <PaidOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Price",
+              value: formatPriceValue(row),
+              icon: <LocalOfferOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Trade Date",
+              value: formatDate(row.trade_date),
+              icon: <EventAvailableIcon fontSize="small" />,
+            },
+          ];
+          const allTags = buildCardTags(row);
+          const writeupTag = allTags.find((tag) =>
+            tag.label.toLowerCase().includes("write-up")
+          );
+          const displayTags = allTags.filter(
+            (tag) => !tag.label.toLowerCase().includes("write-up")
+          );
+          return (
+            <Grid
+              item
+              xs={12}
+              md={6}
+              lg={4}
+              key={row.id ?? `${row.ticker}-${row.pricing_date}`}
+            >
+              <DealCard
+                title={row.ticker || "N/A"}
+                subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
+                secondaryTag={writeupTag}
+                meta={meta}
+                tags={[
+                  { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
+                  { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
+                  ...displayTags,
+                ]}
+              />
+            </Grid>
+          );
+        })}
+      </Grid>
+    </Box>
   );
 
   const renderPipelineCards = (list: any[]) => (
-    <Grid container spacing={2}>
-      {list.map((row: any, index: number) => {
-        const title = row.ticker || row.company || "Pipeline Deal";
-        const subtitle =
-          row.company ||
-          row.country ||
-          row.region ||
-          row.sectors ||
-          row.sector ||
-          "Pipeline Deal";
-        const meta: DealCardMeta[] = [
-          {
-            label: "Expected Date",
-            value: formatDate(row.expected_date || row.last_placement_date || row.lockup_date),
-            icon: <CalendarMonthOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Size / Valuation",
-            value: formatDealSize(
-              row.size_m ||
-                row.valuation_m ||
-                row.sell_down_size_m ||
-                row.implied_secondary_mkt_valuation_m
-            ),
-            icon: <PaidOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Sector",
-            value: row.sectors || row.sector || "TBA",
-            icon: <CategoryOutlinedIcon fontSize="small" />,
-          },
-          {
-            label: "Region",
-            value: row.country || row.region || selectedRegion,
-            icon: <BusinessOutlinedIcon fontSize="small" />,
-          },
-        ];
-        return (
-          <Grid item xs={12} md={6} lg={4} key={row.id ?? `${title}-${index}`}>
-            <DealCard
-              title={title}
-              subtitle={subtitle}
-              meta={meta}
-              tags={[
-                { label: pipelineCategory.replace("_", " ").toUpperCase(), bg: "#eef2ff", color: "#1d4ed8" },
-              ]}
-            />
-          </Grid>
-        );
-      })}
-    </Grid>
+    <Box
+      sx={{
+        maxHeight: list.length > 9 ? 500 : "none",
+        overflowY: list.length > 9 ? "auto" : "visible",
+        pr: list.length > 9 ? 0.5 : 0,
+      }}
+    >
+      <Grid container spacing={2}>
+        {list.map((row: any, index: number) => {
+          const title = row.ticker || row.company || "Pipeline Deal";
+          const subtitle =
+            row.company ||
+            row.country ||
+            row.region ||
+            row.sectors ||
+            row.sector ||
+            "Pipeline Deal";
+          const meta: DealCardMeta[] = [
+            {
+              label: "Expected Date",
+              value: formatDate(row.expected_date || row.last_placement_date || row.lockup_date),
+              icon: <CalendarMonthOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Size / Valuation",
+              value: formatDealSize(
+                row.size_m ||
+                  row.valuation_m ||
+                  row.sell_down_size_m ||
+                  row.implied_secondary_mkt_valuation_m
+              ),
+              icon: <PaidOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Sector",
+              value: row.sectors || row.sector || "TBA",
+              icon: <CategoryOutlinedIcon fontSize="small" />,
+            },
+            {
+              label: "Region",
+              value: row.country || row.region || selectedRegion,
+              icon: <BusinessOutlinedIcon fontSize="small" />,
+            },
+          ];
+          return (
+            <Grid item xs={12} md={6} lg={4} key={row.id ?? `${title}-${index}`}>
+              <DealCard
+                title={title}
+                subtitle={subtitle}
+                meta={meta}
+                tags={[
+                  {
+                    label: pipelineCategory.replace("_", " ").toUpperCase(),
+                    bg: "#eef2ff",
+                    color: "#1d4ed8",
+                  },
+                ]}
+              />
+            </Grid>
+          );
+        })}
+      </Grid>
+    </Box>
   );
 
   return (
