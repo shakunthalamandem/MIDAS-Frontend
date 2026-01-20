@@ -684,7 +684,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
-                    Upcoming Pricing Range Available Deals (But Not Yet Listed)) - {selectedDealType}
+                    Upcoming <span style={{color:'#9400a1ff'}}>{selectedRegion} {selectedDealType} </span> Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
@@ -730,7 +730,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
-                    Upcoming Pricing Range Not Available Deals (TBA) - {selectedDealType}
+                    Upcoming <span style={{color:'#9400a1ff'}}>{selectedRegion} {selectedDealType} </span>Deals Pricing Date Not Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
