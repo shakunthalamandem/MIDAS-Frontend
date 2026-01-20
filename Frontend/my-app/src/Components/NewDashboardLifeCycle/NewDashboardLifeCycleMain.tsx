@@ -1,21 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  CircularProgress,
-  Container,
-  Divider,
-  Grid,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Container, Grid, Typography } from "@mui/material";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -23,153 +7,21 @@ import PublicIcon from "@mui/icons-material/Public";
 import LanguageIcon from "@mui/icons-material/Language";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
-import SearchIcon from "@mui/icons-material/Search";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
-import DealsFilters from "../Main/NewDealsLifeCycle/DealsFilters";
-
-type DealCardMeta = {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-};
-
-type DealCardTag = {
-  label: string;
-  color?: string;
-  bg?: string;
-};
-
-const formatDate = (value: any): string => {
-  if (!value) return "TBA";
-  const parsed = dayjs(value);
-  return parsed.isValid() ? parsed.format("DD MMM YYYY") : String(value);
-};
-
-const formatDealSize = (value: any): string => {
-  if (value == null || value === "") return "TBA";
-  const num = Number(value);
-  if (Number.isNaN(num)) return String(value);
-  const millions = num / 1_000_000;
-  return `$${millions.toFixed(1)}M`;
-};
-
-const formatPriceValue = (row: any): string => {
-  if (row?.deal_type?.toString().toUpperCase() === "FO") {
-    const price = Number(row?.issue_price);
-    return Number.isNaN(price) ? "TBD" : `$${price.toFixed(2)}`;
-  }
-  if (row?.pricing_range_min != null && row?.pricing_range_max != null) {
-    const min = Number(row.pricing_range_min);
-    const max = Number(row.pricing_range_max);
-    if (!Number.isNaN(min) && !Number.isNaN(max)) {
-      return `$${min.toFixed(0)} - $${max.toFixed(0)}`;
-    }
-  }
-  if (row?.price_range) return String(row.price_range);
-  return "TBD";
-};
-
-const DealCard: React.FC<{
-  title: string;
-  subtitle?: string;
-  meta: DealCardMeta[];
-  tags?: DealCardTag[];
-}> = ({ title, subtitle, meta, tags }) => (
-  <Card
-    elevation={0}
-    sx={{
-      borderRadius: 3,
-      border: "1px solid rgba(203,213,225,0.8)",
-      background: "linear-gradient(180deg, #ffffff, #f7f9ff)",
-      boxShadow: "0 16px 36px rgba(15, 23, 42, 0.08)",
-      height: "100%",
-    }}
-  >
-    <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={1}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {title}
-        </Typography>
-        {tags?.length ? (
-          <Stack
-            direction="row"
-            spacing={0.5}
-            flexWrap="wrap"
-            justifyContent="flex-end"
-          >
-            {tags.map((tag) => (
-              <Chip
-                key={tag.label}
-                label={tag.label}
-                size="small"
-                sx={{
-                  bgcolor: tag.bg ?? "#eef2ff",
-                  color: tag.color ?? "#1d4ed8",
-                  fontWeight: 600,
-                }}
-              />
-            ))}
-          </Stack>
-        ) : null}
-      </Stack>
-      {subtitle ? (
-        <Typography variant="body2" sx={{ color: "#475569", fontWeight: 500 }}>
-          {subtitle}
-        </Typography>
-      ) : null}
-      <Divider />
-      <Grid container spacing={1.5}>
-        {meta.map((item) => (
-          <Grid item xs={12} sm={6} key={item.label}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Box
-                sx={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: "50%",
-                  backgroundColor: "#e8edff",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "#1d4ed8",
-                  flexShrink: 0,
-                }}
-              >
-                {item.icon}
-              </Box>
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ color: "#64748b", fontWeight: 600 }}
-                >
-                  {item.label}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 600, color: "#0f172a" }}
-                >
-                  {item.value}
-                </Typography>
-              </Box>
-            </Stack>
-          </Grid>
-        ))}
-      </Grid>
-    </CardContent>
-  </Card>
-);
+import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
+import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
+import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
+import {
+  buildCardTags,
+  formatDate,
+  formatDealSize,
+  formatPriceValue,
+} from "./NewDashboardLifeCycleUtils";
 
 const NewDealsLifecycleCards: React.FC = () => {
   const [rows, setRows] = useState<any[]>([]);
@@ -469,24 +321,6 @@ const NewDealsLifecycleCards: React.FC = () => {
     );
   }, [pipelineData, pipelineCategory, pipelineSearch]);
 
-  const buildCardTags = (row: any): DealCardTag[] => {
-    const tags: DealCardTag[] = [];
-    if (row?.deal_type) {
-      tags.push({ label: String(row.deal_type).toUpperCase(), bg: "#e0f2fe", color: "#0b3d91" });
-    }
-    if (row?.deal_status) {
-      tags.push({ label: String(row.deal_status), bg: "#ecfccb", color: "#3f6212" });
-    }
-    if (row?.writeup_available) {
-      tags.push({
-        label: row.writeup_available.toString().toLowerCase() === "yes" ? "Write-up Ready" : "No Write-up",
-        bg: row.writeup_available.toString().toLowerCase() === "yes" ? "#dcfce7" : "#fee2e2",
-        color: row.writeup_available.toString().toLowerCase() === "yes" ? "#166534" : "#991b1b",
-      });
-    }
-    return tags;
-  };
-
   const renderCards = (list: any[]) => (
     <Grid container spacing={2}>
       {list.map((row) => {
@@ -600,42 +434,11 @@ const NewDealsLifecycleCards: React.FC = () => {
             flexWrap: "wrap",
           }}
         >
-          <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
-            {regionTabs.map((item) => {
-              const isSelected = selectedRegion === item.value;
-              return (
-                <Paper
-                  key={item.value}
-                  onClick={() => setSelectedRegion(item.value as any)}
-                  sx={{
-                    px: 2,
-                    py: 0.6,
-                    borderRadius: 999,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: "0.8rem",
-                    border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
-                    backgroundColor: isSelected ? "#2b146f" : "#ffffff",
-                    color: isSelected ? "#ffffff" : "#1f2a44",
-                    boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
-                    transition: "all 0.2s ease",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    "&:hover": {
-                      backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
-                    },
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={0.75}>
-                    {item.icon}
-                    <Typography fontWeight={600} color="inherit">
-                      {item.label}
-                    </Typography>
-                  </Stack>
-                </Paper>
-              );
-            })}
-          </Stack>
+          <RegionTabs
+            tabs={regionTabs}
+            selectedRegion={selectedRegion}
+            onSelect={(value) => setSelectedRegion(value as any)}
+          />
         </Container>
       </Container>
 
@@ -652,242 +455,23 @@ const NewDealsLifecycleCards: React.FC = () => {
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
-          <Container
-            maxWidth="xl"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 1.5,
-              px: 1,
-              gap: 2,
-              flexWrap: "wrap",
-            }}
-          >
-            <Container maxWidth="xl" sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
-              <DealsFilters selectedOp={selectedOp} onChange={setSelectedOp} options={tabs} />
-            </Container>
-          </Container>
-
-          <Container
-            maxWidth="xl"
-            sx={{
-              mb: 1.5,
-              px: 1,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              justifyContent: "space-between",
-              flexWrap: { xs: "wrap", md: "nowrap" },
-            }}
-          >
-            {!isPipelineView && (
-              <ToggleButtonGroup
-                value={selectedDealType}
-                exclusive
-                onChange={(_e, value) => value && setSelectedDealType(value)}
-                sx={{
-                  backgroundColor: "#f2f4f8",
-                  p: 0.4,
-                  borderRadius: 9999,
-                  border: "1px solid #d7ddea",
-                  display: "inline-flex",
-                  gap: 0.5,
-                  flexShrink: 0,
-                  ml: "auto",
-                  "& .MuiToggleButtonGroup-grouped": {
-                    border: 0,
-                  },
-                  "& .MuiToggleButton-root": {
-                    textTransform: "none",
-                    borderRadius: 9999,
-                    border: 0,
-                    px: 2,
-                    py: 0.5,
-                    fontWeight: 700,
-                    fontSize: "0.8rem",
-                    color: "#6a7286",
-                    backgroundColor: "transparent",
-                    transition: "all 0.2s ease",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#2b146f",
-                    color: "#ffffff",
-                    boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
-                  },
-                }}
-              >
-                <ToggleButton value="IPO">
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography fontWeight={700} color="inherit">
-                      IPO
-                    </Typography>
-                  </Stack>
-                </ToggleButton>
-                <ToggleButton value="FO">
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography fontWeight={700} color="inherit">
-                      FO
-                    </Typography>
-                  </Stack>
-                </ToggleButton>
-              </ToggleButtonGroup>
-            )}
-
-            {!isPipelineView && (
-              <Typography
-                sx={{
-                  fontWeight: 400,
-                  color: "#1f2a44",
-                  lineHeight: 1.4,
-                  textAlign: "left",
-                  fontSize: { xs: "0.82rem", md: "0.88rem" },
-                  whiteSpace: { xs: "normal", md: "nowrap" },
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  flexGrow: 1,
-                  mx: { xs: 0, md: 2 },
-                }}
-              >
-                {headlineText}
-              </Typography>
-            )}
-
-            {selectedOp === "live" && (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
-                  <DatePicker
-                    label="Start date"
-                    value={liveStartDate}
-                    format="DD-MM-YYYY"
-                    onChange={(value) => {
-                      setLiveStartDate(value);
-                      if (value && liveEndDate && value.isAfter(liveEndDate)) {
-                        setLiveEndDate(value);
-                      }
-                    }}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "dd-mm-yyyy",
-                        sx: {
-                          minWidth: 160,
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 999,
-                            height: 36,
-                            backgroundColor: "#ffffff",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                  <DatePicker
-                    label="End date"
-                    value={liveEndDate}
-                    format="DD-MM-YYYY"
-                    onChange={(value) => {
-                      setLiveEndDate(value);
-                      if (value && liveStartDate && value.isBefore(liveStartDate)) {
-                        setLiveStartDate(value);
-                      }
-                    }}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        placeholder: "dd-mm-yyyy",
-                        sx: {
-                          minWidth: 160,
-                          "& .MuiOutlinedInput-root": {
-                            borderRadius: 999,
-                            height: 36,
-                            backgroundColor: "#ffffff",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </Stack>
-              </LocalizationProvider>
-            )}
-
-            {!isPipelineView && (
-              <TextField
-                size="small"
-                placeholder="Search"
-                value={dealSearch}
-                onChange={(e) => setDealSearch(e.target.value)}
-                sx={{
-                  minWidth: 220,
-                  flexShrink: 0,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 999,
-                    height: 36,
-                    backgroundColor: "#ffffff",
-                    "& fieldset": {
-                      borderColor: "#cfd6e4",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#bfc7da",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#b0b9cf",
-                    },
-                  },
-                  "& .MuiInputBase-input::placeholder": {
-                    color: "#8a94a8",
-                    opacity: 1,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ shrink: false }}
-              />
-            )}
-
-            {isPipelineView && (
-              <TextField
-                size="small"
-                placeholder="Search"
-                value={pipelineSearch}
-                onChange={(e) => setPipelineSearch(e.target.value)}
-                sx={{
-                  minWidth: 220,
-                  flexShrink: 0,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 999,
-                    height: 36,
-                    backgroundColor: "#ffffff",
-                    "& fieldset": {
-                      borderColor: "#cfd6e4",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#bfc7da",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#b0b9cf",
-                    },
-                  },
-                  "& .MuiInputBase-input::placeholder": {
-                    color: "#8a94a8",
-                    opacity: 1,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
-                    </InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ shrink: false }}
-              />
-            )}
-          </Container>
+          <FiltersBar
+            tabs={tabs}
+            selectedOp={selectedOp}
+            onSelectOp={setSelectedOp}
+            selectedDealType={selectedDealType}
+            onSelectDealType={setSelectedDealType}
+            headlineText={headlineText}
+            isPipelineView={isPipelineView}
+            liveStartDate={liveStartDate}
+            liveEndDate={liveEndDate}
+            setLiveStartDate={setLiveStartDate}
+            setLiveEndDate={setLiveEndDate}
+            dealSearch={dealSearch}
+            setDealSearch={setDealSearch}
+            pipelineSearch={pipelineSearch}
+            setPipelineSearch={setPipelineSearch}
+          />
 
           {isPipelineView ? (
             pipelineLoading ? (
