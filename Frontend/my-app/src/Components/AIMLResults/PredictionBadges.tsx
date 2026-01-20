@@ -4,15 +4,18 @@ import React from "react";
 
 interface PredictionMarkerResolved {
   index: number;
-  title: string; // keep for internal use/tooltips if you want
+  title: string;
   pred: string;
+  displayText?: string;
   color: string;
   key: string;
   tooltipText: string;
 
-  // ✅ NEW: optional y anchor (price value) to position badge
-  // If not provided, we fall back to candle high (current behavior)
+  // Optional y anchor (price value) to position badge; falls back to candle high
   yValue?: number;
+
+  // Optional horizontal offset (in band widths) to place badges beside the last bar
+  horizontalOffsetBands?: number;
 }
 
 /**
@@ -43,12 +46,20 @@ export const PredictionBadges: React.FC<any> = (props) => {
   const yAxis = yAxisMap.price || yAxisMap[Object.keys(yAxisMap)[0]];
   const yScale = yAxis.scale;
 
-  // group markers by index so we can stack them
-  const byIndex = new Map<number, PredictionMarkerResolved[]>();
+  // Group markers by index and horizontal offset so we can stack them
+  const groups = new Map<
+    string,
+    { index: number; offsetBands: number; markers: PredictionMarkerResolved[] }
+  >();
   for (const m of markers) {
-    const arr = byIndex.get(m.index) ?? [];
-    arr.push(m);
-    byIndex.set(m.index, arr);
+    const key = `${m.index}|${m.horizontalOffsetBands ?? 0}`;
+    const group = groups.get(key) ?? {
+      index: m.index,
+      offsetBands: m.horizontalOffsetBands ?? 0,
+      markers: [],
+    };
+    group.markers.push(m);
+    groups.set(key, group);
   }
 
   // Visual constants
@@ -57,41 +68,38 @@ export const PredictionBadges: React.FC<any> = (props) => {
   const badgeGap = 4;
   const maxBadgeWidth = Math.max(90, bandWidth * 0.95); // keep readable
 
-  // Helper: choose the anchor Y (in pixels) for the badge stack
+  // Choose the anchor Y (in pixels) for the badge stack
   const getAnchorY = (entry: any, ms: PredictionMarkerResolved[]) => {
-    // If ANY marker has yValue, use the first one’s yValue as the anchor
-    // (they’ll still stack nicely relative to this anchor).
     const withY = ms.find((m) => typeof m.yValue === "number");
     if (withY && typeof withY.yValue === "number") {
       const y = yScale(withY.yValue);
       return Number.isFinite(y) ? y : null;
     }
 
-    // fallback: candle high (old behavior)
     const highY = yScale(entry.high);
     return Number.isFinite(highY) ? highY : null;
   };
 
   return (
     <g>
-      {Array.from(byIndex.entries()).map(([idx, ms]) => {
-        const entry = data[idx];
+      {Array.from(groups.values()).map((group) => {
+        const entry = data[group.index];
         if (!entry) return null;
 
         const label = entry.label;
-        const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
+        const xCenter =
+          (xScale(label) ?? 0) + bandWidth / 2 + group.offsetBands * bandWidth;
 
-        const anchorY = getAnchorY(entry, ms);
+        const anchorY = getAnchorY(entry, group.markers);
         if (anchorY == null) return null;
 
         return (
-          <g key={`pred-group-${idx}`}>
-            {ms.map((m, j) => {
-              // ✅ CHANGE #1: show ONLY Positive/Negative/etc
-              const text = `${m.pred}`;
+          <g key={`pred-group-${group.index}-${group.offsetBands}`}>
+            {group.markers.map((m, j) => {
+              // Show prefixed label when provided, otherwise fallback to raw pred
+              const text = m.displayText ?? `${m.pred}`;
 
-              // ✅ CHANGE #2: position relative to anchorY (either yValue or high)
-              // Move badges slightly above the anchor, stack upward
+              // Position relative to anchorY (either yValue or high)
               const y = anchorY - 10 - j * (badgeHeight + badgeGap);
 
               // approximate text width (simple + safe); prevents huge overflow
@@ -103,7 +111,7 @@ export const PredictionBadges: React.FC<any> = (props) => {
               const xLeft = xCenter - estWidth / 2;
 
               return (
-                <g key={`${m.key}-${idx}-${j}`}>
+                <g key={`${m.key}-${group.index}-${j}`}>
                   {/* background */}
                   <rect
                     x={xLeft}
