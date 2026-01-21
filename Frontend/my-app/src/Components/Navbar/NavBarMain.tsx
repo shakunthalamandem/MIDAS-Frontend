@@ -238,7 +238,7 @@ const NavbarMain: React.FC = () => {
                 },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
-                  label: "New Dashboard",
+                  label: "Feb Dashboard",
                   path: "/deals/new_dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
