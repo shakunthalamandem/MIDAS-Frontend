@@ -28,6 +28,12 @@ const formatDealSize = (dealSize: any) => {
   const formattedValue = absoluteValue.toLocaleString("en-US");
   return (isNegative ? "-$" : "$") + formattedValue;
 };
+
+const getPricingDateValue = (pricingDate: any): number => {
+  if (!pricingDate) return 0;
+  const dateValue = new Date(pricingDate).getTime();
+  return isNaN(dateValue) ? 0 : dateValue;
+};
   const headerRow = data && data.length > 0 ? data[0] : {};
 
 
@@ -60,9 +66,12 @@ const formatDealSize = (dealSize: any) => {
  
 
   const filteredRows = useMemo(() => {
-    return preprocessRows(rows).filter((row) =>
-      row.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return preprocessRows(rows)
+      .filter((row) => row.ticker?.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort(
+        (a, b) => getPricingDateValue(b.pricing_date) - getPricingDateValue(a.pricing_date)
+      )
+      .slice(0, 15);
   }, [rows, searchQuery]);
 
   const columns: GridColDef[] = [ {
