@@ -229,12 +229,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   const isPipelineView = selectedOp === "pipeline";
 
-  const headlineText = useMemo(() => {
-    if (selectedOp === "live") {
-      return "";
-    }
-    return "Track Deals that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
-  }, [selectedOp]);
+
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
@@ -507,7 +502,6 @@ const NewDealsLifecycleCards: React.FC = () => {
             onSelectOp={setSelectedOp}
             selectedDealType={selectedDealType}
             onSelectDealType={setSelectedDealType}
-            headlineText={headlineText}
             isPipelineView={isPipelineView}
             liveStartDate={liveStartDate}
             liveEndDate={liveEndDate}

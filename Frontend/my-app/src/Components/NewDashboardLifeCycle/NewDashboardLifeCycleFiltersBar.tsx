@@ -28,7 +28,6 @@ type FiltersBarProps = {
   onSelectOp: (value: string) => void;
   selectedDealType: "IPO" | "FO";
   onSelectDealType: (value: "IPO" | "FO") => void;
-  headlineText: string;
   isPipelineView: boolean;
   liveStartDate: Dayjs | null;
   liveEndDate: Dayjs | null;
@@ -46,7 +45,6 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
   onSelectOp,
   selectedDealType,
   onSelectDealType,
-  headlineText,
   isPipelineView,
   liveStartDate,
   liveEndDate,
@@ -141,24 +139,6 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
           </ToggleButtonGroup>
         )}
 
-        {!isPipelineView && (
-          <Typography
-            sx={{
-              fontWeight: 400,
-              color: "#1f2a44",
-              lineHeight: 1.4,
-              textAlign: "left",
-              fontSize: { xs: "0.82rem", md: "0.88rem" },
-              whiteSpace: { xs: "normal", md: "nowrap" },
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              flexGrow: 1,
-              mx: { xs: 0, md: 2 },
-            }}
-          >
-            {headlineText}
-          </Typography>
-        )}
 
         {selectedOp === "live" && (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
