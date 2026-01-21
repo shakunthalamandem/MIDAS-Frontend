@@ -76,7 +76,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
-    live: "Issued September to Date",
+    live: "Issued",
     upcoming: "Upcoming Deals",
   };
 
