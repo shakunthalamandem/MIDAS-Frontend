@@ -183,7 +183,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
           ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <StockTickerNews ticker={activePayload.ticker}/>
+            <StockTickerNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
             <DashboardAIFewShotAnalysis
               prefillTicker={{
