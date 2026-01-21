@@ -354,9 +354,10 @@ const NewDealsLifecycleCards: React.FC = () => {
           const writeupTag = allTags.find((tag) =>
             tag.label.toLowerCase().includes("write-up")
           );
-          const displayTags = allTags.filter(
-            (tag) => !tag.label.toLowerCase().includes("write-up")
-          );
+          const displayTags = allTags.filter((tag) => {
+            const label = tag.label.toLowerCase();
+            return !label.includes("write-up") && !label.includes("price range");
+          });
           return (
             <Grid
               item
