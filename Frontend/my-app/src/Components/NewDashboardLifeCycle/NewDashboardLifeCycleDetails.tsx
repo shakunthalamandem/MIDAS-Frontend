@@ -31,6 +31,7 @@ import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODas
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
 import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
+import StockTickerNews from "../Macro/StockTickerNews";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -44,10 +45,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
-    { label: "AI- Sentiment", icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" /> },
+    {
+      label: "AI- Sentiment",
+      icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" />,
+    },
     { label: "Ai View", icon: <VisibilityOutlinedIcon fontSize="small" /> },
     { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
-    { label: "Peer Deals Performance", icon: <InsightsOutlinedIcon fontSize="small" /> },
+    {
+      label: "Peer Deals Performance",
+      icon: <InsightsOutlinedIcon fontSize="small" />,
+    },
   ];
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -90,7 +97,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
         }}
       >
-
         <Paper
           sx={{
             mb: 3,
@@ -104,7 +110,12 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={8}>
               <Stack spacing={0.6}>
-                <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  flexWrap="wrap"
+                  alignItems="center"
+                >
                   <Chip
                     icon={<ArrowBackIcon />}
                     label="Back"
@@ -120,7 +131,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                     }}
                   />
                   <Chip
-                    label={activePayload.company_name || activePayload.issuer_name || "N/A"}
+                    label={
+                      activePayload.company_name ||
+                      activePayload.issuer_name ||
+                      "N/A"
+                    }
                     sx={{
                       bgcolor: "#eef2ff",
                       color: "#1d4ed8",
@@ -128,26 +143,51 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                     }}
                   />
                 </Stack>
-                <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  flexWrap="wrap"
+                  alignItems="center"
+                >
                   <Chip
                     label={formatDate(activePayload.pricing_date)}
                     icon={<CalendarMonthOutlinedIcon fontSize="small" />}
-                    sx={{ bgcolor: "#f8fafc", color: "#475569", fontWeight: 600 }}
+                    sx={{
+                      bgcolor: "#f8fafc",
+                      color: "#475569",
+                      fontWeight: 600,
+                    }}
                   />
                   <Chip
                     label={activePayload.deal_type || "N/A"}
                     icon={<LocalOfferOutlinedIcon fontSize="small" />}
-                    sx={{ bgcolor: "#f0fdf4", color: "#166534", fontWeight: 600 }}
+                    sx={{
+                      bgcolor: "#f0fdf4",
+                      color: "#166534",
+                      fontWeight: 600,
+                    }}
                   />
                   <Chip
-                    label={activePayload.region || activePayload.country || "N/A"}
+                    label={
+                      activePayload.region || activePayload.country || "N/A"
+                    }
                     icon={<BusinessOutlinedIcon fontSize="small" />}
-                    sx={{ bgcolor: "#ecfeff", color: "#0f766e", fontWeight: 600 }}
+                    sx={{
+                      bgcolor: "#ecfeff",
+                      color: "#0f766e",
+                      fontWeight: 600,
+                    }}
                   />
                   <Chip
-                    label={activePayload.sector || activePayload.sectors || "N/A"}
+                    label={
+                      activePayload.sector || activePayload.sectors || "N/A"
+                    }
                     icon={<CategoryOutlinedIcon fontSize="small" />}
-                    sx={{ bgcolor: "#fdf4ff", color: "#7c3aed", fontWeight: 600 }}
+                    sx={{
+                      bgcolor: "#fdf4ff",
+                      color: "#7c3aed",
+                      fontWeight: 600,
+                    }}
                   />
                 </Stack>
               </Stack>
@@ -232,6 +272,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 deal_id={activePayload.deal_id}
               />
             )
+          ) : tabItems[tabValue]?.label === "NEWS" ? (
+            <StockTickerNews ticker={activePayload.ticker}/>
           ) : (
             <PageUnderDevelopment />
           )}

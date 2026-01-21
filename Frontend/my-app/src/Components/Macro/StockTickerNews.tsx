@@ -251,7 +251,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
 
                 {initialTicker ? (
                   <Chip
-                    label={`${initialTicker} US`}
+                    label={`${initialTicker}`}
                     size="small"
                     variant="outlined"
                     sx={{
