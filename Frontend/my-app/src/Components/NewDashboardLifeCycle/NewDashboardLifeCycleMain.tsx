@@ -340,12 +340,12 @@ const NewDealsLifecycleCards: React.FC = () => {
               icon: <PaidOutlinedIcon fontSize="small" />,
             },
             {
-              label: "Price",
+              label: "Price Range",
               value: formatPriceValue(row),
               icon: <LocalOfferOutlinedIcon fontSize="small" />,
             },
             {
-              label: "Trade Date",
+              label: "First Trade Date",
               value: formatDate(row.trade_date),
               icon: <EventAvailableIcon fontSize="small" />,
             },
