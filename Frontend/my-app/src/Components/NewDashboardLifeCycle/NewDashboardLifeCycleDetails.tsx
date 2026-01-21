@@ -21,7 +21,7 @@ import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import SentimentSatisfiedAltOutlinedIcon from "@mui/icons-material/SentimentSatisfiedAltOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import HubIcon from "@mui/icons-material/Hub";
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
@@ -52,7 +52,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       label: "AI- Sentiment View",
       icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" />,
     },
-    { label: "AI Unsupervised", icon: <PsychologyOutlinedIcon fontSize="small" /> },
+    { label: "AI Unsupervised", icon: <HubIcon fontSize="small" /> },
 
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
    
