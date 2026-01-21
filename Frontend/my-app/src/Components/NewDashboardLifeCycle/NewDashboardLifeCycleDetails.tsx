@@ -5,17 +5,12 @@ import {
   Container,
   Grid,
   Paper,
-  Stack,
   Tabs,
   Tab,
   Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
@@ -32,6 +27,7 @@ import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain
 import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
 import StockTickerNews from "../Macro/StockTickerNews";
+import DealHeaderCard from "./DealHeaderCard";
 import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 
@@ -46,20 +42,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
-        {
+    {
       label: "Peer Deals Performance",
       icon: <InsightsOutlinedIcon fontSize="small" />,
     },
-     {
+    {
       label: "AI- Sentiment View",
       icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" />,
     },
     { label: "AI Unsupervised", icon: <HubIcon fontSize="small" /> },
 
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
-   
-    { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
 
+    { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
   ];
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -102,109 +97,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
         }}
       >
-        <Paper
-          sx={{
-            mb: 3,
-            p: 2,
-            borderRadius: 3,
-            background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={8}>
-              <Stack spacing={0.6}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  flexWrap="wrap"
-                  alignItems="center"
-                >
-                  <Chip
-                    icon={<ArrowBackIcon />}
-                    label="Back"
-                    onClick={() => navigate("/deals/new_dashboard")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                  />
-                  <Chip
-                    label={activePayload.ticker || "N/A"}
-                    sx={{
-                      bgcolor: "#e2e8f0",
-                      color: "#0f172a",
-                      fontWeight: 700,
-                    }}
-                  />
-                  <Chip
-                    label={
-                      activePayload.company_name ||
-                      activePayload.issuer_name ||
-                      "N/A"
-                    }
-                    sx={{
-                      bgcolor: "#eef2ff",
-                      color: "#1d4ed8",
-                      fontWeight: 600,
-                    }}
-                  />
-                </Stack>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  flexWrap="wrap"
-                  alignItems="center"
-                >
-                  <Chip
-                    label={formatDate(activePayload.pricing_date)}
-                    icon={<CalendarMonthOutlinedIcon fontSize="small" />}
-                    sx={{
-                      bgcolor: "#f8fafc",
-                      color: "#475569",
-                      fontWeight: 600,
-                    }}
-                  />
-                  <Chip
-                    label={activePayload.deal_type || "N/A"}
-                    icon={<LocalOfferOutlinedIcon fontSize="small" />}
-                    sx={{
-                      bgcolor: "#f0fdf4",
-                      color: "#166534",
-                      fontWeight: 600,
-                    }}
-                  />
-                  <Chip
-                    label={
-                      activePayload.region || activePayload.country || "N/A"
-                    }
-                    icon={<BusinessOutlinedIcon fontSize="small" />}
-                    sx={{
-                      bgcolor: "#ecfeff",
-                      color: "#0f766e",
-                      fontWeight: 600,
-                    }}
-                  />
-                  <Chip
-                    label={
-                      activePayload.sector || activePayload.sectors || "N/A"
-                    }
-                    icon={<CategoryOutlinedIcon fontSize="small" />}
-                    sx={{
-                      bgcolor: "#fdf4ff",
-                      color: "#7c3aed",
-                      fontWeight: 600,
-                    }}
-                  />
-                </Stack>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={4}>
+        <DealHeaderCard
+          activePayload={activePayload}
+          formatDate={formatDate}
+          onBack={() => navigate("/deals/new_dashboard")}
+          SearchComponent={
+            <Box sx={{ width: { xs: "100%", md: 320 } }}>
               <NewDashboardLifeCycleTickerSearch
                 selectedTicker={activePayload.ticker}
                 onSelect={setSelectedOption}
               />
-            </Grid>
-          </Grid>
-        </Paper>
+            </Box>
+          }
+        />
 
         <Tabs
           value={tabValue}
@@ -278,7 +183,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
           ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <StockTickerNews ticker={activePayload.ticker}/>
+            <StockTickerNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
             <DashboardAIFewShotAnalysis
               prefillTicker={{
