@@ -28,8 +28,9 @@ import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
 import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
-import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
+import AIMLDealDetails from "./AIMLDealDetails";
+import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
@@ -189,6 +190,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <StockTickerNews ticker={activePayload.ticker} />
+          ) : tabItems[tabValue]?.label === "ML Model" ? (
+            <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
             <DashboardAIFewShotAnalysis
               prefillTicker={{
@@ -196,6 +199,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 pricing_date: activePayload.pricing_date ?? null,
               }}
             />
+          ) : tabItems[tabValue]?.label === "AI- Sentiment View" ? (
+            <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : (
             <PageUnderDevelopment />
           )}
@@ -206,3 +211,4 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 };
 
 export default NewDashboardLifeCycleDetails;
+

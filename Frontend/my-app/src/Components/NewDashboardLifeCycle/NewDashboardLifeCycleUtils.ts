@@ -57,20 +57,5 @@ export const buildCardTags = (row: any): DealCardTag[] => {
       color: "#0b3d91",
     });
   }
-  if (row?.deal_status) {
-    tags.push({
-      label: String(row.deal_status),
-      bg: "#ecfccb",
-      color: "#3f6212",
-    });
-  }
-  if (row?.writeup_available) {
-    const hasWriteup = row.writeup_available.toString().toLowerCase() === "yes";
-    tags.push({
-      label: hasWriteup ? "Write-up Ready" : "No Write-up",
-      bg: hasWriteup ? "#dcfce7" : "#fee2e2",
-      color: hasWriteup ? "#166534" : "#991b1b",
-    });
-  }
   return tags;
 };
