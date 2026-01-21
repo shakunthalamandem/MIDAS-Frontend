@@ -7,19 +7,15 @@ import {
   Grid,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
-import { formatDate, formatDateISO, formatTwoDecimals } from "./NewDashboardLifeCycleUtils";
+import { formatDate, formatDateISO } from "./NewDashboardLifeCycleUtils";
 import NewDashboardLifeCycleComparableTable from "./NewDashboardLifeCycleComparableTable";
+import DashboardIPOfinacialForecastMain from "../IPODashboardLLM/IPOFinancialForecast/DashboardIPOfinacialForecastMain";
 
 type OverviewResponse = {
   data?: {
@@ -94,7 +90,6 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
   const summaryLines = splitBullets(dealData?.differentiated_summary);
   const valuationLines = splitBullets(dealData?.valuation);
 
-  const financialForecasts = payload?.financial_forecasts ?? [];
   const comparables = payload?.comparable_company_metrics ?? [];
 
   const summaryChips = useMemo(() => {
@@ -106,21 +101,6 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
       { label: dealData?.region || "Region", icon: <CategoryOutlinedIcon fontSize="small" /> },
     ];
   }, [dealData, ticker, dealType]);
-
-  const forecastBaseYear = useMemo(() => {
-    const rawDate = dealData?.pricing_date ?? pricingDate;
-    if (!rawDate) return null;
-    const parsed = new Date(rawDate);
-    return Number.isNaN(parsed.getTime()) ? null : parsed.getFullYear();
-  }, [dealData?.pricing_date, pricingDate]);
-
-  const forecastYearLabels = forecastBaseYear
-    ? [
-        String(forecastBaseYear),
-        String(forecastBaseYear + 1),
-        String(forecastBaseYear + 2),
-      ]
-    : ["Current Year", "1Y Later", "2Y Later"];
 
   const dateTimeline = [
     { label: "Filed Date", value: dealData?.filed_date },
@@ -292,40 +272,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
-        <Box sx={{ backgroundColor: "#eef2ff", borderRadius: 2, py: 1, mb: 2 }}>
-          <Typography
-            variant="subtitle1"
-            sx={{ fontWeight: 700, color: "#002060", textAlign: "center" }}
-          >
-            Financial Forecasts
-          </Typography>
-        </Box>
-        <Table size="small">
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#f1f5ff" }}>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>Metric</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
-                {forecastYearLabels[0]}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
-                {forecastYearLabels[1]}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
-                {forecastYearLabels[2]}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {financialForecasts.map((item, idx) => (
-              <TableRow key={`${item.metric_name}-${idx}`}>
-                <TableCell sx={{ fontWeight: 600 }}>{item.metric_name || "N/A"}</TableCell>
-                <TableCell>{formatTwoDecimals(item.current_year)}</TableCell>
-                <TableCell>{formatTwoDecimals(item.one_year_later)}</TableCell>
-                <TableCell>{formatTwoDecimals(item.two_years_later)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DashboardIPOfinacialForecastMain defaultTicker={ticker} />
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
