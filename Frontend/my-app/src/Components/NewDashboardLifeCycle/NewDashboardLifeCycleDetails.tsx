@@ -31,6 +31,7 @@ import DealHeaderCard from "./DealHeaderCard";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
+import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -183,6 +184,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 deal_id={activePayload.deal_id}
               />
             )
+          ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
+            <NewDashboardLifeCyclePeerDeals
+              selectedDeal={activePayload}
+            />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <StockTickerNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (

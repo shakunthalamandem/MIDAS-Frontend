@@ -320,14 +320,14 @@ const DealColorInfo: React.FC<DealColorInfoProps> = ({ data }) => {
 
             <Grid item xs={12} sm={6}>
               {renderField(
-                "Sector Avg Allocation as % of Deal Size - Last 10 Deals",
+                "Sector Avg Allocation as % of Deal Size - Last 15 Deals",
                 "average_allocation",
                 "%"
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField(
-                "Sector Avg Allocation as % of IOI - Last 10 Deals",
+                "Sector Avg Allocation as % of IOI - Last 15 Deals",
                 "average_ioi",
                 "%"
               )}
