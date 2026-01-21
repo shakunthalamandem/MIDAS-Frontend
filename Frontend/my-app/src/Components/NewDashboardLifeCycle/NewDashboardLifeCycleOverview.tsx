@@ -14,8 +14,8 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import { formatDate, formatDateISO } from "./NewDashboardLifeCycleUtils";
-import NewDashboardLifeCycleComparableTable from "./NewDashboardLifeCycleComparableTable";
 import DashboardIPOfinacialForecastMain from "../IPODashboardLLM/IPOFinancialForecast/DashboardIPOfinacialForecastMain";
+import DashboardcompsMetricsMain from "../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DashboardcompsMetricsMain";
 
 type OverviewResponse = {
   data?: {
@@ -91,6 +91,18 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
   const valuationLines = splitBullets(dealData?.valuation);
 
   const comparables = payload?.comparable_company_metrics ?? [];
+  const comparableData = useMemo(
+    () => ({
+      [ticker]: { data: comparables },
+    }),
+    [ticker, comparables]
+  );
+  const pricingYear = useMemo(() => {
+    const rawDate = dealData?.pricing_date ?? pricingDate;
+    if (!rawDate) return undefined;
+    const parsed = new Date(rawDate);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed.getFullYear();
+  }, [dealData?.pricing_date, pricingDate]);
 
   const summaryChips = useMemo(() => {
     return [
@@ -285,7 +297,11 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           </Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        <NewDashboardLifeCycleComparableTable rows={comparables} />
+        <DashboardcompsMetricsMain
+          ticker={ticker}
+          data={comparableData}
+          pricingYear={pricingYear}
+        />
       </Paper>
     </Stack>
   );
