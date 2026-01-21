@@ -7,6 +7,8 @@ export const getColumns = (
   selectedOp: string,
   selectedId: string | number | null
 ): GridColDef[] => {
+  const isUpcoming =
+    (selectedOp || "").toString().toLowerCase().includes("upcoming");
   // ✅ Dynamic date column
   // const dateColumn: GridColDef =
   //   selectedOp === "September to Date"
@@ -90,7 +92,7 @@ const formatDealSize = (value: any): string => {
 };
 
 
-  return [
+  const columns: GridColDef[] = [
     {
       field: "ticker",
       headerName: "Ticker",
@@ -117,7 +119,7 @@ const formatDealSize = (value: any): string => {
     { field: "sector", headerName: "Sector", renderHeader: () => formatHeader("Sector"), flex: 1.25, headerAlign: "left", align: "left",  minWidth: 170 },
     { field: "issuer_name", headerName: "Issuer Name", renderHeader: () => formatHeader("Issuer Name"), flex: 2, headerAlign: "left", align: "left", minWidth: 150 },
 
-{
+  {
   field: "deal_size",
   headerName: "Deal Size",
   renderHeader: () => formatHeader("Deal Size ($M)"),
@@ -127,10 +129,8 @@ const formatDealSize = (value: any): string => {
   align: "left",
   renderCell: (params) => formatDealSize(params.value),
   sortComparator: (v1, v2) => Number(v1) - Number(v2),
-},
+  },
     // dateColumn,
-    {field: "trade_date", headerName: "First Trade Date", renderHeader: () => formatHeader("First Trade Date"), 
-          minWidth: 120,flex: 1.5, headerAlign: "left", align: "left", renderCell: formatDateCell},
     {field: "pricing_date", headerName: "Pricing Date", renderHeader: () => formatHeader("Pricing Date"), 
           minWidth: 120,flex: 1.12, headerAlign: "left", align: "left", renderCell: formatDateCell},
 
@@ -248,4 +248,25 @@ const formatDealSize = (value: any): string => {
     //   },
     // },
   ];
+
+  if (!isUpcoming) {
+    const tradeDateColumn: GridColDef = {
+      field: "trade_date",
+      headerName: "First Trade Date",
+      renderHeader: () => formatHeader("First Trade Date"),
+      minWidth: 120,
+      flex: 1.5,
+      headerAlign: "left",
+      align: "left",
+      renderCell: formatDateCell,
+    };
+    const pricingIndex = columns.findIndex((col) => col.field === "pricing_date");
+    if (pricingIndex === -1) {
+      columns.splice(6, 0, tradeDateColumn);
+    } else {
+      columns.splice(pricingIndex, 0, tradeDateColumn);
+    }
+  }
+
+  return columns;
 };

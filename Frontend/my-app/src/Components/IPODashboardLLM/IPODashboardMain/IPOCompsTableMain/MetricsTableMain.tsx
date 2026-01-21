@@ -192,9 +192,25 @@ const MetricsTableMain: React.FC<Props> = ({
   };
 
   const tableColumns = useMemo(() => createColumns(pricingYear), [pricingYear]);
+  const headerCellSx = {
+    color: "white",
+    fontWeight: 600,
+    textAlign: "center",
+    fontSize: "0.7rem",
+    padding: "6px 8px",
+    lineHeight: 1.2,
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+  };
+  const bodyCellSx = {
+    fontSize: "0.75rem",
+    padding: "6px 8px",
+    lineHeight: 1.2,
+    whiteSpace: "nowrap",
+  };
 
   return (
-    <Box style={{ marginTop: 20, overflow: "auto" }} >
+    <Box style={{ marginTop: 20, overflow: "auto" }}>
       <Box
         sx={{
           display: "flex",
@@ -210,24 +226,22 @@ const MetricsTableMain: React.FC<Props> = ({
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
-        <Table size="small">
+        <Table size="small" sx={{ tableLayout: "fixed" }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {tableColumns.map((col) => (
                 <TableCell
                   key={col.key}
                   sx={{
-                    color: "white",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    minWidth: col.minWidth || 70,
+                    ...headerCellSx,
+                    minWidth: col.minWidth ? Math.max(55, col.minWidth - 20) : 55,
                   }}
                 >
                   {col.label}
                 </TableCell>
               ))}
               <TableCell
-                sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
+                sx={{ ...headerCellSx, minWidth: 55 }}
               >
                 Action
               </TableCell>
@@ -260,7 +274,11 @@ const MetricsTableMain: React.FC<Props> = ({
                           key={col.key}
                           colSpan={4}
                           align="center"
-                          sx={{ fontWeight: "bold", color: "primary.main" }}
+                          sx={{
+                            ...bodyCellSx,
+                            fontWeight: "bold",
+                            color: "primary.main",
+                          }}
                         >
                           {type === "average"
                             ? "Overall Average"
@@ -275,7 +293,7 @@ const MetricsTableMain: React.FC<Props> = ({
                           type as "average" | "median"
                         ] ?? "N/A";
                       return (
-                        <TableCell key={col.key} align="center">
+                        <TableCell key={col.key} align="center" sx={bodyCellSx}>
                           {formatValue(col.key, avgValue)}
                         </TableCell>
                       );
@@ -283,7 +301,7 @@ const MetricsTableMain: React.FC<Props> = ({
 
                     return null;
                   })}
-                  <TableCell />
+                  <TableCell sx={bodyCellSx} />
                 </TableRow>
               ))}
           </TableBody>

@@ -74,6 +74,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
 
 
   const columns = getColumns(selectedOp, selectedId);
+  const isUpcoming =
+    (selectedOp || "").toString().toLowerCase().includes("upcoming");
   const baseColumns =
     hideFoTypeColumn ? columns.filter((col) => col.field !== "fo_type") : columns;
   const visibleColumns = showAllColumns
@@ -83,12 +85,12 @@ const DealsTable: React.FC<DealsTableProps> = ({
   if (hideRegionColumn && col.field === "region") return false;
 
   // hide First Trade Date for Upcoming
-  if (selectedOp === "upcoming" && col.field === "trade_date") {
+  if (isUpcoming && col.field === "trade_date") {
     return false;
   }
 
   if (
-    selectedOp === "upcoming" &&
+    isUpcoming &&
     (col.field === "deal_type" ||
       col.field === "fo_type" ||
       // col.field === "deal_size" ||
