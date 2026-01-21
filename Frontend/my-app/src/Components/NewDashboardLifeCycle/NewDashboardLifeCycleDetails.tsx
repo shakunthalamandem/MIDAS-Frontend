@@ -48,12 +48,14 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       label: "Peer Deals Performance",
       icon: <InsightsOutlinedIcon fontSize="small" />,
     },
-    { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
-    {
-      label: "AI- Sentiment",
+     {
+      label: "AI- Sentiment View",
       icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" />,
     },
-    { label: "Ai View", icon: <VisibilityOutlinedIcon fontSize="small" /> },
+    { label: "AI Unsupervised", icon: <PsychologyOutlinedIcon fontSize="small" /> },
+
+    { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
+   
     { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
 
   ];
