@@ -30,16 +30,25 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
   const isFirstRow =
     idx === 0 &&
     (row.ticker === row.competitor || row.competitor.startsWith(row.ticker));
+  const bodyCellSx = {
+    fontSize: "0.75rem",
+    padding: "6px 8px",
+    lineHeight: 1.2,
+    whiteSpace: "nowrap",
+  };
 
   return (
     <TableRow sx={{ backgroundColor: isFirstRow ? "#f2e1d9ff" : "inherit" }}>
       {columns.map((col) => (
-        <TableCell key={col.key} align="center">
+        <TableCell key={col.key} align="center" sx={bodyCellSx}>
           {isFirstRow && editIndex === idx && col.key !== "competitor" ? (
             <TextField
               size="small"
               value={row[col.key] ?? ""}
               onChange={(e) => onChangeCell(idx, col.key, e.target.value)}
+              inputProps={{
+                style: { fontSize: "0.75rem", padding: "6px 8px" },
+              }}
             />
           ) : (
             formatValue(col.key, row[col.key])
@@ -48,7 +57,7 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
       ))}
 
       {showActions && (
-        <TableCell align="center">
+        <TableCell align="center" sx={bodyCellSx}>
           {isFirstRow ? (
             editIndex === idx ? (
               <IconButton onClick={() => onSave(idx)} sx={{ color: "#002060" }}>
