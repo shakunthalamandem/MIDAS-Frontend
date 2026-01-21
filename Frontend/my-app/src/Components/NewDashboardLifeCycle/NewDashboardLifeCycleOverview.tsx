@@ -173,14 +173,31 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
         <Box
           sx={{
             mt: 2.5,
-            px: { xs: 0, md: 2 },
+            px: { xs: 1.5, md: 3 },
+            py: 2,
             position: "relative",
+            borderRadius: 3,
+            backgroundColor: "#eef4ff",
           }}
         >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "12.5%",
+              right: "12.5%",
+              height: 2,
+              backgroundColor: "#c7d2fe",
+              transform: "translateY(-50%)",
+            }}
+          />
           <Grid container spacing={2} justifyContent="space-between" sx={{ position: "relative" }}>
             {dateTimeline.map((item) => (
               <Grid item xs={6} md={3} key={item.label}>
-                <Stack spacing={0.5} alignItems="center">
+                <Stack spacing={1} alignItems="center">
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#0b1844" }}>
+                    {item.label}
+                  </Typography>
                   <Box
                     sx={{
                       width: 14,
@@ -189,9 +206,6 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                       backgroundColor: "#1e3a8a",
                     }}
                   />
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#0b1844" }}>
-                    {item.label}
-                  </Typography>
                   <Typography variant="body2" sx={{ color: "#334155" }}>
                     {formatDateISO(item.value)}
                   </Typography>
