@@ -28,6 +28,8 @@ import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
 import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
+import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
+import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -181,7 +183,14 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
           ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <StockTickerNews ticker={activePayload.ticker} />
+            <StockTickerNews ticker={activePayload.ticker}/>
+          ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
+            <DashboardAIFewShotAnalysis
+              prefillTicker={{
+                ticker: activePayload.ticker,
+                pricing_date: activePayload.pricing_date ?? null,
+              }}
+            />
           ) : (
             <PageUnderDevelopment />
           )}
