@@ -13,6 +13,7 @@ import { alpha } from "@mui/material/styles";
 import PredictionCell, { ActualCell } from "./PredictionCell";
 import DealDetailsHeader from "./DealDetailsHeader";
 import type { DealRecord } from "./types";
+import DealNewsPanel from "./DealNewsPanel";
 
 interface AIInsightBlockProps {
   title: string;
@@ -217,7 +218,10 @@ const PredictionBlock: React.FC<PredictionBlockProps> = ({
   >
     {/* Title */}
     <Box sx={{ mb: 0.6 }}>
-      <Typography variant="subtitle2" sx={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2 }}>
+      <Typography
+        variant="subtitle2"
+        sx={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2 }}
+      >
         {title}
       </Typography>
     </Box>
@@ -255,7 +259,6 @@ const PredictionBlock: React.FC<PredictionBlockProps> = ({
   </Paper>
 );
 
-
 const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
   if (!deal) {
     return (
@@ -291,191 +294,105 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
       </Box>
 
       <CardContent sx={{ pt: 2.5 }}>
-        {/* ROW 1: DEAL PARAMETER CARDS */}
-        <Box mb={2}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              mb: 1,
-              textTransform: "uppercase",
-              letterSpacing: 0.6,
-              fontSize: 11,
-              color: "text.secondary",
-            }}
-          >
-            Deal parameters
-          </Typography>
+        <Grid container spacing={2} alignItems="flex-start">
+          {/* LEFT: 75% main content */}
+          <Grid item xs={12} md={9}>
+            {/* ROW 1: DEAL PARAMETER CARDS */}
+            <Box mb={2}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  mb: 1,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.6,
+                  fontSize: 11,
+                  color: "text.secondary",
+                }}
+              >
+                Deal parameters & market sentiment
+              </Typography>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <SectionCard title="Deal classification" accent="info">
-                <DetailRow label="Deal type" value={deal.deal_type || "—"} />
-                <DetailRow label="FO type" value={deal.fo_type || "—"} />
-              </SectionCard>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <SectionCard title="Deal economics" accent="primary">
-                <DetailRow
-                  label="Deal size"
-                  value={
-                    formatNumber(deal.deal_size, { decimals: 0 })
-                      ? `$${formatNumber(deal.deal_size, { decimals: 0 })}`
-                      : undefined
-                  }
-                />
-                <DetailRow
-                  label="Issue price"
-                  value={
-                    formatNumber(deal.issue_price, { decimals: 2 })
-                      ? `$${formatNumber(deal.issue_price, { decimals: 2 })}`
-                      : undefined
-                  }
-                />
-                {deal.deal_type !== "IPO" &&
-                  formatNumber(deal.discount_from_announcement_price, {
-                    suffix: "%",
-                    decimals: 2,
-                  }) && (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <SectionCard title="Deal economics" accent="primary">
                     <DetailRow
-                      label="Disc vs announcement"
+                      label="Deal size"
+                      value={
+                        formatNumber(deal.deal_size, { decimals: 0 })
+                          ? `$${formatNumber(deal.deal_size, { decimals: 0 })}`
+                          : undefined
+                      }
+                    />
+                    <DetailRow
+                      label="Issue price"
+                      value={
+                        formatNumber(deal.issue_price, { decimals: 2 })
+                          ? `$${formatNumber(deal.issue_price, { decimals: 2 })}`
+                          : undefined
+                      }
+                    />
+                    {deal.deal_type !== "IPO" &&
+                      formatNumber(deal.discount_from_announcement_price, {
+                        suffix: "%",
+                        decimals: 2,
+                      }) && (
+                        <DetailRow
+                          label="Disc from announcement"
+                          value={formatNumber(
+                            deal.discount_from_announcement_price,
+                            {
+                              suffix: "%",
+                              decimals: 2,
+                            }
+                          )}
+                        />
+                      )}
+                  </SectionCard>
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <SectionCard title="Allocations" accent="success">
+                    <DetailRow
+                      label="Alloc as % of deal size"
                       value={formatNumber(
-                        deal.discount_from_announcement_price,
+                        deal.allocation_as_percentage_of_deal_size,
                         {
                           suffix: "%",
                           decimals: 2,
                         }
                       )}
                     />
-                  )}
-              </SectionCard>
-            </Grid>
+                    <DetailRow
+                      label="Alloc as % of IOI"
+                      value={formatNumber(
+                        deal.allocation_as_percentage_of_ioi,
+                        {
+                          suffix: "%",
+                          decimals: 2,
+                        }
+                      )}
+                    />
+                  </SectionCard>
+                </Grid>
 
-            <Grid item xs={12} md={4}>
-              <SectionCard title="Allocations" accent="success">
-                <DetailRow
-                  label="Alloc as % of deal size"
-                  value={formatNumber(
-                    deal.allocation_as_percentage_of_deal_size,
-                    {
-                      suffix: "%",
-                      decimals: 2,
-                    }
-                  )}
-                />
-                <DetailRow
-                  label="Alloc as % of IOI"
-                  value={formatNumber(deal.allocation_as_percentage_of_ioi, {
-                    suffix: "%",
-                    decimals: 2,
-                  })}
-                />
-              </SectionCard>
-            </Grid>
-          </Grid>
-        </Box>
+                <Grid item xs={12} md={4}>
+                  <SectionCard title="Market sentiment" accent="info">
+                    <DetailRow
+                      label="1W sentiment"
+                      value={deal.one_week_sentiment || "—"}
+                    />
+                    <DetailRow
+                      label="1M sentiment"
+                      value={deal.one_month_sentiment || "—"}
+                    />
+                  </SectionCard>
+                </Grid>
+              </Grid>
+            </Box>
 
-        <Divider sx={{ my: 2 }} />
-
-        {/* ROW 2: ML MODEL PREDICTIONS */}
-        <Box>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              mb: 1,
-              textTransform: "uppercase",
-              letterSpacing: 0.6,
-              fontSize: 11,
-              color: "text.secondary",
-            }}
-          >
-            ML model predictions & outcomes
-          </Typography>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <PredictionBlock
-                title="1st Day Close from Issue Price"
-                pred={deal.t1d_pred}
-                confidence={deal.t1d_confidence}
-                actual={deal.t1d_actual_return}
-                tone="primary"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <PredictionBlock
-                title="1st Day Close from Open Price"
-                pred={deal.t1d_openprice_pred}
-                confidence={deal.t1d_openprice_confidence}
-                actual={deal.t1d_openprice_actual_return}
-                tone="info"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <PredictionBlock
-                title="1 Week Close from 1st Day Close"
-                pred={deal.t1w_pred}
-                confidence={deal.t1w_confidence}
-                actual={deal.t1w_actual_return}
-                tone="success"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <PredictionBlock
-                title="1 Month Close from 1st Day Close"
-                pred={deal.t1m_pred}
-                confidence={deal.t1m_confidence}
-                actual={deal.t1m_actual_return}
-                tone="warning"
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* ✅ NEW: AI SENTIMENT VIEW (BOTH IPO + FO) */}
-        <Divider sx={{ my: 2 }} />
-
-        <Box>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              mb: 1,
-              textTransform: "uppercase",
-              letterSpacing: 0.6,
-              fontSize: 11,
-              color: "text.secondary",
-            }}
-          >
-            AI sentiment view
-          </Typography>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={6}>
-              <AIInsightBlock
-                title="1 Week Sentiment"
-                subtitle="Sentiment signal"
-                value={deal.one_week_sentiment}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={6}>
-              <AIInsightBlock
-                title="1 Month Sentiment"
-                subtitle="Sentiment signal"
-                value={deal.one_month_sentiment}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* IPO ONLY: AI MODEL PREDICTIONS */}
-        {deal.deal_type === "IPO" && (
-          <>
             <Divider sx={{ my: 2 }} />
 
+            {/* ROW 2: ML MODEL PREDICTIONS */}
             <Box>
               <Typography
                 variant="subtitle2"
@@ -487,53 +404,132 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   color: "text.secondary",
                 }}
               >
-                AI model predictions
+                ML model predictions & outcomes
               </Typography>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
-                  <AIInsightBlock
-                    title="FS 1 Week Sentiment"
-                    subtitle="AI sentiment signal"
-                    value={deal.fs_1w_sentiment}
+                  <PredictionBlock
+                    title="1st Day Close from Issue Price"
+                    pred={deal.t1d_pred}
+                    confidence={deal.t1d_confidence}
+                    actual={deal.t1d_actual_return}
+                    tone="primary"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <AIInsightBlock
-                    title="FS 1 Month Sentiment"
-                    subtitle="AI sentiment signal"
-                    value={deal.fs_1m_sentiment}
+                  <PredictionBlock
+                    title="1st Day Close from Open Price"
+                    pred={deal.t1d_openprice_pred}
+                    confidence={deal.t1d_openprice_confidence}
+                    actual={deal.t1d_openprice_actual_return}
+                    tone="info"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <AIInsightBlock
-                    title="Expected Volatility"
-                    subtitle="AI estimated"
-                    value={
-                      deal.fs_expected_volatility
-                        ? `${formatNumber(deal.fs_expected_volatility, { decimals: 2 })}%`
-                        : "—"
-                    }
+                  <PredictionBlock
+                    title="1 Week Close from 1st Day Close"
+                    pred={deal.t1w_pred}
+                    confidence={deal.t1w_confidence}
+                    actual={deal.t1w_actual_return}
+                    tone="success"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <AIInsightBlock
-                    title="Confidence Level"
-                    subtitle="Model confidence"
-                    value={
-                      deal.fs_confidence_level
-                        ? `${formatNumber(deal.fs_confidence_level, { decimals: 0 })}%`
-                        : "—"
-                    }
+                  <PredictionBlock
+                    title="1 Month Close from 1st Day Close"
+                    pred={deal.t1m_pred}
+                    confidence={deal.t1m_confidence}
+                    actual={deal.t1m_actual_return}
+                    tone="warning"
                   />
                 </Grid>
               </Grid>
             </Box>
-          </>
-        )}
+            {/* IPO ONLY: AI MODEL PREDICTIONS */}
+            {deal.deal_type === "IPO" && (
+              <>
+                <Divider sx={{ my: 2 }} />
+
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      mb: 1,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.6,
+                      fontSize: 11,
+                      color: "text.secondary",
+                    }}
+                  >
+                    AI model predictions
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <AIInsightBlock
+                        title="FS 1 Week Sentiment"
+                        subtitle="AI sentiment signal"
+                        value={deal.fs_1w_sentiment}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <AIInsightBlock
+                        title="FS 1 Month Sentiment"
+                        subtitle="AI sentiment signal"
+                        value={deal.fs_1m_sentiment}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <AIInsightBlock
+                        title="Expected Volatility"
+                        subtitle="AI estimated"
+                        value={
+                          deal.fs_expected_volatility
+                            ? `${formatNumber(deal.fs_expected_volatility, {
+                                decimals: 2,
+                              })}%`
+                            : "—"
+                        }
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                      <AIInsightBlock
+                        title="Confidence Level"
+                        subtitle="Model confidence"
+                        value={
+                          deal.fs_confidence_level
+                            ? `${formatNumber(deal.fs_confidence_level, {
+                                decimals: 0,
+                              })}%`
+                            : "—"
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </>
+            )}
+          </Grid>
+
+          {/* RIGHT: 25% News rail */}
+          <Grid item xs={12} md={3}>
+            <Box
+              sx={{
+                position: { md: "sticky" },
+                top: { md: 16 },
+              }}
+            >
+              <DealNewsPanel ticker={deal.ticker} />
+            </Box>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );
