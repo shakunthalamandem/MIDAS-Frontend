@@ -30,6 +30,7 @@ import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 import AIMLDealDetails from "./AIMLDealDetails";
+import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -193,6 +194,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 pricing_date: activePayload.pricing_date ?? null,
               }}
             />
+          ) : tabItems[tabValue]?.label === "AI- Sentiment View" ? (
+            <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : (
             <PageUnderDevelopment />
           )}
