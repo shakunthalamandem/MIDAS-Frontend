@@ -44,6 +44,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
+        {
+      label: "Peer Deals Performance",
+      icon: <InsightsOutlinedIcon fontSize="small" />,
+    },
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
     {
       label: "AI- Sentiment",
@@ -51,10 +55,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     },
     { label: "Ai View", icon: <VisibilityOutlinedIcon fontSize="small" /> },
     { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
-    {
-      label: "Peer Deals Performance",
-      icon: <InsightsOutlinedIcon fontSize="small" />,
-    },
+
   ];
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
