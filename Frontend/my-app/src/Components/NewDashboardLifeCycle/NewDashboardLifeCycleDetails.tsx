@@ -30,6 +30,7 @@ import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
 import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
+import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -182,6 +183,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 deal_id={activePayload.deal_id}
               />
             )
+          ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
+            <NewDashboardLifeCyclePeerDeals
+              selectedDeal={activePayload}
+            />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <StockTickerNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
