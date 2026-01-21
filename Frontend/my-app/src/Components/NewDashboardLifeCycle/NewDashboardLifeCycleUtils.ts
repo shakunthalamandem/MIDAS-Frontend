@@ -50,11 +50,13 @@ export const formatPriceValue = (row: any): string => {
 
 export const buildCardTags = (row: any): DealCardTag[] => {
   const tags: DealCardTag[] = [];
-  if (row?.deal_type) {
+
+  if (row?.writeup_available) {
+    const hasWriteup = row.writeup_available.toString().toLowerCase() === "yes";
     tags.push({
-      label: String(row.deal_type).toUpperCase(),
-      bg: "#e0f2fe",
-      color: "#0b3d91",
+      label: hasWriteup ? "Write-up Ready" : "No Write-up",
+      bg: hasWriteup ? "#dcfce7" : "#fee2e2",
+      color: hasWriteup ? "#166534" : "#991b1b",
     });
   }
   return tags;

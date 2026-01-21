@@ -544,8 +544,8 @@ const NewDealsLifecycleCards: React.FC = () => {
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
-                    Upcoming <span style={{color:'#9400a1ff'}}>{selectedRegion} {selectedDealType} </span> Deals Pricing Date Available (Not Yet Listed)
+                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                    Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
