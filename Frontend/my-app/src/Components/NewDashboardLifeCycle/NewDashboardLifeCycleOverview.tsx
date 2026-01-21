@@ -107,6 +107,21 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
     ];
   }, [dealData, ticker, dealType]);
 
+  const forecastBaseYear = useMemo(() => {
+    const rawDate = dealData?.pricing_date ?? pricingDate;
+    if (!rawDate) return null;
+    const parsed = new Date(rawDate);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.getFullYear();
+  }, [dealData?.pricing_date, pricingDate]);
+
+  const forecastYearLabels = forecastBaseYear
+    ? [
+        String(forecastBaseYear),
+        String(forecastBaseYear + 1),
+        String(forecastBaseYear + 2),
+      ]
+    : ["Current Year", "1Y Later", "2Y Later"];
+
   const dateTimeline = [
     { label: "Filed Date", value: dealData?.filed_date },
     { label: "Pricing Range Date", value: dealData?.term_date },
@@ -170,16 +185,6 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
             position: "relative",
           }}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              top: 22,
-              left: 8,
-              right: 8,
-              height: 2,
-              backgroundColor: "#c7d2fe",
-            }}
-          />
           <Grid container spacing={2} justifyContent="space-between" sx={{ position: "relative" }}>
             {dateTimeline.map((item) => (
               <Grid item xs={6} md={3} key={item.label}>
@@ -299,9 +304,15 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f1f5ff" }}>
               <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>Metric</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>Current Year</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>1Y Later</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>2Y Later</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
+                {forecastYearLabels[0]}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
+                {forecastYearLabels[1]}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#0b1844" }}>
+                {forecastYearLabels[2]}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
