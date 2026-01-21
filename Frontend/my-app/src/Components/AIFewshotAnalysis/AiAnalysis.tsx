@@ -17,6 +17,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import NoDataNotice from "./NoDataNotice";
 
 type AiAnalysisProps = {
   ticker: string | null;
@@ -598,14 +599,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
   // ✅ Plain message (no icon, no red box)
   if (status?.kind === "message") {
     return (
-      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
-        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
-        <CardContent sx={{ p: 2.5 }}>
-          <Typography sx={{ color: "#002060", textAlign: "center", fontWeight: 700 }}>
-            {status.text}
-          </Typography>
-        </CardContent>
-      </Card>
+      <NoDataNotice subtitle={status.text} />
     );
   }
 
@@ -625,14 +619,10 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
 
   if (!analysis) {
     return (
-      <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid", borderColor: "grey.200", background: "#FFFFFF", boxShadow: "0 10px 26px rgba(0,0,0,0.05)", overflow: "hidden", height: "100%" }}>
-        <Box sx={{ height: 6, bgcolor: "#EEF2FF" }} />
-        <CardContent sx={{ p: 2.5 }}>
-          <Typography sx={{ color: "grey.600", textAlign: "center" }}>
-            AI analysis will be available soon.
-          </Typography>
-        </CardContent>
-      </Card>
+      <NoDataNotice
+        title="AI analysis coming soon"
+        subtitle="There is no data for this ticker yet. We will update soon."
+      />
     );
   }
 

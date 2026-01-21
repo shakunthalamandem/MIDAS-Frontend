@@ -1,15 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
-  Autocomplete,
   Box,
   Card,
   CardContent,
   Collapse,
   Container,
-  CircularProgress,
   IconButton,
-  TextField,
   Typography,
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -27,11 +24,6 @@ type TickerItem = {
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("access_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const formatPricingDate = (dateStr?: string | null) => {
-  if (!dateStr) return "TBA";
-  return dateStr;
 };
 
 interface DashboardAIFewShotAnalysisProps {
@@ -110,14 +102,11 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [API_URL]);
 
-  const isLoading = status === "loading";
   const hasError = status === "error";
 
-  const options = useMemo(() => tickers, [tickers]);
-
   useEffect(() => {
-    if (!prefillTicker?.ticker || !options.length) return;
-    const match = options.find(
+    if (!prefillTicker?.ticker || !tickers.length) return;
+    const match = tickers.find(
       (opt) =>
         opt.ticker === prefillTicker.ticker &&
         (opt.pricing_date ?? "") === (prefillTicker.pricing_date ?? "")
@@ -125,7 +114,7 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
     if (match) {
       setSelectedTicker(match);
     }
-  }, [prefillTicker, options]);
+  }, [prefillTicker, tickers]);
 
   const companyName = selectedTicker?.ticker ?? "the selected company";
 
@@ -172,64 +161,6 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
                 AI Unsupervised Analysis for {companyName}
               </Typography>
             </Box>
-            <Autocomplete
-              options={options}
-              loading={isLoading}
-              value={selectedTicker}
-              onChange={(_, value) => setSelectedTicker(value)}
-              getOptionLabel={(option) =>
-                option.pricing_date
-                  ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
-                  : option.ticker
-              }
-              isOptionEqualToValue={(opt, val) =>
-                opt.ticker === val.ticker && (opt.pricing_date ?? "") === (val.pricing_date ?? "")
-              }
-              renderOption={(props, option) => (
-                <li {...props} key={option.id}>
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Typography sx={{ fontWeight: 900, color: "#0e0d0dff" }}>{option.ticker}</Typography>
-                    <Typography variant="caption" sx={{ color: "#6b7280" }}>
-                      {formatPricingDate(option.pricing_date)}
-                    </Typography>
-                  </Box>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search ticker"
-                  placeholder={isLoading ? "Loading tickers..." : "Type to search..."}
-                  fullWidth
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoading ? <CircularProgress color="inherit" size={18} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2.5,
-                      background: "#ffffff",
-                      "& fieldset": { borderColor: "#c5cede" },
-                      "&:hover fieldset": { borderColor: "#9aa9c5" },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#002060",
-                        boxShadow: "0 0 0 2px rgba(0,32,96,0.12)",
-                      },
-                    },
-                  }}
-                />
-              )}
-              sx={{
-                width: { xs: "100%", md: 360 },
-                maxWidth: "100%",
-                flexShrink: 0,
-              }}
-            />
           </Box>
 
           <Card
