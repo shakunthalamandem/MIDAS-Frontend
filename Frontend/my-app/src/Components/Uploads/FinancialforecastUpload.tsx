@@ -109,15 +109,15 @@ const FinancialforecastUpload: React.FC = () => {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("ticker", selected?.ticker ?? "");
+    formData.append("deal_id", selected?.deal_id ?? "");
+    formData.append("deal_type", selected?.deal_type ?? "");
+    formData.append("pricing_date", selected?.pricing_date ?? "");
     formData.append(
-      "data",
-      JSON.stringify({
-        ticker: selected?.ticker ?? "",
-        deal_id: selected?.deal_id ?? "",
-        deal_type: selected?.deal_type ?? "",
-        pricing_date: selected?.pricing_date ?? "",
-        flag_for_writeup: selected?.flag_for_writeup ?? null,
-      })
+      "flag_for_writeup",
+      selected?.flag_for_writeup === null || selected?.flag_for_writeup === undefined
+        ? ""
+        : String(selected.flag_for_writeup)
     );
 
     setUploading(true);
