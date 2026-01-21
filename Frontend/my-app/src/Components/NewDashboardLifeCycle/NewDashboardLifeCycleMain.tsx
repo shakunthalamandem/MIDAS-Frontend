@@ -229,12 +229,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   const isPipelineView = selectedOp === "pipeline";
 
-  const headlineText = useMemo(() => {
-    if (selectedOp === "live") {
-      return "";
-    }
-    return "Track Deals that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
-  }, [selectedOp]);
+
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
@@ -345,12 +340,12 @@ const NewDealsLifecycleCards: React.FC = () => {
               icon: <PaidOutlinedIcon fontSize="small" />,
             },
             {
-              label: "Price",
+              label: "Price Range",
               value: formatPriceValue(row),
               icon: <LocalOfferOutlinedIcon fontSize="small" />,
             },
             {
-              label: "Trade Date",
+              label: "First Trade Date",
               value: formatDate(row.trade_date),
               icon: <EventAvailableIcon fontSize="small" />,
             },
@@ -359,9 +354,10 @@ const NewDealsLifecycleCards: React.FC = () => {
           const writeupTag = allTags.find((tag) =>
             tag.label.toLowerCase().includes("write-up")
           );
-          const displayTags = allTags.filter(
-            (tag) => !tag.label.toLowerCase().includes("write-up")
-          );
+          const displayTags = allTags.filter((tag) => {
+            const label = tag.label.toLowerCase();
+            return !label.includes("write-up") && !label.includes("price range");
+          });
           return (
             <Grid
               item
@@ -507,7 +503,6 @@ const NewDealsLifecycleCards: React.FC = () => {
             onSelectOp={setSelectedOp}
             selectedDealType={selectedDealType}
             onSelectDealType={setSelectedDealType}
-            headlineText={headlineText}
             isPipelineView={isPipelineView}
             liveStartDate={liveStartDate}
             liveEndDate={liveEndDate}

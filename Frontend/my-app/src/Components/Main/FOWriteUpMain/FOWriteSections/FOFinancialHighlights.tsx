@@ -198,7 +198,7 @@ const FOFinancialHighlights: React.FC<ChildProps> = ({ ticker, deal_id }) => {
 
     const highlights = selectedData.financial_highlights;
     const tickerUpper = ticker?.toUpperCase();
-    const isSpecialTicker = ["PRAX", "CRNX", "ALMS"].includes(tickerUpper || "");
+    const isSpecialTicker = ["PRAX", "CRNX", "ALMS", "CRVS US"].includes(tickerUpper || "");
     const priorPeriodLabel = isSpecialTicker
       ? "Nine months ended September 30, 2024 ($)"
       : "2024 ($)";
