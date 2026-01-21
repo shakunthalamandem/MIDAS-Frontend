@@ -91,6 +91,13 @@ const formatDealSize = (dealSize: any) => {
   return (isNegative ? "-$" : "$") + formattedValue;
 };
 
+const formatDealSizeMillions = (dealSize: number) => {
+  const valueInMillions = dealSize / 1_000_000;
+  const absoluteValue = Math.abs(valueInMillions);
+  const formattedValue = absoluteValue.toFixed(2);
+  return `${valueInMillions < 0 ? "-$" : "$"}${formattedValue}M`;
+};
+
 const averageValue = (list: any[], getter: (row: any) => number) => {
   const values = list
     .map((row) => getter(row))
@@ -349,44 +356,104 @@ return (
     justifyContent="space-between"
   >
     <Box>
-      <Typography variant="caption" color="text.secondary">
-        Average Deal Size
-      </Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-        {formatDealSize(averageMetrics.dealSize)}
-      </Typography>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#e8f2ff",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Average Deal Size
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {formatDealSizeMillions(averageMetrics.dealSize)}
+        </Typography>
+      </Box>
     </Box>
     <Box>
-      <Typography variant="caption" color="text.secondary">
-        Avg Allocation IOI %
-      </Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-        {averageMetrics.allocationIoi.toFixed(2)}%
-      </Typography>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#ecfdf3",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg Allocation IOI %
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.allocationIoi.toFixed(2)}%
+        </Typography>
+      </Box>
     </Box>
     <Box>
-      <Typography variant="caption" color="text.secondary">
-        Avg Allocation % of Deal Size
-      </Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-        {averageMetrics.allocationDealSize.toFixed(2)}%
-      </Typography>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#fff4e6",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg Allocation % of Deal Size
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.allocationDealSize.toFixed(2)}%
+        </Typography>
+      </Box>
     </Box>
     <Box>
-      <Typography variant="caption" color="text.secondary">
-        Avg T+1 Day Return
-      </Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-        {averageMetrics.t1dReturn.toFixed(2)}%
-      </Typography>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#f3e8ff",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg T+1 Day Return
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.t1dReturn.toFixed(2)}%
+        </Typography>
+      </Box>
     </Box>
     <Box>
-      <Typography variant="caption" color="text.secondary">
-        Avg T+1 Month Return
-      </Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-        {averageMetrics.t1mReturn.toFixed(2)}%
-      </Typography>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#e0f2fe",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg T+1 Month Return
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.t1mReturn.toFixed(2)}%
+        </Typography>
+      </Box>
     </Box>
   </Stack>
 </Paper>
