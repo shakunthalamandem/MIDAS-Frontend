@@ -17,8 +17,9 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
+import FinancialforecastUpload from "../Uploads/FinancialforecastUpload";
 
-type View = "ipo" | "fo";
+type View = "ipo" | "fo" | "forecast";
 
 const IPOUploadsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -71,6 +72,7 @@ const IPOUploadsPage: React.FC = () => {
             size="small"
           >
             <ToggleButton value="ipo">IPO Documents</ToggleButton>
+            <ToggleButton value="forecast">Financial Forecasts</ToggleButton>
             <ToggleButton value="fo">FO Documents</ToggleButton>
           </ToggleButtonGroup>
         </Box>
@@ -104,7 +106,9 @@ const IPOUploadsPage: React.FC = () => {
           </motion.div>
         )}
 
-        {/* === Financial Forecast Upload Section === */}
+
+
+        {/* === FO Upload Section === */}
         {view === "fo" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -131,6 +135,36 @@ const IPOUploadsPage: React.FC = () => {
                 <Divider sx={{ my: 2 }} />
                 <FOS1FileUpload />
               </Card>
+            </Card>
+          </motion.div>
+        )}
+
+
+                {/* === Financial Forecast Upload Section === */}
+        {view === "forecast" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Card
+              elevation={3}
+              sx={{
+                borderRadius: 3,
+                p: 3,
+                background: "linear-gradient(to right, #ffecd2, #fcb69f)",
+              }}
+            >
+              <Typography
+                variant="h6"
+                align="center"
+                color="primary"
+                sx={{ fontWeight: 600, mb: 2 }}
+              >
+                Upload IPO Financial Forecasts
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <FinancialforecastUpload />
             </Card>
           </motion.div>
         )}

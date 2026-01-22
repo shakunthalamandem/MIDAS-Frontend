@@ -165,27 +165,8 @@ const FinancialforecastUpload: React.FC = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#fff", minHeight: "100vh", py: 6, px: { xs: 2, md: 4 } }}>
       <Box sx={{ maxWidth: 980, mx: "auto" }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "#0b3d91", mb: 1 }}>
-          Financial Forecast Upload
-        </Typography>
-        <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
-          Search a ticker and upload the corresponding financial forecast file.
-        </Typography>
 
-        <Card
-          elevation={3}
-          sx={{
-            borderRadius: 3,
-            p: { xs: 2, md: 3 },
-            background: "linear-gradient(to right, #c2e9fb, #a1c4fd)",
-          }}
-        >
-          <Typography variant="h6" align="center" color="success.main" sx={{ fontWeight: 600, mb: 2 }}>
-            Upload Financial Forecasts
-          </Typography>
-          <Divider sx={{ my: 2 }} />
 
           <Box sx={{ maxWidth: 620, mx: "auto", mt: 3 }}>
             <Card
@@ -317,36 +298,6 @@ const FinancialforecastUpload: React.FC = () => {
               </Stack>
             </Card>
           </Box>
-        </Card>
-
-        {/* {selected && (
-          <Card variant="outlined" sx={{ borderRadius: 2, mt: 3 }}>
-            <CardContent>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-                Deal Details
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <Stack spacing={1}>
-                <Typography variant="body2">
-                  <strong>Ticker:</strong> {selected.ticker || "-"}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Pricing Date:</strong> {formatDateSimple(selected.pricing_date)}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Deal Type:</strong> {selected.deal_type || "-"}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Deal ID:</strong> {selected.deal_id || "-"}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Flag for Writeup:</strong> {selected.flag_for_writeup ?? "-"}
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-        )} */}
-      </Box>
     </Box>
 
   );
