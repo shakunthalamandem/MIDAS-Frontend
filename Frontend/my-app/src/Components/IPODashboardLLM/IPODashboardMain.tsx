@@ -13,7 +13,7 @@ import IPODashboardPage3 from "./IPODashboardMain/IPODashboardPage3";
 import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 import IPOComparablesAndAISection from "./IPOComparablesAndAISection";
-import IPOFinancialForecastTableMain from "./IPOFinancialForecast/IPOFinancialForecastTableMain";
+import NewFinancialTableMain from "./IPOFinancialForecast/NewFinancialTableMain";
 import { useLocation } from "react-router-dom";
 
 interface TickerOption {
@@ -695,7 +695,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
                 <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 ,ml:3,mr:3}}>
                   <CardContent>
-                    <IPOFinancialForecastTableMain
+                    <NewFinancialTableMain
                       defaultTicker={currentTicker || ""}
                     />
                   </CardContent>
