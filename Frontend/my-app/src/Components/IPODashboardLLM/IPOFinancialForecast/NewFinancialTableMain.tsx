@@ -13,11 +13,12 @@ import NewFinancialTableData from "./NewFinancialTableData";
 
 interface NewFinancialTableMainProps {
   defaultTicker?: string;
+  deal_id?: string;
 }
 
 const NewFinancialTableMain: React.FC<
   NewFinancialTableMainProps
-> = ({ defaultTicker = "" }) => {
+> = ({ defaultTicker = "", deal_id }) => {
   const [forecastsInput, setForecastsInput] = useState(defaultTicker);
   const [forecastsTicker, setForecastsTicker] = useState(defaultTicker);
   const [forecasts, setForecasts] = useState<any | null>(null);
@@ -52,7 +53,10 @@ const NewFinancialTableMain: React.FC<
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: tickerToFetch }),
+          body: JSON.stringify({
+            ticker: tickerToFetch,
+            ...(deal_id ? { deal_id } : {}),
+          }),
         }
       );
 
@@ -167,6 +171,7 @@ const NewFinancialTableMain: React.FC<
       const payload = {
         ticker: forecastsTicker,
         meta_data: metaDataPayload,
+        ...(deal_id ? { deal_id } : {}),
       };
 
       const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
