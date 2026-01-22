@@ -91,7 +91,6 @@ import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
-import FinancialforecastUpload from "../Components/Uploads/FinancialforecastUpload";
 
 const AppRouters: React.FC = () => {
   return (
@@ -284,7 +283,6 @@ const AppRouters: React.FC = () => {
 
         <Route path="/deals/new_dashboard" element={<AuthGuard><NewDashboardLifeCycleMain /></AuthGuard>} />
         <Route path='page_under_development' element={<AuthGuard><PageUnderDevelopment /></AuthGuard>} />
-        <Route path="/fiupload" element={<AuthGuard><FinancialforecastUpload /></AuthGuard>} />
 
 
 
