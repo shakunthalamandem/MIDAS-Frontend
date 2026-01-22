@@ -72,13 +72,12 @@ const Aibot: React.FC = () => {
 
   const tooltipFullText = 'Hi, I am Midas AI Assistant';
   const [typedTooltip, setTypedTooltip] = useState<string>('');
+  const [isHovering, setIsHovering] = useState(false);
 
   const intervalRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let idx = 0;
-
     const clearTimers = () => {
       if (intervalRef.current) window.clearInterval(intervalRef.current);
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
@@ -86,6 +85,13 @@ const Aibot: React.FC = () => {
       timeoutRef.current = null;
     };
 
+    if (!isHovering) {
+      clearTimers();
+      setTypedTooltip('');
+      return;
+    }
+
+    let idx = 0;
     const startTyping = () => {
       clearTimers();
       setTypedTooltip('');
@@ -109,7 +115,7 @@ const Aibot: React.FC = () => {
       clearTimers();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isHovering]);
 
   return (
     <div
@@ -125,12 +131,22 @@ const Aibot: React.FC = () => {
         }
       }}
     >
-      <div style={bubbleStyle}>
-        {typedTooltip}
-        <span aria-hidden="true" style={bubbleTailStyle} />
-      </div>
+      {isHovering && (
+        <div style={bubbleStyle}>
+          {typedTooltip}
+          <span aria-hidden="true" style={bubbleTailStyle} />
+        </div>
+      )}
 
-      <div style={avatarStyle} aria-label="Gen AI assistant">
+      <div
+        style={avatarStyle}
+        aria-label="Gen AI assistant"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        onFocus={() => setIsHovering(true)}
+        onBlur={() => setIsHovering(false)}
+        tabIndex={0}
+      >
         <video src={videoSrc} style={videoStyle} autoPlay loop muted playsInline />
       </div>
     </div>
