@@ -131,7 +131,7 @@ const handleSave = async () => {
           <Grid container spacing={2} mt={2}>
             <Grid item xs={12} sm={6}>
               <FieldRenderer
-                label="Sector Avg 1D Return % - Last 10 Deals"
+                label="Sector Avg 1D Return % - Last 15 Deals"
                 name="average_sector_return"
                 value={formData.average_sector_return}
                 editable={false}

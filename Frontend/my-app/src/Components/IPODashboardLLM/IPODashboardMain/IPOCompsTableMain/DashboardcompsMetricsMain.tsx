@@ -17,7 +17,6 @@ import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { createColumns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
-import { overflow } from "html2canvas/dist/types/css/property-descriptors/overflow";
 
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
@@ -33,7 +32,7 @@ interface Props {
   pricingYear?: number;
 }
 
-const MetricsTableMain: React.FC<Props> = ({
+const DashboardcompsMetricsMain: React.FC<Props> = ({
   ticker,
   data,
   onRefresh,
@@ -328,4 +327,4 @@ const MetricsTableMain: React.FC<Props> = ({
   );
 };
 
-export default MetricsTableMain;
+export default DashboardcompsMetricsMain;

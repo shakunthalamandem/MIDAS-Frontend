@@ -260,7 +260,7 @@ const PredictionCell: React.FC<{
           />
         )}
         <Typography variant="caption" color="text.secondary" textAlign="center">
-          {hasConf ? `${formatPercent(confClamped!)}` : "Confidence N/A"}
+         Prob. {hasConf ? `${formatPercent(confClamped!)}` : "Confidence N/A"}
         </Typography>
       </Box>
     </Box>

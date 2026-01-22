@@ -194,6 +194,12 @@ const DealFormDataTabsMain: React.FC<Props> = ({
     boxShadow: 3,
   };
 
+  const createdByName = formData?.deal_information?.form_owner
+    ? `${formData.deal_information.form_owner
+        .charAt(0)
+        .toUpperCase()}${formData.deal_information.form_owner.slice(1)}`
+    : "";
+
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Stack
@@ -316,24 +322,34 @@ const DealFormDataTabsMain: React.FC<Props> = ({
             </>
           ) : (
             /* Edit button */
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={handleEdit}
-              disabled={loading}
-              sx={{
-                px: 3,
-                fontWeight: 500,
-                borderRadius: "12px",
-                background: "linear-gradient(to right, #0061a8, #00c6a7)",
-                color: "#fff",
-                "&:hover": {
-                  background: "linear-gradient(to right, #004c82, #009e85)",
-                },
-              }}
-            >
-              Edit
-            </Button>
+            <Stack direction="column" alignItems="center" spacing={1}>
+              <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={handleEdit}
+                disabled={loading}
+                sx={{
+                  px: 3,
+                  fontWeight: 500,
+                  borderRadius: "12px",
+                  background: "linear-gradient(to right, #0061a8, #00c6a7)",
+                  color: "#fff",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #004c82, #009e85)",
+                  },
+                }}
+              >
+                Edit
+              </Button>
+              {createdByName ? (
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#666", fontWeight: 400, fontStyle: "italic" }}
+                >
+                  {`Created by : ${createdByName}`}
+                </Typography>
+              ) : null}
+            </Stack>
           )}
         </Stack>
       </Stack>

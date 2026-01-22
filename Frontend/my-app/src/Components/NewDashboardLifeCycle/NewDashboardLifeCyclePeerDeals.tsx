@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Card, CardContent, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
@@ -7,13 +7,75 @@ import CategoryIcon from "@mui/icons-material/Category";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 
-interface DealInfoTableUIMainProps {
-  data: any[];
+interface NewDashboardLifeCyclePeerDealsProps {
+  data?: any[];
+  selectedDeal?: {
+    ticker?: string;
+    deal_type?: string;
+    fo_type?: string;
+    broad_region?: string;
+    gics_sector?: string;
+    years?: string[];
+    region?: string;
+    sector?: string;
+  };
 }
 
-const DealInfoTableUIMain: React.FC<DealInfoTableUIMainProps> = ({ data }) => {
+const NewDashboardLifeCyclePeerDeals: React.FC<NewDashboardLifeCyclePeerDealsProps> = ({
+  data,
+  selectedDeal,
+}) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [rows, setRows] = useState<any[]>(data);
+  const [rows, setRows] = useState<any[]>(data ?? []);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  useEffect(() => {
+    if (data) {
+      setRows(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!selectedDeal || data) return;
+    const fetchData = async () => {
+      try {
+        const payload = {
+          deal_type: selectedDeal.deal_type ? [selectedDeal.deal_type] : [],
+          fo_type: selectedDeal.fo_type ? [selectedDeal.fo_type] : [],
+          broad_region: selectedDeal.broad_region
+            ? [selectedDeal.broad_region]
+            : selectedDeal.region
+            ? [selectedDeal.region]
+            : [],
+          gics_sector: selectedDeal.gics_sector
+            ? [selectedDeal.gics_sector]
+            : selectedDeal.sector
+            ? [selectedDeal.sector]
+            : [],
+          years: selectedDeal.years ?? [],
+        };
+
+        const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch data");
+
+        const result = await response.json();
+        setRows(result.data || []);
+      } catch (error) {
+        console.error("Error fetching peer deals:", error);
+      }
+    };
+
+    fetchData();
+  }, [selectedDeal, data, apiUrl, token]);
 
 const cleanDealSize = (dealSize: any): number => {
   if (dealSize == null || dealSize === "") return 0;
@@ -27,6 +89,22 @@ const formatDealSize = (dealSize: any) => {
   const absoluteValue = Math.abs(cleanedValue);
   const formattedValue = absoluteValue.toLocaleString("en-US");
   return (isNegative ? "-$" : "$") + formattedValue;
+};
+
+const formatDealSizeMillions = (dealSize: number) => {
+  const valueInMillions = dealSize / 1_000_000;
+  const absoluteValue = Math.abs(valueInMillions);
+  const formattedValue = absoluteValue.toFixed(2);
+  return `${valueInMillions < 0 ? "-$" : "$"}${formattedValue}M`;
+};
+
+const averageValue = (list: any[], getter: (row: any) => number) => {
+  const values = list
+    .map((row) => getter(row))
+    .filter((value) => Number.isFinite(value));
+  if (values.length === 0) return 0;
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return total / values.length;
 };
 
 const getPricingDateValue = (pricingDate: any): number => {
@@ -73,6 +151,20 @@ const getPricingDateValue = (pricingDate: any): number => {
       )
       .slice(0, 15);
   }, [rows, searchQuery]);
+
+  const averageMetrics = useMemo(() => {
+    return {
+      dealSize: averageValue(filteredRows, (row) => cleanDealSize(row.deal_size)),
+      allocationIoi: averageValue(filteredRows, (row) =>
+        cleanDealSize(row.allocation_ioi_percentage)
+      ),
+      allocationDealSize: averageValue(filteredRows, (row) =>
+        cleanDealSize(row.allocation_deal_size_percentage)
+      ),
+      t1dReturn: averageValue(filteredRows, (row) => cleanDealSize(row.t1d_return_actual)),
+      t1mReturn: averageValue(filteredRows, (row) => cleanDealSize(row.t1m_return_actual)),
+    };
+  }, [filteredRows]);
 
   const columns: GridColDef[] = [ {
   field: "ticker",
@@ -233,17 +325,19 @@ const getPricingDateValue = (pricingDate: any): number => {
 
 return (
   <>
- <Paper
-  elevation={3}
+ 
+
+<Paper
+  elevation={0}
   sx={{
-    p: 2,
+    p: 2.5,
     mb: 2,
     borderRadius: 3,
-    backgroundColor: "#f8f9fb",
+    backgroundColor: "#ffffff",
+    border: "1px solid #e2e8f0",
   }}
 >
-  {/* Title Section */}
-  <Typography
+      <Typography
     variant="h6"
     fontWeight={600}
     sx={{
@@ -255,39 +349,112 @@ return (
   >
     Past Deals of the Sector for the Comparison
   </Typography>
-
-  {/* Existing Stack Content */}
   <Stack
-    direction={{ xs: "column", sm: "row" }}
-    spacing={4}
+    direction={{ xs: "column", md: "row" }}
+    spacing={3}
     alignItems="center"
     justifyContent="space-between"
   >
-    <Stack direction="row" spacing={2} alignItems="center">
-      <BusinessIcon color="primary" />
-      <Typography variant="body1" fontWeight={500}>
-        Sector: <strong>{headerRow.gics_sector_from_bloomberg}</strong>
-      </Typography>
-    </Stack>
-    <Stack direction="row" spacing={2} alignItems="center">
-      <PublicIcon color="success" />
-      <Typography variant="body1" fontWeight={500}>
-        Region: <strong>{headerRow.broad_region}</strong>
-      </Typography>
-    </Stack>
-    <Stack direction="row" spacing={2} alignItems="center">
-      <CategoryIcon color="secondary" />
-      <Typography variant="body1" fontWeight={500}>
-        Deal Type: <strong>{headerRow.deal_type}</strong>
-      </Typography>
-    </Stack>
-  </Stack>
-
-  <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-    <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-    <Typography variant="body2" color="text.secondary">
-      The table below shows the performance of the past 15 deals in which Monashee participated
-    </Typography>
+    <Box>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#e8f2ff",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Average Deal Size
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {formatDealSizeMillions(averageMetrics.dealSize)}
+        </Typography>
+      </Box>
+    </Box>
+    <Box>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#ecfdf3",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg Allocation IOI %
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.allocationIoi.toFixed(2)}%
+        </Typography>
+      </Box>
+    </Box>
+    <Box>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#fff4e6",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg Allocation % of Deal Size
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.allocationDealSize.toFixed(2)}%
+        </Typography>
+      </Box>
+    </Box>
+    <Box>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#f3e8ff",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg T+1 Day Return
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.t1dReturn.toFixed(2)}%
+        </Typography>
+      </Box>
+    </Box>
+    <Box>
+      <Box
+        sx={{
+          px: 1.25,
+          py: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "#e0f2fe",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
+          Avg T+1 Month Return
+        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
+          {averageMetrics.t1mReturn.toFixed(2)}%
+        </Typography>
+      </Box>
+    </Box>
   </Stack>
 </Paper>
 
@@ -327,4 +494,4 @@ return (
 );
 };
 
-export default DealInfoTableUIMain;
+export default NewDashboardLifeCyclePeerDeals;

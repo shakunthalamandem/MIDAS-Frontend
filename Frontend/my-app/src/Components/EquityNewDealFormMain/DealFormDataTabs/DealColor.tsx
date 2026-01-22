@@ -114,7 +114,7 @@ const DealColor: React.FC<DealColorProps> = ({ data, editable, onChange }) => {
               value={data.times_covered || ""}
               onChange={handleTimesCoveredChange}
             >
-              {["1x-5x", "5x-10x", "greater than 10x"].map((val) => (
+              {["1x-5x", "5x-10x", ">10x"].map((val) => (
                 <Box display="flex" alignItems="center" mr={2} key={val}>
                   <Radio
                     value={val}

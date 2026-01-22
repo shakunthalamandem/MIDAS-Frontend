@@ -76,7 +76,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
   const opMap: Record<string, string> = {
-    live: "Issued September to Date",
+    live: "Issued",
     upcoming: "Upcoming Deals",
   };
 
@@ -249,12 +249,6 @@ const NewDealsUpcomingRecent: React.FC = () => {
     }
   }, [selectedOp]);
 
-  const headlineText = useMemo(() => {
-    if (selectedOp === "live") {
-      return "Track IPOs that have been issued or priced within the last 31 days, with real-time deal status and key market details.";
-    }
-    return "Track IPOs that have been filed but not yet issued, highlighting key issuer details, expected timelines, and deal readiness.";
-  }, [selectedOp]);
 
   const filteredRows = useMemo(() => {
     const term = dealSearch.trim().toLowerCase();
@@ -548,24 +542,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
               </ToggleButtonGroup>
             )}
        
-            {!isPipelineView && (
-              <Typography
-                sx={{
-                  fontWeight: 400,
-                  color: "#1f2a44",
-                  lineHeight: 1.4,
-                  textAlign: "left",
-                  fontSize: { xs: "0.82rem", md: "0.88rem" },
-                  whiteSpace: { xs: "normal", md: "nowrap" },
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  flexGrow: 1,
-                  mx: { xs: 0, md: 2 },
-                }}
-              >
-                {headlineText}
-              </Typography>
-            )}
+
 
             {selectedOp === "live" && (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -683,8 +660,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
-                    Upcoming Pricing Range Available Deals (But Not Yet Listed)) - {selectedDealType}
+                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                    Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
@@ -729,8 +706,8 @@ const NewDealsUpcomingRecent: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#f18900ff" }} align="center">
-                    Upcoming Pricing Range Not Available Deals (TBA) - {selectedDealType}
+                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                    Upcoming {selectedRegion} {selectedDealType} Deals Pricing Date Not Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
