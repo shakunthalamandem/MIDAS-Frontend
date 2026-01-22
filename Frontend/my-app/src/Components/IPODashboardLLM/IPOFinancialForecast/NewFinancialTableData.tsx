@@ -38,7 +38,9 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
   onCancel,
   onChange,
 }) => {
-  const columnKeys = Object.keys(data || {});
+  const columnKeys = Object.keys(data || {}).filter(
+    (key) => key !== "metric_name" && key !== "ticker_name"
+  );
   const editableColumnKeys = columnKeys.slice(-2);
   const metricList: string[] = [];
   const metricSet = new Set<string>();
