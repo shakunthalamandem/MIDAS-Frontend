@@ -289,10 +289,6 @@ const AppRouters: React.FC = () => {
 
 
 
-
-
-
-
       </Routes>
     </ErrorBoundary>
     
