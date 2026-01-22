@@ -621,7 +621,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
           }}
         >
           {/* Create new record checkbox */}
-          {/* <FormControlLabel
+          <FormControlLabel
             control={
               <Checkbox
                 checked={values.create_new_record}
@@ -635,7 +635,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
               />
             }
             label="Create new record"
-          /> */}
+          />
 
           {/* Buttons */}
           <Box

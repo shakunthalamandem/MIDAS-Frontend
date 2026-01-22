@@ -633,7 +633,7 @@ const FOForm: React.FC<FOFormProps> = ({
             gap: 2,
           }}
         >
-          {/* <FormControlLabel
+          <FormControlLabel
             control={
               <Checkbox
                 checked={values.create_new_record}
@@ -647,7 +647,7 @@ const FOForm: React.FC<FOFormProps> = ({
               />
             }
             label="Create new record"
-          /> */}
+          />
 
           <Box
             sx={{
