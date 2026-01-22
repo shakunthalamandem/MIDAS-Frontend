@@ -164,7 +164,7 @@ const MainUpload: React.FC = () => {
         >
           <Tab label="Monashee Data" />
           <Tab label="Upload" />
-          <Tab label="IPO Files" /> {/* routes to /ipouploads */}
+          <Tab label="IPO and FO Files" /> 
           <Tab label="Downloads" />
           <Tab label="Calendar" />
           <Tab label="LK File" />
