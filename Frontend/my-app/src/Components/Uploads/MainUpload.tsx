@@ -22,7 +22,6 @@ import Ipos1Download from "../IPOwriteUp/Ipos1Download";
 import UploadDataCard from "./UploadDataCard";
 import LkFileUpload from "./LkFileUpload";
 import DailyNoteUpload from "./DailyNoteUpload";
-import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
 
 const uploadConfigs = [
   { key: "form", label: "Upload New Deal Data", apiEndpoint: "form_data_upload", buttonColor: "primary" },
