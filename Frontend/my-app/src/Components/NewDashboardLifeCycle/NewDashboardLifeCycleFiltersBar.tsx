@@ -9,6 +9,8 @@ import {
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import TableRowsIcon from "@mui/icons-material/TableRows";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -37,6 +39,8 @@ type FiltersBarProps = {
   setDealSearch: (value: string) => void;
   pipelineSearch: string;
   setPipelineSearch: (value: string) => void;
+  viewMode: "card" | "table";
+  onViewModeChange: (value: "card" | "table") => void;
 };
 
 const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
@@ -54,6 +58,8 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
   setDealSearch,
   pipelineSearch,
   setPipelineSearch,
+  viewMode,
+  onViewModeChange,
 }) => {
   return (
     <>
@@ -70,7 +76,42 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
         }}
       >
         <Container maxWidth="xl" sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
-          <DealsFilters selectedOp={selectedOp} onChange={onSelectOp} options={tabs} />
+          <DealsFilters
+            selectedOp={selectedOp}
+            onChange={onSelectOp}
+            options={tabs}
+            rightContent={
+              <ToggleButtonGroup
+                size="small"
+                value={viewMode}
+                exclusive
+                onChange={(_e, value) => value && onViewModeChange(value)}
+                sx={{
+                  backgroundColor: "#ffffff",
+                  borderRadius: 999,
+                  border: "1px solid #d7ddea",
+                  "& .MuiToggleButton-root": {
+                    border: 0,
+                    px: 1.25,
+                    py: 0.4,
+                    minWidth: 36,
+                    color: "#6a7286",
+                  },
+                  "& .Mui-selected": {
+                    color: "#2b146f",
+                    backgroundColor: "#eef2ff",
+                  },
+                }}
+              >
+                <ToggleButton value="card" aria-label="Card view">
+                  <ViewModuleIcon fontSize="small" />
+                </ToggleButton>
+                <ToggleButton value="table" aria-label="Table view">
+                  <TableRowsIcon fontSize="small" />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            }
+          />
         </Container>
       </Container>
 

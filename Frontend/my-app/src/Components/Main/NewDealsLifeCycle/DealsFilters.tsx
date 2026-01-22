@@ -115,6 +115,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               alignSelf: { xs: "stretch", md: "center" },
               display: "flex",
               justifyContent: { xs: "center", md: "flex-start" },
+              ml: { md: "auto" },
             }}
           >
             {rightContent}
