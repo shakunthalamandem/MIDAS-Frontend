@@ -163,7 +163,7 @@ const FONewFinancialTableMain: React.FC<
       }
 
       const columnKeys = Object.keys(updatedMeta);
-      const editableColumnKeys = columnKeys.slice(-1);
+      const editableColumnKeys = columnKeys;
       const metaDataPayload: any = {};
 
       for (const colKey of editableColumnKeys) {
