@@ -280,24 +280,6 @@ const FONewFinancialTableMain: React.FC<
                   />
                 )}
 
-              {forecastsTicker.toUpperCase() !== "MINIMAX" && (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  mt={2}
-                >
-                  <InfoIcon sx={{ mr: 1 }} />
-                  <Typography sx={{ mr: 3 }}>
-                    Above values are in local currency
-                  </Typography>
-                  <InfoIcon sx={{ mr: 1 }} />
-                  <Typography>
-                    High positive and negative values are shown as NM (Not
-                    Meaningful)
-                  </Typography>
-                </Box>
-              )}
             </Grid>
           </Grid>
         </CardContent>
