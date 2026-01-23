@@ -14,8 +14,9 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import { formatDate, formatDateISO } from "./NewDashboardLifeCycleUtils";
-import DashboardIPOfinacialForecastMain from "../IPODashboardLLM/IPOFinancialForecast/DashboardIPOfinacialForecastMain";
+// import DashboardIPOfinacialForecastMain from "../IPODashboardLLM/IPOFinancialForecast/DashboardIPOfinacialForecastMain";
 import DashboardcompsMetricsMain from "../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DashboardcompsMetricsMain";
+import NewFinancialTableMain from "../IPODashboardLLM/IPOFinancialForecast/NewFinancialTableMain";
 
 type OverviewResponse = {
   data?: {
@@ -298,7 +299,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
-        <DashboardIPOfinacialForecastMain defaultTicker={ticker} />
+        <NewFinancialTableMain defaultTicker={ticker} />
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3, backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>

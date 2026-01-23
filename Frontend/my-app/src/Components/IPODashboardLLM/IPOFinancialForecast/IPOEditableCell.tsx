@@ -1,7 +1,7 @@
 import React from "react";
 import { TextField, TableCell } from "@mui/material";
 
-interface EditableCellProps {
+interface IPOEditableCellProps {
   isEditable: boolean;
   value: any;
   onChange: (val: string) => void;
@@ -9,10 +9,9 @@ interface EditableCellProps {
   isHighlightColumn: boolean;
   renderAsPercent: boolean;
   formatter: (val: any) => string;
-  align?: "left" | "center" | "right";
 }
 
-const EditableCell: React.FC<EditableCellProps> = ({
+const IPOEditableCell: React.FC<IPOEditableCellProps> = ({
   isEditable,
   value,
   onChange,
@@ -20,14 +19,14 @@ const EditableCell: React.FC<EditableCellProps> = ({
   isHighlightColumn,
   renderAsPercent,
   formatter,
-  align = "center",
 }) => {
   return (
     <TableCell
-      align={align}
+      align="center"
       sx={{
+        border: "1px solid #000000",
         fontStyle: isEvenRow ? "normal" : "italic",
-        fontSize: isEvenRow ? "1.3rem" : "1.1rem",
+        fontSize:isEvenRow ? "1.3rem": "1.1rem",
         backgroundColor: isHighlightColumn
           ? "rgba(248, 247, 245, 1)"
           : isEvenRow
@@ -44,7 +43,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
           inputProps={{
             style: {
               fontSize: "1rem",
-              textAlign: align,
+              textAlign: "center",
               padding: "6px 8px",
             },
           }}
@@ -64,4 +63,4 @@ const EditableCell: React.FC<EditableCellProps> = ({
   );
 };
 
-export default EditableCell;
+export default IPOEditableCell;

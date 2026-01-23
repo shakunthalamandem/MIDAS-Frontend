@@ -80,13 +80,10 @@ import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/Delet
 import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
 import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
 import ExcelUploads from "../Components/UpcomingPipelineDeals/ExcelUploads";
-import ABBDiscountDataMainFunction from "../Components/ABBModelMain/DiscountDataModel/ABBDiscountDataMainFunction";
 import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
 import MattermostChat from "../Components/Discussion/MattermostChat";
-import DealPricesChart from "../Components/AIMLResults/DealPricesChart";
 import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
-import MidasChatbotMain from "../Components/WebsiteChatBot/MidasChatbotMain";
 import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
@@ -94,7 +91,6 @@ import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
-import FinancialforecastUpload from "../Components/Uploads/FinancialforecastUpload";
 
 const AppRouters: React.FC = () => {
   return (
@@ -287,11 +283,6 @@ const AppRouters: React.FC = () => {
 
         <Route path="/deals/new_dashboard" element={<AuthGuard><NewDashboardLifeCycleMain /></AuthGuard>} />
         <Route path='page_under_development' element={<AuthGuard><PageUnderDevelopment /></AuthGuard>} />
-        <Route path="/fiupload" element={<AuthGuard><FinancialforecastUpload /></AuthGuard>} />
-
-
-
-
 
 
 

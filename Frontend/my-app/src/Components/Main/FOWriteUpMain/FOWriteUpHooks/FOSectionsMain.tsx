@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { ExportProvider } from "../../../../contexts/ExportContext";
 import { useFoPdfExport } from "../hooks/useFoPdfExport";
 import FOValuationDashboard from "./FOValuationDashboard";
+import FONewFinancialTableMain from "../../../IPODashboardLLM/IPOFinancialForecast/FONewFinancialTableMain";
 
 interface FOSectionsMainProps {
   ticker: string;
@@ -225,7 +226,12 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
         <FOValuationDashboard ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
       </div>
       <div id="fo-page3">
-        <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} />
+        {/* <FOFinancialHighlights ticker={selected?.ticker || ""} deal_id={selected?.deal_id || ""} /> */}
+                <FONewFinancialTableMain
+                  defaultTicker={selected?.ticker || ""}
+                  deal_id={selected?.deal_id}
+                />
+
         <FOComparisionTableMain
           ticker={selected?.ticker || ""}
           deal_id={selected?.deal_id || ""}

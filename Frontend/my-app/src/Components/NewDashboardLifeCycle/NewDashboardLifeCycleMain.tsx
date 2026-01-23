@@ -17,6 +17,8 @@ import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
 import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
+import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
+import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
 import {
   buildCardTags,
   formatDate,
@@ -32,6 +34,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [viewMode, setViewMode] = useState<"card" | "table">("card");
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
     dayjs().subtract(30, "day")
   );
@@ -318,6 +321,38 @@ const NewDealsLifecycleCards: React.FC = () => {
     );
   }, [pipelineData, pipelineCategory, pipelineSearch]);
 
+  const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
+    navigate("/deals/new_dashboard/details", {
+      state: { payload: row, ...(extraState || {}) },
+    });
+  };
+
+  const renderDealsList = (list: any[]) =>
+    viewMode === "table" ? (
+      <DealsTable
+        rows={list}
+        loading={loading}
+        onRowSelect={(row) => handleRowNavigate(row)}
+        selectedOp={selectedOp}
+        showAllColumns
+        hideFoTypeColumn={selectedDealType === "IPO"}
+      />
+    ) : (
+      renderCards(list)
+    );
+
+  const renderPipelineList = (list: any[]) =>
+    viewMode === "table" ? (
+      <NewDashboardLifeCycleTableView
+        rows={list}
+        mode="pipeline"
+        selectedRegion={selectedRegion}
+        onRowClick={(row) => handleRowNavigate(row, { pipelineCategory })}
+      />
+    ) : (
+      renderPipelineCards(list)
+    );
+
   const renderCards = (list: any[]) => (
     <Box
       sx={{
@@ -512,6 +547,8 @@ const NewDealsLifecycleCards: React.FC = () => {
             setDealSearch={setDealSearch}
             pipelineSearch={pipelineSearch}
             setPipelineSearch={setPipelineSearch}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
 
           {isPipelineView ? (
@@ -536,7 +573,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                 </Typography>
               </Container>
             ) : (
-              renderPipelineCards(pipelineRows)
+              renderPipelineList(pipelineRows)
             )
           ) : loading ? (
             <CircularProgress sx={{ display: "block", mx: "auto" }} />
@@ -549,7 +586,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
-                  renderCards(upcomingDatedRows)
+                  renderDealsList(upcomingDatedRows)
                 ) : (
                   <Container
                     sx={{
@@ -577,7 +614,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
-                  renderCards(upcomingTbaRows)
+                  renderDealsList(upcomingTbaRows)
                 ) : (
                   <Container
                     sx={{
@@ -618,7 +655,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               </Typography>
             </Container>
           ) : (
-            renderCards(filteredRows)
+            renderDealsList(filteredRows)
           )}
         </Container>
       </Container>
