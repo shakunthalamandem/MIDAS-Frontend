@@ -6,10 +6,17 @@ import {
   Alert,
   Snackbar,
   Box,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 import NewFinancialTableData from "./NewFinancialTableData";
+import FONewFinancialTableData from "./FONewFinancialTableData";
 
 interface FONewFinancialTableMainProps {
   defaultTicker?: string;
@@ -26,6 +33,7 @@ const FONewFinancialTableMain: React.FC<
   const [forecastsError, setForecastsError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [editedData, setEditedData] = useState<any>({});
+  const [saving, setSaving] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
@@ -112,6 +120,14 @@ const FONewFinancialTableMain: React.FC<
     setEditedData({});
   };
 
+  const handleEditToggle = () => {
+    if (editing) {
+      void handleSave();
+      return;
+    }
+    handleEdit();
+  };
+
   // ---------------------- Cell Edit Change ----------------------
   const handleEditChange = (
     metricName: string,
@@ -134,6 +150,7 @@ const FONewFinancialTableMain: React.FC<
   const handleSave = async () => {
     setEditing(false);
     setForecastsError(null);
+    setSaving(true);
 
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("access_token");
@@ -146,7 +163,7 @@ const FONewFinancialTableMain: React.FC<
       }
 
       const columnKeys = Object.keys(updatedMeta);
-      const editableColumnKeys = columnKeys.slice(-2);
+      const editableColumnKeys = columnKeys;
       const metaDataPayload: any = {};
 
       for (const colKey of editableColumnKeys) {
@@ -195,50 +212,78 @@ const FONewFinancialTableMain: React.FC<
       await handleFetchForecasts(forecastsTicker);
     } catch (error: any) {
       setForecastsError(error.message || "Failed to save data.");
+    } finally {
+      setSaving(false);
     }
   };
 
   // ---------------------- Render ----------------------
   return (
-    <Container sx={{ maxWidth: "xl", mb: 4 }}>
-      <Typography
-        variant="h6"
-        sx={{ mb: 2, mt: 4 }}
-        color="#002060"
-        fontWeight={600}
-        align="center"
-      >
-        Financial Forecasts (FYE{" "}
-        {forecastsTicker?.toUpperCase() === "MH" ? "Mar 31" : "Dec 31"},{" "}
-        Internal Estimates) for {defaultTicker}
-      </Typography>
+    <Container maxWidth="xl" sx={{ mb: 4 }}>
+      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+        <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
+          <Grid container spacing={4} mb={4} mt={2}>
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    color: "#026269",
+                    flex: 1,
+                  }}
+                >
+                  Financial Highlights
+                </Typography>
+                <IconButton
+                  onClick={handleEditToggle}
+                  disabled={saving || forecastsLoading}
+                  sx={{ color: "#002060" }}
+                  aria-label={
+                    editing
+                      ? "save financial highlights"
+                      : "edit financial highlights"
+                  }
+                >
+                  {editing ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
+              </Box>
 
-      {forecastsLoading && <CircularProgress />}
-      {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
+              {forecastsLoading && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              )}
 
-      {!forecastsLoading &&
-        forecasts &&
-        forecasts?.meta_data && (
-          <NewFinancialTableData
-            data={
-              editing ? editedData : forecasts?.meta_data
-            }
-            editing={editing}
-            onEdit={handleEdit}
-            onSave={handleSave}
-            onCancel={handleCancelEdit}
-            onChange={handleEditChange}
-          />
-        )}
-      {forecastsTicker.toUpperCase() !== "MINIMAX" && (
-        <Box display="flex" alignItems="center" justifyContent="center" mt={2}>
-  <InfoIcon sx={{ mr: 1 }} />
-  <Typography sx={{ mr: 3 }}>Above values are in local currency</Typography>
-  <InfoIcon sx={{ mr: 1 }} />
-  <Typography>High positive and negative values are shown as NM (Not Meaningful)</Typography>
-</Box>
+              {forecastsError && (
+                <Alert severity="error" sx={{ mt: 3 }}>
+                  {forecastsError}
+                </Alert>
+              )}
 
-      )}
+              {!forecastsLoading &&
+                forecasts &&
+                forecasts?.meta_data && (
+                  <FONewFinancialTableData
+                    data={editing ? editedData : forecasts?.meta_data}
+                    editing={editing}
+                    onChange={handleEditChange}
+                  />
+                )}
+
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}

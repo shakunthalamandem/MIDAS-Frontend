@@ -21,6 +21,7 @@ import {
   formatFinancialValue,
   formatFinancialMargin,
 } from "./utils/financialFormatters";
+import IPOEditableCell from "./IPOEditableCell";
 
 interface NewFinancialTableDataProps {
   data: any;
@@ -39,6 +40,11 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
   onCancel,
   onChange,
 }) => {
+  const formatLabel = (value: string) =>
+    value
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
   const columnKeys = Object.keys(data || {}).filter(
     (key) => key !== "metric_name" && key !== "ticker_name"
   );
@@ -113,7 +119,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                       : "#002060",
                   }}
                 >
-                  {label}
+                  {formatLabel(label)}
                   {isEditableColumn && (
                     <Box component="span" sx={{ ml: 1 }}>
                       {!editing ? (
@@ -157,7 +163,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
             backgroundColor: isOddRow ? "" : "#ebebeb",
           }}
         >
-          {metricName}
+          {formatLabel(metricName)}
         </TableCell>
 
         {columnKeys.map((yearKey) => {
@@ -175,7 +181,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
           const value = data?.[yearKey]?.[metricName];
 
           return (
-            <EditableCell
+            <IPOEditableCell
               key={yearKey}
               isEditable={isEditableCell}
               value={value}
