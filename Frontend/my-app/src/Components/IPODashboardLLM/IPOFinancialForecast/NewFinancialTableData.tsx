@@ -20,6 +20,7 @@ import {
   formatFinancialValue,
   formatFinancialMargin,
 } from "./utils/financialFormatters";
+import IPOEditableCell from "./IPOEditableCell";
 
 interface NewFinancialTableDataProps {
   data: any;
@@ -163,7 +164,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
           const value = data?.[yearKey]?.[metricName];
 
           return (
-            <EditableCell
+            <IPOEditableCell
               key={yearKey}
               isEditable={isEditableCell}
               value={value}
