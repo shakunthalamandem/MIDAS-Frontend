@@ -31,6 +31,8 @@ export const getMetricKeys = (dataObj: any) =>
 export const priorityOrder = [
   "Sales",
   "Sales Growth",
+  "Total Revenue & Financial Income",
+  "Revenue Growth",
   "Net Interest Income",
   "Net Interest Income Growth",
   "Gross Profit",
