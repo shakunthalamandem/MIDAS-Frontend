@@ -16,6 +16,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 import EditableCell from "./EditableCell";
+import { priorityOrder } from "./utils/financialHelpers";
 import {
   formatFinancialValue,
   formatFinancialMargin,
@@ -60,6 +61,17 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
       }
     }
   }
+  const orderedMetrics: string[] = [];
+  const remaining = new Set(metricList);
+  for (const name of priorityOrder) {
+    if (remaining.has(name)) {
+      orderedMetrics.push(name);
+      remaining.delete(name);
+    }
+  }
+  const rest = Array.from(remaining);
+  rest.sort();
+  orderedMetrics.push(...rest);
 
   return (
     <>
@@ -137,7 +149,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
         </TableHead>
 
        <TableBody>
-  {metricList.map((metricName: string, rowIndex: number) => {
+  {orderedMetrics.map((metricName: string, rowIndex: number) => {
     const isOddRow = rowIndex % 2 === 1;
 
     return (
