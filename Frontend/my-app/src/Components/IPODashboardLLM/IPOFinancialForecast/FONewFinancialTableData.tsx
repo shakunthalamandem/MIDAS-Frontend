@@ -69,6 +69,32 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
     }
   }
 
+  const priorityLabels = [
+    "Total Revenue",
+    "Gross Profit",
+    "Operating Income",
+    "Net Income",
+  ];
+  const metricLabelMap = new Map<string, string>();
+  for (const metric of metricList) {
+    const label = formatLabel(metric);
+    if (!metricLabelMap.has(label)) {
+      metricLabelMap.set(label, metric);
+    }
+  }
+  const orderedMetrics: string[] = [];
+  const used = new Set<string>();
+  for (const label of priorityLabels) {
+    const metric = metricLabelMap.get(label);
+    if (metric && !used.has(metric)) {
+      orderedMetrics.push(metric);
+      used.add(metric);
+    }
+  }
+  const remaining = metricList.filter((metric) => !used.has(metric));
+  remaining.sort((a, b) => formatLabel(a).localeCompare(formatLabel(b)));
+  orderedMetrics.push(...remaining);
+
   return (
     <TableContainer component={Paper} sx={{ mt: 3 }}>
       <Table size="medium">
@@ -110,7 +136,7 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
         </TableHead>
 
         <TableBody>
-          {metricList.map((metricName: string) => (
+          {orderedMetrics.map((metricName: string) => (
             <TableRow key={metricName} sx={{ fontSize: "1rem" }}>
               <TableCell>{formatLabel(metricName)}</TableCell>
 
