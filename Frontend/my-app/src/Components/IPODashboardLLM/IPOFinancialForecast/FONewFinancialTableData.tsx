@@ -42,15 +42,24 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
   onCancel,
   onChange,
 }) => {
+  const formatLabel = (value: string) =>
+    value
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
   const columnKeys = Object.keys(data || {}).filter(
     (key) => key !== "metric_name" && key !== "ticker_name"
   );
+  const orderedColumnKeys = [
+    ...columnKeys.filter((key) => !key.toLowerCase().includes("yoy")),
+    ...columnKeys.filter((key) => key.toLowerCase().includes("yoy")),
+  ];
   const editableColumnKeys = columnKeys;
   const metricList: string[] = [];
   const metricSet = new Set<string>();
   const showEditControls = Boolean(onEdit && onSave && onCancel);
 
-  for (const colKey of columnKeys) {
+  for (const colKey of orderedColumnKeys) {
     const metrics = Object.keys(data?.[colKey] || {});
     for (const metric of metrics) {
       if (!metricSet.has(metric)) {
@@ -66,12 +75,12 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
         <TableHead sx={{ backgroundColor: "#002060" }}>
           <TableRow>
             <StyledTableCell>Metric</StyledTableCell>
-            {columnKeys.map((label) => {
+            {orderedColumnKeys.map((label) => {
               const isEditableColumn = editableColumnKeys.includes(label);
 
               return (
                 <StyledTableCell key={label} align="right">
-                  {label}
+                  {formatLabel(label)}
                   {isEditableColumn && showEditControls && (
                     <>
                       {!editing ? (
@@ -103,9 +112,9 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
         <TableBody>
           {metricList.map((metricName: string) => (
             <TableRow key={metricName} sx={{ fontSize: "1rem" }}>
-              <TableCell>{metricName}</TableCell>
+              <TableCell>{formatLabel(metricName)}</TableCell>
 
-              {columnKeys.map((yearKey) => {
+              {orderedColumnKeys.map((yearKey) => {
                 const isEditableCell =
                   editing && editableColumnKeys.includes(yearKey);
                 const renderAsPercent =
