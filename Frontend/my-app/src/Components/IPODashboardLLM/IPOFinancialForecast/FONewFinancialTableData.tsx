@@ -42,6 +42,11 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
   onCancel,
   onChange,
 }) => {
+  const formatLabel = (value: string) =>
+    value
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
   const columnKeys = Object.keys(data || {}).filter(
     (key) => key !== "metric_name" && key !== "ticker_name"
   );
@@ -71,7 +76,7 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
 
               return (
                 <StyledTableCell key={label} align="right">
-                  {label}
+                  {formatLabel(label)}
                   {isEditableColumn && showEditControls && (
                     <>
                       {!editing ? (
@@ -103,7 +108,7 @@ const FONewFinancialTableData: React.FC<FONewFinancialTableDataProps> = ({
         <TableBody>
           {metricList.map((metricName: string) => (
             <TableRow key={metricName} sx={{ fontSize: "1rem" }}>
-              <TableCell>{metricName}</TableCell>
+              <TableCell>{formatLabel(metricName)}</TableCell>
 
               {columnKeys.map((yearKey) => {
                 const isEditableCell =
