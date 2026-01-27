@@ -6,11 +6,14 @@ import {
   Container,
   InputAdornment,
   Paper,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MeetingDealNoteCreate from "./MeetingDealNoteCreate";
+import UnlistedDealMeetingNotesMain from "./UnlistedDealMeetingNotesMain";
 
 export interface DealSearchResult {
   ticker: string;
@@ -58,6 +61,7 @@ const DealMeetingNotesMain: React.FC = () => {
   const [selectedDeal, setSelectedDeal] = useState<DealSearchResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"listed" | "unlisted">("listed");
 
   useEffect(() => {
     if (!apiUrl) {
@@ -161,6 +165,37 @@ const DealMeetingNotesMain: React.FC = () => {
       </Typography>
 
       <Container maxWidth="xl" sx={{mb:4}}>
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 3,
+            p: 0.5,
+            borderRadius: 999,
+            border: "1px solid rgba(0,32,96,0.12)",
+            backgroundColor: "rgba(0,32,96,0.04)",
+          }}
+        >
+          <Tabs
+            value={mode}
+            onChange={(_, value) => setMode(value)}
+            variant="fullWidth"
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              minHeight: 38,
+              "& .MuiTab-root": {
+                minHeight: 38,
+                fontWeight: 700,
+              },
+            }}
+          >
+            <Tab value="listed" label="Listed" />
+            <Tab value="unlisted" label="Unlisted" />
+          </Tabs>
+        </Paper>
+
+        {mode === "listed" ? (
+          <>
         <Box display="flex" justifyContent="center" mb={3}>
           <Box sx={{ width: { xs: "100%", sm: 380, md: 440 } }}>
             <Autocomplete
@@ -288,6 +323,10 @@ const DealMeetingNotesMain: React.FC = () => {
           >
             <MeetingDealNoteCreate selectedDeal={selectedDeal} />
           </Paper>
+        )}
+          </>
+        ) : (
+          <UnlistedDealMeetingNotesMain />
         )}
       </Container>
     </>
