@@ -14,7 +14,7 @@ import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 import IPOComparablesAndAISection from "./IPOComparablesAndAISection";
 import NewFinancialTableMain from "./IPOFinancialForecast/NewFinancialTableMain";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface TickerOption {
   ticker_name: string;
@@ -49,16 +49,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
     {}
   );
   const location = useLocation();
-  const navigate = useNavigate();
   const fromTickerClick = location.state?.fromTickerClick || false;
-  useEffect(() => {
-    const targetPath = currentTicker
-      ? `/equity/ipo_dashboard/${encodeURIComponent(currentTicker)}`
-      : "/equity/ipo_dashboard";
-    if (location.pathname !== targetPath) {
-      navigate(targetPath, { replace: true });
-    }
-  }, [currentTicker, location.pathname, navigate]);
   const [noDataPopupOpen, setNoDataPopupOpen] = useState(false);
   const [, setSectionsLoaded] = useState<Record<SectionKey, boolean>>({
     core: false,

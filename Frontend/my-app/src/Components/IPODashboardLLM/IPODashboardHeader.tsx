@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -47,31 +47,6 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
   onExportPDF,
   pdfLoading,
 }) => {
-  const getOptionLabel = (option: TickerOption) => {
-    let formattedDate = "TBA";
-    if (option.pricing_date) {
-      try {
-        formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");
-      } catch {
-        formattedDate = option.pricing_date; // fallback
-      }
-    }
-    return `${option.ticker_name} (${formattedDate})`;
-  };
-
-  const displayedInputValue = searchText || selectedTicker || "";
-  useEffect(() => {
-    if (!selectedTicker) {
-      setSearchText("");
-      return;
-    }
-    const matchedOption = allIpoTickers.find((item) => item.ticker_name === selectedTicker);
-    if (matchedOption) {
-      setSearchText(getOptionLabel(matchedOption));
-    } else {
-      setSearchText(selectedTicker);
-    }
-  }, [selectedTicker, allIpoTickers, setSearchText]);
   // ✅ Sort tickers: no date → top, then newest first
   const sortedTickers = [...allIpoTickers].sort((a, b) => {
     const aTime = a.pricing_date ? Date.parse(a.pricing_date) : NaN;
@@ -124,19 +99,29 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
         </Box>
 
         {/* Search Dropdown */}
-          <Autocomplete
-            size="small"
-            options={sortedTickers}
+        <Autocomplete
+          size="small"
+          options={sortedTickers}
           className="pdf-hidden"
-          getOptionLabel={(option) => getOptionLabel(option)}
+          getOptionLabel={(option) => {
+            let formattedDate = "TBA";
+            if (option.pricing_date) {
+              try {
+                formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");
+              } catch {
+                formattedDate = option.pricing_date; // fallback
+              }
+            }
+            return `${option.ticker_name} (${formattedDate})`;
+          }}
           value={sortedTickers.find((t) => t.ticker_name === selectedTicker) || null}
           onChange={(_, newValue) => {
             setSelectedTicker(newValue ? newValue.ticker_name : null);
-            setSearchText(newValue ? getOptionLabel(newValue) : "");
+            setSearchText("");
           }}
-          inputValue={displayedInputValue}
-            onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
-            sx={{ width: { xs: "100%", sm: "300px" } }}
+          inputValue={searchText}
+          onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
+          sx={{ width: { xs: "100%", sm: "300px" } }}
           renderInput={(params) => (
             <TextField
               {...params}
