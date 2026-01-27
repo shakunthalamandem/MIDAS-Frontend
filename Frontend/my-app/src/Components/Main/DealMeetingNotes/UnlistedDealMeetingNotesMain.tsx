@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Box, Button, Paper, Stack, TextField, Typography } from "@mui/material";
-import MeetingNoteForm from "./MeetingNoteForm";
+import {
+  Alert,
+  Autocomplete,
+  Box,
+  Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import MeetingTabsBar from "./MeetingTabsBar";
 import MeetingStatusPanels from "./MeetingStatusPanels";
 import MeetingEditorActions from "./MeetingEditorActions";
@@ -17,6 +25,7 @@ import {
   initialInvestmentSnapshot,
   initialMeetingOverview,
 } from "./MeetingDealNoteCreate";
+import { LabeledTextField } from "./MeetingNoteFormFields";
 
 type Status =
   | { kind: "success"; message: string }
@@ -37,12 +46,25 @@ type MeetingEntry = {
   isNew?: boolean;
 };
 
+type SearchOption = {
+  ticker: string;
+  pricingDate?: string;
+  name?: string;
+  dealType?: string;
+  dealId?: string | number;
+  id?: number | string;
+};
+
 const UnlistedDealMeetingNotesMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useMemo(() => localStorage.getItem("access_token"), []);
 
   const [tickerInput, setTickerInput] = useState("");
-  const [pricingDateInput, setPricingDateInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchOption[]>([]);
+  const [selectedOption, setSelectedOption] = useState<SearchOption | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [meetingOverview, setMeetingOverview] = useState<MeetingOverview>(initialMeetingOverview);
   const [investmentSnapshot, setInvestmentSnapshot] = useState<InvestmentSnapshot>(
     initialInvestmentSnapshot
@@ -64,6 +86,173 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   const [pendingAction, setPendingAction] = useState<null | (() => void)>(null);
 
   const shouldShowEmptyState = meetings.length === 0;
+
+  const defaultMeetingNotes = [
+    "Dtech A/H IPO candidate TTW meeting with HSBC....",
+    "",
+    "Attending:",
+    "- Cynthia Chen (Chairlady)",
+    "- Jessie Lian (CEO)",
+    "- Olivia Chen (PR Senior Manager)",
+    "- Joy Jiang (IR Manager)",
+    "",
+    "- Li Wang (HSBC MD)",
+    "",
+    "Summary:",
+    "- Best in class fully vertically integrated precision manufacturer, aiming for A/H listing in H1 2026",
+    "- H1 2025 revenue up 27% YoY with gross margin expanding to >40% (from historical 30%+) and ROE at 12.4%",
+    "- Revenue growth driven by AI server demand and market-share gains in PCB drilling bits. No 1 globally with 29% mkt share >120M units/month.",
+    "- Vertical integration powers cost advantage. 95% of production equipment built in-house (at 30% the cost of imported alternatives)",
+    "- This enables faster capacity expansion than competitors and recent capex investments have just one-year payback",
+    "- International revenue growth has huge potential, up from 1.4% in 2022, to 8.8% H1 2025",
+    "- Thailand facility now does 40M units/month capacity",
+    "- German acquisition (MPK Camera, 2025) added high end technology and helped penetrate European market",
+    "- Hong Kong listing will accelerate overseas expansion, M&A and global talent incentives",
+    "- Automation roadmap targets one-third headcount reduction by 2027-2028, positioning the company for projected 2029-2030 industry downturn",
+    "",
+    "Full meeting notes....",
+    "Company Background:",
+    "- 30 years in PCB and advanced manufacturing, first branch opened in 2002",
+    "- Went public in 2022, accelerating international expansion",
+    "- Expanded into Grinding and polishing, functional film and Intelligent Equipment",
+    "",
+    "Divisions:",
+    "- PCB Drilling Bits (Primary Revenue Driver)",
+    "- Global market leader with 29% market share, expected to exceed 30% in 2025",
+    "- Produces over 120 million geodes monthly",
+    "- Covers 70%+ of top 100 PCB manufacturers globally, including 9 of top 10",
+    "- High demand from AI server manufacturing requiring longer, more resilient bits for harder boards",
+    "",
+    "Other Lines:",
+    "- Functional films for automotive, new energy vehicles, glass surfaces, and touch controls",
+    "- Polishing/grinding materials with 70% gross margins, including non-woven and ceramic-based grinding wheels",
+    "- CNC and smart equipment, recently launching intelligent drill bit storage systems, laser drilling machines, and coating equipment",
+    "- Industry-leading intelligent drill geode storage system strengthens customer stickiness",
+    "",
+    "Organization:",
+    "- 4,000 employees including 400+ technical engineers and R&D personnel",
+    "- Headcount elevated due to capacity expansion phase",
+    "- Expected significant reduction by 2027-2028 through automation and intelligent manufacturing",
+    "- Multiple independent business units with separate financial accounting and incentive mechanisms",
+    "- Core culture: no product operates at a loss or without growth; aim for top-three position in every category entered, many targeting number-one",
+    "",
+    "Vertical Integration:",
+    "- Identified equipment manufacturing as bottleneck when entering PCB drilling bit market in 2005-2006",
+    "- Built production equipment in-house due to limited capital",
+    "- Current equipment precision and efficiency exceed imported standards at 30% of cost",
+    "- Produces approximately 30 units monthly versus Swiss competitor's 100 units annually",
+    "- Achieved global number-one position by 2020, surpassing Japanese competitors with 40-60 years of production history",
+    "- Maintained strong manufacturing capability during 2020 COVID disruptions when competitors faced supply issues",
+    "- 95% of production equipment developed in-house; only 5% outsourced for general machine beds",
+    "- Applied same strategy to grinding wheels",
+    "- Partnered with 3M to develop non-woven fabric capabilities after identifying material sourcing as critical bottleneck",
+    "- Now produces ceramic grinding wheels in-house, including ceramic powder and sintering processes",
+    "",
+    "Strategic Approach:",
+    "- Philosophy: analyze supply chain to identify single critical bottleneck, then assess if company can control it",
+    "- During downturns, competitors engage in price wars while company increases automation and jointly develops new high-margin products with customers",
+    "- Only three companies can provide volume, cost-efficient products for demanding AI server specs: DTEC, Jinzhou (state-owned with limited expansion capability), and Union Tool Japan (limited capacity expansion speed)",
+    "- DTEC best positioned to capture growth due to equipment manufacturing capability and private company flexibility",
+    "",
+    "Market Position:",
+    "- PCB industry consolidating; top 5 players account for 75%+ of geode market",
+    "- In 2023 downturn, domestic competitors declined 20% while Dtech grew 20%!",
+    "- Competitors cannot match capacity expansion speed; company captures majority of industry growth",
+    "",
+    "Financial Performance:",
+    "- Revenue CAGR 2022-2024: approximately 40%",
+    "- H1 2025 YoY growth accelerating: 27%, driven by AI server boom and market share gains",
+    "- Gross margins historically above 30%, expected to exceed 40% in 2025",
+    "- ROE currently 12.4% for H1 2025 (up from approximately 9% in 2023)",
+    "- Recent capex (2026-2027) can achieve payback within one year at latest pricing!",
+    "- Company doesn't publicly market strong ROE to avoid concerning customers",
+    "",
+    "International Expansion Plans:",
+    "- Thailand facility produces approximately 40 million units monthly",
+    "- Overseas revenue increased from 1.4% in 2022 to 8.8% in H1 2025",
+    "- Expansion helps avoid tariffs",
+    "- Acquired German company MPK Camera in 2025, gaining leading technology, distribution, clients, and brand for high-end European market",
+    "- Established technology center in Germany",
+    "- Major customers across Europe, Korea, Japan, Thailand, Vietnam, and Malaysia",
+    "",
+    "Growth Strategy:",
+    "- Deepen portfolio across tools, materials, and equipment",
+    "- Invest in talent, technology innovation, selective acquisitions, and global expansion",
+    "- Expand domestic and overseas capacity",
+    "- Prepare for potential 2029-2030 downturn by maintaining high margins on high-end products while reducing human cost by one-third on standard products through automation",
+    "",
+    "Hong Kong Listing Rationale:",
+    "- Provides global capital markets access for international expansion and acquisitions, enabling quick fundraising when opportunities arise",
+    "- Attracts high-quality international shareholders to improve governance",
+    "- Enables stock equity incentives for global talent (not available through domestic A-share listing)",
+    "",
+    "Leadership:",
+    "- Jessie Wang started at age 16 in 1989 as production line worker - developed excellent company culture.",
+    "- Advanced to team leader within one year, workshop director by ages 19-20",
+    "- Transitioned to sales, learned Cantonese for circuit board industry work",
+    "- Started trading company in 1997 with brother, operated for seven years before launching manufacturing factory in 2005",
+    "- Brother provides technical expertise, complementing chairlady's marketing and business development strengths, excellent team.",
+    "",
+    "To do:",
+    "- Peer fundamental analysis and comparisons in Midas",
+    "- Feedback to HSBC",
+    "- Timeline check",
+    "- Email banker",
+    "- Email management",
+    "",
+    "Follow up questions to Management:",
+    "- Dividend payout ratio plan?",
+    "- Acquisition focus, country or sector?",
+    "- Key clients and concentration?",
+    "- Recent pricing trends?",
+  ].join("\n");
+
+  const createDefaultMeeting = () => {
+    const templateMeeting: MeetingEntry = {
+      meetingKey: "meeting1",
+      form: {
+        meetingOverview: {
+          ...initialMeetingOverview,
+          ticker: "DTECH",
+          name: "Dtech A/H IPO candidate TTW meeting with HSBC",
+          date: "",
+          location: "",
+          reason: "",
+          broker: "HSBC",
+          attendees:
+            "Cynthia Chen (Chairlady), Jessie Lian (CEO), Olivia Chen (PR Senior Manager), Joy Jiang (IR Manager)",
+          bankerAttendees: "Li Wang (HSBC MD)",
+        },
+        investmentSnapshot: {
+          ...initialInvestmentSnapshot,
+          oneLineSummary:
+            "Best in class fully vertically integrated precision manufacturer aiming for A/H listing in H1 2026.",
+          executiveSummary:
+            "H1 2025 revenue up 27% YoY with gross margin expanding to >40% and ROE at 12.4%.",
+          results: "Peer fundamental analysis and comparisons in Midas\nFeedback to HSBC\nTimeline check\nEmail banker\nEmail management",
+        },
+        businessStrategy: {
+          ...initialBusinessStrategy,
+          meetingNotes: defaultMeetingNotes,
+        },
+        capitalStructure: {
+          ...initialCapitalStructure,
+          followUpQuestions:
+            "Dividend payout ratio plan?\nAcquisition focus, country or sector?\nKey clients and concentration?\nRecent pricing trends?",
+        },
+      },
+      isNew: true,
+    };
+
+    setMeetings([templateMeeting]);
+    setSelectedMeetingIndex(0);
+    setCurrentMeetingId(null);
+    setCurrentMeetingKey("meeting1");
+    applyMeetingToForm(templateMeeting);
+    setIsEditing(true);
+    setNoDataFound(false);
+    setTickerInput("DTECH");
+  };
 
   const getNextMeetingKey = () => {
     if (meetings.length === 0) return "meeting1";
@@ -176,6 +365,84 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    if (!apiUrl) {
+      setSearchError("REACT_APP_API_URL is not configured.");
+      return;
+    }
+
+    const term = searchTerm.trim();
+
+    const controller = new AbortController();
+    const handle = window.setTimeout(() => {
+      const fetchResults = async () => {
+        setSearching(true);
+        setSearchError(null);
+
+        try {
+          const params = new URLSearchParams();
+          if (term) {
+            params.set("ticker", term);
+            params.set("company_name", term);
+          }
+          const query = params.toString() ? `?${params.toString()}` : "";
+          const response = await fetch(`${apiUrl}/api/get_unlisted_deal_meeting/${query}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message || `Request failed with status ${response.status}`);
+          }
+
+          const json = await response.json();
+          if (json?.message) {
+            setSearchResults([]);
+            return;
+          }
+
+          const payload = Array.isArray(json)
+            ? json
+            : Array.isArray(json?.data)
+            ? json.data
+            : Array.isArray(json?.results)
+            ? json.results
+            : [];
+
+          const normalized = (payload as any[])
+            .map((item) => ({
+              ticker: (item?.ticker || item?.symbol || item?.fs_ticker || "").toUpperCase(),
+              pricingDate: item?.pricing_date || item?.pricingDate || item?.pricingdate || "",
+              name: item?.company_name || item?.issuer_name || item?.name || "",
+              dealType: item?.deal_type || "",
+              dealId: item?.deal_id ?? null,
+              id: item?.id ?? item?.pk ?? null,
+            }))
+            .filter((item) => item.ticker);
+
+          setSearchResults(normalized);
+        } catch (err: any) {
+          if (err.name === "AbortError") return;
+          console.error("Error fetching unlisted meetings:", err);
+          setSearchError("Unable to fetch unlisted meetings. Please try again.");
+        } finally {
+          setSearching(false);
+        }
+      };
+
+      fetchResults();
+    }, 250);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(handle);
+    };
+  }, [apiUrl, token, searchTerm]);
+
   const createNewMeetingFromTemplate = (resetExisting = false) => {
     const meetingKey = getNextMeetingKey();
     const templateMeeting: MeetingEntry = {
@@ -271,14 +538,14 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     handleConfirmClose();
   };
 
-  const loadNotes = async () => {
+  const loadNotes = async (tickerOverride?: string, pricingOverride?: string) => {
     if (!apiUrl) {
       setStatus({ kind: "error", message: "REACT_APP_API_URL is not set." });
       return;
     }
 
-    const ticker = tickerInput.trim();
-    const pricingDate = pricingDateInput.trim();
+    const ticker = (tickerOverride ?? tickerInput).trim();
+    const pricingDate = (pricingOverride ?? "").trim();
     if (!ticker || !pricingDate) {
       setStatus({ kind: "error", message: "Ticker and pricing date are required." });
       return;
@@ -339,7 +606,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     const shouldCreate = isNewMeeting && !hasExistingMeetingInDb;
 
     const normalizedTicker = meetingOverview.ticker.trim();
-    const pricingDate = pricingDateInput.trim();
+    const pricingDate = meetingOverview.date.trim();
 
     if (!normalizedTicker) {
       setStatus({ kind: "error", message: "Ticker is required." });
@@ -466,25 +733,71 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             Unlisted Meeting Notes
           </Typography>
           <Box display="flex" flexWrap="wrap" gap={2} alignItems="center">
-            <TextField
-              size="small"
-              label="Ticker"
-              value={tickerInput}
-              onChange={(e) => setTickerInput(e.target.value.toUpperCase())}
-              sx={{ minWidth: 160 }}
-            />
-            <TextField
-              size="small"
-              label="Pricing Date"
-              type="date"
-              value={pricingDateInput}
-              onChange={(e) => setPricingDateInput(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              sx={{ minWidth: 200 }}
+            <Autocomplete
+              options={searchResults}
+              value={selectedOption}
+              inputValue={searchTerm}
+              loading={searching}
+              autoHighlight
+              getOptionLabel={(option) => {
+                const dateLabel = option.pricingDate ? ` (${option.pricingDate})` : "";
+                return `${option.ticker}${dateLabel}`;
+              }}
+              isOptionEqualToValue={(option, value) =>
+                option.ticker === value.ticker &&
+                (option.pricingDate ?? "") === (value.pricingDate ?? "")
+              }
+              onInputChange={(_, value, reason) => {
+                if (reason === "input" || reason === "clear") {
+                  setSearchTerm(value || "");
+                  setSearchResults([]);
+                  setSearchError(null);
+                }
+              }}
+              onChange={(_, value) => {
+                setSelectedOption(value);
+                if (!value) return;
+                setSearchTerm(value.ticker);
+                const nextTicker = value.ticker.toUpperCase();
+                const nextPricingDate = value.pricingDate || "";
+                requestDiscardConfirm(() => {
+                  setTickerInput(nextTicker);
+                  setMeetingOverview((prev) => ({
+                    ...prev,
+                    ticker: nextTicker,
+                    name: value.name || prev.name,
+                  }));
+                  loadNotes(nextTicker, nextPricingDate);
+                });
+              }}
+              renderOption={(props, option) => (
+                <li {...props} key={`${option.ticker}-${option.pricingDate ?? "na"}`}>
+                  <Box display="flex" flexDirection="column">
+                    <Typography fontWeight={700} sx={{ color: "#002060" }}>
+                      {option.ticker}
+                      {option.pricingDate ? ` (${option.pricingDate})` : ""}
+                    </Typography>
+                    {option.name || option.dealType ? (
+                      <Typography variant="caption" color="text.secondary">
+                        {[option.name, option.dealType].filter(Boolean).join(" • ")}
+                      </Typography>
+                    ) : null}
+                  </Box>
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  label="Search unlisted meeting notes"
+                  placeholder="Type ticker or company..."
+                  sx={{ minWidth: 320 }}
+                />
+              )}
             />
             <Button
               variant="contained"
-              onClick={() => requestDiscardConfirm(loadNotes)}
+              onClick={() => requestDiscardConfirm(createDefaultMeeting)}
               sx={{
                 textTransform: "none",
                 borderRadius: 999,
@@ -492,28 +805,18 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                 background: "linear-gradient(90deg, #0062ff 0%, #00c2a2 100%)",
               }}
             >
-              Load Notes
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() =>
-                requestDiscardConfirm(() => {
-                  setMeetings([]);
-                  setSelectedMeetingIndex(0);
-                  setCurrentMeetingId(null);
-                  setCurrentMeetingKey("meeting1");
-                  setNoDataFound(false);
-                  setStatus(null);
-                })
-              }
-              sx={{ textTransform: "none", borderRadius: 999 }}
-            >
-              Clear
+              Create
             </Button>
           </Box>
-          <Typography variant="caption" color="text.secondary">
-            Enter a ticker and pricing date to load existing unlisted meeting notes.
-          </Typography>
+          {searchError ? (
+            <Typography variant="caption" color="error">
+              {searchError}
+            </Typography>
+          ) : (
+            <Typography variant="caption" color="text.secondary">
+              Search existing unlisted meetings, or click Create to start a new note.
+            </Typography>
+          )}
         </Stack>
       </Paper>
 
@@ -598,17 +901,78 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             </Alert>
           ) : null}
 
-          <MeetingNoteForm
-            meetingOverview={meetingOverview}
-            setMeetingOverview={setMeetingOverview}
-            investmentSnapshot={investmentSnapshot}
-            setInvestmentSnapshot={setInvestmentSnapshot}
-            businessStrategy={businessStrategy}
-            setBusinessStrategy={setBusinessStrategy}
-            capitalStructure={capitalStructure}
-            setCapitalStructure={setCapitalStructure}
-            isEditing={isEditing}
-          />
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, md: 3 },
+              borderRadius: 3,
+              border: "1px solid rgba(0,32,96,0.12)",
+              backgroundColor: "#fff",
+            }}
+          >
+            <Stack spacing={2}>
+              <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                Meeting Notes Form
+              </Typography>
+              <LabeledTextField
+                label="Heading"
+                value={meetingOverview.name}
+                onChange={(val) => setMeetingOverview((prev) => ({ ...prev, name: val }))}
+                isEditing={isEditing}
+                options={{ required: true }}
+              />
+              <LabeledTextField
+                label="Attending (Management)"
+                value={meetingOverview.attendees}
+                onChange={(val) => setMeetingOverview((prev) => ({ ...prev, attendees: val }))}
+                isEditing={isEditing}
+              />
+              <LabeledTextField
+                label="Attending (Bankers)"
+                value={meetingOverview.bankerAttendees}
+                onChange={(val) =>
+                  setMeetingOverview((prev) => ({ ...prev, bankerAttendees: val }))
+                }
+                isEditing={isEditing}
+              />
+              <LabeledTextField
+                label="Summary"
+                value={investmentSnapshot.executiveSummary}
+                onChange={(val) =>
+                  setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val }))
+                }
+                isEditing={isEditing}
+                options={{ multiline: true }}
+              />
+              <LabeledTextField
+                label="Full Meeting Notes"
+                value={businessStrategy.meetingNotes}
+                onChange={(val) =>
+                  setBusinessStrategy((prev) => ({ ...prev, meetingNotes: val }))
+                }
+                isEditing={isEditing}
+                options={{ multiline: true }}
+              />
+              <LabeledTextField
+                label="To Do"
+                value={investmentSnapshot.results}
+                onChange={(val) =>
+                  setInvestmentSnapshot((prev) => ({ ...prev, results: val }))
+                }
+                isEditing={isEditing}
+                options={{ multiline: true }}
+              />
+              <LabeledTextField
+                label="Follow Up Questions"
+                value={capitalStructure.followUpQuestions}
+                onChange={(val) =>
+                  setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val }))
+                }
+                isEditing={isEditing}
+                options={{ multiline: true }}
+              />
+            </Stack>
+          </Paper>
         </>
       ) : null}
 
