@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, CircularProgress, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Grid,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
@@ -13,6 +22,8 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import TableRowsIcon from "@mui/icons-material/TableRows";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
 import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
@@ -502,20 +513,59 @@ const NewDealsLifecycleCards: React.FC = () => {
           maxWidth="xl"
           sx={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: { xs: "flex-start", md: "center" },
+            justifyContent: "space-between",
             mb: 1.5,
             px: 1,
-            gap: 1.25,
+            gap: 1.5,
             flexWrap: "wrap",
           }}
         >
+          <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
           <RegionTabs
             tabs={regionTabs}
             selectedRegion={selectedRegion}
             onSelect={(value) => setSelectedRegion(value as any)}
           />
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
+          >
+            <ToggleButtonGroup
+              size="small"
+              value={viewMode}
+              exclusive
+              onChange={(_e, value) => value && setViewMode(value)}
+              sx={{
+                backgroundColor: "#ffffff",
+                borderRadius: 999,
+                border: "1px solid #d7ddea",
+                ml: { md: "auto" },
+                "& .MuiToggleButton-root": {
+                  border: 0,
+                  px: 1,
+                  py: 0.4,
+                  minWidth: 72,
+                  color: "#6a7286",
+                  textTransform: "none",
+                  fontWeight: 600,
+                },
+                "& .Mui-selected": {
+                  color: "#ffff",
+                  backgroundColor: "#002060",
+                },
+              }}
+            >
+              <ToggleButton value="card" aria-label="Card view">
+                Card View
+              </ToggleButton>
+              <ToggleButton value="table" aria-label="Table view">
+                Table View
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
         </Container>
       </Container>
 
@@ -547,8 +597,6 @@ const NewDealsLifecycleCards: React.FC = () => {
             setDealSearch={setDealSearch}
             pipelineSearch={pipelineSearch}
             setPipelineSearch={setPipelineSearch}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
 
           {isPipelineView ? (
