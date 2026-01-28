@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -37,6 +38,19 @@ interface TickerData {
   expected_listing_date?: string | null;
 }
 
+const formatTickerLabel = (option?: TickerData) => {
+  if (!option) return "";
+  let formattedDate = "TBA";
+  if (option.pricing_date) {
+    try {
+      formattedDate = format(new Date(option.pricing_date), "dd MMM yyyy");
+    } catch {
+      formattedDate = option.pricing_date || "N/A";
+    }
+  }
+  return `${option.ticker} (${formattedDate})`;
+};
+
 const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   ticker,
   deal_id,
@@ -50,6 +64,7 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   const [ipoData, setIpoData] = useState<TickerData | null>(null);
   const [sortedTickers, setSortedTickers] = useState<TickerData[]>([]);
   const [searchText, setSearchText] = useState<string>(ticker);
+  const navigate = useNavigate();
 
   // 🔹 Fetch ticker list for search
   useEffect(() => {
@@ -108,11 +123,21 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   useEffect(() => {
     if (selected?.ticker) {
       fetchIpoDetails(selected.ticker);
-      setSearchText("");
     } else if (ticker) {
       fetchIpoDetails(ticker);
     }
   }, [selected, ticker]);
+
+  useEffect(() => {
+    const activeTicker = selected?.ticker || ticker;
+    if (!activeTicker) {
+      setSearchText("");
+      return;
+    }
+    const match = sortedTickers.find((t) => t.ticker === activeTicker);
+    setSearchText(formatTickerLabel(match || undefined) || activeTicker);
+  }, [ticker, selected?.ticker, sortedTickers]);
+
 
   // Export Monashee-style PDF via shared hook
   const [forceExpand, setForceExpand] = useState(false);
@@ -128,10 +153,19 @@ const FOSectionsMain: React.FC<FOSectionsMainProps> = ({
   };
 
 const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
-  if (newValue) {
-    setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
-  }
+  if (!newValue) return;
+
+  setSelected({ ticker: newValue.ticker, deal_id: newValue.deal_id });
+
+  // 🔑 UPDATE URL (same as IPO write-up)
+  navigate(`/equity/fo_dashboard/${encodeURIComponent(newValue.ticker)}`, {
+    replace: false,
+    state: { deal_id: newValue.deal_id },
+  });
+
+  setSearchText(formatTickerLabel(newValue));
 };
+
 
 
   return (
@@ -196,9 +230,12 @@ const handleAutocompleteChange = (_: any, newValue: TickerData | null) => {
           }}
           value={sortedTickers.find((t) => t.ticker === selected?.ticker) || null}
           onChange={handleAutocompleteChange}
-          onOpen={() => setSearchText("")}
+          // onOpen={() => setSearchText("")}
           inputValue={searchText}
-          onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
+          onInputChange={(_, newInputValue, reason) => {
+            if (reason === "reset") return;
+            setSearchText(newInputValue);
+          }}
           sx={{ width: { xs: "100%", sm: "300px" } }}
           renderInput={(params) => (
             <TextField

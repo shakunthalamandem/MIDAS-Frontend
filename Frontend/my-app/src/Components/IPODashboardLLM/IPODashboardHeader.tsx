@@ -15,6 +15,8 @@ import IPOdashboardLine from "./IPOdashboardLine";
 import IPODealSummarySection from "./IPODealSummarySection";
 import IPOSummaryTable from "./IPODashboardMain/IPOSummaryTable";
 import IPOValuationSection from "./IPOValuationSection";
+import { useEffect } from "react";
+
 
 interface TickerOption {
   ticker_name: string;
@@ -59,6 +61,32 @@ const IPODashboardHeader: React.FC<IPODashboardHeaderProps> = ({
     if (!bValid) return -1;
     return bTime - aTime;
   });
+
+  useEffect(() => {
+  if (!selectedTicker) return;
+
+  const match = sortedTickers.find(
+    (t) => t.ticker_name === selectedTicker
+  );
+
+  if (match) {
+    let formattedDate = "TBA";
+    if (match.pricing_date) {
+      try {
+        formattedDate = format(
+          new Date(match.pricing_date),
+          "dd MMM yyyy"
+        );
+      } catch {
+        formattedDate = match.pricing_date;
+      }
+    }
+
+    // 🔑 URL → search bar sync
+    setSearchText(`${match.ticker_name} (${formattedDate})`);
+  }
+}, [selectedTicker, sortedTickers, setSearchText]);
+
 
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
