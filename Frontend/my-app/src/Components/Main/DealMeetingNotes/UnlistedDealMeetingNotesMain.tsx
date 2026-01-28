@@ -362,9 +362,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     );
   };
 
-  const createNewMeetingFromTemplate = (resetExisting = false) => {
+  const createNewMeetingFromTemplate = (resetExisting = false, companyOverride?: string) => {
     const meetingKey = getNextMeetingKey();
-    const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
+    const normalizedCompany = (companyOverride || selectedCompanyName || companyNameInput).trim();
     const templateMeeting: MeetingEntry = {
       meetingKey,
       form: {
@@ -396,8 +396,13 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     const updated = resetExisting ? [templateMeeting] : [...meetings, templateMeeting];
     setMeetings(updated);
     setSelectedMeetingIndex(updated.length - 1);
-    applyMeetingToForm(templateMeeting);
+    setMeetingOverview(templateMeeting.form.meetingOverview);
+    setInvestmentSnapshot(templateMeeting.form.investmentSnapshot);
+    setBusinessStrategy(templateMeeting.form.businessStrategy);
+    setCapitalStructure(templateMeeting.form.capitalStructure);
+    setSectionNotes(templateMeeting.form.sectionNotes);
     setCurrentMeetingId(null);
+    setCurrentMeetingKey(meetingKey);
     setIsEditing(true);
     setNoDataFound(false);
     setSelectedCompanyName(normalizedCompany);
@@ -698,12 +703,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           onCreate={() =>
             requestDiscardConfirm(() => {
               const normalizedCompany = companyNameInput.trim();
-              if (!normalizedCompany) {
-                setStatus({ kind: "error", message: "Company name is required." });
-                return;
-              }
               setSelectedCompanyName(normalizedCompany);
-              createNewMeetingFromTemplate(true);
+              createNewMeetingFromTemplate(true, normalizedCompany);
             })
           }
           onInputChange={(value) => {
@@ -814,12 +815,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         loading={loadingMeetings}
         onCreateNew={() => {
           const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
-          if (!normalizedCompany) {
-            setStatus({ kind: "error", message: "Company name is required." });
-            return;
-          }
           setSelectedCompanyName(normalizedCompany);
-          createNewMeetingFromTemplate(true);
+          createNewMeetingFromTemplate(true, normalizedCompany);
         }}
       />
 
