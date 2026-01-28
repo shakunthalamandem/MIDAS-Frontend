@@ -164,137 +164,164 @@ const DealMeetingNotesMain: React.FC = () => {
         Deal Meeting Notes  📊
       </Typography>
 
-      <Container maxWidth="xl" sx={{mb:4}}>
-        <Paper
-          elevation={0}
-          sx={{
-            mb: 3,
-            p: 0.5,
-            borderRadius: 999,
-            border: "1px solid rgba(0,32,96,0.12)",
-            backgroundColor: "rgba(0,32,96,0.04)",
-          }}
+      <Container maxWidth="xl" sx={{ mb: 4 }}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          flexWrap="wrap"
+          gap={2}
+          mb={3}
         >
-          <Tabs
-            value={mode}
-            onChange={(_, value) => setMode(value)}
-            variant="fullWidth"
-            textColor="primary"
-            indicatorColor="primary"
+          <Paper
+            elevation={0}
             sx={{
-              minHeight: 38,
-              "& .MuiTab-root": {
-                minHeight: 38,
-                fontWeight: 700,
-              },
+              p: 0.5,
+              borderRadius: 999,
+              background: "linear-gradient(90deg, #5b1db3 0%, #7b2ff2 100%)",
+              boxShadow: "0 10px 24px rgba(40, 10, 80, 0.2)",
             }}
           >
-            <Tab value="listed" label="Listed" />
-            <Tab value="unlisted" label="Unlisted" />
-          </Tabs>
-        </Paper>
+            <Tabs
+              value={mode}
+              onChange={(_, value) => setMode(value)}
+              variant="standard"
+              textColor="inherit"
+              TabIndicatorProps={{ style: { display: "none" } }}
+              sx={{
+                minHeight: 40,
+                "& .MuiTabs-flexContainer": {
+                  gap: 6,
+                },
+                "& .MuiTab-root": {
+                  minHeight: 40,
+                  minWidth: 120,
+                  px: 3,
+                  fontWeight: 700,
+                  textTransform: "none",
+                  color: "rgba(255,255,255,0.95)",
+                  borderRadius: 999,
+                  transition: "all 180ms ease",
+                },
+                "& .MuiTab-root.Mui-selected": {
+                  color: "#4a178f",
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 6px 14px rgba(20, 10, 40, 0.18)",
+                },
+                "& .MuiTab-root:hover": {
+                  color: "#ffffff",
+                  opacity: 0.95,
+                },
+              }}
+            >
+              <Tab value="listed" label="Listed Companies" />
+              <Tab value="unlisted" label="Unlisted Companies" />
+            </Tabs>
+          </Paper>
+
+          {mode === "listed" ? (
+            <Box sx={{ width: { xs: "100%", sm: 360, md: 440 }, ml: { sm: "auto" } }}>
+              <Autocomplete
+                options={allDeals}
+                value={selectedDeal}
+                inputValue={searchTerm}
+                loading={searching}
+                autoHighlight
+                noOptionsText={
+                  searchTerm
+                    ? "No matches found and Create this Ticker in the New Deal Form"
+                    : "Type a ticker or company name"
+                }
+                getOptionLabel={(option) => {
+                  const dateLabel = formatPricingDate(option.pricingDate);
+                  return `${option.ticker}${dateLabel ? ` (${dateLabel})` : ""}`;
+                }}
+                isOptionEqualToValue={(option, value) =>
+                  option.ticker === value.ticker && (option.dealId ?? "") === (value.dealId ?? "")
+                }
+                onInputChange={(_, value, reason) => {
+                  if (reason === "input" || reason === "clear") {
+                    setSearchTerm(value || "");
+                    setAllDeals([]);
+                  }
+                }}
+                onChange={(_, value) => {
+                  setSelectedDeal(value);
+                  if (value?.ticker) setSearchTerm(value.ticker);
+                }}
+                filterOptions={(opts, state) => {
+                  const term = norm(state.inputValue || "");
+                  const t = (d: DealSearchResult) => norm(d.ticker);
+
+                  if (!term) {
+                    return [...opts].sort((a, b) => t(a).localeCompare(t(b)));
+                  }
+
+                  return opts;
+                }}
+                renderOption={(props, option) => (
+                  <li {...props} key={`${option.ticker}-${option.dealId ?? option.name ?? "deal"}`}>
+                    <Box display="flex" flexDirection="column">
+                      <Typography fontWeight={700} sx={{ color: "#002060" }}>
+                        {option.ticker}
+                        <span style={{ fontSize: "13px", color: "#5D0163" }}>
+                          {option.pricingDate ? ` (${formatPricingDate(option.pricingDate)})` : ""}
+                        </span>
+                      </Typography>
+                      {option.name ? (
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                          {option.name}
+                        </Typography>
+                      ) : null}
+                    </Box>
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size="small"
+                    label="Search ticker"
+                    placeholder="Type to search..."
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <>
+                          {searching ? <CircularProgress color="primary" size={18} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "16px",
+                        backgroundColor: "#fff",
+                      },
+                      "& .MuiInputLabel-root": {
+                        color: "#0050c8",
+                      },
+                      "& .MuiInputBase-input": {
+                        color: "#002060",
+                      },
+                    }}
+                  />
+                )}
+              />
+              {searchError ? (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                  {searchError}
+                </Typography>
+              ) : null}
+            </Box>
+          ) : null}
+        </Box>
 
         {mode === "listed" ? (
           <>
-        <Box display="flex" justifyContent="center" mb={3}>
-          <Box sx={{ width: { xs: "100%", sm: 380, md: 440 } }}>
-            <Autocomplete
-              options={allDeals}
-              value={selectedDeal}
-              inputValue={searchTerm}
-              loading={searching}
-              autoHighlight
-              noOptionsText={searchTerm ? "No matches found and Create this Ticker in the New Deal Form" : "Type a ticker or company name"}
-              getOptionLabel={(option) => {
-                const dateLabel = formatPricingDate(option.pricingDate);
-                return `${option.ticker}${dateLabel ? ` (${dateLabel})` : ""}`;
-              }}
-              isOptionEqualToValue={(option, value) =>
-                option.ticker === value.ticker && (option.dealId ?? "") === (value.dealId ?? "")
-              }
-              onInputChange={(_, value, reason) => {
-                if (reason === "input" || reason === "clear") {
-                  setSearchTerm(value || "");
-                  setAllDeals([]);
-                }
-              }}
-              onChange={(_, value) => {
-                setSelectedDeal(value);
-                if (value?.ticker) setSearchTerm(value.ticker);
-              }}
-              filterOptions={(opts, state) => {
-                const term = norm(state.inputValue || "");
-                const t = (d: DealSearchResult) => norm(d.ticker);
-
-                if (!term) {
-                  return [...opts].sort((a, b) => t(a).localeCompare(t(b)));
-                }
-
-                return opts;
-              }}
-              renderOption={(props, option) => (
-                <li {...props} key={`${option.ticker}-${option.dealId ?? option.name ?? "deal"}`}>
-                  <Box display="flex" flexDirection="column">
-                    <Typography fontWeight={700} sx={{ color: "#002060" }}>
-                      {option.ticker}
-                     <span style={{fontSize:'13px',color:'#5D0163'}}>{option.pricingDate ? ` (${formatPricingDate(option.pricingDate)})` : ""}</span> 
-                    </Typography>
-                    {option.name ? (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontSize: "0.7rem" }}
-                      >
-                        {option.name}
-                      </Typography>
-                    ) : null}
-                  </Box>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  size="small"
-                  label="Search ticker"
-                  placeholder="Type to search..."
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon color="action" fontSize="small" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <>
-                        {searching ? <CircularProgress color="primary" size={18} /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "16px",
-                      backgroundColor: "#fff",
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#0050c8",
-                    },
-                    "& .MuiInputBase-input": {
-                      color: "#002060",
-                    },
-                  }}
-                />
-              )}
-            />
-
-            {searchError ? (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
-                {searchError}
-              </Typography>
-            ) : null}
-          </Box>
-        </Box>
-
         {/* ✅ Show ONLY the upper message box when no ticker is selected */}
         {!selectedDeal ? (
           <Paper
