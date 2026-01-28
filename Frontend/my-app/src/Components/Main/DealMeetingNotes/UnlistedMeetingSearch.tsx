@@ -19,6 +19,7 @@ type UnlistedMeetingSearchProps = {
   token: string | null;
   onSelect: (option: UnlistedMeetingSearchOptionData) => void;
   onCreate: () => void;
+  onInputChange: (value: string) => void;
 };
 
 const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
@@ -26,6 +27,7 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
   token,
   onSelect,
   onCreate,
+  onInputChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<UnlistedMeetingSearchOptionData[]>([]);
@@ -138,6 +140,7 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
               setSearchTerm(value || "");
               setSearchResults([]);
               setSearchError(null);
+              onInputChange(value || "");
             }
           }}
           onChange={(_, value) => {

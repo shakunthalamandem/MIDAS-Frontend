@@ -20,6 +20,7 @@ type Status =
 
 export const initialMeetingOverview: MeetingOverview = {
   ticker: "",
+  companyName: "",
   name: "",
   date: "",
   location: "",
@@ -164,6 +165,8 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     form: {
       meetingOverview: {
         ticker: (overview?.ticker || record?.ticker || selectedDeal?.ticker || "").toUpperCase(),
+        companyName:
+          overview?.company_name || overview?.name || record?.issuer_name || record?.company_name || "",
         name: overview?.name || "",
         date: overview?.date || record?.pricing_date || selectedDeal?.pricingDate || "",
         location: overview?.location || "",
