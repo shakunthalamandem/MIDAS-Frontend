@@ -60,7 +60,6 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
         try {
           const params = new URLSearchParams();
           if (term) {
-            params.set("ticker", term);
             params.set("company_name", term);
           }
           const query = params.toString() ? `?${params.toString()}` : "";
@@ -90,14 +89,14 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
 
           const normalized = (payload as any[])
             .map((item) => ({
-              ticker: (item?.ticker || item?.symbol || item?.fs_ticker || "").toUpperCase(),
-              pricingDate: item?.pricing_date || item?.pricingDate || item?.pricingdate || "",
+              ticker: "",
+              pricingDate: "",
               name: item?.company_name || item?.issuer_name || item?.name || "",
               dealType: item?.deal_type || "",
               dealId: item?.deal_id ?? null,
               id: item?.id ?? item?.pk ?? null,
             }))
-            .filter((item) => item.ticker);
+            .filter((item) => item.name);
 
           setSearchResults(normalized);
         } catch (err: any) {
@@ -127,13 +126,9 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
           inputValue={searchTerm}
           loading={searching}
           autoHighlight
-          getOptionLabel={(option) => {
-            const dateLabel = option.pricingDate ? ` (${option.pricingDate})` : "";
-            return `${option.ticker}${dateLabel}`;
-          }}
+          getOptionLabel={(option) => option.name || ""}
           isOptionEqualToValue={(option, value) =>
-            option.ticker === value.ticker &&
-            (option.pricingDate ?? "") === (value.pricingDate ?? "")
+            option.name === value.name && (option.dealId ?? "") === (value.dealId ?? "")
           }
           onInputChange={(_, value, reason) => {
             if (reason === "input" || reason === "clear") {
@@ -146,11 +141,11 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
           onChange={(_, value) => {
             setSelectedOption(value);
             if (!value) return;
-            setSearchTerm(value.ticker);
+            setSearchTerm(value.name || "");
             onSelect(value);
           }}
           renderOption={(props, option) => (
-            <li {...props} key={`${option.ticker}-${option.pricingDate ?? "na"}`}>
+            <li {...props} key={`${option.name}-${option.dealId ?? option.id ?? "company"}`}>
               <UnlistedMeetingSearchOption option={option} />
             </li>
           )}

@@ -15,14 +15,8 @@ const UnlistedMeetingSearchOption: React.FC<{ option: UnlistedMeetingSearchOptio
 }) => (
   <Box display="flex" flexDirection="column">
     <Typography fontWeight={700} sx={{ color: "#002060" }}>
-      {option.ticker}
-      {option.pricingDate ? ` (${option.pricingDate})` : ""}
+      {option.name}
     </Typography>
-    {option.name || option.dealType ? (
-      <Typography variant="caption" color="text.secondary">
-        {[option.name, option.dealType].filter(Boolean).join(" - ")}
-      </Typography>
-    ) : null}
   </Box>
 );
 

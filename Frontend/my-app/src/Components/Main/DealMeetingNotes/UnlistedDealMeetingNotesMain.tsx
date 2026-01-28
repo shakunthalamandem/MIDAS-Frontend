@@ -65,8 +65,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = useMemo(() => localStorage.getItem("access_token"), []);
 
-  const [tickerInput, setTickerInput] = useState("");
   const [companyNameInput, setCompanyNameInput] = useState("");
+  const [selectedCompanyName, setSelectedCompanyName] = useState("");
   const [meetingOverview, setMeetingOverview] = useState<MeetingOverview>(initialMeetingOverview);
   const [investmentSnapshot, setInvestmentSnapshot] = useState<InvestmentSnapshot>(
     initialInvestmentSnapshot
@@ -225,70 +225,135 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setBusinessStrategy(entry.form.businessStrategy);
     setCapitalStructure(entry.form.capitalStructure);
     setSectionNotes(entry.form.sectionNotes);
+    if (entry.form.meetingOverview.companyName) {
+      setSelectedCompanyName(entry.form.meetingOverview.companyName);
+    }
     setCurrentMeetingId(entry.id ?? null);
     setCurrentMeetingKey(entry.meetingKey);
     setIsEditing(false);
     setBackupState(null);
     setHasUnsavedChanges(false);
   };
+  const emptySectionNotes: SectionNotes = {
+    companyBackground: "",
+    divisions: "",
+    otherLines: "",
+    organization: "",
+    verticalIntegration: "",
+    strategicApproach: "",
+    marketPosition: "",
+    financialPerformance: "",
+    internationalExpansionPlans: "",
+    growthStrategy: "",
+    hongKongListingRationale: "",
+    leadership: "",
+  };
 
-  const buildMeetingFromOverview = (overview: any, record: any): MeetingEntry => ({
-    id: record?.id ?? record?.pk ?? null,
-    meetingKey: overview?.__key ?? "meeting1",
-    form: {
-      meetingOverview: {
-        ticker: (overview?.ticker || record?.ticker || "").toUpperCase(),
-        companyName:
-          overview?.company_name || record?.company_name || overview?.name || record?.issuer_name || "",
-        name: overview?.name || "",
-        date: overview?.date || "",
-        location: overview?.location || "",
-        reason: overview?.reason || "",
-        broker: overview?.broker || "",
-        attendees: formatAttendeeGroup(overview?.attendees, "management"),
-        bankerAttendees: formatAttendeeGroup(overview?.attendees, "banker"),
+  const buildMeetingFromOverview = (overview: any, record: any): MeetingEntry => {
+    const metaOverview = overview?.meeting_overview || overview?.meetingOverview || {};
+    const metaInvestment = overview?.investment_snapshot || overview?.investmentSnapshot || {};
+    const metaBusiness = overview?.business_strategy || overview?.businessStrategy || {};
+    const metaCapital = overview?.capital_structure || overview?.capitalStructure || {};
+    const metaSection = overview?.section_notes || {};
+    const attendeesValue = metaOverview?.attendees ?? overview?.attendees;
+    const meetingNotesText = metaBusiness?.meeting_notes || overview?.meeting_notes || "";
+    const parsedSectionNotes =
+      Object.keys(metaSection || {}).length > 0
+        ? { ...emptySectionNotes, ...metaSection }
+        : parseMeetingNotes(meetingNotesText);
+
+    return {
+      id: record?.id ?? record?.pk ?? null,
+      meetingKey: overview?.__key ?? "meeting1",
+      form: {
+        meetingOverview: {
+          ticker: (metaOverview?.ticker || record?.ticker || overview?.ticker || "").toUpperCase(),
+          companyName:
+            metaOverview?.company_name ||
+            record?.company_name ||
+            overview?.company_name ||
+            overview?.name ||
+            "",
+          name: metaOverview?.meeting_name || overview?.name || "",
+          date:
+            metaOverview?.pricing_date ||
+            overview?.date ||
+            record?.pricing_date ||
+            "",
+          location: metaOverview?.location || overview?.location || "",
+          reason: metaOverview?.reason || overview?.reason || "",
+          broker: metaOverview?.broker || overview?.broker || "",
+          attendees: formatAttendeeGroup(attendeesValue, "management"),
+          bankerAttendees: formatAttendeeGroup(attendeesValue, "banker"),
+        },
+        investmentSnapshot: {
+          oneLineSummary: metaInvestment?.one_line_summary || overview?.one_line_summary || "",
+          executiveSummary:
+            metaInvestment?.executive_summary || overview?.executive_summary || "",
+          keyLevel: metaInvestment?.key_level || overview?.key_level || "",
+          possibleSize: metaInvestment?.possible_size || overview?.possible_size || "",
+          results: metaInvestment?.results || overview?.results || "",
+        },
+        businessStrategy: {
+          meetingNotes: metaBusiness?.meeting_notes || overview?.meeting_notes || "",
+          catalysts: metaBusiness?.catalysts || overview?.catalyst || "",
+          likelihoodPrimaryRaise:
+            metaBusiness?.likelihood_of_primary_raise ||
+            overview?.likelihood_of_primary_raise ||
+            "",
+          reasonForRaise: metaBusiness?.likelihood_reason || overview?.likelihood_reason || "",
+          opportunisticDeal:
+            metaBusiness?.possible_opportunistic_deal ||
+            overview?.possible_opportunistic_deal ||
+            "",
+        },
+        sectionNotes: parsedSectionNotes,
+        capitalStructure: {
+          potentialSellers: metaCapital?.potential_sellers || overview?.potential_sellers || "",
+          ipoLockupExpiry: metaCapital?.ipo_lockup_expiry || overview?.ipo_lockup_expiry || "",
+          lastDealLockupExpiry:
+            metaCapital?.last_deal_lockup_expiry ||
+            overview?.last_deal_lockup_expiry ||
+            "",
+          historicalSellers: metaCapital?.historical_sellers || overview?.historical_sellers || "",
+          followUpQuestions:
+            metaCapital?.follow_up_question_for_management ||
+            overview?.follow_up_question_for_management ||
+            "",
+          attachments: [],
+          keyValueAmount: metaCapital?.key_value_amount || overview?.key_value_amount || "",
+          keyValueComparator:
+            metaCapital?.key_value_comparator || overview?.key_value_comparator || "greater",
+          keyValueAutomate: toBool(
+            metaCapital?.key_value_automate ?? overview?.key_value_automate
+          ),
+          emailRecipients: metaCapital?.email_recipients || overview?.email_recipients || "",
+          ipoLockupExpiryAutomate: toBool(
+            metaCapital?.ipo_lockup_expiry_automate ?? overview?.ipo_lockup_expiry_automate
+          ),
+          lastDealLockupExpiryAutomate: toBool(
+            metaCapital?.last_deal_lockup_expiry_automate ??
+              overview?.last_deal_lockup_expiry_automate
+          ),
+          resultsAutomate: toBool(
+            metaCapital?.results_automate ?? overview?.results_automate
+          ),
+        },
       },
-      investmentSnapshot: {
-        oneLineSummary: overview?.one_line_summary || "",
-        executiveSummary: overview?.executive_summary || "",
-        keyLevel: overview?.key_level || "",
-        possibleSize: overview?.possible_size || "",
-        results: overview?.results || "",
-      },
-      businessStrategy: {
-        meetingNotes: overview?.meeting_notes || "",
-        catalysts: overview?.catalyst || "",
-        likelihoodPrimaryRaise: overview?.likelihood_of_primary_raise || "",
-        reasonForRaise: overview?.likelihood_reason || "",
-        opportunisticDeal: overview?.possible_opportunistic_deal || "",
-      },
-      sectionNotes: parseMeetingNotes(overview?.meeting_notes || ""),
-      capitalStructure: {
-        potentialSellers: overview?.potential_sellers || "",
-        ipoLockupExpiry: overview?.ipo_lockup_expiry || "",
-        lastDealLockupExpiry: overview?.last_deal_lockup_expiry || "",
-        historicalSellers: overview?.historical_sellers || "",
-        followUpQuestions: overview?.follow_up_question_for_management || "",
-        attachments: [],
-        keyValueAmount: overview?.key_value_amount || "",
-        keyValueComparator: overview?.key_value_comparator || "greater",
-        keyValueAutomate: toBool(overview?.key_value_automate),
-        emailRecipients: overview?.email_recipients || "",
-        ipoLockupExpiryAutomate: toBool(overview?.ipo_lockup_expiry_automate),
-        lastDealLockupExpiryAutomate: toBool(overview?.last_deal_lockup_expiry_automate),
-        resultsAutomate: toBool(overview?.results_automate),
-      },
-    },
-    isNew: false,
-  });
+      isNew: false,
+    };
+  };
 
   const normalizeRecordToMeetings = (record: any): MeetingEntry[] => {
-    const desc = record?.description || {};
-    const meetingEntries = Object.entries(desc).filter(([key]) =>
+    const meta = record?.meta_data || record?.description || {};
+    const meetingEntries = Object.entries(meta).filter(([key]) =>
       key.toLowerCase().startsWith("meeting")
     );
 
     if (meetingEntries.length === 0) {
+      if (Object.keys(meta || {}).length > 0) {
+        return [buildMeetingFromOverview(meta, record)];
+      }
       return [buildMeetingFromOverview({}, record)];
     }
 
@@ -299,15 +364,13 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
 
   const createNewMeetingFromTemplate = (resetExisting = false) => {
     const meetingKey = getNextMeetingKey();
-    const normalizedTicker = tickerInput.trim().toUpperCase();
+    const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
     const templateMeeting: MeetingEntry = {
       meetingKey,
       form: {
         meetingOverview: {
           ...initialMeetingOverview,
-          ticker: normalizedTicker,
-          companyName: companyNameInput.trim(),
-          name: companyNameInput.trim(),
+          companyName: normalizedCompany,
           date: "",
         },
         investmentSnapshot: initialInvestmentSnapshot,
@@ -337,7 +400,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setCurrentMeetingId(null);
     setIsEditing(true);
     setNoDataFound(false);
-    setTickerInput(normalizedTicker);
+    setSelectedCompanyName(normalizedCompany);
   };
 
   const startEdit = () => {
@@ -428,16 +491,15 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     handleConfirmClose();
   };
 
-  const loadNotes = async (tickerOverride?: string, pricingOverride?: string) => {
+  const loadNotesByCompany = async (companyOverride?: string) => {
     if (!apiUrl) {
       setStatus({ kind: "error", message: "REACT_APP_API_URL is not set." });
       return;
     }
 
-    const ticker = (tickerOverride ?? tickerInput).trim();
-    const pricingDate = (pricingOverride ?? "").trim();
-    if (!ticker || !pricingDate) {
-      setStatus({ kind: "error", message: "Ticker and pricing date are required." });
+    const companyName = (companyOverride ?? selectedCompanyName).trim();
+    if (!companyName) {
+      setStatus({ kind: "error", message: "Company name is required." });
       return;
     }
 
@@ -445,13 +507,13 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       setLoadingMeetings(true);
       setStatus(null);
       setNoDataFound(false);
-      const response = await fetch(`${apiUrl}/api/unlisted_get_deal_meeting_notes/`, {
+      const response = await fetch(`${apiUrl}/api/unlisted_get_deal_meeting_by_company/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ ticker, pricing_date: pricingDate }),
+        body: JSON.stringify({ company_name: companyName }),
       });
 
       if (!response.ok) {
@@ -465,16 +527,18 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         setMeetings([]);
         setCurrentMeetingId(null);
         setCurrentMeetingKey("meeting1");
+        setSelectedCompanyName(companyName);
         return;
       }
 
-      const items = Array.isArray(data) ? data : [data];
+      const items = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [data];
       const normalized = items.flatMap(normalizeRecordToMeetings);
       setMeetings(normalized);
       setSelectedMeetingIndex(0);
       if (normalized[0]) {
         applyMeetingToForm(normalized[0]);
       }
+      setSelectedCompanyName(companyName);
     } catch (err: any) {
       console.error("Failed to load meeting notes:", err);
       setStatus({ kind: "error", message: err?.message || "Unable to load meeting notes." });
@@ -494,10 +558,6 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     const isNewMeeting = currentEntry?.isNew ?? meetings.length === 0;
     const hasExistingMeetingInDb = meetings.some((m) => !m.isNew);
     const shouldCreate = isNewMeeting && !hasExistingMeetingInDb;
-
-    const pricingDate = meetingOverview.date.trim();
-
-
 
     if (!meetingOverview.companyName.trim()) {
       setStatus({ kind: "error", message: "Company name is required." });
@@ -549,7 +609,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
 
     const payload: any = {
       company_name: meetingOverview.companyName.trim(),
-      pricing_date: pricingDate || null,
+      ticker: meetingOverview.ticker.trim() || null,
+      pricing_date: meetingOverview.date.trim() || null,
       meta_data: {
         [currentMeetingKey]: metaData,
       },
@@ -592,7 +653,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       });
       setIsEditing(false);
       setNoDataFound(false);
-      await loadNotes(meetingOverview.ticker, meetingOverview.date.trim());
+      await loadNotesByCompany(meetingOverview.companyName.trim());
     } catch (err: any) {
       console.error("Failed to submit meeting notes:", err);
       setStatus({
@@ -619,36 +680,53 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           apiUrl={apiUrl}
           token={token}
           onSelect={(value: UnlistedMeetingSearchOptionData) => {
-            const nextTicker = value.ticker.toUpperCase();
-            const nextPricingDate = value.pricingDate || "";
             requestDiscardConfirm(() => {
-              setTickerInput(nextTicker);
-              setCompanyNameInput(value.name || "");
+              const nextCompany = value.name || "";
+              setCompanyNameInput(nextCompany);
+              setSelectedCompanyName(nextCompany);
               setMeetingOverview((prev) => ({
                 ...prev,
-                ticker: nextTicker,
-                companyName: value.name || prev.companyName,
-                name: value.name || prev.name,
+                companyName: nextCompany || prev.companyName,
               }));
-              loadNotes(nextTicker, nextPricingDate);
+              setMeetings([]);
+              setSelectedMeetingIndex(0);
+              setCurrentMeetingId(null);
+              setCurrentMeetingKey("meeting1");
+              loadNotesByCompany(nextCompany);
             });
           }}
-          onCreate={() => requestDiscardConfirm(() => createNewMeetingFromTemplate(true))}
+          onCreate={() =>
+            requestDiscardConfirm(() => {
+              const normalizedCompany = companyNameInput.trim();
+              if (!normalizedCompany) {
+                setStatus({ kind: "error", message: "Company name is required." });
+                return;
+              }
+              setSelectedCompanyName(normalizedCompany);
+              createNewMeetingFromTemplate(true);
+            })
+          }
           onInputChange={(value) => {
             setCompanyNameInput(value);
-            setTickerInput(value);
-            setMeetingOverview((prev) => {
-              const nextCompanyName = value;
-              const shouldSyncName = !prev.name || prev.name === prev.companyName;
-              return {
-                ...prev,
-                companyName: nextCompanyName,
-                name: shouldSyncName ? nextCompanyName : prev.name,
-              };
-            });
           }}
         />
       </Paper>
+
+      {selectedCompanyName ? (
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 1.5, md: 2 },
+            borderRadius: 2,
+            border: "1px solid rgba(0,32,96,0.12)",
+            backgroundColor: "#fff",
+          }}
+        >
+          <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+            {selectedCompanyName}
+          </Typography>
+        </Paper>
+      ) : null}
 
       {!shouldShowEmptyState ? (
         <Paper
@@ -734,7 +812,15 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       <MeetingStatusPanels
         noDataFound={noDataFound}
         loading={loadingMeetings}
-        onCreateNew={() => createNewMeetingFromTemplate(true)}
+        onCreateNew={() => {
+          const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
+          if (!normalizedCompany) {
+            setStatus({ kind: "error", message: "Company name is required." });
+            return;
+          }
+          setSelectedCompanyName(normalizedCompany);
+          createNewMeetingFromTemplate(true);
+        }}
       />
 
       {!loadingMeetings && !shouldShowEmptyState ? (
@@ -759,34 +845,17 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                 Meeting Notes Form
               </Typography>
               <LabeledTextField
-                label="Company Name"
-                value={meetingOverview.companyName}
-                onChange={(val) =>
-                  setMeetingOverview((prev) => {
-                    const shouldSyncName = !prev.name || prev.name === prev.companyName;
-                    return {
-                      ...prev,
-                      companyName: val,
-                      name: shouldSyncName ? val : prev.name,
-                    };
-                  })
-                }
-                isEditing={isEditing}
-                options={{ required: true }}
-              />
-              <LabeledTextField
                 label="Meeting Name"
                 value={meetingOverview.name}
                 onChange={(val) => setMeetingOverview((prev) => ({ ...prev, name: val }))}
                 isEditing={isEditing}
-                options={{ required: true }}
               />
               <LabeledTextField
                 label="Meeting Date"
                 value={meetingOverview.date}
                 onChange={(val) => setMeetingOverview((prev) => ({ ...prev, date: val }))}
                 isEditing={isEditing}
-                options={{ type: "date", required: true }}
+                options={{ type: "date" }}
               />
               <LabeledTextField
                 label="Attending"
