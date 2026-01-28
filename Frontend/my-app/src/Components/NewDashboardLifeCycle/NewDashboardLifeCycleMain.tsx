@@ -553,7 +553,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                   fontWeight: 600,
                 },
                 "& .Mui-selected": {
-                  color: "#ffff",
+                  color: "#f5f5f5ff",
                   backgroundColor: "#002060",
                 },
               }}
@@ -577,8 +577,8 @@ const NewDealsLifecycleCards: React.FC = () => {
           pb: 4,
           pt: 2,
           px: { xs: 1.5, md: 2 },
-          backgroundColor: "rgba(21,101,192,0.05)",
-          borderRadius: 3,
+          backgroundColor: "transparent",
+          borderRadius: 0,
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>

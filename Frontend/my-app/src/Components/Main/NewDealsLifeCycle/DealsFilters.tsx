@@ -20,7 +20,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
       sx={{
         p: { xs: 1, md: 1.5 },
         borderRadius: 3,
-        backgroundColor: "#ffffff",
+        backgroundColor: "#b2bdcb3b",
         border: "1px solid #e6ebf5",
         boxShadow: "0 12px 26px rgba(15,23,42,0.06)",
       }}
@@ -48,7 +48,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               textTransform: "none",
               borderRadius: 999,
               border: "1px solid transparent",
-              backgroundColor: "transparent",
+              backgroundColor: "#f4f6ff",
               minWidth: 200,
               height: 72,
               minHeight: 72,
@@ -66,15 +66,15 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
             },
             "& .Mui-selected": {
               borderColor: "#c7d2fe",
-              backgroundColor: "#f1f5ff",
+              backgroundColor: "#cad5f1ff",
               boxShadow: "0 6px 14px rgba(76,110,245,0.12)",
             },
             "& .MuiToggleButton-root.Mui-selected:after": {
               display: "none",
             },
             "& .deal-icon-box": {
-              width: 34,
-              height: 34,
+              width: 24,
+              height: 24,
               borderRadius: 999,
               display: "grid",
               placeItems: "center",
