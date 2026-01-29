@@ -807,7 +807,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           }}
         >
           <Stack spacing={1} sx={{ maxWidth: 680 }}>
-            <Typography sx={{ fontWeight: 800, color: "#001b4d", fontSize: { xs: 20, md: 24 } }}>
+            <Typography sx={{ fontWeight: 800, color: "#002060", fontSize: { xs: 20, md: 24 } }}>
               Unlisted Company Meeting Notes
             </Typography>
             <Typography sx={{ color: "rgba(0,27,77,0.75)" }}>
