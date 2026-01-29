@@ -48,10 +48,10 @@ const DealCard: React.FC<DealCardProps> = ({
     (item) => !barMeta.includes(item) && !dateMeta.includes(item)
   );
   const actionCards = [
-    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 18 }} />, bg: "#cfd6ff", tone: "#2f3a9c" },
-    { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 18 }} />, bg: "#dffbff", tone: "#196a7e" },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 18 }} />, bg: "#f3eaff", tone: "#6b4bb8" },
-    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 18 }} />, bg: "#f5f8dc", tone: "#6d7a1c" },
+    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#cfd6ff", tone: "#000000ff" },
+    { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#dffbff", tone: "#000000ff" },
+    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f3eaff", tone: "#000000ff" },
+    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f5f8dc", tone: "#000000ff" },
   ];
 
   return (
@@ -59,8 +59,8 @@ const DealCard: React.FC<DealCardProps> = ({
       elevation={0}
       sx={{
         borderRadius: 4,
-        border: "1px solid #e5e8f5",
-        backgroundColor: "#ffffff",
+        border: "1px solid #f3faff",
+        backgroundColor: "#f3faff",
         boxShadow: "0 18px 40px rgba(37, 44, 97, 0.12)",
         height: "100%",
         minHeight: { xs: 470, sm: 500 },
@@ -136,20 +136,20 @@ const DealCard: React.FC<DealCardProps> = ({
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
                   color: item.tone,
-                  p: 0.9,
+                  p: 0.7,
                   display: "flex",
                   flexDirection: "column",
-                  gap: 0.4,
+                  gap: 0.3,
                   alignItems: "center",
                   textAlign: "center",
-                  minHeight: 64,
+                  minHeight: 56,
                   justifyContent: "center",
                 }}
               >
                 <Box
                   sx={{
-                    width: 26,
-                    height: 26,
+                    width: 22,
+                    height: 22,
                     borderRadius: "50%",
                     backgroundColor: "rgba(255,255,255,0.7)",
                     display: "grid",
@@ -159,7 +159,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 >
                   {item.icon}
                 </Box>
-                <Typography variant="caption" sx={{ fontWeight: 700, fontSize: "0.68rem" }}>
+                <Typography sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
                   {item.label}
                 </Typography>
               </Box>
