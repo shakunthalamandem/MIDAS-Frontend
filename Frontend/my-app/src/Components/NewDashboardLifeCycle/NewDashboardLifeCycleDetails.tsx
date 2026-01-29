@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Chip,
@@ -40,31 +40,22 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
 
-  const tabItems = [
-    { label: "Write up" },
-    { label: "Write Up New" },
-    { label: "Red Flag Analysis" },
+  const tabItems = useMemo(
+    () => [
+      { label: "Write Up New" },
+      { label: "Write up" },
+      { label: "Red Flag Analysis" },
+      { label: "Deal Recommendation" },
+      { label: "Peer Deals Performance" },
+      { label: "AI- Sentiment View" },
+      { label: "AI Unsupervised" },
+      { label: "ML Model" },
+      { label: "S1 AI Query" },
+      { label: "NEWS" },
+    ],
+    []
+  );
 
-    { label: "Deal Recommendation" },
-
-    {
-      label: "Peer Deals Performance",
-    },
-    {
-      label: "AI- Sentiment View",
-     
-    },
-    { label: "AI Unsupervised"},
-
-    { label: "ML Model" },
-    { label: "S1 AI Query"},
-
-    { label: "NEWS" },
-  ];
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
 
   React.useEffect(() => {
     if (!targetTabLabel) return;
@@ -147,7 +138,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
           <Tabs
             value={tabValue}
-            onChange={handleTabChange}
+            onChange={(_: React.SyntheticEvent, newValue: number) => {
+              setTabValue(newValue);
+            }}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
