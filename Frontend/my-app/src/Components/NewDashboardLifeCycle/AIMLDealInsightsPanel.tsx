@@ -16,8 +16,7 @@ import {
   useTheme,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
-import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import type { DealRecord } from "../AIMLResults/types";
 
@@ -302,7 +301,7 @@ function PredictionCard({
     >
       <CardContent sx={{ p: 2.4 }}>
         <Typography
-          sx={{ fontWeight: 1000, fontSize: 16, lineHeight: 1.25, mb: 1.6 }}
+          sx={{ fontWeight: 900, fontSize: 14, lineHeight: 1.25, mb: 1.6 }}
         >
           {title}
         </Typography>
@@ -444,9 +443,38 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
           }}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography sx={{ fontWeight: 1000 }}>
-              Model Inputs Used for Prediction
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.2,
+                px: 2.5,
+                py: 1.5,
+                borderRadius: "14px",
+                background: "linear-gradient(135deg, #f5f7ff, #e8ecff)",
+                boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+                width: "fit-content",
+                mb: 2,
+              }}
+            >
+              <InfoOutlinedIcon
+                sx={{
+                  fontSize: 26,
+                  color: "#3f51b5",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  fontSize: "1.15rem",
+                  color: "#1a237e",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Key Input Factors for Model Prediction
+              </Typography>
+            </Box>
           </AccordionSummary>
           <AccordionDetails sx={{ bgcolor: "#FFFFFF" }}>
             <Grid container spacing={2}>
