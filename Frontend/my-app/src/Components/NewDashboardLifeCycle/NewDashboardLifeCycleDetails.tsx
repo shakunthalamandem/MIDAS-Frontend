@@ -39,8 +39,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
+  const viewMode = (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
+  const targetTabLabel = (location.state as { targetTabLabel?: string } | null)?.targetTabLabel;
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
+  const appliedTabRef = React.useRef<string | null>(null);
 
   const tabItems = [
     { label: "Write up" },
@@ -67,6 +70,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  React.useEffect(() => {
+    if (!targetTabLabel) return;
+    if (appliedTabRef.current === targetTabLabel) return;
+    const nextIndex = tabItems.findIndex((item) => item.label === targetTabLabel);
+    if (nextIndex >= 0) {
+      appliedTabRef.current = targetTabLabel;
+      setTabValue(nextIndex);
+    }
+  }, [targetTabLabel, tabItems]);
 
   if (!payload) {
     return (
@@ -122,7 +135,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <DealHeaderCard
             activePayload={activePayload}
             formatDate={formatDate}
-            onBack={() => navigate("/deals/new_dashboard")}
+            onBack={() =>
+              navigate("/deals/new_dashboard", {
+                state: { viewMode: viewMode === "table" ? "table" : "card" },
+              })
+            }
             SearchComponent={
               <Box sx={{ width: { xs: "100%", md: 320 } }}>
                 <NewDashboardLifeCycleTickerSearch
