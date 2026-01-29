@@ -32,6 +32,7 @@ import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotA
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
+import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -185,9 +186,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
-            <NewDashboardLifeCyclePeerDeals
-              selectedDeal={activePayload}
-            />
+            // <NewDashboardLifeCyclePeerDeals
+            //   selectedDeal={activePayload}
+            // />
+            <FebWriteUpDashboardMain ticker={activePayload.ticker} pricingDate={activePayload.pricing_date} />
+            
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <StockTickerNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
