@@ -168,9 +168,9 @@ const DealMeetingNotesMain: React.FC = () => {
         <Box
           display="flex"
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent="center"
           flexWrap="wrap"
-          gap={2}
+          gap={3}
           mb={3}
         >
           <Paper
@@ -178,8 +178,8 @@ const DealMeetingNotesMain: React.FC = () => {
             sx={{
               p: 0.5,
               borderRadius: 999,
-              background: "linear-gradient(90deg, #5b1db3 0%, #7b2ff2 100%)",
-              boxShadow: "0 10px 24px rgba(40, 10, 80, 0.2)",
+              background: "linear-gradient(90deg, #0b2c6a 0%, #1f6feb 100%)",
+              boxShadow: "0 10px 24px rgba(13, 44, 106, 0.22)",
             }}
           >
             <Tabs
@@ -204,9 +204,9 @@ const DealMeetingNotesMain: React.FC = () => {
                   transition: "all 180ms ease",
                 },
                 "& .MuiTab-root.Mui-selected": {
-                  color: "#4a178f",
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 6px 14px rgba(20, 10, 40, 0.18)",
+                  color: "#0b2c6a",
+                  backgroundColor: "#f5f9ff",
+                  boxShadow: "0 6px 14px rgba(13, 44, 106, 0.2)",
                 },
                 "& .MuiTab-root:hover": {
                   color: "#ffffff",
@@ -220,7 +220,7 @@ const DealMeetingNotesMain: React.FC = () => {
           </Paper>
 
           {mode === "listed" ? (
-            <Box sx={{ width: { xs: "100%", sm: 360, md: 440 }, ml: { sm: "auto" } }}>
+            <Box sx={{ width: { xs: "100%", sm: 360, md: 440 } }}>
               <Autocomplete
                 options={allDeals}
                 value={selectedDeal}
