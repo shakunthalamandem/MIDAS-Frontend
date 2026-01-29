@@ -702,8 +702,6 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
 
     const payload: any = {
       company_name: meetingOverview.companyName.trim(),
-      ticker: meetingOverview.ticker.trim() || null,
-      pricing_date: meetingOverview.date.trim() || null,
       meta_data: {
         [currentMeetingKey]: metaData,
       },
