@@ -509,64 +509,94 @@ const NewDealsLifecycleCards: React.FC = () => {
   return (
     <>
       <Container maxWidth="xl" sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}>
-        <Container
-          maxWidth="xl"
+        <Box
           sx={{
-            display: "flex",
-            alignItems: { xs: "flex-start", md: "center" },
-            justifyContent: "space-between",
-            mb: 1.5,
-            px: 1,
-            gap: 1.5,
-            flexWrap: "wrap",
+            backgroundColor: "#f3faff",
+            borderRadius: 4,
+            px: { xs: 1.5, md: 2 },
+            py: { xs: 1.5, md: 2 },
+            border: "1px solid #cbd7ff",
+            boxShadow: "0 12px 26px rgba(15,23,42,0.08)",
           }}
         >
-          <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
-          <RegionTabs
-            tabs={regionTabs}
-            selectedRegion={selectedRegion}
-            onSelect={(value) => setSelectedRegion(value as any)}
-          />
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-            sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
+          <Container
+            maxWidth="xl"
+            sx={{
+              display: "flex",
+              alignItems: { xs: "flex-start", md: "center" },
+              justifyContent: "space-between",
+              mb: 1.5,
+              px: 1,
+              gap: 1.5,
+              flexWrap: "wrap",
+            }}
           >
-            <ToggleButtonGroup
-              size="small"
-              value={viewMode}
-              exclusive
-              onChange={(_e, value) => value && setViewMode(value)}
-              sx={{
-                backgroundColor: "#ffffff",
-                borderRadius: 999,
-                border: "1px solid #d7ddea",
-                ml: { md: "auto" },
-                "& .MuiToggleButton-root": {
-                  border: 0,
-                  px: 1,
-                  py: 0.4,
-                  minWidth: 72,
-                  color: "#6a7286",
-                  textTransform: "none",
-                  fontWeight: 600,
-                },
-                "& .Mui-selected": {
-                  color: "#f5f5f5ff",
-                  backgroundColor: "#002060",
-                },
-              }}
+            <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
+            <RegionTabs
+              tabs={regionTabs}
+              selectedRegion={selectedRegion}
+              onSelect={(value) => setSelectedRegion(value as any)}
+            />
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
             >
-              <ToggleButton value="card" aria-label="Card view">
-                Card View
-              </ToggleButton>
-              <ToggleButton value="table" aria-label="Table view">
-                Table View
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Stack>
-        </Container>
+              <ToggleButtonGroup
+                size="small"
+                value={viewMode}
+                exclusive
+                onChange={(_e, value) => value && setViewMode(value)}
+                sx={{
+                  backgroundColor: "#ffffff",
+                  borderRadius: 999,
+                  border: "1px solid #d7ddea",
+                  ml: { md: "auto" },
+                  "& .MuiToggleButton-root": {
+                    border: 0,
+                    px: 1,
+                    py: 0.4,
+                    minWidth: 72,
+                    color: "#6a7286",
+                    textTransform: "none",
+                    fontWeight: 600,
+                  },
+                  "& .Mui-selected": {
+                    color: "#f5f5f5ff",
+                    backgroundColor: "#002060",
+                  },
+                }}
+              >
+                <ToggleButton value="card" aria-label="Card view">
+                  Card View
+                </ToggleButton>
+                <ToggleButton value="table" aria-label="Table view">
+                  Table View
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+          </Container>
+
+          <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
+            <FiltersBar
+              tabs={tabs}
+              selectedOp={selectedOp}
+              onSelectOp={setSelectedOp}
+              selectedDealType={selectedDealType}
+              onSelectDealType={setSelectedDealType}
+              isPipelineView={isPipelineView}
+              liveStartDate={liveStartDate}
+              liveEndDate={liveEndDate}
+              setLiveStartDate={setLiveStartDate}
+              setLiveEndDate={setLiveEndDate}
+              dealSearch={dealSearch}
+              setDealSearch={setDealSearch}
+              pipelineSearch={pipelineSearch}
+              setPipelineSearch={setPipelineSearch}
+            />
+          </Container>
+        </Box>
       </Container>
 
       <Container
@@ -582,23 +612,6 @@ const NewDealsLifecycleCards: React.FC = () => {
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
-          <FiltersBar
-            tabs={tabs}
-            selectedOp={selectedOp}
-            onSelectOp={setSelectedOp}
-            selectedDealType={selectedDealType}
-            onSelectDealType={setSelectedDealType}
-            isPipelineView={isPipelineView}
-            liveStartDate={liveStartDate}
-            liveEndDate={liveEndDate}
-            setLiveStartDate={setLiveStartDate}
-            setLiveEndDate={setLiveEndDate}
-            dealSearch={dealSearch}
-            setDealSearch={setDealSearch}
-            pipelineSearch={pipelineSearch}
-            setPipelineSearch={setPipelineSearch}
-          />
-
           {isPipelineView ? (
             pipelineLoading ? (
               <CircularProgress sx={{ display: "block", mx: "auto" }} />
