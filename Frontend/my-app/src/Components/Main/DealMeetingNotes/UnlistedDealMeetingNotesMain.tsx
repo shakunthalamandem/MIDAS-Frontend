@@ -739,50 +739,62 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             animation: "floatGlow 6s ease-in-out infinite",
           }}
         />
-        <Stack spacing={1.5}>
-          <Typography sx={{ fontWeight: 800, color: "#001b4d", fontSize: { xs: 20, md: 24 } }}>
-            Unlisted Company Meeting Notes
-          </Typography>
-          <Typography sx={{ color: "rgba(0,27,77,0.75)", maxWidth: 620 }}>
-            Search existing companies or create a new company record with multiple meetings.
-          </Typography>
-          <UnlistedMeetingSearch
-            apiUrl={apiUrl}
-            token={token}
-            onSelect={(value: UnlistedMeetingSearchOptionData) => {
-              requestDiscardConfirm(() => {
-                const nextCompany = value.name || "";
-                setCompanyNameInput(nextCompany);
-                setSelectedCompanyName(nextCompany);
-                setMeetingOverview((prev) => ({
-                  ...prev,
-                  companyName: nextCompany || prev.companyName,
-                }));
-                setMeetings([]);
-                setSelectedMeetingIndex(0);
-                setCurrentMeetingId(null);
-                setCurrentMeetingKey("meeting1");
-                setCreateMode(false);
-                loadNotesByCompany(nextCompany);
-              });
-            }}
-            onCreate={() =>
-              requestDiscardConfirm(() => {
-                const normalizedCompany = companyNameInput.trim();
-                setSelectedCompanyName(normalizedCompany);
-                setCreateMode(true);
-                setMeetings([]);
-                setSelectedMeetingIndex(0);
-                setCurrentMeetingId(null);
-                setCurrentMeetingKey("meeting1");
-                createNewMeetingFromTemplate(true, normalizedCompany);
-              })
-            }
-            onInputChange={(value) => {
-              setCompanyNameInput(value);
-            }}
-          />
-        </Stack>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "flex-start", md: "center" },
+            justifyContent: "space-between",
+            gap: { xs: 2, md: 4 },
+          }}
+        >
+          <Stack spacing={1} sx={{ maxWidth: 680 }}>
+            <Typography sx={{ fontWeight: 800, color: "#001b4d", fontSize: { xs: 20, md: 24 } }}>
+              Unlisted Company Meeting Notes
+            </Typography>
+            <Typography sx={{ color: "rgba(0,27,77,0.75)" }}>
+              Search existing companies or create a new company record with multiple meetings.
+            </Typography>
+          </Stack>
+          <Box sx={{ width: { xs: "100%", md: "auto" } }}>
+            <UnlistedMeetingSearch
+              apiUrl={apiUrl}
+              token={token}
+              onSelect={(value: UnlistedMeetingSearchOptionData) => {
+                requestDiscardConfirm(() => {
+                  const nextCompany = value.name || "";
+                  setCompanyNameInput(nextCompany);
+                  setSelectedCompanyName(nextCompany);
+                  setMeetingOverview((prev) => ({
+                    ...prev,
+                    companyName: nextCompany || prev.companyName,
+                  }));
+                  setMeetings([]);
+                  setSelectedMeetingIndex(0);
+                  setCurrentMeetingId(null);
+                  setCurrentMeetingKey("meeting1");
+                  setCreateMode(false);
+                  loadNotesByCompany(nextCompany);
+                });
+              }}
+              onCreate={() =>
+                requestDiscardConfirm(() => {
+                  const normalizedCompany = companyNameInput.trim();
+                  setSelectedCompanyName(normalizedCompany);
+                  setCreateMode(true);
+                  setMeetings([]);
+                  setSelectedMeetingIndex(0);
+                  setCurrentMeetingId(null);
+                  setCurrentMeetingKey("meeting1");
+                  createNewMeetingFromTemplate(true, normalizedCompany);
+                })
+              }
+              onInputChange={(value) => {
+                setCompanyNameInput(value);
+              }}
+            />
+          </Box>
+        </Box>
       </Paper>
 
       <Paper
