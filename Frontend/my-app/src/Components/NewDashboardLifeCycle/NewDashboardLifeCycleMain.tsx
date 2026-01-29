@@ -551,22 +551,38 @@ const NewDealsLifecycleCards: React.FC = () => {
                   setViewMode((prev) => (value ?? prev ?? "card"))
                 }
                 sx={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "transparent",
                   borderRadius: 999,
-                  border: "1px solid #d7ddea",
+                  border: "1px solid transparent",
                   ml: { md: "auto" },
                   "& .MuiToggleButton-root": {
-                    border: 0,
-                    px: 1,
+                    border: "1px solid #d7ddea",
+                    px: 2,
                     py: 0.4,
-                    minWidth: 72,
-                    color: "#6a7286",
+                    minWidth: 80,
+                    color: "#1f2a44",
                     textTransform: "none",
                     fontWeight: 600,
+                    borderRadius: 999,
+                    backgroundColor: "#ffffff",
+                  },
+                  "& .MuiToggleButton-root:hover": {
+                    backgroundColor: "#8f75ddff",
+                    color: "#ffffff",
                   },
                   "& .Mui-selected": {
-                    color: "#ffff",
-                    backgroundColor: "#002060",
+                    color: "#ffffff",
+                    backgroundColor: "#2b146f",
+                    borderColor: "#2b146f",
+                    boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
+                  },
+                  "& .MuiToggleButton-root.Mui-selected:hover": {
+                    backgroundColor: "#2b146f",
+                    color: "#ffffff",
+                  },
+                   "& .MuiToggleButton-root.Mui-selected:leave": {
+                    backgroundColor: "#2b146f",
+                    color: "#ffffff",
                   },
                 }}
               >

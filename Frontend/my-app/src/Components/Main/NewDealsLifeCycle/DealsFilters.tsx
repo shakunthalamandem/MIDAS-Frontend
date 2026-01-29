@@ -61,10 +61,9 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               boxShadow: "none",
               transition: "all 0.2s ease",
             },
-            "& .MuiToggleButton-root:hover": {
+            "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
               backgroundColor: "#2b146f",
               color: "#ffffff",
-
             },
             "& .Mui-selected": {
               borderColor: "#2b146f",
@@ -73,6 +72,10 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               color: "#ffffff",
             },
             "& .MuiToggleButton-root.Mui-selected:hover": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
+            },
+            "& .MuiToggleButton-root.Mui-selected:leave": {
               backgroundColor: "#2b146f",
               color: "#ffffff",
             },
