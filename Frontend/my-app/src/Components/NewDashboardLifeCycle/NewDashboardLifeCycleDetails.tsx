@@ -32,6 +32,8 @@ import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotA
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
+import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
+import RecentDealRecomendation from "./RecentDealRecomendation";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -91,6 +93,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const activePayload = selectedOption || payload;
   const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
+  const status = activePayload?.deal_status ?? "Announced";
+  const isUpcoming = ["Announced", "Price Range"].includes(status);
+
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
@@ -203,6 +208,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <FOWriteUpDashboardMain
                 ticker={activePayload.ticker}
                 deal_id={activePayload.deal_id}
+              />
+            )
+          )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
+            isUpcoming ? (
+              <UpcomingDealRecomendation/>
+            ) : (
+              <RecentDealRecomendation
               />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
