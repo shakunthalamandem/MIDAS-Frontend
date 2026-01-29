@@ -35,47 +35,53 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
         <ToggleButtonGroup
           value={selectedOp}
           exclusive
-          onChange={(_e, value) => value && onChange(value)}
+          onChange={(_e, value) => onChange(value ?? selectedOp)}
           sx={{
-            flexWrap: "nowrap",
-            columnGap: { xs: 1, md: 1.5 },
-            rowGap: { xs: 1, md: 1.25 },
-            overflowX: "auto",
+            flexWrap: "wrap",
+            columnGap: 1,
+            rowGap: 1,
+            overflowX: "visible",
             maxWidth: "100%",
             flex: 1,
             minWidth: 0,
             "& .MuiToggleButton-root": {
               textTransform: "none",
               borderRadius: 999,
-              border: "1px solid transparent",
-              backgroundColor: "#e5e7eb",
-              minWidth: 200,
-              height: 72,
-              minHeight: 72,
-              justifyContent: "flex-start",
-              px: 1.75,
-              py: 0.75,
-              color: "#4b5563",
+              border: "1px solid #d7ddea",
+              backgroundColor: "#ffffff",
+              minWidth: 0,
+              height: 36,
+              minHeight: 36,
+              justifyContent: "center",
+              px: 2,
+              py: 0.4,
+              color: "#1f2a44",
               position: "relative",
               overflow: "hidden",
               boxShadow: "none",
               transition: "all 0.2s ease",
             },
             "& .MuiToggleButton-root:hover": {
-              backgroundColor: "#e2e8f0",
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
+
             },
             "& .Mui-selected": {
               borderColor: "#2b146f",
               backgroundColor: "#2b146f",
+              boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
               color: "#ffffff",
-              boxShadow: "none",
+            },
+            "& .MuiToggleButton-root.Mui-selected:hover": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
             },
             "& .MuiToggleButton-root.Mui-selected:after": {
               display: "none",
             },
             "& .deal-icon-box": {
-              width: 24,
-              height: 24,
+              width: 20,
+              height: 20,
               borderRadius: 999,
               display: "grid",
               placeItems: "center",
