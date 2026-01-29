@@ -92,11 +92,12 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
       <Paper
+        elevation={0}
         sx={{
           p: 3,
-          borderRadius: 4,
-          background: "linear-gradient(180deg, #ffffff 0%, #f5f8ff 100%)",
-          boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
+          borderRadius: 0,
+          background: "transparent",
+          boxShadow: "none",
         }}
       >
         <DealHeaderCard
@@ -120,26 +121,31 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           scrollButtons="auto"
           sx={{
             mb: 3,
-            backgroundColor: "#ffffff",
-            borderRadius: 999,
-            p: 0.5,
-            boxShadow: "0 6px 16px rgba(15, 23, 42, 0.08)",
-            border: "1px solid #e2e8f0",
+            backgroundColor: "transparent",
+            borderRadius: 0,
+            p: 0,
+            boxShadow: "none",
+            border: "none",
             "& .MuiTabs-indicator": {
               display: "none",
             },
             "& .MuiTab-root": {
               textTransform: "none",
               fontWeight: 600,
-              color: "#64748b",
-              minHeight: 44,
+              color: "#0f0f0fff",
+              minHeight: 40,
               px: 2,
               borderRadius: 999,
+              border: "1px solid #e2e8f0",
+              backgroundColor: "#ffffff",
+              boxShadow: "none",
+              transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
             },
             "& .Mui-selected": {
-              color: "#ffffff",
-              backgroundColor: "#2f6fed",
-              boxShadow: "0 6px 12px rgba(47, 111, 237, 0.28)",
+              color: "#ffff",
+              backgroundColor: "#4f46e5",
+              borderColor: "#c7d2fe",
+              boxShadow: "none",
             },
           }}
         >
@@ -151,10 +157,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               label={item.label}
               sx={{
                 borderRadius: 999,
-                backgroundColor: "#f1f5ff",
                 mr: 1,
                 "&.Mui-selected": {
-                  backgroundColor: "#e0e7ff",
+                  backgroundColor: "#eef2ff",
                 },
               }}
             />

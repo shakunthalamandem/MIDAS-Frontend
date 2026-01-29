@@ -26,11 +26,8 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
         mb: 3,
         borderRadius: 3,
         overflow: "hidden",
-        border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
-        background:
-          theme.palette.mode === "light"
-            ? "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)"
-            : theme.palette.background.paper,
+        // border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+        background:"#97bbf00d",
         boxShadow: "0 10px 26px rgba(15, 23, 42, 0.10)",
       })}
     >
@@ -57,7 +54,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               borderRadius: 2,
               fontWeight: 600,
               textTransform: "none",
-              borderColor: alpha(theme.palette.divider, 0.9),
+              // borderColor: alpha(theme.palette.divider, 0.9),
               "&:hover": {
                 backgroundColor: alpha(theme.palette.info.main, 0.06),
               },
@@ -71,7 +68,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 600, lineHeight: 1.15 }}
+            sx={{ fontWeight: 600, lineHeight: 1.15 ,color:"#22252a"}}
             title={activePayload?.company_name || activePayload?.issuer_name}
           >
             {activePayload?.company_name || activePayload?.issuer_name || "—"}
@@ -86,6 +83,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
+              color:"#7b61ff"
             }}
           >
             {activePayload?.ticker || "N/A"} • US
@@ -99,7 +97,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
       </Box>
 
       {/* ROW 2 */}
-      <Box
+      {/* <Box
         sx={(theme) => ({
           px: 2,
           py: 1.25,
@@ -133,7 +131,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
           label="Sector"
           value={activePayload?.sector || activePayload?.sectors}
         />
-      </Box>
+      </Box> */}
     </Paper>
   );
 };
