@@ -17,7 +17,7 @@ interface IPOWriteUpMetaDataSectionCardProps {
 
 const IPOWriteUpMetaDataSectionCard: React.FC<
   IPOWriteUpMetaDataSectionCardProps
-> = ({ title, basicDealDetails, accentColor = "#3f62d6" }) => {
+> = ({ title, basicDealDetails, accentColor = "#fdfdfdff" }) => {
   const summaryItems = [
     { label: "Ticker", value: basicDealDetails.ticker },
     { label: "Region", value: basicDealDetails.region },
