@@ -98,7 +98,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+    <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
       <Paper
         elevation={0}
         sx={{
