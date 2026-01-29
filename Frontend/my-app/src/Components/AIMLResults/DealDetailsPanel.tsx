@@ -376,7 +376,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                 </Grid>
 
                 <Grid item xs={12} md={4}>
-                  <SectionCard title="Market sentiment" accent="info">
+                  <SectionCard title="AI Sentiment View" accent="info">
                     <DetailRow
                       label="1W sentiment"
                       value={deal.one_week_sentiment || "—"}
@@ -471,7 +471,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
                       <AIInsightBlock
-                        title="FS 1 Week Sentiment"
+                        title="1 Week Sentiment"
                         subtitle="AI sentiment signal"
                         value={deal.fs_1w_sentiment}
                       />
@@ -479,7 +479,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
 
                     <Grid item xs={12} sm={6} md={3}>
                       <AIInsightBlock
-                        title="FS 1 Month Sentiment"
+                        title="1 Month Sentiment"
                         subtitle="AI sentiment signal"
                         value={deal.fs_1m_sentiment}
                       />
