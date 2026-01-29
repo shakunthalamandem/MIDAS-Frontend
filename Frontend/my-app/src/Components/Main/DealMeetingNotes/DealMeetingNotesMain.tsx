@@ -97,17 +97,28 @@ const DealMeetingNotesMain: React.FC = () => {
           ? json
           : json?.data || json?.results || [];
 
-        setAllDeals(
-          payload
-            .map((item: any) => ({
-              ticker: item?.ticker || item?.symbol || "",
-              name: item?.issuer_name || item?.company_name,
-              dealId: item?.deal_id || item?.id,
-              pricingDate: item?.pricing_date,
-              issuerName: item?.issuer_name,
-            }))
-            .filter((d: DealSearchResult) => d.ticker)
+        const normalized: DealSearchResult[] = payload
+          .map((item: any) => ({
+            ticker: item?.ticker || item?.symbol || "",
+            name: item?.issuer_name || item?.company_name,
+            dealId: item?.deal_id || item?.id,
+            pricingDate: item?.pricing_date,
+            issuerName: item?.issuer_name,
+          }))
+          .filter((d: DealSearchResult) => d.ticker);
+
+        const toTime = (value?: string) => {
+          if (!value) return -Infinity;
+          const parsed = new Date(value);
+          const time = parsed.getTime();
+          return Number.isNaN(time) ? -Infinity : time;
+        };
+
+        normalized.sort(
+          (a: DealSearchResult, b: DealSearchResult) =>
+            toTime(b.pricingDate) - toTime(a.pricingDate)
         );
+        setAllDeals(normalized);
       } catch (err: any) {
         if (err.name !== "AbortError") {
           setSearchError("Unable to fetch deals");
@@ -203,6 +214,7 @@ Meetings can only be created for existing companies. Select a company to proceed
                     value={selectedDeal}
                     inputValue={searchTerm}
                     loading={searching}
+                    autoHighlight
                     getOptionLabel={(o) =>
                       `${o.ticker}${
                         o.pricingDate
@@ -212,16 +224,61 @@ Meetings can only be created for existing companies. Select a company to proceed
                     }
                     onInputChange={(_, v) => setSearchTerm(v)}
                     onChange={(_, v) => setSelectedDeal(v)}
+                    renderOption={(props, option) => {
+                      const pricingLabel = option.pricingDate
+                        ? formatPricingDate(option.pricingDate)
+                        : "";
+
+                      return (
+                        <li
+                          {...props}
+                          key={`${option.ticker}-${option.dealId ?? option.pricingDate ?? ""}`}
+                        >
+                          <Box display="flex" flexDirection="column" gap={0.25}>
+                            <Box display="flex" alignItems="baseline" gap={0.75}>
+                              <Typography
+                                component="span"
+                                sx={{ fontWeight: 700, color: "#0b2c6a", fontSize: 13 }}
+                              >
+                                {option.ticker}
+                              </Typography>
+                              {pricingLabel ? (
+                                <Typography
+                                  component="span"
+                                  sx={{ fontWeight: 600, color: "#6b2dbd", fontSize: 12 }}
+                                >
+                                  ({pricingLabel})
+                                </Typography>
+                              ) : null}
+                            </Box>
+                            {option.name ? (
+                              <Typography
+                                component="span"
+                                sx={{
+                                  fontSize: 11,
+                                  color: "#6b7280",
+                                  textTransform: "uppercase",
+                                  letterSpacing: 0.4,
+                                }}
+                              >
+                                {option.name}
+                              </Typography>
+                            ) : null}
+                          </Box>
+                        </li>
+                      );
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         size="small"
                         label="Search ticker"
+                        placeholder="Type to search..."
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
                             <InputAdornment position="start">
-                              <SearchIcon fontSize="small" />
+                              <SearchIcon fontSize="small" sx={{ color: "#6b7280" }} />
                             </InputAdornment>
                           ),
                           endAdornment: (
@@ -235,12 +292,58 @@ Meetings can only be created for existing companies. Select a company to proceed
                         }}
                         sx={{
                           "& .MuiOutlinedInput-root": {
-                            borderRadius: 3,
+                            borderRadius: "999px",
                             backgroundColor: "#fff",
+                            fontSize: 13,
+                            "& fieldset": {
+                              border: "none",
+                            },
+                            "&:hover fieldset": {
+                              border: "none",
+                            },
+                            "&.Mui-focused fieldset": {
+                              border: "none",
+                              boxShadow: "0 0 0 3px rgba(59, 91, 219, 0.12)",
+                            },
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: "#3b5bdb",
+                            fontWeight: 600,
+                          },
+                          "& .MuiInputLabel-root.Mui-focused": {
+                            color: "#3b5bdb",
+                          },
+                          "& .MuiInputBase-input::placeholder": {
+                            color: "#9aa3b2",
+                            opacity: 1,
                           },
                         }}
                       />
                     )}
+                    sx={{
+                      "& .MuiAutocomplete-paper": {
+                        mt: 1,
+                        borderRadius: 2,
+                        border: "1px solid #e2e8f0",
+                        boxShadow: "0 12px 24px rgba(15, 23, 42, 0.12)",
+                      },
+                      "& .MuiAutocomplete-listbox": {
+                        maxHeight: 320,
+                        p: 0,
+                      },
+                      "& .MuiAutocomplete-option": {
+                        alignItems: "flex-start",
+                        py: 1,
+                        px: 2,
+                        borderBottom: "1px solid #eef2ff",
+                        "&[aria-selected='true']": {
+                          backgroundColor: "rgba(59, 91, 219, 0.08)",
+                        },
+                        "&.Mui-focused": {
+                          backgroundColor: "rgba(59, 91, 219, 0.08)",
+                        },
+                      },
+                    }}
                   />
                 </Box>
               </Box>
