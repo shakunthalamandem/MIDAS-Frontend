@@ -164,13 +164,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Tabs>
 
         <Box sx={{ mb: 3 }}>
-          {tabItems[tabValue]?.label === "Overview" ? (
+          {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
-              <NewDashboardLifeCycleOverview
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-                dealType={activePayload.deal_type}
-              />
+           <FebWriteUpDashboardMain
+            basicDealDetails={{
+              deal_id: activePayload.deal_id,
+              ticker: activePayload.ticker,
+              pricing_date: activePayload.pricing_date,
+              region: activePayload.region,
+              deal_type: activePayload.deal_type
+            }}
+          />
+
+              
             ) : (
               <NewDashboardLifeCycleOverviewFO
                 ticker={activePayload.ticker}
@@ -187,16 +193,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
 
-) : tabItems[tabValue]?.label === "Write Up New" ? (
-  <FebWriteUpDashboardMain
-    basicDealDetails={{
-      deal_id: activePayload.deal_id,
-      ticker: activePayload.ticker,
-      pricing_date: activePayload.pricing_date,
-      region: activePayload.region,
-      deal_type: activePayload.deal_type
-    }}
-  />
+
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
