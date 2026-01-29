@@ -87,44 +87,60 @@ const DealCard: React.FC<DealCardProps> = ({
             >
               {title}
             </Typography>
-            {subtitle ? (
-              <Typography
-                variant="body2"
-                sx={{ color: "#000000ff", fontWeight: 300 , mt: 0.2 }}
-              >
-                {subtitle}
-              </Typography>
-            ) : null}
           </Box>
-          {secondaryTag ? (
-            <Chip
-              label={secondaryTag.label}
-              size="small"
-              sx={{
-                bgcolor: secondaryTag.bg ?? "#dcfce7",
-                color: secondaryTag.color ?? "#166534",
-                fontWeight: 700,
-                borderRadius: 999,
-              }}
-            />
+          {tags?.length ? (
+            <Stack direction="row" spacing={0.8} flexWrap="wrap" justifyContent="flex-end">
+              {tags.map((tag) => (
+                <Chip
+                  key={tag.label}
+                  label={tag.label}
+                  size="small"
+                  sx={{
+                    bgcolor: tag.bg ?? "#e9edff",
+                    color: tag.color ?? "#3348d0",
+                    fontWeight: 700,
+                    borderRadius: 999,
+                  }}
+                />
+              ))}
+            </Stack>
           ) : null}
         </Stack>
 
-        {tags?.length ? (
-          <Stack direction="row" spacing={0.8} flexWrap="wrap">
-            {tags.map((tag) => (
-              <Chip
-                key={tag.label}
-                label={tag.label}
-                size="small"
-                sx={{
-                  bgcolor: tag.bg ?? "#e9edff",
-                  color: tag.color ?? "#3348d0",
-                  fontWeight: 700,
-                  borderRadius: 999,
-                }}
-              />
-            ))}
+        {(subtitle || secondaryTag) ? (
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="space-between"
+            flexWrap="nowrap"
+          >
+            {subtitle ? (
+              <Box sx={{ flex: "0 0 50%", minWidth: 0 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#000000ff", fontWeight: 300, fontSize: "0.8rem", wordBreak: "break-word" }}
+                >
+                  {subtitle}
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ flex: "0 0 50%" }} />
+            )}
+            <Box sx={{ flex: "0 0 50%", display: "flex", justifyContent: "flex-end" }}>
+              {secondaryTag ? (
+                <Chip
+                  label={secondaryTag.label}
+                  size="small"
+                  sx={{
+                    bgcolor: secondaryTag.bg ?? "#dcfce7",
+                    color: secondaryTag.color ?? "#166534",
+                    fontWeight: 700,
+                    borderRadius: 999,
+                  }}
+                />
+              ) : null}
+            </Box>
           </Stack>
         ) : null}
 
