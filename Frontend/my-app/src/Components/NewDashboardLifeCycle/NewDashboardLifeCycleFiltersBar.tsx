@@ -65,12 +65,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           mb: 1.5,
-          px: 1,
+          px: 0,
           gap: 2,
           flexWrap: { xs: "wrap", md: "nowrap" },
         }}
       >
-        <Container maxWidth="xl" sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
+        <Container
+          maxWidth="xl"
+          disableGutters
+          sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}
+        >
           <DealsFilters
             selectedOp={selectedOp}
             onChange={onSelectOp}

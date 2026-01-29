@@ -18,7 +18,8 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 1, md: 1.5 },
+        py: { xs: 1, md: 1.5 },
+        px: 0,
         borderRadius: 3,
         backgroundColor: "transparent",
         border: "1px solid transparent",

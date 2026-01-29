@@ -49,9 +49,9 @@ const DealCard: React.FC<DealCardProps> = ({
   );
   const actionCards = [
     { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
-    { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9e8ff" },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f1ebf8ff", tone: "#7b4ae8", border: "#dbc8ff" },
-    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
+    { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9e8ff" },
+    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9c7ff" },
+    { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
   ];
 
   return (
