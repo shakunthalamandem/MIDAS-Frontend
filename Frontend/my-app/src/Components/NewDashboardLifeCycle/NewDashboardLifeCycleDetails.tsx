@@ -162,7 +162,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               },
               "& .Mui-selected": {
                 color: "#ffff",
-                backgroundColor: "#332f86ff",
+                backgroundColor: "#262268ff",
                 borderColor: "#c7d2fe",
                 boxShadow: "none",
               },
@@ -179,7 +179,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                   mr: 1,
                   "&.Mui-selected": {
                     color: "#ffff",
-                    backgroundColor: "#4f46e5",
+                    backgroundColor: "#262268ff",
                   },
                 }}
               />
