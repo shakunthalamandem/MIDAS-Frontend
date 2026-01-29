@@ -9,9 +9,17 @@ export interface DealRecord {
   sector: string;
   deal_size: number | string;
   issue_price: number | string;
+  sponsor: string;
+  primary_percentage: number | string;
+  lead_bank: string;
   discount_from_announcement_price: number | string;
   allocation_as_percentage_of_deal_size: number | string;
   allocation_as_percentage_of_ioi: number | string;
+  previous_day_close_price: number | string;
+  revenue: number | string;
+  revenue_growth: number | string;
+  net_profit_margin: number | string;
+
 
   // existing predictions
   t1d_pred: string;
