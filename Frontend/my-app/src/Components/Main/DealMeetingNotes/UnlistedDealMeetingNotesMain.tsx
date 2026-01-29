@@ -100,6 +100,12 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<null | (() => void)>(null);
+  const [createMode, setCreateMode] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    companyName?: string;
+    meetingName?: string;
+    meetingDate?: string;
+  }>({});
 
   const shouldShowEmptyState = meetings.length === 0;
   const headingConfig: Array<{ key: keyof SectionNotes; label: string }> = [
@@ -233,6 +239,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setIsEditing(false);
     setBackupState(null);
     setHasUnsavedChanges(false);
+    setValidationErrors({});
   };
   const emptySectionNotes: SectionNotes = {
     companyBackground: "",
@@ -406,6 +413,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setIsEditing(true);
     setNoDataFound(false);
     setSelectedCompanyName(normalizedCompany);
+    setValidationErrors({});
   };
 
   const startEdit = () => {
@@ -431,6 +439,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setIsEditing(false);
     setStatus(null);
     setHasUnsavedChanges(false);
+    setValidationErrors({});
   };
 
   const handleReset = () => {
@@ -454,6 +463,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     });
     setCurrentMeetingKey("meeting1");
     setHasUnsavedChanges(true);
+    setValidationErrors({});
   };
 
   useEffect(() => {
@@ -509,6 +519,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     }
 
     try {
+      setCreateMode(false);
       setLoadingMeetings(true);
       setStatus(null);
       setNoDataFound(false);
@@ -559,15 +570,32 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       return;
     }
 
+    const nextErrors: {
+      companyName?: string;
+      meetingName?: string;
+      meetingDate?: string;
+    } = {};
+
+    if (!meetingOverview.companyName.trim()) {
+      nextErrors.companyName = "Company name is required.";
+    }
+    if (!meetingOverview.name.trim()) {
+      nextErrors.meetingName = "Meeting name is required.";
+    }
+    if (!meetingOverview.date.trim()) {
+      nextErrors.meetingDate = "Meeting date is required.";
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setValidationErrors(nextErrors);
+      setStatus({ kind: "error", message: "Please complete the required fields." });
+      return;
+    }
+
     const currentEntry = meetings[selectedMeetingIndex];
     const isNewMeeting = currentEntry?.isNew ?? meetings.length === 0;
     const hasExistingMeetingInDb = meetings.some((m) => !m.isNew);
     const shouldCreate = isNewMeeting && !hasExistingMeetingInDb;
-
-    if (!meetingOverview.companyName.trim()) {
-      setStatus({ kind: "error", message: "Company name is required." });
-      return;
-    }
 
     const meetingNotes = buildMeetingNotes(sectionNotes);
     const metaData = {
@@ -671,63 +699,141 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   };
 
   return (
-    <Stack spacing={3}>
+    <Stack
+      spacing={3}
+      sx={{
+        position: "relative",
+        "@keyframes fadeUp": {
+          from: { opacity: 0, transform: "translateY(12px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+        "@keyframes floatGlow": {
+          "0%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+          "100%": { transform: "translateY(0px)" },
+        },
+      }}
+    >
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, md: 3 },
-          borderRadius: 3,
-          backgroundColor: "rgba(0,32,96,0.05)",
+          p: { xs: 2.5, md: 3.5 },
+          borderRadius: 4,
+          color: "#0b1f3a",
+          background:
+            "linear-gradient(120deg, rgba(0,98,255,0.12) 0%, rgba(0,194,162,0.12) 40%, rgba(255,193,7,0.12) 100%)",
           border: "1px solid rgba(0,32,96,0.12)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <UnlistedMeetingSearch
-          apiUrl={apiUrl}
-          token={token}
-          onSelect={(value: UnlistedMeetingSearchOptionData) => {
-            requestDiscardConfirm(() => {
-              const nextCompany = value.name || "";
-              setCompanyNameInput(nextCompany);
-              setSelectedCompanyName(nextCompany);
-              setMeetingOverview((prev) => ({
-                ...prev,
-                companyName: nextCompany || prev.companyName,
-              }));
-              setMeetings([]);
-              setSelectedMeetingIndex(0);
-              setCurrentMeetingId(null);
-              setCurrentMeetingKey("meeting1");
-              loadNotesByCompany(nextCompany);
-            });
-          }}
-          onCreate={() =>
-            requestDiscardConfirm(() => {
-              const normalizedCompany = companyNameInput.trim();
-              setSelectedCompanyName(normalizedCompany);
-              createNewMeetingFromTemplate(true, normalizedCompany);
-            })
-          }
-          onInputChange={(value) => {
-            setCompanyNameInput(value);
+        <Box
+          sx={{
+            position: "absolute",
+            top: -30,
+            right: { xs: -40, md: 40 },
+            width: { xs: 140, md: 200 },
+            height: { xs: 140, md: 200 },
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(0,98,255,0.35) 0%, transparent 70%)",
+            animation: "floatGlow 6s ease-in-out infinite",
           }}
         />
+        <Stack spacing={1.5}>
+          <Typography sx={{ fontWeight: 800, color: "#001b4d", fontSize: { xs: 20, md: 24 } }}>
+            Unlisted Company Meeting Notes
+          </Typography>
+          <Typography sx={{ color: "rgba(0,27,77,0.75)", maxWidth: 620 }}>
+            Search existing companies or create a new company record with multiple meetings.
+          </Typography>
+          <UnlistedMeetingSearch
+            apiUrl={apiUrl}
+            token={token}
+            onSelect={(value: UnlistedMeetingSearchOptionData) => {
+              requestDiscardConfirm(() => {
+                const nextCompany = value.name || "";
+                setCompanyNameInput(nextCompany);
+                setSelectedCompanyName(nextCompany);
+                setMeetingOverview((prev) => ({
+                  ...prev,
+                  companyName: nextCompany || prev.companyName,
+                }));
+                setMeetings([]);
+                setSelectedMeetingIndex(0);
+                setCurrentMeetingId(null);
+                setCurrentMeetingKey("meeting1");
+                setCreateMode(false);
+                loadNotesByCompany(nextCompany);
+              });
+            }}
+            onCreate={() =>
+              requestDiscardConfirm(() => {
+                const normalizedCompany = companyNameInput.trim();
+                setSelectedCompanyName(normalizedCompany);
+                setCreateMode(true);
+                setMeetings([]);
+                setSelectedMeetingIndex(0);
+                setCurrentMeetingId(null);
+                setCurrentMeetingKey("meeting1");
+                createNewMeetingFromTemplate(true, normalizedCompany);
+              })
+            }
+            onInputChange={(value) => {
+              setCompanyNameInput(value);
+            }}
+          />
+        </Stack>
       </Paper>
 
-      {selectedCompanyName ? (
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 1.5, md: 2 },
-            borderRadius: 2,
-            border: "1px solid rgba(0,32,96,0.12)",
-            backgroundColor: "#fff",
-          }}
-        >
-          <Typography sx={{ color: "#002060", fontWeight: 700 }}>
-            {selectedCompanyName}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, md: 2.5 },
+          borderRadius: 3,
+          border: "1px solid rgba(0,32,96,0.12)",
+          backgroundColor: "#fff",
+          animation: "fadeUp 380ms ease",
+          animationFillMode: "both",
+        }}
+      >
+        <Stack spacing={1}>
+          <Typography sx={{ color: "#002060", fontWeight: 700, fontSize: 15 }}>
+            Company
           </Typography>
-        </Paper>
-      ) : null}
+          <Typography sx={{ color: "#00133a", fontWeight: 800, fontSize: { xs: 18, md: 20 } }}>
+            {selectedCompanyName || "Select or create a company"}
+          </Typography>
+          {createMode ? (
+            <Box
+              sx={{
+                mt: 1,
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
+              <LabeledTextField
+                label="Company Name"
+                value={meetingOverview.companyName}
+                onChange={(val) => {
+                  setMeetingOverview((prev) => ({ ...prev, companyName: val }));
+                  setSelectedCompanyName(val);
+                  setCompanyNameInput(val);
+                  if (validationErrors.companyName) {
+                    setValidationErrors((prev) => ({ ...prev, companyName: undefined }));
+                  }
+                }}
+                isEditing={isEditing}
+                options={{
+                  required: true,
+                  error: Boolean(validationErrors.companyName),
+                  helperText: validationErrors.companyName,
+                }}
+              />
+            </Box>
+          ) : null}
+        </Stack>
+      </Paper>
 
       {!shouldShowEmptyState ? (
         <Paper
@@ -737,6 +843,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             borderRadius: 999,
             border: "1px solid #d8deef",
             backgroundColor: "rgba(0,32,96,0.06)",
+            animation: "fadeUp 420ms ease",
+            animationFillMode: "both",
           }}
         >
           <Box
@@ -810,15 +918,18 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         </Paper>
       ) : null}
 
-      <MeetingStatusPanels
-        noDataFound={noDataFound}
-        loading={loadingMeetings}
-        onCreateNew={() => {
-          const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
-          setSelectedCompanyName(normalizedCompany);
-          createNewMeetingFromTemplate(true, normalizedCompany);
-        }}
-      />
+      {!createMode ? (
+        <MeetingStatusPanels
+          noDataFound={noDataFound}
+          loading={loadingMeetings}
+          onCreateNew={() => {
+            const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
+            setSelectedCompanyName(normalizedCompany);
+            setCreateMode(true);
+            createNewMeetingFromTemplate(true, normalizedCompany);
+          }}
+        />
+      ) : null}
 
       {!loadingMeetings && !shouldShowEmptyState ? (
         <>
@@ -828,163 +939,516 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             </Alert>
           ) : null}
 
-          <Paper
-            elevation={0}
+          <Box
             sx={{
-              p: { xs: 2, md: 3 },
-              borderRadius: 3,
-              border: "1px solid rgba(0,32,96,0.12)",
-              backgroundColor: "#fff",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+              gap: 2.5,
             }}
           >
-            <Stack spacing={2}>
-              <Typography sx={{ color: "#002060", fontWeight: 700 }}>
-                Meeting Notes Form
-              </Typography>
-              <LabeledTextField
-                label="Meeting Name"
-                value={meetingOverview.name}
-                onChange={(val) => setMeetingOverview((prev) => ({ ...prev, name: val }))}
-                isEditing={isEditing}
-              />
-              <LabeledTextField
-                label="Meeting Date"
-                value={meetingOverview.date}
-                onChange={(val) => setMeetingOverview((prev) => ({ ...prev, date: val }))}
-                isEditing={isEditing}
-                options={{ type: "date" }}
-              />
-              <LabeledTextField
-                label="Attending"
-                value={meetingOverview.attendees}
-                onChange={(val) => setMeetingOverview((prev) => ({ ...prev, attendees: val }))}
-                isEditing={isEditing}
-              />
-              <LabeledTextField
-                label="Company Background"
-                value={sectionNotes.companyBackground}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, companyBackground: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Divisions"
-                value={sectionNotes.divisions}
-                onChange={(val) => setSectionNotes((prev) => ({ ...prev, divisions: val }))}
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Other Lines"
-                value={sectionNotes.otherLines}
-                onChange={(val) => setSectionNotes((prev) => ({ ...prev, otherLines: val }))}
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Organization"
-                value={sectionNotes.organization}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, organization: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Vertical Integration"
-                value={sectionNotes.verticalIntegration}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, verticalIntegration: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Strategic Approach"
-                value={sectionNotes.strategicApproach}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, strategicApproach: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Market Position"
-                value={sectionNotes.marketPosition}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, marketPosition: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Financial Performance"
-                value={sectionNotes.financialPerformance}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, financialPerformance: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="International Expansion Plans"
-                value={sectionNotes.internationalExpansionPlans}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({
-                    ...prev,
-                    internationalExpansionPlans: val,
-                  }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Growth Strategy"
-                value={sectionNotes.growthStrategy}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, growthStrategy: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Hong Kong Listing Rationale"
-                value={sectionNotes.hongKongListingRationale}
-                onChange={(val) =>
-                  setSectionNotes((prev) => ({ ...prev, hongKongListingRationale: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Leadership"
-                value={sectionNotes.leadership}
-                onChange={(val) => setSectionNotes((prev) => ({ ...prev, leadership: val }))}
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="To Do"
-                value={investmentSnapshot.results}
-                onChange={(val) =>
-                  setInvestmentSnapshot((prev) => ({ ...prev, results: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-              <LabeledTextField
-                label="Follow Up Questions"
-                value={capitalStructure.followUpQuestions}
-                onChange={(val) =>
-                  setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val }))
-                }
-                isEditing={isEditing}
-                options={{ multiline: true }}
-              />
-            </Stack>
-          </Paper>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "40ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #0050c8 0%, #00c2a2 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Meeting Overview
+                </Typography>
+                {createMode ? null : (
+                  <LabeledTextField
+                    label="Company Name"
+                    value={meetingOverview.companyName}
+                    onChange={(val) => {
+                      setMeetingOverview((prev) => ({ ...prev, companyName: val }));
+                      setSelectedCompanyName(val);
+                      if (validationErrors.companyName) {
+                        setValidationErrors((prev) => ({ ...prev, companyName: undefined }));
+                      }
+                    }}
+                    isEditing={isEditing}
+                    options={{
+                      required: true,
+                      error: Boolean(validationErrors.companyName),
+                      helperText: validationErrors.companyName,
+                    }}
+                  />
+                )}
+                <LabeledTextField
+                  label="Meeting Name"
+                  value={meetingOverview.name}
+                  onChange={(val) => {
+                    setMeetingOverview((prev) => ({ ...prev, name: val }));
+                    if (validationErrors.meetingName) {
+                      setValidationErrors((prev) => ({ ...prev, meetingName: undefined }));
+                    }
+                  }}
+                  isEditing={isEditing}
+                  options={{
+                    required: true,
+                    error: Boolean(validationErrors.meetingName),
+                    helperText: validationErrors.meetingName,
+                  }}
+                />
+                <LabeledTextField
+                  label="Meeting Date"
+                  value={meetingOverview.date}
+                  onChange={(val) => {
+                    setMeetingOverview((prev) => ({ ...prev, date: val }));
+                    if (validationErrors.meetingDate) {
+                      setValidationErrors((prev) => ({ ...prev, meetingDate: undefined }));
+                    }
+                  }}
+                  isEditing={isEditing}
+                  options={{
+                    type: "date",
+                    required: true,
+                    error: Boolean(validationErrors.meetingDate),
+                    helperText: validationErrors.meetingDate,
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 2,
+                  }}
+                >
+                  <LabeledTextField
+                    label="Location"
+                    value={meetingOverview.location}
+                    onChange={(val) =>
+                      setMeetingOverview((prev) => ({ ...prev, location: val }))
+                    }
+                    isEditing={isEditing}
+                  />
+                  <LabeledTextField
+                    label="Broker"
+                    value={meetingOverview.broker}
+                    onChange={(val) =>
+                      setMeetingOverview((prev) => ({ ...prev, broker: val }))
+                    }
+                    isEditing={isEditing}
+                  />
+                </Box>
+                <LabeledTextField
+                  label="Meeting Reason"
+                  value={meetingOverview.reason}
+                  onChange={(val) =>
+                    setMeetingOverview((prev) => ({ ...prev, reason: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "80ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #ff9800 0%, #ffcc80 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Attendees
+                </Typography>
+                <LabeledTextField
+                  label="Management Attendees"
+                  value={meetingOverview.attendees}
+                  onChange={(val) =>
+                    setMeetingOverview((prev) => ({ ...prev, attendees: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true, placeholder: "Comma-separated names" }}
+                />
+                <LabeledTextField
+                  label="Banker Attendees"
+                  value={meetingOverview.bankerAttendees}
+                  onChange={(val) =>
+                    setMeetingOverview((prev) => ({ ...prev, bankerAttendees: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true, placeholder: "Comma-separated names" }}
+                />
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "120ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #6a1b9a 0%, #ab47bc 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Investment Snapshot
+                </Typography>
+                <LabeledTextField
+                  label="One Line Summary"
+                  value={investmentSnapshot.oneLineSummary}
+                  onChange={(val) =>
+                    setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val }))
+                  }
+                  isEditing={isEditing}
+                />
+                <LabeledTextField
+                  label="Executive Summary"
+                  value={investmentSnapshot.executiveSummary}
+                  onChange={(val) =>
+                    setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                    gap: 2,
+                  }}
+                >
+                  <LabeledTextField
+                    label="Key Level"
+                    value={investmentSnapshot.keyLevel}
+                    onChange={(val) =>
+                      setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
+                    }
+                    isEditing={isEditing}
+                  />
+                  <LabeledTextField
+                    label="Possible Size"
+                    value={investmentSnapshot.possibleSize}
+                    onChange={(val) =>
+                      setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+                    }
+                    isEditing={isEditing}
+                  />
+                </Box>
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "160ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #00bcd4 0%, #80deea 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Strategy Highlights
+                </Typography>
+                <LabeledTextField
+                  label="Catalysts"
+                  value={businessStrategy.catalysts}
+                  onChange={(val) =>
+                    setBusinessStrategy((prev) => ({ ...prev, catalysts: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Likelihood of Primary Raise"
+                  value={businessStrategy.likelihoodPrimaryRaise}
+                  onChange={(val) =>
+                    setBusinessStrategy((prev) => ({
+                      ...prev,
+                      likelihoodPrimaryRaise: val,
+                    }))
+                  }
+                  isEditing={isEditing}
+                />
+                <LabeledTextField
+                  label="Reason for Raise"
+                  value={businessStrategy.reasonForRaise}
+                  onChange={(val) =>
+                    setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Opportunistic Deal"
+                  value={businessStrategy.opportunisticDeal}
+                  onChange={(val) =>
+                    setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "200ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #2e7d32 0%, #81c784 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Company Structure
+                </Typography>
+                <LabeledTextField
+                  label="Company Background"
+                  value={sectionNotes.companyBackground}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, companyBackground: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Divisions"
+                  value={sectionNotes.divisions}
+                  onChange={(val) => setSectionNotes((prev) => ({ ...prev, divisions: val }))}
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Other Lines"
+                  value={sectionNotes.otherLines}
+                  onChange={(val) => setSectionNotes((prev) => ({ ...prev, otherLines: val }))}
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Organization"
+                  value={sectionNotes.organization}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, organization: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Vertical Integration"
+                  value={sectionNotes.verticalIntegration}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, verticalIntegration: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "240ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #f06292 0%, #f8bbd0 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Market & Growth
+                </Typography>
+                <LabeledTextField
+                  label="Strategic Approach"
+                  value={sectionNotes.strategicApproach}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, strategicApproach: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Market Position"
+                  value={sectionNotes.marketPosition}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, marketPosition: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Financial Performance"
+                  value={sectionNotes.financialPerformance}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, financialPerformance: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="International Expansion Plans"
+                  value={sectionNotes.internationalExpansionPlans}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      internationalExpansionPlans: val,
+                    }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Growth Strategy"
+                  value={sectionNotes.growthStrategy}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, growthStrategy: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Hong Kong Listing Rationale"
+                  value={sectionNotes.hongKongListingRationale}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, hongKongListingRationale: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Leadership"
+                  value={sectionNotes.leadership}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, leadership: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "280ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background: "linear-gradient(180deg, #1565c0 0%, #90caf9 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Actions & Follow Ups
+                </Typography>
+                <LabeledTextField
+                  label="To Do"
+                  value={investmentSnapshot.results}
+                  onChange={(val) =>
+                    setInvestmentSnapshot((prev) => ({ ...prev, results: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+                <LabeledTextField
+                  label="Follow Up Questions"
+                  value={capitalStructure.followUpQuestions}
+                  onChange={(val) =>
+                    setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val }))
+                  }
+                  isEditing={isEditing}
+                  options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+          </Box>
         </>
       ) : null}
 
