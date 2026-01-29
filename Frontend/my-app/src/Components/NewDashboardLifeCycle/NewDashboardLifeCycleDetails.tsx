@@ -44,7 +44,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     () => [
       { label: "Write Up New" },
       { label: "Write up" },
-      { label: "Red Flag Analysis" },
+      // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "AI- Sentiment View" },
@@ -52,6 +52,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "ML Model" },
       { label: "S1 AI Query" },
       { label: "NEWS" },
+      { label: "Meeting Notes" },
     ],
     []
   );
