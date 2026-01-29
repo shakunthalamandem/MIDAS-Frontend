@@ -159,7 +159,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 borderRadius: 999,
                 mr: 1,
                 "&.Mui-selected": {
-                  backgroundColor: "#eef2ff",
+                  color:"#ffff",
+                  backgroundColor: "#4f46e5",
                 },
               }}
             />
