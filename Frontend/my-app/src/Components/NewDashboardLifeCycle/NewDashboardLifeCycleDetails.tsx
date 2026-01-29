@@ -39,6 +39,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
+  const viewMode = (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
 
@@ -122,7 +123,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <DealHeaderCard
             activePayload={activePayload}
             formatDate={formatDate}
-            onBack={() => navigate("/deals/new_dashboard")}
+            onBack={() =>
+              navigate("/deals/new_dashboard", {
+                state: { viewMode: viewMode === "table" ? "table" : "card" },
+              })
+            }
             SearchComponent={
               <Box sx={{ width: { xs: "100%", md: 320 } }}>
                 <NewDashboardLifeCycleTickerSearch

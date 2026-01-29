@@ -9,7 +9,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -39,13 +39,18 @@ import {
 
 const NewDealsLifecycleCards: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
-  const [viewMode, setViewMode] = useState<"card" | "table">("card");
+  const locationViewMode =
+    (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
+  const [viewMode, setViewMode] = useState<"card" | "table">(
+    locationViewMode === "table" ? "table" : "card"
+  );
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
     dayjs().subtract(30, "day")
   );
@@ -235,6 +240,12 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [selectedOp, selectedRegion, selectedDealType]);
 
   useEffect(() => {
+    if (locationViewMode === "card" || locationViewMode === "table") {
+      setViewMode(locationViewMode);
+    }
+  }, [locationViewMode]);
+
+  useEffect(() => {
     if (selectedOp === "live") {
       setLiveStartDate(dayjs().subtract(30, "day"));
       setLiveEndDate(dayjs());
@@ -334,7 +345,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
     navigate("/deals/new_dashboard/details", {
-      state: { payload: row, ...(extraState || {}) },
+      state: { payload: row, viewMode, ...(extraState || {}) },
     });
   };
 
@@ -422,11 +433,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
-              onViewDetails={() =>
-                navigate("/deals/new_dashboard/details", {
-                  state: { payload: row },
-                })
-              }
+              onViewDetails={() => handleRowNavigate(row)}
             />
             </Grid>
           );
@@ -493,11 +500,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     color: "#1d4ed8",
                   },
                 ]}
-                onViewDetails={() =>
-                  navigate("/deals/new_dashboard/details", {
-                    state: { payload: row, pipelineCategory },
-                  })
-                }
+                onViewDetails={() => handleRowNavigate(row, { pipelineCategory })}
               />
             </Grid>
           );
