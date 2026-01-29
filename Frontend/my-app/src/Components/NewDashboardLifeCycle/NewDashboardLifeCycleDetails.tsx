@@ -212,9 +212,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             )
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
-              <UpcomingDealRecomendation/>
+              <UpcomingDealRecomendation ticker={activePayload.ticker}
+              />
             ) : (
-              <RecentDealRecomendation
+              <RecentDealRecomendation ticker={activePayload.ticker}
               />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
