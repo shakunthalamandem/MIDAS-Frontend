@@ -64,6 +64,7 @@ const DealCard: React.FC<DealCardProps> = ({
         boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
         height: "100%",
         minHeight: { xs: 470, sm: 500 },
+        fontSize: "0.92rem",
       }}
     >
       <CardContent
@@ -83,6 +84,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 color: "#162048",
                 letterSpacing: 0.2,
                 wordBreak: "break-word",
+                fontSize: "1.05rem",
               }}
             >
               {title}
@@ -100,6 +102,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     color: tag.color ?? "#3348d0",
                     fontWeight: 700,
                     borderRadius: 999,
+                    fontSize: "0.7rem",
                   }}
                 />
               ))}
@@ -119,7 +122,7 @@ const DealCard: React.FC<DealCardProps> = ({
               <Box sx={{ flex: "0 0 50%", minWidth: 0 }}>
                 <Typography
                   variant="body2"
-                  sx={{ color: "#000000ff", fontWeight: 300, fontSize: "0.8rem", wordBreak: "break-word" }}
+                  sx={{ color: "#000000ff", fontWeight: 300, fontSize: "0.78rem", wordBreak: "break-word" }}
                 >
                   {subtitle}
                 </Typography>
@@ -177,7 +180,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 >
                   {item.icon}
                 </Box>
-                <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.82rem" }}>
                   {item.label}
                 </Typography>
               </Box>
@@ -246,7 +249,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                   {item.label}
                 </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
                   {item.value}
                 </Typography>
               </Box>
@@ -281,7 +284,7 @@ const DealCard: React.FC<DealCardProps> = ({
                   <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.82rem" }}>
                     {item.value}
                   </Typography>
                 </Box>
@@ -303,6 +306,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 background: "#5b3ee6",
                 // boxShadow: "0 10px 20px rgba(91, 62, 230, 0.3)",
                 fontWeight: 700,
+                fontSize: "0.85rem",
               }}
             >
               View Details
