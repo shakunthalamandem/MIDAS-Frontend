@@ -14,7 +14,7 @@ import IPODashboardPage4 from "./IPODashboardMain/IPODashboardPage4";
 import EditableCard from "./Hooks/EditableCard";
 import IPOComparablesAndAISection from "./IPOComparablesAndAISection";
 import NewFinancialTableMain from "./IPOFinancialForecast/NewFinancialTableMain";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface TickerOption {
   ticker_name: string;
@@ -60,6 +60,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const navigate = useNavigate();
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -69,9 +70,24 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   useEffect(() => {
     if (selectedTicker !== undefined) {
       setCurrentTicker(selectedTicker ?? null);
-      setSearchText("");
+      setSearchText(selectedTicker ?? "");
     }
   }, [selectedTicker]);
+
+  useEffect(() => {
+  if (!currentTicker) return;
+
+  const encodedTicker = encodeURIComponent(currentTicker);
+
+  // Avoid unnecessary navigation if URL already matches
+  if (!location.pathname.endsWith(encodedTicker)) {
+    navigate(`/equity/ipo_dashboard/${encodedTicker}`, {
+      replace: false,
+      state: { fromSearch: true },
+    });
+  }
+}, [currentTicker, navigate, location.pathname]);
+
 
   useEffect(() => {
     // Reset section tracking whenever a new ticker is selected
