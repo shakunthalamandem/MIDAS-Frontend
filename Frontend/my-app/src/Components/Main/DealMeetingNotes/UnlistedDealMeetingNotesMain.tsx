@@ -2,8 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import UnlistedMeetingSearch from "./UnlistedMeetingSearch";
@@ -106,6 +112,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     meetingName?: string;
     meetingDate?: string;
   }>({});
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createCompanyName, setCreateCompanyName] = useState("");
+  const [createCompanyError, setCreateCompanyError] = useState<string | null>(null);
 
   const shouldShowEmptyState = meetings.length === 0;
   const headingConfig: Array<{ key: keyof SectionNotes; label: string }> = [
@@ -506,6 +515,33 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     handleConfirmClose();
   };
 
+  const openCreateDialog = () => {
+    setCreateCompanyName(companyNameInput.trim());
+    setCreateCompanyError(null);
+    setCreateDialogOpen(true);
+  };
+
+  const closeCreateDialog = () => {
+    setCreateDialogOpen(false);
+  };
+
+  const handleCreateCompany = () => {
+    const normalizedCompany = createCompanyName.trim();
+    if (!normalizedCompany) {
+      setCreateCompanyError("Company name is required.");
+      return;
+    }
+    setSelectedCompanyName(normalizedCompany);
+    setCompanyNameInput(normalizedCompany);
+    setCreateMode(true);
+    setMeetings([]);
+    setSelectedMeetingIndex(0);
+    setCurrentMeetingId(null);
+    setCurrentMeetingKey("meeting1");
+    createNewMeetingFromTemplate(true, normalizedCompany);
+    setCreateDialogOpen(false);
+  };
+
   const loadNotesByCompany = async (companyOverride?: string) => {
     if (!apiUrl) {
       setStatus({ kind: "error", message: "REACT_APP_API_URL is not set." });
@@ -777,75 +813,28 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   loadNotesByCompany(nextCompany);
                 });
               }}
-              onCreate={() =>
-                requestDiscardConfirm(() => {
-                  const normalizedCompany = companyNameInput.trim();
-                  setSelectedCompanyName(normalizedCompany);
-                  setCreateMode(true);
-                  setMeetings([]);
-                  setSelectedMeetingIndex(0);
-                  setCurrentMeetingId(null);
-                  setCurrentMeetingKey("meeting1");
-                  createNewMeetingFromTemplate(true, normalizedCompany);
-                })
-              }
-              onInputChange={(value) => {
-                setCompanyNameInput(value);
-              }}
-            />
+            onCreate={() => requestDiscardConfirm(openCreateDialog)}
+            onInputChange={(value) => {
+              setCompanyNameInput(value);
+            }}
+          />
           </Box>
         </Box>
       </Paper>
 
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2, md: 2.5 },
-          borderRadius: 3,
-          border: "1px solid rgba(0,32,96,0.12)",
-          backgroundColor: "#fff",
-          animation: "fadeUp 380ms ease",
-          animationFillMode: "both",
-        }}
-      >
-        <Stack spacing={1}>
-          <Typography sx={{ color: "#002060", fontWeight: 700, fontSize: 15 }}>
-            Company
-          </Typography>
-          <Typography sx={{ color: "#00133a", fontWeight: 800, fontSize: { xs: 18, md: 20 } }}>
-            {selectedCompanyName || "Select or create a company"}
-          </Typography>
-          {createMode ? (
-            <Box
-              sx={{
-                mt: 1,
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                gap: 2,
-              }}
-            >
-              <LabeledTextField
-                label="Company Name"
-                value={meetingOverview.companyName}
-                onChange={(val) => {
-                  setMeetingOverview((prev) => ({ ...prev, companyName: val }));
-                  setSelectedCompanyName(val);
-                  setCompanyNameInput(val);
-                  if (validationErrors.companyName) {
-                    setValidationErrors((prev) => ({ ...prev, companyName: undefined }));
-                  }
-                }}
-                isEditing={isEditing}
-                options={{
-                  required: true,
-                  error: Boolean(validationErrors.companyName),
-                  helperText: validationErrors.companyName,
-                }}
-              />
-            </Box>
-          ) : null}
-        </Stack>
-      </Paper>
+      {selectedCompanyName ? (
+        <Typography
+          sx={{
+            color: "#002060",
+            fontWeight: 800,
+            fontSize: { xs: 18, md: 20 },
+            animation: "fadeUp 380ms ease",
+            animationFillMode: "both",
+          }}
+        >
+          {selectedCompanyName}
+        </Typography>
+      ) : null}
 
       {!shouldShowEmptyState ? (
         <Paper
@@ -983,25 +972,6 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                 <Typography sx={{ color: "#002060", fontWeight: 700 }}>
                   Meeting Overview
                 </Typography>
-                {createMode ? null : (
-                  <LabeledTextField
-                    label="Company Name"
-                    value={meetingOverview.companyName}
-                    onChange={(val) => {
-                      setMeetingOverview((prev) => ({ ...prev, companyName: val }));
-                      setSelectedCompanyName(val);
-                      if (validationErrors.companyName) {
-                        setValidationErrors((prev) => ({ ...prev, companyName: undefined }));
-                      }
-                    }}
-                    isEditing={isEditing}
-                    options={{
-                      required: true,
-                      error: Boolean(validationErrors.companyName),
-                      helperText: validationErrors.companyName,
-                    }}
-                  />
-                )}
                 <LabeledTextField
                   label="Meeting Name"
                   value={meetingOverview.name}
@@ -1469,6 +1439,31 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         onClose={handleConfirmClose}
         onDiscard={handleConfirmDiscard}
       />
+
+      <Dialog open={createDialogOpen} onClose={closeCreateDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>Enter Company Name</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Company Name"
+            fullWidth
+            value={createCompanyName}
+            onChange={(e) => {
+              setCreateCompanyName(e.target.value);
+              if (createCompanyError) setCreateCompanyError(null);
+            }}
+            error={Boolean(createCompanyError)}
+            helperText={createCompanyError ?? " "}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={closeCreateDialog}>Cancel</Button>
+          <Button variant="contained" onClick={handleCreateCompany}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 };
