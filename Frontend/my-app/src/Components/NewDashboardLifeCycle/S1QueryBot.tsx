@@ -2,13 +2,14 @@ import React from "react";
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
+  IconButton,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
@@ -117,7 +118,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
       }}
     >
       <Stack spacing={2}>
-        <Box>
+        <Box sx={{ textAlign: "center" }}>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             S1 AI Query
           </Typography>
@@ -126,41 +127,82 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
           </Typography>
         </Box>
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
           <TextField
             fullWidth
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Type your question..."
+            placeholder="Search company policies, culture, benefits, careers..."
             disabled={loading}
             onKeyDown={(e) => {
               if (e.key === "Enter") ask();
             }}
-            size="small"
-            sx={{ bgcolor: "white" }}
+            size="medium"
+            sx={{
+              maxWidth: 900,
+              bgcolor: "transparent",
+              "& .MuiOutlinedInput-root": {
+                height: 56,
+                borderRadius: 999,
+                bgcolor: "white",
+                transition: "box-shadow 0.2s ease, border-color 0.2s ease",
+                boxShadow: "0 6px 20px rgba(110, 150, 220, 0.25)",
+                "& fieldset": {
+                  borderColor: "rgba(120, 160, 220, 0.35)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgba(90, 140, 210, 0.6)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#4aa3ff",
+                  borderWidth: 2,
+                },
+              },
+              "& .MuiOutlinedInput-input": {
+                px: 2.5,
+              },
+            }}
           />
-          <Button
-            variant="contained"
+          <IconButton
             onClick={ask}
-            disabled={loading || !question.trim()}
-            sx={{ minWidth: { xs: "100%", sm: 120 } }}
+            aria-label="Send question"
+            sx={{
+              bgcolor: "#8ed0ff",
+              color: "white",
+              width: 48,
+              height: 48,
+              backgroundColor:"#2f81c0ff",
+              boxShadow: "0 6px 20px rgba(110, 150, 220, 0.25)",
+              "&:hover": { bgcolor: "#2f81c0ff" },
+            }}
           >
-            {loading ? <CircularProgress size={18} color="inherit" /> : "Ask"}
-          </Button>
-        </Stack>
+            {loading ? (
+              <CircularProgress size={18} color="inherit" />
+            ) : (
+              <SendRoundedIcon fontSize="small" />
+            )}
+          </IconButton>
+        </Box>
 
         {error && <Alert severity="error">{error}</Alert>}
 
         {blocks.length > 0 && (
-          <Box
-            sx={{
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 2,
-              bgcolor: "white",
-              overflow: "hidden",
-            }}
-          >
+          // <Box
+          //   sx={{
+          //     border: "1px solid",
+          //     borderColor: "divider",
+          //     borderRadius: 2,
+          //     bgcolor: "white",
+          //     overflow: "hidden",
+          //   }}
+          // >
             <GENAIRenderer
               blocks={blocks}
               setQuestion={setQuestion}
@@ -168,7 +210,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
               renderAll
               disableMotion
             />
-          </Box>
+          // </Box>
         )}
       </Stack>
     </Paper>
