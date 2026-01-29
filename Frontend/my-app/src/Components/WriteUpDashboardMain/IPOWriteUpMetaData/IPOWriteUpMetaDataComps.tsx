@@ -1,4 +1,5 @@
 import { BasicDealDetails } from "../types/DealInformation"
+import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataCompsProps {
   basicDealDetails: BasicDealDetails
@@ -6,17 +7,11 @@ interface IPOWriteUpMetaDataCompsProps {
 
 const IPOWriteUpMetaDataComps: React.FC<IPOWriteUpMetaDataCompsProps> = ({
   basicDealDetails
-}) => {
-  const { ticker, region, deal_id } = basicDealDetails
-
-  return (
-    <section>
-      <h4>Comps</h4>
-      <p>Ticker: {ticker}</p>
-      <p>Region: {region}</p>
-      <p>Deal ID: {deal_id}</p>
-    </section>
-  )
-}
+}) => (
+  <IPOWriteUpMetaDataSectionCard
+    title="Comps"
+    basicDealDetails={basicDealDetails}
+  />
+)
 
 export default IPOWriteUpMetaDataComps

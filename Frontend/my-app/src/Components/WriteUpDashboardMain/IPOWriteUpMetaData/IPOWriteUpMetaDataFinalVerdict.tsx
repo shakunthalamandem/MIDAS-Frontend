@@ -1,4 +1,5 @@
 import { BasicDealDetails } from "../types/DealInformation"
+import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataFinalVerdictProps {
   basicDealDetails: BasicDealDetails
@@ -6,17 +7,11 @@ interface IPOWriteUpMetaDataFinalVerdictProps {
 
 const IPOWriteUpMetaDataFinalVerdict: React.FC<
   IPOWriteUpMetaDataFinalVerdictProps
-> = ({ basicDealDetails }) => {
-  const { ticker, region, deal_id } = basicDealDetails
-
-  return (
-    <section>
-      <h4>Final Verdict</h4>
-      <p>Ticker: {ticker}</p>
-      <p>Region: {region}</p>
-      <p>Deal ID: {deal_id}</p>
-    </section>
-  )
-}
+> = ({ basicDealDetails }) => (
+  <IPOWriteUpMetaDataSectionCard
+    title="Final Verdict"
+    basicDealDetails={basicDealDetails}
+  />
+)
 
 export default IPOWriteUpMetaDataFinalVerdict
