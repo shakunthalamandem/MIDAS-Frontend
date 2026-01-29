@@ -1,6 +1,10 @@
 import React from 'react'
 
-const UpcomingDealRecomendation = () => {
+interface DashboardProps {
+  ticker?: string;
+}
+
+const UpcomingDealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
   return (
     <div>
         <h1>Upcoming Deal Recommendation Component</h1>
