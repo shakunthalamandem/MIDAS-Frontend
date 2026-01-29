@@ -50,10 +50,10 @@ const DealCard: React.FC<DealCardProps> = ({
     (item) => !barMeta.includes(item) && !dateMeta.includes(item)
   );
   const actionCards = [
-    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
-    { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9e8ff" },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9c7ff" },
-    { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
+    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", },
+    { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
+    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
+    { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
   ];
 
   return (
@@ -166,7 +166,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 sx={{
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
-                  border: `1px solid ${item.border}`,
+                  // border: `1px solid ${item.border}`,
                   boxShadow: "0 6px 12px rgba(30, 41, 59, 0.06)",
                   color: "#0f172a",
                   p: 0.8,
@@ -179,7 +179,9 @@ const DealCard: React.FC<DealCardProps> = ({
                   justifyContent: "center",
                   cursor: onActionClick ? "pointer" : "default",
                   "&:hover": onActionClick
-                    ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)" }
+                    ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
+                      bgcolor:"#ceccf3ff"
+                     }
                     : undefined,
                 }}
               >

@@ -34,6 +34,7 @@ import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
+import S1QueryBot from "./S1QueryBot";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -252,6 +253,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "AI- Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
+          ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
+            <S1QueryBot ticker={activePayload.ticker} />
           ) : (
             <PageUnderDevelopment />
           )}
