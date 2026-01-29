@@ -103,72 +103,84 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           boxShadow: "none",
         }}
       >
-        <DealHeaderCard
-          activePayload={activePayload}
-          formatDate={formatDate}
-          onBack={() => navigate("/deals/new_dashboard")}
-          SearchComponent={
-            <Box sx={{ width: { xs: "100%", md: 320 } }}>
-              <NewDashboardLifeCycleTickerSearch
-                selectedTicker={activePayload.ticker}
-                onSelect={setSelectedOption}
-              />
-            </Box>
-          }
-        />
-
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{
+        <Paper
+          elevation={0}
+          sx={(theme) => ({
             mb: 3,
-            backgroundColor: "transparent",
-            borderRadius: 0,
-            p: 0,
-            boxShadow: "none",
-            border: "none",
-            "& .MuiTabs-indicator": {
-              display: "none",
-            },
-            "& .MuiTab-root": {
-              textTransform: "none",
-              fontWeight: 600,
-              color: "#0f0f0fff",
-              minHeight: 40,
-              px: 2,
-              borderRadius: 999,
-              border: "1px solid #e2e8f0",
-              backgroundColor: "#ffffff",
-              boxShadow: "none",
-              transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
-            },
-            "& .Mui-selected": {
-              color: "#ffff",
-              backgroundColor: "#4f46e5",
-              borderColor: "#c7d2fe",
-              boxShadow: "none",
-            },
-          }}
+            p: 2,
+            borderRadius: 3,
+            backgroundColor: "rgba(151, 187, 240, 0.12)",
+            backdropFilter: "blur(10px)",
+            border: `1px solid ${theme.palette.divider}`,
+          })}
         >
-          {tabItems.map((item) => (
-            <Tab
-              key={item.label}
-              // icon={item.icon}
-              iconPosition="start"
-              label={item.label}
-              sx={{
+          <DealHeaderCard
+            activePayload={activePayload}
+            formatDate={formatDate}
+            onBack={() => navigate("/deals/new_dashboard")}
+            SearchComponent={
+              <Box sx={{ width: { xs: "100%", md: 320 } }}>
+                <NewDashboardLifeCycleTickerSearch
+                  selectedTicker={activePayload.ticker}
+                  onSelect={setSelectedOption}
+                />
+              </Box>
+            }
+          />
+
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              mb: 1,
+              backgroundColor: "transparent",
+              borderRadius: 0,
+              p: 0,
+              boxShadow: "none",
+              border: "none",
+              "& .MuiTabs-indicator": {
+                display: "none",
+              },
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                color: "#0f0f0fff",
+                minHeight: 40,
+                px: 2,
                 borderRadius: 999,
-                mr: 1,
-                "&.Mui-selected": {
-                  color:"#ffff",
-                  backgroundColor: "#4f46e5",
-                },
-              }}
-            />
-          ))}
-        </Tabs>
+                border: "1px solid #e2e8f0",
+                backgroundColor: "#ffffff",
+                boxShadow: "none",
+                transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
+              },
+              "& .Mui-selected": {
+                color: "#ffff",
+                backgroundColor: "#4f46e5",
+                borderColor: "#c7d2fe",
+                boxShadow: "none",
+              },
+            }}
+          >
+            {tabItems.map((item) => (
+              <Tab
+                key={item.label}
+                // icon={item.icon}
+                iconPosition="start"
+                label={item.label}
+                sx={{
+                  borderRadius: 999,
+                  mr: 1,
+                  "&.Mui-selected": {
+                    color: "#ffff",
+                    backgroundColor: "#4f46e5",
+                  },
+                }}
+              />
+            ))}
+          </Tabs>
+        </Paper>
 
         <Box sx={{ mb: 3 }}>
           {tabItems[tabValue]?.label === "Overview" ? (
