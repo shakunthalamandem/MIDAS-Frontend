@@ -22,13 +22,14 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
 }) => {
   return (
     <Paper
-      sx={(theme) => ({
+      elevation={0}
+      sx={() => ({
         mb: 3,
-        borderRadius: 3,
-        overflow: "hidden",
-        // border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
-        background:"#97bbf00d",
-        boxShadow: "0 10px 26px rgba(15, 23, 42, 0.10)",
+        borderRadius: 0,
+        overflow: "visible",
+        background: "transparent",
+        boxShadow: "none",
+        border: "none",
       })}
     >
       {/* ROW 1 */}
@@ -40,8 +41,8 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
           gridTemplateColumns: { xs: "1fr", md: "1fr 2fr 1fr" },
           alignItems: "center",
           gap: 1.5,
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          backgroundColor: alpha(theme.palette.info.main, 0.05),
+          borderBottom: "none",
+          backgroundColor: "transparent",
         })}
       >
         {/* Left */}
@@ -68,7 +69,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 600, lineHeight: 1.15 ,color:"#22252a"}}
+            sx={{ fontWeight: 700, lineHeight: 1.15 ,color:"#600e79ff"}}
             title={activePayload?.company_name || activePayload?.issuer_name}
           >
             {activePayload?.company_name || activePayload?.issuer_name || "—"}
@@ -83,7 +84,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
-              color:"#7b61ff"
+              color:"#22252a"
             }}
           >
             {activePayload?.ticker || "N/A"} • US

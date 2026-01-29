@@ -41,24 +41,25 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
-    { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
-    { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    { label: "Deal Recommendation", icon: <DashboardOutlinedIcon fontSize="small" /> },
+    { label: "Write up" },
+    // { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
+    { label: "Red Flag Analysis" },
+
+    { label: "Deal Recommendation" },
 
     {
       label: "Peer Deals Performance",
-      icon: <InsightsOutlinedIcon fontSize="small" />,
     },
     {
       label: "AI- Sentiment View",
-      icon: <SentimentSatisfiedAltOutlinedIcon fontSize="small" />,
+     
     },
-    { label: "AI Unsupervised", icon: <HubIcon fontSize="small" /> },
+    { label: "AI Unsupervised"},
 
-    { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
-    { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
+    { label: "ML Model" },
+    { label: "S1 AI Query"},
 
-    { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
+    { label: "NEWS" },
   ];
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -154,7 +155,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           {tabItems.map((item) => (
             <Tab
               key={item.label}
-              icon={item.icon}
+              // icon={item.icon}
               iconPosition="start"
               label={item.label}
               sx={{
