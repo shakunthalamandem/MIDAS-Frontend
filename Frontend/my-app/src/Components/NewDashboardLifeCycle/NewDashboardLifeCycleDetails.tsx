@@ -41,9 +41,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
-    { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
+    { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
+    { label: "Deal Recommendation", icon: <DashboardOutlinedIcon fontSize="small" /> },
+
     {
       label: "Peer Deals Performance",
       icon: <InsightsOutlinedIcon fontSize="small" />,
@@ -55,6 +56,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     { label: "AI Unsupervised", icon: <HubIcon fontSize="small" /> },
 
     { label: "ML Model", icon: <PsychologyOutlinedIcon fontSize="small" /> },
+    { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
 
     { label: "NEWS", icon: <NewspaperOutlinedIcon fontSize="small" /> },
   ];
