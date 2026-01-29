@@ -362,7 +362,11 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   };
 
   const normalizeRecordToMeetings = (record: any): MeetingEntry[] => {
-    const meta = record?.meta_data || record?.description || {};
+    const metaRoot = record?.meta_data || record?.description || {};
+    const meta =
+      metaRoot?.meta_data && typeof metaRoot.meta_data === "object"
+        ? metaRoot.meta_data
+        : metaRoot;
     const meetingEntries = Object.entries(meta).filter(([key]) =>
       key.toLowerCase().startsWith("meeting")
     );
