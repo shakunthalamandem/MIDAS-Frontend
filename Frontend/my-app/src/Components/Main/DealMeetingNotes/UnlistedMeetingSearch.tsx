@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -20,6 +20,7 @@ type UnlistedMeetingSearchProps = {
   onSelect: (option: UnlistedMeetingSearchOptionData) => void;
   onCreate: () => void;
   onInputChange: (value: string) => void;
+  resetSignal?: number;
 };
 
 const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
@@ -28,6 +29,7 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
   onSelect,
   onCreate,
   onInputChange,
+  resetSignal,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<UnlistedMeetingSearchOptionData[]>([]);
@@ -35,6 +37,7 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
     useState<UnlistedMeetingSearchOptionData | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const onInputChangeRef = useRef(onInputChange);
 
   const authHeader = useMemo(
     () => ({
@@ -116,6 +119,19 @@ const UnlistedMeetingSearch: React.FC<UnlistedMeetingSearchProps> = ({
       window.clearTimeout(handle);
     };
   }, [apiUrl, authHeader, searchTerm]);
+
+  useEffect(() => {
+    onInputChangeRef.current = onInputChange;
+  }, [onInputChange]);
+
+  useEffect(() => {
+    if (resetSignal === undefined) return;
+    setSearchTerm("");
+    setSearchResults([]);
+    setSelectedOption(null);
+    setSearchError(null);
+    onInputChangeRef.current("");
+  }, [resetSignal]);
 
   return (
     <Stack spacing={1}>

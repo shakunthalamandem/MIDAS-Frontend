@@ -112,6 +112,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     meetingName?: string;
     meetingDate?: string;
   }>({});
+  const [searchResetSignal, setSearchResetSignal] = useState(0);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createCompanyName, setCreateCompanyName] = useState("");
   const [createCompanyError, setCreateCompanyError] = useState<string | null>(null);
@@ -542,6 +543,25 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     setCreateDialogOpen(false);
   };
 
+  const resetForNewCompany = () => {
+    setSearchResetSignal((prev) => prev + 1);
+    setSelectedCompanyName("");
+    setCompanyNameInput("");
+    setCreateMode(true);
+    setMeetings([]);
+    setSelectedMeetingIndex(0);
+    setCurrentMeetingId(null);
+    setCurrentMeetingKey("meeting1");
+    setMeetingOverview(initialMeetingOverview);
+    setInvestmentSnapshot(initialInvestmentSnapshot);
+    setBusinessStrategy(initialBusinessStrategy);
+    setCapitalStructure(initialCapitalStructure);
+    setSectionNotes(emptySectionNotes);
+    setNoDataFound(false);
+    setStatus(null);
+    setIsEditing(true);
+  };
+
   const loadNotesByCompany = async (companyOverride?: string) => {
     if (!apiUrl) {
       setStatus({ kind: "error", message: "REACT_APP_API_URL is not set." });
@@ -793,27 +813,33 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             </Typography>
           </Stack>
           <Box sx={{ width: { xs: "100%", md: "auto" } }}>
-            <UnlistedMeetingSearch
-              apiUrl={apiUrl}
-              token={token}
-              onSelect={(value: UnlistedMeetingSearchOptionData) => {
-                requestDiscardConfirm(() => {
-                  const nextCompany = value.name || "";
-                  setCompanyNameInput(nextCompany);
-                  setSelectedCompanyName(nextCompany);
+          <UnlistedMeetingSearch
+            apiUrl={apiUrl}
+            token={token}
+            resetSignal={searchResetSignal}
+            onSelect={(value: UnlistedMeetingSearchOptionData) => {
+              requestDiscardConfirm(() => {
+                const nextCompany = value.name || "";
+                setCompanyNameInput(nextCompany);
+                setSelectedCompanyName(nextCompany);
                   setMeetingOverview((prev) => ({
                     ...prev,
                     companyName: nextCompany || prev.companyName,
                   }));
                   setMeetings([]);
                   setSelectedMeetingIndex(0);
-                  setCurrentMeetingId(null);
-                  setCurrentMeetingKey("meeting1");
-                  setCreateMode(false);
-                  loadNotesByCompany(nextCompany);
-                });
-              }}
-            onCreate={() => requestDiscardConfirm(openCreateDialog)}
+                setCurrentMeetingId(null);
+                setCurrentMeetingKey("meeting1");
+                setCreateMode(false);
+                loadNotesByCompany(nextCompany);
+              });
+            }}
+            onCreate={() =>
+              requestDiscardConfirm(() => {
+                resetForNewCompany();
+                openCreateDialog();
+              })
+            }
             onInputChange={(value) => {
               setCompanyNameInput(value);
             }}
