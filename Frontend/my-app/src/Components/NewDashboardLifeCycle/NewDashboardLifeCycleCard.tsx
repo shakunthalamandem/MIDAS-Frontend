@@ -124,7 +124,7 @@ const DealCard: React.FC<DealCardProps> = ({
               <Box>
                 <Typography
                   variant="caption"
-                  sx={{ color: "#64748b", fontWeight: 600 }}
+                  sx={{ color: "#5f5f5fff", fontWeight: 750 }}
                 >
                   {item.label}
                 </Typography>

@@ -418,8 +418,8 @@ const NewDealsLifecycleCards: React.FC = () => {
               secondaryTag={writeupTag}
               meta={meta}
               tags={[
-                { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
-                { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
+                { label: row.region || "Region N/A", bg: "#e6efff", color: "#1e3a8a" },
+                { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
               onViewDetails={() =>
