@@ -32,9 +32,8 @@ import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotA
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebIPOWriteUpDashboardMain";
-import FebIPOWriteUpDashboardMain from "../WriteUpDashboardMain/FebIPOWriteUpDashboardMain";
-import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
+import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
+
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
 
   const tabItems = [
-    { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
+    { label: "Write Up New", icon: <DashboardOutlinedIcon fontSize="small" /> },
     { label: "S1 AI Query", icon: <FindInPageOutlinedIcon fontSize="small" /> },
     { label: "Write up", icon: <ArticleOutlinedIcon fontSize="small" /> },
     {
@@ -188,15 +187,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               />
             )
 
-                      ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
-            isIpo ? (
-              <FebIPOWriteUpDashboardMain ticker={activePayload.ticker} />
-            ) : (
-              <FebFOWriteUpDashboardMain
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-              />
-            )
+) : tabItems[tabValue]?.label === "Write Up New" ? (
+  <FebWriteUpDashboardMain
+    basicDealDetails={{
+      deal_id: activePayload.deal_id,
+      ticker: activePayload.ticker,
+      pricing_date: activePayload.pricing_date,
+      region: activePayload.region,
+      deal_type: activePayload.deal_type
+    }}
+  />
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}

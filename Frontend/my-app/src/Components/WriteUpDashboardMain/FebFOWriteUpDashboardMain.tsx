@@ -1,16 +1,21 @@
-import { Typography } from '@mui/material'
-import React from 'react'
+import { BasicDealDetails } from "./types/DealInformation"
 
 interface FebFOWriteUpDashboardMainProps {
-  ticker: string
-  pricingDate?: string  
+  basicDealDetails: BasicDealDetails
 }
 
-const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({ ticker, pricingDate }) => {
+const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
+  basicDealDetails
+}) => {
+  const { ticker, pricing_date, region } = basicDealDetails
+
   return (
-    <div>
-      <Typography>Hey {ticker} and {pricingDate }</Typography>
-    </div>
+    <>
+      <h3>FO Write-up</h3>
+      <p>Ticker: {ticker}</p>
+      <p>Pricing Date: {pricing_date}</p>
+      <p>Region: {region}</p>
+    </>
   )
 }
 
