@@ -570,7 +570,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     backgroundColor: "#8f75ddff",
                     color: "#ffffff",
                   },
-                  "& .Mui-selected": {
+                  "& .MuiToggleButton-root.Mui-selected": {
                     color: "#ffffff",
                     backgroundColor: "#2b146f",
                     borderColor: "#2b146f",

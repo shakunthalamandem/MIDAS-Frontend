@@ -33,7 +33,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
         sx={{ width: "100%" }}
       >
         <ToggleButtonGroup
-          value={selectedOp}
+          value={selectedOp || options[0]?.value}
           exclusive
           onChange={(_e, value) => onChange(value ?? selectedOp)}
           sx={{
@@ -65,7 +65,7 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               backgroundColor: "#2b146f",
               color: "#ffffff",
             },
-            "& .Mui-selected": {
+            "& .MuiToggleButton-root.Mui-selected": {
               borderColor: "#2b146f",
               backgroundColor: "#2b146f",
               boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
@@ -79,9 +79,9 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               backgroundColor: "#2b146f",
               color: "#ffffff",
             },
-            "& .MuiToggleButton-root.Mui-selected:after": {
-              display: "none",
-            },
+            // "& .MuiToggleButton-root.Mui-selected:after": {
+            //   display: "none",
+            // },
             "& .deal-icon-box": {
               width: 20,
               height: 20,

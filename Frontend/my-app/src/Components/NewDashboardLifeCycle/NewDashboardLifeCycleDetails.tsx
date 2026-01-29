@@ -45,7 +45,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const tabItems = [
     { label: "Write up" },
     // { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    { label: "Red Flag Analysis" },
+    // { label: "Red Flag Analysis" },
 
     { label: "Deal Recommendation" },
 
@@ -162,7 +162,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               },
               "& .Mui-selected": {
                 color: "#ffff",
-                backgroundColor: "#4f46e5",
+                backgroundColor: "#332f86ff",
                 borderColor: "#c7d2fe",
                 boxShadow: "none",
               },

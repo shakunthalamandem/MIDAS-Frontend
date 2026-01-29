@@ -51,7 +51,7 @@ const DealCard: React.FC<DealCardProps> = ({
     { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
     { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9e8ff" },
     { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f1ebf8ff", tone: "#7b4ae8", border: "#dbc8ff" },
-    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#fbfcf1ff", tone: "#7a8a1b", border: "#dbe6a6" },
+    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
   ];
 
   return (
@@ -63,7 +63,7 @@ const DealCard: React.FC<DealCardProps> = ({
         backgroundColor: "#f6fbff",
         boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
         height: "100%",
-        minHeight: { xs: 470, sm: 500 },
+        minHeight: { xs: 400, sm: 300 },
         fontSize: "0.92rem",
       }}
     >
@@ -303,7 +303,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 borderRadius: 999,
                 px: 3,
                 py: 0.7,
-                background: "#5b3ee6",
+                background: "#0f3072ff",
                 // boxShadow: "0 10px 20px rgba(91, 62, 230, 0.3)",
                 fontWeight: 700,
                 fontSize: "0.85rem",
