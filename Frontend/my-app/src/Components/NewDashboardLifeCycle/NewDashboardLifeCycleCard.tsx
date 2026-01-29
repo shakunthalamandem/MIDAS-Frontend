@@ -135,6 +135,8 @@ const DealCard: React.FC<DealCardProps> = ({
                 sx={{
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
+                  border: `1px solid ${item.tone}33`,
+                  boxShadow: "0 8px 16px rgba(30, 41, 59, 0.08)",
                   color: item.tone,
                   p: 0.7,
                   display: "flex",
@@ -281,8 +283,8 @@ const DealCard: React.FC<DealCardProps> = ({
                 borderRadius: 999,
                 px: 3,
                 py: 0.7,
-                background: "linear-gradient(135deg, #4055e6 0%, #283bba 100%)",
-                boxShadow: "0 10px 20px rgba(64, 85, 230, 0.35)",
+                background: "#4055e6",
+                // boxShadow: "0 10px 20px rgba(64, 85, 230, 0.35)",
                 fontWeight: 700,
               }}
             >

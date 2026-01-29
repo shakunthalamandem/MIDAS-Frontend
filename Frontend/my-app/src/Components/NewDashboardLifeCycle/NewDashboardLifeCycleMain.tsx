@@ -508,7 +508,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1.5, md: 2 } }}>
         <Box
           sx={{
             backgroundColor: "#f3faff",
@@ -643,7 +643,7 @@ const NewDealsLifecycleCards: React.FC = () => {
           ) : selectedOp === "upcoming" ? (
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
-                <Container sx={{ px: 0, mb: 1 }}>
+                <Container sx={{ px: 0, mb: 1,mt:0 }}>
                   <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
                     Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
@@ -729,7 +729,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 const NewDashboardLifeCycleMain: React.FC = () => {
   return (
     <>
-      <Box
+      {/* <Box
         sx={{
           backgroundColor: "#0b2a6b",
           color: "#fff",
@@ -742,7 +742,7 @@ const NewDashboardLifeCycleMain: React.FC = () => {
         <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
           Welcome to New Dashboard Life Cycle!
         </Typography>
-      </Box>
+      </Box> */}
       <NewDealsLifecycleCards />
     </>
   );
