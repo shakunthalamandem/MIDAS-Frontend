@@ -11,14 +11,6 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import SentimentSatisfiedAltOutlinedIcon from "@mui/icons-material/SentimentSatisfiedAltOutlined";
-import HubIcon from "@mui/icons-material/Hub";
-import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
@@ -50,8 +42,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const tabItems = [
     { label: "Write up" },
-    // { label: "Write Up New", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    // { label: "Red Flag Analysis" },
+    { label: "Write Up New" },
+    { label: "Red Flag Analysis" },
 
     { label: "Deal Recommendation" },
 
