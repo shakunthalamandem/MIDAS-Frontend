@@ -45,7 +45,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const tabItems = [
     { label: "Write up" },
     // { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    { label: "Red Flag Analysis" },
+    // { label: "Red Flag Analysis" },
 
     { label: "Deal Recommendation" },
 
@@ -98,7 +98,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+    <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
       <Paper
         elevation={0}
         sx={{
@@ -162,7 +162,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               },
               "& .Mui-selected": {
                 color: "#ffff",
-                backgroundColor: "#4f46e5",
+                backgroundColor: "#262268ff",
                 borderColor: "#c7d2fe",
                 boxShadow: "none",
               },
@@ -179,7 +179,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                   mr: 1,
                   "&.Mui-selected": {
                     color: "#ffff",
-                    backgroundColor: "#4f46e5",
+                    backgroundColor: "#262268ff",
                   },
                 }}
               />

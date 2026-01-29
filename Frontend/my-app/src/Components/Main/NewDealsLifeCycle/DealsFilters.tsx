@@ -18,11 +18,12 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 1, md: 1.5 },
+        py: { xs: 1, md: 1.5 },
+        px: 0,
         borderRadius: 3,
-        backgroundColor: "#b2bdcb3b",
-        border: "1px solid #e6ebf5",
-        boxShadow: "0 12px 26px rgba(15,23,42,0.06)",
+        backgroundColor: "transparent",
+        border: "1px solid transparent",
+        boxShadow: "none",
       }}
     >
       <Stack
@@ -33,49 +34,58 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
         sx={{ width: "100%" }}
       >
         <ToggleButtonGroup
-          value={selectedOp}
+          value={selectedOp || options[0]?.value}
           exclusive
-          onChange={(_e, value) => value && onChange(value)}
+          onChange={(_e, value) => onChange(value ?? selectedOp)}
           sx={{
-            flexWrap: "nowrap",
-            columnGap: { xs: 1, md: 1.5 },
-            rowGap: { xs: 1, md: 1.25 },
-            overflowX: "auto",
+            flexWrap: "wrap",
+            columnGap: 1,
+            rowGap: 1,
+            overflowX: "visible",
             maxWidth: "100%",
             flex: 1,
             minWidth: 0,
             "& .MuiToggleButton-root": {
               textTransform: "none",
               borderRadius: 999,
-              border: "1px solid transparent",
-              backgroundColor: "#e5e7eb",
-              minWidth: 200,
-              height: 72,
-              minHeight: 72,
-              justifyContent: "flex-start",
-              px: 1.75,
-              py: 0.75,
-              color: "#4b5563",
+              border: "1px solid #d7ddea",
+              backgroundColor: "#ffffff",
+              minWidth: 0,
+              height: 36,
+              minHeight: 36,
+              justifyContent: "center",
+              px: 2,
+              py: 0.4,
+              color: "#1f2a44",
               position: "relative",
               overflow: "hidden",
               boxShadow: "none",
               transition: "all 0.2s ease",
             },
-            "& .MuiToggleButton-root:hover": {
-              backgroundColor: "#e2e8f0",
+            "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
             },
-            "& .Mui-selected": {
-              borderColor: "#2563eb",
-              backgroundColor: "#dbeafe",
-              color: "#1e3a8a",
-              boxShadow: "0 8px 18px rgba(37,99,235,0.25)",
+            "& .MuiToggleButton-root.Mui-selected": {
+              borderColor: "#2b146f",
+              backgroundColor: "#2b146f",
+              boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
+              color: "#ffffff",
             },
-            "& .MuiToggleButton-root.Mui-selected:after": {
-              display: "none",
+            "& .MuiToggleButton-root.Mui-selected:hover": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
             },
+            "& .MuiToggleButton-root.Mui-selected:leave": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
+            },
+            // "& .MuiToggleButton-root.Mui-selected:after": {
+            //   display: "none",
+            // },
             "& .deal-icon-box": {
-              width: 24,
-              height: 24,
+              width: 20,
+              height: 20,
               borderRadius: 999,
               display: "grid",
               placeItems: "center",
@@ -84,8 +94,8 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               transition: "all 0.2s ease",
             },
             "& .Mui-selected .deal-icon-box": {
-              backgroundColor: "#ece7f8",
-              color: "#2b146f",
+              backgroundColor: "rgba(255,255,255,0.2)",
+              color: "#ffffff",
             },
             "& .deal-label": {
               fontWeight: 700,
