@@ -545,7 +545,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             >
               <ToggleButtonGroup
                 size="small"
-                value={viewMode}
+                value={viewMode ?? "card"}
                 exclusive
                 onChange={(_e, value) => value && setViewMode(value)}
                 sx={{
@@ -563,7 +563,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     fontWeight: 600,
                   },
                   "& .Mui-selected": {
-                    color: "#f5f5f5ff",
+                    color: "#ffff",
                     backgroundColor: "#002060",
                   },
                 }}
@@ -642,7 +642,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                  <Typography sx={{ fontsize:"0.9rem",fontWeight: 600, color: "#002060" }} align="center">
                     Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
