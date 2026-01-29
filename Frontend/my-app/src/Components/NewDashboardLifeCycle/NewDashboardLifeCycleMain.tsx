@@ -408,8 +408,8 @@ const NewDealsLifecycleCards: React.FC = () => {
             <Grid
               item
               xs={12}
-              md={6}
-              lg={4}
+              md={4}
+              lg={3}
               key={row.id ?? `${row.ticker}-${row.pricing_date}`}
             >
             <DealCard
@@ -481,7 +481,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             },
           ];
           return (
-            <Grid item xs={12} md={6} lg={4} key={row.id ?? `${title}-${index}`}>
+            <Grid item xs={12} md={4} lg={3} key={row.id ?? `${title}-${index}`}>
               <DealCard
                 title={title}
                 subtitle={subtitle}
