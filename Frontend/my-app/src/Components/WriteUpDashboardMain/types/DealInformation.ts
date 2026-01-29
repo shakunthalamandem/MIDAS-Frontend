@@ -5,3 +5,5 @@ export interface BasicDealDetails {
   region: string
   deal_type: 'IPO' | 'FO'
 }
+
+
