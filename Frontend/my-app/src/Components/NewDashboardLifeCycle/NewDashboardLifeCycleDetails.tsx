@@ -32,7 +32,9 @@ import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotA
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
+import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebIPOWriteUpDashboardMain";
+import FebIPOWriteUpDashboardMain from "../WriteUpDashboardMain/FebIPOWriteUpDashboardMain";
+import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -185,11 +187,20 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 deal_id={activePayload.deal_id}
               />
             )
+
+                      ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
+            isIpo ? (
+              <FebIPOWriteUpDashboardMain ticker={activePayload.ticker} />
+            ) : (
+              <FebFOWriteUpDashboardMain
+                ticker={activePayload.ticker}
+                pricingDate={activePayload.pricing_date}
+              />
+            )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
-            // <NewDashboardLifeCyclePeerDeals
-            //   selectedDeal={activePayload}
-            // />
-            <FebWriteUpDashboardMain ticker={activePayload.ticker} pricingDate={activePayload.pricing_date} />
+            <NewDashboardLifeCyclePeerDeals
+              selectedDeal={activePayload}
+            />
             
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <StockTickerNews ticker={activePayload.ticker} />

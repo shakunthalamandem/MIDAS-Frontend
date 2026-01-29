@@ -1,12 +1,12 @@
 import { Typography } from '@mui/material'
 import React from 'react'
 
-interface FebWriteUpDashboardMainProps {
+interface FebIPOWriteUpDashboardMainProps {
   ticker: string
   pricingDate?: string  
 }
 
-const FebWriteUpDashboardMain: React.FC<FebWriteUpDashboardMainProps> = ({ ticker, pricingDate }) => {
+const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({ ticker, pricingDate }) => {
   return (
     <div>
       <Typography>Hey {ticker}</Typography>
@@ -14,4 +14,4 @@ const FebWriteUpDashboardMain: React.FC<FebWriteUpDashboardMainProps> = ({ ticke
   )
 }
 
-export default FebWriteUpDashboardMain
+export default FebIPOWriteUpDashboardMain
