@@ -48,10 +48,10 @@ const DealCard: React.FC<DealCardProps> = ({
     (item) => !barMeta.includes(item) && !dateMeta.includes(item)
   );
   const actionCards = [
-    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#cfd6ff", tone: "#000000ff" },
-    { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#dffbff", tone: "#000000ff" },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f3eaff", tone: "#000000ff" },
-    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f5f8dc", tone: "#000000ff" },
+    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", border: "#b9c7ff" },
+    { label: "AI Sentiment View", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", border: "#b9e8ff" },
+    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#f1ebf8ff", tone: "#7b4ae8", border: "#dbc8ff" },
+    { label: "ML Model", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#fbfcf1ff", tone: "#7a8a1b", border: "#dbe6a6" },
   ];
 
   return (
@@ -59,9 +59,9 @@ const DealCard: React.FC<DealCardProps> = ({
       elevation={0}
       sx={{
         borderRadius: 4,
-        border: "1px solid #f3faff",
-        backgroundColor: "#f3faff",
-        boxShadow: "0 18px 40px rgba(37, 44, 97, 0.12)",
+        border: "1px solid #e5f0ff",
+        backgroundColor: "#f6fbff",
+        boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
         height: "100%",
         minHeight: { xs: 470, sm: 500 },
       }}
@@ -90,7 +90,7 @@ const DealCard: React.FC<DealCardProps> = ({
             {subtitle ? (
               <Typography
                 variant="body2"
-                sx={{ color: "#68708a", fontWeight: 600, wordBreak: "break-word", mt: 0.2 }}
+                sx={{ color: "#000000ff", fontWeight: 300 , mt: 0.2 }}
               >
                 {subtitle}
               </Typography>
@@ -101,8 +101,8 @@ const DealCard: React.FC<DealCardProps> = ({
               label={secondaryTag.label}
               size="small"
               sx={{
-                bgcolor: secondaryTag.bg ?? "#eef2ff",
-                color: secondaryTag.color ?? "#3b52e5",
+                bgcolor: secondaryTag.bg ?? "#dcfce7",
+                color: secondaryTag.color ?? "#166534",
                 fontWeight: 700,
                 borderRadius: 999,
               }}
@@ -118,9 +118,9 @@ const DealCard: React.FC<DealCardProps> = ({
                 label={tag.label}
                 size="small"
                 sx={{
-                  bgcolor: tag.bg ?? "#eef2ff",
-                  color: tag.color ?? "#3b52e5",
-                  fontWeight: 600,
+                  bgcolor: tag.bg ?? "#e9edff",
+                  color: tag.color ?? "#3348d0",
+                  fontWeight: 700,
                   borderRadius: 999,
                 }}
               />
@@ -135,10 +135,10 @@ const DealCard: React.FC<DealCardProps> = ({
                 sx={{
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
-                  border: `1px solid ${item.tone}33`,
-                  boxShadow: "0 8px 16px rgba(30, 41, 59, 0.08)",
-                  color: item.tone,
-                  p: 0.7,
+                  border: `1px solid ${item.border}`,
+                  boxShadow: "0 6px 12px rgba(30, 41, 59, 0.06)",
+                  color: "#0f172a",
+                  p: 0.8,
                   display: "flex",
                   flexDirection: "column",
                   gap: 0.3,
@@ -153,7 +153,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     width: 22,
                     height: 22,
                     borderRadius: "50%",
-                    backgroundColor: "rgba(255,255,255,0.7)",
+                    backgroundColor: "#ffffff",
                     display: "grid",
                     placeItems: "center",
                     color: item.tone,
@@ -161,7 +161,7 @@ const DealCard: React.FC<DealCardProps> = ({
                 >
                   {item.icon}
                 </Box>
-                <Typography sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
                   {item.label}
                 </Typography>
               </Box>
@@ -217,19 +217,20 @@ const DealCard: React.FC<DealCardProps> = ({
           <Box
             sx={{
               borderRadius: 3,
-              backgroundColor: "#eef3ff",
-              p: 1.4,
+              backgroundColor: "transparent",
+              border: "1px solid #c7d2fe",
+              p: 1.2,
               display: "grid",
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-              gap: 1.2,
+              gap: 1,
             }}
           >
             {barMeta.map((item) => (
               <Box key={item.label}>
-                <Typography variant="caption" sx={{ color: "#6b7280", fontWeight: 700 }}>
+                <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                   {item.label}
                 </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 700, color: "#19213e" }}>
+                <Typography variant="body1" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
                   {item.value}
                 </Typography>
               </Box>
@@ -251,7 +252,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     width: 26,
                     height: 26,
                     borderRadius: "50%",
-                    backgroundColor: "#3b52e5",
+                    backgroundColor: "#5b3ee6",
                     display: "grid",
                     placeItems: "center",
                     color: "#ffffff",
@@ -261,10 +262,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   {item.icon}
                 </Box>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#6b7280", fontWeight: 700 }}>
+                  <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1f2a44" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
                     {item.value}
                   </Typography>
                 </Box>
@@ -283,8 +284,8 @@ const DealCard: React.FC<DealCardProps> = ({
                 borderRadius: 999,
                 px: 3,
                 py: 0.7,
-                background: "#4055e6",
-                // boxShadow: "0 10px 20px rgba(64, 85, 230, 0.35)",
+                background: "#5b3ee6",
+                // boxShadow: "0 10px 20px rgba(91, 62, 230, 0.3)",
                 fontWeight: 700,
               }}
             >

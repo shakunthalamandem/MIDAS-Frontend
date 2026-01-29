@@ -68,7 +68,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
         {/* Center */}
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Typography
-            variant="h6"
+            variant="h2"
             sx={{ fontWeight: 700, lineHeight: 1.15 ,color:"#600e79ff"}}
             title={activePayload?.company_name || activePayload?.issuer_name}
           >
