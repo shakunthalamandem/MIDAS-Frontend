@@ -40,8 +40,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
   const viewMode = (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
+  const targetTabLabel = (location.state as { targetTabLabel?: string } | null)?.targetTabLabel;
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
+  const appliedTabRef = React.useRef<string | null>(null);
 
   const tabItems = [
     { label: "Write up" },
@@ -68,6 +70,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
+
+  React.useEffect(() => {
+    if (!targetTabLabel) return;
+    if (appliedTabRef.current === targetTabLabel) return;
+    const nextIndex = tabItems.findIndex((item) => item.label === targetTabLabel);
+    if (nextIndex >= 0) {
+      appliedTabRef.current = targetTabLabel;
+      setTabValue(nextIndex);
+    }
+  }, [targetTabLabel, tabItems]);
 
   if (!payload) {
     return (

@@ -28,6 +28,7 @@ type DealCardProps = {
   tags?: DealCardTag[];
   secondaryTag?: DealCardTag;
   onViewDetails?: () => void;
+  onActionClick?: (label: string) => void;
 };
 
 const DealCard: React.FC<DealCardProps> = ({
@@ -37,6 +38,7 @@ const DealCard: React.FC<DealCardProps> = ({
   tags,
   secondaryTag,
   onViewDetails,
+  onActionClick,
 }) => {
   const barMeta = meta.filter((item) =>
     /size|price range|valuation/i.test(item.label)
@@ -151,6 +153,16 @@ const DealCard: React.FC<DealCardProps> = ({
           {actionCards.map((item) => (
             <Grid item xs={6} key={item.label}>
               <Box
+                onClick={() => onActionClick?.(item.label)}
+                onKeyDown={(event) => {
+                  if (!onActionClick) return;
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onActionClick(item.label);
+                  }
+                }}
+                role={onActionClick ? "button" : undefined}
+                tabIndex={onActionClick ? 0 : -1}
                 sx={{
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
@@ -165,6 +177,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   textAlign: "center",
                   minHeight: 56,
                   justifyContent: "center",
+                  cursor: onActionClick ? "pointer" : "default",
+                  "&:hover": onActionClick
+                    ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)" }
+                    : undefined,
                 }}
               >
                 <Box

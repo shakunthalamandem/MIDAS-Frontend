@@ -349,6 +349,13 @@ const NewDealsLifecycleCards: React.FC = () => {
     });
   };
 
+  const actionTabMap: Record<string, string> = {
+    "Write Up": "Write up",
+    "ML Model": "ML Model",
+    "AI Unsupervised": "AI Unsupervised",
+    "AI Sentiment View": "AI- Sentiment View",
+  };
+
   const renderDealsList = (list: any[]) =>
     viewMode === "table" ? (
       <DealsTable
@@ -433,6 +440,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
+              onActionClick={(label) =>
+                handleRowNavigate(row, {
+                  targetTabLabel: actionTabMap[label] ?? label,
+                })
+              }
               onViewDetails={() => handleRowNavigate(row)}
             />
             </Grid>
@@ -500,6 +512,12 @@ const NewDealsLifecycleCards: React.FC = () => {
                     color: "#1d4ed8",
                   },
                 ]}
+                onActionClick={(label) =>
+                  handleRowNavigate(row, {
+                    pipelineCategory,
+                    targetTabLabel: actionTabMap[label] ?? label,
+                  })
+                }
                 onViewDetails={() => handleRowNavigate(row, { pipelineCategory })}
               />
             </Grid>
