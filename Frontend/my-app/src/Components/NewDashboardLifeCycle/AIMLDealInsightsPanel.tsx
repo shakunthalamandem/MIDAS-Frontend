@@ -19,6 +19,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import type { DealRecord } from "../AIMLResults/types";
+import DealHeaderHero from "./DealHeaderHero"; // ✅ NEW
 
 type Props = { deal: DealRecord };
 type Direction =
@@ -72,7 +73,6 @@ function parseDirection(raw: string | null | undefined): Direction {
   return "NEUTRAL";
 }
 
-// confidence can be 0-1 or 0-100
 function confidenceProgressValue(
   conf: number | string | null | undefined,
 ): number {
@@ -86,40 +86,16 @@ function getCardTone(dir: Direction) {
   switch (dir) {
     case "POSITIVE":
     case "POSITIVE_RETURN":
-      return {
-        chipBg: "#DCFCE7",
-        chipText: "#166534",
-        bar: "#22C55E",
-      };
-
+      return { chipBg: "#DCFCE7", chipText: "#166534", bar: "#22C55E" };
     case "NEGATIVE":
-      return {
-        chipBg: "#FEE2E2",
-        chipText: "#991B1B",
-        bar: "#EF4444",
-      };
-
+      return { chipBg: "#FEE2E2", chipText: "#991B1B", bar: "#EF4444" };
     case "LOW_RETURN":
-      return {
-        chipBg: "#FEF9C3", // yellow soft
-        chipText: "#854D0E",
-        bar: "#EAB308",
-      };
-
+      return { chipBg: "#FEF9C3", chipText: "#854D0E", bar: "#EAB308" };
     case "EXTREME":
-      return {
-        chipBg: "#E0E7FF", // purple/blue highlight
-        chipText: "#3730A3",
-        bar: "#6366F1",
-      };
-
+      return { chipBg: "#E0E7FF", chipText: "#3730A3", bar: "#6366F1" };
     case "NEUTRAL":
     default:
-      return {
-        chipBg: "#E5E7EB",
-        chipText: "#374151",
-        bar: "#9CA3AF",
-      };
+      return { chipBg: "#E5E7EB", chipText: "#374151", bar: "#9CA3AF" };
   }
 }
 
@@ -143,7 +119,6 @@ function directionLabel(dir: Direction) {
 
 function DirectionChip({ dir }: { dir: Direction }) {
   const tone = getCardTone(dir);
-
   return (
     <Chip
       label={directionLabel(dir)}
@@ -365,7 +340,6 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      {/* subtle page background like screenshot */}
       <Box
         sx={{
           borderRadius: 4,
@@ -376,60 +350,10 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
               : "linear-gradient(180deg, rgba(59,130,246,0.06), rgba(255,255,255,0))",
         }}
       >
-        {/* Header strip */}
-        <Box
-          sx={{
-            p: 2.25,
-            borderRadius: 4,
-            border: "1px solid #E6EEF9",
-            background:
-              "linear-gradient(90deg, rgba(59,130,246,0.14), rgba(59,130,246,0.05))",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            flexWrap: "wrap",
-            boxShadow: "0 10px 30px rgba(16, 24, 40, 0.06)",
-          }}
-        >
-          <Box sx={{ minWidth: 220 }}>
-            <Typography variant="h6" sx={{ fontWeight: 1100, lineHeight: 1.1 }}>
-              {fmtPlain(deal.issuer_name).toUpperCase()}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: "#111827", fontWeight: 600, opacity: 0.85 }}
-            >
-              {fmtPlain(deal.region)} • {fmtPlain(deal.sector)} • Priced at{" "}
-              <span style={{ fontWeight: 1000 }}>
-                {fmtMoney(deal.issue_price)}
-              </span>
-            </Typography>
-          </Box>
+        {/* ✅ NEW Premium Header */}
+        <DealHeaderHero deal={deal} fmtPlain={fmtPlain} fmtMoney={fmtMoney} />
 
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1,
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Chip
-              label={fmtPlain(deal.ticker)}
-              variant="outlined"
-              sx={{ fontWeight: 900, borderColor: "#CFE3FF" }}
-            />
-            <Chip
-              label="IPO"
-              color="info"
-              variant="outlined"
-              sx={{ fontWeight: 900 }}
-            />
-          </Box>
-        </Box>
-
-        {/* Model inputs accordion (closed by default) */}
+        {/* Model inputs accordion */}
         <Accordion
           defaultExpanded={false}
           disableGutters
@@ -448,34 +372,28 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: 1.2,
-                px: 2.5,
-                py: 1.5,
-                borderRadius: "14px",
+                px: 2.25,
+                py: 1.25,
+                borderRadius: 999,
                 background: "linear-gradient(135deg, #f5f7ff, #e8ecff)",
                 boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
                 width: "fit-content",
-                mb: 2,
               }}
             >
-              <InfoOutlinedIcon
-                sx={{
-                  fontSize: 26,
-                  color: "#3f51b5",
-                }}
-              />
-
+              <InfoOutlinedIcon sx={{ fontSize: 22, color: "#3f51b5" }} />
               <Typography
                 sx={{
-                  fontWeight: 800,
-                  fontSize: "1.15rem",
+                  fontWeight: 900,
+                  fontSize: 14,
                   color: "#1a237e",
-                  letterSpacing: "0.5px",
+                  letterSpacing: 0.4,
                 }}
               >
                 Key Input Factors for Model Prediction
               </Typography>
             </Box>
           </AccordionSummary>
+
           <AccordionDetails sx={{ bgcolor: "#FFFFFF" }}>
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
@@ -565,7 +483,7 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
           </AccordionDetails>
         </Accordion>
 
-        {/* Predictions section background like screenshot */}
+        {/* Predictions section */}
         <Box
           sx={{
             mt: 2,
