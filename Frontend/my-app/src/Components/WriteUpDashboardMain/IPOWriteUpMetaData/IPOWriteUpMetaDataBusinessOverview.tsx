@@ -1,166 +1,228 @@
-import React, { useState, useEffect } from 'react';
-import { IconButton, TextField, Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useEffect, useState, ReactElement } from 'react'
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  IconButton,
+  TextField,
+  Box,
+  Chip,
+  Paper,
+} from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import EditIcon from '@mui/icons-material/Edit'
+import SaveIcon from '@mui/icons-material/Save'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import GroupsIcon from '@mui/icons-material/Groups'
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
+
+/* ===================== TYPES ===================== */
 
 interface WriteUpData {
-  business_overview: string[];
-  key_highlights: string[];
-  concerns: string[];
-  principal_stockholders_preipo: string[];
-  key_management_personnel: string[];
-  [key: string]: string[];  // Index signature added
+  business_overview: string[]
+  key_highlights: string[]
+  concerns: string[]
+  principal_stockholders_preipo: string[]
+  key_management_personnel: string[]
+  [key: string]: string[]
 }
 
-interface IPOWriteUpMetaDataBusinessOverviewProps {
-  basicDealDetails: { ticker: string };
+interface Props {
+  basicDealDetails: {
+    ticker: string
+  }
 }
 
-const IPOWriteUpMetaDataBusinessOverview: React.FC<IPOWriteUpMetaDataBusinessOverviewProps> = ({ basicDealDetails }) => {
-  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
-  const [editMode, setEditMode] = useState<string | null>(null); // Track which section is being edited
-  const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+type AccordionSection = {
+  section: keyof WriteUpData
+  title: string
+  icon: ReactElement
+}
+
+/* ===================== CONFIG ===================== */
+
+const ACCORDION_SECTIONS: AccordionSection[] = [
+  {
+    section: 'key_highlights',
+    title: 'Key Highlights',
+    icon: <TrendingUpIcon />,
+  },
+  {
+    section: 'concerns',
+    title: 'Concerns',
+    icon: <WarningAmberIcon />,
+  },
+  {
+    section: 'principal_stockholders_preipo',
+    title: 'Principal Stockholders Pre-IPO',
+    icon: <AccountTreeIcon />,
+  },
+  {
+    section: 'key_management_personnel',
+    title: 'Key Management Personnel',
+    icon: <GroupsIcon />,
+  },
+]
+
+/* ===================== COMPONENT ===================== */
+
+const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
+  basicDealDetails,
+}) => {
+  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null)
+  const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null)
+  const [editMode, setEditMode] = useState<keyof WriteUpData | null>(null)
+
+  /* ===================== FETCH ===================== */
 
   useEffect(() => {
-    const { ticker } = basicDealDetails;
     const fetchData = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem('access_token');
+      const apiUrl = process.env.REACT_APP_API_URL
+      const token = localStorage.getItem('access_token')
 
-      try {
-        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify({ ticker }),
-        });
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
-        const data = await res.json();
-        setWriteUpData(data);
-        setUpdatedData(data); // Keep a separate copy for editing
-      } catch (error) {
-        setError('An error occurred while fetching the data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [basicDealDetails]);
-
-  const handleEdit = (section: string) => {
-    setEditMode(section);
-  };
-
-  const handleSave = async (section: string) => {
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem('access_token');
-
-    try {
       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: token ? `Bearer ${token}` : '',
         },
-        body: JSON.stringify({
-          ticker: basicDealDetails.ticker,
-          [section]: updatedData ? updatedData[section] : [],
-        }),
-      });
+        body: JSON.stringify({ ticker: basicDealDetails.ticker }),
+      })
 
-      if (!res.ok) {
-        throw new Error('Failed to save data');
-      }
-
-      setEditMode(null); // Exit edit mode after saving
-    } catch (error) {
-      setError('An error occurred while saving the data');
+      const data = await res.json()
+      setWriteUpData(data)
+      setUpdatedData(data)
     }
-  };
 
-  const handleChange = (section: string, index: number, value: string) => {
-    // Use a type assertion to ensure TypeScript knows the structure
-    const newData = { ...updatedData } as WriteUpData; // Ensure the updated data is of type WriteUpData
-    if (newData[section]) {
-      newData[section][index] = value;
-      setUpdatedData(newData);
-    }
-  };
+    fetchData()
+  }, [basicDealDetails])
 
-  const renderEditableSection = (
-    section: string,
-    data: string[],
+  /* ===================== HANDLERS ===================== */
+
+  const handleChange = (
+    section: keyof WriteUpData,
+    index: number,
+    value: string
   ) => {
-    return data.map((item, index) => (
-      <div key={index}>
-        {editMode === section ? (
-          <TextField
-            fullWidth
-            value={item}
-            onChange={(e) => handleChange(section, index, e.target.value)}
-            variant="outlined"
-            margin="normal"
-          />
-        ) : (
-          <Typography variant="body2" paragraph>
-            {item}
-          </Typography>
-        )}
-      </div>
-    ));
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
+    if (!updatedData) return
+    const copy = { ...updatedData }
+    copy[section][index] = value
+    setUpdatedData(copy)
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  const renderSectionContent = (
+    section: keyof WriteUpData,
+    data: string[]
+  ) =>
+    data.map((item, index) =>
+      editMode === section ? (
+        <TextField
+          key={index}
+          fullWidth
+          value={item}
+          onChange={(e) => handleChange(section, index, e.target.value)}
+          sx={{ mb: 2 }}
+        />
+      ) : (
+        <Typography key={index} variant="body2" sx={{ mb: 1.5 }}>
+          {item}
+        </Typography>
+      )
+    )
 
-  if (!writeUpData) {
-    return <div>No data available</div>;
-  }
+  if (!writeUpData) return null
+
+  /* ===================== UI ===================== */
 
   return (
-    <div>
-      {[
-        ['business_overview', 'Business Overview'],
-        ['key_highlights', 'Key Highlights'],
-        ['concerns', 'Concerns'],
-        ['principal_stockholders_preipo', 'Principal Stockholders Pre-IPO'],
-        ['key_management_personnel', 'Key Management Personnel'],
-      ].map(([section, title]) => (
-        <Accordion key={section}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls={`${section}-content`} id={`${section}-header`}>
-            <Typography variant="h6">{title}</Typography>
-            {editMode === section ? (
-              <IconButton onClick={() => handleSave(section)} color="primary" sx={{ marginLeft: 'auto' }}>
-                <SaveIcon />
-              </IconButton>
-            ) : (
-              <IconButton onClick={() => handleEdit(section)} color="primary" sx={{ marginLeft: 'auto' }}>
-                <EditIcon />
-              </IconButton>
-            )}
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        backgroundColor: '#F8FAFF',
+        border: '1px solid #E6ECF5',
+      }}
+    >
+      {/* ================= BUSINESS OVERVIEW ================= */}
+      <Box textAlign="center" mb={4}>
+        <Typography variant="h5" fontWeight={600}>
+          Business Overview
+        </Typography>
+
+        <Chip
+          label="Rating – 9/10"
+          size="small"
+          sx={{
+            mt: 1,
+            backgroundColor: '#EAF1FF',
+            color: '#2563EB',
+            fontWeight: 500,
+          }}
+        />
+
+        <Box mt={3}>
+          {renderSectionContent(
+            'business_overview',
+            writeUpData.business_overview || []
+          )}
+        </Box>
+      </Box>
+
+      {/* ================= ACCORDIONS ================= */}
+      {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
+        <Accordion
+          key={section}
+          sx={{
+            mb: 2,
+            borderRadius: 2,
+            border: '1px solid #E6ECF5',
+            '&:before': { display: 'none' },
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 2,
+                  backgroundColor: '#EEF4FF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#2563EB',
+                }}
+              >
+                {icon}
+              </Box>
+
+              <Typography fontWeight={600}>{title}</Typography>
+            </Box>
+
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation()
+                setEditMode(editMode === section ? null : section)
+              }}
+              sx={{ ml: 'auto' }}
+            >
+              {editMode === section ? <SaveIcon /> : <EditIcon />}
+            </IconButton>
           </AccordionSummary>
+
           <AccordionDetails>
-            {renderEditableSection(section, writeUpData[section] || [])}
+            {renderSectionContent(
+              section,
+              writeUpData[section] || []
+            )}
           </AccordionDetails>
         </Accordion>
       ))}
-    </div>
-  );
-};
+    </Paper>
+  )
+}
 
-export default IPOWriteUpMetaDataBusinessOverview;
+export default IPOWriteUpMetaDataBusinessOverview
