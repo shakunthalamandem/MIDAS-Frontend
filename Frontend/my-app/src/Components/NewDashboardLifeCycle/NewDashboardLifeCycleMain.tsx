@@ -87,19 +87,19 @@ const NewDealsLifecycleCards: React.FC = () => {
       helper: "Issued Deals",
       icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
-    {
-      value: "pipeline",
-      label: "Future Pipeline",
-      helper: "Not filed",
-      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
-    },
+    // {
+    //   value: "pipeline",
+    //   label: "Future Pipeline",
+    //   helper: "Not filed",
+    //   icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
+    // },
   ];
 
   const regionTabs = [
     { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
     { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
     { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-    { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
+    // { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
   ] as const;
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
