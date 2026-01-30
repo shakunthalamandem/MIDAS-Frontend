@@ -1,12 +1,18 @@
+import React, { useEffect, useMemo, useState } from "react"
 import {
   Box,
   Chip,
   CircularProgress,
   Grid,
+  IconButton,
   LinearProgress,
   Stack,
+  TextField,
   Typography
 } from "@mui/material"
+import EditIcon from "@mui/icons-material/Edit"
+import SaveIcon from "@mui/icons-material/Save"
+import CancelIcon from "@mui/icons-material/Cancel"
 import { BasicDealDetails } from "../types/DealInformation"
 import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
@@ -18,6 +24,86 @@ interface IPOWriteUpMetaDataFinalVerdictProps {
 const IPOWriteUpMetaDataFinalVerdict: React.FC<
   IPOWriteUpMetaDataFinalVerdictProps
 > = ({ basicDealDetails, metadata }) => {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [finalVerdictText, setFinalVerdictText] = useState("")
+  const [overallRating, setOverallRating] = useState("")
+  const [draftFinalVerdictText, setDraftFinalVerdictText] = useState("")
+  const [draftOverallRating, setDraftOverallRating] = useState("")
+  const [sectionScores, setSectionScores] = useState<Record<string, number>>({})
+
+  const apiUrl = process.env.REACT_APP_API_URL
+  const token = localStorage.getItem("access_token")
+
+  const getAuthHeaders = useMemo(
+    () => ({
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : ""
+    }),
+    [token]
+  )
+
+  useEffect(() => {
+    let isActive = true
+    const fetchFinalVerdict = async () => {
+      if (!apiUrl || !basicDealDetails.ticker) return
+
+      try {
+        if (isActive) setLoading(true)
+        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers: getAuthHeaders,
+          body: JSON.stringify({ ticker: basicDealDetails.ticker })
+        })
+
+        if (!res.ok) {
+          const errData = await res.json()
+          throw new Error(errData.message || "Failed to fetch final verdict")
+        }
+
+        const data = await res.json()
+        if (!isActive) return
+
+        const verdict = data?.final_verdict ?? metadata?.final_verdict ?? ""
+        const rating = data?.overall_rating ?? metadata?.overall_rating ?? ""
+        setFinalVerdictText(verdict)
+        setOverallRating(rating)
+        setDraftFinalVerdictText(verdict)
+        setDraftOverallRating(rating)
+
+        const incomingScores =
+          data?.section_scores ?? data?.final_verdict_section_scores ?? {}
+        if (incomingScores && typeof incomingScores === "object") {
+          setSectionScores(incomingScores)
+        }
+        setError(null)
+      } catch (err: any) {
+        if (isActive) setError(err.message || "Unable to load final verdict")
+      } finally {
+        if (isActive) setLoading(false)
+      }
+    }
+
+    fetchFinalVerdict()
+
+    return () => {
+      isActive = false
+    }
+  }, [apiUrl, basicDealDetails.ticker, getAuthHeaders, metadata])
+
+  useEffect(() => {
+    if (!metadata) return
+    if (!finalVerdictText && metadata.final_verdict) {
+      setFinalVerdictText(metadata.final_verdict)
+      setDraftFinalVerdictText(metadata.final_verdict)
+    }
+    if (!overallRating && metadata.overall_rating) {
+      setOverallRating(metadata.overall_rating)
+      setDraftOverallRating(metadata.overall_rating)
+    }
+  }, [metadata, finalVerdictText, overallRating])
+
   const sectionDefaults = [
     { id: "deal-info", label: "Deal Info" },
     { id: "deal-indication", label: "Deal Indication" },
@@ -31,7 +117,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   ]
 
   const scoreMap =
-    metadata?.section_scores ?? metadata?.final_verdict_section_scores ?? {}
+    Object.keys(sectionScores).length > 0
+      ? sectionScores
+      : metadata?.section_scores ?? metadata?.final_verdict_section_scores ?? {}
 
   const sections = sectionDefaults.map((section) => ({
     ...section,
@@ -42,13 +130,61 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       null
   }))
 
-  const overallScore =
-    metadata?.overall_score ?? metadata?.overall_rating ?? metadata?.verdict_score
+  const parseOverallPercent = (value: string | number | null | undefined) => {
+    if (value === null || value === undefined) return null
+    if (typeof value === "number") {
+      return Math.max(0, Math.min(100, Math.round(value)))
+    }
+    const match = String(value).match(/[\d.]+/)
+    if (!match) return null
+    const parsed = Number(match[0])
+    if (Number.isNaN(parsed)) return null
+    return Math.max(0, Math.min(100, Math.round(parsed)))
+  }
 
-  const overallPercent =
-    typeof overallScore === "number"
-      ? Math.max(0, Math.min(100, Math.round(overallScore)))
-      : null
+  const overallScore =
+    parseOverallPercent(overallRating) ??
+    parseOverallPercent(metadata?.overall_score) ??
+    parseOverallPercent(metadata?.overall_rating) ??
+    parseOverallPercent(metadata?.verdict_score)
+
+  const overallPercent = typeof overallScore === "number" ? overallScore : null
+
+  const handleSave = async () => {
+    try {
+      if (!apiUrl) throw new Error("API URL not defined")
+      const payload = {
+        ticker_name: basicDealDetails.ticker,
+        final_verdict: draftFinalVerdictText || null,
+        overall_rating: draftOverallRating || null
+      }
+
+      const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+        method: "PATCH",
+        headers: getAuthHeaders,
+        body: JSON.stringify(payload)
+      })
+
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.message || "Failed to save final verdict")
+      }
+
+      setFinalVerdictText(draftFinalVerdictText)
+      setOverallRating(draftOverallRating)
+      setEditMode(false)
+      setError(null)
+    } catch (err: any) {
+      setError(err.message || "Save failed")
+    }
+  }
+
+  const handleCancel = () => {
+    setDraftFinalVerdictText(finalVerdictText)
+    setDraftOverallRating(overallRating)
+    setEditMode(false)
+    setError(null)
+  }
 
   return (
     <IPOWriteUpMetaDataSectionCard
@@ -104,11 +240,45 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
 
         <Grid item xs={12} md={6}>
           <Stack spacing={2}>
-            <Typography variant="body2" sx={{ color: "#1f2a44" }}>
-              {metadata?.final_verdict_summary ??
-                metadata?.final_verdict ??
-                "Provide a concise verdict summary with valuation view, risks, and entry stance."}
-            </Typography>
+            <Box display="flex" justifyContent="flex-end">
+              {editMode ? (
+                <>
+                  <IconButton color="primary" onClick={handleSave}>
+                    <SaveIcon />
+                  </IconButton>
+                  <IconButton color="secondary" onClick={handleCancel}>
+                    <CancelIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton onClick={() => setEditMode(true)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+
+            {editMode ? (
+              <TextField
+                fullWidth
+                multiline
+                minRows={5}
+                placeholder="Enter final verdict summary"
+                value={draftFinalVerdictText}
+                onChange={(event) => setDraftFinalVerdictText(event.target.value)}
+                sx={{
+                  background: "#ffffff",
+                  borderRadius: 1.5,
+                  "& .MuiOutlinedInput-root": { borderRadius: 1.5 }
+                }}
+              />
+            ) : (
+              <Typography variant="body2" sx={{ color: "#1f2a44" }}>
+                {finalVerdictText ||
+                  metadata?.final_verdict_summary ||
+                  metadata?.final_verdict ||
+                  "Provide a concise verdict summary with valuation view, risks, and entry stance."}
+              </Typography>
+            )}
 
             <Stack alignItems="center" spacing={1.5}>
               <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -141,10 +311,20 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                   </Typography>
                 </Box>
               </Box>
+              {editMode ? (
+                <TextField
+                  size="small"
+                  placeholder="Overall rating (0-100)"
+                  value={draftOverallRating}
+                  onChange={(event) => setDraftOverallRating(event.target.value)}
+                  sx={{ width: 200, background: "#ffffff" }}
+                />
+              ) : (
               <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
                 Overall Rating
                 {overallPercent !== null ? ` (${overallPercent}%)` : ""}
               </Typography>
+              )}
             </Stack>
 
             <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -176,6 +356,18 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                 />
               )}
             </Stack>
+
+            {loading ? (
+              <Typography variant="caption" sx={{ color: "#6a7897" }}>
+                Loading latest verdict...
+              </Typography>
+            ) : null}
+
+            {error ? (
+              <Typography variant="caption" sx={{ color: "#b91c1c" }}>
+                {error}
+              </Typography>
+            ) : null}
 
             {metadata?.final_verdict_note && (
               <Typography variant="caption" sx={{ color: "#6a7897" }}>
