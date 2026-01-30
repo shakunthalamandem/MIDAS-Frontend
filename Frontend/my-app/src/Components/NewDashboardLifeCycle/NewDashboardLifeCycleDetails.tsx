@@ -30,7 +30,7 @@ import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
 import S1QueryBot from "./S1QueryBot";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
-import DealMeetingNotesMain from "../Main/DealMeetingNotes/DealMeetingNotesMain";
+import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -255,7 +255,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
-            <DealMeetingNotesMain />
+            <NewDashboardLifeCycleMeetingNotes
+              ticker={activePayload.ticker}
+              pricingDate={activePayload.pricing_date}
+            />
           ) : (
             <PageUnderDevelopment />
           )}
