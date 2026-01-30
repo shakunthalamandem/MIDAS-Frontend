@@ -95,6 +95,58 @@ const DealInfoCardData: React.FC<DealInfoCardDataProps> = ({ writeUpData }) => {
     const parsed = Number(cleaned)
     return Number.isNaN(parsed) ? null : parsed
   }
+const handleSaveAll = async () => {
+  try {
+    setIsSaving(true)
+    setError(null)
+
+    const payload: Record<string, unknown> = {
+      ticker_name: localData.ticker_name,
+
+      company_name: draftValues.company_name?.trim() || null,
+      industry: draftValues.industry?.trim() || null,
+
+      filed_date: draftValues.filed_date || null,
+      term_date: draftValues.term_date || null,
+      pricing_date: draftValues.pricing_date || null,
+      trade_date: draftValues.trade_date || null,
+
+      lower_bound: toNumberOrNull(draftValues.lower_bound ?? ""),
+      upper_bound: toNumberOrNull(draftValues.upper_bound ?? ""),
+
+      deal_size: toNumberOrNull(draftValues.deal_size ?? ""),
+      shares_offered: toNumberOrNull(draftValues.shares_offered ?? ""),
+      nosh: toNumberOrNull(draftValues.nosh ?? ""),
+      established_year: toNumberOrNull(draftValues.established_year ?? ""),
+
+      bookrunners: draftValues.bookrunners
+        ? draftValues.bookrunners
+            .split(",")
+            .map((b) => b.trim())
+            .filter(Boolean)
+        : []
+    }
+
+    await patchWriteUpData(payload)
+
+    // Optional: refresh from backend (recommended)
+    const refreshed = await refreshWriteUpData()
+    if (refreshed) {
+      setLocalData(refreshed)
+    } else {
+      // fallback: optimistic update
+      setLocalData((prev) => ({ ...prev, ...payload }))
+    }
+
+    setIsEditing(false)
+    setDraftValues({})
+  } catch (err) {
+    console.error(err)
+    setError("Failed to save changes. Please try again.")
+  } finally {
+    setIsSaving(false)
+  }
+}
 
   const openEdit = () => {
     setError(null)
@@ -169,56 +221,6 @@ const DealInfoCardData: React.FC<DealInfoCardDataProps> = ({ writeUpData }) => {
     return response.json()
   }
 
-  // const handleSaveAll = async () => {
-  //   try {
-  //     setIsSaving(true)
-  //     const payload = {
-  //       ticker_name: localData.ticker_name,
-  //       company_name: draftValues.company_name?.trim() ?? "",
-  //       industry: draftValues.industry?.trim() ?? "",
-  //       filed_date: draftValues.filed_date ?? "",
-  //       term_date: draftValues.term_date ?? "",
-  //       pricing_date: draftValues.pricing_date ?? "",
-  //       trade_date: draftValues.trade_date ?? "",
-  //       lower_bound: toNumberOrNull(draftValues.lower_bound ?? ""),
-  //       upper_bound: toNumberOrNull(draftValues.upper_bound ?? ""),
-  //       deal_size: toNumberOrNull(draftValues.deal_size ?? ""),
-  //       shares_offered: toNumberOrNull(draftValues.shares_offered ?? ""),
-  //       established_year: toNumberOrNull(draftValues.established_year ?? ""),
-  //       nosh: draftValues.nosh?.trim() ?? "",
-  //       bookrunners: (draftValues.bookrunners ?? "")
-  //         .split(",")
-  //         .map((item) => item.trim())
-  //         .filter(Boolean)
-  //     }
-
-  //     await patchWriteUpData(payload)
-  //     setLocalData((prev) => ({
-  //       ...prev,
-  //       company_name: payload.company_name,
-  //       industry: payload.industry,
-  //       filed_date: payload.filed_date,
-  //       term_date: payload.term_date,
-  //       pricing_date: payload.pricing_date,
-  //       trade_date: payload.trade_date,
-  //       lower_bound: payload.lower_bound ?? prev.lower_bound,
-  //       upper_bound: payload.upper_bound ?? prev.upper_bound,
-  //       deal_size: payload.deal_size ?? prev.deal_size,
-  //       shares_offered: payload.shares_offered ?? prev.shares_offered,
-  //       established_year: payload.established_year ?? prev.established_year,
-  //       nosh: payload.nosh === "" ? prev.nosh : payload.nosh,
-  //       bookrunners: payload.bookrunners
-  //     }))
-
-  //     const refreshed = await refreshWriteUpData()
-  //     if (refreshed) setLocalData(refreshed)
-  //     handleCancel()
-  //   } catch (saveError: any) {
-  //     setError(saveError?.message || "Unable to save changes")
-  //   } finally {
-  //     setIsSaving(false)
-  //   }
-  // }
 
 
   const priceRange = useMemo(() => {
@@ -275,7 +277,7 @@ const DealInfoCardData: React.FC<DealInfoCardDataProps> = ({ writeUpData }) => {
               <Stack direction="row" spacing={1}>
                 <IconButton
                   size="small"
-                  // onClick={handleSaveAll}
+                  onClick={handleSaveAll}
                   disabled={isSaving}
                   sx={{ color: "#1f3b73" }}
                 >
