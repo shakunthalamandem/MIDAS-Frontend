@@ -74,19 +74,19 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
     }
   }, [selectedTicker]);
 
-  useEffect(() => {
-  if (!currentTicker) return;
+//   useEffect(() => {
+//   if (!currentTicker) return;
 
-  const encodedTicker = encodeURIComponent(currentTicker);
+//   const encodedTicker = encodeURIComponent(currentTicker);
 
-  // Avoid unnecessary navigation if URL already matches
-  if (!location.pathname.endsWith(encodedTicker)) {
-    navigate(`/equity/ipo_dashboard/${encodedTicker}`, {
-      replace: false,
-      state: { fromSearch: true },
-    });
-  }
-}, [currentTicker, navigate, location.pathname]);
+//   // Avoid unnecessary navigation if URL already matches
+//   if (!location.pathname.endsWith(encodedTicker)) {
+//     navigate(`/equity/ipo_dashboard/${encodedTicker}`, {
+//       replace: false,
+//       state: { fromSearch: true },
+//     });
+//   }
+// }, [currentTicker, navigate, location.pathname]);
 
 
   useEffect(() => {

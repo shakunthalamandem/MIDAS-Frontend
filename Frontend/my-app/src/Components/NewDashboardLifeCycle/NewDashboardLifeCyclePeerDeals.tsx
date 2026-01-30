@@ -1,497 +1,663 @@
 import React, { useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Paper,
+  Stack,
+  Typography,
+  Link,
+  Autocomplete,
+  TextField,
+  Button,
+  IconButton,
+  CircularProgress,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Card, CardContent, Link, Paper, Stack, TextField, Typography } from "@mui/material";
-import BusinessIcon from "@mui/icons-material/Business";
-import PublicIcon from "@mui/icons-material/Public";
-import CategoryIcon from "@mui/icons-material/Category";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
+type PeerRow = {
+  ticker: string;
+  issuer_name: string;
+  pricing_date: string;
+  deal_type: string;
+  number_of_shares_offered: number;
+  issue_offer_price: number;
+  deal_size: number;
+  allocation_deal_size_percentage: number;
+  allocation_percentage: number; // allocation of IOI (per your API)
+  t1d_return_from_bloomberg: number;
+  t1w_percent_change: number;
+  t1m_return_from_bloomberg: number;
+};
+
+type PeerSummary = {
+  average_deal_size: number;
+  avg_allocation_as_percent_of_deal_size: number;
+  avg_allocation_of_ioi: number;
+  avg_t1d_return: number;
+  avg_t1w_return: number;
+  avg_t1m_return: number;
+};
+
+type ApiResponse = {
+  data: PeerRow[];
+  summary: PeerSummary;
+};
 
 interface NewDashboardLifeCyclePeerDealsProps {
-  data?: any[];
-  selectedDeal?: {
-    ticker?: string;
-    deal_type?: string;
-    fo_type?: string;
-    broad_region?: string;
-    gics_sector?: string;
-    years?: string[];
-    region?: string;
-    sector?: string;
-  };
+  selectedDeal?: { ticker?: string };
+  ticker?: string;
 }
 
-const NewDashboardLifeCyclePeerDeals: React.FC<NewDashboardLifeCyclePeerDealsProps> = ({
-  data,
-  selectedDeal,
-}) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [rows, setRows] = useState<any[]>(data ?? []);
+const cleanNumber = (v: any): number => {
+  if (v == null || v === "") return 0;
+  const n =
+    typeof v === "number" ? v : parseFloat(String(v).replace(/[^0-9.-]+/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+
+const fmtMoney = (n: any) => {
+  const v = cleanNumber(n);
+  const abs = Math.abs(v);
+  if (abs >= 1_000_000_000)
+    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000_000).toFixed(2)}B`;
+  if (abs >= 1_000_000)
+    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000).toFixed(2)}M`;
+  return `${v < 0 ? "-$" : "$"}${abs.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+const fmtPct = (n: any, digits = 2) => `${cleanNumber(n).toFixed(digits)}%`;
+
+const NewDashboardLifeCyclePeerDeals: React.FC<
+  NewDashboardLifeCyclePeerDealsProps
+> = ({ selectedDeal, ticker }) => {
+  const baseTicker = (ticker ?? selectedDeal?.ticker ?? "").trim();
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
-  useEffect(() => {
-    if (data) {
-      setRows(data);
-    }
-  }, [data]);
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<PeerRow[]>([]);
+  const [summary, setSummary] = useState<PeerSummary | null>(null);
 
-  useEffect(() => {
-    if (!selectedDeal || data) return;
-    const fetchData = async () => {
-      try {
-        const payload = {
-          deal_type: selectedDeal.deal_type ? [selectedDeal.deal_type] : [],
-          fo_type: selectedDeal.fo_type ? [selectedDeal.fo_type] : [],
-          broad_region: selectedDeal.broad_region
-            ? [selectedDeal.broad_region]
-            : selectedDeal.region
-            ? [selectedDeal.region]
-            : [],
-          gics_sector: selectedDeal.gics_sector
-            ? [selectedDeal.gics_sector]
-            : selectedDeal.sector
-            ? [selectedDeal.sector]
-            : [],
-          years: selectedDeal.years ?? [],
-        };
+  // dropdown (search should work here)
+  const [tickerOptions, setTickerOptions] = useState<string[]>([]);
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [selectedPeerTicker, setSelectedPeerTicker] = useState<string | null>(
+    null,
+  );
 
-        const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify(payload),
-        });
+  // notifications
+  const [toast, setToast] = useState<{
+    open: boolean;
+    msg: string;
+    severity: "success" | "error" | "info";
+  }>({ open: false, msg: "", severity: "info" });
 
-        if (!response.ok) throw new Error("Failed to fetch data");
-
-        const result = await response.json();
-        setRows(result.data || []);
-      } catch (error) {
-        console.error("Error fetching peer deals:", error);
-      }
-    };
-
-    fetchData();
-  }, [selectedDeal, data, apiUrl, token]);
-
-const cleanDealSize = (dealSize: any): number => {
-  if (dealSize == null || dealSize === "") return 0;
-  const cleanedValue = parseFloat(dealSize.toString().replace(/[^0-9.-]+/g, ""));
-  return isNaN(cleanedValue) ? 0 : cleanedValue;
-};
-
-const formatDealSize = (dealSize: any) => {
-  const cleanedValue = cleanDealSize(dealSize);
-  const isNegative = cleanedValue < 0;
-  const absoluteValue = Math.abs(cleanedValue);
-  const formattedValue = absoluteValue.toLocaleString("en-US");
-  return (isNegative ? "-$" : "$") + formattedValue;
-};
-
-const formatDealSizeMillions = (dealSize: number) => {
-  const valueInMillions = dealSize / 1_000_000;
-  const absoluteValue = Math.abs(valueInMillions);
-  const formattedValue = absoluteValue.toFixed(2);
-  return `${valueInMillions < 0 ? "-$" : "$"}${formattedValue}M`;
-};
-
-const averageValue = (list: any[], getter: (row: any) => number) => {
-  const values = list
-    .map((row) => getter(row))
-    .filter((value) => Number.isFinite(value));
-  if (values.length === 0) return 0;
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return total / values.length;
-};
-
-const getPricingDateValue = (pricingDate: any): number => {
-  if (!pricingDate) return 0;
-  const dateValue = new Date(pricingDate).getTime();
-  return isNaN(dateValue) ? 0 : dateValue;
-};
-  const headerRow = data && data.length > 0 ? data[0] : {};
-
-
-  const preprocessRows = (rows: any[]) =>
-    rows.map((row, index) => ({
-      id: index,
-      ...row,
-      deal_size: row.deal_size ? formatDealSize(row.deal_size.toFixed()) : "$0",
-      gics_sector_from_bloomberg: row.gics_sector_from_bloomberg || "N/A",
-      broad_region: row.broad_region || "N/A",
-      deal_type: row.deal_type || "N/A",
-      fo_type: row.deal_type === "IPO" ? "-" : row.fo_type || "-",
-      issue_offer_price: row.issue_offer_price ? formatDealSize(row.issue_offer_price.toFixed(2)) : "$0",
-      ioi_deal_size: row.ioi_deal_size ? `${row.ioi_deal_size.toFixed(2)}%` : "0%",
-      allocation_return: row.allocation_return ? `${formatDealSize(row.allocation_return.toFixed())}` : "$0",
-      allocation_ioi_percentage: row.allocation_ioi_percentage ? `${row.allocation_ioi_percentage.toFixed(2)}%` : "0%",
-
-      t1m_return_actual: row.t1m_return_actual ? `${row.t1m_return_actual.toFixed(2)}%` : "0%",
-      t1d_return_actual: row.t1d_return_actual ? `${row.t1d_return_actual.toFixed(2)}%` : "0%",
-      am_return_difference: row.am_return_difference ? `${row.am_return_difference.toFixed(2)}%` : "0%",
-      am_return: row.am_return ? `${formatDealSize(row.am_return.toFixed())}` : "$0",
-      total_committed_capital: row.total_committed_capital ? `${formatDealSize(row.total_committed_capital.toFixed())}` : "$0",
-      am_capital_committed: row.am_capital_committed ? `${formatDealSize(row.am_capital_committed.toFixed())}` : "$0",
-      allocated_capital: row.allocated_capital ? `${formatDealSize(row.allocated_capital.toFixed())}` : "$0",
-      allocation_deal_size_percentage: row.allocation_deal_size_percentage ? `${row.allocation_deal_size_percentage.toFixed(2)}%` : "0%",
-      monahsee_actual_total: row.monahsee_actual_total ? `${formatDealSize(row.monahsee_actual_total.toFixed())}` : "$0",
-      
-
-    }));
- 
-
-  const filteredRows = useMemo(() => {
-    return preprocessRows(rows)
-      .filter((row) => row.ticker?.toLowerCase().includes(searchQuery.toLowerCase()))
-      .sort(
-        (a, b) => getPricingDateValue(b.pricing_date) - getPricingDateValue(a.pricing_date)
-      )
-      .slice(0, 15);
-  }, [rows, searchQuery]);
-
-  const averageMetrics = useMemo(() => {
+  const authHeaders = useMemo(() => {
     return {
-      dealSize: averageValue(filteredRows, (row) => cleanDealSize(row.deal_size)),
-      allocationIoi: averageValue(filteredRows, (row) =>
-        cleanDealSize(row.allocation_ioi_percentage)
-      ),
-      allocationDealSize: averageValue(filteredRows, (row) =>
-        cleanDealSize(row.allocation_deal_size_percentage)
-      ),
-      t1dReturn: averageValue(filteredRows, (row) => cleanDealSize(row.t1d_return_actual)),
-      t1mReturn: averageValue(filteredRows, (row) => cleanDealSize(row.t1m_return_actual)),
-    };
-  }, [filteredRows]);
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    } as Record<string, string>;
+  }, [token]);
 
-  const columns: GridColDef[] = [ {
-  field: "ticker",
-  headerName: "Ticker",
-  width: 100,
-  headerAlign: "left",
-  renderCell: (params) => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "left",
-        alignItems: "left",
-        height: "100%",
-      }}
-    >
-      <Link
-        href={`/opportunity/equity/${params.value}`}
-        style={{
-          color: "brown",
-          fontWeight: "bold",
-          paddingLeft: 15,
-          textDecoration: "none",
-        }}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {params.value}
-      </Link>
-    </div>
-  ),
-}, 
+  const showToast = (msg: string, severity: "success" | "error" | "info") => {
+    setToast({ open: true, msg, severity });
+  };
 
-  { field: "pricing_date", headerName: "Pricing Date", width: 100 },
-     { field: "first_trade_date", headerName: "First Trade Date", width: 100 },
-    { field: "issuer_name", headerName: "Issuer Name", width: 200 },
-    { field: "deal_type", headerName: "Deal Type", width: 80 },
-    { field: "fo_type", headerName: "FO Type", width: 80, align: "left" },
-    { field: "broad_region", headerName: "Region", width: 80 },
+  const fetchPeers = async () => {
+    if (!baseTicker) return;
+    if (!apiUrl) {
+      showToast("REACT_APP_API_URL is not set.", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const url = `${apiUrl}/api/get_peer_tickers_data/`;
+      const payload = { ticker: baseTicker };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(
+          `Failed to fetch peers (${res.status})${txt ? `: ${txt}` : ""}`,
+        );
+      }
+
+      const json = (await res.json()) as ApiResponse;
+
+      setRows(Array.isArray(json.data) ? json.data : []);
+      setSummary(json.summary ?? null);
+    } catch (e: any) {
+      console.error("Peer Fetch Error:", e);
+      showToast(e?.message || "Failed to load peer tickers data", "error");
+      setRows([]);
+      setSummary(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTickerOptions = async () => {
+    if (!apiUrl) {
+      showToast("REACT_APP_API_URL is not set.", "error");
+      return;
+    }
+    setOptionsLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/get_mdd_tickers/`, {
+        method: "GET",
+        headers: authHeaders,
+      });
+      if (!res.ok) throw new Error(`Failed to fetch tickers (${res.status})`);
+      const json = await res.json();
+
+      const list: string[] = (
+        Array.isArray(json) ? json : (json?.data ?? json?.tickers ?? [])
+      ).map((x: any) =>
+        typeof x === "string" ? x : (x?.ticker ?? x?.symbol ?? ""),
+      );
+
+      setTickerOptions(list.filter(Boolean));
+    } catch (e: any) {
+      console.error(e);
+      showToast(e?.message || "Failed to load ticker options", "error");
+      setTickerOptions([]);
+    } finally {
+      setOptionsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!baseTicker) return;
+    fetchPeers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseTicker]);
+
+  useEffect(() => {
+    fetchTickerOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleUpdatePeer = async (
+    action: "add" | "delete",
+    peerTicker: string,
+  ) => {
+    if (!apiUrl) {
+      showToast("REACT_APP_API_URL is not set.", "error");
+      return;
+    }
+    if (!baseTicker) {
+      showToast("Base ticker is missing.", "error");
+      return;
+    }
+    if (!peerTicker) {
+      showToast("Peer ticker is missing.", "error");
+      return;
+    }
+
+    try {
+      const payload = {
+        action,
+        ticker: baseTicker,
+        peer_ticker: peerTicker,
+      };
+
+      const res = await fetch(`${apiUrl}/api/update_peer_tickers/`, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(
+          `update_peer_tickers failed (${res.status})${txt ? `: ${txt}` : ""}`,
+        );
+      }
+
+      await res.json().catch(() => null);
+
+      showToast(
+        action === "add"
+          ? "Peer added successfully."
+          : "Peer deleted successfully.",
+        "success",
+      );
+
+      setSelectedPeerTicker(null);
+      await fetchPeers();
+    } catch (e: any) {
+      console.error(e);
+      showToast(e?.message || "Failed to update peers.", "error");
+    }
+  };
+
+  // remove duplicates + stable order
+  const displayRows = useMemo(() => {
+    const seen = new Set<string>();
+    const out: PeerRow[] = [];
+    for (const r of rows) {
+      const key = `${r.ticker}-${r.pricing_date}-${r.issue_offer_price}-${r.deal_size}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
+    }
+    // sort latest first (pricing_date)
+    out.sort((a, b) =>
+      String(b.pricing_date).localeCompare(String(a.pricing_date)),
+    );
+    return out;
+  }, [rows]);
+
+  const columns: GridColDef[] = [
+    {
+      field: "ticker",
+      headerName: "Ticker",
+      width: 110,
+      renderCell: (params) => (
+        <Link
+          href={`/opportunity/equity/${params.row.ticker}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ fontWeight: 900, textDecoration: "none", color: "#7c2d12" }}
+        >
+          {params.row.ticker}
+        </Link>
+      ),
+    },
+    { field: "issuer_name", headerName: "Issuer Name", width: 240 },
+    { field: "pricing_date", headerName: "Pricing Date", width: 125 },
+    { field: "deal_type", headerName: "Deal Type", width: 90 },
+
+    {
+      field: "number_of_shares_offered",
+      headerName: "Shares Offered",
+      width: 150,
+      renderCell: (params) => {
+        const v = Number(params.row.number_of_shares_offered);
+        return isNaN(v)
+          ? ""
+          : v.toLocaleString(undefined, { maximumFractionDigits: 0 });
+      },
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
+    {
+      field: "issue_offer_price",
+      headerName: "Issue Offer Price",
+      width: 150,
+      renderCell: (params) => fmtMoney(params.row.issue_offer_price),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
     {
       field: "deal_size",
       headerName: "Deal Size",
-      width: 120,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-        {
-      field: "issue_offer_price",
-      headerName: "Issue Offer Price",
-      width: 120,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    { field: "gics_sector_from_bloomberg", headerName: "Sector", width: 180 },
-{
-  field: "number_of_shares_offered",
-  headerName: "Shares Offered",
-  width: 120,
-    valueFormatter: (params) => {
-    const value = Number(params);
-    return isNaN(value) ? '' : value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-},
-
-  { 
-    field: "allocation_deal_size_percentage", 
-    headerName: "Allocation % of Deal Size", 
-    width: 180,
-    renderCell: (params) => `${params.value}`,
-    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-  { 
-    field: "allocation_ioi_percentage", 
-    headerName: "Allocation IOI %", 
-    width: 150,
-    renderCell: (params) => `${params.value}`,
-    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-  {
-    field:"ioi_deal_size",
-    headerName:"IOI % of Deal Size",
-    width:150,
-      renderCell: (params) => `${params.value}`,
-    sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-
-    { 
-    field: "t1m_return_actual", 
-    headerName: "T+1Month Return", 
-    width: 140,
-    renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-    { 
-    field: "t1d_return_actual", 
-    headerName: "T+1Day Return", 
-    width: 140,
-    renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-  {field: "am_return_difference",
-    headerName: "AM Return",
-    width: 215,
-     renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-
-  },
-  { 
-    field: "allocated_capital", 
-    headerName: "Allocation Capital", 
-    width: 180,
-    renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-    },
-    {
-      field: "am_capital_committed",
-      headerName: "AM Capital Committed",
       width: 150,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
+      renderCell: (params) => fmtMoney(params.row.deal_size),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
+
     {
-      field: "total_committed_capital",
-      headerName: "Total Committed Capital",
+      field: "allocation_deal_size_percentage",
+      headerName: "Allocation % of Deal Size",
+      width: 200,
+      renderCell: (params) =>
+        fmtPct(params.row.allocation_deal_size_percentage, 2),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
+    {
+      field: "allocation_percentage",
+      headerName: "Allocation IOI %",
+      width: 150,
+      renderCell: (params) => fmtPct(params.row.allocation_percentage, 2),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
+    {
+      field: "t1d_return_from_bloomberg",
+      headerName: "T+1 Day Return",
+      width: 150,
+      renderCell: (params) => fmtPct(params.row.t1d_return_from_bloomberg, 2),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
+    {
+      field: "t1w_percent_change",
+      headerName: "T+1 Week Return",
+      width: 150,
+      renderCell: (params) => fmtPct(params.row.t1w_percent_change, 2),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
+
+    {
+      field: "t1m_return_from_bloomberg",
+      headerName: "T+1 Month Return",
       width: 160,
-      renderCell: (params) => `${params.value}`,
-      sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  },
-   
-{ 
-  field: "allocation_return", 
-  headerName: "Monashee Actual Allocation PnL(Gross)", 
-  width: 280,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-  cellClassName: "first-column-border",
+      renderCell: (params) => fmtPct(params.row.t1m_return_from_bloomberg, 2),
+      sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
+    },
 
-},
+    // ACTIONS (sticky right)
+    {
+      field: "actions",
+      headerName: "",
+      width: 80,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      align: "center",
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={() => handleUpdatePeer("delete", String(params.row.ticker))}
+          sx={{
+            bgcolor: "rgba(239,68,68,0.10)",
+            "&:hover": { bgcolor: "rgba(239,68,68,0.18)" },
+          }}
+          aria-label="Delete peer"
+        >
+          <DeleteOutlineRoundedIcon fontSize="small" />
+        </IconButton>
+      ),
+    },
+  ];
 
-{ 
-  field: "am_return", 
-  headerName: "Monashee Actual AM PnL(Gross)", 
-  width: 215,
-  renderCell: (params) => `${params.value}`,
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-},
+  return (
+    <>
+      {!baseTicker ? (
+        <Alert severity="info">
+          Ticker is missing. Provide selectedDeal.ticker or prop ticker.
+        </Alert>
+      ) : null}
 
-{
-  field: "monahsee_actual_total", 
-  headerName: "Monashee Actual Total PnL(Gross)",
-  width: 220,
-  renderCell: (params) => {
-    return `${params.value}`;
-  },
-  sortComparator: (v1, v2) => cleanDealSize(v1) - cleanDealSize(v2),
-},
-
-];
-
-return (
-  <>
- 
-
-<Paper
-  elevation={0}
-  sx={{
-    p: 2.5,
-    mb: 2,
-    borderRadius: 3,
-    backgroundColor: "#ffffff",
-    border: "1px solid #e2e8f0",
-  }}
->
-      <Typography
-    variant="h6"
-    fontWeight={600}
-    sx={{
-      mb: 2,
-      textAlign: 'center',  // Center-align the text
-      color: '#002060',  // Set text color
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',  // Set the font family
-    }}
-  >
-    Past Deals of the Sector for the Comparison
-  </Typography>
-  <Stack
-    direction={{ xs: "column", md: "row" }}
-    spacing={3}
-    alignItems="center"
-    justifyContent="space-between"
-  >
-    <Box>
-      <Box
+      {/* SUMMARY + ADD PEER CONTROLS */}
+      <Paper
+        elevation={0}
         sx={{
-          px: 1.25,
-          py: 0.6,
-          borderRadius: 1.5,
-          backgroundColor: "#e8f2ff",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 1,
+          p: 2.5,
+          mb: 2,
+          borderRadius: 3,
+          bgcolor: "#ffffff",
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
         }}
       >
-        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-          Average Deal Size
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {formatDealSizeMillions(averageMetrics.dealSize)}
-        </Typography>
-      </Box>
-    </Box>
-    <Box>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          alignItems={{ xs: "stretch", md: "center" }}
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography
+              variant="h6"
+              fontWeight={900}
+              sx={{
+                mb: 0.25,
+                color: "#002060",
+                fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+              }}
+            >
+              Peer Deals (Ticker: {baseTicker})
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: "#475569", fontWeight: 600 }}
+            >
+              Summary metrics are computed on the peer set returned by the API.
+            </Typography>
+          </Box>
+
+          {/* RIGHT CORNER: searchable dropdown + add */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1.25}
+            alignItems="center"
+          >
+            <Autocomplete
+              size="small"
+              sx={{ width: { xs: "100%", sm: 280 } }}
+              options={tickerOptions}
+              loading={optionsLoading}
+              value={selectedPeerTicker}
+              onChange={(_, v) => setSelectedPeerTicker(v)}
+              filterOptions={(opts, state) => {
+                const q = state.inputValue.trim().toLowerCase();
+                if (!q) return opts.slice(0, 200);
+                // simple, fast ticker search
+                return opts
+                  .filter((t) => t.toLowerCase().includes(q))
+                  .slice(0, 200);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Add peer ticker"
+                  placeholder="Search ticker…"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {optionsLoading ? (
+                          <CircularProgress color="inherit" size={16} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
+
+            <Button
+              variant="contained"
+              startIcon={<AddRoundedIcon />}
+              disabled={!selectedPeerTicker || loading}
+              onClick={() =>
+                selectedPeerTicker &&
+                handleUpdatePeer("add", selectedPeerTicker)
+              }
+              sx={{
+                borderRadius: 2,
+                fontWeight: 900,
+                textTransform: "none",
+                px: 2,
+              }}
+            >
+              Add
+            </Button>
+          </Stack>
+        </Stack>
+
+        {/* Summary tiles */}
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mt: 2 }}
+        >
+          {[
+            {
+              label: "Average Deal Size",
+              value: summary ? fmtMoney(summary.average_deal_size) : "-",
+              bg: "#e8f2ff",
+            },
+            {
+              label: "Avg Allocation % of Deal Size",
+              value: summary
+                ? fmtPct(summary.avg_allocation_as_percent_of_deal_size, 2)
+                : "-",
+              bg: "#ecfdf3",
+            },
+            {
+              label: "Avg Allocation IOI %",
+              value: summary ? fmtPct(summary.avg_allocation_of_ioi, 2) : "-",
+              bg: "#fff4e6",
+            },
+            {
+              label: "Avg T+1 Day Return",
+              value: summary ? fmtPct(summary.avg_t1d_return, 2) : "-",
+              bg: "#f3e8ff",
+            },
+            {
+              label: "Avg T+1 Week Return",
+              value: summary ? fmtPct(summary.avg_t1w_return, 2) : "-",
+              bg: "#e0f2fe",
+            },
+            {
+              label: "Avg T+1 Month Return",
+              value: summary ? fmtPct(summary.avg_t1m_return, 2) : "-",
+              bg: "#f1f5f9",
+            },
+          ].map((tile) => (
+            <Box
+              key={tile.label}
+              sx={{
+                px: 1.25,
+                py: 0.8,
+                borderRadius: 2,
+                bgcolor: tile.bg,
+                display: "inline-flex",
+                gap: 1,
+                alignItems: "center",
+                width: { xs: "100%", md: "auto" },
+                justifyContent: { xs: "space-between", md: "flex-start" },
+                border: "1px solid rgba(15, 23, 42, 0.06)",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#475569", fontWeight: 900 }}
+              >
+                {tile.label}
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 1000, color: "#0b1844" }}
+              >
+                {tile.value}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Paper>
+
+      {/* DATA TABLE */}
       <Box
         sx={{
-          px: 1.25,
-          py: 0.6,
-          borderRadius: 1.5,
-          backgroundColor: "#ecfdf3",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 1,
+          height: 520,
+          width: "100%",
+          borderRadius: 3,
+          overflow: "hidden",
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+          backgroundColor: "#ffffff",
         }}
       >
-        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-          Avg Allocation IOI %
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {averageMetrics.allocationIoi.toFixed(2)}%
-        </Typography>
-      </Box>
-    </Box>
-    <Box>
-      <Box
-        sx={{
-          px: 1.25,
-          py: 0.6,
-          borderRadius: 1.5,
-          backgroundColor: "#fff4e6",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 1,
-        }}
-      >
-        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-          Avg Allocation % of Deal Size
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {averageMetrics.allocationDealSize.toFixed(2)}%
-        </Typography>
-      </Box>
-    </Box>
-    <Box>
-      <Box
-        sx={{
-          px: 1.25,
-          py: 0.6,
-          borderRadius: 1.5,
-          backgroundColor: "#f3e8ff",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 1,
-        }}
-      >
-        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-          Avg T+1 Day Return
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {averageMetrics.t1dReturn.toFixed(2)}%
-        </Typography>
-      </Box>
-    </Box>
-    <Box>
-      <Box
-        sx={{
-          px: 1.25,
-          py: 0.6,
-          borderRadius: 1.5,
-          backgroundColor: "#e0f2fe",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 1,
-        }}
-      >
-        <Typography variant="caption" sx={{ color: "#475569", fontWeight: 600 }}>
-          Avg T+1 Month Return
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b1844" }}>
-          {averageMetrics.t1mReturn.toFixed(2)}%
-        </Typography>
-      </Box>
-    </Box>
-  </Stack>
-</Paper>
-
-
-
-
-
-      <Box sx={{ height: 450, width: "100%", marginTop: 3 }}>
         <DataGrid
-          rows={filteredRows}
+          loading={loading}
+          rows={displayRows.map((r, idx) => ({
+            id: `${r.ticker}-${r.pricing_date}-${idx}`,
+            ...r,
+          }))}
           columns={columns}
-          pageSizeOptions={[25, 50, 100]}
-          sortingOrder={["asc", "desc"]}
+          pageSizeOptions={[15, 25, 50]}
           disableRowSelectionOnClick
-          rowHeight={35}
+          rowHeight={44}
+          sx={{
+            border: "none",
 
-       sx={{
-            "& .MuiDataGrid-container--top [role='row']": {
-              backgroundColor: "#002060",
-              color: "#FFFFFF",
+            /* HEADER */
+            "& .MuiDataGrid-columnHeaders": {
+              background: "linear-gradient(90deg, #002060, #003a8c)",
+              color: "#09378b",
             },
-            "& .Mui-selected": {
-              backgroundColor: "#cad0f1ff !important",
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: 1000,
+              fontSize: "13px",
             },
-            "& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon": {
-              color: "#FFFFFF",
+            "& .MuiDataGrid-sortIcon": {
+              color: "#fff",
             },
-            cursor: "pointer",
-            border: "1px solid #ccccccff",
+
+            /* CELLS */
+            "& .MuiDataGrid-cell": {
+              borderBottom: "1px solid #f1f5f9",
+              fontWeight: 650,
+              color: "#0f172a",
+              fontSize: "13px",
+            },
+
+            /* STRIPED ROWS */
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: "#f8fafc",
+            },
+
+            /* HOVER */
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "#e0f2fe",
+              cursor: "pointer",
+            },
+
+            /* STICKY ACTION COLUMN (always visible) */
+            "& .MuiDataGrid-cell:last-child": {
+              position: "sticky",
+              right: 0,
+              backgroundColor: "#ffffff",
+              zIndex: 10,
+              borderLeft: "1px solid #e2e8f0",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even) .MuiDataGrid-cell:last-child":
+              {
+                backgroundColor: "#f8fafc",
+              },
+            "& .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader:last-child":
+              {
+                position: "sticky",
+                right: 0,
+                background: "linear-gradient(90deg, #002060, #003a8c)",
+                zIndex: 11,
+                borderLeft: "1px solid rgba(255,255,255,0.25)",
+              },
+
+            /* FOOTER */
+            "& .MuiDataGrid-footerContainer": {
+              borderTop: "1px solid #e2e8f0",
+              backgroundColor: "#f8fafc",
+            },
           }}
         />
       </Box>
 
-
-
-  </>
-);
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={2500}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      >
+        <Alert
+          onClose={() => setToast((t) => ({ ...t, open: false }))}
+          severity={toast.severity}
+          variant="filled"
+          sx={{ fontWeight: 800 }}
+        >
+          {toast.msg}
+        </Alert>
+      </Snackbar>
+    </>
+  );
 };
 
 export default NewDashboardLifeCyclePeerDeals;

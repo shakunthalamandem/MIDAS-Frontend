@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, CircularProgress, Container, Grid, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Grid,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -13,6 +22,8 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import TableRowsIcon from "@mui/icons-material/TableRows";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
 import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
@@ -28,13 +39,18 @@ import {
 
 const NewDealsLifecycleCards: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
-  const [viewMode, setViewMode] = useState<"card" | "table">("card");
+  const locationViewMode =
+    (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
+  const [viewMode, setViewMode] = useState<"card" | "table">(
+    locationViewMode === "table" ? "table" : "card"
+  );
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
     dayjs().subtract(30, "day")
   );
@@ -224,6 +240,12 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [selectedOp, selectedRegion, selectedDealType]);
 
   useEffect(() => {
+    if (locationViewMode === "card" || locationViewMode === "table") {
+      setViewMode(locationViewMode);
+    }
+  }, [locationViewMode]);
+
+  useEffect(() => {
     if (selectedOp === "live") {
       setLiveStartDate(dayjs().subtract(30, "day"));
       setLiveEndDate(dayjs());
@@ -323,8 +345,15 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
     navigate("/deals/new_dashboard/details", {
-      state: { payload: row, ...(extraState || {}) },
+      state: { payload: row, viewMode, ...(extraState || {}) },
     });
+  };
+
+  const actionTabMap: Record<string, string> = {
+    "Write Up": "Write up",
+    "ML Model": "ML Model",
+    "AI Unsupervised": "AI Unsupervised",
+    "AI Sentiment View": "AI- Sentiment View",
   };
 
   const renderDealsList = (list: any[]) =>
@@ -397,8 +426,8 @@ const NewDealsLifecycleCards: React.FC = () => {
             <Grid
               item
               xs={12}
-              md={6}
-              lg={4}
+              md={4}
+              lg={3}
               key={row.id ?? `${row.ticker}-${row.pricing_date}`}
             >
             <DealCard
@@ -407,15 +436,16 @@ const NewDealsLifecycleCards: React.FC = () => {
               secondaryTag={writeupTag}
               meta={meta}
               tags={[
-                { label: row.region || "Region N/A", bg: "#f1f5f9", color: "#475569" },
-                { label: row.sector || "Sector N/A", bg: "#f8fafc", color: "#334155" },
+                { label: row.region || "Region N/A", bg: "#e6efff", color: "#1e3a8a" },
+                { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
-              onViewDetails={() =>
-                navigate("/deals/new_dashboard/details", {
-                  state: { payload: row },
+              onActionClick={(label) =>
+                handleRowNavigate(row, {
+                  targetTabLabel: actionTabMap[label] ?? label,
                 })
               }
+              onViewDetails={() => handleRowNavigate(row)}
             />
             </Grid>
           );
@@ -470,7 +500,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             },
           ];
           return (
-            <Grid item xs={12} md={6} lg={4} key={row.id ?? `${title}-${index}`}>
+            <Grid item xs={12} md={4} lg={3} key={row.id ?? `${title}-${index}`}>
               <DealCard
                 title={title}
                 subtitle={subtitle}
@@ -482,11 +512,13 @@ const NewDealsLifecycleCards: React.FC = () => {
                     color: "#1d4ed8",
                   },
                 ]}
-                onViewDetails={() =>
-                  navigate("/deals/new_dashboard/details", {
-                    state: { payload: row, pipelineCategory },
+                onActionClick={(label) =>
+                  handleRowNavigate(row, {
+                    pipelineCategory,
+                    targetTabLabel: actionTabMap[label] ?? label,
                   })
                 }
+                onViewDetails={() => handleRowNavigate(row, { pipelineCategory })}
               />
             </Grid>
           );
@@ -497,26 +529,113 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ mt: 0, mb: 2, px: { xs: 1.5, md: 2 } }}>
-        <Container
-          maxWidth="xl"
+      <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1, md: 1.5 } }}>
+        <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            mb: 1.5,
-            px: 1,
-            gap: 1.25,
-            flexWrap: "wrap",
+            backgroundColor: "#f3faff",
+            borderRadius: 4,
+            px: { xs: 1.5, md: 2 },
+            py: { xs: 1.5, md: 2 },
+            border: "1px solid #cbd7ff",
+            boxShadow: "0 12px 26px rgba(15,23,42,0.08)",
           }}
         >
-          <RegionTabs
-            tabs={regionTabs}
-            selectedRegion={selectedRegion}
-            onSelect={(value) => setSelectedRegion(value as any)}
-          />
-        </Container>
+          <Container
+            maxWidth="xl"
+            sx={{
+              display: "flex",
+              alignItems: { xs: "flex-start", md: "center" },
+              justifyContent: "space-between",
+              mb: 1.5,
+              px: 1,
+              gap: 1.5,
+              flexWrap: "wrap",
+            }}
+          >
+            <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
+            <RegionTabs
+              tabs={regionTabs}
+              selectedRegion={selectedRegion}
+              onSelect={(value) => setSelectedRegion(value as any)}
+            />
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
+            >
+              <ToggleButtonGroup
+                size="small"
+                value={viewMode || "card"}
+                exclusive
+                onChange={(_e, value) =>
+                  setViewMode((prev) => (value ?? prev ?? "card"))
+                }
+                sx={{
+                  backgroundColor: "transparent",
+                  borderRadius: 999,
+                  border: "1px solid transparent",
+                  ml: { md: "auto" },
+                  "& .MuiToggleButton-root": {
+                    border: "1px solid #d7ddea",
+                    px: 2,
+                    py: 0.4,
+                    minWidth: 80,
+                    color: "#1f2a44",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderRadius: 999,
+                    backgroundColor: "#ffffff",
+                  },
+                  "& .MuiToggleButton-root:hover": {
+                    backgroundColor: "#8f75ddff",
+                    color: "#ffffff",
+                  },
+                  "& .MuiToggleButton-root.Mui-selected": {
+                    color: "#ffffff",
+                    backgroundColor: "#2b146f",
+                    borderColor: "#2b146f",
+                    boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
+                  },
+                  "& .MuiToggleButton-root.Mui-selected:hover": {
+                    backgroundColor: "#2b146f",
+                    color: "#ffffff",
+                  },
+                   "& .MuiToggleButton-root.Mui-selected:leave": {
+                    backgroundColor: "#2b146f",
+                    color: "#ffffff",
+                  },
+                }}
+              >
+                <ToggleButton value="card" aria-label="Card view">
+                  Card View
+                </ToggleButton>
+                <ToggleButton value="table" aria-label="Table view">
+                  Table View
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+          </Container>
+
+          <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
+            <FiltersBar
+              tabs={tabs}
+              selectedOp={selectedOp}
+              onSelectOp={setSelectedOp}
+              selectedDealType={selectedDealType}
+              onSelectDealType={setSelectedDealType}
+              isPipelineView={isPipelineView}
+              liveStartDate={liveStartDate}
+              liveEndDate={liveEndDate}
+              setLiveStartDate={setLiveStartDate}
+              setLiveEndDate={setLiveEndDate}
+              dealSearch={dealSearch}
+              setDealSearch={setDealSearch}
+              pipelineSearch={pipelineSearch}
+              setPipelineSearch={setPipelineSearch}
+            />
+          </Container>
+        </Box>
       </Container>
 
       <Container
@@ -526,31 +645,12 @@ const NewDealsLifecycleCards: React.FC = () => {
           position: "relative",
           pb: 4,
           pt: 2,
-          px: { xs: 1.5, md: 2 },
-          backgroundColor: "rgba(21,101,192,0.05)",
-          borderRadius: 3,
+          px: { xs: 1, md: 1.5 },
+          backgroundColor: "transparent",
+          borderRadius: 0,
         }}
       >
         <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
-          <FiltersBar
-            tabs={tabs}
-            selectedOp={selectedOp}
-            onSelectOp={setSelectedOp}
-            selectedDealType={selectedDealType}
-            onSelectDealType={setSelectedDealType}
-            isPipelineView={isPipelineView}
-            liveStartDate={liveStartDate}
-            liveEndDate={liveEndDate}
-            setLiveStartDate={setLiveStartDate}
-            setLiveEndDate={setLiveEndDate}
-            dealSearch={dealSearch}
-            setDealSearch={setDealSearch}
-            pipelineSearch={pipelineSearch}
-            setPipelineSearch={setPipelineSearch}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
-
           {isPipelineView ? (
             pipelineLoading ? (
               <CircularProgress sx={{ display: "block", mx: "auto" }} />
@@ -580,8 +680,8 @@ const NewDealsLifecycleCards: React.FC = () => {
           ) : selectedOp === "upcoming" ? (
             <Grid container spacing={2} sx={{ px: 1 }}>
               <Grid item xs={12}>
-                <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                <Container sx={{ px: 0, mb: 1,mt:0 }}>
+                  <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
                     Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
@@ -609,7 +709,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }} align="center">
+                  <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
                     Upcoming {selectedRegion} {selectedDealType} Deals Pricing Date Not Available (Not Yet Listed)
                   </Typography>
                 </Container>
@@ -666,7 +766,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 const NewDashboardLifeCycleMain: React.FC = () => {
   return (
     <>
-      <Box
+      {/* <Box
         sx={{
           backgroundColor: "#0b2a6b",
           color: "#fff",
@@ -679,7 +779,7 @@ const NewDashboardLifeCycleMain: React.FC = () => {
         <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
           Welcome to New Dashboard Life Cycle!
         </Typography>
-      </Box>
+      </Box> */}
       <NewDealsLifecycleCards />
     </>
   );

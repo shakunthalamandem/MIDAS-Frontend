@@ -1,8 +1,7 @@
 import React from "react";
 import { Box, CircularProgress, Alert } from "@mui/material";
-import DealDetailsPanel from "../AIMLResults/DealDetailsPanel";
-import DealPricesChart from "../AIMLResults/DealPricesChart";
 import { DealRecord } from "../AIMLResults/types";
+import AIMLDealInsightsPanel from "./AIMLDealInsightsPanel";
 
 type AIMLDealDetailsProps = {
   ticker: string;
@@ -10,7 +9,7 @@ type AIMLDealDetailsProps = {
 
 const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
   const [selectedDeal, setSelectedDeal] = React.useState<DealRecord | null>(
-    null
+    null,
   );
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -46,7 +45,7 @@ const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
         if (!res.ok) {
           const text = await res.text().catch(() => "");
           throw new Error(
-            `ai_ml_ticker_result failed (${res.status} ${res.statusText})${text ? `: ${text}` : ""}`
+            `ai_ml_ticker_result failed (${res.status} ${res.statusText})${text ? `: ${text}` : ""}`,
           );
         }
 
@@ -99,8 +98,7 @@ const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
 
   return (
     <Box mt={2}>
-      <DealDetailsPanel deal={selectedDeal} />
-      <DealPricesChart deal={selectedDeal} />
+      <AIMLDealInsightsPanel deal={selectedDeal} />
     </Box>
   );
 };
