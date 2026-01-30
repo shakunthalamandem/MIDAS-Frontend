@@ -8,7 +8,8 @@ import {
   ListItemText,
   Typography
 } from "@mui/material"
-import { useState } from "react"
+import axios from "axios"
+import { useEffect, useState } from "react"
 import { BasicDealDetails } from "./types/DealInformation"
 import IPOWriteUpMetaDataBusinessOverview from "./IPOWriteUpMetaData/IPOWriteUpMetaDataBusinessOverview"
 import IPOWriteUpMetaDataComps from "./IPOWriteUpMetaData/IPOWriteUpMetaDataComps"
@@ -21,6 +22,17 @@ import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMet
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataTrends from "./IPOWriteUpMetaData/IPOWriteUpMetaDataTrends"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
+
+interface DealWriteupResponse {
+  ticker: string
+  pricing_date: string | null
+  deal_id: number | null
+  sector: string
+  region: string
+  deal_type: string
+  issuer_name: string
+  metadata: Record<string, any>
+}
 
 interface FebIPOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
@@ -37,12 +49,32 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     { id: "key-metrics", label: "Key Metrics" },
     { id: "financial-highlights", label: "Financial Highlights" },
     { id: "comps", label: "Comps" },
-        { id: "trends", label: "Trends" },
+    { id: "trends", label: "Trends" },
     { id: "valuation-analysis", label: "Valuation Analysis" },
     { id: "red-flag", label: "Red Flag" },
     { id: "final-verdict", label: "Final Verdict" }
   ]
-  const [activeSection, setActiveSection] = useState(sections[0]?.id ?? "")
+
+  const [activeSection, setActiveSection] = useState(sections[0].id)
+  const [writeupData, setWriteupData] = useState<DealWriteupResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchDealWriteup = async () => {
+      try {
+        const res = await axios.post<DealWriteupResponse>("/api/get_deal_writeup/", {
+          ticker: basicDealDetails.ticker
+        })
+        setWriteupData(res.data)
+      } catch (err) {
+        console.error("Error fetching deal writeup", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDealWriteup()
+  }, [basicDealDetails.ticker])
 
   const handleNavClick = (sectionId: string) => {
     setActiveSection(sectionId)
@@ -51,6 +83,12 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
       target.scrollIntoView({ behavior: "smooth", block: "start" })
     }
   }
+
+  if (loading) {
+    return <Typography>Loading IPO write-up…</Typography>
+  }
+
+  const meta = writeupData?.metadata
 
   return (
     <Box
@@ -73,10 +111,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         }}
       >
         <CardContent sx={{ p: 2.5 }}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "#1d2b5a", mb: 2 }}
-          >
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
             IPO Write-up
           </Typography>
           <List sx={{ p: 0, display: "grid", gap: 0.5 }}>
@@ -85,30 +120,28 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               return (
                 <ListItemButton
                   key={section.id}
-                  onClick={() => handleNavClick(section.id)}
                   selected={isActive}
+                  onClick={() => handleNavClick(section.id)}
                   sx={{
                     borderRadius: 2,
                     px: 1.5,
                     py: 1,
                     background: isActive ? "#e7edff" : "transparent",
-                    border: isActive ? "1px solid #c8d6ff" : "1px solid transparent",
-                    "&:hover": {
-                      background: isActive ? "#e7edff" : "#f0f3ff"
-                    }
+                    border: isActive
+                      ? "1px solid #c8d6ff"
+                      : "1px solid transparent"
                   }}
                 >
                   <ListItemText
                     primary={section.label}
                     primaryTypographyProps={{
                       fontSize: 14,
-                      fontWeight: isActive ? 700 : 600,
-                      color: isActive ? "#2a3d84" : "#2a2f45"
+                      fontWeight: isActive ? 700 : 600
                     }}
                   />
-                  {isActive ? (
+                  {isActive && (
                     <CheckIcon sx={{ color: "#4c6fff", fontSize: 18 }} />
-                  ) : null}
+                  )}
                 </ListItemButton>
               )
             })}
@@ -118,30 +151,22 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Box id="deal-info" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
+          <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="deal-indication" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataDealIndication
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="market-strategy" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataMarketStatergy
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="business-overview" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataBusinessOverview
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataBusinessOverview basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="key-metrics" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} />
+          <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="financial-highlights" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataFinancialHighlights
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
         </Box>
         <Box id="trends" sx={{ scrollMarginTop: 96 }}>
           <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
@@ -150,17 +175,13 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
         </Box>
         <Box id="valuation-analysis" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataValuationAnalysis
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="red-flag" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} />
+          <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
         <Box id="final-verdict" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataFinalVerdict
-            basicDealDetails={basicDealDetails}
-          />
+          <IPOWriteUpMetaDataFinalVerdict basicDealDetails={basicDealDetails} metadata={meta} />
         </Box>
       </Box>
     </Box>
