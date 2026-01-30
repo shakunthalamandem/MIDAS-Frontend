@@ -4,36 +4,34 @@ import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataDealIndicationProps {
   basicDealDetails: BasicDealDetails
-  metadata?: Record<string, any>
 }
 
 const IPOWriteUpMetaDataDealIndication: React.FC<
   IPOWriteUpMetaDataDealIndicationProps
-> = ({ basicDealDetails, metadata }) => {
+> = ({ basicDealDetails }) => {
   return (
-
+    <IPOWriteUpMetaDataSectionCard
+      title="Deal Indication"
+      basicDealDetails={basicDealDetails}
+    >
       <Stack spacing={1.5}>
         <Typography variant="body2">
-          <strong>Indication of Interest:</strong>{" "}
-          {metadata?.indication_of_interest ?? "—"}
+          <strong>Indication of Interest:</strong> —
         </Typography>
 
         <Typography variant="body2">
-          <strong>Valuation:</strong> {metadata?.valuation ?? "—"}
+          <strong>Valuation:</strong> —
         </Typography>
 
         <Typography variant="body2">
-          <strong>Fair Value Estimate:</strong>{" "}
-          {metadata?.fair_value_estimate
-            ? `$${metadata.fair_value_estimate}`
-            : "—"}
+          <strong>Fair Value Estimate:</strong> —
         </Typography>
 
         <Typography variant="body2">
-          <strong>After Market Threshold:</strong>{" "}
-          {metadata?.after_market_threshold ?? "—"}
+          <strong>After Market Threshold:</strong> —
         </Typography>
       </Stack>
+    </IPOWriteUpMetaDataSectionCard>
   )
 }
 
