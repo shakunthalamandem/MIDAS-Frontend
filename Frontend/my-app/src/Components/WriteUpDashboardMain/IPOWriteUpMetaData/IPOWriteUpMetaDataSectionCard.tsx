@@ -24,7 +24,7 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
 > = ({
   title,
   basicDealDetails,
-  accentColor = "#dadadaff",
+  // accentColor = "#dadadaff",
   showSummary = true,
   showNotes = true,
   children
@@ -53,7 +53,7 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
           top: 0,
           bottom: 0,
           width: 6,
-          background: accentColor
+          // background: accentColor
         }
       }}
     >
