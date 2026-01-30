@@ -321,6 +321,7 @@ type ExpectedPipelineDealsTableProps = {
   onSearchQueryChange?: (value: string) => void;
   showSearch?: boolean;
   showDealTypeToggle?: boolean;
+  showTitle?: boolean;
   selectedDealType?: "IPO" | "FO";
   onSelectedDealTypeChange?: (value: "IPO" | "FO") => void;
   selectedRegion: "US" | "APAC" | "EMEA" | "Non-US America";
@@ -331,6 +332,7 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
   onSearchQueryChange,
   showSearch = true,
   showDealTypeToggle = true,
+  showTitle = true,
   selectedDealType: controlledDealType,
   onSelectedDealTypeChange,
   selectedRegion,
@@ -523,17 +525,19 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
           </ToggleButtonGroup>
         )}
      
-        <Typography
-          variant="h6"
-          color="#002060"
-          sx={{
-            fontWeight: 700,
-            textAlign: "center",
-            flexGrow: 1,
-          }}
-        >
-          Future Pipeline Deals
-        </Typography>
+        {showTitle && (
+          <Typography
+            variant="h6"
+            color="#002060"
+            sx={{
+              fontWeight: 700,
+              textAlign: "center",
+              flexGrow: 1,
+            }}
+          >
+            Future Pipeline Deals
+          </Typography>
+        )}
         {showSearch && (
           <TextField
             placeholder="Search"
