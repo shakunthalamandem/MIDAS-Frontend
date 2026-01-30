@@ -6,10 +6,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
 import LanguageIcon from "@mui/icons-material/Language";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import SearchIcon from "@mui/icons-material/Search";
 import ExpectedPipelineDealsTable from "./ExpectedPipelineDealsTable";
 
 const FuturePipelineDealsMain = () => {
@@ -17,6 +20,7 @@ const FuturePipelineDealsMain = () => {
     "US" | "EMEA" | "APAC"
   >("US");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (selectedRegion !== "US") {
@@ -57,22 +61,25 @@ const FuturePipelineDealsMain = () => {
                Welcome to the Future Pipeline Deals Dashboard
               </Typography>
       <Container maxWidth="xl" sx={{ mt: 2, mb: 2, px: { xs: 1.5, md: 2 } }}>
-       
         <Container
           maxWidth="xl"
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
             mb: 1.5,
             px: 1,
-            gap: 1.25,
-            flexWrap: "wrap",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            justifyContent: "space-between",
+            flexWrap: { xs: "wrap", md: "nowrap" },
           }}
         >
-
-          <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            flexWrap="wrap"
+            justifyContent={{ xs: "center", md: "flex-start" }}
+            sx={{ minWidth: 240 }}
+          >
             {regionTabs.map((item) => {
               const isSelected = selectedRegion === item.value;
 
@@ -105,53 +112,110 @@ const FuturePipelineDealsMain = () => {
                       {item.label}
                     </Typography>
                   </Stack>
-                  
                 </Paper>
               );
             })}
           </Stack>
-                    <ToggleButtonGroup
-            value={selectedDealType}
-            exclusive
-            onChange={(_e, value) => value && setSelectedDealType(value)}
+
+          <Typography
+            variant="h6"
+            color="#002060"
             sx={{
-              backgroundColor: "#f2f4f8",
-              p: 0.4,
-              borderRadius: 9999,
-              border: "1px solid #d7ddea",
-              display: "inline-flex",
-              gap: 0.5,
-              flexShrink: 0,
-              ml: "auto",
-              "& .MuiToggleButtonGroup-grouped": {
-                border: 0,
-              },
-              "& .MuiToggleButton-root": {
-                textTransform: "none",
-                borderRadius: 9999,
-                border: 0,
-                px: 2,
-                py: 0.5,
-                fontWeight: 700,
-                fontSize: "0.8rem",
-                color: "#6a7286",
-                backgroundColor: "transparent",
-                transition: "all 0.2s ease",
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#2b146f",
-                color: "#ffffff",
-                boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
-              },
+              fontWeight: 700,
+              textAlign: "center",
+              flexGrow: 1,
+              minWidth: 200,
             }}
           >
-            <ToggleButton value="IPO" disabled={selectedRegion !== "US"}>
-              IPO
-            </ToggleButton>
-            <ToggleButton value="FO" disabled={selectedRegion !== "US"}>
-              FO
-            </ToggleButton>
-          </ToggleButtonGroup>
+            Future Pipeline Deals
+          </Typography>
+
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent={{ xs: "center", md: "flex-end" }}
+            sx={{ minWidth: 260 }}
+          >
+            <ToggleButtonGroup
+              value={selectedDealType}
+              exclusive
+              onChange={(_e, value) => value && setSelectedDealType(value)}
+              sx={{
+                backgroundColor: "#f2f4f8",
+                p: 0.4,
+                borderRadius: 9999,
+                border: "1px solid #d7ddea",
+                display: "inline-flex",
+                gap: 0.5,
+                flexShrink: 0,
+                "& .MuiToggleButtonGroup-grouped": {
+                  border: 0,
+                },
+                "& .MuiToggleButton-root": {
+                  textTransform: "none",
+                  borderRadius: 9999,
+                  border: 0,
+                  px: 2,
+                  py: 0.5,
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  color: "#6a7286",
+                  backgroundColor: "transparent",
+                  transition: "all 0.2s ease",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#2b146f",
+                  color: "#ffffff",
+                  boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
+                },
+              }}
+            >
+              <ToggleButton value="IPO" disabled={selectedRegion !== "US"}>
+                IPO
+              </ToggleButton>
+              <ToggleButton value="FO" disabled={selectedRegion !== "US"}>
+                FO
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            <TextField
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              sx={{
+                minWidth: 220,
+                flexShrink: 0,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 999,
+                  height: 36,
+                  backgroundColor: "#ffffff",
+                  "& fieldset": {
+                    borderColor: "#cfd6e4",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#bfc7da",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#b0b9cf",
+                  },
+                },
+                "& .MuiInputBase-input::placeholder": {
+                  color: "#8a94a8",
+                  opacity: 1,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: "#8a94a8" }} />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{ shrink: false }}
+            />
+          </Stack>
         </Container>
       </Container>
 
@@ -161,6 +225,10 @@ const FuturePipelineDealsMain = () => {
         selectedDealType={selectedDealType}
         onSelectedDealTypeChange={setSelectedDealType}
         showDealTypeToggle={false}
+        showSearch={false}
+        showTitle={false}
+        searchQuery={searchTerm}
+        onSearchQueryChange={setSearchTerm}
       />
     </>
   );
