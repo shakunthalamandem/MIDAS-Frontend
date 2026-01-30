@@ -13,9 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import PublicIcon from "@mui/icons-material/Public";
-import LanguageIcon from "@mui/icons-material/Language";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
@@ -26,7 +23,6 @@ import TableRowsIcon from "@mui/icons-material/TableRows";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
-import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
 import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
 import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
@@ -103,13 +99,6 @@ const NewDealsLifecycleCards: React.FC = () => {
     //   icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
     // },
   ];
-
-  const regionTabs = [
-    { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
-    { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
-    { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-    // { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
-  ] as const;
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
     setLoading(true);
@@ -453,7 +442,6 @@ const NewDealsLifecycleCards: React.FC = () => {
               secondaryTag={writeupTag}
               meta={meta}
               tags={[
-                { label: row.region || "Region N/A", bg: "#e6efff", color: "#1e3a8a" },
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
@@ -560,26 +548,47 @@ const NewDealsLifecycleCards: React.FC = () => {
           <Container
             maxWidth="xl"
             sx={{
-              display: "flex",
-              alignItems: { xs: "flex-start", md: "center" },
-              justifyContent: "space-between",
-              mb: 1.5,
+              display: "grid",
+              alignItems: "center",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "minmax(360px, 1.6fr) minmax(220px, 0.6fr)",
+              },
+              columnGap: 2,
+              rowGap: 1.5,
+              mb: 0.5,
               px: 1,
-              gap: 1.5,
-              flexWrap: "wrap",
             }}
           >
-            <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
-            <RegionTabs
-              tabs={regionTabs}
-              selectedRegion={selectedRegion}
-              onSelect={(value) => setSelectedRegion(value as any)}
-            />
+            <Box sx={{ minWidth: 0 }}>
+              <FiltersBar
+                tabs={tabs}
+                selectedOp={selectedOp}
+                onSelectOp={setSelectedOp}
+                selectedDealType={selectedDealType}
+                onSelectDealType={setSelectedDealType}
+                isPipelineView={isPipelineView}
+                liveStartDate={liveStartDate}
+                liveEndDate={liveEndDate}
+                setLiveStartDate={setLiveStartDate}
+                setLiveEndDate={setLiveEndDate}
+                dealSearch={dealSearch}
+                setDealSearch={setDealSearch}
+                pipelineSearch={pipelineSearch}
+                setPipelineSearch={setPipelineSearch}
+                inline
+              />
+            </Box>
+
             <Stack
               direction="row"
               spacing={1}
               alignItems="center"
-              sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
+              sx={{
+                ml: "auto",
+                minWidth: 200,
+                justifyContent: "flex-end",
+              }}
             >
               <ToggleButtonGroup
                 size="small"
@@ -592,7 +601,6 @@ const NewDealsLifecycleCards: React.FC = () => {
                   backgroundColor: "transparent",
                   borderRadius: 999,
                   border: "1px solid transparent",
-                  ml: { md: "auto" },
                   "& .MuiToggleButton-root": {
                     border: "1px solid #d7ddea",
                     px: 2,
@@ -618,7 +626,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     backgroundColor: "#2b146f",
                     color: "#ffffff",
                   },
-                   "& .MuiToggleButton-root.Mui-selected:leave": {
+                  "& .MuiToggleButton-root.Mui-selected:leave": {
                     backgroundColor: "#2b146f",
                     color: "#ffffff",
                   },
@@ -632,25 +640,6 @@ const NewDealsLifecycleCards: React.FC = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Stack>
-          </Container>
-
-          <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
-            <FiltersBar
-              tabs={tabs}
-              selectedOp={selectedOp}
-              onSelectOp={setSelectedOp}
-              selectedDealType={selectedDealType}
-              onSelectDealType={setSelectedDealType}
-              isPipelineView={isPipelineView}
-              liveStartDate={liveStartDate}
-              liveEndDate={liveEndDate}
-              setLiveStartDate={setLiveStartDate}
-              setLiveEndDate={setLiveEndDate}
-              dealSearch={dealSearch}
-              setDealSearch={setDealSearch}
-              pipelineSearch={pipelineSearch}
-              setPipelineSearch={setPipelineSearch}
-            />
           </Container>
         </Box>
       </Container>
