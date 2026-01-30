@@ -155,10 +155,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
   const summaryImageUrl = metadata?.differentiated_summary_image_url
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Deal Info"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Box
         sx={{
           background: "#f2f6ff",
@@ -344,7 +341,6 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
           </Grid>
         )}
       </Box>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 
