@@ -1,5 +1,5 @@
+import NewFinancialTableMain from "../../IPODashboardLLM/IPOFinancialForecast/NewFinancialTableMain"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataFinancialHighlightsProps {
   basicDealDetails: BasicDealDetails
@@ -8,10 +8,11 @@ interface IPOWriteUpMetaDataFinancialHighlightsProps {
 const IPOWriteUpMetaDataFinancialHighlights: React.FC<
   IPOWriteUpMetaDataFinancialHighlightsProps
 > = ({ basicDealDetails }) => (
-  <IPOWriteUpMetaDataSectionCard
-    title="Financial Highlights"
-    basicDealDetails={basicDealDetails}
-  />
+
+    <NewFinancialTableMain
+      defaultTicker={basicDealDetails.ticker}
+      deal_id={String(basicDealDetails.deal_id)}
+    />
 )
 
 export default IPOWriteUpMetaDataFinancialHighlights

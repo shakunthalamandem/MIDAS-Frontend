@@ -18,77 +18,91 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 1, md: 1.5 },
+        py: { xs: 1, md: 1.5 },
+        px: 0,
         borderRadius: 3,
+        backgroundColor: "transparent",
+        border: "1px solid transparent",
+        boxShadow: "none",
       }}
     >
       <Stack
         direction={{ xs: "column", md: "row" }}
         spacing={2}
         alignItems={{ xs: "stretch", md: "center" }}
-        justifyContent="center"
+        justifyContent="space-between"
         sx={{ width: "100%" }}
       >
         <ToggleButtonGroup
-          value={selectedOp}
+          value={selectedOp || options[0]?.value}
           exclusive
-          onChange={(_e, value) => value && onChange(value)}
+          onChange={(_e, value) => onChange(value ?? selectedOp)}
           sx={{
             flexWrap: "wrap",
-            columnGap: { xs: 1, md: 1.5 },
-            rowGap: { xs: 1, md: 1.25 },
+            columnGap: 1,
+            rowGap: 1,
+            overflowX: "visible",
+            maxWidth: "100%",
+            flex: 1,
+            minWidth: 0,
             "& .MuiToggleButton-root": {
               textTransform: "none",
-              borderRadius: 2,
-              border: "1px solid #e1e5ef",
+              borderRadius: 999,
+              border: "1px solid #d7ddea",
               backgroundColor: "#ffffff",
-              minWidth: 210,
-              justifyContent: "flex-start",
+              minWidth: 0,
+              height: 36,
+              minHeight: 36,
+              justifyContent: "center",
               px: 2,
-              py: 1,
+              py: 0.4,
               color: "#1f2a44",
               position: "relative",
               overflow: "hidden",
-              boxShadow: "0 1px 2px rgba(15,23,42,0.05)",
+              boxShadow: "none",
               transition: "all 0.2s ease",
             },
-            "& .MuiToggleButton-root:hover": {
-              backgroundColor: "#f6f8fc",
-            },
-            "& .Mui-selected": {
-              borderColor: "#c8c1e5",
-              boxShadow: "0 10px 24px rgba(44,24,93,0.12)",
-            },
-            "& .MuiToggleButton-root.Mui-selected:after": {
-              content: '""',
-              position: "absolute",
-              left: "22%",
-              right: "22%",
-              bottom: 0,
-              height: 3,
-              borderRadius: 999,
+            "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
               backgroundColor: "#2b146f",
+              color: "#ffffff",
             },
+            "& .MuiToggleButton-root.Mui-selected": {
+              borderColor: "#2b146f",
+              backgroundColor: "#2b146f",
+              boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
+              color: "#ffffff",
+            },
+            "& .MuiToggleButton-root.Mui-selected:hover": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
+            },
+            "& .MuiToggleButton-root.Mui-selected:leave": {
+              backgroundColor: "#2b146f",
+              color: "#ffffff",
+            },
+            // "& .MuiToggleButton-root.Mui-selected:after": {
+            //   display: "none",
+            // },
             "& .deal-icon-box": {
-              width: 34,
-              height: 34,
-              borderRadius: 2,
+              width: 20,
+              height: 20,
+              borderRadius: 999,
               display: "grid",
               placeItems: "center",
-              backgroundColor: "#eef1f6",
+              backgroundColor: "#eef2ff",
               color: "#5b6476",
               transition: "all 0.2s ease",
             },
             "& .Mui-selected .deal-icon-box": {
-              backgroundColor: "#ece7f8",
-              color: "#2b146f",
+              backgroundColor: "rgba(255,255,255,0.2)",
+              color: "#ffffff",
             },
             "& .deal-label": {
               fontWeight: 700,
               color: "inherit",
             },
             "& .deal-helper": {
-              color: "#6a7286",
+              display: "none",
             },
           }}
         >

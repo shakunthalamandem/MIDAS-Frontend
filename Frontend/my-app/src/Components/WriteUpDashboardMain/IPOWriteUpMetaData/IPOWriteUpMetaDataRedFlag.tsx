@@ -14,11 +14,12 @@ import {
   Typography
 } from "@mui/material"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { Stack, Typography, Chip } from "@mui/material"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
+  metadata?: Record<string, any>
 }
 
 type RedFlagItem = {
@@ -92,6 +93,19 @@ const RiskMeter: React.FC<{
           }}
         >
           RISK
+          <Box
+            sx={{
+              position: "absolute",
+              left: "50%",
+              bottom: -6,
+              transform: "translateX(-50%)",
+              width: 0,
+              height: 0,
+              borderLeft: "6px solid transparent",
+              borderRight: "6px solid transparent",
+              borderTop: "6px solid #6b5bd2"
+            }}
+          />
         </Box>
         {editable ? (
           <Slider
@@ -156,6 +170,7 @@ const RiskMeter: React.FC<{
 }
 
 const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
+<<<<<<< HEAD
   basicDealDetails
 }) => {
   const [loading, setLoading] = useState(false)
@@ -165,6 +180,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const [draftItems, setDraftItems] = useState<RedFlagItem[]>([])
   const [saveLoading, setSaveLoading] = useState(false)
   const [pendingDeleteIndices, setPendingDeleteIndices] = useState<number[]>([])
+  const [draftRatingScore, setDraftRatingScore] = useState<number | null>(null)
 
   const apiUrl = process.env.REACT_APP_API_URL
   const ticker = basicDealDetails.ticker
@@ -249,8 +265,25 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const avgScore = useMemo(() => computeAvgScore(items), [items])
   const derivedRating = useMemo(() => computeRating(avgScore), [avgScore])
 
-  const badgeRating =
-    analysis?.red_flag_analysis_rating ?? analysis?.rating ?? derivedRating
+  const parsedRatingScore = useMemo(() => {
+    const raw = analysis?.red_flag_analysis_rating
+    if (typeof raw === "number") return raw
+    if (typeof raw === "string") {
+      const match = raw.match(/(\d+(\.\d+)?)/)
+      return match ? Number(match[1]) : null
+    }
+    return null
+  }, [analysis?.red_flag_analysis_rating])
+
+  const ratingScore = draftRatingScore ?? parsedRatingScore ?? 0
+  const ratingLabel = useMemo(() => {
+    if (ratingScore >= 0 && ratingScore < 4) return "High Risk"
+    if (ratingScore >= 4 && ratingScore < 7) return "Moderate Risk"
+    if (ratingScore >= 7 && ratingScore <= 10) return "Low Risk"
+    return "High Risk"
+  }, [ratingScore])
+
+  const badgeRating = `${ratingLabel} – ${ratingScore}/10`
 
   const updateLocalItems = (updatedItems: RedFlagItem[]) => {
     const nextAvg = computeAvgScore(updatedItems)
@@ -274,8 +307,10 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       const snapshot = items.map((item) => ({ ...item }))
       originalItemsRef.current = snapshot.map((item) => ({ ...item }))
       setDraftItems(snapshot)
+      setDraftRatingScore(parsedRatingScore ?? 0)
     } else {
       setPendingDeleteIndices([])
+      setDraftRatingScore(null)
     }
     setIsEditing((prev) => !prev)
   }
@@ -286,6 +321,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     setError(null)
     try {
       const originalItems = originalItemsRef.current
+      const updates: Array<{ category: string; changes: Record<string, unknown> }> =
+        []
       for (let index = 0; index < draftItems.length; index += 1) {
         const item = draftItems[index]
         if (!item.category) continue
@@ -314,31 +351,37 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           })
           if (!response.ok) throw new Error("Failed to delete red flag category")
         } else if (hasChanges) {
-          const changesPayload = {
-            score: item.score,
+          updates.push({
             category: item.category,
-            impact_risk: item.impact_risk,
-            observation: item.observation,
-            company_name: item.company_name ?? "",
-            red_flag_analysis_rating: item.red_flag_analysis_rating ?? null
-          }
-          const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
-            },
-            body: JSON.stringify({
-              ticker_name: ticker,
+            changes: {
+              score: item.score,
               category: item.category,
-              changes: changesPayload
-            })
+              impact_risk: item.impact_risk,
+              observation: item.observation,
+              company_name: item.company_name ?? "",
+              red_flag_analysis_rating: `${ratingLabel} – ${ratingScore}/10`
+            }
           })
-          if (!response.ok) throw new Error("Failed to save red flag analysis")
         }
+      }
+      if (updates.length) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            action: "update",
+            updates
+          })
+        })
+        if (!response.ok) throw new Error("Failed to save red flag analysis")
       }
       setPendingDeleteIndices([])
       setIsEditing(false)
+      setDraftRatingScore(null)
       await refreshRedFlags()
     } catch (fetchError: any) {
       setError(fetchError?.message || "Unable to save changes")
@@ -381,8 +424,20 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
               variant="subtitle2"
               sx={{ color: "#1f2937", fontWeight: 700 }}
             >
-              Avg Score: {avgScore.toFixed(2)} | Rating: {derivedRating}
+              Avg Score: {(avgScore * 2).toFixed(2)}/10 | Rating: {derivedRating}
             </Typography>
+            {isEditing ? (
+              <TextField
+                size="small"
+                type="number"
+                inputProps={{ min: 0, max: 10, step: 0.1 }}
+                value={ratingScore}
+                onChange={(event) =>
+                  setDraftRatingScore(Number(event.target.value))
+                }
+                sx={{ width: 120, background: "#ffffff" }}
+              />
+            ) : null}
             <IconButton
               size="small"
               onClick={handleEditToggle}
@@ -614,6 +669,42 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         </Typography>
       </Stack>
     </IPOWriteUpMetaDataSectionCard>
+=======
+  basicDealDetails,
+  metadata
+}) => {
+  return (
+
+      <Stack spacing={1.5}>
+        <Typography variant="body2">
+          <strong>Risk Analysis:</strong>{" "}
+          {metadata?.red_flag_analysis ?? "—"}
+        </Typography>
+
+        <Typography variant="body2">
+          <strong>Key Concerns:</strong> {metadata?.concerns ?? "—"}
+        </Typography>
+
+        <Typography variant="body2">
+          <strong>Leverage Profile:</strong>{" "}
+          {metadata?.leverage_profile_category ?? "—"}
+        </Typography>
+
+        {metadata?.leverage_profile_color && (
+          <Chip
+            label={`Leverage Risk: ${metadata.leverage_profile_color}`}
+            size="small"
+            color={
+              metadata.leverage_profile_color === "red"
+                ? "error"
+                : metadata.leverage_profile_color === "yellow"
+                ? "warning"
+                : "success"
+            }
+          />
+        )}
+      </Stack>
+>>>>>>> 1d5532868076a64b734b9029887e6bac60529899
   )
 }
 
