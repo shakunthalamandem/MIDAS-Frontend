@@ -320,6 +320,9 @@ type ExpectedPipelineDealsTableProps = {
   searchQuery?: string;
   onSearchQueryChange?: (value: string) => void;
   showSearch?: boolean;
+  showDealTypeToggle?: boolean;
+  selectedDealType?: "IPO" | "FO";
+  onSelectedDealTypeChange?: (value: "IPO" | "FO") => void;
   selectedRegion: "US" | "APAC" | "EMEA" | "Non-US America";
 };
 
@@ -327,6 +330,9 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
   searchQuery,
   onSearchQueryChange,
   showSearch = true,
+  showDealTypeToggle = true,
+  selectedDealType: controlledDealType,
+  onSelectedDealTypeChange,
   selectedRegion,
 }) => {
   const API_URL = process.env.REACT_APP_API_URL;
@@ -337,7 +343,7 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
     ipo_us: [],
     ipo_europe: [],
   });
-  const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [internalDealType, setInternalDealType] = useState<"IPO" | "FO">("IPO");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -404,14 +410,18 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
       return "ipo_international";
     }
     if (selectedRegion === "EMEA") return "ipo_europe";
-    return selectedDealType === "FO" ? "fo" : "ipo_us";
-  }, [selectedRegion, selectedDealType]);
+    return (controlledDealType ?? internalDealType) === "FO" ? "fo" : "ipo_us";
+  }, [selectedRegion, controlledDealType, internalDealType]);
 
   useEffect(() => {
     if (selectedRegion !== "US") {
-      setSelectedDealType("IPO");
+      if (controlledDealType) {
+        onSelectedDealTypeChange?.("IPO");
+      } else {
+        setInternalDealType("IPO");
+      }
     }
-  }, [selectedRegion]);
+  }, [selectedRegion, controlledDealType, onSelectedDealTypeChange]);
 
   const rows = useMemo(() => {
     const list = (data[selectedCategory] as any[]) || [];
@@ -441,6 +451,16 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
     onSearchQueryChange?.(value);
   };
 
+  const handleDealTypeChange = (value: "IPO" | "FO") => {
+    if (controlledDealType) {
+      onSelectedDealTypeChange?.(value);
+      return;
+    }
+    setInternalDealType(value);
+  };
+
+  const currentDealType = controlledDealType ?? internalDealType;
+
   return (
     <Container maxWidth="xl" sx={{ mb: 4, mt: 2 }}>
       <Container
@@ -458,48 +478,50 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
         }}
       >
 
-                  <ToggleButtonGroup
-          value={selectedDealType}
-          exclusive
-          onChange={(_e, val) => val && setSelectedDealType(val)}
-          sx={{
-            backgroundColor: "#f2f4f8",
-            p: 0.4,
-            borderRadius: 9999,
-            border: "1px solid #d7ddea",
-            display: "inline-flex",
-            gap: 0.5,
-            flexShrink: 0,
-            ml: "auto",
-            "& .MuiToggleButtonGroup-grouped": {
-              border: 0,
-            },
-            "& .MuiToggleButton-root": {
-              textTransform: "none",
+        {showDealTypeToggle && (
+          <ToggleButtonGroup
+            value={currentDealType}
+            exclusive
+            onChange={(_e, val) => val && handleDealTypeChange(val)}
+            sx={{
+              backgroundColor: "#f2f4f8",
+              p: 0.4,
               borderRadius: 9999,
-              border: 0,
-              px: 2,
-              py: 0.5,
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              color: "#6a7286",
-              backgroundColor: "transparent",
-              transition: "all 0.2s ease",
-            },
-            "& .Mui-selected": {
-              backgroundColor: "#2b146f",
-              color: "#ffffff",
-              boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
-            },
-          }}
-        >
-          <ToggleButton value="IPO" disabled={selectedRegion !== "US"}>
-            IPO
-          </ToggleButton>
-          <ToggleButton value="FO" disabled={selectedRegion !== "US"}>
-            FO
-          </ToggleButton>
-        </ToggleButtonGroup>
+              border: "1px solid #d7ddea",
+              display: "inline-flex",
+              gap: 0.5,
+              flexShrink: 0,
+              ml: "auto",
+              "& .MuiToggleButtonGroup-grouped": {
+                border: 0,
+              },
+              "& .MuiToggleButton-root": {
+                textTransform: "none",
+                borderRadius: 9999,
+                border: 0,
+                px: 2,
+                py: 0.5,
+                fontWeight: 700,
+                fontSize: "0.8rem",
+                color: "#6a7286",
+                backgroundColor: "transparent",
+                transition: "all 0.2s ease",
+              },
+              "& .Mui-selected": {
+                backgroundColor: "#2b146f",
+                color: "#ffffff",
+                boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
+              },
+            }}
+          >
+            <ToggleButton value="IPO" disabled={selectedRegion !== "US"}>
+              IPO
+            </ToggleButton>
+            <ToggleButton value="FO" disabled={selectedRegion !== "US"}>
+              FO
+            </ToggleButton>
+          </ToggleButtonGroup>
+        )}
      
         <Typography
           variant="h6"
@@ -512,7 +534,8 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
         >
           Future Pipeline Deals
         </Typography>
-                  <TextField
+        {showSearch && (
+          <TextField
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
@@ -548,6 +571,7 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
             }}
             InputLabelProps={{ shrink: false }}
           />
+        )}
 
       </Container>
 
