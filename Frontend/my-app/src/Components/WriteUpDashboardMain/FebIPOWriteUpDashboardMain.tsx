@@ -37,8 +37,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     { id: "business-overview", label: "Business Overview" },
     { id: "key-metrics", label: "Key Metrics" },
     { id: "financial-highlights", label: "Financial Highlights" },
-    { id: "comps", label: "Comps" },
-    { id: "trends", label: "Trends" },
+    { id: "comps", label: "Comps & Peer Trends" },
+    // { id: "trends", label: "Trends" },
     { id: "valuation-analysis", label: "Valuation Analysis" },
     { id: "red-flag", label: "Red Flag" },
     { id: "final-verdict", label: "Final Verdict" }
@@ -140,10 +140,10 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         <Box id="financial-highlights" sx={{ scrollMarginTop: 96 }}>
           <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
         </Box>
-
+{/* 
         <Box id="trends" sx={{ scrollMarginTop: 96 }}>
           <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
-        </Box>
+        </Box> */}
 
         <Box id="comps" sx={{ scrollMarginTop: 96 }}>
           <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
