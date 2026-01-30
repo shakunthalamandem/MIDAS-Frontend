@@ -70,6 +70,7 @@ const DealCard: React.FC<DealCardProps> = ({
   return (
     <Card
       elevation={0}
+      onClick={onViewDetails}
       sx={{
         borderRadius: 4,
         border: "1px solid #e5f0ff",
@@ -78,6 +79,7 @@ const DealCard: React.FC<DealCardProps> = ({
         height: "100%",
         minHeight: { xs: 400, sm: 300 },
         fontSize: "0.92rem",
+        cursor: onViewDetails ? "pointer" : "default",
       }}
     >
       <CardContent
@@ -143,11 +145,15 @@ const DealCard: React.FC<DealCardProps> = ({
           {actionCards.map((item) => (
             <Grid item xs={6} key={item.label}>
               <Box
-                onClick={() => onActionClick?.(item.label)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onActionClick?.(item.label);
+                }}
                 onKeyDown={(event) => {
                   if (!onActionClick) return;
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
+                    event.stopPropagation();
                     onActionClick(item.label);
                   }
                 }}
