@@ -24,7 +24,7 @@ const IPOEditableCell: React.FC<IPOEditableCellProps> = ({
     <TableCell
       align="center"
       sx={{
-        border: "1px solid #000000",
+        border: "1px solid #C9C9C9",
         fontStyle: isEvenRow ? "normal" : "italic",
         fontSize:isEvenRow ? "1.3rem": "1.1rem",
         backgroundColor: isHighlightColumn
