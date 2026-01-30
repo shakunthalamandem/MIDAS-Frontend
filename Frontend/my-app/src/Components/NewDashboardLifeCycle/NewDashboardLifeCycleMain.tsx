@@ -783,20 +783,6 @@ const NewDealsLifecycleCards: React.FC = () => {
 const NewDashboardLifeCycleMain: React.FC = () => {
   return (
     <>
-      {/* <Box
-        sx={{
-          backgroundColor: "#0b2a6b",
-          color: "#fff",
-          py: 1.2,
-          textAlign: "center",
-          mb: 3,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
-          Welcome to New Dashboard Life Cycle!
-        </Typography>
-      </Box> */}
       <NewDealsLifecycleCards />
     </>
   );
