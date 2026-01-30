@@ -348,7 +348,7 @@ const handleSaveAll = async () => {
                   <Stack spacing={0.75} alignItems="center">
                     <Typography
                       variant="subtitle2"
-                      sx={{ fontWeight: 600, color: "#1d2b5a" }}
+                      sx={{fontsize:"1rem", fontWeight: 600, color: "#1d2b5a" }}
                     >
                       {item.label}
                     </Typography>
@@ -376,7 +376,7 @@ const handleSaveAll = async () => {
                     ) : (
                       <Typography
                         variant="body2"
-                        sx={{ color: "#101d45", fontWeight: 600 }}
+                        sx={{ fontsize:"1rem",color: "#66137a", fontWeight: 600 }}
                       >
                         {formatDate(value)}
                       </Typography>
