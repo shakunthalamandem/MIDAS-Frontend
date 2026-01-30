@@ -11,8 +11,6 @@ import {
 } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import MemoryOutlinedIcon from "@mui/icons-material/MemoryOutlined";
 import { DealCardTag } from "./NewDashboardLifeCycleUtils";
 
 export type DealCardMeta = {
@@ -26,7 +24,7 @@ type DealCardProps = {
   subtitle?: string;
   meta: DealCardMeta[];
   tags?: DealCardTag[];
-  secondaryTag?: DealCardTag;
+  writeupAvailable?: boolean | null;
   onViewDetails?: () => void;
   onActionClick?: (label: string) => void;
 };
@@ -36,7 +34,7 @@ const DealCard: React.FC<DealCardProps> = ({
   subtitle,
   meta,
   tags,
-  secondaryTag,
+  writeupAvailable,
   onViewDetails,
   onActionClick,
 }) => {
@@ -49,11 +47,23 @@ const DealCard: React.FC<DealCardProps> = ({
   const tileMeta = meta.filter(
     (item) => !barMeta.includes(item) && !dateMeta.includes(item)
   );
+  const writeupStatus =
+    writeupAvailable === true
+      ? "Write Up Ready"
+      : writeupAvailable === false
+      ? "Write Up Not Ready"
+      : null;
   const actionCards = [
-    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", },
+    {
+      label: "Write Up",
+      icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />,
+      bg: "#eeeffcff",
+      tone: "#4b5bff",
+      status: writeupStatus,
+    },
     { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
-    { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
+    // { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
+    // { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
   ];
 
   return (
@@ -112,41 +122,20 @@ const DealCard: React.FC<DealCardProps> = ({
           ) : null}
         </Stack>
 
-        {(subtitle || secondaryTag) ? (
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-            justifyContent="space-between"
-            flexWrap="nowrap"
-          >
-            {subtitle ? (
-              <Box sx={{ flex: "0 0 50%", minWidth: 0 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#000000ff", fontWeight: 300, fontSize: "0.78rem", wordBreak: "break-word" }}
-                >
-                  {subtitle}
-                </Typography>
-              </Box>
-            ) : (
-              <Box sx={{ flex: "0 0 50%" }} />
-            )}
-            <Box sx={{ flex: "0 0 50%", display: "flex", justifyContent: "flex-end" }}>
-              {secondaryTag ? (
-                <Chip
-                  label={secondaryTag.label}
-                  size="small"
-                  sx={{
-                    bgcolor: secondaryTag.bg ?? "#dcfce7",
-                    color: secondaryTag.color ?? "#166534",
-                    fontWeight: 700,
-                    borderRadius: 999,
-                  }}
-                />
-              ) : null}
-            </Box>
-          </Stack>
+        {subtitle ? (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#000000ff",
+                fontWeight: 300,
+                fontSize: "0.78rem",
+                wordBreak: "break-word",
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </Box>
         ) : null}
 
         <Grid container spacing={1.2}>
@@ -180,9 +169,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   cursor: onActionClick ? "pointer" : "default",
                   "&:hover": onActionClick
                     ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
-                      bgcolor:"#ceccf3ff"
-                     }
+                      bgcolor:"#ceccf3ff"}
                     : undefined,
+                    mt:2,
+                    mb:2
                 }}
               >
                 <Box
@@ -201,6 +191,17 @@ const DealCard: React.FC<DealCardProps> = ({
                 <Typography sx={{ fontWeight: 600, fontSize: "0.82rem" }}>
                   {item.label}
                 </Typography>
+                {item.status ? (
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "0.7rem",
+                      color: item.status === "Write Up Ready" ? "#0d883c" : "#991b1b",
+                    }}
+                  >
+                    {item.status}
+                  </Typography>
+                ) : null}
               </Box>
             </Grid>
           ))}
