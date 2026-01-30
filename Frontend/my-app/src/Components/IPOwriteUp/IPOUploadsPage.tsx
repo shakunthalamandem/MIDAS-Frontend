@@ -18,8 +18,9 @@ import { useNavigate } from "react-router-dom";
 import IPOS1FileUpload from "../IPOwriteUp/IPOS1FileUpload";
 import FOS1FileUpload from "../Main/FOWriteUpMain/FOWriteUpUploads/FOS1FileUpload";
 import FinancialforecastUpload from "../Uploads/FinancialforecastUpload";
+import S1DocumentUpload from "../Uploads/S1DocumentUpload";
 
-type View = "ipo" | "fo" | "forecast";
+type View = "ipo" | "fo" | "forecast" | "S1";
 
 const IPOUploadsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ const IPOUploadsPage: React.FC = () => {
             <ToggleButton value="ipo">IPO Documents</ToggleButton>
             <ToggleButton value="forecast">Financial Forecasts</ToggleButton>
             <ToggleButton value="fo">FO Documents</ToggleButton>
+            <ToggleButton value="S1">S1 File upload</ToggleButton>
           </ToggleButtonGroup>
         </Box>
 
@@ -165,6 +167,33 @@ const IPOUploadsPage: React.FC = () => {
               </Typography>
               <Divider sx={{ my: 2 }} />
               <FinancialforecastUpload />
+            </Card>
+          </motion.div>
+        )}
+        {view === "S1" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Card
+              elevation={3}
+              sx={{
+                borderRadius: 3,
+                p: 3,
+                background: "linear-gradient(to right, #ffecd2, #fcb69f)",
+              }}
+            >
+              <Typography
+                variant="h6"
+                align="center"
+                color="primary"
+                sx={{ fontWeight: 600, mb: 2 }}
+              >
+                Upload Full S1 Document
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <S1DocumentUpload />
             </Card>
           </motion.div>
         )}
