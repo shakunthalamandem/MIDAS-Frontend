@@ -689,7 +689,11 @@ const NewDealsLifecycleCards: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1,mt:0 }}>
                   <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
-                    Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
+                    Upcoming{" "}
+                    <Box component="span" sx={{ color: "#dc2626" }}>
+                      {selectedRegion} {selectedDealType}
+                    </Box>{" "}
+                    Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
@@ -717,7 +721,10 @@ const NewDealsLifecycleCards: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
-                    Upcoming {selectedRegion} {selectedDealType} Deals Pricing Date Not Available (Not Yet Listed)
+                                    Upcoming{" "}
+                    <Box component="span" sx={{ color: "#dc2626" }}>
+                      {selectedRegion} {selectedDealType}
+                    </Box>{" "} Deals Pricing Date Not Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
