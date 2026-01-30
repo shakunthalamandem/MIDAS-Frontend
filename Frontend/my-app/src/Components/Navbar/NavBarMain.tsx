@@ -242,6 +242,11 @@ const NavbarMain: React.FC = () => {
                   path: "/deals/new_dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
+                                {
+                  label: "Future Pipeline",
+                  path: "/deals/future_pipeline",
+                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
+                },
                 // {
                 //   label: "IPO Write-Up",
                 //   path: "/equity/ipo_dashboard",
