@@ -44,7 +44,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const tabItems = useMemo(
     () => [
       { label: "Write Up New" },
-      { label: "Write up" },
+      { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
