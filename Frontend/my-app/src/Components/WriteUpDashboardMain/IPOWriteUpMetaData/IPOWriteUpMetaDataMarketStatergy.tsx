@@ -1,4 +1,16 @@
-import { Stack, Typography, Chip } from "@mui/material"
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Stack,
+  TextField,
+  Typography
+} from "@mui/material"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
+import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 
 interface IPOWriteUpMetaDataMarketStatergyProps {
@@ -6,51 +18,346 @@ interface IPOWriteUpMetaDataMarketStatergyProps {
   metadata?: Record<string, any>
 }
 
+type FairValueData = {
+  fair_value_estimate?: string | number | null
+  indication_of_interest?: string | null
+  after_market_threshold?: string | null
+  internal_notes?: string | null
+}
+
 const IPOWriteUpMetaDataMarketStatergy: React.FC<
   IPOWriteUpMetaDataMarketStatergyProps
-> = ({ basicDealDetails, metadata }) => {
+> = ({ basicDealDetails }) => {
+  const API_URL = process.env.REACT_APP_API_URL
+  const token = localStorage.getItem("access_token")
+
+  const [data, setData] = useState<FairValueData | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [isEditingCards, setIsEditingCards] = useState(false)
+  const [isEditingNotes, setIsEditingNotes] = useState(false)
+  const [draftCards, setDraftCards] = useState<Record<string, string>>({})
+  const [draftNotes, setDraftNotes] = useState("")
+  const [isSavingCards, setIsSavingCards] = useState(false)
+  const [isSavingNotes, setIsSavingNotes] = useState(false)
+
+  const getAuthHeaders = () => ({
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  })
+
+  const fetchFairValues = async () => {
+    if (!API_URL) throw new Error("REACT_APP_API_URL is not set.")
+    const response = await fetch(`${API_URL}/api/ipo_deal_data_fairvalues/`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ ticker: basicDealDetails.ticker })
+    })
+    const raw = await response.text()
+    if (!response.ok) throw new Error(raw || "Failed to load fair value data")
+    return raw ? (JSON.parse(raw) as FairValueData) : ({} as FairValueData)
+  }
+
+  const patchFairValues = async (payload: Record<string, unknown>) => {
+    if (!API_URL) throw new Error("REACT_APP_API_URL is not set.")
+    const response = await fetch(`${API_URL}/api/ipo_deal_data_fairvalues/`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    })
+    const raw = await response.text()
+    if (!response.ok) throw new Error(raw || "Failed to save fair value data")
+    return raw ? JSON.parse(raw) : null
+  }
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      if (!basicDealDetails.ticker) return
+      try {
+        setLoading(true)
+        setError(null)
+        const result = await fetchFairValues()
+        if (!cancelled) setData(result)
+      } catch (err) {
+        console.error("Error fetching fair value data", err)
+        if (!cancelled) setError("No data found.")
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [API_URL, basicDealDetails.ticker])
+
+  const formattedCards = useMemo(
+    () => [
+      {
+        label: "Fair Value Estimate",
+        key: "fair_value_estimate",
+        value: data?.fair_value_estimate ?? "--"
+      },
+      {
+        label: "Indication of Interest",
+        key: "indication_of_interest",
+        value: data?.indication_of_interest ?? "--"
+      },
+      {
+        label: "After Market Threshold",
+        key: "after_market_threshold",
+        value: data?.after_market_threshold ?? "--"
+      }
+    ],
+    [data]
+  )
+
+  const openEditCards = () => {
+    setError(null)
+    setIsEditingCards(true)
+    setDraftCards({
+      fair_value_estimate: String(data?.fair_value_estimate ?? ""),
+      indication_of_interest: String(data?.indication_of_interest ?? ""),
+      after_market_threshold: String(data?.after_market_threshold ?? "")
+    })
+  }
+
+  const openEditNotes = () => {
+    setError(null)
+    setIsEditingNotes(true)
+    setDraftNotes(String(data?.internal_notes ?? ""))
+  }
+
+  const cancelEditCards = () => {
+    setIsEditingCards(false)
+    setDraftCards({})
+  }
+
+  const cancelEditNotes = () => {
+    setIsEditingNotes(false)
+    setDraftNotes("")
+  }
+
+  const handleSaveCards = async () => {
+    try {
+      setIsSavingCards(true)
+      await patchFairValues({
+        ticker: basicDealDetails.ticker,
+        fair_value_estimate: draftCards.fair_value_estimate?.trim() ?? "",
+        indication_of_interest: draftCards.indication_of_interest?.trim() ?? "",
+        after_market_threshold: draftCards.after_market_threshold?.trim() ?? ""
+      })
+      const refreshed = await fetchFairValues()
+      setData(refreshed)
+      cancelEditCards()
+    } catch (saveError: any) {
+      setError(saveError?.message || "Unable to save changes")
+    } finally {
+      setIsSavingCards(false)
+    }
+  }
+
+  const handleSaveNotes = async () => {
+    try {
+      setIsSavingNotes(true)
+      await patchFairValues({
+        ticker: basicDealDetails.ticker,
+        internal_notes: draftNotes
+      })
+      const refreshed = await fetchFairValues()
+      setData(refreshed)
+      cancelEditNotes()
+    } catch (saveError: any) {
+      setError(saveError?.message || "Unable to save changes")
+    } finally {
+      setIsSavingNotes(false)
+    }
+  }
+
   return (
-
-      <Stack spacing={1.5}>
-        <Typography variant="body2">
-          <strong>Market Analysis:</strong>{" "}
-          {metadata?.market_analysis_category ?? "—"}
+    <Stack spacing={3}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ px: 0.5 }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
+          Market Strategy
         </Typography>
-
-        <Typography variant="body2">
-          <strong>Growth Catalysts:</strong>{" "}
-          {metadata?.growth_catalysts_category ?? "—"}
-        </Typography>
-
-        <Typography variant="body2">
-          <strong>Secular Trends:</strong>{" "}
-          {metadata?.secular_trends_category ?? "—"}
-        </Typography>
-
-        <Stack direction="row" spacing={1} mt={1}>
-          {metadata?.market_analysis_color && (
-            <Chip
-              label={`Market: ${metadata.market_analysis_color}`}
+        {isEditingCards ? (
+          <Stack direction="row" spacing={1}>
+            <IconButton
               size="small"
-              color="success"
-            />
-          )}
-          {metadata?.growth_catalysts_color && (
-            <Chip
-              label={`Catalysts: ${metadata.growth_catalysts_color}`}
+              onClick={handleSaveCards}
+              disabled={isSavingCards}
+              sx={{ color: "#1f3b73" }}
+            >
+              <SaveOutlinedIcon fontSize="small" />
+            </IconButton>
+            <IconButton
               size="small"
-              color="success"
+              onClick={cancelEditCards}
+              disabled={isSavingCards}
+              sx={{ color: "#6b7280" }}
+            >
+              <CloseOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Stack>
+        ) : (
+          <IconButton
+            size="small"
+            onClick={openEditCards}
+            sx={{ color: "#1f3b73" }}
+          >
+            <EditOutlinedIcon fontSize="small" />
+          </IconButton>
+        )}
+      </Stack>
+
+      {loading ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <CircularProgress size={18} />
+          <Typography variant="body2">Loading fair value data...</Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={2}>
+          {formattedCards.map((card) => (
+            <Grid item xs={12} md={4} key={card.key}>
+              <Box
+                sx={{
+                  borderRadius: 2,
+                  border: "1px solid #e5e7ef",
+                  background: "#ffffff",
+                  boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+                  p: 2.25,
+                  minHeight: 90
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#1d2b5a" }}
+                >
+                  {card.label}
+                </Typography>
+                {isEditingCards ? (
+                  <TextField
+                    size="small"
+                    value={draftCards[card.key] ?? ""}
+                    onChange={(event) =>
+                      setDraftCards((prev) => ({
+                        ...prev,
+                        [card.key]: event.target.value
+                      }))
+                    }
+                    sx={{ mt: 1, background: "#ffffff" }}
+                    fullWidth
+                  />
+                ) : (
+                  <Typography
+                    variant="body1"
+                    sx={{ mt: 1, fontWeight: 600, color: "#111827" }}
+                  >
+                    {card.value}
+                  </Typography>
+                )}
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      <Box
+        sx={{
+          borderRadius: 3,
+          border: "1px solid #e5e7ef",
+          background: "#f3f5ff",
+          p: { xs: 2.5, md: 3 },
+          boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+        }}
+      >
+        <Stack spacing={2}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            flexWrap="wrap"
+            gap={1}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+              Aftermarket Strategy
+            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography
+                variant="caption"
+                sx={{ color: "#6b7280", fontStyle: "italic" }}
+              >
+                (For internal use only, not included in PDF)
+              </Typography>
+              {isEditingNotes ? (
+                <Stack direction="row" spacing={1}>
+                  <IconButton
+                    size="small"
+                    onClick={handleSaveNotes}
+                    disabled={isSavingNotes}
+                    sx={{ color: "#1f3b73" }}
+                  >
+                    <SaveOutlinedIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={cancelEditNotes}
+                    disabled={isSavingNotes}
+                    sx={{ color: "#6b7280" }}
+                  >
+                    <CloseOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              ) : (
+                <IconButton
+                  size="small"
+                  onClick={openEditNotes}
+                  sx={{ color: "#1f3b73" }}
+                >
+                  <EditOutlinedIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Stack>
+          </Stack>
+
+          {isEditingNotes ? (
+            <TextField
+              multiline
+              minRows={6}
+              value={draftNotes}
+              onChange={(event) => setDraftNotes(event.target.value)}
+              sx={{ background: "#ffffff" }}
             />
-          )}
-          {metadata?.secular_trends_color && (
-            <Chip
-              label={`Trends: ${metadata.secular_trends_color}`}
-              size="small"
-              color="success"
-            />
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: "pre-line",
+                color: "#1f2937",
+                lineHeight: 1.7
+              }}
+            >
+              {data?.internal_notes || "--"}
+            </Typography>
           )}
         </Stack>
-      </Stack>
+      </Box>
+
+      {error ? (
+        <Typography variant="body2" sx={{ color: "#b91c1c" }}>
+          {error}
+        </Typography>
+      ) : null}
+    </Stack>
   )
 }
 
