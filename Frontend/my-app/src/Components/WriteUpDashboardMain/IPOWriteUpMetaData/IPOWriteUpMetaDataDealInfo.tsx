@@ -81,10 +81,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<
   /* ---------------- UI ---------------- */
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Deal Info"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Box sx={{ position: "relative" }}>
         {/* ACTIONS */}
         <Box sx={{ position: "absolute", right: 8, top: 8 }}>
@@ -204,7 +201,6 @@ const IPOWriteUpMetaDataDealInfo: React.FC<
           </Grid>
         </Grid>
       </Box>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

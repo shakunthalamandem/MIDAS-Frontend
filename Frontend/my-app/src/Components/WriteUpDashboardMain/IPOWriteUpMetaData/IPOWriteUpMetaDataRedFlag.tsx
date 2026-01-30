@@ -1,6 +1,5 @@
 import { Stack, Typography, Chip } from "@mui/material"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -12,10 +11,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   metadata
 }) => {
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Red Flag"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={1.5}>
         <Typography variant="body2">
           <strong>Risk Analysis:</strong>{" "}
@@ -45,7 +41,6 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           />
         )}
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

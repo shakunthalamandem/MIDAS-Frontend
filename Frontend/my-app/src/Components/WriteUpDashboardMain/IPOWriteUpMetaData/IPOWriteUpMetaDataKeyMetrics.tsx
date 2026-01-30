@@ -54,16 +54,12 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   }, [metadata])
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Key Metrics"
-      basicDealDetails={basicDealDetails}
-    >
+
       <IPODashboardCardRatings
         selectedTicker={basicDealDetails.ticker}
         ipodata={ipoData}
         setIpoData={setIpoData}
       />
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

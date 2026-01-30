@@ -11,10 +11,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<
   IPOWriteUpMetaDataBusinessOverviewProps
 > = ({ basicDealDetails, metadata }) => {
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Business Overview"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={1.5}>
         <Typography variant="body2">
           {metadata?.business_overview ?? "—"}
@@ -42,7 +39,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<
           {metadata?.barriers_to_entry ?? "—"}
         </Typography>
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

@@ -22,10 +22,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   )
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Valuation Analysis"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={2}>
         {/* Backend-driven valuation context */}
         <Typography variant="body2">
@@ -48,7 +45,6 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
         {/* Existing valuation model */}
         <IPOValuationSection selectedData={selectedData} />
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

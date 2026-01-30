@@ -11,10 +11,7 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
   IPOWriteUpMetaDataDealIndicationProps
 > = ({ basicDealDetails, metadata }) => {
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Deal Indication"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={1.5}>
         <Typography variant="body2">
           <strong>Indication of Interest:</strong>{" "}
@@ -37,7 +34,6 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
           {metadata?.after_market_threshold ?? "—"}
         </Typography>
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

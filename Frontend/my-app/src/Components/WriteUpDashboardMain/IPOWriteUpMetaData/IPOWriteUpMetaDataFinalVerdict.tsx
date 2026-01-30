@@ -11,10 +11,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   IPOWriteUpMetaDataFinalVerdictProps
 > = ({ basicDealDetails, metadata }) => {
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Final Verdict"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={1.5}>
         <Typography variant="body2">
           <strong>Overall Recommendation:</strong>{" "}
@@ -45,7 +42,6 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
           />
         )}
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 

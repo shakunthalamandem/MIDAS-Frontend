@@ -1,6 +1,5 @@
 import { Stack, Typography, Chip } from "@mui/material"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataMarketStatergyProps {
   basicDealDetails: BasicDealDetails
@@ -11,10 +10,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   IPOWriteUpMetaDataMarketStatergyProps
 > = ({ basicDealDetails, metadata }) => {
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Market Strategy"
-      basicDealDetails={basicDealDetails}
-    >
+
       <Stack spacing={1.5}>
         <Typography variant="body2">
           <strong>Market Analysis:</strong>{" "}
@@ -55,7 +51,6 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
           )}
         </Stack>
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 
