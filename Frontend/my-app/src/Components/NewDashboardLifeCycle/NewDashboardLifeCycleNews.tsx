@@ -120,6 +120,7 @@ const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) =
   const [allNews, setAllNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [noNewsMessage, setNoNewsMessage] = useState("");
 
   const [tickerFilter, setTickerFilter] = useState(initialTicker);
   const [sentimentFilter, setSentimentFilter] = useState<
@@ -153,6 +154,10 @@ const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) =
           data?.portfolio_data?.news_data || data?.news_data || [];
 
         setAllNews(newsData);
+        setNoNewsMessage(
+          data?.portfolio_data?.message ||
+            (data?.portfolio_data?.status === 204 ? "No news available." : "")
+        );
 
         // auto select first item for better UX
         setSelectedId(newsData?.[0]?.id ?? null);
@@ -178,6 +183,9 @@ const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) =
       return tickerOk && sentimentOk;
     });
   }, [allNews, tickerFilter, sentimentFilter]);
+
+  const isNoNews =
+    !loading && !error && allNews.length === 0 && !!noNewsMessage;
 
   const selected = useMemo(
     () => filtered.find((n) => n.id === selectedId) || filtered[0] || null,
@@ -390,8 +398,28 @@ const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) =
         </Paper>
       )}
 
+      {/* No news state */}
+      {isNoNews && (
+        <Paper
+          elevation={0}
+          sx={(theme) => ({
+            borderRadius: 3,
+            border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+            backgroundColor: alpha(theme.palette.info.main, 0.04),
+            p: 2,
+          })}
+        >
+          <Typography sx={{ fontWeight: 600 }}>
+            {noNewsMessage}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Check back later for new updates.
+          </Typography>
+        </Paper>
+      )}
+
       {/* Main layout */}
-      {!loading && !error && (
+      {!loading && !error && !isNoNews && (
         <Box
           sx={{
             display: "grid",
