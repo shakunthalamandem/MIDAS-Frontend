@@ -180,96 +180,111 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
 
   return (
     <Stack spacing={3}>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ px: 0.5 }}
+      <Box
+        sx={{
+          borderRadius: 3,
+          border: "1px solid #e5e7ef",
+          background: "#f7f9ff",
+          p: { xs: 2.5, md: 3 },
+          boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+        }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
-          Market Strategy
-        </Typography>
-        {isEditingCards ? (
-          <Stack direction="row" spacing={1}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ px: 0.5 }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
+            Market Strategy
+          </Typography>
+          {isEditingCards ? (
+            <Stack direction="row" spacing={1}>
+              <IconButton
+                size="small"
+                onClick={handleSaveCards}
+                disabled={isSavingCards}
+                sx={{ color: "#1f3b73" }}
+              >
+                <SaveOutlinedIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={cancelEditCards}
+                disabled={isSavingCards}
+                sx={{ color: "#6b7280" }}
+              >
+                <CloseOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          ) : (
             <IconButton
               size="small"
-              onClick={handleSaveCards}
-              disabled={isSavingCards}
+              onClick={openEditCards}
               sx={{ color: "#1f3b73" }}
             >
-              <SaveOutlinedIcon fontSize="small" />
+              <EditOutlinedIcon fontSize="small" />
             </IconButton>
-            <IconButton
-              size="small"
-              onClick={cancelEditCards}
-              disabled={isSavingCards}
-              sx={{ color: "#6b7280" }}
-            >
-              <CloseOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Stack>
-        ) : (
-          <IconButton
-            size="small"
-            onClick={openEditCards}
-            sx={{ color: "#1f3b73" }}
-          >
-            <EditOutlinedIcon fontSize="small" />
-          </IconButton>
-        )}
-      </Stack>
+          )}
+        </Stack>
 
-      {loading ? (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <CircularProgress size={18} />
-          <Typography variant="body2">Loading fair value data...</Typography>
-        </Box>
-      ) : (
-        <Grid container spacing={2}>
-          {formattedCards.map((card) => (
-            <Grid item xs={12} md={4} key={card.key}>
-              <Box
-                sx={{
-                  borderRadius: 2,
-                  border: "1px solid #e5e7ef",
-                  background: "#ffffff",
-                  boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-                  p: 2.25,
-                  minHeight: 90
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#1d2b5a" }}
+        {loading ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 2 }}>
+            <CircularProgress size={18} />
+            <Typography variant="body2">Loading fair value data...</Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            {formattedCards.map((card) => (
+              <Grid item xs={12} md={4} key={card.key}>
+                <Box
+                  sx={{
+                    borderRadius: 2,
+                    border: "1px solid #e5e7ef",
+                    background: "#eceff5",
+                    boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+                    p: 2.25,
+                    minHeight: 90,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center"
+                  }}
                 >
-                  {card.label}
-                </Typography>
-                {isEditingCards ? (
-                  <TextField
-                    size="small"
-                    value={draftCards[card.key] ?? ""}
-                    onChange={(event) =>
-                      setDraftCards((prev) => ({
-                        ...prev,
-                        [card.key]: event.target.value
-                      }))
-                    }
-                    sx={{ mt: 1, background: "#ffffff" }}
-                    fullWidth
-                  />
-                ) : (
                   <Typography
-                    variant="body1"
-                    sx={{ mt: 1, fontWeight: 600, color: "#111827" }}
+                    variant="subtitle2"
+                    sx={{ fontSize:"1rem",fontWeight: 700, color: "#1d2b5a" }}
                   >
-                    {card.value}
+                    {card.label}
                   </Typography>
-                )}
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+                  {isEditingCards ? (
+                    <TextField
+                      size="small"
+                      value={draftCards[card.key] ?? ""}
+                      onChange={(event) =>
+                        setDraftCards((prev) => ({
+                          ...prev,
+                          [card.key]: event.target.value
+                        }))
+                      }
+                      sx={{ mt: 1, background: "#ffffff", maxWidth: 240 }}
+                      fullWidth
+                    />
+                  ) : (
+                    <Typography
+                      variant="body1"
+                      sx={{ mt: 1, fontWeight: 600, color: "#111827" }}
+                    >
+                      {card.value}
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
 
       <Box
         sx={{
