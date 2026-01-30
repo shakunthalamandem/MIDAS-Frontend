@@ -29,6 +29,7 @@ import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboard
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
 import S1QueryBot from "./S1QueryBot";
+import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -238,7 +239,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
             
           ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <StockTickerNews ticker={activePayload.ticker} />
+            <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (

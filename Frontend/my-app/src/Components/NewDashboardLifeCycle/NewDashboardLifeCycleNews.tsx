@@ -109,7 +109,7 @@ const mdComponents = {
   ),
 };
 
-const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
+const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -198,7 +198,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   return (
     <Container maxWidth="xl" sx={{ py: 2.5 }}>
       {/* Top header (no card) */}
-      <Box sx={{ mb: 2 ,mt:4}}>
+      <Box sx={{ mb: 2 }}>
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -266,7 +266,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
 
           <Stack direction="row" spacing={1} alignItems="center">
             {/* Search bar temporarily disabled */}
-            
+            {/*
               <TextField
                 value={tickerFilter}
                 onChange={(e) => setTickerFilter(e.target.value)}
@@ -281,7 +281,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                   ),
                 }}
               />
-           
+            */}
             <ToggleButtonGroup
               size="small"
               value={sentimentFilter}
@@ -800,4 +800,4 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   );
 };
 
-export default StockTickerNews;
+export default NewDashboardLifeCycleNews;
