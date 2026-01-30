@@ -2,7 +2,6 @@ import { useMemo } from "react"
 import IPOComparablesAndAISection from "../../IPODashboardLLM/IPOComparablesAndAISection"
 import { SelectedData } from "../../IPODashboardLLM/IPODealsS1DealData"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 
 interface IPOWriteUpMetaDataCompsProps {
   basicDealDetails: BasicDealDetails
