@@ -195,51 +195,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           )}
         </Box>
 
-        <Box
-          sx={{
-            borderRadius: 2,
-            border: "1px solid #e0e6f5",
-            background: "#ffffff",
-            p: 2
-          }}
-        >
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
-            Valuation Image
-          </Typography>
-          {editMode ? (
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Paste valuation image URL"
-              value={draftImageUrl}
-              onChange={(event) => setDraftImageUrl(event.target.value)}
-              sx={{
-                mt: 1,
-                background: "#ffffff",
-                borderRadius: 1,
-                "& .MuiOutlinedInput-root": { borderRadius: 1 }
-              }}
-            />
-          ) : valuationImageUrl ? (
-            <Box
-              component="img"
-              src={valuationImageUrl}
-              alt="Valuation"
-              sx={{
-                mt: 1.5,
-                width: "100%",
-                maxHeight: 320,
-                objectFit: "contain",
-                borderRadius: 2,
-                border: "1px solid #e6ebf5"
-              }}
-            />
-          ) : (
-            <Typography variant="body2" sx={{ mt: 1, color: "#6b7a99" }}>
-              No valuation image available.
-            </Typography>
-          )}
-        </Box>
+
       </Stack>
     )
   }
