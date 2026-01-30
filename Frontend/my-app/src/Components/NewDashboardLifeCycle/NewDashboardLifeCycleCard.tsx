@@ -1,16 +1,17 @@
 import React from "react";
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Chip,
   Grid,
+  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { DealCardTag } from "./NewDashboardLifeCycleUtils";
 
 export type DealCardMeta = {
@@ -242,7 +243,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   <Typography variant="caption" sx={{ fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#17203d" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "#17203d", fontSize: "0.95rem" }}
+                  >
                     {item.value}
                   </Typography>
                 </Box>
@@ -268,7 +272,10 @@ const DealCard: React.FC<DealCardProps> = ({
                 <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                   {item.label}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.95rem" }}
+                >
                   {item.value}
                 </Typography>
               </Box>
@@ -290,7 +297,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     width: 26,
                     height: 26,
                     borderRadius: "50%",
-                    backgroundColor: "#0f3072ff",
+                    backgroundColor: "rgb(53, 15, 114)",
                     display: "grid",
                     placeItems: "center",
                     color: "#ffffff",
@@ -303,7 +310,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.82rem" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.92rem" }}
+                  >
                     {item.value}
                   </Typography>
                 </Box>
@@ -314,22 +324,21 @@ const DealCard: React.FC<DealCardProps> = ({
 
         {onViewDetails && (
           <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 0.5 }}>
-            <Button
+            <IconButton
               onClick={onViewDetails}
-              variant="contained"
+              aria-label="View details"
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                px: 3,
-                py: 0.7,
-                background: "#0c3992ff",
-                // boxShadow: "0 10px 20px rgba(91, 62, 230, 0.3)",
-                fontWeight: 700,
-                fontSize: "0.85rem",
+                backgroundColor: "rgb(74, 130, 243)",
+                color: "#ffffff",
+                width: 20,
+                height: 20,
+                "&:hover": {
+                  backgroundColor: "#0a2f73",
+                },
               }}
             >
-              View Details
-            </Button>
+              <ArrowForwardIcon />
+            </IconButton>
           </Box>
         )}
       </CardContent>
