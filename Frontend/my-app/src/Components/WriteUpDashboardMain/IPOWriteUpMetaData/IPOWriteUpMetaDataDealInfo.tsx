@@ -151,11 +151,11 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
     }
   }
 
-  const imageUrl = metadata?.valuation_image_url
-  const summaryImageUrl = metadata?.differentiated_summary_image_url
-
   return (
-
+    <IPOWriteUpMetaDataSectionCard
+      title="Deal Info"
+      basicDealDetails={basicDealDetails}
+    >
       <Box
         sx={{
           background: "#f2f6ff",
@@ -198,149 +198,187 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
         )}
 
         {!loading && (
-          <Grid container spacing={2.5}>
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Pricing Date
-              </Typography>
-              {editMode ? (
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={formState.pricing_date ?? ""}
-                  onChange={(e) => handleChange("pricing_date", e.target.value)}
-                  placeholder="YYYY-MM-DD"
-                />
-              ) : (
-                <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
-                  {metadata?.pricing_date || "--"}
-                </Typography>
-              )}
-            </Grid>
+          <>
+            <Box
+              sx={{
+                position: "relative",
+                py: 2.5,
+                mb: 3,
+                borderRadius: 2,
+                background: "#f6f8ff"
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: { xs: 16, md: 28 },
+                  right: { xs: 16, md: 28 },
+                  top: 28,
+                  height: 2,
+                  background: "#d9e3ff"
+                }}
+              />
+              <Grid container spacing={2} sx={{ position: "relative", px: 1 }}>
+                {[
+                  { label: "Filed", value: metadata?.filed_date },
+                  { label: "Term", value: metadata?.term_date },
+                  { label: "Pricing", value: metadata?.pricing_date },
+                  { label: "Trade", value: metadata?.trade_date }
+                ].map((item) => (
+                  <Grid item xs={6} md={3} key={item.label}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 0.5,
+                        pt: 1
+                      }}
+                    >
+                      <Typography
+                        sx={{ color: "#5064c4", fontWeight: 600, fontSize: 13 }}
+                      >
+                        {item.label}
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: "50%",
+                          background: "#ffffff",
+                          border: "2px solid #4b63d2",
+                          boxShadow: "0 4px 10px rgba(75, 99, 210, 0.2)"
+                        }}
+                      />
+                      <Typography sx={{ color: "#1a1a1a", fontWeight: 600 }}>
+                        {item.value || "--"}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
 
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Price Range
-              </Typography>
-              {editMode ? (
-                <Box display="flex" gap={1} mt={0.5}>
+            {editMode && (
+              <Grid container spacing={2.5} sx={{ mb: 2 }}>
+                <Grid item xs={12} md={3}>
+                  <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
+                    Pricing Date
+                  </Typography>
                   <TextField
                     size="small"
-                    value={formState.lower_bound ?? ""}
-                    onChange={(e) => handleChange("lower_bound", e.target.value)}
-                    placeholder="Lower"
                     fullWidth
+                    value={formState.pricing_date ?? ""}
+                    onChange={(e) => handleChange("pricing_date", e.target.value)}
+                    placeholder="YYYY-MM-DD"
                   />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
+                    Filed Date
+                  </Typography>
                   <TextField
                     size="small"
-                    value={formState.upper_bound ?? ""}
-                    onChange={(e) => handleChange("upper_bound", e.target.value)}
-                    placeholder="Upper"
                     fullWidth
+                    value={formState.filed_date ?? ""}
+                    onChange={(e) => handleChange("filed_date", e.target.value)}
+                    placeholder="YYYY-MM-DD"
                   />
-                </Box>
-              ) : (
-                <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
-                  {priceRange}
-                </Typography>
-              )}
-            </Grid>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
+                    Trade Date
+                  </Typography>
+                  <TextField
+                    size="small"
+                    fullWidth
+                    value={formState.trade_date ?? ""}
+                    onChange={(e) => handleChange("trade_date", e.target.value)}
+                    placeholder="YYYY-MM-DD"
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
+                    Term Date
+                  </Typography>
+                  <TextField
+                    size="small"
+                    fullWidth
+                    value={formState.term_date ?? ""}
+                    onChange={(e) => handleChange("term_date", e.target.value)}
+                    placeholder="YYYY-MM-DD"
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
+                    Price Range
+                  </Typography>
+                  <Box display="flex" gap={1} mt={0.5}>
+                    <TextField
+                      size="small"
+                      value={formState.lower_bound ?? ""}
+                      onChange={(e) => handleChange("lower_bound", e.target.value)}
+                      placeholder="Lower"
+                      fullWidth
+                    />
+                    <TextField
+                      size="small"
+                      value={formState.upper_bound ?? ""}
+                      onChange={(e) => handleChange("upper_bound", e.target.value)}
+                      placeholder="Upper"
+                      fullWidth
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            )}
 
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Filed Date
-              </Typography>
-              {editMode ? (
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={formState.filed_date ?? ""}
-                  onChange={(e) => handleChange("filed_date", e.target.value)}
-                  placeholder="YYYY-MM-DD"
-                />
-              ) : (
-                <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
-                  {metadata?.filed_date || "--"}
-                </Typography>
-              )}
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Trade Date
-              </Typography>
-              {editMode ? (
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={formState.trade_date ?? ""}
-                  onChange={(e) => handleChange("trade_date", e.target.value)}
-                  placeholder="YYYY-MM-DD"
-                />
-              ) : (
-                <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
-                  {metadata?.trade_date || "--"}
-                </Typography>
-              )}
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Term Date
-              </Typography>
-              {editMode ? (
-                <TextField
-                  size="small"
-                  fullWidth
-                  value={formState.term_date ?? ""}
-                  onChange={(e) => handleChange("term_date", e.target.value)}
-                  placeholder="YYYY-MM-DD"
-                />
-              ) : (
-                <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
-                  {metadata?.term_date || "--"}
-                </Typography>
-              )}
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Typography sx={{ color: "#203c8a", fontWeight: 700 }}>
-                Attached Images
-              </Typography>
-              <Box display="flex" gap={1} mt={0.5} flexWrap="wrap">
-                {imageUrl ? (
+            <Grid container spacing={2}>
+              {[
+                { label: "Deal Size ($ Million)", value: metadata?.deal_size },
+                { label: "Sector", value: metadata?.sector },
+                { label: "Shares Offered", value: metadata?.shares_offered },
+                {
+                  label: "No of Shares Outstanding",
+                  value: metadata?.nosh
+                },
+                { label: "Established", value: metadata?.established_year },
+                { label: "Bookrunners", value: metadata?.bookrunners },
+                { label: "Price Range", value: priceRange }
+              ].map((item) => {
+                const displayValue =
+                  item.value == null || item.value === ""
+                    ? "--"
+                    : String(item.value)
+                return (
+                <Grid item xs={12} sm={6} md={4} key={item.label}>
                   <Box
-                    component="img"
-                    src={imageUrl}
-                    alt="Valuation"
                     sx={{
-                      width: 110,
-                      height: 70,
-                      borderRadius: 1,
-                      objectFit: "cover"
+                      background: "#eef3ff",
+                      borderRadius: 2,
+                      border: "1px solid #d9e3ff",
+                      p: 2,
+                      minHeight: 84,
+                      boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)"
                     }}
-                  />
-                ) : (
-                  <Typography sx={{ color: "#1a1a1a" }}>--</Typography>
-                )}
-                {summaryImageUrl ? (
-                  <Box
-                    component="img"
-                    src={summaryImageUrl}
-                    alt="Summary"
-                    sx={{
-                      width: 110,
-                      height: 70,
-                      borderRadius: 1,
-                      objectFit: "cover"
-                    }}
-                  />
-                ) : null}
-              </Box>
+                  >
+                    <Typography
+                      sx={{ color: "#203c8a", fontWeight: 700, fontSize: 13 }}
+                    >
+                      {item.label}
+                    </Typography>
+                    <Typography sx={{ color: "#1a1a1a", mt: 0.5 }}>
+                      {displayValue}
+                    </Typography>
+                  </Box>
+                </Grid>
+                )
+              })}
             </Grid>
-          </Grid>
+          </>
         )}
       </Box>
+    </IPOWriteUpMetaDataSectionCard>
   )
 }
 
