@@ -252,15 +252,16 @@ const NavbarMain: React.FC = () => {
                       path: "/deals/new_dashboard",
                       onSelect: () => setNewDashboardDefaults("US"),
                     },
-                    {
-                      label: "APAC",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("APAC"),
-                    },
+      
                     {
                       label: "EMEA",
                       path: "/deals/new_dashboard",
                       onSelect: () => setNewDashboardDefaults("EMEA"),
+                    },
+                                  {
+                      label: "APAC",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("APAC"),
                     },
                   ],
                 },
