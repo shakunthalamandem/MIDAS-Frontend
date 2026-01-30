@@ -192,7 +192,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       basicDealDetails={basicDealDetails}
       showSummary={false}
       showNotes={false}
-      accentColor="#4b5bff"
+      // accentColor="#4b5bff"
     >
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
