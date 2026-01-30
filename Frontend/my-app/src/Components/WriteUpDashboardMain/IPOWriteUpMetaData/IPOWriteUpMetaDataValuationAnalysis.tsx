@@ -245,11 +245,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   }
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Valuation Analysis"
-      basicDealDetails={basicDealDetails}
-      showNotes={false}
-    >
+
       <Box>
         <Box
           display="flex"
@@ -279,7 +275,6 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
         </Box>
         {renderValuationContent()}
       </Box>
-    </IPOWriteUpMetaDataSectionCard>
   )
 }
 
