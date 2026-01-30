@@ -88,7 +88,11 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
   >
     (Values are in Millions)
   </Typography> 
-  <TableContainer component={Paper} elevation={4}>
+  <TableContainer
+    component={Paper}
+    elevation={0}
+    sx={{ boxShadow: "none", border: "1px solid #C9C9C9" }}
+  >
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -97,7 +101,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                 fontWeight: "bold",
                 color: "#FFFFFF",
                 backgroundColor: "#002060",
-                border: "1px solid #000000",
+                border: "1px solid #C9C9C9",
                 textAlign: "center",
               }}
             >
@@ -112,7 +116,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                   sx={{
                     fontWeight: "bold",
                     color: "#FFFFFF",
-                    border: "1px solid #000000",
+                    border: "1px solid #C9C9C9",
                     textAlign: "center",
                     backgroundColor: isEditableColumn
                       ? "rgb(95, 82, 30)"
@@ -156,7 +160,7 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
       <TableRow key={metricName}>
         <TableCell
           sx={{
-            border: "1px solid #000000",
+            border: "1px solid #C9C9C9",
             fontWeight: "bold",
             fontStyle: isOddRow ? "italic" : "normal",
             fontSize: isOddRow ? "1rem" : "1.3rem",
