@@ -565,7 +565,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                     <Stack spacing={1} sx={{ mt: 1 }}>
                       <Typography variant="body2" sx={{ color: "#1f2937" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
-                          O:
+                          Observation:
                         </Box>{" "}
                         {isEditing ? (
                           <TextField
@@ -594,7 +594,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#1f2937" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
-                          I:
+                          Impact:
                         </Box>{" "}
                         {isEditing ? (
                           <TextField
@@ -676,13 +676,13 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           </Stack>
         )}
 
-        <Typography
+        {/* <Typography
           variant="caption"
           sx={{ color: "#5c6c8a", fontStyle: "italic" }}
         >
           Note: O = Observation, I = Impact. The red flag scores are indicative
           and based on the analysis of available information.
-        </Typography>
+        </Typography> */}
       </Stack>
     </IPOWriteUpMetaDataSectionCard>
   )
