@@ -214,7 +214,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 pricingDate={activePayload.pricing_date}
               />
             )
-          ) : tabItems[tabValue]?.label === "Write up" ? (
+          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
