@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Import the dropdown arrow icon
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 export interface DropdownMenuItem {
   label: string;
   path: string;
   icon?: React.ReactNode;
+  children?: DropdownMenuItem[];
+  onSelect?: () => void;
 }
 
 interface DropdownTabProps {
@@ -25,7 +28,13 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
   rich,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [subAnchorEl, setSubAnchorEl] = useState<null | HTMLElement>(null);
+  const [subMenuItems, setSubMenuItems] = useState<DropdownMenuItem[]>([]);
+  const [subSubAnchorEl, setSubSubAnchorEl] = useState<null | HTMLElement>(null);
+  const [subSubMenuItems, setSubSubMenuItems] = useState<DropdownMenuItem[]>([]);
   const open = Boolean(anchorEl);
+  const subOpen = Boolean(subAnchorEl);
+  const subSubOpen = Boolean(subSubAnchorEl);
   const navigate = useNavigate();
   const location = useLocation();
   const isRichMenu = rich ?? menuItems.some((item) => item.icon);
@@ -46,13 +55,18 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
     setTimeout(() => window.location.reload(), 0);
   };
 
-  const handleMenuItemClick = (path: string) => {
+  const handleMenuItemClick = (item: DropdownMenuItem) => {
+    item.onSelect?.();
     setAnchorEl(null);
-    navigateAndRefresh(path);
+    setSubAnchorEl(null);
+    setSubSubAnchorEl(null);
+    navigateAndRefresh(item.path);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    setSubAnchorEl(null);
+    setSubSubAnchorEl(null);
   };
 
   return (
@@ -110,10 +124,26 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
       >
         {menuItems.map((item) => {
           const isActive = isMenuItemActive(item.path);
+          const hasChildren = Boolean(item.children?.length);
           return (
             <MenuItem
               key={item.label}
-              onClick={() => handleMenuItemClick(item.path)}
+              onClick={() => {
+                if (!hasChildren) {
+                  handleMenuItemClick(item);
+                }
+              }}
+              onMouseEnter={(event) => {
+                if (hasChildren) {
+                  setSubAnchorEl(event.currentTarget);
+                  setSubMenuItems(item.children ?? []);
+                } else {
+                  setSubAnchorEl(null);
+                  setSubMenuItems([]);
+                  setSubSubAnchorEl(null);
+                  setSubSubMenuItems([]);
+                }
+              }}
               sx={
                 isRichMenu
                   ? {
@@ -163,9 +193,118 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
                   {item.label}
                 </Typography>
               </Box>
+              {hasChildren && (
+                <Box sx={{ marginLeft: "auto", color: "#93a0bf" }}>
+                  <ArrowRightIcon fontSize="small" />
+                </Box>
+              )}
             </MenuItem>
           );
         })}
+      </Menu>
+
+      <Menu
+        anchorEl={subAnchorEl}
+        open={subOpen}
+        onClose={() => {
+          setSubAnchorEl(null);
+          setSubSubAnchorEl(null);
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{
+          elevation: 6,
+          sx: {
+            mt: -0.5,
+            ml: 1,
+            borderRadius: 2,
+            minWidth: 200,
+            boxShadow: "0px 18px 45px rgba(0, 0, 0, 0.18)",
+          },
+        }}
+      >
+        {subMenuItems.map((item) => {
+          const hasChildren = Boolean(item.children?.length);
+          return (
+            <MenuItem
+              key={item.label}
+              onClick={() => {
+                if (!hasChildren) {
+                  handleMenuItemClick(item);
+                }
+              }}
+              onMouseEnter={(event) => {
+                if (hasChildren) {
+                  setSubSubAnchorEl(event.currentTarget);
+                  setSubSubMenuItems(item.children ?? []);
+                } else {
+                  setSubSubAnchorEl(null);
+                  setSubSubMenuItems([]);
+                }
+              }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                py: 1,
+                px: 1.5,
+                borderRadius: 1.5,
+                "&:hover": {
+                  backgroundColor: "#f3f6ff",
+                },
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {item.label}
+              </Typography>
+              {hasChildren && (
+                <Box sx={{ marginLeft: "auto", color: "#93a0bf" }}>
+                  <ArrowRightIcon fontSize="small" />
+                </Box>
+              )}
+            </MenuItem>
+          );
+        })}
+      </Menu>
+
+      <Menu
+        anchorEl={subSubAnchorEl}
+        open={subSubOpen}
+        onClose={() => setSubSubAnchorEl(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{
+          elevation: 6,
+          sx: {
+            mt: -0.5,
+            ml: 1,
+            borderRadius: 2,
+            minWidth: 180,
+            boxShadow: "0px 18px 45px rgba(0, 0, 0, 0.16)",
+          },
+        }}
+      >
+        {subSubMenuItems.map((item) => (
+          <MenuItem
+            key={item.label}
+            onClick={() => handleMenuItemClick(item)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              py: 1,
+              px: 1.5,
+              borderRadius: 1.5,
+              "&:hover": {
+                backgroundColor: "#f3f6ff",
+              },
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+              {item.label}
+            </Typography>
+          </MenuItem>
+        ))}
       </Menu>
     </>
   );

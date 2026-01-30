@@ -40,12 +40,21 @@ import {
 const NewDealsLifecycleCards: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const storedRegion = localStorage.getItem("newDashboardSelectedRegion");
+  const storedDealType = localStorage.getItem("newDashboardSelectedDealType");
+  const initialRegion: "US" | "EMEA" | "APAC" | "Non-US America" =
+    storedRegion === "US" || storedRegion === "APAC" || storedRegion === "EMEA"
+      ? storedRegion
+      : "US";
+  const initialDealType: "IPO" | "FO" =
+    storedDealType === "FO" ? "FO" : "IPO";
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
-  const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [selectedDealType, setSelectedDealType] =
+    useState<"IPO" | "FO">(initialDealType);
   const locationViewMode =
     (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
   const [viewMode, setViewMode] = useState<"card" | "table">(
@@ -57,7 +66,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const [selectedRegion, setSelectedRegion] = useState<
     "US" | "EMEA" | "APAC" | "Non-US America"
-  >("US");
+  >(initialRegion);
 
   const [pipelineData, setPipelineData] = useState<Record<string, any[]>>({
     fo: [],
@@ -238,6 +247,14 @@ const NewDealsLifecycleCards: React.FC = () => {
     const apiOperation = opMap[selectedOp] || selectedOp;
     fetchData(apiOperation, selectedRegion, selectedDealType);
   }, [selectedOp, selectedRegion, selectedDealType]);
+
+  useEffect(() => {
+    localStorage.setItem("newDashboardSelectedRegion", selectedRegion);
+  }, [selectedRegion]);
+
+  useEffect(() => {
+    localStorage.setItem("newDashboardSelectedDealType", selectedDealType);
+  }, [selectedDealType]);
 
   useEffect(() => {
     if (locationViewMode === "card" || locationViewMode === "table") {
@@ -766,20 +783,6 @@ const NewDealsLifecycleCards: React.FC = () => {
 const NewDashboardLifeCycleMain: React.FC = () => {
   return (
     <>
-      {/* <Box
-        sx={{
-          backgroundColor: "#0b2a6b",
-          color: "#fff",
-          py: 1.2,
-          textAlign: "center",
-          mb: 3,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
-          Welcome to New Dashboard Life Cycle!
-        </Typography>
-      </Box> */}
       <NewDealsLifecycleCards />
     </>
   );

@@ -147,6 +147,11 @@ const NavbarMain: React.FC = () => {
     handleMenuClose();
   };
 
+  const setNewDashboardDefaults = (region: "US" | "APAC" | "EMEA") => {
+    localStorage.setItem("newDashboardSelectedRegion", region);
+    localStorage.setItem("newDashboardSelectedDealType", "IPO");
+  };
+
   return (
     <>
       <AppBar
@@ -241,6 +246,23 @@ const NavbarMain: React.FC = () => {
                   label: "New Dashboard",
                   path: "/deals/new_dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
+                  children: [
+                    {
+                      label: "US",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("US"),
+                    },
+                    {
+                      label: "APAC",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("APAC"),
+                    },
+                    {
+                      label: "EMEA",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("EMEA"),
+                    },
+                  ],
                 },
                                 {
                   label: "Future Pipeline",
