@@ -53,6 +53,9 @@ const stripMarkdown = (input?: unknown): string => {
         })()
 
   return safe
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s+/gm, "")
+    .replace(/^\s*(?:\d+\.|[-*+])\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/\*(.*?)\*/g, "$1")
     .replace(/__([^_]+)__/g, "$1")

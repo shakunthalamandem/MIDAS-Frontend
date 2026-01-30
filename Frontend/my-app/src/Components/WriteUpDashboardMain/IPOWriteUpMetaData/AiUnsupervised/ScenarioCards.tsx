@@ -3,7 +3,6 @@ import { Box, Card, CardContent, Typography } from "@mui/material";
 import ActivityIcon from "@mui/icons-material/ShowChartRounded";
 import AlertTriangleIcon from "@mui/icons-material/ErrorOutlineRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircleRounded";
-import ReactMarkdown from "react-markdown";
 
 type ScenarioCardsProps = {
   base?: string;
@@ -14,10 +13,10 @@ type ScenarioCardsProps = {
 const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish }) => {
   const cards = [
     {
-      title: "Bearish Scenario",
-      body: bearish,
-      tone: "bearish" as const,
-      icon: <AlertTriangleIcon sx={{ fontSize: 18 }} />,
+      title: "Bullish Scenario",
+      body: bullish,
+      tone: "bullish" as const,
+      icon: <CheckCircleIcon sx={{ fontSize: 18 }} />,
     },
     {
       title: "Base Case",
@@ -26,10 +25,10 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
       icon: <ActivityIcon sx={{ fontSize: 18 }} />,
     },
     {
-      title: "Bullish Scenario",
-      body: bullish,
-      tone: "bullish" as const,
-      icon: <CheckCircleIcon sx={{ fontSize: 18 }} />,
+      title: "Bearish Scenario",
+      body: bearish,
+      tone: "bearish" as const,
+      icon: <AlertTriangleIcon sx={{ fontSize: 18 }} />,
     },
   ];
 
@@ -89,7 +88,7 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
                     {icon}
                   </Box>
                   <Typography sx={{ fontWeight: 600, color: "#002060" }}>
-                    <ReactMarkdown>{title}</ReactMarkdown>
+                    {title}
                   </Typography>
                 </Box>
                 <Typography
@@ -97,7 +96,7 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
                   variant="body2"
                   sx={{ mt: 1.5, color: "#141414", lineHeight: 1.8, whiteSpace: "pre-line" }}
                 >
-                  <ReactMarkdown>{body || "-"}</ReactMarkdown>
+                  {body || "-"}
                 </Typography>
               </CardContent>
             </Card>
