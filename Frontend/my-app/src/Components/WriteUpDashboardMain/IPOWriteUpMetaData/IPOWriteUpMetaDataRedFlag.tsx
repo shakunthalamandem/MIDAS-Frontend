@@ -351,22 +351,13 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             changesPayload.observation = item.observation
           if (item.company_name !== original?.company_name)
             changesPayload.company_name = item.company_name ?? ""
-          if (
-            item.red_flag_analysis_rating !== original?.red_flag_analysis_rating ||
-            ratingChanged
-          ) {
-            changesPayload.red_flag_analysis_rating = `${ratingLabel} - ${ratingScore}/10`
+          if (item.red_flag_analysis_rating !== original?.red_flag_analysis_rating) {
+            changesPayload.red_flag_analysis_rating = item.red_flag_analysis_rating
           }
           if (Object.keys(changesPayload).length) {
             updates.push({ category: item.category, changes: changesPayload })
           }
         }
-      }
-      if (!updates.length && ratingChanged && draftItems[0]?.category) {
-        updates.push({
-          category: draftItems[0].category,
-          changes: { red_flag_analysis_rating: `${ratingLabel} - ${ratingScore}/10` }
-        })
       }
       if (updates.length) {
         const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
@@ -382,6 +373,22 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           })
         })
         if (!response.ok) throw new Error("Failed to save red flag analysis")
+      }
+      if (ratingChanged) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            root_changes: {
+              red_flag_analysis_rating: `${ratingLabel} - ${ratingScore}/10`
+            }
+          })
+        })
+        if (!response.ok) throw new Error("Failed to save rating")
       }
       setPendingDeleteIndices([])
       setIsEditing(false)
@@ -412,36 +419,41 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             flexWrap: "wrap"
           }}
         >
-          <Chip
-            label={`Rating - ${badgeRating}`}
-            size="small"
-            variant="outlined"
-            sx={{
-              borderRadius: 999,
-              borderColor: "#b6d4ff",
-              color: "#1f3b73",
-              fontWeight: 700
-            }}
-          />
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          {isEditing ? (
+            <TextField
+              size="small"
+              type="number"
+              inputProps={{ min: 0, max: 10, step: 0.1 }}
+              value={ratingScore}
+              onChange={(event) =>
+                setDraftRatingScore(Number(event.target.value))
+              }
+              sx={{
+                width: 70,
+                background: "#ffffff",
+                "& .MuiOutlinedInput-root": { borderRadius: 999 }
+              }}
+            />
+          ) : (
+            <Chip
+              label={`Rating - ${badgeRating}`}
+              size="small"
+              variant="outlined"
+              sx={{
+                borderRadius: 999,
+                borderColor: "#b6d4ff",
+                color: "#1f3b73",
+                fontWeight: 700
+              }}
+            />
+          )}
+          <Stack direction="row" spacing={1} alignItems="center">
             <Typography
               variant="subtitle2"
               sx={{ color: "#1f2937", fontWeight: 700 }}
             >
-              Avg Score: {(avgScore * 2).toFixed(2)}/10 | Rating: {ratingLabel}
+              Avg Score: {(avgScore * 2).toFixed(2)}/10 
             </Typography>
-            {isEditing ? (
-              <TextField
-                size="small"
-                type="number"
-                inputProps={{ min: 0, max: 10, step: 0.1 }}
-                value={ratingScore}
-                onChange={(event) =>
-                  setDraftRatingScore(Number(event.target.value))
-                }
-                sx={{ width: 120, background: "#ffffff" }}
-              />
-            ) : null}
             <IconButton
               size="small"
               onClick={handleEditToggle}
