@@ -32,15 +32,15 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 }) => {
   const sections = [
     { id: "deal-info", label: "Deal Info" },
-    { id: "deal-indication", label: "Deal Indication" },
-    { id: "market-strategy", label: "Market Strategy" },
+    { id: "deal-indication", label: "AI Indication" },
+    { id: "market-strategy", label: "After Market Strategy" },
     { id: "business-overview", label: "Business Overview" },
     { id: "key-metrics", label: "Key Metrics" },
     { id: "financial-highlights", label: "Financial Highlights" },
-    { id: "comps", label: "Comps & Peer Trends" },
+    { id: "comps", label: "Comparative Multiples" },
     // { id: "trends", label: "Trends" },
     { id: "valuation-analysis", label: "Valuation Analysis" },
-    { id: "red-flag", label: "Red Flag" },
+    { id: "red-flag", label: "Red Flag Analysis" },
     { id: "final-verdict", label: "Final Verdict" }
   ]
 
