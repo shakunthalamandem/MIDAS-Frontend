@@ -35,6 +35,7 @@ import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
 import S1QueryBot from "./S1QueryBot";
+import DealRecomendation from "./DealRecomendation";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -230,11 +231,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             )
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
-              <UpcomingDealRecomendation ticker={activePayload.ticker}
-              />
+              // <UpcomingDealRecomendation ticker={activePayload.ticker}
+              // />
+              <DealRecomendation ticker={activePayload.ticker} />
             ) : (
-              <RecentDealRecomendation ticker={activePayload.ticker}
-              />
+              // <RecentDealRecomendation ticker={activePayload.ticker}
+              // />
+              <DealRecomendation ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
