@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Alert, Box, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material";
 import DealTopMetrics from "./DealTopMetrics";
 import DealSecondRow from "./DealSecondRow";
 import DealAMStrategy from "./DealAMStrategy";
-
 
 export interface DealRecommendationResponse {
   fair_value_estimate: string;
@@ -47,13 +47,18 @@ interface DashboardProps {
 }
 
 type LoadState = "idle" | "loading" | "success" | "error";
-const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
 
-async function fetchDealRecommendation(ticker: string) {
+const apiUrl = process.env.REACT_APP_API_URL;
+
+async function fetchDealRecommendation(ticker: string): Promise<DealRecommendationResponse> {
+  const token = localStorage.getItem("access_token");
+
   const res = await fetch(`${apiUrl}/api/deal_recommendation/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json",Authorization: token ? `Bearer ${token}` : "", },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
     body: JSON.stringify({ ticker }),
   });
 
@@ -102,61 +107,69 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
   }, [effectiveTicker]);
 
   return (
-    <div className="w-full">
-      <div className="mx-auto max-w-7xl px-4 py-4 space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">
-              Deal Recommendation
-            </h1>
-            <p className="text-sm text-slate-500">
-              {effectiveTicker ? `Ticker: ${effectiveTicker}` : "Select a ticker to view insights"}
-            </p>
-          </div>
+    <Box sx={{ width: "100%" }}>
+      <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 }}>
+        <Stack spacing={2}>
+          {/* Header */}
+          <Card variant="outlined">
+            <CardContent>
+              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="h6" fontWeight={700}>
+                    Deal Recommendation
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {effectiveTicker ? `Ticker: ${effectiveTicker}` : "Select a ticker to view insights"}
+                  </Typography>
+                </Box>
 
-          {state === "loading" && (
-            <div className="text-sm text-slate-500">Loading…</div>
+                {state === "loading" && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <CircularProgress size={18} />
+                    <Typography variant="body2" color="text.secondary">
+                      Loading
+                    </Typography>
+                  </Stack>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+
+          {/* Empty */}
+          {!effectiveTicker && (
+            <Alert severity="info" variant="outlined">
+              Please provide a ticker to fetch the deal recommendation.
+            </Alert>
           )}
-        </div>
 
-        {/* Empty */}
-        {!effectiveTicker && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">
-            Please provide a ticker to fetch the deal recommendation.
-          </div>
-        )}
+          {/* Error */}
+          {effectiveTicker && state === "error" && (
+            <Alert severity="error" variant="outlined">
+              <Typography fontWeight={700}>Could not load data</Typography>
+              <Typography variant="body2">{error}</Typography>
+            </Alert>
+          )}
 
-        {/* Error */}
-        {effectiveTicker && state === "error" && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800">
-            <div className="font-semibold">Could not load data</div>
-            <div className="text-sm opacity-90">{error}</div>
-          </div>
-        )}
+          {/* Content */}
+          {effectiveTicker && data && (
+            <>
+              <DealTopMetrics
+                fairValue={data.fair_value_estimate}
+                indicationOfInterest={data.indication_of_interest}
+                afterMarketThreshold={data.after_market_threshold}
+              />
 
-        {/* Content */}
-        {effectiveTicker && data && (
-          <>
-            {/* 1st card: top metrics in 3 columns */}
-            <DealTopMetrics
-              fairValue={data.fair_value_estimate}
-              indicationOfInterest={data.indication_of_interest}
-              afterMarketThreshold={data.after_market_threshold}
-            />
+              <DealSecondRow data={data} />
 
-            {/* 2nd card: split vertical (left valuation+momentum, right AI/ML) */}
-            <DealSecondRow data={data} />
-
-            {/* 3rd card: horizontal AM recommendation + qty */}
-            <DealAMStrategy
-              recommendation={data.AM_strategy_recommendation}
-              potentialQty={data.potential_am_quantity}
-            />
-          </>
-        )}
-      </div>
-    </div>
+              <DealAMStrategy
+                recommendation={data.AM_strategy_recommendation}
+                potentialQty={data.potential_am_quantity}
+              />
+            </>
+          )}
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 

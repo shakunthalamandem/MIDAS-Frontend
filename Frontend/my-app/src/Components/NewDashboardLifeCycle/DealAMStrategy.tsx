@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, CardContent, Grid, Stack, Typography } from "@mui/material";
 
 export default function DealAMStrategy({
   recommendation,
@@ -8,35 +9,45 @@ export default function DealAMStrategy({
   potentialQty: number | null;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="mb-3 text-sm font-semibold text-slate-900">
-        After Market (AM) Strategy
-      </div>
+    <Card variant="outlined">
+      <CardContent>
+        <Stack spacing={2}>
+          <Typography variant="subtitle1" fontWeight={800}>
+            After Market (AM) Strategy
+          </Typography>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-        {/* 80% */}
-        <div className="md:col-span-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <div className="text-xs font-medium text-slate-500 mb-2">
-            AM Strategy Recommendation
-          </div>
-          <div className="whitespace-pre-line text-sm leading-6 text-slate-800">
-            {recommendation || "-"}
-          </div>
-        </div>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={9}>
+              <Card variant="outlined" sx={{ bgcolor: "grey.50", height: "100%" }}>
+                <CardContent>
+                  <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                    AM Strategy Recommendation
+                  </Typography>
+                  <Typography sx={{ mt: 1, whiteSpace: "pre-line", lineHeight: 1.7 }}>
+                    {recommendation || "-"}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
 
-        {/* 20% */}
-        <div className="md:col-span-1 rounded-2xl border border-slate-200 bg-white p-4 flex flex-col justify-between">
-          <div className="text-xs font-medium text-slate-500">
-            Potential AM Quantity
-          </div>
-          <div className="mt-2 text-2xl font-semibold text-slate-900">
-            {potentialQty ?? "-"}
-          </div>
-          <div className="text-xs text-slate-500 mt-2">
-            (as provided by API)
-          </div>
-        </div>
-      </div>
-    </div>
+            <Grid item xs={12} md={3}>
+              <Card variant="outlined" sx={{ height: "100%" }}>
+                <CardContent>
+                  <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                    Potential AM Quantity
+                  </Typography>
+                  <Typography variant="h5" fontWeight={900} sx={{ mt: 1 }}>
+                    {potentialQty ?? "-"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    As per API output
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
