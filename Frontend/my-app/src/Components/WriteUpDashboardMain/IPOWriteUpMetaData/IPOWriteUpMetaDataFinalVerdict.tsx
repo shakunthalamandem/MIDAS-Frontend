@@ -6,6 +6,7 @@ import {
   Grid,
   IconButton,
   LinearProgress,
+  Slider,
   Stack,
   TextField,
   Typography
@@ -32,6 +33,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   const [draftFinalVerdictText, setDraftFinalVerdictText] = useState("")
   const [draftOverallRating, setDraftOverallRating] = useState("")
   const [sectionScores, setSectionScores] = useState<Record<string, number>>({})
+  const [draftSectionScores, setDraftSectionScores] = useState<
+    Record<string, number>
+  >({})
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -65,15 +69,28 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
         const data = await res.json()
         if (!isActive) return
 
-        const verdict = data?.final_verdict ?? metadata?.final_verdict ?? ""
-        const rating = data?.overall_rating ?? metadata?.overall_rating ?? ""
+        const verdict =
+          data?.writeup_finalverdict_summary ??
+          data?.final_verdict ??
+          metadata?.writeup_finalverdict_summary ??
+          metadata?.final_verdict ??
+          ""
+        const rating =
+          data?.writeup_overall_rating ??
+          data?.overall_rating ??
+          metadata?.writeup_overall_rating ??
+          metadata?.overall_rating ??
+          ""
         setFinalVerdictText(verdict)
         setOverallRating(rating)
         setDraftFinalVerdictText(verdict)
         setDraftOverallRating(rating)
 
         const incomingScores =
-          data?.section_scores ?? data?.final_verdict_section_scores ?? {}
+          data?.writeup_ratings ??
+          data?.section_scores ??
+          data?.final_verdict_section_scores ??
+          {}
         if (incomingScores && typeof incomingScores === "object") {
           setSectionScores(incomingScores)
         }
@@ -106,8 +123,8 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
 
   const sectionDefaults = [
     { id: "deal-info", label: "Deal Info" },
-    { id: "deal-indication", label: "Deal Indication" },
-    { id: "market-strategy", label: "Market Strategy" },
+    // { id: "deal-indication", label: "Deal Indication" },
+    // { id: "market-strategy", label: "Market Strategy" },
     { id: "business-overview", label: "Business Overview" },
     { id: "key-metrics", label: "Key Metrics" },
     { id: "financial-highlights", label: "Financial Highlights" },
@@ -119,7 +136,10 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   const scoreMap =
     Object.keys(sectionScores).length > 0
       ? sectionScores
-      : metadata?.section_scores ?? metadata?.final_verdict_section_scores ?? {}
+      : metadata?.writeup_ratings ??
+        metadata?.section_scores ??
+        metadata?.final_verdict_section_scores ??
+        {}
 
   const sections = sectionDefaults.map((section) => ({
     ...section,
@@ -129,6 +149,22 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       metadata?.[`${section.id}_score`] ??
       null
   }))
+
+  const computedOverall = useMemo(() => {
+    const values = sectionDefaults
+      .map((section) => draftSectionScores?.[section.id])
+      .filter((val) => typeof val === "number") as number[]
+    if (values.length === 0) return null
+    const avg = values.reduce((sum, val) => sum + val, 0) / values.length
+    return Math.max(0, Math.min(100, Math.round(avg * 10)))
+  }, [draftSectionScores, sectionDefaults])
+
+  const getScoreColor = (score: number | null | undefined) => {
+    if (typeof score !== "number") return "#e6e9f2"
+    if (score <= 3) return "#dc2626"
+    if (score <= 7) return "#f59e0b"
+    return "#18a957"
+  }
 
   const parseOverallPercent = (value: string | number | null | undefined) => {
     if (value === null || value === undefined) return null
@@ -144,19 +180,40 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
 
   const overallScore =
     parseOverallPercent(overallRating) ??
+    parseOverallPercent(metadata?.writeup_overall_rating) ??
     parseOverallPercent(metadata?.overall_score) ??
     parseOverallPercent(metadata?.overall_rating) ??
     parseOverallPercent(metadata?.verdict_score)
 
-  const overallPercent = typeof overallScore === "number" ? overallScore : null
+  const overallPercent =
+    editMode && computedOverall !== null
+      ? computedOverall
+      : typeof overallScore === "number"
+      ? overallScore
+      : null
+
+  const handleEditMode = () => {
+    const initialScores: Record<string, number> = {}
+    for (const section of sections) {
+      initialScores[section.id] =
+        typeof section.score === "number" ? section.score : 0
+    }
+    setDraftSectionScores(initialScores)
+    setDraftFinalVerdictText(finalVerdictText)
+    setDraftOverallRating(overallRating)
+    setEditMode(true)
+  }
 
   const handleSave = async () => {
     try {
       if (!apiUrl) throw new Error("API URL not defined")
+      const computed = computedOverall ?? parseOverallPercent(draftOverallRating)
+      const payloadOverall = computed !== null ? String(computed) : null
       const payload = {
         ticker_name: basicDealDetails.ticker,
-        final_verdict: draftFinalVerdictText || null,
-        overall_rating: draftOverallRating || null
+        writeup_finalverdict_summary: draftFinalVerdictText || null,
+        writeup_overall_rating: payloadOverall,
+        writeup_ratings: draftSectionScores
       }
 
       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
@@ -171,7 +228,8 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       }
 
       setFinalVerdictText(draftFinalVerdictText)
-      setOverallRating(draftOverallRating)
+      setOverallRating(payloadOverall || "")
+      setSectionScores(draftSectionScores)
       setEditMode(false)
       setError(null)
     } catch (err: any) {
@@ -182,6 +240,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   const handleCancel = () => {
     setDraftFinalVerdictText(finalVerdictText)
     setDraftOverallRating(overallRating)
+    setDraftSectionScores({})
     setEditMode(false)
     setError(null)
   }
@@ -197,44 +256,75 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Stack spacing={2}>
-            {sections.map((section) => (
-              <Stack key={section.id} spacing={0.75}>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {section.label}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: "#1d2b5a" }}
-                  >
-                    {typeof section.score === "number"
-                      ? `${section.score}/10`
-                      : "--"}
-                  </Typography>
-                </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={
-                    typeof section.score === "number"
-                      ? Math.min(100, Math.max(0, section.score * 10))
-                      : 0
-                  }
-                  sx={{
-                    height: 8,
-                    borderRadius: 999,
-                    backgroundColor: "#e6e9f2",
-                    "& .MuiLinearProgress-bar": {
-                      borderRadius: 999,
-                      backgroundColor: "#18a957"
-                    }
-                  }}
-                />
-              </Stack>
-            ))}
+            <Stack spacing={2}>
+              {sections.map((section) => {
+                const displayScore =
+                  editMode && typeof draftSectionScores?.[section.id] === "number"
+                    ? draftSectionScores[section.id]
+                    : section.score
+                const progressValue =
+                  typeof displayScore === "number"
+                    ? Math.min(100, Math.max(0, displayScore * 10))
+                    : 0
+
+                return (
+                  <Stack key={section.id} spacing={0.75}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {section.label}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 700, color: "#1d2b5a" }}
+                      >
+                        {typeof displayScore === "number"
+                          ? `${displayScore}/10`
+                          : "--"}
+                      </Typography>
+                    </Stack>
+                    {editMode ? (
+                      <Slider
+                        value={
+                          typeof displayScore === "number" ? displayScore : 0
+                        }
+                        min={0}
+                        max={10}
+                        step={0.5}
+                        onChange={(_, value) => {
+                          const numeric = Array.isArray(value) ? value[0] : value
+                          setDraftSectionScores((prev) => ({
+                            ...prev,
+                            [section.id]: Number(numeric)
+                          }))
+                        }}
+                        sx={{
+                          color: getScoreColor(displayScore),
+                          "& .MuiSlider-rail": { opacity: 0.35 }
+                        }}
+                      />
+                    ) : (
+                      <LinearProgress
+                        variant="determinate"
+                        value={progressValue}
+                        sx={{
+                          height: 8,
+                          borderRadius: 999,
+                          backgroundColor: "#e6e9f2",
+                          "& .MuiLinearProgress-bar": {
+                            borderRadius: 999,
+                            backgroundColor: getScoreColor(displayScore)
+                          }
+                        }}
+                      />
+                    )}
+                  </Stack>
+                )
+              })}
+            </Stack>
           </Stack>
         </Grid>
 
@@ -251,7 +341,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                   </IconButton>
                 </>
               ) : (
-                <IconButton onClick={() => setEditMode(true)}>
+                <IconButton onClick={handleEditMode}>
                   <EditIcon fontSize="small" />
                 </IconButton>
               )}
@@ -288,7 +378,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                   size={140}
                   thickness={4}
                   sx={{
-                    color: "#4b5bff",
+                    color: getScoreColor(
+                      typeof overallPercent === "number" ? overallPercent / 10 : null
+                    ),
                     backgroundColor: "#e7e9ff",
                     borderRadius: "50%"
                   }}
@@ -312,13 +404,10 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                 </Box>
               </Box>
               {editMode ? (
-                <TextField
-                  size="small"
-                  placeholder="Overall rating (0-100)"
-                  value={draftOverallRating}
-                  onChange={(event) => setDraftOverallRating(event.target.value)}
-                  sx={{ width: 200, background: "#ffffff" }}
-                />
+                <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
+                  Overall Rating
+                  {overallPercent !== null ? ` (${overallPercent}%)` : ""}
+                </Typography>
               ) : (
               <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
                 Overall Rating
