@@ -144,6 +144,7 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
               <DealAMStrategy
                 recommendation={data.AM_strategy_recommendation}
                 potentialQty={data.potential_am_quantity}
+                ticker={effectiveTicker}
               />
             </>
           )}

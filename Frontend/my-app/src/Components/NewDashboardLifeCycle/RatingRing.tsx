@@ -20,8 +20,8 @@ export function RatingRing({
   const v = clamp0to100(value);
 
   return (
-    <Card variant="outlined">
-      <CardContent>
+    // <Card variant="outlined">
+      <CardContent >
         <Stack alignItems="center" spacing={1.25}>
           <Box sx={{ position: "relative", display: "inline-flex" }}>
             {/* Track (background ring) */}
@@ -70,6 +70,6 @@ export function RatingRing({
           </Typography>
         </Stack>
       </CardContent>
-    </Card>
+    // </Card>
   );
 }

@@ -1,20 +1,30 @@
 import React from "react";
-import { Card, CardContent, Grid, Stack, Typography } from "@mui/material";
+import { Box, Card, CardContent, Grid, Stack, Typography } from "@mui/material";
 
 function MetricTile({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
-    <Card variant="outlined" sx={{ height: "100%" }}>
-      <CardContent>
-        <Stack spacing={1}>
-          <Typography variant="caption" color="#000000" fontWeight={600}>
-            {label}
-          </Typography>
-          <Typography variant="h6" fontWeight={800}>
-            {value ?? "-"}
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
+    <Box
+      sx={{
+        borderRadius: 2,
+        border: "1px solid #e5e7ef",
+        background: "#eceff5",
+        boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+        p: 2.25,
+        minHeight: 90,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center"
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ fontSize: "1rem", fontWeight: 700, color: "#1d2b5a" }}>
+        {label}
+      </Typography>
+      <Typography variant="body1" sx={{ mt: 1, fontWeight: 600, color: "#111827" }}>
+        {value ?? "-"}
+      </Typography>
+    </Box>
   );
 }
 
@@ -28,10 +38,18 @@ export default function DealTopMetrics({
   afterMarketThreshold: string;
 }) {
   return (
-    <Card variant="outlined">
-      <CardContent>
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #e5e7ef",
+        background: "#f7f9ff",
+        boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+      }}
+    >
+      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
         <Stack spacing={2}>
-          <Typography variant="subtitle1" fontWeight={800}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
             Key Deal Metrics
           </Typography>
 

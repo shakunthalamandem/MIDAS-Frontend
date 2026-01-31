@@ -78,10 +78,18 @@ export function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card variant="outlined">
-      <CardContent>
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #e5e7ef",
+        background: "#f7f9ff",
+        boxShadow: "0 10px 20px rgba(32, 70, 150, 0.08)",
+      }}
+    >
+      <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
         <Stack spacing={1.5}>
-          <Typography variant="subtitle1" fontWeight={800}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
             {title}
           </Typography>
           {children}
@@ -111,53 +119,62 @@ function PredictionTile({
           : "inherit";
 
   return (
-    <Card variant="outlined" sx={{ height: "100%" }}>
-      <CardContent>
-        <Stack spacing={1.25}>
-          <Typography variant="caption" color="#000000" fontWeight={700}>
-            {title}
-          </Typography>
+    <Box
+      sx={{
+        borderRadius: 2,
+        border: "1px solid #e5e7ef",
+        background: "#eceff5",
+        boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+        p: 2.25,
+        minHeight: 120,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Stack spacing={1.25}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+          {title}
+        </Typography>
 
-          <Chip
-            size="small"
-            label={(pred || "NEUTRAL").toUpperCase()}
-            color={color as any}
-            variant={tone === "default" ? "outlined" : "filled"}
-            sx={{ alignSelf: "flex-start" }}
+        <Chip
+          size="small"
+          label={(pred || "NEUTRAL").toUpperCase()}
+          color={color as any}
+          variant={tone === "default" ? "outlined" : "filled"}
+          sx={{ alignSelf: "flex-start" }}
+        />
+
+        <Box>
+          <LinearProgress
+            variant="determinate"
+            value={Math.max(0, Math.min(100, confidence || 0))}
+            sx={{ height: 8, borderRadius: 99 }}
+            color={
+              tone === "success"
+                ? "success"
+                : tone === "warning"
+                  ? "warning"
+                  : "inherit"
+            }
           />
-
-          <Box>
-            <LinearProgress
-              variant="determinate"
-              value={Math.max(0, Math.min(100, confidence || 0))}
-              sx={{ height: 8, borderRadius: 99 }}
-              color={
-                tone === "success"
-                  ? "success"
-                  : tone === "warning"
-                    ? "warning"
-                    : "inherit"
-              }
-            />
+          <Typography
+            variant="caption"
+            color="#000000"
+            sx={{ mt: 0.75, display: "block" }}
+          >
+            Prob.{" "}
             <Typography
+              component="span"
               variant="caption"
-              color="#000000"
-              sx={{ mt: 0.75, display: "block" }}
+              fontWeight={800}
+              color="text.primary"
             >
-              Prob.{" "}
-              <Typography
-                component="span"
-                variant="caption"
-                fontWeight={800}
-                color="text.primary"
-              >
-                {formatPct(confidence)}
-              </Typography>
+              {formatPct(confidence)}
             </Typography>
-          </Box>
-        </Stack>
-      </CardContent>
-    </Card>
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
   );
 }
 
@@ -168,29 +185,36 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
         Average price performance of recent deals in similar sectors/industries
       </Typography>
 
-      <TableContainer component={Card} variant="outlined">
+      <TableContainer
+        component={Card}
+        elevation={0}
+        sx={{
+          borderRadius: 2,
+          border: "1px solid #e5e7ef",
+          background: "#ffffff",
+          boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+        }}
+      >
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 800 }}>Window</TableCell>
-              <TableCell sx={{ fontWeight: 800 }}>Last 5 Deals</TableCell>
-              <TableCell sx={{ fontWeight: 800 }}>Last 10 Deals</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>Deals</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>1st Day</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>1st Week</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>1st Month</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>1st Day</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Last 5 Deals</TableCell>
               <TableCell>{formatNum(data.last_5_t1d_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_10_t1d_avg_price)}%</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>1st Week</TableCell>
               <TableCell>{formatNum(data.last_5_t1w_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_10_t1w_avg_price)}%</TableCell>
+              <TableCell>{formatNum(data.last_5_t1m_avg_price)}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>1st Month</TableCell>
-              <TableCell>{formatNum(data.last_5_t1m_avg_price)}%</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Last 10 Deals</TableCell>
+              <TableCell>{formatNum(data.last_10_t1d_avg_price)}%</TableCell>
+              <TableCell>{formatNum(data.last_10_t1w_avg_price)}%</TableCell>
               <TableCell>{formatNum(data.last_10_t1m_avg_price)}%</TableCell>
             </TableRow>
           </TableBody>
@@ -203,57 +227,90 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
 export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
   return (
     <SectionCard title="AI Unsupervised Summary">
-      <Grid container spacing={2}>
+      <Grid container spacing={1} sx={{ pb: 0.5 }}>
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  1-Week
-                </Typography>
-                <SentimentChip text={data.fs_1w_sentiment} />
-              </Stack>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#f7f9ff",
+              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
+              p: 2,
+              height: "70%",
+              textAlign: "center",
+              
+            }}
+          >
+            <Stack spacing={1} alignItems="center">
+              <Typography variant="body2" fontWeight={700} color="#111827">
+                1-Week
+              </Typography>
+              <SentimentChip text={data.fs_1w_sentiment} />
+            </Stack>
+          </Box>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  1-Month
-                </Typography>
-                <SentimentChip text={data.fs_1m_sentiment} />
-              </Stack>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#f7f9ff",
+              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
+              p: 2,
+              height: "70%",
+              textAlign: "center",
+            }}
+          >
+            <Stack spacing={1} alignItems="center">
+              <Typography variant="body2" fontWeight={700} color="#111827">
+                1-Month
+              </Typography>
+              <SentimentChip text={data.fs_1m_sentiment} />
+            </Stack>
+          </Box>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  Expected Volatility
-                </Typography>
-                <SentimentChip text={data.fs_expected_volatility} />
-              </Stack>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#f7f9ff",
+              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
+              p: 2,
+              height: "70%",
+              textAlign: "center",
+            }}
+          >
+            <Stack spacing={1} alignItems="center">
+              <Typography variant="body2" fontWeight={700} color="#111827">
+                Expected Volatility
+              </Typography>
+              <SentimentChip text={data.fs_expected_volatility} />
+            </Stack>
+          </Box>
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  Confidence
-                </Typography>
-                <SentimentChip text={data.fs_confidence_level} />
-              </Stack>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#f7f9ff",
+              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
+              p: 2,
+              height: "70%",
+              textAlign: "center",
+            }}
+          >
+            <Stack spacing={1} alignItems="center">
+              <Typography variant="body2" fontWeight={700} color="#111827">
+                Confidence
+              </Typography>
+              <SentimentChip text={data.fs_confidence_level} />
+            </Stack>
+          </Box>
         </Grid>
       </Grid>
     </SectionCard>
@@ -269,30 +326,44 @@ export function MarketSentiment({
 }) {
   return (
     <SectionCard title="Social Media Buzz (Public Sentiment)">
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  First Week
-                </Typography>
-                <SentimentChip text={oneWeek} />
-              </Stack>
-            </CardContent>
-          </Card>
+      <Grid container spacing={1} sx={{ pb: 0.5 }}>
+        <Grid item xs={4} >
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#eceff5",
+              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+              p: 2,
+              height: "70%",
+            }}
+          >
+            <Stack spacing={1}>
+              <Typography variant="body2" fontWeight={700} color="#000000">
+                First Week
+              </Typography>
+              <SentimentChip text={oneWeek} />
+            </Stack>
+          </Box>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="#000000">
-                  First Month
-                </Typography>
-                <SentimentChip text={oneMonth} />
-              </Stack>
-            </CardContent>
-          </Card>
+        <Grid item xs={4} >
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#eceff5",
+              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+              p: 2,
+              height: "70%",
+            }}
+          >
+            <Stack spacing={1}>
+              <Typography variant="body2" fontWeight={700} color="#000000">
+                First Month
+              </Typography>
+              <SentimentChip text={oneMonth} />
+            </Stack>
+          </Box>
         </Grid>
       </Grid>
     </SectionCard>
@@ -312,40 +383,58 @@ export function OverallAISummary({
     <SectionCard title="Overall AI Summary">
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="caption" color="#000000" fontWeight={700}>
-                T+1 Day
-              </Typography>
-              <Typography sx={{ mt: 1 }} fontWeight={800}>
-                {t1d || "-"}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#eceff5",
+              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+              p: 2,
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+              T+1 Day
+            </Typography>
+            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
+              {t1d || "-"}
+            </Typography>
+          </Box>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="caption" color="#000000" fontWeight={700}>
-                T+1 Week
-              </Typography>
-              <Typography sx={{ mt: 1 }} fontWeight={800}>
-                {t1w || "-"}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#eceff5",
+              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+              p: 2,
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+              T+1 Week
+            </Typography>
+            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
+              {t1w || "-"}
+            </Typography>
+          </Box>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="caption" color="#000000" fontWeight={700}>
-                T+1 Month
-              </Typography>
-              <Typography sx={{ mt: 1 }} fontWeight={800}>
-                {t1m || "-"}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #e5e7ef",
+              background: "#eceff5",
+              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+              p: 2,
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+              T+1 Month
+            </Typography>
+            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
+              {t1m || "-"}
+            </Typography>
+          </Box>
         </Grid>
       </Grid>
     </SectionCard>
