@@ -1,5 +1,6 @@
 export type MeetingOverview = {
   ticker: string;
+  companyName: string;
   name: string;
   date: string;
   location: string;
