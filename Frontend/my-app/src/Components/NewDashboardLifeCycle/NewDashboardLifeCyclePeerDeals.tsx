@@ -58,15 +58,15 @@ const cleanNumber = (v: any): number => {
   return Number.isFinite(n) ? n : 0;
 };
 
-const fmtMoney = (n: any) => {
+const fmtMoney = (n: any, digits = 2) => {
   const v = cleanNumber(n);
   const abs = Math.abs(v);
   if (abs >= 1_000_000_000)
-    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000_000).toFixed(2)}B`;
+    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000_000).toFixed(digits)}B`;
   if (abs >= 1_000_000)
-    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000).toFixed(2)}M`;
+    return `${v < 0 ? "-$" : "$"}${(abs / 1_000_000).toFixed(digits)}M`;
   return `${v < 0 ? "-$" : "$"}${abs.toLocaleString("en-US", {
-    maximumFractionDigits: 2,
+    maximumFractionDigits: digits,
   })}`;
 };
 
@@ -304,7 +304,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       field: "deal_size",
       headerName: "Deal Size",
       width: 150,
-      renderCell: (params) => fmtMoney(params.row.deal_size),
+      renderCell: (params) => fmtMoney(params.row.deal_size, 0),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
 
@@ -410,13 +410,13 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
                 fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
               }}
             >
-              Peer Deals (Ticker: {baseTicker})
+              Peer Deals for {baseTicker}
             </Typography>
             <Typography
               variant="body2"
               sx={{ color: "#475569", fontWeight: 600 }}
             >
-              Summary metrics are computed on the peer set returned by the API.
+              Summary metrics
             </Typography>
           </Box>
 
@@ -489,17 +489,17 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
           justifyContent="space-between"
           sx={{ mt: 2 }}
         >
-          {[
+            {[
             {
               label: "Average Deal Size",
-              value: summary ? fmtMoney(summary.average_deal_size) : "-",
+              value: summary ? fmtMoney(summary.average_deal_size, 0) : "-",
               bg: "#e8f2ff",
             },
             {
               label: "Avg Allocation % of Deal Size",
               value: summary
-                ? fmtPct(summary.avg_allocation_as_percent_of_deal_size, 2)
-                : "-",
+              ? fmtPct(summary.avg_allocation_as_percent_of_deal_size, 2)
+              : "-",
               bg: "#ecfdf3",
             },
             {
@@ -522,36 +522,36 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
               value: summary ? fmtPct(summary.avg_t1m_return, 2) : "-",
               bg: "#f1f5f9",
             },
-          ].map((tile) => (
+            ].map((tile) => (
             <Box
               key={tile.label}
               sx={{
-                px: 1.25,
-                py: 0.8,
-                borderRadius: 2,
-                bgcolor: tile.bg,
-                display: "inline-flex",
-                gap: 1,
-                alignItems: "center",
-                width: { xs: "100%", md: "auto" },
-                justifyContent: { xs: "space-between", md: "flex-start" },
-                border: "1px solid rgba(15, 23, 42, 0.06)",
+              px: 1.25,
+              py: 0.8,
+              borderRadius: 2,
+              bgcolor: tile.bg,
+              display: "inline-flex",
+              gap: 1,
+              alignItems: "center",
+              width: { xs: "100%", md: "auto" },
+              justifyContent: { xs: "space-between", md: "flex-start" },
+              border: "1px solid rgba(15, 23, 42, 0.06)",
               }}
             >
               <Typography
-                variant="caption"
-                sx={{ color: "#475569", fontWeight: 900 }}
+              variant="caption"
+              sx={{ color: "#475569", fontWeight: 900 }}
               >
-                {tile.label}
+              {tile.label}
               </Typography>
               <Typography
-                variant="h6"
-                sx={{ fontWeight: 1000, color: "#0b1844" }}
+              variant="h6"
+              sx={{ fontWeight: 1000, color: "#0b1844" }}
               >
-                {tile.value}
+              {tile.value}
               </Typography>
             </Box>
-          ))}
+            ))}
         </Stack>
       </Paper>
 
