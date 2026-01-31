@@ -6,7 +6,7 @@ function MetricTile({ label, value }: { label: string; value: string | number | 
     <Card variant="outlined" sx={{ height: "100%" }}>
       <CardContent>
         <Stack spacing={1}>
-          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+          <Typography variant="caption" color="#000000" fontWeight={600}>
             {label}
           </Typography>
           <Typography variant="h6" fontWeight={800}>

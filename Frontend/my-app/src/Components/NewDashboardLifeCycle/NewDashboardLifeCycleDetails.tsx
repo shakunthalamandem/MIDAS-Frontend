@@ -90,7 +90,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             No details available
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body2" color="#000000" sx={{ mt: 1 }}>
             Please go back and select a deal card.
           </Typography>
           <Box sx={{ mt: 2 }}>
