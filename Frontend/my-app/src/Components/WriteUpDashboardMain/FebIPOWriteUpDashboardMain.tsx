@@ -8,7 +8,7 @@ import {
   ListItemText,
   Typography
 } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "./types/DealInformation"
 
 import IPOWriteUpMetaDataBusinessOverview from "./IPOWriteUpMetaData/IPOWriteUpMetaDataBusinessOverview"
@@ -30,19 +30,22 @@ interface FebIPOWriteUpDashboardMainProps {
 const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   basicDealDetails
 }) => {
-  const sections = [
-    { id: "deal-info", label: "Deal Info" },
-    { id: "deal-indication", label: "AI Indication" },
-    { id: "market-strategy", label: "After Market Strategy" },
-    { id: "business-overview", label: "Business Overview" },
-    { id: "key-metrics", label: "Key Metrics" },
-    { id: "financial-highlights", label: "Financial Highlights" },
-    { id: "comps", label: "Comparative Multiples" },
-    // { id: "trends", label: "Trends" },
-    { id: "valuation-analysis", label: "Valuation Analysis" },
-    { id: "red-flag", label: "Red Flag Analysis" },
-    { id: "final-verdict", label: "Final Verdict" }
-  ]
+  const sections = useMemo(
+    () => [
+      { id: "deal-info", label: "Deal Info" },
+      { id: "deal-indication", label: "AI Indication" },
+      { id: "market-strategy", label: "After Market Strategy" },
+      { id: "business-overview", label: "Business Overview" },
+      { id: "key-metrics", label: "Key Metrics" },
+      { id: "financial-highlights", label: "Financial Highlights" },
+      { id: "comps", label: "Comparative Multiples" },
+      // { id: "trends", label: "Trends" },
+      { id: "valuation-analysis", label: "Valuation Analysis" },
+      { id: "red-flag", label: "Red Flag Analysis" },
+      { id: "final-verdict", label: "Final Verdict" }
+    ],
+    []
+  )
 
   const [activeSection, setActiveSection] = useState(sections[0].id)
 
@@ -53,6 +56,39 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
       target.scrollIntoView({ behavior: "smooth", block: "start" })
     }
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+
+        if (visibleEntries.length > 0) {
+          const nextId = visibleEntries[0].target.id
+          if (nextId && nextId !== activeSection) {
+            setActiveSection(nextId)
+          }
+        }
+      },
+      {
+        root: null,
+        rootMargin: "-20% 0px -70% 0px",
+        threshold: [0, 0.25, 0.5, 0.75, 1]
+      }
+    )
+
+    sections.forEach((section) => {
+      const target = document.getElementById(section.id)
+      if (target) {
+        observer.observe(target)
+      }
+    })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [activeSection, sections])
 
   return (
     <Box
