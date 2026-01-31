@@ -39,6 +39,10 @@ export interface DealRecommendationResponse {
   t1w_overall_prediction: string;
   t1m_overall_prediction: string;
 
+  writeup_overall_rating: number;  // out of 100
+  ai_ml_overall_rating: number;    // out of 100
+
+
   AM_strategy_recommendation: string;
 }
 
@@ -111,31 +115,7 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
       <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 }}>
         <Stack spacing={2}>
           {/* Header */}
-          <Card variant="outlined">
-            <CardContent>
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="h6" fontWeight={700}>
-                    Deal Recommendation
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {effectiveTicker ? `Ticker: ${effectiveTicker}` : "Select a ticker to view insights"}
-                  </Typography>
-                </Box>
 
-                {state === "loading" && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <CircularProgress size={18} />
-                    <Typography variant="body2" color="text.secondary">
-                      Loading
-                    </Typography>
-                  </Stack>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-
-          {/* Empty */}
           {!effectiveTicker && (
             <Alert severity="info" variant="outlined">
               Please provide a ticker to fetch the deal recommendation.
