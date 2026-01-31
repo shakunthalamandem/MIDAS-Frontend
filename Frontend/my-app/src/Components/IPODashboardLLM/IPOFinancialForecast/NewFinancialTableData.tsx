@@ -88,17 +88,22 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
   >
     (Values are in Millions)
   </Typography> 
-  <TableContainer component={Paper} elevation={4}>
+  <TableContainer
+    component={Paper}
+    elevation={0}
+    sx={{ boxShadow: "none", border: "none", backgroundColor: "transparent" }}
+  >
       <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell
               sx={{
+                fontSize:"1rem",
                 fontWeight: "bold",
-                color: "#FFFFFF",
-                backgroundColor: "#002060",
-                border: "1px solid #000000",
-                textAlign: "center",
+                color: "#0f172a",
+                backgroundColor: "#cfd6ff",
+                borderBottom: "1px solid #e3e7f3",
+                textAlign: "left",
               }}
             >
               Metric Name
@@ -110,31 +115,38 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                 <TableCell
                   key={label}
                   sx={{
+                    fontSize:"0.9rem",
                     fontWeight: "bold",
-                    color: "#FFFFFF",
-                    border: "1px solid #000000",
+                    color: "#0f172a",
+                    borderBottom: "1px solid #e3e7f3",
                     textAlign: "center",
-                    backgroundColor: isEditableColumn
-                      ? "rgb(95, 82, 30)"
-                      : "#002060",
+                    backgroundColor: "#cfd6ff",
                   }}
                 >
                   {formatLabel(label)}
                   {isEditableColumn && (
                     <Box component="span" sx={{ ml: 1 }}>
                       {!editing ? (
-                        <IconButton onClick={onEdit} size="small" sx={{ color: "#fff" }}>
+                        <IconButton
+                          onClick={onEdit}
+                          size="small"
+                          sx={{ color: "#0f172a" }}
+                        >
                           <EditIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                       ) : (
                         <>
-                          <IconButton onClick={onSave} size="small" sx={{ color: "#fff" }}>
+                          <IconButton
+                            onClick={onSave}
+                            size="small"
+                            sx={{ color: "#0f172a" }}
+                          >
                             <SaveIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                           <IconButton
                             onClick={onCancel}
                             size="small"
-                            sx={{ color: "#fff" }}
+                            sx={{ color: "#0f172a" }}
                           >
                             <CancelIcon sx={{ fontSize: 16 }} />
                           </IconButton>
@@ -156,11 +168,11 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
       <TableRow key={metricName}>
         <TableCell
           sx={{
-            border: "1px solid #000000",
+            borderBottom: "1px solid #e3e7f3",
             fontWeight: "bold",
             fontStyle: isOddRow ? "italic" : "normal",
             fontSize: isOddRow ? "1rem" : "1.3rem",
-            backgroundColor: isOddRow ? "" : "#ebebeb",
+            backgroundColor: "transparent",
           }}
         >
           {formatLabel(metricName)}

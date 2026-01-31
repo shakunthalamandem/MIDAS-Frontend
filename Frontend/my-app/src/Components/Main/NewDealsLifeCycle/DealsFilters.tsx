@@ -6,6 +6,7 @@ interface DealsFiltersProps {
   options: { value: string; label: string; helper: string; icon?: React.ReactNode }[];
   onChange: (value: string) => void;
   rightContent?: React.ReactNode;
+  compact?: boolean;
 }
 
 const DealsFilters: React.FC<DealsFiltersProps> = ({
@@ -13,12 +14,13 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
   options,
   onChange,
   rightContent,
+  compact = false,
 }) => {
   return (
     <Paper
       elevation={0}
       sx={{
-        py: { xs: 1, md: 1.5 },
+        py: compact ? 0 : { xs: 1, md: 1.5 },
         px: 0,
         borderRadius: 3,
         backgroundColor: "transparent",
@@ -27,23 +29,23 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
       }}
     >
       <Stack
-        direction={{ xs: "column", md: "row" }}
-        spacing={2}
-        alignItems={{ xs: "stretch", md: "center" }}
+        direction={compact ? "row" : { xs: "column", md: "row" }}
+        spacing={compact ? 1.25 : 2}
+        alignItems={compact ? "center" : { xs: "stretch", md: "center" }}
         justifyContent="space-between"
-        sx={{ width: "100%" }}
+        sx={{ width: "100%", flexWrap: compact ? "nowrap" : "wrap" }}
       >
         <ToggleButtonGroup
           value={selectedOp || options[0]?.value}
           exclusive
           onChange={(_e, value) => onChange(value ?? selectedOp)}
           sx={{
-            flexWrap: "wrap",
-            columnGap: 1,
-            rowGap: 1,
+            flexWrap: compact ? "nowrap" : "wrap",
+            columnGap: compact ? 0.75 : 1,
+            rowGap: compact ? 0 : 1,
             overflowX: "visible",
             maxWidth: "100%",
-            flex: 1,
+            flex: compact ? "0 0 auto" : 1,
             minWidth: 0,
             "& .MuiToggleButton-root": {
               textTransform: "none",
@@ -51,11 +53,11 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
               border: "1px solid #d7ddea",
               backgroundColor: "#ffffff",
               minWidth: 0,
-              height: 36,
-              minHeight: 36,
+              height: compact ? 34 : 36,
+              minHeight: compact ? 34 : 36,
               justifyContent: "center",
-              px: 2,
-              py: 0.4,
+              px: compact ? 1.5 : 2,
+              py: 0.3,
               color: "#1f2a44",
               position: "relative",
               overflow: "hidden",
@@ -84,8 +86,8 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
             //   display: "none",
             // },
             "& .deal-icon-box": {
-              width: 20,
-              height: 20,
+              width: compact ? 18 : 20,
+              height: compact ? 18 : 20,
               borderRadius: 999,
               display: "grid",
               placeItems: "center",
@@ -125,11 +127,11 @@ const DealsFilters: React.FC<DealsFiltersProps> = ({
         {rightContent && (
           <Box
             sx={{
-              width: { xs: "100%", md: "auto" },
-              alignSelf: { xs: "stretch", md: "center" },
+              width: compact ? "auto" : { xs: "100%", md: "auto" },
+              alignSelf: compact ? "center" : { xs: "stretch", md: "center" },
               display: "flex",
-              justifyContent: { xs: "center", md: "flex-start" },
-              ml: { md: "auto" },
+              justifyContent: compact ? "flex-end" : { xs: "center", md: "flex-start" },
+              ml: compact ? "auto" : { md: "auto" },
             }}
           >
             {rightContent}

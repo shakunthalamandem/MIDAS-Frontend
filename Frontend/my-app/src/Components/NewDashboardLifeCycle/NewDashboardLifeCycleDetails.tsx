@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Box,
   Chip,
@@ -11,14 +11,6 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import FindInPageOutlinedIcon from "@mui/icons-material/FindInPageOutlined";
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import SentimentSatisfiedAltOutlinedIcon from "@mui/icons-material/SentimentSatisfiedAltOutlined";
-import HubIcon from "@mui/icons-material/Hub";
-import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
@@ -32,10 +24,14 @@ import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotA
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
+import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
+
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
 import S1QueryBot from "./S1QueryBot";
 import DealRecomendation from "./DealRecomendation";
+import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
+import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -47,31 +43,23 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
 
-  const tabItems = [
-    { label: "Write up" },
-    // { label: "Overview", icon: <DashboardOutlinedIcon fontSize="small" /> },
-    // { label: "Red Flag Analysis" },
+  const tabItems = useMemo(
+    () => [
+      { label: "Write Up New" },
+      { label: "Write Up Old" },
+      // { label: "Red Flag Analysis" },
+      { label: "Deal Recommendation" },
+      { label: "Peer Deals Performance" },
+      { label: "AI- Sentiment View" },
+      { label: "AI Unsupervised" },
+      { label: "ML Model" },
+      { label: "S1 AI Query" },
+      { label: "NEWS" },
+      { label: "Meeting Notes" },
+    ],
+    []
+  );
 
-    { label: "Deal Recommendation" },
-
-    {
-      label: "Peer Deals Performance",
-    },
-    {
-      label: "AI- Sentiment View",
-     
-    },
-    { label: "AI Unsupervised"},
-
-    { label: "ML Model" },
-    { label: "S1 AI Query"},
-
-    { label: "NEWS" },
-  ];
-
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
 
   React.useEffect(() => {
     if (!targetTabLabel) return;
@@ -154,7 +142,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
           <Tabs
             value={tabValue}
-            onChange={handleTabChange}
+            onChange={(_: React.SyntheticEvent, newValue: number) => {
+              setTabValue(newValue);
+            }}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
@@ -207,20 +197,26 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3 }}>
-          {tabItems[tabValue]?.label === "Overview" ? (
+          {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
-              <NewDashboardLifeCycleOverview
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-                dealType={activePayload.deal_type}
-              />
+           <FebWriteUpDashboardMain
+            basicDealDetails={{
+              deal_id: activePayload.deal_id,
+              ticker: activePayload.ticker,
+              pricing_date: activePayload.pricing_date,
+              region: activePayload.region,
+              deal_type: activePayload.deal_type
+            }}
+          />
+
+              
             ) : (
               <NewDashboardLifeCycleOverviewFO
                 ticker={activePayload.ticker}
                 pricingDate={activePayload.pricing_date}
               />
             )
-          ) : tabItems[tabValue]?.label === "Write up" ? (
+          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
@@ -229,6 +225,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 deal_id={activePayload.deal_id}
               />
             )
+
+
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
               // <UpcomingDealRecomendation ticker={activePayload.ticker}
@@ -243,8 +241,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
+            
           ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <StockTickerNews ticker={activePayload.ticker} />
+            <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
@@ -258,6 +257,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
+          ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
+            <NewDashboardLifeCycleMeetingNotes
+              ticker={activePayload.ticker}
+              pricingDate={activePayload.pricing_date}
+            />
           ) : (
             <PageUnderDevelopment />
           )}

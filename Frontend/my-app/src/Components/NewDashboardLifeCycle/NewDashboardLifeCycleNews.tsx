@@ -109,7 +109,7 @@ const mdComponents = {
   ),
 };
 
-const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
+const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   const API_BASE_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -120,6 +120,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   const [allNews, setAllNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [noNewsMessage, setNoNewsMessage] = useState("");
 
   const [tickerFilter, setTickerFilter] = useState(initialTicker);
   const [sentimentFilter, setSentimentFilter] = useState<
@@ -153,6 +154,10 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
           data?.portfolio_data?.news_data || data?.news_data || [];
 
         setAllNews(newsData);
+        setNoNewsMessage(
+          data?.portfolio_data?.message ||
+            (data?.portfolio_data?.status === 204 ? "No news available." : "")
+        );
 
         // auto select first item for better UX
         setSelectedId(newsData?.[0]?.id ?? null);
@@ -179,6 +184,9 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
     });
   }, [allNews, tickerFilter, sentimentFilter]);
 
+  const isNoNews =
+    !loading && !error && allNews.length === 0 && !!noNewsMessage;
+
   const selected = useMemo(
     () => filtered.find((n) => n.id === selectedId) || filtered[0] || null,
     [filtered, selectedId]
@@ -198,7 +206,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   return (
     <Container maxWidth="xl" sx={{ py: 2.5 }}>
       {/* Top header (no card) */}
-      <Box sx={{ mb: 2 ,mt:4}}>
+      <Box sx={{ mb: 2 }}>
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -266,7 +274,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
 
           <Stack direction="row" spacing={1} alignItems="center">
             {/* Search bar temporarily disabled */}
-            
+            {/*
               <TextField
                 value={tickerFilter}
                 onChange={(e) => setTickerFilter(e.target.value)}
@@ -281,7 +289,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                   ),
                 }}
               />
-           
+            */}
             <ToggleButtonGroup
               size="small"
               value={sentimentFilter}
@@ -390,8 +398,28 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
         </Paper>
       )}
 
+      {/* No news state */}
+      {isNoNews && (
+        <Paper
+          elevation={0}
+          sx={(theme) => ({
+            borderRadius: 3,
+            border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+            backgroundColor: alpha(theme.palette.info.main, 0.04),
+            p: 2,
+          })}
+        >
+          <Typography sx={{ fontWeight: 600 }}>
+            {noNewsMessage}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Check back later for new updates.
+          </Typography>
+        </Paper>
+      )}
+
       {/* Main layout */}
-      {!loading && !error && (
+      {!loading && !error && !isNoNews && (
         <Box
           sx={{
             display: "grid",
@@ -800,4 +828,4 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
   );
 };
 
-export default StockTickerNews;
+export default NewDashboardLifeCycleNews;

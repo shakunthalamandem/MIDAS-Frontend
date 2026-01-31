@@ -220,8 +220,7 @@ const MetricsTableMain: React.FC<Props> = ({
         }}
       >
         <Typography variant="h6" color="#002060" fontWeight={600}>
-          Comparative Trading Multiples & Performance Metrics
-        </Typography>
+          Comparative Trading Multiples         </Typography>
         <CompetitorSearch onSelect={handleAddCompetitor} />
       </Box>
 
