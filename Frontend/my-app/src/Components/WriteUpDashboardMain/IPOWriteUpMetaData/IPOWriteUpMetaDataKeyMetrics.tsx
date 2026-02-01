@@ -335,9 +335,9 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           <Box sx={{ display: { xs: "none", sm: "block" } }} />
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+            sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}
           >
-            Key Metrics
+           Top 5 performance of Key Metrics
           </Typography>
           <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
             {editMode ? (

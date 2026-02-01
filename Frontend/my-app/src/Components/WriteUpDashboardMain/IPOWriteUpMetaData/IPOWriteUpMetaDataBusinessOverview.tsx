@@ -233,7 +233,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         <Typography
           variant="h5"
           fontWeight={600}
-          sx={{ color: "#1d2b5a", textAlign: "center" }}
+          sx={{ color: "#124180", textAlign: "center" }}
         >
           Business Overview
         </Typography>
@@ -293,7 +293,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                   {icon}
                 </Box>
 
-                <Typography fontWeight={600}>{title}</Typography>
+                <Typography fontWeight={600} color="#124180">{title}</Typography>
               </Box>
 
               <IconButton
