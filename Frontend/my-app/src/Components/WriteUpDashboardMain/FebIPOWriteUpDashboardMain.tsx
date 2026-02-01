@@ -110,7 +110,10 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         }}
       >
         <CardContent sx={{ p: 2.5 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, mb: 2, textAlign: "center", color: "#1d2b5a" }}
+          >
             IPO Write-up
           </Typography>
 

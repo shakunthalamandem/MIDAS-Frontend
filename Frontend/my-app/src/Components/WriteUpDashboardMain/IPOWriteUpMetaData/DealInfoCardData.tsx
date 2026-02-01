@@ -243,67 +243,79 @@ const handleSaveAll = async () => {
     >
       <Stack spacing={2.5}>
         <Box>
-          <Stack
-            direction="row"
-            alignItems="flex-start"
-            justifyContent="space-between"
-            gap={2}
-            flexWrap="wrap"
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+              alignItems: "center",
+              gap: 2
+            }}
           >
+            <Box sx={{ display: { xs: "none", sm: "block" } }} />
             {isEditing ? (
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                <TextField
-                  size="small"
-                  placeholder="Company name"
-                  value={draftValues.company_name ?? ""}
-                  onChange={(event) =>
-                    setDraftValues((prev) => ({
-                      ...prev,
-                      company_name: event.target.value
-                    }))
-                  }
-                  sx={{ minWidth: 260, background: "#ffffff" }}
-                />
-              </Stack>
+              <TextField
+                size="small"
+                placeholder="Company name"
+                value={draftValues.company_name ?? ""}
+                onChange={(event) =>
+                  setDraftValues((prev) => ({
+                    ...prev,
+                    company_name: event.target.value
+                  }))
+                }
+                sx={{
+                  minWidth: 260,
+                  background: "#ffffff",
+                  justifySelf: "center"
+                }}
+              />
             ) : (
               <Typography
                 variant="h5"
-                sx={{ fontWeight: 700, color: "#121f44" }}
+                sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
               >
                 {localData.company_name} - {localData.ticker_name}
               </Typography>
             )}
-            {isEditing ? (
-              <Stack direction="row" spacing={1}>
+            <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
+              {isEditing ? (
+                <Stack direction="row" spacing={1}>
+                  <IconButton
+                    size="small"
+                    onClick={handleSaveAll}
+                    disabled={isSaving}
+                    sx={{ color: "#1f3b73" }}
+                  >
+                    <SaveOutlinedIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    sx={{ color: "#6b7280" }}
+                  >
+                    <CloseOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              ) : (
                 <IconButton
                   size="small"
-                  onClick={handleSaveAll}
-                  disabled={isSaving}
+                  onClick={openEdit}
                   sx={{ color: "#1f3b73" }}
                 >
-                  <SaveOutlinedIcon fontSize="small" />
+                  <EditOutlinedIcon fontSize="small" />
                 </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={handleCancel}
-                  disabled={isSaving}
-                  sx={{ color: "#6b7280" }}
-                >
-                  <CloseOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Stack>
-            ) : (
-              <IconButton
-                size="small"
-                onClick={openEdit}
-                sx={{ color: "#1f3b73" }}
-              >
-                <EditOutlinedIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Stack>
+              )}
+            </Box>
+          </Box>
 
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ mt: 0.5 }}
+          >
             {isEditing ? (
               <TextField
                 size="small"

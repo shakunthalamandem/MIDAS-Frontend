@@ -20,7 +20,7 @@ const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ companyName
     >
       <Typography
         variant="h6"
-        sx={{ color: "#5D0163", fontWeight: 600, textAlign: "center" }}
+        sx={{ color: "#1d2b5a", fontWeight: 600, textAlign: "center" }}
       >
         Executive Summary of {companyName}
       </Typography>

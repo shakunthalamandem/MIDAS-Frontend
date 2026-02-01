@@ -189,44 +189,53 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
         }}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ px: 0.5 }}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+            alignItems: "center",
+            gap: 1.5,
+            px: 0.5
+          }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
+          <Box sx={{ display: { xs: "none", sm: "block" } }} />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+          >
             Market Strategy
           </Typography>
-          {isEditingCards ? (
-            <Stack direction="row" spacing={1}>
+          <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
+            {isEditingCards ? (
+              <Stack direction="row" spacing={1}>
+                <IconButton
+                  size="small"
+                  onClick={handleSaveCards}
+                  disabled={isSavingCards}
+                  sx={{ color: "#1f3b73" }}
+                >
+                  <SaveOutlinedIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={cancelEditCards}
+                  disabled={isSavingCards}
+                  sx={{ color: "#6b7280" }}
+                >
+                  <CloseOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            ) : (
               <IconButton
                 size="small"
-                onClick={handleSaveCards}
-                disabled={isSavingCards}
+                onClick={openEditCards}
                 sx={{ color: "#1f3b73" }}
               >
-                <SaveOutlinedIcon fontSize="small" />
+                <EditOutlinedIcon fontSize="small" />
               </IconButton>
-              <IconButton
-                size="small"
-                onClick={cancelEditCards}
-                disabled={isSavingCards}
-                sx={{ color: "#6b7280" }}
-              >
-                <CloseOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Stack>
-          ) : (
-            <IconButton
-              size="small"
-              onClick={openEditCards}
-              sx={{ color: "#1f3b73" }}
-            >
-              <EditOutlinedIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Stack>
+            )}
+          </Box>
+        </Box>
 
         {loading ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 2 }}>
@@ -296,17 +305,27 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
         }}
       >
         <Stack spacing={2}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            flexWrap="wrap"
-            gap={1}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+              alignItems: "center",
+              gap: 1
+            }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+            <Box sx={{ display: { xs: "none", sm: "block" } }} />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+            >
               Aftermarket Strategy
             </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifySelf="end"
+            >
               <Typography
                 variant="caption"
                 sx={{ color: "#6b7280", fontStyle: "italic" }}
@@ -342,7 +361,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
                 </IconButton>
               )}
             </Stack>
-          </Stack>
+          </Box>
 
           {isEditingNotes ? (
             <TextField
