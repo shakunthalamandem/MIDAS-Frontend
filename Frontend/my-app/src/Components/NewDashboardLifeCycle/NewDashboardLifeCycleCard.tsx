@@ -342,23 +342,34 @@ const DealCard: React.FC<DealCardProps> = ({
         ) : null}
 
         {onViewDetails && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 0.5 }}>
-            <IconButton
-              onClick={onViewDetails}
-              aria-label="View details"
-              sx={{
-                backgroundColor: "rgb(74, 130, 243)",
-                color: "#ffffff",
-                width: 20,
-                height: 20,
-                "&:hover": {
-                  backgroundColor: "#0a2f73",
-                },
-              }}
-            >
-              <ArrowForwardIcon />
-            </IconButton>
-          </Box>
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 0.5,
+    pt: 0.5,
+  }}
+>
+  <Typography variant="body2" color="#002060" fontWeight={600}>View</Typography>
+
+  <IconButton
+    onClick={onViewDetails}
+    aria-label="View details"
+    sx={{
+      backgroundColor: "#002060",
+      color: "#ffffff",
+      width: 20,
+      height: 20,
+      "&:hover": {
+        backgroundColor: "#002060",
+      },
+    }}
+  >
+    <ArrowForwardIcon sx={{ fontSize: 14 }} />
+  </IconButton>
+</Box>
+
         )}
       </CardContent>
     </Card>
