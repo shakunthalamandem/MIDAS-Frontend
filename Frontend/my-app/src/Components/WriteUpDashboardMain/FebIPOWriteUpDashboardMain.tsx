@@ -50,8 +50,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   const [activeSection, setActiveSection] = useState(sections[0].id)
   const sectionCardSx = {
     borderRadius: 3,
-    border: "1px solid #e5ebffff",
-    background: "#e5ebffff",
+    border: "1px solid #edf0faff",
+    background: "#fcfaf7ff",
     boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)"
   }
 
