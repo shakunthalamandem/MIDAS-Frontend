@@ -74,7 +74,7 @@ const DealCard: React.FC<DealCardProps> = ({
       sx={{
         borderRadius: 4,
         border: "1px solid #e5f0ff",
-        backgroundColor: "#f6fbff",
+        backgroundColor: "#c2dbf0",
         boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
         height: "100%",
         minHeight: { xs: 400, sm: 300 },
