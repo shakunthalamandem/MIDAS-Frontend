@@ -100,10 +100,10 @@ const DealHeaderHero: React.FC<Props> = ({ deal, fmtPlain, fmtMoney }) => {
         p: 2.5,
         borderRadius: 4,
         border: "1px solid rgba(207,227,255,0.9)",
-        background:
-          "radial-gradient(900px 300px at 10% 10%, rgba(59,130,246,0.22), transparent 55%)," +
-          "radial-gradient(800px 260px at 90% 30%, rgba(99,102,241,0.18), transparent 55%)," +
-          "linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.55))",
+        background:"#e0e7f5",
+          // "radial-gradient(900px 300px at 10% 10%, rgba(59, 130, 246, 0.22), transparent 55%)," +
+          // "radial-gradient(800px 260px at 90% 30%, rgba(99,102,241,0.18), transparent 55%)," +
+          // "linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.55))",
         boxShadow: "0 16px 42px rgba(16, 24, 40, 0.10)",
         backdropFilter: "blur(10px)",
         display: "flex",

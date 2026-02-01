@@ -1,18 +1,17 @@
 import React from "react";
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Chip,
   Grid,
+  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import MemoryOutlinedIcon from "@mui/icons-material/MemoryOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { DealCardTag } from "./NewDashboardLifeCycleUtils";
 
 export type DealCardMeta = {
@@ -26,7 +25,7 @@ type DealCardProps = {
   subtitle?: string;
   meta: DealCardMeta[];
   tags?: DealCardTag[];
-  secondaryTag?: DealCardTag;
+  writeupAvailable?: boolean | null;
   onViewDetails?: () => void;
   onActionClick?: (label: string) => void;
 };
@@ -36,7 +35,7 @@ const DealCard: React.FC<DealCardProps> = ({
   subtitle,
   meta,
   tags,
-  secondaryTag,
+  writeupAvailable,
   onViewDetails,
   onActionClick,
 }) => {
@@ -49,16 +48,29 @@ const DealCard: React.FC<DealCardProps> = ({
   const tileMeta = meta.filter(
     (item) => !barMeta.includes(item) && !dateMeta.includes(item)
   );
+  const writeupStatus =
+    writeupAvailable === true
+      ? "Write Up Ready"
+      : writeupAvailable === false
+      ? "Write Up Not Ready"
+      : null;
   const actionCards = [
-    { label: "Write Up", icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff", },
+    {
+      label: "Write Up",
+      icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />,
+      bg: "#eeeffcff",
+      tone: "#4b5bff",
+      status: writeupStatus,
+    },
     { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
-    { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
-    { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
+    // { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
+    // { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
   ];
 
   return (
     <Card
       elevation={0}
+      onClick={onViewDetails}
       sx={{
         borderRadius: 4,
         border: "1px solid #e5f0ff",
@@ -67,6 +79,7 @@ const DealCard: React.FC<DealCardProps> = ({
         height: "100%",
         minHeight: { xs: 400, sm: 300 },
         fontSize: "0.92rem",
+        cursor: onViewDetails ? "pointer" : "default",
       }}
     >
       <CardContent
@@ -112,52 +125,35 @@ const DealCard: React.FC<DealCardProps> = ({
           ) : null}
         </Stack>
 
-        {(subtitle || secondaryTag) ? (
-          <Stack
-            direction="row"
-            spacing={1}
-            alignItems="center"
-            justifyContent="space-between"
-            flexWrap="nowrap"
-          >
-            {subtitle ? (
-              <Box sx={{ flex: "0 0 50%", minWidth: 0 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#000000ff", fontWeight: 300, fontSize: "0.78rem", wordBreak: "break-word" }}
-                >
-                  {subtitle}
-                </Typography>
-              </Box>
-            ) : (
-              <Box sx={{ flex: "0 0 50%" }} />
-            )}
-            <Box sx={{ flex: "0 0 50%", display: "flex", justifyContent: "flex-end" }}>
-              {secondaryTag ? (
-                <Chip
-                  label={secondaryTag.label}
-                  size="small"
-                  sx={{
-                    bgcolor: secondaryTag.bg ?? "#dcfce7",
-                    color: secondaryTag.color ?? "#166534",
-                    fontWeight: 700,
-                    borderRadius: 999,
-                  }}
-                />
-              ) : null}
-            </Box>
-          </Stack>
+        {subtitle ? (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#000000ff",
+                fontWeight: 300,
+                fontSize: "0.78rem",
+                wordBreak: "break-word",
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </Box>
         ) : null}
 
         <Grid container spacing={1.2}>
           {actionCards.map((item) => (
             <Grid item xs={6} key={item.label}>
               <Box
-                onClick={() => onActionClick?.(item.label)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onActionClick?.(item.label);
+                }}
                 onKeyDown={(event) => {
                   if (!onActionClick) return;
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
+                    event.stopPropagation();
                     onActionClick(item.label);
                   }
                 }}
@@ -180,9 +176,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   cursor: onActionClick ? "pointer" : "default",
                   "&:hover": onActionClick
                     ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
-                      bgcolor:"#ceccf3ff"
-                     }
+                      bgcolor:"#ceccf3ff"}
                     : undefined,
+                    mt:2,
+                    mb:2
                 }}
               >
                 <Box
@@ -201,6 +198,17 @@ const DealCard: React.FC<DealCardProps> = ({
                 <Typography sx={{ fontWeight: 600, fontSize: "0.82rem" }}>
                   {item.label}
                 </Typography>
+                {item.status ? (
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: "0.7rem",
+                      color: item.status === "Write Up Ready" ? "#0d883c" : "#991b1b",
+                    }}
+                  >
+                    {item.status}
+                  </Typography>
+                ) : null}
               </Box>
             </Grid>
           ))}
@@ -241,7 +249,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   <Typography variant="caption" sx={{ fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#17203d" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "#17203d", fontSize: "0.95rem" }}
+                  >
                     {item.value}
                   </Typography>
                 </Box>
@@ -267,7 +278,10 @@ const DealCard: React.FC<DealCardProps> = ({
                 <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                   {item.label}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.95rem" }}
+                >
                   {item.value}
                 </Typography>
               </Box>
@@ -289,7 +303,7 @@ const DealCard: React.FC<DealCardProps> = ({
                     width: 26,
                     height: 26,
                     borderRadius: "50%",
-                    backgroundColor: "#0f3072ff",
+                    backgroundColor: "rgb(53, 15, 114)",
                     display: "grid",
                     placeItems: "center",
                     color: "#ffffff",
@@ -302,7 +316,10 @@ const DealCard: React.FC<DealCardProps> = ({
                   <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.82rem" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.92rem" }}
+                  >
                     {item.value}
                   </Typography>
                 </Box>
@@ -313,22 +330,21 @@ const DealCard: React.FC<DealCardProps> = ({
 
         {onViewDetails && (
           <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 0.5 }}>
-            <Button
+            <IconButton
               onClick={onViewDetails}
-              variant="contained"
+              aria-label="View details"
               sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                px: 3,
-                py: 0.7,
-                background: "#0c3992ff",
-                // boxShadow: "0 10px 20px rgba(91, 62, 230, 0.3)",
-                fontWeight: 700,
-                fontSize: "0.85rem",
+                backgroundColor: "rgb(74, 130, 243)",
+                color: "#ffffff",
+                width: 20,
+                height: 20,
+                "&:hover": {
+                  backgroundColor: "#0a2f73",
+                },
               }}
             >
-              View Details
-            </Button>
+              <ArrowForwardIcon />
+            </IconButton>
           </Box>
         )}
       </CardContent>

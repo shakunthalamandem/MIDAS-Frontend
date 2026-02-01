@@ -38,6 +38,7 @@ type FiltersBarProps = {
   setDealSearch: (value: string) => void;
   pipelineSearch: string;
   setPipelineSearch: (value: string) => void;
+  inline?: boolean;
 };
 
 const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
@@ -55,36 +56,40 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
   setDealSearch,
   pipelineSearch,
   setPipelineSearch,
+  inline = false,
 }) => {
+  const Wrapper: React.ElementType = inline ? Box : Container;
   return (
     <>
-      <Container
-        maxWidth="xl"
+      <Wrapper
+        {...(!inline ? { maxWidth: "xl" } : {})}
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          mb: 1.5,
+          mb: inline ? 0 : 1.5,
           px: 0,
           gap: 2,
           flexWrap: { xs: "wrap", md: "nowrap" },
+          flexGrow: inline ? 1 : undefined,
+          minWidth: inline ? 0 : undefined,
         }}
       >
-        <Container
-          maxWidth="xl"
-          disableGutters
-          sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}
-        >
+        <Box sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "auto" } }}>
           <DealsFilters
             selectedOp={selectedOp}
             onChange={onSelectOp}
             options={tabs}
+            compact={inline}
             rightContent={
               <Stack
                 direction="row"
-                spacing={1.5}
+                spacing={1}
                 alignItems="center"
-                sx={{ flexWrap: { xs: "wrap", lg: "nowrap" }, justifyContent: "flex-end" }}
+                sx={{
+                  flexWrap: inline ? "nowrap" : { xs: "wrap", lg: "nowrap" },
+                  justifyContent: "flex-end",
+                }}
               >
                 {!isPipelineView && (
                   <ToggleButtonGroup
@@ -97,7 +102,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                       borderRadius: 9999,
                       border: "1px solid #d7ddea",
                       display: "inline-flex",
-                      gap: 0.5,
+                      gap: 0.4,
                       flexShrink: 0,
                       "& .MuiToggleButtonGroup-grouped": {
                         border: 0,
@@ -106,10 +111,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                         textTransform: "none",
                         borderRadius: 9999,
                         border: 0,
-                        px: 2,
-                        py: 0.5,
+                        px: inline ? 1.5 : 2,
+                        py: inline ? 0.35 : 0.5,
                         fontWeight: 700,
-                        fontSize: "0.8rem",
+                        fontSize: inline ? "0.75rem" : "0.8rem",
                         color: "#6a7286",
                         backgroundColor: "transparent",
                         transition: "all 0.2s ease",
@@ -210,12 +215,12 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                     value={dealSearch}
                     onChange={(e) => setDealSearch(e.target.value)}
                     sx={{
-                      minWidth: 160,
-                      maxWidth: 200,
+                      minWidth: inline ? 150 : 160,
+                      maxWidth: inline ? 180 : 200,
                       flexShrink: 0,
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 999,
-                        height: 36,
+                        height: inline ? 34 : 36,
                         backgroundColor: "#ffffff",
                         "& fieldset": {
                           borderColor: "#cfd6e4",
@@ -250,12 +255,12 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                     value={pipelineSearch}
                     onChange={(e) => setPipelineSearch(e.target.value)}
                     sx={{
-                      minWidth: 160,
-                      maxWidth: 200,
+                      minWidth: inline ? 150 : 160,
+                      maxWidth: inline ? 180 : 200,
                       flexShrink: 0,
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 999,
-                        height: 36,
+                        height: inline ? 34 : 36,
                         backgroundColor: "#ffffff",
                         "& fieldset": {
                           borderColor: "#cfd6e4",
@@ -285,8 +290,8 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               </Stack>
             }
           />
-        </Container>
-      </Container>
+        </Box>
+      </Wrapper>
     </>
   );
 };

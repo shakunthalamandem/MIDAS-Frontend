@@ -67,12 +67,12 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
     Authorization: token ? `Bearer ${token}` : "",
   });
 
-  useEffect(() => {
-    if (selectedTicker !== undefined) {
-      setCurrentTicker(selectedTicker ?? null);
-      setSearchText(selectedTicker ?? "");
-    }
-  }, [selectedTicker]);
+//   useEffect(() => {
+//     if (selectedTicker !== undefined) {
+//       setCurrentTicker(selectedTicker ?? null);
+//       setSearchText(selectedTicker ?? "");
+//     }
+//   }, [selectedTicker]);
 
 //   useEffect(() => {
 //   if (!currentTicker) return;

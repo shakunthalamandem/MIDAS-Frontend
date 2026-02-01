@@ -13,9 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import PublicIcon from "@mui/icons-material/Public";
-import LanguageIcon from "@mui/icons-material/Language";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
@@ -26,7 +23,6 @@ import TableRowsIcon from "@mui/icons-material/TableRows";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
-import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
 import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
 import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
@@ -40,12 +36,21 @@ import {
 const NewDealsLifecycleCards: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const storedRegion = localStorage.getItem("newDashboardSelectedRegion");
+  const storedDealType = localStorage.getItem("newDashboardSelectedDealType");
+  const initialRegion: "US" | "EMEA" | "APAC" | "Non-US America" =
+    storedRegion === "US" || storedRegion === "APAC" || storedRegion === "EMEA"
+      ? storedRegion
+      : "US";
+  const initialDealType: "IPO" | "FO" =
+    storedDealType === "FO" ? "FO" : "IPO";
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOp, setSelectedOp] = useState<string>("upcoming");
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
-  const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
+  const [selectedDealType, setSelectedDealType] =
+    useState<"IPO" | "FO">(initialDealType);
   const locationViewMode =
     (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
   const [viewMode, setViewMode] = useState<"card" | "table">(
@@ -57,7 +62,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const [selectedRegion, setSelectedRegion] = useState<
     "US" | "EMEA" | "APAC" | "Non-US America"
-  >("US");
+  >(initialRegion);
 
   const [pipelineData, setPipelineData] = useState<Record<string, any[]>>({
     fo: [],
@@ -87,20 +92,13 @@ const NewDealsLifecycleCards: React.FC = () => {
       helper: "Issued Deals",
       icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
-    {
-      value: "pipeline",
-      label: "Future Pipeline",
-      helper: "Not filed",
-      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
-    },
+    // {
+    //   value: "pipeline",
+    //   label: "Future Pipeline",
+    //   helper: "Not filed",
+    //   icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
+    // },
   ];
-
-  const regionTabs = [
-    { label: "US", value: "US", icon: <PublicIcon fontSize="small" /> },
-    { label: "APAC", value: "APAC", icon: <LanguageIcon fontSize="small" /> },
-    { label: "EMEA", value: "EMEA", icon: <TravelExploreIcon fontSize="small" /> },
-    { label: "Others", value: "Non-US America", icon: <Diversity3Icon fontSize="small" /> },
-  ] as const;
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
     setLoading(true);
@@ -238,6 +236,14 @@ const NewDealsLifecycleCards: React.FC = () => {
     const apiOperation = opMap[selectedOp] || selectedOp;
     fetchData(apiOperation, selectedRegion, selectedDealType);
   }, [selectedOp, selectedRegion, selectedDealType]);
+
+  useEffect(() => {
+    localStorage.setItem("newDashboardSelectedRegion", selectedRegion);
+  }, [selectedRegion]);
+
+  useEffect(() => {
+    localStorage.setItem("newDashboardSelectedDealType", selectedDealType);
+  }, [selectedDealType]);
 
   useEffect(() => {
     if (locationViewMode === "card" || locationViewMode === "table") {
@@ -415,9 +421,10 @@ const NewDealsLifecycleCards: React.FC = () => {
             },
           ];
           const allTags = buildCardTags(row);
-          const writeupTag = allTags.find((tag) =>
-            tag.label.toLowerCase().includes("write-up")
-          );
+          const writeupAvailable =
+            row.writeup_available == null
+              ? null
+              : row.writeup_available.toString().toLowerCase() === "yes";
           const displayTags = allTags.filter((tag) => {
             const label = tag.label.toLowerCase();
             return !label.includes("write-up") && !label.includes("price range");
@@ -433,10 +440,9 @@ const NewDealsLifecycleCards: React.FC = () => {
             <DealCard
               title={row.ticker || "N/A"}
               subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
-              secondaryTag={writeupTag}
+              writeupAvailable={writeupAvailable}
               meta={meta}
               tags={[
-                { label: row.region || "Region N/A", bg: "#e6efff", color: "#1e3a8a" },
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
                 ...displayTags,
               ]}
@@ -543,26 +549,47 @@ const NewDealsLifecycleCards: React.FC = () => {
           <Container
             maxWidth="xl"
             sx={{
-              display: "flex",
-              alignItems: { xs: "flex-start", md: "center" },
-              justifyContent: "space-between",
-              mb: 1.5,
+              display: "grid",
+              alignItems: "center",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "minmax(360px, 1.6fr) minmax(220px, 0.6fr)",
+              },
+              columnGap: 2,
+              rowGap: 1.5,
+              mb: 0.5,
               px: 1,
-              gap: 1.5,
-              flexWrap: "wrap",
             }}
           >
-            <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
-            <RegionTabs
-              tabs={regionTabs}
-              selectedRegion={selectedRegion}
-              onSelect={(value) => setSelectedRegion(value as any)}
-            />
+            <Box sx={{ minWidth: 0 }}>
+              <FiltersBar
+                tabs={tabs}
+                selectedOp={selectedOp}
+                onSelectOp={setSelectedOp}
+                selectedDealType={selectedDealType}
+                onSelectDealType={setSelectedDealType}
+                isPipelineView={isPipelineView}
+                liveStartDate={liveStartDate}
+                liveEndDate={liveEndDate}
+                setLiveStartDate={setLiveStartDate}
+                setLiveEndDate={setLiveEndDate}
+                dealSearch={dealSearch}
+                setDealSearch={setDealSearch}
+                pipelineSearch={pipelineSearch}
+                setPipelineSearch={setPipelineSearch}
+                inline
+              />
+            </Box>
+
             <Stack
               direction="row"
               spacing={1}
               alignItems="center"
-              sx={{ ml: "auto", width: { xs: "100%", md: "auto" }, flex: 1, justifyContent: "flex-end" }}
+              sx={{
+                ml: "auto",
+                minWidth: 200,
+                justifyContent: "flex-end",
+              }}
             >
               <ToggleButtonGroup
                 size="small"
@@ -575,7 +602,6 @@ const NewDealsLifecycleCards: React.FC = () => {
                   backgroundColor: "transparent",
                   borderRadius: 999,
                   border: "1px solid transparent",
-                  ml: { md: "auto" },
                   "& .MuiToggleButton-root": {
                     border: "1px solid #d7ddea",
                     px: 2,
@@ -601,7 +627,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     backgroundColor: "#2b146f",
                     color: "#ffffff",
                   },
-                   "& .MuiToggleButton-root.Mui-selected:leave": {
+                  "& .MuiToggleButton-root.Mui-selected:leave": {
                     backgroundColor: "#2b146f",
                     color: "#ffffff",
                   },
@@ -615,25 +641,6 @@ const NewDealsLifecycleCards: React.FC = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Stack>
-          </Container>
-
-          <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
-            <FiltersBar
-              tabs={tabs}
-              selectedOp={selectedOp}
-              onSelectOp={setSelectedOp}
-              selectedDealType={selectedDealType}
-              onSelectDealType={setSelectedDealType}
-              isPipelineView={isPipelineView}
-              liveStartDate={liveStartDate}
-              liveEndDate={liveEndDate}
-              setLiveStartDate={setLiveStartDate}
-              setLiveEndDate={setLiveEndDate}
-              dealSearch={dealSearch}
-              setDealSearch={setDealSearch}
-              pipelineSearch={pipelineSearch}
-              setPipelineSearch={setPipelineSearch}
-            />
           </Container>
         </Box>
       </Container>
@@ -682,7 +689,11 @@ const NewDealsLifecycleCards: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1,mt:0 }}>
                   <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
-                    Upcoming {selectedRegion} {selectedDealType}  Deals Pricing Date Available (Not Yet Listed)
+                    Upcoming{" "}
+                    <Box component="span" sx={{ color: "#dc2626" }}>
+                      {selectedRegion} {selectedDealType}
+                    </Box>{" "}
+                    Deals Pricing Date Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingDatedRows.length > 0 ? (
@@ -710,7 +721,10 @@ const NewDealsLifecycleCards: React.FC = () => {
               <Grid item xs={12}>
                 <Container sx={{ px: 0, mb: 1 }}>
                   <Typography sx={{ fontSize: "1.5rem", fontWeight: 600, color: "#002060" }} align="center">
-                    Upcoming {selectedRegion} {selectedDealType} Deals Pricing Date Not Available (Not Yet Listed)
+                                    Upcoming{" "}
+                    <Box component="span" sx={{ color: "#dc2626" }}>
+                      {selectedRegion} {selectedDealType}
+                    </Box>{" "} Deals Pricing Date Not Available (Not Yet Listed)
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
@@ -766,20 +780,6 @@ const NewDealsLifecycleCards: React.FC = () => {
 const NewDashboardLifeCycleMain: React.FC = () => {
   return (
     <>
-      {/* <Box
-        sx={{
-          backgroundColor: "#0b2a6b",
-          color: "#fff",
-          py: 1.2,
-          textAlign: "center",
-          mb: 3,
-          boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.2 }}>
-          Welcome to New Dashboard Life Cycle!
-        </Typography>
-      </Box> */}
       <NewDealsLifecycleCards />
     </>
   );
