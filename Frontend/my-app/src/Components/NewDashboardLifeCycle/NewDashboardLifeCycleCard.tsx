@@ -80,6 +80,19 @@ const DealCard: React.FC<DealCardProps> = ({
         minHeight: { xs: 400, sm: 300 },
         fontSize: "0.92rem",
         cursor: onViewDetails ? "pointer" : "default",
+        transition: "transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease",
+        willChange: "transform, box-shadow",
+        "&:hover": onViewDetails
+          ? {
+              transform: "translateY(-4px)",
+              boxShadow: "0 22px 40px rgba(27, 44, 90, 0.16)",
+            }
+          : undefined,
+        "&:focus-visible": onViewDetails
+          ? {
+              outlineOffset: 2,
+            }
+          : undefined,
       }}
     >
       <CardContent
