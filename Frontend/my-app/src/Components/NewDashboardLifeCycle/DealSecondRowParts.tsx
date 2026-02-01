@@ -447,7 +447,7 @@ export function AIMLPredictions({
   data: DealRecommendationResponse;
 }) {
   return (
-    <SectionCard title="AI/ML Predictions">
+    <SectionCard title="AI-ML Predictions">
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
           <PredictionTile

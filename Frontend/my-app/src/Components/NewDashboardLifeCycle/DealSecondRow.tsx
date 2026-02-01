@@ -84,13 +84,6 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
               </SectionCard>
 
               <DealMomentum data={data} />
-
-              <OverallAISummary
-                t1d={data.t1d_overall_prediction}
-                t1w={data.t1w_overall_prediction}
-                t1m={data.t1m_overall_prediction}
-              />
-
               {/* ✅ BELOW DEAL MOMENTUM */}
             </Stack>
           </Grid>
