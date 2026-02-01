@@ -29,6 +29,7 @@ import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboard
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
 import S1QueryBot from "./S1QueryBot";
+import DealRecomendation from "./DealRecomendation";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 
@@ -77,7 +78,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             No details available
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body2" color="#000000" sx={{ mt: 1 }}>
             Please go back and select a deal card.
           </Typography>
           <Box sx={{ mt: 2 }}>
@@ -228,11 +229,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
-              <UpcomingDealRecomendation ticker={activePayload.ticker}
-              />
+              // <UpcomingDealRecomendation ticker={activePayload.ticker}
+              // />
+              <DealRecomendation ticker={activePayload.ticker} />
             ) : (
-              <RecentDealRecomendation ticker={activePayload.ticker}
-              />
+              // <RecentDealRecomendation ticker={activePayload.ticker}
+              // />
+              <DealRecomendation ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
