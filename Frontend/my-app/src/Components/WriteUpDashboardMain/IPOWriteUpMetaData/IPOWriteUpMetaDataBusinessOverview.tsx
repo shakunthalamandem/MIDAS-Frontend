@@ -204,7 +204,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       sx={{
         p: 3,
         borderRadius: 3,
-        backgroundColor: "#F8FAFF",
+        // backgroundColor: "#F8FAFF",
+        background: "linear-gradient(#f0f5ff)",
         border: "1px solid #E6ECF5"
       }}
     >

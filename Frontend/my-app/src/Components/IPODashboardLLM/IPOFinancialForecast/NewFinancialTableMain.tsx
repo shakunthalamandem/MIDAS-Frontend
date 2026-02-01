@@ -200,7 +200,7 @@ const NewFinancialTableMain: React.FC<
 
   // ---------------------- Render ----------------------
   return (
-    <Container sx={{ maxWidth: "xl", mb: 4 }}>
+    <Container sx={{ maxWidth: "xl", mb: 4 ,background: "#f0f5ff"}}>
       <Typography
         variant="h6"
         sx={{ mb: 2, mt: 4 }}

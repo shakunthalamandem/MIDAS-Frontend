@@ -184,7 +184,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
-          background: "#f7f9ff",
+          // background: "#f7f9ff",
+                    background: "linear-gradient(#f0f5ff)",
           p: { xs: 2.5, md: 3 },
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
         }}

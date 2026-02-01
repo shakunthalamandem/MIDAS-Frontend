@@ -51,7 +51,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   const sectionCardSx = {
     borderRadius: 3,
     border: "1px solid #edf0faff",
-    background: "#fcfaf7ff",
+    background: "#d6e0ef",
     boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)"
   }
 
