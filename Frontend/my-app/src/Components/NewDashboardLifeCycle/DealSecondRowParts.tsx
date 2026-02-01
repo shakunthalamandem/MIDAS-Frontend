@@ -89,7 +89,7 @@ export function SectionCard({
     >
       <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
         <Stack spacing={1.5}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }} align="center">
             {title}
           </Typography>
           {children}

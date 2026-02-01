@@ -117,49 +117,54 @@ export default function DealAMStrategy({
         
       }}
     >
-      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+      <CardContent sx={{ p: { xs: 2.5, md: 3, mb: 2 } }}>
         <Stack spacing={2}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={1}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+              alignItems: "center",
+              gap: 1
+            }}
           >
+            <Box sx={{ display: { xs: "none", sm: "block" } }} />
             <Typography
               variant="h6"
-              sx={{ fontWeight: 700, color: "#121f44" }}
+              sx={{ fontWeight: 700, color: "#121f44", textAlign: "center" }}
             >
-              After Market (AM) Strategy
+              After Market (AM) Recommendation
             </Typography>
-            {isEditing ? (
-              <Stack direction="row" spacing={1}>
+            <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
+              {isEditing ? (
+                <Stack direction="row" spacing={1}>
+                  <IconButton
+                    size="small"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    sx={{ color: "#1f3b73" }}
+                  >
+                    <SaveOutlinedIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={cancelEdit}
+                    disabled={isSaving}
+                    sx={{ color: "#6b7280" }}
+                  >
+                    <CloseOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              ) : (
                 <IconButton
                   size="small"
-                  onClick={handleSave}
-                  disabled={isSaving}
+                  onClick={openEdit}
                   sx={{ color: "#1f3b73" }}
                 >
-                  <SaveOutlinedIcon fontSize="small" />
+                  <EditOutlinedIcon fontSize="small" />
                 </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={cancelEdit}
-                  disabled={isSaving}
-                  sx={{ color: "#6b7280" }}
-                >
-                  <CloseOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Stack>
-            ) : (
-              <IconButton
-                size="small"
-                onClick={openEdit}
-                sx={{ color: "#1f3b73" }}
-              >
-                <EditOutlinedIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Stack>
+              )}
+            </Box>
+          </Box>
 
           <Grid container spacing={2}>
             <Grid item xs={12} md={9}>
@@ -171,9 +176,10 @@ export default function DealAMStrategy({
                   boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
                   p: 2.25,
                   height: "100%"
+                  
                 }}
               >
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }} align="center">
                   AM Strategy Recommendation
                 </Typography>
                 {isEditing ? (
@@ -208,7 +214,7 @@ export default function DealAMStrategy({
                   justifyContent: "center"
                 }}
               >
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }} align="center">
                   Potential AM Quantity
                 </Typography>
                 {isEditing ? (

@@ -324,16 +324,22 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
       <Box>
         <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+            alignItems: "center",
+            gap: 2,
+            mb: 2
+          }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1d2b5a" }} align="center">
-           Key Metrics
-
+          <Box sx={{ display: { xs: "none", sm: "block" } }} />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+          >
+            Key Metrics
           </Typography>
-          <Box>
+          <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
             {editMode ? (
               <>
                 <IconButton color="primary" onClick={handleSave}>

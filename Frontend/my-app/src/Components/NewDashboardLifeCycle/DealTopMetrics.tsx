@@ -49,7 +49,7 @@ export default function DealTopMetrics({
     >
       <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
         <Stack spacing={2}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }} align="center">
             Key Deal Metrics
           </Typography>
 
