@@ -30,7 +30,7 @@ const OutlookSummaryRow: React.FC<OutlookSummaryRowProps> = ({ week, month, vola
     <Box>
       <Typography
         variant="h6"
-        sx={{ fontWeight: 600, color: "#5D0163", textAlign: "center" }}
+        sx={{ fontWeight: 600, color: "#1d2b5a", textAlign: "center" }}
       >
         Outlook Summary
       </Typography>
@@ -71,7 +71,7 @@ const OutlookSummaryRow: React.FC<OutlookSummaryRowProps> = ({ week, month, vola
                   gap: 1,
                 }}
               >
-                <Typography variant="h6" sx={{ color: "#002060", textAlign: "center" }}>
+                <Typography variant="h6" sx={{ color: "#1d2b5a", textAlign: "center" }}>
                   {label}
                 </Typography>
                 {isSentiment ? (

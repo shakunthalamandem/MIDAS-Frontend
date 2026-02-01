@@ -29,6 +29,7 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
   showNotes = true,
   children
 }) => {
+  const headingColor = "#1d2b5a"
   const summaryItems = [
     { label: "Ticker", value: basicDealDetails.ticker },
     { label: "Region", value: basicDealDetails.region },
@@ -59,7 +60,10 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
     >
       <CardContent sx={{ p: { xs: 2.5, md: 3 }, pl: { xs: 3, md: 3.5 } }}>
         <Stack spacing={2.5}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: headingColor, textAlign: "center" }}
+          >
             {title}
           </Typography>
 

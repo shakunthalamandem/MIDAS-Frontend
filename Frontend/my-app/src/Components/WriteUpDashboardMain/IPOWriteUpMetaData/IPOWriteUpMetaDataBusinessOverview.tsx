@@ -230,7 +230,11 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           )}
         </Box>
 
-        <Typography variant="h5" fontWeight={600}>
+        <Typography
+          variant="h5"
+          fontWeight={600}
+          sx={{ color: "#1d2b5a", textAlign: "center" }}
+        >
           Business Overview
         </Typography>
         <Box mt={3}>

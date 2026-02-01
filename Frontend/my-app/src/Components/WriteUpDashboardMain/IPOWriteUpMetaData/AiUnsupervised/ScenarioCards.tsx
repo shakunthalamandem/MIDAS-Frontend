@@ -44,7 +44,7 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
     <Box>
       <Typography
         variant="h6"
-        sx={{ fontWeight: 600, color: "#5D0163", textAlign: "center" }}
+        sx={{ fontWeight: 600, color: "#1d2b5a", textAlign: "center" }}
       >
         Scenario Analysis
       </Typography>
@@ -87,7 +87,7 @@ const ScenarioCards: React.FC<ScenarioCardsProps> = ({ base, bullish, bearish })
                   >
                     {icon}
                   </Box>
-                  <Typography sx={{ fontWeight: 600, color: "#002060" }}>
+                  <Typography sx={{ fontWeight: 600, color: "#1d2b5a" }}>
                     {title}
                   </Typography>
                 </Box>
