@@ -34,7 +34,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     () => [
       { id: "deal-info", label: "Deal Info" },
       { id: "deal-indication", label: "AI Indication" },
-      { id: "market-strategy", label: "After Market Strategy" },
+      { id: "market-strategy", label: "IOI and After-Market Strategy" },
       { id: "business-overview", label: "Business Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
