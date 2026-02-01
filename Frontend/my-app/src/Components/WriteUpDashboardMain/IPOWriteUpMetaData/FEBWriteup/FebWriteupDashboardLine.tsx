@@ -278,7 +278,7 @@ useEffect(() => {
                   >
                     <Typography
                       variant="body1"
-                      sx={{ color: "#002060", fontWeight: 600, mb: 1 }}
+                      sx={{ color: "#124180", fontWeight: 600, mb: 1 }}
                     >
                       {item.label}
                     </Typography>
