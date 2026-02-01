@@ -233,18 +233,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         <Typography variant="h5" fontWeight={600}>
           Business Overview
         </Typography>
-
-        <Chip
-          label="Rating - 9/10"
-          size="small"
-          sx={{
-            mt: 1,
-            backgroundColor: "#EAF1FF",
-            color: "#2563EB",
-            fontWeight: 500
-          }}
-        />
-
         <Box mt={3}>
           {businessOverviewEditing ? (
             <TextField
