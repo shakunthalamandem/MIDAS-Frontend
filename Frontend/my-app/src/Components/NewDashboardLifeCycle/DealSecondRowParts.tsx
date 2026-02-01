@@ -45,30 +45,35 @@ function SentimentChip({ text }: { text: string }) {
     tone === "success"
       ? "success"
       : tone === "warning"
-        ? "warning"
-        : tone === "info"
-          ? "info"
-          : "default";
+      ? "warning"
+      : tone === "info"
+      ? "info"
+      : "default";
 
   return (
     <Chip
       label={text || "-"}
       color={color as any}
       variant={color === "default" ? "outlined" : "filled"}
+      size="small"
       sx={{
-        height: "auto", // allow chip to grow vertically
+        height: 16,
+        fontSize: "0.6rem",
+        lineHeight: 1,
+        borderRadius: 1,
         "& .MuiChip-label": {
-          display: "block",
-          whiteSpace: "normal", // ✅ wrap text
-          wordBreak: "break-word", // break long words
-          paddingTop: "6px",
-          paddingBottom: "6px",
+          padding: "0 6px",
+          whiteSpace: "nowrap",      // ❌ no wrapping
+          overflow: "hidden",
+          textOverflow: "ellipsis",  // cut, don’t grow
+          maxWidth: 80,              // hard cap
           textAlign: "center",
         },
       }}
     />
   );
 }
+
 
 export function SectionCard({
   title,
@@ -89,7 +94,11 @@ export function SectionCard({
     >
       <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
         <Stack spacing={1.5}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#121f44" }} align="center">
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#121f44" }}
+            align="center"
+          >
             {title}
           </Typography>
           {children}
@@ -132,7 +141,10 @@ function PredictionTile({
       }}
     >
       <Stack spacing={1.25}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 700, color: "#1d2b5a" }}
+        >
           {title}
         </Typography>
 
@@ -227,91 +239,66 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
 export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
   return (
     <SectionCard title="AI Unsupervised Summary">
+      {/* Executive Summary */}
+      <Box
+        sx={{
+          mb: 2,
+          p: 2,
+          borderRadius: 2,
+          background: "#ffffff",
+          borderLeft: "4px solid #4f46e5",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.04)",
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          fontWeight={700}
+          color="#111827"
+          gutterBottom
+        >
+          Executive Summary
+        </Typography>
+
+        <Typography
+          variant="body2"
+          sx={{
+            color: "#374151",
+            lineHeight: 1.6,
+          }}
+        >
+          {data.executive_summary || "No executive summary available."}
+        </Typography>
+      </Box>
+
+      {/* Sentiment Cards */}
       <Grid container spacing={1} sx={{ pb: 0.5 }}>
-        <Grid item xs={12} md={3}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#f7f9ff",
-              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
-              p: 2,
-              height: "70%",
-              textAlign: "center",
-              
-            }}
-          >
-            <Stack spacing={1} alignItems="center">
-              <Typography variant="body2" fontWeight={700} color="#111827">
-                1-Week
-              </Typography>
-              <SentimentChip text={data.fs_1w_sentiment} />
-            </Stack>
-          </Box>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#f7f9ff",
-              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
-              p: 2,
-              height: "70%",
-              textAlign: "center",
-            }}
-          >
-            <Stack spacing={1} alignItems="center">
-              <Typography variant="body2" fontWeight={700} color="#111827">
-                1-Month
-              </Typography>
-              <SentimentChip text={data.fs_1m_sentiment} />
-            </Stack>
-          </Box>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#f7f9ff",
-              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
-              p: 2,
-              height: "70%",
-              textAlign: "center",
-            }}
-          >
-            <Stack spacing={1} alignItems="center">
-              <Typography variant="body2" fontWeight={700} color="#111827">
-                Expected Volatility
-              </Typography>
-              <SentimentChip text={data.fs_expected_volatility} />
-            </Stack>
-          </Box>
-        </Grid>
-
-        <Grid item xs={12} md={3}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#f7f9ff",
-              boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
-              p: 2,
-              height: "70%",
-              textAlign: "center",
-            }}
-          >
-            <Stack spacing={1} alignItems="center">
-              <Typography variant="body2" fontWeight={700} color="#111827">
-                Confidence
-              </Typography>
-              <SentimentChip text={data.fs_confidence_level} />
-            </Stack>
-          </Box>
-        </Grid>
+        {[
+          { label: "1-Week", value: data.fs_1w_sentiment },
+          { label: "1-Month", value: data.fs_1m_sentiment },
+          { label: "Expected Volatility", value: data.fs_expected_volatility },
+          { label: "Confidence", value: data.fs_confidence_level },
+        ].map(({ label, value }) => (
+          <Grid item xs={12} md={3} key={label}>
+            <Box
+              sx={{
+                borderRadius: 2,
+                border: "1px solid #e5e7ef",
+                background: "#f7f9ff",
+                boxShadow: "0 6px 14px rgba(32, 70, 150, 0.08)",
+                p: 2,
+                height: "70%",
+                textAlign: "center",
+              }}
+            >
+              <Stack spacing={1} alignItems="center">
+                <Typography variant="body2" fontWeight={700} color="#111827">
+                  {label}
+                </Typography>
+                <SentimentChip text={value} />
+              </Stack>
+            </Box>
+          </Grid>
+        ))}
       </Grid>
     </SectionCard>
   );
@@ -327,7 +314,7 @@ export function MarketSentiment({
   return (
     <SectionCard title="Social Media Buzz (Public Sentiment)">
       <Grid container spacing={1} sx={{ pb: 0.5 }}>
-        <Grid item xs={4} >
+        <Grid item xs={4}>
           <Box
             sx={{
               borderRadius: 2,
@@ -346,7 +333,7 @@ export function MarketSentiment({
             </Stack>
           </Box>
         </Grid>
-        <Grid item xs={4} >
+        <Grid item xs={4}>
           <Box
             sx={{
               borderRadius: 2,
@@ -392,7 +379,10 @@ export function OverallAISummary({
               p: 2,
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: "#1d2b5a" }}
+            >
               T+1 Day
             </Typography>
             <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
@@ -410,7 +400,10 @@ export function OverallAISummary({
               p: 2,
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: "#1d2b5a" }}
+            >
               T+1 Week
             </Typography>
             <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
@@ -428,7 +421,10 @@ export function OverallAISummary({
               p: 2,
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 700, color: "#1d2b5a" }}
+            >
               T+1 Month
             </Typography>
             <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>

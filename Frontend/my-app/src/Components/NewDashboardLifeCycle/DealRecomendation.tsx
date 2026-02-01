@@ -24,6 +24,7 @@ export interface DealRecommendationResponse {
   fs_1m_sentiment: string;
   fs_expected_volatility: string;
   fs_confidence_level: string;
+  executive_summary: string;
 
   one_week_sentiment: string;
   one_month_sentiment: string;
