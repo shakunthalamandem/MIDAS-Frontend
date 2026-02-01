@@ -109,7 +109,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         sx={{
           borderRadius: 3,
           border: "1px solid #e2e8f5",
-          background: "#e1f5e9",
+          background: "#dbe9ff",
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)",
           position: { md: "sticky" },
           top: { md: 24 }
