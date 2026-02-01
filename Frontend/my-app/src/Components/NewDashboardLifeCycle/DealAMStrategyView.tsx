@@ -1,4 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+// ✅ UPDATED + CORRECT DealAMStrategyView.tsx
+// Put this in: src/Components/NewDashboardLifeCycle/DealAMStrategyView.tsx
+
+import React from "react";
 import {
   Box,
   Card,
@@ -22,18 +25,11 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-type SummaryKey = "t1d" | "t1w" | "t1m";
-type SummaryOption = "Positive" | "Neutral" | "Negative";
-type SummaryState = Record<SummaryKey, SummaryOption>;
+export type SummaryKey = "t1d" | "t1w" | "t1m";
+export type SummaryOption = "Positive" | "Neutral" | "Negative";
+export type SummaryState = Record<SummaryKey, SummaryOption>;
 
-type Props = {
-  recommendation: string;
-  potentialQty: number | null;
-  ticker: string;
-  overallSummary: { t1d: string; t1w: string; t1m: string };
-};
-
-type DealState = {
+export type DealState = {
   am_strategy_recommendation: string;
   potential_am_quantity: number | null;
   overall: SummaryState;
@@ -59,168 +55,40 @@ const selectBgMap: Record<SummaryOption, string> = {
   Negative: "rgba(239, 68, 68, 0.12)",
 };
 
-function mapToSummaryOption(value?: string): SummaryOption {
-  const normalized = (value || "").toLowerCase();
-  if (normalized.includes("positive") || normalized.includes("bull") || normalized.includes("up")) return "Positive";
-  if (normalized.includes("negative") || normalized.includes("bear") || normalized.includes("down") || normalized.includes("low"))
-    return "Negative";
-  return "Neutral";
-}
+type Props = {
+  ticker: string;
+  isEditing: boolean;
+  isSaving: boolean;
+  error: string | null;
 
-function buildSummaryState(values: Partial<Record<SummaryKey, string>>): SummaryState {
-  return {
-    t1d: mapToSummaryOption(values.t1d),
-    t1w: mapToSummaryOption(values.t1w),
-    t1m: mapToSummaryOption(values.t1m),
-  };
-}
+  current: DealState;
+  draft: DealState;
 
-function toIntOrNull(raw: any): number | null {
-  if (raw === null || raw === undefined || raw === "") return null;
-  const n = Number(raw);
-  if (!Number.isFinite(n)) return null;
-  return Math.trunc(n);
-}
+  onOpenEdit: () => void;
+  onCancelEdit: () => void;
+  onSave: () => void;
 
-/**
- * Backend → UI mapping in one place.
- * If backend keys differ, update here.
- */
-function normalizeDealFromApi(data: any, fallback: DealState): DealState {
-  const rec =
-    data?.am_strategy_recommendation ??
-    data?.amStrategyRecommendation ??
-    data?.recommendation ??
-    data?.AM_strategy_recommendation ??
-    fallback.am_strategy_recommendation ??
-    "";
+  onDraftChange: (next: DealState) => void;
+};
 
-  const qtyRaw =
-    data?.potential_am_quantity ??
-    data?.potentialAmQuantity ??
-    data?.potentialQty ??
-    data?.potential_AM_quantity ??
-    fallback.potential_am_quantity ??
-    null;
-
-  const overall = buildSummaryState({
-    t1d: data?.t1d_overall_pred ?? data?.t1dOverallPred ?? data?.overallSummary?.t1d ?? fallback.overall.t1d,
-    t1w: data?.t1w_overall_pred ?? data?.t1wOverallPred ?? data?.overallSummary?.t1w ?? fallback.overall.t1w,
-    t1m: data?.t1m_overall_pred ?? data?.t1mOverallPred ?? data?.overallSummary?.t1m ?? fallback.overall.t1m,
-  });
-
-  return {
-    am_strategy_recommendation: String(rec ?? ""),
-    potential_am_quantity: toIntOrNull(qtyRaw),
-    overall,
-  };
-}
-
-export default function DealAMStrategy({ recommendation, potentialQty, ticker, overallSummary }: Props) {
-  const API_URL = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("access_token");
-
-  const stateFromProps = useMemo<DealState>(
-    () => ({
-      am_strategy_recommendation: recommendation || "",
-      potential_am_quantity: potentialQty ?? null,
-      overall: buildSummaryState(overallSummary),
-    }),
-    [recommendation, potentialQty, overallSummary.t1d, overallSummary.t1w, overallSummary.t1m]
-  );
-
-  const [current, setCurrent] = useState<DealState>(stateFromProps);
-  const [draft, setDraft] = useState<DealState>(stateFromProps);
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // ✅ sync from props only when NOT editing (prevents overwrite after refresh)
-  useEffect(() => {
-    if (isEditing) return;
-    setCurrent(stateFromProps);
-    setDraft(stateFromProps);
-  }, [stateFromProps, isEditing]);
-
-  const openEdit = () => {
-    setError(null);
-    setDraft(current);
-    setIsEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setError(null);
-    setDraft(current);
-    setIsEditing(false);
-  };
-
-  const fetchDeal = async (): Promise<void> => {
-    if (!API_URL) throw new Error("REACT_APP_API_URL is not set.");
-
-    const res = await fetch(`${API_URL}/api/get_deal_recommendation/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ ticker }),
-    });
-
-    const raw = await res.text();
-    if (!res.ok) throw new Error(raw || "Failed to refresh deal details");
-
-    const data = raw ? JSON.parse(raw) : {};
-    const normalized = normalizeDealFromApi(data, stateFromProps);
-
-    setCurrent(normalized);
-    setDraft(normalized);
-  };
-
-  const handleSave = async () => {
-    if (!API_URL) {
-      setError("REACT_APP_API_URL is not set.");
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      setError(null);
-
-      const payload = {
-        ticker,
-        potential_am_quantity: draft.potential_am_quantity,
-        am_strategy_recommendation: draft.am_strategy_recommendation.trim(),
-        t1d_overall_pred: draft.overall.t1d,
-        t1w_overall_pred: draft.overall.t1w,
-        t1m_overall_pred: draft.overall.t1m,
-      };
-
-      const response = await fetch(`${API_URL}/api/update_deal_recommendation/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const raw = await response.text();
-      if (!response.ok) throw new Error(raw || "Failed to save AM strategy");
-
-      await fetchDeal();
-      setIsEditing(false);
-    } catch (err: any) {
-      setError(err?.message || "Failed to save AM strategy");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
+export default function DealAMStrategyView({
+  ticker,
+  isEditing,
+  isSaving,
+  error,
+  current,
+  draft,
+  onOpenEdit,
+  onCancelEdit,
+  onSave,
+  onDraftChange,
+}: Props) {
   const qtyLabel = (() => {
     const q = isEditing ? draft.potential_am_quantity : current.potential_am_quantity;
     if (q === null || q === undefined) return "-";
-    return `${Math.trunc(Number(q))}x`;
+    const n = Number(q);
+    if (!Number.isFinite(n)) return "-";
+    return `${Math.trunc(n)}x`;
   })();
 
   return (
@@ -236,13 +104,24 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
     >
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
         {/* Header */}
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            mb: 2,
+          }}
+        >
           <Box>
             <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 18 }}>
               After Market (AM) Recommendation
             </Typography>
             <Typography sx={{ color: "rgba(15,23,42,0.65)", fontSize: 12, mt: 0.25 }}>
-              Ticker: <Box component="span" sx={{ fontWeight: 800 }}>{ticker}</Box>
+              Ticker:{" "}
+              <Box component="span" sx={{ fontWeight: 800 }}>
+                {ticker}
+              </Box>
             </Typography>
           </Box>
 
@@ -251,14 +130,15 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
               <>
                 <Tooltip title="Save">
                   <span>
-                    <IconButton size="small" onClick={handleSave} disabled={isSaving}>
+                    <IconButton size="small" onClick={onSave} disabled={isSaving}>
                       <SaveOutlinedIcon fontSize="small" />
                     </IconButton>
                   </span>
                 </Tooltip>
+
                 <Tooltip title="Cancel">
                   <span>
-                    <IconButton size="small" onClick={cancelEdit} disabled={isSaving}>
+                    <IconButton size="small" onClick={onCancelEdit} disabled={isSaving}>
                       <CloseOutlinedIcon fontSize="small" />
                     </IconButton>
                   </span>
@@ -266,7 +146,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
               </>
             ) : (
               <Tooltip title="Edit">
-                <IconButton size="small" onClick={openEdit}>
+                <IconButton size="small" onClick={onOpenEdit}>
                   <EditOutlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -303,15 +183,18 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                     {isEditing ? (
                       <FormControl fullWidth size="small" sx={{ mt: 1 }}>
                         <InputLabel id={`overall-${field.key}-label`}>Sentiment</InputLabel>
-                        <Select
+                        <Select<SummaryOption>
                           labelId={`overall-${field.key}-label`}
                           label="Sentiment"
                           value={draft.overall[field.key]}
-                          onChange={(event: SelectChangeEvent) =>
-                            setDraft((prev) => ({
-                              ...prev,
-                              overall: { ...prev.overall, [field.key]: event.target.value as SummaryOption },
-                            }))
+                          onChange={(event: SelectChangeEvent<SummaryOption>) =>
+                            onDraftChange({
+                              ...draft,
+                              overall: {
+                                ...draft.overall,
+                                [field.key]: event.target.value as SummaryOption,
+                              },
+                            })
                           }
                           sx={{ background: selectBgMap[draft.overall[field.key]], borderRadius: 2 }}
                         >
@@ -360,7 +243,12 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                   multiline
                   minRows={8}
                   value={draft.am_strategy_recommendation}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, am_strategy_recommendation: e.target.value }))}
+                  onChange={(e) =>
+                    onDraftChange({
+                      ...draft,
+                      am_strategy_recommendation: e.target.value,
+                    })
+                  }
                   placeholder="Write AM strategy recommendation..."
                   fullWidth
                   sx={{ "& .MuiInputBase-root": { borderRadius: 2, background: "#fff" } }}
@@ -384,7 +272,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             </Box>
           </Grid>
 
-          {/* Potential AM Quantity (smaller) */}
+          {/* Potential AM Quantity */}
           <Grid item xs={12} md={2}>
             <Box
               sx={{
@@ -410,10 +298,10 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                   value={draft.potential_am_quantity === null ? "" : String(draft.potential_am_quantity)}
                   onChange={(e) => {
                     const v = e.target.value.replace(/[^\d]/g, "");
-                    setDraft((prev) => ({
-                      ...prev,
+                    onDraftChange({
+                      ...draft,
                       potential_am_quantity: v ? Math.trunc(Number(v)) : null,
-                    }));
+                    });
                   }}
                   inputProps={{
                     inputMode: "numeric",

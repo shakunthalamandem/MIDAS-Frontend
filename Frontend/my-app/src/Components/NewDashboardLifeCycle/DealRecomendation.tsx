@@ -58,7 +58,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 async function fetchDealRecommendation(ticker: string): Promise<DealRecommendationResponse> {
   const token = localStorage.getItem("access_token");
 
-  const res = await fetch(`${apiUrl}/api/deal_recommendation/`, {
+  const res = await fetch(`${apiUrl}/api/get_deal_recommendation/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

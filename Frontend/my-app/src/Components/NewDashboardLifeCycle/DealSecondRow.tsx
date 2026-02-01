@@ -84,7 +84,7 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
               </SectionCard>
 
               <DealMomentum data={data} />
-              {/* ✅ BELOW DEAL MOMENTUM */}
+              <MarketSentiment oneWeek={data.one_week_sentiment} oneMonth={data.one_month_sentiment} />
             </Stack>
           </Grid>
 
@@ -94,18 +94,13 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
               <AIMLPredictions data={data} />
 
               <OutlookSummary data={data} />
-
-              <MarketSentiment oneWeek={data.one_week_sentiment} oneMonth={data.one_month_sentiment} />
-
-              {/* <Divider /> */}
-
-              {/* ✅ BELOW OVERALL AI SUMMARY */}
-              {/* <RatingRing title="Overall Rating" value={data.ai_ml_overall_rating} /> */}
+              
             </Stack>
           </Grid>
         </Grid>
       </CardContent>
-      <RatingRing title="Overall Rating" value={data.writeup_overall_rating} />
+      {/* ✅ BELOW OVERALL AI SUMMARY */}
+      {/* <RatingRing title="Overall Rating" value={data.writeup_overall_rating} /> */}
 
     </Card>
   );
