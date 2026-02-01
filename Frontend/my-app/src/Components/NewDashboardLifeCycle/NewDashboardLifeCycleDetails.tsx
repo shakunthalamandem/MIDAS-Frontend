@@ -157,14 +157,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               "& .MuiTabs-indicator": {
                 display: "none",
               },
-              "& .MuiTab-root": {
-                textTransform: "none",
-                fontWeight: 600,
-                color: "#0f0f0fff",
-                minHeight: 40,
-                px: 2,
-                borderRadius: 999,
-                border: "1px solid #e2e8f0",
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  fontWeight: 600,
+                  color: "#0f0f0fff",
+                  fontSize: "0.725rem",
+                  minHeight: 40,
+                  px: 2,
+                  borderRadius: 999,
+                  border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
                 boxShadow: "none",
                 transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",

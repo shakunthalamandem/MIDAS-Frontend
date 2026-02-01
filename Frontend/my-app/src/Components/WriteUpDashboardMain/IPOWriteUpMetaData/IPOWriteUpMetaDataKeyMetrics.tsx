@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 import {
   Box,
   CircularProgress,
@@ -18,6 +17,11 @@ import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
 import CircleIcon from "@mui/icons-material/Circle"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
+import { motion } from "framer-motion"
+
+/* -------------------- TYPES -------------------- */
 
 interface IPOWriteUpMetaDataKeyMetricsProps {
   basicDealDetails: BasicDealDetails
@@ -29,6 +33,8 @@ interface KeyMetricItem {
 }
 
 type KeyMetricsResponse = Record<string, KeyMetricItem>
+
+/* -------------------- CONFIG -------------------- */
 
 const criteriaList = [
   { label: "Regulatory Environment", key: "regulatory_environment" },
@@ -47,7 +53,7 @@ const criteriaList = [
   { label: "M&A Opportunities", key: "ma_opportunities" }
 ]
 
-const getColorHex = (color: string | null | undefined) => {
+const getColorHex = (color?: string | null) => {
   switch (color?.toLowerCase()) {
     case "green":
       return "#2e7d32"
@@ -66,6 +72,8 @@ const lightColorMap: Record<string, string> = {
   green: "#dff5e1"
 }
 
+/* -------------------- COMPONENT -------------------- */
+
 const IPOWriteUpMetaDataKeyMetrics: React.FC<
   IPOWriteUpMetaDataKeyMetricsProps
 > = ({ basicDealDetails }) => {
@@ -78,7 +86,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
 
-  const getAuthHeaders = useMemo(
+  const headers = useMemo(
     () => ({
       "Content-Type": "application/json",
       Authorization: token ? `Bearer ${token}` : ""
@@ -86,50 +94,50 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     [token]
   )
 
-  useEffect(() => {
-    let isActive = true
-    const fetchKeyMetrics = async () => {
-      if (!apiUrl) {
-        if (isActive) {
-          setError("API URL not defined")
-          setLoading(false)
-        }
-        return
-      }
+  /* -------------------- FETCH -------------------- */
 
+  useEffect(() => {
+    let active = true
+
+    const fetchMetrics = async () => {
       try {
-        if (isActive) setLoading(true)
-        const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+        setLoading(true)
+        const res = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
           method: "POST",
-          headers: getAuthHeaders,
+          headers,
           body: JSON.stringify({ ticker: basicDealDetails.ticker })
         })
 
-        if (!response.ok) {
-          const errData = await response.json()
-          throw new Error(errData.message || "Failed to fetch key metrics")
-        }
+        if (!res.ok) throw new Error("Failed to load key metrics")
 
-        const data: KeyMetricsResponse = await response.json()
-        if (isActive) {
-          setMetrics(data || {})
-          setError(null)
-        }
+        const data = await res.json()
+        if (active) setMetrics(data || {})
       } catch (err: any) {
-        if (isActive) setError(err.message || "Unknown error occurred")
+        if (active) setError(err.message)
       } finally {
-        if (isActive) setLoading(false)
+        if (active) setLoading(false)
       }
     }
 
-    if (basicDealDetails.ticker) {
-      fetchKeyMetrics()
-    }
-
+    if (basicDealDetails.ticker) fetchMetrics()
     return () => {
-      isActive = false
+      active = false
     }
-  }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
+  }, [apiUrl, basicDealDetails.ticker, headers])
+
+  /* -------------------- DERIVED ROW LOGIC -------------------- */
+
+  const filledCriteria = criteriaList.filter(
+    (c) => metrics[c.key]?.category?.trim()
+  )
+
+  const emptyCriteria = criteriaList.filter(
+    (c) => !metrics[c.key]?.category?.trim()
+  )
+
+  const rowsToRender = editMode ? criteriaList : filledCriteria
+
+  /* -------------------- HANDLERS -------------------- */
 
   const handleColorChange = (key: string, color: string) => {
     setEditedMetrics((prev) => ({
@@ -144,32 +152,24 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   const handleSave = async () => {
     try {
-      if (!apiUrl) throw new Error("API URL not defined")
       const payload = {
         ticker_name: basicDealDetails.ticker,
-        revenue_growth: {
-          ...metrics,
-          ...editedMetrics
-        }
+        revenue_growth: { ...metrics, ...editedMetrics }
       }
 
-      const response = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+      const res = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
         method: "PATCH",
-        headers: getAuthHeaders,
+        headers,
         body: JSON.stringify(payload)
       })
 
-      if (!response.ok) {
-        const errData = await response.json()
-        throw new Error(errData.message || "Failed to save key metrics")
-      }
+      if (!res.ok) throw new Error("Save failed")
 
       setMetrics(payload.revenue_growth)
       setEditedMetrics({})
       setEditMode(false)
-      setError(null)
     } catch (err: any) {
-      setError(err.message || "Save failed")
+      setError(err.message)
     }
   }
 
@@ -178,174 +178,80 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     setEditMode(false)
   }
 
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress size={28} />
-        </Box>
-      )
-    }
+  /* -------------------- RENDER -------------------- */
 
-    if (error) {
-      return (
-        <Typography color="error" variant="body2">
-          {error}
-        </Typography>
-      )
-    }
-
+  if (loading)
     return (
-      <Table
-        sx={{
-          borderRadius: 2,
-          overflow: "hidden",
-          border: "1px solid #e0e6f5",
-          background: "#ffffff"
-        }}
-      >
-        <TableHead>
-          <TableRow sx={{ background: "#1d2b5a" }}>
-            <TableCell sx={{ color: "#ffffff", fontWeight: 700, width: 240 }}>
-              Criteria
-            </TableCell>
-            <TableCell
-              sx={{
-                color: "#ffffff",
-                fontWeight: 700,
-                width: 120,
-                textAlign: "center"
-              }}
-            >
-              Color
-            </TableCell>
-            <TableCell sx={{ color: "#ffffff", fontWeight: 700 }}>
-              Notes
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {criteriaList.map((item, index) => {
-            const original = metrics[item.key] || {}
-            const edited = editedMetrics[item.key] || {}
-            const value = editMode
-              ? edited.category ?? original.category ?? ""
-              : original.category ?? "--"
-            const color = editMode
-              ? edited.color ?? original.color ?? undefined
-              : original.color ?? undefined
-
-            return (
-              <TableRow
-                key={item.key}
-                sx={{
-                  background: index % 2 === 0 ? "#f7f9ff" : "#ffffff",
-                  verticalAlign: "top"
-                }}
-              >
-                <TableCell sx={{ fontWeight: 600, color: "#23325b" }}>
-                  {item.label}
-                </TableCell>
-                <TableCell align="center">
-                  {editMode ? (
-                    <Box display="flex" justifyContent="center" gap={1}>
-                      {["red", "yellow", "green"].map((c) => {
-                        const isSelected = color === c
-                        return (
-                          <IconButton
-                            key={c}
-                            onClick={() => handleColorChange(item.key, c)}
-                            size="small"
-                            sx={{
-                              backgroundColor: isSelected
-                                ? getColorHex(c)
-                                : lightColorMap[c],
-                              border: isSelected
-                                ? "2px solid #101d45"
-                                : "1px solid #c7cfe4",
-                              borderRadius: "50%",
-                              width: 28,
-                              height: 28
-                            }}
-                          />
-                        )
-                      })}
-                    </Box>
-                  ) : (
-                    <Tooltip title={color ? color.toUpperCase() : "Not set"}>
-                      <CircleIcon
-                        fontSize="small"
-                        sx={{ color: getColorHex(color) }}
-                      />
-                    </Tooltip>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode ? (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder="Enter note"
-                      value={value}
-                      onChange={(event) =>
-                        setEditedMetrics((prev) => ({
-                          ...prev,
-                          [item.key]: {
-                            ...prev[item.key],
-                            category: event.target.value,
-                            color: color
-                          }
-                        }))
-                      }
-                      sx={{
-                        background: "#ffffff",
-                        borderRadius: 1,
-                        "& .MuiOutlinedInput-root": { borderRadius: 1 }
-                      }}
-                    />
-                  ) : (
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#2b3a67", whiteSpace: "pre-wrap" }}
-                    >
-                      {value}
-                    </Typography>
-                  )}
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+      <Box display="flex" justifyContent="center" py={4}>
+        <CircularProgress size={28} />
+      </Box>
     )
-  }
+
+  if (error) return <Typography color="error">{error}</Typography>
 
   return (
-
-      <Box>
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <Box
+        sx={{
+          // background: "#553939ff",
+          background: "linear-gradient(#f0f5ff)",
+          borderRadius: 2,
+          boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
+          p: 2
+        }}
+      >
+        {/* ---------- HEADER ---------- */}
         <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
-            alignItems: "center",
-            gap: 2,
-            mb: 2
-          }}
+          display="grid"
+          gridTemplateColumns="1fr auto 1fr"
+          alignItems="center"
+          mb={2}
         >
-          <Box sx={{ display: { xs: "none", sm: "block" } }} />
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
-          >
-            Key Metrics
-          </Typography>
-          <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
+          <Box />
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography variant="h6" fontWeight={700} color="#124180">
+           Top 5 performance of Key Metrics
+            </Typography>
+
+            <Tooltip
+              arrow
+              title={
+                <Box>
+                  <Typography fontWeight={700} mb={1}>
+                    Color Key
+                  </Typography>
+                  {[
+                    ["Red", "Negative"],
+                    ["Yellow", "Neutral"],
+                    ["Green", "Positive"]
+                  ].map(([c, label]) => (
+                    <Box key={c} display="flex" gap={1} alignItems="center">
+                      <FiberManualRecordIcon
+                        sx={{ fontSize: 12, color: getColorHex(c) }}
+                      />
+                      <Typography variant="body2">{label}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              }
+            >
+              <IconButton size="small">
+                <InfoOutlinedIcon sx={{ color: "#7e7e7e" }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Box textAlign="right">
             {editMode ? (
               <>
-                <IconButton color="primary" onClick={handleSave}>
+                <IconButton onClick={handleSave} color="primary">
                   <SaveIcon />
                 </IconButton>
-                <IconButton color="secondary" onClick={handleCancel}>
+                <IconButton onClick={handleCancel} color="secondary">
                   <CancelIcon />
                 </IconButton>
               </>
@@ -356,8 +262,120 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             )}
           </Box>
         </Box>
-        {renderContent()}
+
+        {/* ---------- TABLE ---------- */}
+        <Table sx={{ border: "1px solid #e0e6f5" }}>
+          <TableHead>
+            <TableRow sx={{ background: "#1d2b5a" }}>
+              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
+                Criteria
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ color: "#fff", fontWeight: 700 }}
+              >
+                Color
+              </TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
+                Notes
+              </TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {rowsToRender.map((item, idx) => {
+              const original = metrics[item.key] || {}
+              const edited = editedMetrics[item.key] || {}
+              const value = editMode
+                ? edited.category ?? original.category ?? ""
+                : original.category ?? ""
+              const color = editMode
+                ? edited.color ?? original.color
+                : original.color
+
+              return (
+                <TableRow key={item.key}>
+                  <TableCell >{item.label}</TableCell>
+
+                  <TableCell align="center">
+                    {editMode ? (
+                      <Box display="flex" justifyContent="center" gap={1}>
+                        {["red", "yellow", "green"].map((c) => (
+                          <IconButton
+                            key={c}
+                            size="small"
+                            onClick={() => handleColorChange(item.key, c)}
+                            sx={{
+                              backgroundColor:
+                                color === c
+                                  ? getColorHex(c)
+                                  : lightColorMap[c],
+                              border: "1px solid #c7cfe4",
+                              width: 26,
+                              height: 26
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    ) : (
+                      <CircleIcon
+                        fontSize="small"
+                        sx={{ color: getColorHex(color) }}
+                      />
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                    {editMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={value}
+                        onChange={(e) =>
+                          setEditedMetrics((prev) => ({
+                            ...prev,
+                            [item.key]: {
+                              ...prev[item.key],
+                              category: e.target.value,
+                              color
+                            }
+                          }))
+                        }
+                      />
+                    ) : (
+                      <Typography variant="body2">{value}</Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+
+        {/* ---------- EMPTY FIELDS HINT ---------- */}
+        {!editMode && emptyCriteria.length > 0 && (
+          <Box
+            mt={2}
+            p={1.5}
+            sx={{
+              border: "1px dashed #c7cfe4",
+              background: "#fafafa",
+              borderRadius: 1
+            }}
+          >
+            <Typography fontWeight={600} variant="body2">
+              Empty fields:
+            </Typography>
+            <Typography variant="body2">
+              {emptyCriteria.map((c) => c.label).join(", ")}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Click edit to fill these metrics.
+            </Typography>
+          </Box>
+        )}
       </Box>
+    </motion.div>
   )
 }
 

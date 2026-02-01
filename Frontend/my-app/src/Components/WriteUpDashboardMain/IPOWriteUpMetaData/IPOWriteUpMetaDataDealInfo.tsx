@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BasicDealDetails } from "../types/DealInformation";
 import DealInfoCardData from './DealInfoCardData';
+import FebWriteupDashboardLine from './FEBWriteup/FebWriteupDashboardLine';
+import FebWriteupSummaryTable from './FEBWriteup/FebWriteupSummaryTable';
 
 interface IPOWriteUpMetaDataDealInfoProps {
   basicDealDetails: BasicDealDetails;
@@ -75,7 +77,19 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
   }
 
   return (
-    <DealInfoCardData writeUpData={writeUpData} />
+    <>
+      <FebWriteupDashboardLine
+        ipodata={writeUpData}
+        selectedTicker={basicDealDetails.ticker}
+        setIpoData={setWriteUpData}
+      />
+      <FebWriteupSummaryTable
+        ipodata={writeUpData}
+        selectedTicker={basicDealDetails.ticker}
+        setIpoData={setWriteUpData}
+      />
+
+    </>
   );
 };
 
