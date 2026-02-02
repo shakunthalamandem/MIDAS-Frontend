@@ -5,7 +5,7 @@ import DealAMStrategyView, {
   SummaryKey,
   SummaryOption,
   SummaryState,
-} from "./DealAMStrategyView";
+} from "./DealAMStrategy";
 
 type Props = {
   recommendation: string;
