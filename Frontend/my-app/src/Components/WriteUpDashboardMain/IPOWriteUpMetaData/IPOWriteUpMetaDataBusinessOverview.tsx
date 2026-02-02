@@ -20,6 +20,8 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import GroupsIcon from "@mui/icons-material/Groups"
 import AccountTreeIcon from "@mui/icons-material/AccountTree"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 /* ===================== TYPES ===================== */
 
@@ -68,6 +70,25 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
     icon: <GroupsIcon />
   }
 ]
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 /* ===================== COMPONENT ===================== */
 
@@ -93,7 +114,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
       try {
         setLoading(true)
-        setFetchError(null)
         const res = await fetch(`${apiUrl}/api/writeup_data/`, {
           method: "POST",
           headers: {
@@ -103,17 +123,14 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           body: JSON.stringify({ ticker: basicDealDetails.ticker })
         })
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch business overview")
-        }
+        if (!res.ok) throw new Error("Failed to fetch data")
 
         const data = await res.json()
         setWriteUpData(data)
         setUpdatedData(data)
-        const overviewText = (data?.business_overview || []).join("\n\n")
-        setBusinessOverviewDraft(overviewText)
-      } catch (error: any) {
-        setFetchError(error?.message || "No data found.")
+        setBusinessOverviewDraft((data.business_overview || []).join(""))
+      } catch (e: any) {
+        setFetchError(e.message)
       } finally {
         setLoading(false)
       }
@@ -124,7 +141,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
   /* ===================== HANDLERS ===================== */
 
-  const handleChange = (
+  const handlePointChange = (
     section: keyof WriteUpData,
     index: number,
     value: string
@@ -141,16 +158,10 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     const token = localStorage.getItem("access_token")
 
     try {
-      if (!apiUrl) throw new Error("API URL not configured")
       setSavingBusinessOverview(true)
-      setSaveError(null)
-      const lines = businessOverviewDraft
-        .split(/\n{2,}|\r\n{2,}/)
-        .map((line) => line.trim())
-        .filter(Boolean)
       const payload = {
         ticker_name: basicDealDetails.ticker,
-        business_overview: lines
+        business_overview: [businessOverviewDraft]
       }
 
       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
@@ -162,53 +173,47 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         body: JSON.stringify(payload)
       })
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.message || "Failed to save business overview")
-      }
+      if (!res.ok) throw new Error("Save failed")
 
       setWriteUpData((prev) =>
-        prev ? { ...prev, business_overview: lines } : prev
-      )
-      setUpdatedData((prev) =>
-        prev ? { ...prev, business_overview: lines } : prev
+        prev ? { ...prev, business_overview: [businessOverviewDraft] } : prev
       )
       setBusinessOverviewEditing(false)
-    } catch (error: any) {
-      setSaveError(error?.message || "Failed to save business overview")
+    } catch (e: any) {
+      setSaveError(e.message)
     } finally {
       setSavingBusinessOverview(false)
     }
   }
 
-  const handleCancelBusinessOverview = () => {
-    setUpdatedData(writeUpData)
-    const overviewText = (writeUpData?.business_overview || []).join("\n\n")
-    setBusinessOverviewDraft(overviewText)
-    setBusinessOverviewEditing(false)
-    setSaveError(null)
-  }
+  /* ===================== RENDER HELPERS ===================== */
 
   const renderSectionContent = (
     section: keyof WriteUpData,
     data: string[]
   ) =>
     data.map((item, index) =>
-      editMode === section ||
-      (businessOverviewEditing && section === "business_overview") ? (
-        <TextField
-          key={index}
-          fullWidth
-          value={item}
-          onChange={(e) => handleChange(section, index, e.target.value)}
-          sx={{ mb: 2 }}
-        />
+      editMode === section ? (
+        <Box key={index} mb={2}>
+          <ReactQuill
+            theme="snow"
+            value={item}
+            onChange={(val) => handlePointChange(section, index, val)}
+            modules={quillModules}
+            formats={quillFormats}
+          />
+        </Box>
       ) : (
-        <Typography key={index} variant="body2" sx={{ mb: 1.5 }}>
-          {item}
-        </Typography>
+        <Box
+          key={index}
+          mb={2}
+          sx={{ color: "#1f2a44" }}
+          dangerouslySetInnerHTML={{ __html: item }}
+        />
       )
     )
+
+  /* ===================== UI ===================== */
 
   if (loading) {
     return (
@@ -218,25 +223,14 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     )
   }
 
-  if (fetchError) {
+  if (fetchError || !writeUpData) {
     return (
       <NoDataNotice
         title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        subtitle="There is no data for this ticker."
       />
     )
   }
-
-  if (!writeUpData) {
-    return (
-      <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
-      />
-    )
-  }
-
-  /* ===================== UI ===================== */
 
   return (
     <Paper
@@ -244,23 +238,19 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       sx={{
         p: 3,
         borderRadius: 3,
-        // backgroundColor: "#F8FAFF",
         background: "linear-gradient(#f0f5ff)",
         border: "1px solid #E6ECF5"
       }}
     >
       {/* ================= BUSINESS OVERVIEW ================= */}
-      <Box textAlign="center" mb={4}>
-        <Box display="flex" justifyContent="flex-end" mb={1}>
+      <Box mb={4}>
+        <Box display="flex" justifyContent="flex-end">
           {businessOverviewEditing ? (
             <>
-              <IconButton
-                onClick={handleSaveBusinessOverview}
-                disabled={savingBusinessOverview}
-              >
+              <IconButton onClick={handleSaveBusinessOverview}>
                 <SaveIcon />
               </IconButton>
-              <IconButton onClick={handleCancelBusinessOverview}>
+              <IconButton onClick={() => setBusinessOverviewEditing(false)}>
                 <CancelIcon />
               </IconButton>
             </>
@@ -271,33 +261,24 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           )}
         </Box>
 
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          sx={{ color: "#124180", textAlign: "center" }}
-        >
+        <Typography variant="h5" fontWeight={600} color="#124180" mb={2}>
           Business Overview
         </Typography>
-        <Box mt={3}>
-          {businessOverviewEditing ? (
-            <TextField
-              fullWidth
-              multiline
-              minRows={6}
-              value={businessOverviewDraft}
-              onChange={(e) => setBusinessOverviewDraft(e.target.value)}
-              placeholder="Enter business overview"
-              sx={{ background: "#ffffff" }}
-            />
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{ whiteSpace: "pre-line", color: "#1f2a44" }}
-            >
-              {businessOverviewDraft}
-            </Typography>
-          )}
-        </Box>
+
+        {businessOverviewEditing ? (
+          <ReactQuill
+            theme="snow"
+            value={businessOverviewDraft}
+            onChange={setBusinessOverviewDraft}
+            modules={quillModules}
+            formats={quillFormats}
+          />
+        ) : (
+          <Box
+            sx={{ color: "#1f2a44" }}
+            dangerouslySetInnerHTML={{ __html: businessOverviewDraft }}
+          />
+        )}
       </Box>
 
       {/* ================= ACCORDIONS ================= */}
@@ -309,40 +290,19 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         }}
       >
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
-          <Accordion
-            key={section}
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #E6ECF5",
-              "&:before": { display: "none" }
-            }}
-          >
+          <Accordion key={section}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box display="flex" alignItems="center" gap={1.5}>
-                <Box
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 2,
-                    backgroundColor: "#EEF4FF",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#2563EB"
-                  }}
-                >
-                  {icon}
-                </Box>
-
-                <Typography fontWeight={600} color="#124180">{title}</Typography>
+                {icon}
+                <Typography fontWeight={600}>{title}</Typography>
               </Box>
 
               <IconButton
+                sx={{ ml: "auto" }}
                 onClick={(e) => {
                   e.stopPropagation()
                   setEditMode(editMode === section ? null : section)
                 }}
-                sx={{ ml: "auto" }}
               >
                 {editMode === section ? <SaveIcon /> : <EditIcon />}
               </IconButton>
@@ -354,12 +314,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           </Accordion>
         ))}
       </Box>
-
-      {saveError ? (
-        <Typography variant="caption" color="error" sx={{ mt: 2 }}>
-          {saveError}
-        </Typography>
-      ) : null}
     </Paper>
   )
 }
