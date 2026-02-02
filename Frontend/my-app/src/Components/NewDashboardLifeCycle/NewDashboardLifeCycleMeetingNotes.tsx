@@ -17,7 +17,7 @@ const NewDashboardLifeCycleMeetingNotes: React.FC<
     if (!ticker || (requiresPricingDate && !pricingDate)) return null;
     return {
       ticker,
-      pricingDate,
+      pricingDate: pricingDate ?? undefined,
       dealType: dealType ?? undefined,
     };
   }, [ticker, pricingDate, dealType]);
