@@ -73,12 +73,17 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
 
   const [companyNameInput, setCompanyNameInput] = useState("");
   const [selectedCompanyName, setSelectedCompanyName] = useState("");
-  const [meetingOverview, setMeetingOverview] = useState<MeetingOverview>(initialMeetingOverview);
-  const [investmentSnapshot, setInvestmentSnapshot] = useState<InvestmentSnapshot>(
-    initialInvestmentSnapshot
+  const [meetingOverview, setMeetingOverview] = useState<MeetingOverview>(
+    initialMeetingOverview,
   );
-  const [businessStrategy, setBusinessStrategy] = useState<BusinessStrategy>(initialBusinessStrategy);
-  const [capitalStructure, setCapitalStructure] = useState<CapitalStructure>(initialCapitalStructure);
+  const [investmentSnapshot, setInvestmentSnapshot] =
+    useState<InvestmentSnapshot>(initialInvestmentSnapshot);
+  const [businessStrategy, setBusinessStrategy] = useState<BusinessStrategy>(
+    initialBusinessStrategy,
+  );
+  const [capitalStructure, setCapitalStructure] = useState<CapitalStructure>(
+    initialCapitalStructure,
+  );
   const [sectionNotes, setSectionNotes] = useState<SectionNotes>({
     companyBackground: "",
     divisions: "",
@@ -99,8 +104,11 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   const [backupState, setBackupState] = useState<FormState | null>(null);
   const [meetings, setMeetings] = useState<MeetingEntry[]>([]);
   const [selectedMeetingIndex, setSelectedMeetingIndex] = useState(0);
-  const [currentMeetingId, setCurrentMeetingId] = useState<number | string | null>(null);
-  const [currentMeetingKey, setCurrentMeetingKey] = useState<string>("meeting1");
+  const [currentMeetingId, setCurrentMeetingId] = useState<
+    number | string | null
+  >(null);
+  const [currentMeetingKey, setCurrentMeetingKey] =
+    useState<string>("meeting1");
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [noDataFound, setNoDataFound] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -115,7 +123,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   const [searchResetSignal, setSearchResetSignal] = useState(0);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createCompanyName, setCreateCompanyName] = useState("");
-  const [createCompanyError, setCreateCompanyError] = useState<string | null>(null);
+  const [createCompanyError, setCreateCompanyError] = useState<string | null>(
+    null,
+  );
 
   const shouldShowEmptyState = meetings.length === 0;
   const headingConfig: Array<{ key: keyof SectionNotes; label: string }> = [
@@ -127,7 +137,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     { key: "strategicApproach", label: "Strategic Approach" },
     { key: "marketPosition", label: "Market Position" },
     { key: "financialPerformance", label: "Financial Performance" },
-    { key: "internationalExpansionPlans", label: "International Expansion Plans" },
+    {
+      key: "internationalExpansionPlans",
+      label: "International Expansion Plans",
+    },
     { key: "growthStrategy", label: "Growth Strategy" },
     { key: "hongKongListingRationale", label: "Hong Kong Listing Rationale" },
     { key: "leadership", label: "Leadership" },
@@ -217,7 +230,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     return entries.filter(Boolean).join(", ");
   };
 
-  const buildAttendeesPayload = (managementValue: string, bankerValue: string) => {
+  const buildAttendeesPayload = (
+    managementValue: string,
+    bankerValue: string,
+  ) => {
     const normalize = (input: string) =>
       (input || "")
         .split(/,|;/)
@@ -266,14 +282,22 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     leadership: "",
   };
 
-  const buildMeetingFromOverview = (overview: any, record: any): MeetingEntry => {
-    const metaOverview = overview?.meeting_overview || overview?.meetingOverview || {};
-    const metaInvestment = overview?.investment_snapshot || overview?.investmentSnapshot || {};
-    const metaBusiness = overview?.business_strategy || overview?.businessStrategy || {};
-    const metaCapital = overview?.capital_structure || overview?.capitalStructure || {};
+  const buildMeetingFromOverview = (
+    overview: any,
+    record: any,
+  ): MeetingEntry => {
+    const metaOverview =
+      overview?.meeting_overview || overview?.meetingOverview || {};
+    const metaInvestment =
+      overview?.investment_snapshot || overview?.investmentSnapshot || {};
+    const metaBusiness =
+      overview?.business_strategy || overview?.businessStrategy || {};
+    const metaCapital =
+      overview?.capital_structure || overview?.capitalStructure || {};
     const metaSection = overview?.section_notes || {};
     const attendeesValue = metaOverview?.attendees ?? overview?.attendees;
-    const meetingNotesText = metaBusiness?.meeting_notes || overview?.meeting_notes || "";
+    const meetingNotesText =
+      metaBusiness?.meeting_notes || overview?.meeting_notes || "";
     const parsedSectionNotes =
       Object.keys(metaSection || {}).length > 0
         ? { ...emptySectionNotes, ...metaSection }
@@ -284,7 +308,12 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       meetingKey: overview?.__key ?? "meeting1",
       form: {
         meetingOverview: {
-          ticker: (metaOverview?.ticker || record?.ticker || overview?.ticker || "").toUpperCase(),
+          ticker: (
+            metaOverview?.ticker ||
+            record?.ticker ||
+            overview?.ticker ||
+            ""
+          ).toUpperCase(),
           companyName:
             metaOverview?.company_name ||
             record?.company_name ||
@@ -304,21 +333,31 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           bankerAttendees: formatAttendeeGroup(attendeesValue, "banker"),
         },
         investmentSnapshot: {
-          oneLineSummary: metaInvestment?.one_line_summary || overview?.one_line_summary || "",
+          oneLineSummary:
+            metaInvestment?.one_line_summary ||
+            overview?.one_line_summary ||
+            "",
           executiveSummary:
-            metaInvestment?.executive_summary || overview?.executive_summary || "",
+            metaInvestment?.executive_summary ||
+            overview?.executive_summary ||
+            "",
           keyLevel: metaInvestment?.key_level || overview?.key_level || "",
-          possibleSize: metaInvestment?.possible_size || overview?.possible_size || "",
+          possibleSize:
+            metaInvestment?.possible_size || overview?.possible_size || "",
           results: metaInvestment?.results || overview?.results || "",
         },
         businessStrategy: {
-          meetingNotes: metaBusiness?.meeting_notes || overview?.meeting_notes || "",
+          meetingNotes:
+            metaBusiness?.meeting_notes || overview?.meeting_notes || "",
           catalysts: metaBusiness?.catalysts || overview?.catalyst || "",
           likelihoodPrimaryRaise:
             metaBusiness?.likelihood_of_primary_raise ||
             overview?.likelihood_of_primary_raise ||
             "",
-          reasonForRaise: metaBusiness?.likelihood_reason || overview?.likelihood_reason || "",
+          reasonForRaise:
+            metaBusiness?.likelihood_reason ||
+            overview?.likelihood_reason ||
+            "",
           opportunisticDeal:
             metaBusiness?.possible_opportunistic_deal ||
             overview?.possible_opportunistic_deal ||
@@ -326,34 +365,44 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         },
         sectionNotes: parsedSectionNotes,
         capitalStructure: {
-          potentialSellers: metaCapital?.potential_sellers || overview?.potential_sellers || "",
-          ipoLockupExpiry: metaCapital?.ipo_lockup_expiry || overview?.ipo_lockup_expiry || "",
+          potentialSellers:
+            metaCapital?.potential_sellers || overview?.potential_sellers || "",
+          ipoLockupExpiry:
+            metaCapital?.ipo_lockup_expiry || overview?.ipo_lockup_expiry || "",
           lastDealLockupExpiry:
             metaCapital?.last_deal_lockup_expiry ||
             overview?.last_deal_lockup_expiry ||
             "",
-          historicalSellers: metaCapital?.historical_sellers || overview?.historical_sellers || "",
+          historicalSellers:
+            metaCapital?.historical_sellers ||
+            overview?.historical_sellers ||
+            "",
           followUpQuestions:
             metaCapital?.follow_up_question_for_management ||
             overview?.follow_up_question_for_management ||
             "",
           attachments: [],
-          keyValueAmount: metaCapital?.key_value_amount || overview?.key_value_amount || "",
+          keyValueAmount:
+            metaCapital?.key_value_amount || overview?.key_value_amount || "",
           keyValueComparator:
-            metaCapital?.key_value_comparator || overview?.key_value_comparator || "greater",
+            metaCapital?.key_value_comparator ||
+            overview?.key_value_comparator ||
+            "greater",
           keyValueAutomate: toBool(
-            metaCapital?.key_value_automate ?? overview?.key_value_automate
+            metaCapital?.key_value_automate ?? overview?.key_value_automate,
           ),
-          emailRecipients: metaCapital?.email_recipients || overview?.email_recipients || "",
+          emailRecipients:
+            metaCapital?.email_recipients || overview?.email_recipients || "",
           ipoLockupExpiryAutomate: toBool(
-            metaCapital?.ipo_lockup_expiry_automate ?? overview?.ipo_lockup_expiry_automate
+            metaCapital?.ipo_lockup_expiry_automate ??
+              overview?.ipo_lockup_expiry_automate,
           ),
           lastDealLockupExpiryAutomate: toBool(
             metaCapital?.last_deal_lockup_expiry_automate ??
-              overview?.last_deal_lockup_expiry_automate
+              overview?.last_deal_lockup_expiry_automate,
           ),
           resultsAutomate: toBool(
-            metaCapital?.results_automate ?? overview?.results_automate
+            metaCapital?.results_automate ?? overview?.results_automate,
           ),
         },
       },
@@ -368,7 +417,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         ? metaRoot.meta_data
         : metaRoot;
     const meetingEntries = Object.entries(meta).filter(([key]) =>
-      key.toLowerCase().startsWith("meeting")
+      key.toLowerCase().startsWith("meeting"),
     );
 
     if (meetingEntries.length === 0) {
@@ -379,13 +428,20 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     }
 
     return meetingEntries.map(([key, overview]) =>
-      buildMeetingFromOverview({ ...(overview as any), __key: key }, record)
+      buildMeetingFromOverview({ ...(overview as any), __key: key }, record),
     );
   };
 
-  const createNewMeetingFromTemplate = (resetExisting = false, companyOverride?: string) => {
+  const createNewMeetingFromTemplate = (
+    resetExisting = false,
+    companyOverride?: string,
+  ) => {
     const meetingKey = getNextMeetingKey();
-    const normalizedCompany = (companyOverride || selectedCompanyName || companyNameInput).trim();
+    const normalizedCompany = (
+      companyOverride ||
+      selectedCompanyName ||
+      companyNameInput
+    ).trim();
     const templateMeeting: MeetingEntry = {
       meetingKey,
       form: {
@@ -414,7 +470,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       },
       isNew: true,
     };
-    const updated = resetExisting ? [templateMeeting] : [...meetings, templateMeeting];
+    const updated = resetExisting
+      ? [templateMeeting]
+      : [...meetings, templateMeeting];
     setMeetings(updated);
     setSelectedMeetingIndex(updated.length - 1);
     setMeetingOverview(templateMeeting.form.meetingOverview);
@@ -483,10 +541,14 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
   useEffect(() => {
     if (!isEditing || !backupState) return;
     const isChanged =
-      JSON.stringify(backupState.meetingOverview) !== JSON.stringify(meetingOverview) ||
-      JSON.stringify(backupState.investmentSnapshot) !== JSON.stringify(investmentSnapshot) ||
-      JSON.stringify(backupState.businessStrategy) !== JSON.stringify(businessStrategy) ||
-      JSON.stringify(backupState.capitalStructure) !== JSON.stringify(capitalStructure) ||
+      JSON.stringify(backupState.meetingOverview) !==
+        JSON.stringify(meetingOverview) ||
+      JSON.stringify(backupState.investmentSnapshot) !==
+        JSON.stringify(investmentSnapshot) ||
+      JSON.stringify(backupState.businessStrategy) !==
+        JSON.stringify(businessStrategy) ||
+      JSON.stringify(backupState.capitalStructure) !==
+        JSON.stringify(capitalStructure) ||
       JSON.stringify(backupState.sectionNotes) !== JSON.stringify(sectionNotes);
     setHasUnsavedChanges(isChanged);
   }, [
@@ -583,14 +645,17 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       setLoadingMeetings(true);
       setStatus(null);
       setNoDataFound(false);
-      const response = await fetch(`${apiUrl}/api/unlisted_get_deal_meeting_by_company/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+      const response = await fetch(
+        `${apiUrl}/api/unlisted_get_deal_meeting_by_company/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ company_name: companyName }),
         },
-        body: JSON.stringify({ company_name: companyName }),
-      });
+      );
 
       if (!response.ok) {
         const errText = await response.text();
@@ -607,7 +672,11 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         return;
       }
 
-      const items = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [data];
+      const items = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : [data];
       const normalized = items.flatMap(normalizeRecordToMeetings);
       setMeetings(normalized);
       setSelectedMeetingIndex(0);
@@ -617,7 +686,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       setSelectedCompanyName(companyName);
     } catch (err: any) {
       console.error("Failed to load meeting notes:", err);
-      setStatus({ kind: "error", message: err?.message || "Unable to load meeting notes." });
+      setStatus({
+        kind: "error",
+        message: err?.message || "Unable to load meeting notes.",
+      });
     } finally {
       setLoadingMeetings(false);
     }
@@ -648,7 +720,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
 
     if (Object.keys(nextErrors).length > 0) {
       setValidationErrors(nextErrors);
-      setStatus({ kind: "error", message: "Please complete the required fields." });
+      setStatus({
+        kind: "error",
+        message: "Please complete the required fields.",
+      });
       return;
     }
 
@@ -669,7 +744,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         broker: meetingOverview.broker,
         attendees: buildAttendeesPayload(
           meetingOverview.attendees,
-          meetingOverview.bankerAttendees
+          meetingOverview.bankerAttendees,
         ),
       },
       investment_snapshot: {
@@ -694,7 +769,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         follow_up_question_for_management: capitalStructure.followUpQuestions,
         email_recipients: capitalStructure.emailRecipients,
         ipo_lockup_expiry_automate: capitalStructure.ipoLockupExpiryAutomate,
-        last_deal_lockup_expiry_automate: capitalStructure.lastDealLockupExpiryAutomate,
+        last_deal_lockup_expiry_automate:
+          capitalStructure.lastDealLockupExpiryAutomate,
         results_automate: capitalStructure.resultsAutomate,
       },
       section_notes: sectionNotes,
@@ -708,7 +784,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     };
 
     const existingRecordId =
-      currentMeetingId ?? meetings.find((entry) => !entry.isNew && entry.id)?.id ?? null;
+      currentMeetingId ??
+      meetings.find((entry) => !entry.isNew && entry.id)?.id ??
+      null;
     if (!shouldCreate && existingRecordId) {
       payload.id = existingRecordId;
     }
@@ -732,7 +810,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         const errorText = await response.text();
         throw new Error(
           errorText ||
-            (isNewMeeting ? "Failed to create meeting notes" : "Failed to update meeting notes")
+            (isNewMeeting
+              ? "Failed to create meeting notes"
+              : "Failed to update meeting notes"),
         );
       }
 
@@ -760,7 +840,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
     <Stack
       spacing={3}
       sx={{
-        position: "relative",
+        position: "relative", mb: 6,
         "@keyframes fadeUp": {
           from: { opacity: 0, transform: "translateY(12px)" },
           to: { opacity: 1, transform: "translateY(0)" },
@@ -775,7 +855,7 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2.5, md: 3.5 },
+          p: { xs: 2.5, md: 3.5 ,mb: 2},
           borderRadius: 4,
           color: "#0b1f3a",
           background:
@@ -793,7 +873,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
             width: { xs: 140, md: 200 },
             height: { xs: 140, md: 200 },
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(0,98,255,0.35) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(0,98,255,0.35) 0%, transparent 70%)",
             animation: "floatGlow 6s ease-in-out infinite",
           }}
         />
@@ -807,45 +888,52 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           }}
         >
           <Stack spacing={1} sx={{ maxWidth: 680 }}>
-            <Typography sx={{ fontWeight: 800, color: "#002060", fontSize: { xs: 20, md: 24 } }}>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                color: "#002060",
+                fontSize: { xs: 20, md: 24 },
+              }}
+            >
               Unlisted Company Meeting Notes
             </Typography>
             <Typography sx={{ color: "rgba(0,27,77,0.75)" }}>
-              Search existing companies or create a new company record with multiple meetings.
+              Search existing companies or create a new company record with
+              multiple meetings.
             </Typography>
           </Stack>
-          <Box sx={{ width: { xs: "100%", md: "auto" } }}>
-          <UnlistedMeetingSearch
-            apiUrl={apiUrl}
-            token={token}
-            resetSignal={searchResetSignal}
-            onSelect={(value: UnlistedMeetingSearchOptionData) => {
-              requestDiscardConfirm(() => {
-                const nextCompany = value.name || "";
-                setCompanyNameInput(nextCompany);
-                setSelectedCompanyName(nextCompany);
+          <Box sx={{ width: { xs: "100%", md: "auto"} }}>
+            <UnlistedMeetingSearch
+              apiUrl={apiUrl}
+              token={token}
+              resetSignal={searchResetSignal}
+              onSelect={(value: UnlistedMeetingSearchOptionData) => {
+                requestDiscardConfirm(() => {
+                  const nextCompany = value.name || "";
+                  setCompanyNameInput(nextCompany);
+                  setSelectedCompanyName(nextCompany);
                   setMeetingOverview((prev) => ({
                     ...prev,
                     companyName: nextCompany || prev.companyName,
                   }));
                   setMeetings([]);
                   setSelectedMeetingIndex(0);
-                setCurrentMeetingId(null);
-                setCurrentMeetingKey("meeting1");
-                setCreateMode(false);
-                loadNotesByCompany(nextCompany);
-              });
-            }}
-            onCreate={() =>
-              requestDiscardConfirm(() => {
-                resetForNewCompany();
-                openCreateDialog();
-              })
-            }
-            onInputChange={(value) => {
-              setCompanyNameInput(value);
-            }}
-          />
+                  setCurrentMeetingId(null);
+                  setCurrentMeetingKey("meeting1");
+                  setCreateMode(false);
+                  loadNotesByCompany(nextCompany);
+                });
+              }}
+              onCreate={() =>
+                requestDiscardConfirm(() => {
+                  resetForNewCompany();
+                  openCreateDialog();
+                })
+              }
+              onInputChange={(value) => {
+                setCompanyNameInput(value);
+              }}
+            />
           </Box>
         </Box>
       </Paper>
@@ -898,7 +986,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
               showCancelNew={Boolean(meetings[selectedMeetingIndex]?.isNew)}
               onCancelNew={() => {
                 requestDiscardConfirm(() => {
-                  const updated = meetings.filter((_, idx) => idx !== selectedMeetingIndex);
+                  const updated = meetings.filter(
+                    (_, idx) => idx !== selectedMeetingIndex,
+                  );
                   setMeetings(updated);
                   const nextIndex = updated.length > 0 ? 0 : 0;
                   setSelectedMeetingIndex(nextIndex);
@@ -952,7 +1042,9 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
           noDataFound={noDataFound}
           loading={loadingMeetings}
           onCreateNew={() => {
-            const normalizedCompany = (selectedCompanyName || companyNameInput).trim();
+            const normalizedCompany = (
+              selectedCompanyName || companyNameInput
+            ).trim();
             setSelectedCompanyName(normalizedCompany);
             setCreateMode(true);
             createNewMeetingFromTemplate(true, normalizedCompany);
@@ -992,7 +1084,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #0050c8 0%, #00c2a2 100%)",
+                  background:
+                    "linear-gradient(180deg, #0050c8 0%, #00c2a2 100%)",
                 },
               }}
             >
@@ -1006,7 +1099,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   onChange={(val) => {
                     setMeetingOverview((prev) => ({ ...prev, name: val }));
                     if (validationErrors.meetingName) {
-                      setValidationErrors((prev) => ({ ...prev, meetingName: undefined }));
+                      setValidationErrors((prev) => ({
+                        ...prev,
+                        meetingName: undefined,
+                      }));
                     }
                   }}
                   isEditing={isEditing}
@@ -1022,7 +1118,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   onChange={(val) => {
                     setMeetingOverview((prev) => ({ ...prev, date: val }));
                     if (validationErrors.meetingDate) {
-                      setValidationErrors((prev) => ({ ...prev, meetingDate: undefined }));
+                      setValidationErrors((prev) => ({
+                        ...prev,
+                        meetingDate: undefined,
+                      }));
                     }
                   }}
                   isEditing={isEditing}
@@ -1086,7 +1185,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #ff9800 0%, #ffcc80 100%)",
+                  background:
+                    "linear-gradient(180deg, #ff9800 0%, #ffcc80 100%)",
                 },
               }}
             >
@@ -1101,16 +1201,25 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                     setMeetingOverview((prev) => ({ ...prev, attendees: val }))
                   }
                   isEditing={isEditing}
-                  options={{ multiline: true, placeholder: "Comma-separated names" }}
+                  options={{
+                    multiline: true,
+                    placeholder: "Comma-separated names",
+                  }}
                 />
                 <LabeledTextField
                   label="Banker Attendees"
                   value={meetingOverview.bankerAttendees}
                   onChange={(val) =>
-                    setMeetingOverview((prev) => ({ ...prev, bankerAttendees: val }))
+                    setMeetingOverview((prev) => ({
+                      ...prev,
+                      bankerAttendees: val,
+                    }))
                   }
                   isEditing={isEditing}
-                  options={{ multiline: true, placeholder: "Comma-separated names" }}
+                  options={{
+                    multiline: true,
+                    placeholder: "Comma-separated names",
+                  }}
                 />
               </Stack>
             </Paper>
@@ -1132,7 +1241,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #6a1b9a 0%, #ab47bc 100%)",
+                  background:
+                    "linear-gradient(180deg, #6a1b9a 0%, #ab47bc 100%)",
                 },
               }}
             >
@@ -1144,7 +1254,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="One Line Summary"
                   value={investmentSnapshot.oneLineSummary}
                   onChange={(val) =>
-                    setInvestmentSnapshot((prev) => ({ ...prev, oneLineSummary: val }))
+                    setInvestmentSnapshot((prev) => ({
+                      ...prev,
+                      oneLineSummary: val,
+                    }))
                   }
                   isEditing={isEditing}
                 />
@@ -1152,7 +1265,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Executive Summary"
                   value={investmentSnapshot.executiveSummary}
                   onChange={(val) =>
-                    setInvestmentSnapshot((prev) => ({ ...prev, executiveSummary: val }))
+                    setInvestmentSnapshot((prev) => ({
+                      ...prev,
+                      executiveSummary: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1168,7 +1284,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                     label="Key Level"
                     value={investmentSnapshot.keyLevel}
                     onChange={(val) =>
-                      setInvestmentSnapshot((prev) => ({ ...prev, keyLevel: val }))
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        keyLevel: val,
+                      }))
                     }
                     isEditing={isEditing}
                   />
@@ -1176,7 +1295,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                     label="Possible Size"
                     value={investmentSnapshot.possibleSize}
                     onChange={(val) =>
-                      setInvestmentSnapshot((prev) => ({ ...prev, possibleSize: val }))
+                      setInvestmentSnapshot((prev) => ({
+                        ...prev,
+                        possibleSize: val,
+                      }))
                     }
                     isEditing={isEditing}
                   />
@@ -1201,7 +1323,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #00bcd4 0%, #80deea 100%)",
+                  background:
+                    "linear-gradient(180deg, #00bcd4 0%, #80deea 100%)",
                 },
               }}
             >
@@ -1233,7 +1356,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Reason for Raise"
                   value={businessStrategy.reasonForRaise}
                   onChange={(val) =>
-                    setBusinessStrategy((prev) => ({ ...prev, reasonForRaise: val }))
+                    setBusinessStrategy((prev) => ({
+                      ...prev,
+                      reasonForRaise: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1242,7 +1368,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Opportunistic Deal"
                   value={businessStrategy.opportunisticDeal}
                   onChange={(val) =>
-                    setBusinessStrategy((prev) => ({ ...prev, opportunisticDeal: val }))
+                    setBusinessStrategy((prev) => ({
+                      ...prev,
+                      opportunisticDeal: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1267,7 +1396,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #2e7d32 0%, #81c784 100%)",
+                  background:
+                    "linear-gradient(180deg, #2e7d32 0%, #81c784 100%)",
                 },
               }}
             >
@@ -1279,7 +1409,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Company Background"
                   value={sectionNotes.companyBackground}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, companyBackground: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      companyBackground: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1287,14 +1420,18 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                 <LabeledTextField
                   label="Divisions"
                   value={sectionNotes.divisions}
-                  onChange={(val) => setSectionNotes((prev) => ({ ...prev, divisions: val }))}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, divisions: val }))
+                  }
                   isEditing={isEditing}
                   options={{ multiline: true }}
                 />
                 <LabeledTextField
                   label="Other Lines"
                   value={sectionNotes.otherLines}
-                  onChange={(val) => setSectionNotes((prev) => ({ ...prev, otherLines: val }))}
+                  onChange={(val) =>
+                    setSectionNotes((prev) => ({ ...prev, otherLines: val }))
+                  }
                   isEditing={isEditing}
                   options={{ multiline: true }}
                 />
@@ -1311,7 +1448,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Vertical Integration"
                   value={sectionNotes.verticalIntegration}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, verticalIntegration: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      verticalIntegration: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1336,7 +1476,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #f06292 0%, #f8bbd0 100%)",
+                  background:
+                    "linear-gradient(180deg, #f06292 0%, #f8bbd0 100%)",
                 },
               }}
             >
@@ -1348,7 +1489,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Strategic Approach"
                   value={sectionNotes.strategicApproach}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, strategicApproach: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      strategicApproach: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1357,7 +1501,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Market Position"
                   value={sectionNotes.marketPosition}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, marketPosition: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      marketPosition: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1366,7 +1513,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Financial Performance"
                   value={sectionNotes.financialPerformance}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, financialPerformance: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      financialPerformance: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1387,7 +1537,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Growth Strategy"
                   value={sectionNotes.growthStrategy}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, growthStrategy: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      growthStrategy: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1396,7 +1549,10 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Hong Kong Listing Rationale"
                   value={sectionNotes.hongKongListingRationale}
                   onChange={(val) =>
-                    setSectionNotes((prev) => ({ ...prev, hongKongListingRationale: val }))
+                    setSectionNotes((prev) => ({
+                      ...prev,
+                      hongKongListingRationale: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
@@ -1430,7 +1586,8 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   width: 6,
-                  background: "linear-gradient(180deg, #1565c0 0%, #90caf9 100%)",
+                  background:
+                    "linear-gradient(180deg, #1565c0 0%, #90caf9 100%)",
                 },
               }}
             >
@@ -1451,10 +1608,53 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
                   label="Follow Up Questions"
                   value={capitalStructure.followUpQuestions}
                   onChange={(val) =>
-                    setCapitalStructure((prev) => ({ ...prev, followUpQuestions: val }))
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      followUpQuestions: val,
+                    }))
                   }
                   isEditing={isEditing}
                   options={{ multiline: true }}
+                />
+              </Stack>
+            </Paper>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                border: "1px solid rgba(0,32,96,0.12)",
+                backgroundColor: "#fff",
+                position: "relative",
+                overflow: "hidden",
+                animation: "fadeUp 420ms ease",
+                animationDelay: "320ms",
+                animationFillMode: "both",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  width: 6,
+                  background:
+                    "linear-gradient(180deg, #84910b 0%, #f9f290 100%)",
+                },
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography sx={{ color: "#002060", fontWeight: 700 }}>
+                  Email Automation
+                </Typography>
+                <LabeledTextField
+                  label="Email Recipients"
+                  value={capitalStructure.emailRecipients}
+                  onChange={(val) =>
+                    setCapitalStructure((prev) => ({
+                      ...prev,
+                      emailRecipients: val,
+                    }))
+                  }
+                  isEditing={isEditing}
+                  options={{ placeholder: "Enter email recipients" }}
                 />
               </Stack>
             </Paper>
@@ -1468,7 +1668,12 @@ const UnlistedDealMeetingNotesMain: React.FC = () => {
         onDiscard={handleConfirmDiscard}
       />
 
-      <Dialog open={createDialogOpen} onClose={closeCreateDialog} maxWidth="xs" fullWidth>
+      <Dialog
+        open={createDialogOpen}
+        onClose={closeCreateDialog}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Enter Company Name</DialogTitle>
         <DialogContent>
           <TextField
