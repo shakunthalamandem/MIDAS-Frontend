@@ -360,7 +360,7 @@ const NewDealsLifecycleCards: React.FC = () => {
     "Write Up": "Write up",
     "ML Model": "ML Model",
     "AI Unsupervised": "AI Unsupervised",
-    "AI Sentiment View": "AI- Sentiment View",
+    "AI Sentiment View": "AI - Sentiment View",
   };
 
   const renderDealsList = (list: any[]) =>

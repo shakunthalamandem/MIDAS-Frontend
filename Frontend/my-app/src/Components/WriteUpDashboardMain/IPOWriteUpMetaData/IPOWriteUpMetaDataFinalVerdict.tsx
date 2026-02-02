@@ -16,6 +16,7 @@ import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
 import { BasicDealDetails } from "../types/DealInformation"
 import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 interface IPOWriteUpMetaDataFinalVerdictProps {
   basicDealDetails: BasicDealDetails
@@ -26,7 +27,8 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
   IPOWriteUpMetaDataFinalVerdictProps
 > = ({ basicDealDetails, metadata }) => {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [finalVerdictText, setFinalVerdictText] = useState("")
   const [overallRating, setOverallRating] = useState("")
@@ -94,9 +96,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
         if (incomingScores && typeof incomingScores === "object") {
           setSectionScores(incomingScores)
         }
-        setError(null)
+        setFetchError(null)
       } catch (err: any) {
-        if (isActive) setError(err.message || "Unable to load final verdict")
+        if (isActive) setFetchError(err.message || "No data found.")
       } finally {
         if (isActive) setLoading(false)
       }
@@ -231,9 +233,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
       setOverallRating(payloadOverall || "")
       setSectionScores(draftSectionScores)
       setEditMode(false)
-      setError(null)
+      setSaveError(null)
     } catch (err: any) {
-      setError(err.message || "Save failed")
+      setSaveError(err.message || "Save failed")
     }
   }
 
@@ -242,7 +244,16 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
     setDraftOverallRating(overallRating)
     setDraftSectionScores({})
     setEditMode(false)
-    setError(null)
+    setSaveError(null)
+  }
+
+  if (!loading && fetchError) {
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
   }
 
   return (
@@ -452,9 +463,9 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
               </Typography>
             ) : null}
 
-            {error ? (
+            {saveError ? (
               <Typography variant="caption" sx={{ color: "#b91c1c" }}>
-                {error}
+                {saveError}
               </Typography>
             ) : null}
 

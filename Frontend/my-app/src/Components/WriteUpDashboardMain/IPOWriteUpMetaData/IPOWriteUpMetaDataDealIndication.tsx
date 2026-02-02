@@ -4,6 +4,7 @@ import { BasicDealDetails } from "../types/DealInformation"
 import ExecutiveSummaryCard from "./AiUnsupervised/ExecutiveSummaryCard"
 import OutlookSummaryRow from "./AiUnsupervised/OutlookSummaryRow"
 import ScenarioCards from "./AiUnsupervised/ScenarioCards"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 type AiAnalysisRecord = {
   [key: string]: unknown
@@ -242,9 +243,10 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
           <Typography variant="body2">Loading deal indication...</Typography>
         </Box>
       ) : error ? (
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {error}
-        </Typography>
+        <NoDataNotice
+          title="No data found"
+          subtitle="There is no data for this ticker. We will update soon."
+        />
       ) : (
         <>
           <ExecutiveSummaryCard
