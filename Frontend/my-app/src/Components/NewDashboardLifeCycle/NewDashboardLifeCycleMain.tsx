@@ -24,6 +24,7 @@ import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
+import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
 import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
 import {
@@ -533,6 +534,17 @@ const NewDealsLifecycleCards: React.FC = () => {
     </Box>
   );
 
+  const regionTabs = [
+    { label: "US", value: "US", icon: <BusinessOutlinedIcon fontSize="small" /> },
+    { label: "EMEA", value: "EMEA", icon: <Diversity3Icon fontSize="small" /> },
+    { label: "APAC", value: "APAC", icon: <RocketLaunchIcon fontSize="small" /> },
+    {
+      label: "Non-US America",
+      value: "Non-US America",
+      icon: <CategoryOutlinedIcon fontSize="small" />,
+    },
+  ] as const;
+
   return (
     <>
       <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1, md: 1.5 } }}>
@@ -562,23 +574,35 @@ const NewDealsLifecycleCards: React.FC = () => {
             }}
           >
             <Box sx={{ minWidth: 0 }}>
-              <FiltersBar
-                tabs={tabs}
-                selectedOp={selectedOp}
-                onSelectOp={setSelectedOp}
-                selectedDealType={selectedDealType}
-                onSelectDealType={setSelectedDealType}
-                isPipelineView={isPipelineView}
-                liveStartDate={liveStartDate}
-                liveEndDate={liveEndDate}
-                setLiveStartDate={setLiveStartDate}
-                setLiveEndDate={setLiveEndDate}
-                dealSearch={dealSearch}
-                setDealSearch={setDealSearch}
-                pipelineSearch={pipelineSearch}
-                setPipelineSearch={setPipelineSearch}
-                inline
-              />
+              <Stack spacing={1} sx={{ minWidth: 0 }}>
+                <FiltersBar
+                  tabs={tabs}
+                  selectedOp={selectedOp}
+                  onSelectOp={setSelectedOp}
+                  selectedDealType={selectedDealType}
+                  onSelectDealType={setSelectedDealType}
+                  isPipelineView={isPipelineView}
+                  liveStartDate={liveStartDate}
+                  liveEndDate={liveEndDate}
+                  setLiveStartDate={setLiveStartDate}
+                  setLiveEndDate={setLiveEndDate}
+                  dealSearch={dealSearch}
+                  setDealSearch={setDealSearch}
+                  pipelineSearch={pipelineSearch}
+                  setPipelineSearch={setPipelineSearch}
+                  inline
+                />
+                <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                  <RegionTabs
+                    tabs={regionTabs}
+                    selectedRegion={selectedRegion}
+                    onSelect={(value) =>
+                      setSelectedRegion(value as "US" | "EMEA" | "APAC" )
+                    }
+                    compact
+                  />
+                </Box>
+              </Stack>
             </Box>
 
             <Stack

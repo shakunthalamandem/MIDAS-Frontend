@@ -11,14 +11,21 @@ type RegionTabsProps = {
   tabs: ReadonlyArray<RegionTab>;
   selectedRegion: string;
   onSelect: (value: string) => void;
+  compact?: boolean;
 };
 
 const RegionTabs: React.FC<RegionTabsProps> = ({
   tabs,
   selectedRegion,
   onSelect,
+  compact = false,
 }) => (
-  <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center">
+  <Stack
+    direction="row"
+    spacing={compact ? 0.75 : 1}
+    flexWrap="wrap"
+    justifyContent="center"
+  >
     {tabs.map((item) => {
       const isSelected = selectedRegion === item.value;
       return (
@@ -26,12 +33,12 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
           key={item.value}
           onClick={() => onSelect(item.value)}
           sx={{
-            px: 2,
-            py: 0.6,
+            px: compact ? 1.4 : 2,
+            py: compact ? 0.35 : 0.6,
             borderRadius: 999,
             cursor: "pointer",
             fontWeight: 600,
-            fontSize: "0.8rem",
+            fontSize: compact ? "0.7rem" : "0.8rem",
             border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
             backgroundColor: isSelected ? "#2b146f" : "#ffffff",
             color: isSelected ? "#ffffff" : "#1f2a44",
@@ -44,9 +51,13 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
             },
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={0.75}>
-            {item.icon}
-            <Typography fontWeight={600} color="inherit">
+          <Stack direction="row" alignItems="center" spacing={compact ? 0.5 : 0.75}>
+            {/* {item.icon} */}
+            <Typography
+              fontWeight={600}
+              color="inherit"
+              sx={{ fontSize: compact ? "0.7rem" : "0.8rem" }}
+            >
               {item.label}
             </Typography>
           </Stack>

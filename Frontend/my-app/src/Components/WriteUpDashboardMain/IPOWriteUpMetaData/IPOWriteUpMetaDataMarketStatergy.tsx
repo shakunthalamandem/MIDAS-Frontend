@@ -184,7 +184,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
-          background: "#f7f9ff",
+          // background: "#f7f9ff",
+                    background: "linear-gradient(#f0f5ff)",
           p: { xs: 2.5, md: 3 },
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
         }}
@@ -201,10 +202,9 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
           <Box sx={{ display: { xs: "none", sm: "block" } }} />
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+            sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}
           >
-            Market Strategy
-          </Typography>
+IOI and After-Market Strategy          </Typography>
           <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
             {isEditingCards ? (
               <Stack direction="row" spacing={1}>
@@ -263,7 +263,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
                 >
                   <Typography
                     variant="subtitle2"
-                    sx={{ fontSize:"1rem",fontWeight: 700, color: "#1d2b5a" }}
+                    sx={{ fontSize:"1rem",fontWeight: 700, color: "#124180" }}
                   >
                     {card.label}
                   </Typography>
@@ -316,7 +316,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
             <Box sx={{ display: { xs: "none", sm: "block" } }} />
             <Typography
               variant="h6"
-              sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
+              sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}
             >
               Aftermarket Strategy
             </Typography>

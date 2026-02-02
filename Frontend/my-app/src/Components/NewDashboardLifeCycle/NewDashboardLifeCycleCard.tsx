@@ -74,12 +74,25 @@ const DealCard: React.FC<DealCardProps> = ({
       sx={{
         borderRadius: 4,
         border: "1px solid #e5f0ff",
-        backgroundColor: "#f6fbff",
+        backgroundColor: "#c2dbf0",
         boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
         height: "100%",
         minHeight: { xs: 400, sm: 300 },
         fontSize: "0.92rem",
         cursor: onViewDetails ? "pointer" : "default",
+        transition: "transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease",
+        willChange: "transform, box-shadow",
+        "&:hover": onViewDetails
+          ? {
+              transform: "translateY(-4px)",
+              boxShadow: "0 22px 40px rgba(27, 44, 90, 0.16)",
+            }
+          : undefined,
+        "&:focus-visible": onViewDetails
+          ? {
+              outlineOffset: 2,
+            }
+          : undefined,
       }}
     >
       <CardContent
@@ -329,23 +342,34 @@ const DealCard: React.FC<DealCardProps> = ({
         ) : null}
 
         {onViewDetails && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", pt: 0.5 }}>
-            <IconButton
-              onClick={onViewDetails}
-              aria-label="View details"
-              sx={{
-                backgroundColor: "rgb(74, 130, 243)",
-                color: "#ffffff",
-                width: 20,
-                height: 20,
-                "&:hover": {
-                  backgroundColor: "#0a2f73",
-                },
-              }}
-            >
-              <ArrowForwardIcon />
-            </IconButton>
-          </Box>
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 0.5,
+    pt: 0.5,
+  }}
+>
+  <Typography variant="body2" color="#002060" fontWeight={600}>View</Typography>
+
+  <IconButton
+    onClick={onViewDetails}
+    aria-label="View details"
+    sx={{
+      backgroundColor: "#002060",
+      color: "#ffffff",
+      width: 20,
+      height: 20,
+      "&:hover": {
+        backgroundColor: "#002060",
+      },
+    }}
+  >
+    <ArrowForwardIcon sx={{ fontSize: 14 }} />
+  </IconButton>
+</Box>
+
         )}
       </CardContent>
     </Card>
