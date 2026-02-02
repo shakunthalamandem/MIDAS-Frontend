@@ -538,11 +538,11 @@ const NewDealsLifecycleCards: React.FC = () => {
     { label: "US", value: "US", icon: <BusinessOutlinedIcon fontSize="small" /> },
     { label: "EMEA", value: "EMEA", icon: <Diversity3Icon fontSize="small" /> },
     { label: "APAC", value: "APAC", icon: <RocketLaunchIcon fontSize="small" /> },
-    {
-      label: "Non-US America",
-      value: "Non-US America",
-      icon: <CategoryOutlinedIcon fontSize="small" />,
-    },
+    // {
+    //   label: "Non-US America",
+    //   value: "Non-US America",
+    //   icon: <CategoryOutlinedIcon fontSize="small" />,
+    // },
   ] as const;
 
   return (
