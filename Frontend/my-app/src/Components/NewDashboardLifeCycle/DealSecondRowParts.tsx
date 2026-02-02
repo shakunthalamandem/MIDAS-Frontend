@@ -192,9 +192,10 @@ function PredictionTile({
 
 export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
   return (
-    <SectionCard title="Deal Momentum (Avg Price)">
+    <SectionCard title="Deal Momentum (Peers Avg Price)">
       <Typography variant="body2" color="#000000">
-        Average price performance of recent deals in similar sectors/industries
+        Average price performance based on the latest deal of each peer
+        ({data.peers_count || 0} peers)
       </Typography>
 
       <TableContainer
@@ -205,29 +206,36 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
           border: "1px solid #e5e7ef",
           background: "#ffffff",
           boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+          mt: 1.5,
         }}
       >
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 800 }}>Deals</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>Peers</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>1st Day</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>1st Week</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>1st Month</TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Last 5 Deals</TableCell>
-              <TableCell>{formatNum(data.last_5_t1d_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_5_t1w_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_5_t1m_avg_price)}%</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Last 10 Deals</TableCell>
-              <TableCell>{formatNum(data.last_10_t1d_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_10_t1w_avg_price)}%</TableCell>
-              <TableCell>{formatNum(data.last_10_t1m_avg_price)}%</TableCell>
+              <TableCell sx={{ fontWeight: 400 }}>
+                Peers Average (Top {data.peers_count || 0})
+              </TableCell>
+
+              <TableCell>
+                {formatNum(data.peers_t1d_avg_price)}%
+              </TableCell>
+
+              <TableCell>
+                {formatNum(data.peers_t1w_avg_price)}%
+              </TableCell>
+
+              <TableCell>
+                {formatNum(data.peers_t1m_avg_price)}%
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -235,6 +243,7 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
     </SectionCard>
   );
 }
+
 
 export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
   return (

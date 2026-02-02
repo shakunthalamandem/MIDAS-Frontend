@@ -28,12 +28,10 @@ export interface DealRecommendationResponse {
   one_week_sentiment: string;
   one_month_sentiment: string;
 
-  last_5_t1d_avg_price: number;
-  last_10_t1d_avg_price: number;
-  last_5_t1w_avg_price: number;
-  last_10_t1w_avg_price: number;
-  last_5_t1m_avg_price: number;
-  last_10_t1m_avg_price: number;
+  peers_t1d_avg_price: number;
+  peers_t1w_avg_price: number;
+  peers_t1m_avg_price: number;
+  peers_count: number;
 
   t1d_overall_prediction: string;
   t1w_overall_prediction: string;
