@@ -31,6 +31,9 @@ type Props = {
   potentialQty: number | null;
   ticker: string;
   overallSummary: { t1d: string; t1w: string; t1m: string };
+
+  // ✅ tells parent to refetch so props update (fixes stale UI)
+  onSaved?: () => void;
 };
 
 type DealState = {
@@ -62,7 +65,12 @@ const selectBgMap: Record<SummaryOption, string> = {
 function mapToSummaryOption(value?: string): SummaryOption {
   const normalized = (value || "").toLowerCase();
   if (normalized.includes("positive") || normalized.includes("bull") || normalized.includes("up")) return "Positive";
-  if (normalized.includes("negative") || normalized.includes("bear") || normalized.includes("down") || normalized.includes("low"))
+  if (
+    normalized.includes("negative") ||
+    normalized.includes("bear") ||
+    normalized.includes("down") ||
+    normalized.includes("low")
+  )
     return "Negative";
   return "Neutral";
 }
@@ -75,23 +83,21 @@ function buildSummaryState(values: Partial<Record<SummaryKey, string>>): Summary
   };
 }
 
-function toIntOrNull(raw: any): number | null {
+function toIntOrNull(raw: unknown): number | null {
   if (raw === null || raw === undefined || raw === "") return null;
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
   return Math.trunc(n);
 }
 
-/**
- * Backend → UI mapping in one place.
- * If backend keys differ, update here.
- */
+/** backend → UI normalization */
 function normalizeDealFromApi(data: any, fallback: DealState): DealState {
   const rec =
     data?.am_strategy_recommendation ??
     data?.amStrategyRecommendation ??
     data?.recommendation ??
     data?.AM_strategy_recommendation ??
+    data?.AM_strategy_recommendation ?? // keep
     fallback.am_strategy_recommendation ??
     "";
 
@@ -100,13 +106,29 @@ function normalizeDealFromApi(data: any, fallback: DealState): DealState {
     data?.potentialAmQuantity ??
     data?.potentialQty ??
     data?.potential_AM_quantity ??
+    data?.potential_am_qty ??
     fallback.potential_am_quantity ??
     null;
 
   const overall = buildSummaryState({
-    t1d: data?.t1d_overall_pred ?? data?.t1dOverallPred ?? data?.overallSummary?.t1d ?? fallback.overall.t1d,
-    t1w: data?.t1w_overall_pred ?? data?.t1wOverallPred ?? data?.overallSummary?.t1w ?? fallback.overall.t1w,
-    t1m: data?.t1m_overall_pred ?? data?.t1mOverallPred ?? data?.overallSummary?.t1m ?? fallback.overall.t1m,
+    t1d:
+      data?.t1d_overall_pred ??
+      data?.t1dOverallPred ??
+      data?.t1d_overall_prediction ??
+      data?.overallSummary?.t1d ??
+      fallback.overall.t1d,
+    t1w:
+      data?.t1w_overall_pred ??
+      data?.t1wOverallPred ??
+      data?.t1w_overall_prediction ??
+      data?.overallSummary?.t1w ??
+      fallback.overall.t1w,
+    t1m:
+      data?.t1m_overall_pred ??
+      data?.t1mOverallPred ??
+      data?.t1m_overall_prediction ??
+      data?.overallSummary?.t1m ??
+      fallback.overall.t1m,
   });
 
   return {
@@ -116,7 +138,7 @@ function normalizeDealFromApi(data: any, fallback: DealState): DealState {
   };
 }
 
-export default function DealAMStrategy({ recommendation, potentialQty, ticker, overallSummary }: Props) {
+export default function DealAMStrategy({ recommendation, potentialQty, ticker, overallSummary, onSaved }: Props) {
   const API_URL = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -136,7 +158,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ sync from props only when NOT editing (prevents overwrite after refresh)
+  // ✅ Sync from parent ONLY when not editing
   useEffect(() => {
     if (isEditing) return;
     setCurrent(stateFromProps);
@@ -208,7 +230,12 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
       const raw = await response.text();
       if (!response.ok) throw new Error(raw || "Failed to save AM strategy");
 
+      // ✅ local refresh
       await fetchDeal();
+
+      // ✅ parent refresh (THIS fixes the "not reflecting" problem)
+      onSaved?.();
+
       setIsEditing(false);
     } catch (err: any) {
       setError(err?.message || "Failed to save AM strategy");
@@ -218,7 +245,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
   };
 
   const qtyLabel = (() => {
-    const q = isEditing ? draft.potential_am_quantity : current.potential_am_quantity;
+    const q = isEditing ? draft?.potential_am_quantity : current?.potential_am_quantity;
     if (q === null || q === undefined) return "-";
     return `${Math.trunc(Number(q))}x`;
   })();
@@ -235,7 +262,6 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
       }}
     >
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 2 }}>
           <Box>
             <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 18 }}>
@@ -274,7 +300,6 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
         <Divider sx={{ mb: 2, opacity: 0.5 }} />
 
         <Grid container spacing={2}>
-          {/* Overall AI Summary */}
           <Grid item xs={12} md={4}>
             <Box
               sx={{
@@ -334,7 +359,6 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             </Box>
           </Grid>
 
-          {/* AM Strategy Recommendation */}
           <Grid item xs={12} md={6}>
             <Box
               sx={{
@@ -381,7 +405,6 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             </Box>
           </Grid>
 
-          {/* Potential AM Quantity (smaller) */}
           <Grid item xs={12} md={2}>
             <Box
               sx={{

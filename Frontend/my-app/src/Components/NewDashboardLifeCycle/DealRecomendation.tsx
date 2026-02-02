@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Box, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Box, Stack, Typography } from "@mui/material";
 import DealTopMetrics from "./DealTopMetrics";
 import DealSecondRow from "./DealSecondRow";
 import DealAMStrategy from "./DealAMStrategy";
@@ -10,7 +10,6 @@ export interface DealRecommendationResponse {
   after_market_threshold: string;
 
   valuation: string;
-
   potential_am_quantity: number | null;
 
   t1d_pred: string;
@@ -40,9 +39,8 @@ export interface DealRecommendationResponse {
   t1w_overall_prediction: string;
   t1m_overall_prediction: string;
 
-  writeup_overall_rating: number;  // out of 100
-  ai_ml_overall_rating: number;    // out of 100
-
+  writeup_overall_rating: number;
+  ai_ml_overall_rating: number;
 
   AM_strategy_recommendation: string;
 }
@@ -82,13 +80,8 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
 
   const effectiveTicker = useMemo(() => (ticker || "").trim(), [ticker]);
 
-  useEffect(() => {
-    if (!effectiveTicker) {
-      setData(null);
-      setState("idle");
-      setError("");
-      return;
-    }
+  const reload = useCallback(() => {
+    if (!effectiveTicker) return;
 
     let cancelled = false;
     setState("loading");
@@ -111,19 +104,26 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
     };
   }, [effectiveTicker]);
 
+  useEffect(() => {
+    if (!effectiveTicker) {
+      setData(null);
+      setState("idle");
+      setError("");
+      return;
+    }
+    return reload();
+  }, [effectiveTicker, reload]);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 }}>
         <Stack spacing={2}>
-          {/* Header */}
-
           {!effectiveTicker && (
             <Alert severity="info" variant="outlined">
               Please provide a ticker to fetch the deal recommendation.
             </Alert>
           )}
 
-          {/* Error */}
           {effectiveTicker && state === "error" && (
             <Alert severity="error" variant="outlined">
               <Typography fontWeight={700}>Could not load data</Typography>
@@ -131,7 +131,6 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
             </Alert>
           )}
 
-          {/* Content */}
           {effectiveTicker && data && (
             <>
               <DealTopMetrics
@@ -151,6 +150,7 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
                   t1w: data.t1w_overall_prediction,
                   t1m: data.t1m_overall_prediction,
                 }}
+                onSaved={() => reload()}
               />
             </>
           )}
