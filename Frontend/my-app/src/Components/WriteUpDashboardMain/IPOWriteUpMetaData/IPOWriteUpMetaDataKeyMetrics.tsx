@@ -20,6 +20,7 @@ import CircleIcon from "@mui/icons-material/Circle"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { motion } from "framer-motion"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 /* -------------------- TYPES -------------------- */
 
@@ -78,7 +79,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   IPOWriteUpMetaDataKeyMetricsProps
 > = ({ basicDealDetails }) => {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [metrics, setMetrics] = useState<KeyMetricsResponse>({})
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
@@ -113,7 +115,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         const data = await res.json()
         if (active) setMetrics(data || {})
       } catch (err: any) {
-        if (active) setError(err.message)
+        if (active) setFetchError(err.message || "No data found.")
       } finally {
         if (active) setLoading(false)
       }
@@ -169,7 +171,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       setEditedMetrics({})
       setEditMode(false)
     } catch (err: any) {
-      setError(err.message)
+      setSaveError(err.message || "Save failed")
     }
   }
 
@@ -187,7 +189,13 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       </Box>
     )
 
-  if (error) return <Typography color="error">{error}</Typography>
+  if (fetchError)
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
 
   return (
     <motion.div
@@ -374,6 +382,11 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             </Typography>
           </Box>
         )}
+        {saveError ? (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {saveError}
+          </Typography>
+        ) : null}
       </Box>
     </motion.div>
   )

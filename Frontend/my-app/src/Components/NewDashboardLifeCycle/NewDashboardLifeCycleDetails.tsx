@@ -50,7 +50,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
-      { label: "AI- Sentiment View" },
+      { label: "AI - Sentiment View" },
       { label: "AI Unsupervised" },
       { label: "ML Model" },
       { label: "S1 AI Query" },

@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -172,7 +173,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   basicDealDetails
 }) => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<RedFlagAnalysis | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [draftItems, setDraftItems] = useState<RedFlagItem[]>([])
@@ -189,7 +191,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
 
     const fetchRedFlags = async () => {
       setLoading(true)
-      setError(null)
+      setFetchError(null)
       try {
         const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
           method: "POST",
@@ -205,7 +207,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         if (isActive) setAnalysis(payload?.red_flag_analysis ?? null)
       } catch (fetchError: any) {
         if (isActive) {
-          setError(fetchError?.message || "Unable to load red flag analysis")
+          setFetchError(fetchError?.message || "No data found.")
         }
       } finally {
         if (isActive) setLoading(false)
@@ -221,7 +223,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const refreshRedFlags = async () => {
     if (!apiUrl || !ticker) return
     setLoading(true)
-    setError(null)
+    setFetchError(null)
     try {
       const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
         method: "POST",
@@ -236,7 +238,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       const payload = (await response.json()) as RedFlagResponse
       setAnalysis(payload?.red_flag_analysis ?? null)
     } catch (fetchError: any) {
-      setError(fetchError?.message || "Unable to load red flag analysis")
+      setFetchError(fetchError?.message || "No data found.")
     } finally {
       setLoading(false)
     }
@@ -306,7 +308,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const handleSaveAll = async () => {
     if (!apiUrl || !ticker) return
     setSaveLoading(true)
-    setError(null)
+    setSaveError(null)
     try {
       const originalItems = originalItemsRef.current
       const updates: Array<{ category: string; changes: Record<string, unknown> }> =
@@ -395,7 +397,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       setDraftRatingScore(null)
       await refreshRedFlags()
     } catch (fetchError: any) {
-      setError(fetchError?.message || "Unable to save changes")
+      setSaveError(fetchError?.message || "Unable to save changes")
     } finally {
       setSaveLoading(false)
     }
@@ -484,10 +486,11 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
             <CircularProgress size={26} />
           </Box>
-        ) : error ? (
-          <Typography variant="body2" sx={{ color: "#b91c1c" }}>
-            {error}
-          </Typography>
+        ) : fetchError ? (
+          <NoDataNotice
+            title="No data found"
+            subtitle="There is no data for this ticker. We will update soon."
+          />
         ) : items.length === 0 ? (
           <Typography variant="body2" sx={{ color: "#5c6c8a" }}>
             No red flag analysis available for this ticker.
@@ -675,6 +678,11 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             })}
           </Stack>
         )}
+        {saveError ? (
+          <Typography variant="body2" sx={{ color: "#b91c1c" }}>
+            {saveError}
+          </Typography>
+        ) : null}
 
         {/* <Typography
           variant="caption"
