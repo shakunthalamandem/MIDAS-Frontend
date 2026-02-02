@@ -31,8 +31,6 @@ type Props = {
   potentialQty: number | null;
   ticker: string;
   overallSummary: { t1d: string; t1w: string; t1m: string };
-
-  // ✅ tells parent to refetch so props update (fixes stale UI)
   onSaved?: () => void;
 };
 
@@ -43,9 +41,9 @@ type DealState = {
 };
 
 const summaryFields: { key: SummaryKey; short: string }[] = [
-  { key: "t1d", short: "1D" },
-  { key: "t1w", short: "1W" },
-  { key: "t1m", short: "1M" },
+  { key: "t1d", short: "1st Day" },
+  { key: "t1w", short: "1 Week" },
+  { key: "t1m", short: "1 Month" },
 ];
 
 const summaryOptions: SummaryOption[] = ["Positive", "Neutral", "Negative"];
@@ -97,7 +95,7 @@ function normalizeDealFromApi(data: any, fallback: DealState): DealState {
     data?.amStrategyRecommendation ??
     data?.recommendation ??
     data?.AM_strategy_recommendation ??
-    data?.AM_strategy_recommendation ?? // keep
+    data?.AM_strategy_recommendation ??
     fallback.am_strategy_recommendation ??
     "";
 
@@ -230,12 +228,8 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
       const raw = await response.text();
       if (!response.ok) throw new Error(raw || "Failed to save AM strategy");
 
-      // ✅ local refresh
       await fetchDeal();
-
-      // ✅ parent refresh (THIS fixes the "not reflecting" problem)
       onSaved?.();
-
       setIsEditing(false);
     } catch (err: any) {
       setError(err?.message || "Failed to save AM strategy");
@@ -250,129 +244,184 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
     return `${Math.trunc(Number(q))}x`;
   })();
 
+  const surfaceSx = {
+    borderRadius: 3,
+    border: "1px solid rgba(148,163,184,0.28)",
+    background: "rgba(255,255,255,0.82)",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 8px 22px rgba(15, 23, 42, 0.06)",
+  } as const;
+
   return (
     <Card
       elevation={0}
       sx={{
         borderRadius: 4,
-        border: "1px solid rgba(148,163,184,0.35)",
-        background: "linear-gradient(#f0f5ff)",
-        boxShadow: "0 16px 40px rgba(15, 23, 42, 0.10)",
+        border: "1px solid rgba(148,163,184,0.28)",
+        background: "linear-gradient(180deg, rgba(240,245,255,1) 0%, rgba(248,250,255,1) 100%)",
+        boxShadow: "0 18px 44px rgba(15, 23, 42, 0.10)",
         overflow: "hidden",
       }}
     >
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 2 }}>
-          <Box>
-            <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 18 }}>
-              After Market (AM) Recommendation
-            </Typography>
-          </Box>
+        {/* Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            mb: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              fontWeight: 1000,
+              color: "#0f172a",
+              fontSize: 18,
+              textAlign: "center",
+              letterSpacing: 0.2,
+            }}
+          >
+            After Market (AM) Recommendation
+          </Typography>
 
-          <Stack direction="row" spacing={1}>
-            {isEditing ? (
-              <>
-                <Tooltip title="Save">
-                  <span>
-                    <IconButton size="small" onClick={handleSave} disabled={isSaving}>
-                      <SaveOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </span>
+          {/* Actions pinned to the right */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+            <Stack direction="row" spacing={1}>
+              {isEditing ? (
+                <>
+                  <Tooltip title="Save">
+                    <span>
+                      <IconButton size="small" onClick={handleSave} disabled={isSaving}>
+                        <SaveOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title="Cancel">
+                    <span>
+                      <IconButton size="small" onClick={cancelEdit} disabled={isSaving}>
+                        <CloseOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </>
+              ) : (
+                <Tooltip title="Edit">
+                  <IconButton size="small" onClick={openEdit}>
+                    <EditOutlinedIcon fontSize="small" />
+                  </IconButton>
                 </Tooltip>
-                <Tooltip title="Cancel">
-                  <span>
-                    <IconButton size="small" onClick={cancelEdit} disabled={isSaving}>
-                      <CloseOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              </>
-            ) : (
-              <Tooltip title="Edit">
-                <IconButton size="small" onClick={openEdit}>
-                  <EditOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Stack>
+              )}
+            </Stack>
+          </Box>
         </Box>
 
-        <Divider sx={{ mb: 2, opacity: 0.5 }} />
+        <Divider sx={{ mb: 2, opacity: 0.55 }} />
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
+          {/* Overall Summary "Table" */}
           <Grid item xs={12} md={4}>
-            <Box
-              sx={{
-                borderRadius: 3,
-                border: "1px solid rgba(148,163,184,0.30)",
-                background: "rgba(255,255,255,0.75)",
-                backdropFilter: "blur(10px)",
-                p: 2,
-                height: "100%",
-              }}
-            >
-              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1 }}>
+            <Box sx={{ ...surfaceSx, p: 2, height: "100%" }}>
+              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
                 Overall AI Summary
               </Typography>
 
-              <Stack direction="row" spacing={1} sx={{ justifyContent: "space-between" }}>
-                {summaryFields.map((field) => (
-                  <Box key={field.key} sx={{ flex: 1, minWidth: 0, textAlign: "center" }}>
-                    <Typography sx={{ fontSize: 11, fontWeight: 900, color: "rgba(15,23,42,0.7)" }}>
-                      {field.short}
-                    </Typography>
+              {/* Table-like grid */}
+              <Box
+                sx={{
+                  borderRadius: 2,
+                  border: "1px solid rgba(148,163,184,0.30)",
+                  overflow: "hidden",
+                  background: "#fff",
+                }}
+              >
+                {/* Header row */}
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    background: "rgba(15,23,42,0.03)",
+                    borderBottom: "1px solid rgba(148,163,184,0.25)",
+                  }}
+                >
+                  {summaryFields.map((field, idx) => (
+                    <Box
+                      key={field.key}
+                      sx={{
+                        py: 1,
+                        px: 1,
+                        textAlign: "center",
+                        borderRight: idx !== summaryFields.length - 1 ? "1px solid rgba(148,163,184,0.25)" : "none",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 11, fontWeight: 800, color: "rgba(15,23,42,0.75)" }}>
+                        {field.short}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
 
-                    {isEditing ? (
-                      <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-                        <InputLabel id={`overall-${field.key}-label`}>Sentiment</InputLabel>
-                        <Select
-                          labelId={`overall-${field.key}-label`}
-                          label="Sentiment"
-                          value={draft.overall[field.key]}
-                          onChange={(event: SelectChangeEvent) =>
-                            setDraft((prev) => ({
-                              ...prev,
-                              overall: { ...prev.overall, [field.key]: event.target.value as SummaryOption },
-                            }))
-                          }
-                          sx={{ background: selectBgMap[draft.overall[field.key]], borderRadius: 2 }}
-                        >
-                          {summaryOptions.map((option) => (
-                            <MenuItem key={option} value={option}>
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    ) : (
-                      <Chip
-                        sx={{ mt: 1, fontWeight: 900 }}
-                        size="small"
-                        label={current.overall[field.key]}
-                        color={chipColorMap[current.overall[field.key]]}
-                        variant={current.overall[field.key] === "Neutral" ? "outlined" : "filled"}
-                      />
-                    )}
-                  </Box>
-                ))}
-              </Stack>
+                {/* Value row */}
+                <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
+                  {summaryFields.map((field, idx) => (
+                    <Box
+                      key={field.key}
+                      sx={{
+                        p: 1.25,
+                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRight: idx !== summaryFields.length - 1 ? "1px solid rgba(148,163,184,0.20)" : "none",
+                      }}
+                    >
+                      {isEditing ? (
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                          <InputLabel id={`overall-${field.key}-label`}>Sentiment</InputLabel>
+                          <Select
+                            labelId={`overall-${field.key}-label`}
+                            label="Sentiment"
+                            value={draft.overall[field.key]}
+                            onChange={(event: SelectChangeEvent) =>
+                              setDraft((prev) => ({
+                                ...prev,
+                                overall: { ...prev.overall, [field.key]: event.target.value as SummaryOption },
+                              }))
+                            }
+                            sx={{
+                              background: selectBgMap[draft.overall[field.key]],
+                              borderRadius: 2,
+                              "& .MuiSelect-select": { textAlign: "center" },
+                            }}
+                          >
+                            {summaryOptions.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <Chip
+                          size="small"
+                          label={current.overall[field.key]}
+                          color={chipColorMap[current.overall[field.key]]}
+                          variant={current.overall[field.key] === "Neutral" ? "outlined" : "filled"}
+                          sx={{ fontWeight: 700, px: 0.5 }}
+                        />
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
             </Box>
           </Grid>
 
+          {/* Strategy Recommendation */}
           <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                borderRadius: 3,
-                border: "1px solid rgba(148,163,184,0.30)",
-                background: "rgba(255,255,255,0.75)",
-                backdropFilter: "blur(10px)",
-                p: 2,
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1 }}>
+            <Box sx={{ ...surfaceSx, p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
                 AM Strategy Recommendation
               </Typography>
 
@@ -384,7 +433,13 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                   onChange={(e) => setDraft((prev) => ({ ...prev, am_strategy_recommendation: e.target.value }))}
                   placeholder="Write AM strategy recommendation..."
                   fullWidth
-                  sx={{ "& .MuiInputBase-root": { borderRadius: 2, background: "#fff" } }}
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      borderRadius: 2,
+                      background: "#fff",
+                      textAlign: "left",
+                    },
+                  }}
                 />
               ) : (
                 <Box
@@ -392,9 +447,13 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                     borderRadius: 2,
                     border: "1px solid rgba(148,163,184,0.30)",
                     background: "#fff",
-                    p: 1.5,
+                    p: 1.75,
                     flex: 1,
                     overflow: "auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
                   }}
                 >
                   <Typography sx={{ whiteSpace: "pre-line", lineHeight: 1.7, color: "#0f172a" }}>
@@ -405,19 +464,18 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             </Box>
           </Grid>
 
+          {/* Potential Qty */}
           <Grid item xs={12} md={2}>
             <Box
               sx={{
-                borderRadius: 3,
-                border: "1px solid rgba(148,163,184,0.30)",
-                background: "rgba(255,255,255,0.75)",
-                backdropFilter: "blur(10px)",
+                ...surfaceSx,
                 p: 2,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                gap: 1,
+                alignItems: "center",
+                gap: 1.25,
               }}
             >
               <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, textAlign: "center" }}>
@@ -440,7 +498,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                     pattern: "[0-9]*",
                     style: { textAlign: "center", fontWeight: 900 },
                   }}
-                  sx={{ "& .MuiInputBase-root": { borderRadius: 2, background: "#fff" } }}
+                  sx={{ width: "100%", maxWidth: 170, "& .MuiInputBase-root": { borderRadius: 2, background: "#fff" } }}
                   InputProps={{ endAdornment: <InputAdornment position="end">x</InputAdornment> }}
                 />
               ) : (
@@ -453,7 +511,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
         </Grid>
 
         {error ? (
-          <Typography variant="body2" sx={{ color: "#b91c1c", mt: 2 }}>
+          <Typography variant="body2" sx={{ color: "#b91c1c", mt: 2, textAlign: "center" }}>
             {error}
           </Typography>
         ) : null}
