@@ -241,9 +241,6 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 18 }}>
               After Market (AM) Recommendation
             </Typography>
-            <Typography sx={{ color: "rgba(15,23,42,0.65)", fontSize: 12, mt: 0.25 }}>
-              Ticker: <Box component="span" sx={{ fontWeight: 800 }}>{ticker}</Box>
-            </Typography>
           </Box>
 
           <Stack direction="row" spacing={1}>
