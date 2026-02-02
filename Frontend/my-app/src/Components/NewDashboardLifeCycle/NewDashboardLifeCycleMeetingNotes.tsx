@@ -6,18 +6,21 @@ import type { DealSearchResult } from "../Main/DealMeetingNotes/DealMeetingNotes
 type NewDashboardLifeCycleMeetingNotesProps = {
   ticker?: string | null;
   pricingDate?: string | null;
+  dealType?: string | null;
 };
 
 const NewDashboardLifeCycleMeetingNotes: React.FC<
   NewDashboardLifeCycleMeetingNotesProps
-> = ({ ticker, pricingDate }) => {
+> = ({ ticker, pricingDate, dealType }) => {
   const selectedDeal = useMemo<DealSearchResult | null>(() => {
-    if (!ticker || !pricingDate) return null;
+    const requiresPricingDate = (dealType || "").toUpperCase() === "FO";
+    if (!ticker || (requiresPricingDate && !pricingDate)) return null;
     return {
       ticker,
       pricingDate,
+      dealType: dealType ?? undefined,
     };
-  }, [ticker, pricingDate]);
+  }, [ticker, pricingDate, dealType]);
 
   if (!selectedDeal) {
     return (
@@ -32,7 +35,7 @@ const NewDashboardLifeCycleMeetingNotes: React.FC<
         }}
       >
         <Typography fontWeight={700} color="#002060">
-          Ticker and pricing date are required to view meeting notes.
+          Ticker is required, and pricing date is required only for FO deals.
         </Typography>
       </Paper>
     );
