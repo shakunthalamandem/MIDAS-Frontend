@@ -184,7 +184,7 @@ const DealCard: React.FC<DealCardProps> = ({
                   gap: 0.3,
                   alignItems: "center",
                   textAlign: "center",
-                  minHeight: 56,
+                  minHeight: 72,
                   justifyContent: "center",
                   cursor: onActionClick ? "pointer" : "default",
                   "&:hover": onActionClick

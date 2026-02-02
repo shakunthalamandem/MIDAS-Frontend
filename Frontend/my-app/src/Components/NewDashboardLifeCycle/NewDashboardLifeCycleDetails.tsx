@@ -266,6 +266,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCycleMeetingNotes
               ticker={activePayload.ticker}
               pricingDate={activePayload.pricing_date}
+              dealType={activePayload.deal_type}
             />
           ) : (
             <PageUnderDevelopment />

@@ -127,7 +127,23 @@ const formatDealSize = (value: any): string => {
           minWidth: 100,
   headerAlign: "left",
   align: "left",
-  renderCell: (params) => formatDealSize(params.value),
+  renderCell: (params) => {
+  const value = params.value;
+
+  // ✅ handle empty or zero deal size
+  if (
+    value == null ||
+    value === "" ||
+    value === 0 ||
+    value === "0" ||
+    value === "0M" ||
+    value === "$0M"
+  ) {
+    return "TBA";
+  }
+
+  return formatDealSize(value);
+},
   sortComparator: (v1, v2) => Number(v1) - Number(v2),
   },
     // dateColumn,

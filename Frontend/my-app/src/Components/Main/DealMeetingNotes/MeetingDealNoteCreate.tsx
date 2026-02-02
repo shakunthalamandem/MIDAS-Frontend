@@ -233,11 +233,13 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
     }));
   }, [selectedDeal]);
 
-  // Fetch existing meeting notes for the selected ticker + pricing_date.
+  // Fetch existing meeting notes for the selected ticker (+ deal_type/pricing_date when required).
   useEffect(() => {
     const ticker = selectedDeal?.ticker?.trim();
     const pricingDate = selectedDeal?.pricingDate;
-    if (!apiUrl || !ticker || !pricingDate) return;
+    const dealType = selectedDeal?.dealType?.trim();
+    const requiresPricingDate = dealType?.toUpperCase() === "FO";
+    if (!apiUrl || !ticker || (requiresPricingDate && !pricingDate)) return;
 
     const controller = new AbortController();
     const loadNotes = async () => {
@@ -251,7 +253,11 @@ const MeetingDealNoteCreate: React.FC<MeetingDealNoteCreateProps> = ({ selectedD
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker, pricing_date: pricingDate }),
+          body: JSON.stringify({
+            ticker,
+            pricing_date: pricingDate ?? null,
+            deal_type: dealType ?? null,
+          }),
           signal: controller.signal,
         });
 
