@@ -3,6 +3,7 @@ import { BasicDealDetails } from "../types/DealInformation";
 import DealInfoCardData from './DealInfoCardData';
 import FebWriteupDashboardLine from './FEBWriteup/FebWriteupDashboardLine';
 import FebWriteupSummaryTable from './FEBWriteup/FebWriteupSummaryTable';
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice";
 
 interface IPOWriteUpMetaDataDealInfoProps {
   basicDealDetails: BasicDealDetails;
@@ -69,11 +70,21 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    );
   }
 
   if (!writeUpData) {
-    return <div>No data available</div>;
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    );
   }
 
   return (

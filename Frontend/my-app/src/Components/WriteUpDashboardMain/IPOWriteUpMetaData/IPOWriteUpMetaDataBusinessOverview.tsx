@@ -8,7 +8,8 @@ import {
   TextField,
   Box,
   Chip,
-  Paper
+  Paper,
+  CircularProgress
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import EditIcon from "@mui/icons-material/Edit"
@@ -18,6 +19,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import GroupsIcon from "@mui/icons-material/Groups"
 import AccountTreeIcon from "@mui/icons-material/AccountTree"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 /* ===================== TYPES ===================== */
 
@@ -79,6 +81,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   const [businessOverviewDraft, setBusinessOverviewDraft] = useState("")
   const [savingBusinessOverview, setSavingBusinessOverview] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   /* ===================== FETCH ===================== */
 
@@ -87,20 +91,32 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       const apiUrl = process.env.REACT_APP_API_URL
       const token = localStorage.getItem("access_token")
 
-      const res = await fetch(`${apiUrl}/api/writeup_data/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : ""
-        },
-        body: JSON.stringify({ ticker: basicDealDetails.ticker })
-      })
+      try {
+        setLoading(true)
+        setFetchError(null)
+        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : ""
+          },
+          body: JSON.stringify({ ticker: basicDealDetails.ticker })
+        })
 
-      const data = await res.json()
-      setWriteUpData(data)
-      setUpdatedData(data)
-      const overviewText = (data?.business_overview || []).join("\n\n")
-      setBusinessOverviewDraft(overviewText)
+        if (!res.ok) {
+          throw new Error("Failed to fetch business overview")
+        }
+
+        const data = await res.json()
+        setWriteUpData(data)
+        setUpdatedData(data)
+        const overviewText = (data?.business_overview || []).join("\n\n")
+        setBusinessOverviewDraft(overviewText)
+      } catch (error: any) {
+        setFetchError(error?.message || "No data found.")
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchData()
@@ -194,7 +210,31 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       )
     )
 
-  if (!writeUpData) return null
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" py={4}>
+        <CircularProgress size={28} />
+      </Box>
+    )
+  }
+
+  if (fetchError) {
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
+  }
+
+  if (!writeUpData) {
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
+  }
 
   /* ===================== UI ===================== */
 
