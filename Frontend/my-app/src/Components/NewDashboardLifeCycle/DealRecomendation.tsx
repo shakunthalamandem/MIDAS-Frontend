@@ -116,7 +116,7 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 }}>
+      <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 ,background:"#d6e0ef"}}>
         <Stack spacing={2}>
           {!effectiveTicker && (
             <Alert severity="info" variant="outlined">

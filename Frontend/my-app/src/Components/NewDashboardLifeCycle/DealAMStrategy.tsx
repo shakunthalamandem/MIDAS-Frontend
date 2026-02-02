@@ -256,7 +256,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
       sx={{
         borderRadius: 4,
         border: "1px solid rgba(148,163,184,0.35)",
-        background: "linear-gradient(180deg, #F8FAFF 0%, #F4F7FF 100%)",
+        background: "linear-gradient(#f0f5ff)",
         boxShadow: "0 16px 40px rgba(15, 23, 42, 0.10)",
         overflow: "hidden",
       }}
