@@ -40,6 +40,9 @@ export const formatPriceValue = (row: any): string => {
   if (row?.pricing_range_min != null && row?.pricing_range_max != null) {
     const min = Number(row.pricing_range_min);
     const max = Number(row.pricing_range_max);
+    if (min === 0 && max === 0) {
+    return "TBA";
+  }
     if (!Number.isNaN(min) && !Number.isNaN(max)) {
       return `$${min.toFixed(0)} - $${max.toFixed(0)}`;
     }

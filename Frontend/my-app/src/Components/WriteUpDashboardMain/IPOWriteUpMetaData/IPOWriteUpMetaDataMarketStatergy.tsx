@@ -12,6 +12,7 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 interface IPOWriteUpMetaDataMarketStatergyProps {
   basicDealDetails: BasicDealDetails
@@ -33,7 +34,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
 
   const [data, setData] = useState<FairValueData | null>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const [isEditingCards, setIsEditingCards] = useState(false)
   const [isEditingNotes, setIsEditingNotes] = useState(false)
@@ -78,12 +80,12 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
       if (!basicDealDetails.ticker) return
       try {
         setLoading(true)
-        setError(null)
+        setFetchError(null)
         const result = await fetchFairValues()
         if (!cancelled) setData(result)
       } catch (err) {
         console.error("Error fetching fair value data", err)
-        if (!cancelled) setError("No data found.")
+        if (!cancelled) setFetchError("No data found.")
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -117,7 +119,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   )
 
   const openEditCards = () => {
-    setError(null)
+    setSaveError(null)
     setIsEditingCards(true)
     setDraftCards({
       fair_value_estimate: String(data?.fair_value_estimate ?? ""),
@@ -127,7 +129,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   }
 
   const openEditNotes = () => {
-    setError(null)
+    setSaveError(null)
     setIsEditingNotes(true)
     setDraftNotes(String(data?.internal_notes ?? ""))
   }
@@ -155,7 +157,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
       setData(refreshed)
       cancelEditCards()
     } catch (saveError: any) {
-      setError(saveError?.message || "Unable to save changes")
+      setSaveError(saveError?.message || "Unable to save changes")
     } finally {
       setIsSavingCards(false)
     }
@@ -172,10 +174,28 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
       setData(refreshed)
       cancelEditNotes()
     } catch (saveError: any) {
-      setError(saveError?.message || "Unable to save changes")
+      setSaveError(saveError?.message || "Unable to save changes")
     } finally {
       setIsSavingNotes(false)
     }
+  }
+
+  if (!loading && fetchError) {
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
+  }
+
+  if (!loading && !data) {
+    return (
+      <NoDataNotice
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
+      />
+    )
   }
 
   return (
@@ -386,9 +406,9 @@ IOI and After-Market Strategy          </Typography>
         </Stack>
       </Box>
 
-      {error ? (
+      {saveError ? (
         <Typography variant="body2" sx={{ color: "#b91c1c" }}>
-          {error}
+          {saveError}
         </Typography>
       ) : null}
     </Stack>

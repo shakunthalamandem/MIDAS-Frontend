@@ -12,6 +12,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
+import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
@@ -38,7 +39,8 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
 > = ({ basicDealDetails }) => {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [valuationText, setValuationText] = useState("")
   const [valuationImageUrl, setValuationImageUrl] = useState<string>("")
@@ -61,7 +63,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
     const fetchValuation = async () => {
       if (!apiUrl) {
         if (isActive) {
-          setError("API URL not defined")
+          setFetchError("API URL not defined")
           setLoading(false)
         }
         return
@@ -87,10 +89,10 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           setValuationImageUrl(data?.valuation_image_url ?? "")
           setDraftValuationText(normalized)
           setDraftImageUrl(data?.valuation_image_url ?? "")
-          setError(null)
+          setFetchError(null)
         }
       } catch (err: any) {
-        if (isActive) setError(err.message || "Unknown error occurred")
+        if (isActive) setFetchError(err.message || "No data found.")
       } finally {
         if (isActive) setLoading(false)
       }
@@ -128,9 +130,9 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       setValuationText(draftValuationText)
       setValuationImageUrl(draftImageUrl)
       setEditMode(false)
-      setError(null)
+      setSaveError(null)
     } catch (err: any) {
-      setError(err.message || "Save failed")
+      setSaveError(err.message || "Save failed")
     }
   }
 
@@ -149,11 +151,12 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       )
     }
 
-    if (error) {
+    if (fetchError) {
       return (
-        <Typography color="error" variant="body2">
-          {error}
-        </Typography>
+        <NoDataNotice
+          title="No data found"
+          subtitle="There is no data for this ticker. We will update soon."
+        />
       )
     }
 
@@ -237,6 +240,11 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           </Box>
         </Box>
         {renderValuationContent()}
+        {saveError ? (
+          <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+            {saveError}
+          </Typography>
+        ) : null}
       </Box>
   )
 }
