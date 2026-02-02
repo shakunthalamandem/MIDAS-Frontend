@@ -199,12 +199,12 @@ const FebWriteupDashboardLine: React.FC<FebWriteupDashboardLineProps> = ({
       });
 
       // 🔄 Re-fetch latest IPO data from API
-      const refreshed = await axios.get(
-        `${apiUrl}/api/writeup_data/${selectedTicker}/?t=${Date.now()}`,
-        { headers: getAuthHeaders() }
-      );
+      // const refreshed = await axios.get(
+      //   `${apiUrl}/api/writeup_data/${selectedTicker}/?t=${Date.now()}`,
+      //   { headers: getAuthHeaders() }
+      // );
 
-      setIpoData(refreshed.data);
+      // setIpoData(refreshed.data);
       setEditedData({});
     } catch (error: any) {
       console.error("Save Error:", error.response?.data || error.message || error);
@@ -358,10 +358,10 @@ useEffect(() => {
                           mt: 1,
                           display: "block",
                           fontWeight: 500,
-                          color: "#333",
+                          color: ipodata?.[item.key] ? "#333" : "#999",
                         }}
                       >
-                        {editedData[item.key] ?? ipodata[item.key] ?? "N/A"}
+                        {ipodata?.[item.key] ? String(ipodata[item.key]).trim() : "N/A"}
                       </Typography>
                     )}
                   </motion.div>
@@ -371,31 +371,33 @@ useEffect(() => {
             })}
 
             {/* Action Buttons */}
-            <Box position="absolute" top={0} right={0}>
+            <Box position="absolute" top={0} right={3}>
               {editMode ? (
                 <>
-                  <IconButton
+            <IconButton size="small"
                     color="primary"
                     onClick={handleSave}
                     disabled={loading}
+                    sx={{ padding: "4px" }}
                   >
                     {loading ? (
-                      <CircularProgress size={24} />
+                      <CircularProgress size={18} />
                     ) : (
-                      <SaveIcon />
+                      <SaveIcon fontSize="small" />
                     )}
                   </IconButton>
-                  <IconButton
+                <IconButton size="small"
                     color="secondary"
                     onClick={handleCancel}
                     disabled={loading}
+                    sx={{ padding: "4px" }}
                   >
-                    <CancelIcon />
+                    <CancelIcon fontSize="small" />
                   </IconButton>
                 </>
               ) : (
-                <IconButton onClick={handleEnterEdit}>
-                  <EditIcon />
+             <IconButton size="small" onClick={handleEnterEdit} sx={{ padding: "4px" }}>
+                  <EditIcon fontSize="small" />
                 </IconButton>
               )}
             </Box>

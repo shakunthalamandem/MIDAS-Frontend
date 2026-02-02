@@ -73,31 +73,67 @@ const handleSaveSummary = async () => {
   try {
     if (!apiUrl) throw new Error("API URL not defined");
 
+    // Build payload with all fields
     const payload: any = {
       ticker_name: selectedTicker,
-      ...editedSummaryData,
+      pricing_date: editedSummaryData.pricing_date ?? displayData.pricing_date ?? "",
+      lower_bound: editedSummaryData.lower_bound ?? displayData.lower_bound ?? "",
+      upper_bound: editedSummaryData.upper_bound ?? displayData.upper_bound ?? "",
+      deal_size: editedSummaryData.deal_size ?? displayData.deal_size ?? "",
+      industry: editedSummaryData.industry ?? displayData.industry ?? "",
+      shares_offered: editedSummaryData.shares_offered ?? displayData.shares_offered ?? "",
+      nosh: editedSummaryData.nosh ?? displayData.nosh ?? "",
+      established_year: editedSummaryData.established_year ?? displayData.established_year ?? "",
+      bookrunners: editedSummaryData.bookrunners ?? displayData.bookrunners ?? "",
     };
 
-    if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
-      payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
+    // Parse numeric fields - remove empty values
+    if (payload.lower_bound !== "") {
+      payload.lower_bound = parseFloat(payload.lower_bound);
+    } else {
+      delete payload.lower_bound;
     }
-    if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
-      payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
+    if (payload.upper_bound !== "") {
+      payload.upper_bound = parseFloat(payload.upper_bound);
+    } else {
+      delete payload.upper_bound;
+    }
+    if (payload.deal_size !== "") {
+      payload.deal_size = parseFloat(payload.deal_size);
+    } else {
+      delete payload.deal_size;
+    }
+    if (payload.shares_offered !== "") {
+      payload.shares_offered = parseFloat(payload.shares_offered);
+    } else {
+      delete payload.shares_offered;
+    }
+    if (payload.nosh !== "") {
+      payload.nosh = parseFloat(payload.nosh);
+    } else {
+      delete payload.nosh;
+    }
+    if (payload.established_year !== "") {
+      payload.established_year = parseInt(payload.established_year, 10);
+    } else {
+      delete payload.established_year;
     }
 
     await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
       headers: getAuthHeaders(),
     });
-        setLocalSummaryData((prev) => ({
-        ...prev,
-        ...editedSummaryData,
-      }));
 
+    // Update local state with edited data
+    setLocalSummaryData((prev) => ({
+      ...prev,
+      ...editedSummaryData,
+    }));
 
     setSummaryEditMode(false);
     setEditedSummaryData({});
   } catch (error: any) {
     console.error("Save Summary Error:", error.response?.data || error.message || error);
+    alert("Failed to save summary. Please try again.");
   }
 };
 
@@ -153,15 +189,15 @@ const handleSaveSummary = async () => {
                   <Box position="absolute" right={0}>
                     {summaryEditMode ? (
                       <>
-                        <IconButton color="primary" onClick={handleSaveSummary}>
+                        <IconButton size="small" color="primary" onClick={handleSaveSummary} sx={{ padding: "3px" }}>
                           <SaveIcon />
                         </IconButton>
-                        <IconButton color="secondary" onClick={handleCancelSummary}>
+                        <IconButton size="small" color="secondary" onClick={handleCancelSummary} sx={{ padding: "3px" }}>
                           <CancelIcon />
                         </IconButton>
                       </>
                     ) : (
-                      <IconButton onClick={() => setSummaryEditMode(true)}>
+                      <IconButton size="small" onClick={() => setSummaryEditMode(true)} sx={{ padding: "3px" }}>
                         <EditIcon />
                       </IconButton>
                     )}
