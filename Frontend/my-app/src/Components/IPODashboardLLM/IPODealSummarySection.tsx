@@ -321,17 +321,28 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
                 }))
               }
             />
+          ) : dealData.internal_notes ? (
+            <Box
+              sx={{
+                color: "#333",
+                lineHeight: 1.6,
+                mt: 2,
+                p: 2,
+                textAlign: "center",
+                "& ul": { margin: 0, paddingLeft: 3 },
+              }}
+              dangerouslySetInnerHTML={{ __html: dealData.internal_notes }}
+            />
           ) : (
             <Typography
               sx={{
                 color: "#333",
-                whiteSpace: "pre-line",
                 mt: 2,
                 p: 2,
               }}
               align="center"
             >
-              {dealData.internal_notes || "No internal notes provided."}
+              No internal notes provided.
             </Typography>
           )}
         </Card>

@@ -147,11 +147,19 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
 
   const renderValuationList = () => {
     return Array.isArray(valuation) && valuation.length > 0 ? (
-      <Box component="ul" sx={{ pl: 3, color: "#333", mt: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
         {valuation.map((item: string, index: number) => (
-          <li key={index} style={{ marginBottom: 8, lineHeight: 1.6 }}>
-            {item}
-          </li>
+          <Box
+            key={index}
+            sx={{
+              color: "#1f2a44",
+              lineHeight: 1.6,
+              borderRadius: 1,
+              p: 0.5,
+              "& ul": { margin: 0, pl: 3 },
+            }}
+            dangerouslySetInnerHTML={{ __html: item }}
+          />
         ))}
       </Box>
     ) : (
