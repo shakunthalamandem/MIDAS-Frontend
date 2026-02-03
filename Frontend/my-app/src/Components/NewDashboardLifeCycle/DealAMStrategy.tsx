@@ -95,7 +95,6 @@ function normalizeDealFromApi(data: any, fallback: DealState): DealState {
     data?.amStrategyRecommendation ??
     data?.recommendation ??
     data?.AM_strategy_recommendation ??
-    data?.AM_strategy_recommendation ??
     fallback.am_strategy_recommendation ??
     "";
 
@@ -134,6 +133,17 @@ function normalizeDealFromApi(data: any, fallback: DealState): DealState {
     potential_am_quantity: toIntOrNull(qtyRaw),
     overall,
   };
+}
+
+/**
+ * Parses the saved recommendation string into bullet-point lines.
+ * Strips leading bullet markers (-, •, *, 1., 2., etc.) so we render our own.
+ */
+function parseBulletLines(text: string): string[] {
+  return text
+    .split("\n")
+    .map((line) => line.replace(/^[\s]*[-•*]\s*/, "").replace(/^\d+[.)]\s*/, "").trim())
+    .filter(Boolean);
 }
 
 export default function DealAMStrategy({ recommendation, potentialQty, ticker, overallSummary, onSaved }: Props) {
@@ -252,6 +262,9 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
     boxShadow: "0 8px 22px rgba(15, 23, 42, 0.06)",
   } as const;
 
+  // Pre-compute bullet lines for the saved (non-editing) view
+  const bulletLines = useMemo(() => parseBulletLines(current.am_strategy_recommendation), [current.am_strategy_recommendation]);
+
   return (
     <Card
       elevation={0}
@@ -320,10 +333,10 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
         <Divider sx={{ mb: 2, opacity: 0.55 }} />
 
         <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
-          {/* Overall Summary "Table" */}
+          {/* ─── Overall Summary "Table" ─── */}
           <Grid item xs={12} md={4}>
             <Box sx={{ ...surfaceSx, p: 2, height: "100%" }}>
-              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
+              <Typography sx={{ fontWeight: 600, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
                 Overall AI Summary
               </Typography>
 
@@ -350,7 +363,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                       key={field.key}
                       sx={{
                         py: 1,
-                        px: 1,
+                        px: 0.5,
                         textAlign: "center",
                         borderRight: idx !== summaryFields.length - 1 ? "1px solid rgba(148,163,184,0.25)" : "none",
                       }}
@@ -368,7 +381,8 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                     <Box
                       key={field.key}
                       sx={{
-                        p: 1.25,
+                        py: 1.25,
+                        px: 0.5,
                         textAlign: "center",
                         display: "flex",
                         alignItems: "center",
@@ -377,11 +391,8 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                       }}
                     >
                       {isEditing ? (
-                        <FormControl size="small" sx={{ minWidth: 120 }}>
-                          <InputLabel id={`overall-${field.key}-label`}>Sentiment</InputLabel>
+                        <FormControl size="small" sx={{ width: "100%" }}>
                           <Select
-                            labelId={`overall-${field.key}-label`}
-                            label="Sentiment"
                             value={draft.overall[field.key]}
                             onChange={(event: SelectChangeEvent) =>
                               setDraft((prev) => ({
@@ -389,14 +400,25 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                                 overall: { ...prev.overall, [field.key]: event.target.value as SummaryOption },
                               }))
                             }
+                            displayEmpty
                             sx={{
                               background: selectBgMap[draft.overall[field.key]],
                               borderRadius: 2,
-                              "& .MuiSelect-select": { textAlign: "center" },
+                              fontSize: 12,
+                              fontWeight: 700,
+                              "& .MuiSelect-select": {
+                                textAlign: "center",
+                                py: "6px !important",
+                                px: "8px !important",
+                              },
+                              "& .MuiSvgIcon-root": {
+                                right: 2,
+                                fontSize: 16,
+                              },
                             }}
                           >
                             {summaryOptions.map((option) => (
-                              <MenuItem key={option} value={option}>
+                              <MenuItem key={option} value={option} sx={{ fontSize: 13, justifyContent: "center" }}>
                                 {option}
                               </MenuItem>
                             ))}
@@ -418,10 +440,11 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
             </Box>
           </Grid>
 
-          {/* Strategy Recommendation */}
+          {/* ─── Strategy Recommendation ─── */}
           <Grid item xs={12} md={6}>
             <Box sx={{ ...surfaceSx, p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
+              {/* Heading – always center-aligned */}
+              <Typography sx={{ fontWeight: 600, color: "#0f172a", fontSize: 13, mb: 1.5, textAlign: "center" }}>
                 AM Strategy Recommendation
               </Typography>
 
@@ -442,6 +465,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                   }}
                 />
               ) : (
+                /* Saved view – bullet list, left-aligned */
                 <Box
                   sx={{
                     borderRadius: 2,
@@ -450,21 +474,42 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                     p: 1.75,
                     flex: 1,
                     overflow: "auto",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "center",
+                    /* left-align the content */
+                    textAlign: "left",
                   }}
                 >
-                  <Typography sx={{ whiteSpace: "pre-line", lineHeight: 1.7, color: "#0f172a" }}>
-                    {current.am_strategy_recommendation || "-"}
-                  </Typography>
+                  {bulletLines.length > 0 ? (
+                    <Box
+                      component="ul"
+                      sx={{
+                        listStyle: "disc",
+                        paddingLeft: 2.5,
+                        margin: 0,
+                      }}
+                    >
+                      {bulletLines.map((line, i) => (
+                        <Typography
+                          key={i}
+                          component="li"
+                          sx={{
+                            lineHeight: 1.7,
+                            color: "#0f172a",
+                            mb: i < bulletLines.length - 1 ? 0.5 : 0,
+                          }}
+                        >
+                          {line}
+                        </Typography>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography sx={{ color: "rgba(15,23,42,0.4)", textAlign: "center" }}>-</Typography>
+                  )}
                 </Box>
               )}
             </Box>
           </Grid>
 
-          {/* Potential Qty */}
+          {/* ─── Potential Qty ─── */}
           <Grid item xs={12} md={2}>
             <Box
               sx={{
@@ -478,7 +523,7 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                 gap: 1.25,
               }}
             >
-              <Typography sx={{ fontWeight: 900, color: "#0f172a", fontSize: 13, textAlign: "center" }}>
+              <Typography sx={{ fontWeight: 600, color: "#0f172a", fontSize: 13, textAlign: "center" }}>
                 Potential AM Qty
               </Typography>
 
@@ -496,13 +541,13 @@ export default function DealAMStrategy({ recommendation, potentialQty, ticker, o
                   inputProps={{
                     inputMode: "numeric",
                     pattern: "[0-9]*",
-                    style: { textAlign: "center", fontWeight: 900 },
+                    style: { textAlign: "center", fontWeight: 600 },
                   }}
                   sx={{ width: "100%", maxWidth: 170, "& .MuiInputBase-root": { borderRadius: 2, background: "#fff" } }}
                   InputProps={{ endAdornment: <InputAdornment position="end">x</InputAdornment> }}
                 />
               ) : (
-                <Typography sx={{ fontSize: 28, fontWeight: 1000, textAlign: "center", color: "#0f172a" }}>
+                <Typography sx={{ fontSize: 28, fontWeight: 600, textAlign: "center", color: "#0f172a" }}>
                   {qtyLabel}
                 </Typography>
               )}
