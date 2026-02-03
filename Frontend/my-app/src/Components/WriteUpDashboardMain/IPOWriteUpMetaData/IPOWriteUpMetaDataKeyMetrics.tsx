@@ -401,6 +401,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           <Box
             mt={2}
             p={1.5}
+            className="pdf-hidden"
             sx={{
               border: "1px dashed #c7cfe4",
               background: "#fafafa",

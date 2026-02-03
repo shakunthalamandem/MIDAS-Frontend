@@ -316,6 +316,7 @@ IOI and After-Market Strategy          </Typography>
       </Box>
 
       <Box
+        className="pdf-hidden"
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
