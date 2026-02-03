@@ -34,8 +34,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
-      { id: "deal-indication", label: "AI Indication" },
       { id: "market-strategy", label: "IOI and After-Market Strategy" },
+      { id: "deal-indication", label: "AI Indication" },
       { id: "business-overview", label: "Business Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
@@ -197,17 +197,19 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="deal-indication" sx={sectionCardSx}>
+            
+
+            <Card id="market-strategy" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataDealIndication
+                <IPOWriteUpMetaDataMarketStatergy
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
             </Card>
 
-            <Card id="market-strategy" sx={sectionCardSx}>
+            <Card id="deal-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataMarketStatergy
+                <IPOWriteUpMetaDataDealIndication
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>

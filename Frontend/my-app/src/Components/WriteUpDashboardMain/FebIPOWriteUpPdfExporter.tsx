@@ -304,6 +304,18 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
               cloned.style.padding = '0'
               cloned.style.boxSizing = 'border-box'
 
+              // Expand all accordions in the cloned document
+              const accordions = cloned.querySelectorAll<HTMLElement>('.MuiAccordion-root')
+              accordions.forEach((accordion) => {
+                accordion.classList.add('Mui-expanded')
+                const content = accordion.querySelector<HTMLElement>('.MuiCollapse-root')
+                if (content) {
+                  content.style.height = 'auto'
+                  content.style.visibility = 'visible'
+                  content.classList.add('MuiCollapse-entered')
+                }
+              })
+
               // Enhance font sizes for better PDF readability
               const allText = cloned.querySelectorAll<HTMLElement>('*')
               allText.forEach((el) => {
@@ -320,8 +332,8 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         })
 
         const mmPerPx = contentWidth / canvas.width
-        const gapMm = 6
-        const overlapPx = 40
+        const gapMm = 3
+        const overlapPx = 80
         let offsetPx = 0
 
         while (offsetPx < canvas.height) {
