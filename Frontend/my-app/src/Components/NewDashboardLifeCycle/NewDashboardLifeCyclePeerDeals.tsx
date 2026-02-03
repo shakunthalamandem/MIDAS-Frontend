@@ -12,11 +12,17 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Fade,
 } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
+// ─── types ───────────────────────────────────────────────────────────────────
 type PeerRow = {
   ticker: string;
   issuer_name: string;
@@ -26,7 +32,7 @@ type PeerRow = {
   issue_offer_price: number;
   deal_size: number;
   allocation_deal_size_percentage: number;
-  allocation_percentage: number; // allocation of IOI (per your API)
+  allocation_percentage: number;
   t1d_return_from_bloomberg: number;
   t1w_percent_change: number;
   t1m_return_from_bloomberg: number;
@@ -46,11 +52,18 @@ type ApiResponse = {
   summary: PeerSummary;
 };
 
+/** What the confirmation dialog needs to know */
+type ConfirmPayload = {
+  action: "add" | "delete";
+  peerTicker: string;
+};
+
 interface NewDashboardLifeCyclePeerDealsProps {
   selectedDeal?: { ticker?: string };
   ticker?: string;
 }
 
+// ─── helpers ─────────────────────────────────────────────────────────────────
 const cleanNumber = (v: any): number => {
   if (v == null || v === "") return 0;
   const n =
@@ -72,6 +85,186 @@ const fmtMoney = (n: any, digits = 2) => {
 
 const fmtPct = (n: any, digits = 2) => `${cleanNumber(n).toFixed(digits)}%`;
 
+// ─── ConfirmDialog ───────────────────────────────────────────────────────────
+function ConfirmDialog({
+  open,
+  payload,
+  baseTicker,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  payload: ConfirmPayload | null;
+  baseTicker: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  if (!payload) return null;
+
+  const isDelete = payload.action === "delete";
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      TransitionComponent={Fade}
+      PaperProps={{
+        elevation: 24,
+        sx: {
+          borderRadius: 4,
+          minWidth: 380,
+          maxWidth: 440,
+          overflow: "hidden",
+          border: "1px solid rgba(148,163,184,0.18)",
+        },
+      }}
+    >
+      {/* coloured top strip */}
+      <Box
+        sx={{
+          height: 5,
+          background: isDelete
+            ? "linear-gradient(90deg, #ef4444, #dc2626)"
+            : "linear-gradient(90deg, #3b82f6, #2563eb)",
+        }}
+      />
+
+      <DialogContent sx={{ px: 3, pt: 2.75, pb: 1.5 }}>
+        {/* icon + heading row */}
+        <Stack direction="row" spacing={1.5} alignItems="flex-start">
+          <Box
+            sx={{
+              mt: 0.25,
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              background: isDelete
+                ? "rgba(239, 68, 68, 0.10)"
+                : "rgba(59, 130, 246, 0.10)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <WarningAmberRoundedIcon
+              sx={{
+                fontSize: 22,
+                color: isDelete ? "#dc2626" : "#2563eb",
+              }}
+            />
+          </Box>
+
+          <Box>
+            <Typography
+              sx={{
+                fontWeight: 900,
+                fontSize: 15,
+                color: "#0f172a",
+                lineHeight: 1.3,
+              }}
+            >
+              {isDelete ? "Remove Peer Ticker?" : "Add Peer Ticker?"}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ color: "#64748b", mt: 0.75, lineHeight: 1.6 }}
+            >
+              {isDelete ? (
+                <>
+                  Are you sure you want to remove{" "}
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: 900, color: "#0f172a" }}
+                  >
+                    {payload.peerTicker}
+                  </Typography>{" "}
+                  from the peer list of{" "}
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: 900, color: "#0f172a" }}
+                  >
+                    {baseTicker}
+                  </Typography>
+                  ? This action cannot be undone.
+                </>
+              ) : (
+                <>
+                  Are you sure you want to add{" "}
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: 900, color: "#0f172a" }}
+                  >
+                    {payload.peerTicker}
+                  </Typography>{" "}
+                  as a peer for{" "}
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: 900, color: "#0f172a" }}
+                  >
+                    {baseTicker}
+                  </Typography>
+                  ?
+                </>
+              )}
+            </Typography>
+          </Box>
+        </Stack>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          px: 3,
+          pb: 2.5,
+          pt: 0.75,
+          gap: 1,
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button
+          onClick={onCancel}
+          sx={{
+            borderRadius: 2,
+            fontWeight: 700,
+            textTransform: "none",
+            color: "#475569",
+            px: 2.25,
+            "&:hover": { background: "rgba(71,85,105,0.06)" },
+          }}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={onConfirm}
+          sx={{
+            borderRadius: 2,
+            fontWeight: 800,
+            textTransform: "none",
+            px: 2.25,
+            background: isDelete
+              ? "linear-gradient(135deg, #ef4444, #dc2626)"
+              : "linear-gradient(135deg, #3b82f6, #2563eb)",
+            "&:hover": {
+              background: isDelete
+                ? "linear-gradient(135deg, #dc2626, #b91c1c)"
+                : "linear-gradient(135deg, #2563eb, #1d4ed8)",
+            },
+            boxShadow: isDelete
+              ? "0 3px 10px rgba(220,38,38,0.30)"
+              : "0 3px 10px rgba(37,99,235,0.30)",
+          }}
+        >
+          {isDelete ? "Delete" : "Add"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ─── main component ──────────────────────────────────────────────────────────
 const NewDashboardLifeCyclePeerDeals: React.FC<
   NewDashboardLifeCyclePeerDealsProps
 > = ({ selectedDeal, ticker }) => {
@@ -83,14 +276,19 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
   const [rows, setRows] = useState<PeerRow[]>([]);
   const [summary, setSummary] = useState<PeerSummary | null>(null);
 
-  // dropdown (search should work here)
+  // dropdown
   const [tickerOptions, setTickerOptions] = useState<string[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [selectedPeerTicker, setSelectedPeerTicker] = useState<string | null>(
     null,
   );
 
-  // notifications
+  // confirmation dialog
+  const [confirmPayload, setConfirmPayload] = useState<ConfirmPayload | null>(
+    null,
+  );
+
+  // toast
   const [toast, setToast] = useState<{
     open: boolean;
     msg: string;
@@ -108,33 +306,27 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
     setToast({ open: true, msg, severity });
   };
 
+  // ── fetchers ──────────────────────────────────────────────────────────────
   const fetchPeers = async () => {
     if (!baseTicker) return;
     if (!apiUrl) {
       showToast("REACT_APP_API_URL is not set.", "error");
       return;
     }
-
     setLoading(true);
     try {
-      const url = `${apiUrl}/api/get_peer_tickers_data/`;
-      const payload = { ticker: baseTicker };
-
-      const res = await fetch(url, {
+      const res = await fetch(`${apiUrl}/api/get_peer_tickers_data/`, {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ticker: baseTicker }),
       });
-
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
         throw new Error(
           `Failed to fetch peers (${res.status})${txt ? `: ${txt}` : ""}`,
         );
       }
-
       const json = (await res.json()) as ApiResponse;
-
       setRows(Array.isArray(json.data) ? json.data : []);
       setSummary(json.summary ?? null);
     } catch (e: any) {
@@ -160,13 +352,11 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       });
       if (!res.ok) throw new Error(`Failed to fetch tickers (${res.status})`);
       const json = await res.json();
-
       const list: string[] = (
         Array.isArray(json) ? json : (json?.data ?? json?.tickers ?? [])
       ).map((x: any) =>
         typeof x === "string" ? x : (x?.ticker ?? x?.symbol ?? ""),
       );
-
       setTickerOptions(list.filter(Boolean));
     } catch (e: any) {
       console.error(e);
@@ -188,14 +378,9 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleUpdatePeer = async (
-    action: "add" | "delete",
-    peerTicker: string,
-  ) => {
-    if (!apiUrl) {
-      showToast("REACT_APP_API_URL is not set.", "error");
-      return;
-    }
+  // ── actions ───────────────────────────────────────────────────────────────
+  /** Opens the confirmation dialog – does NOT call the API yet */
+  const requestConfirmation = (action: "add" | "delete", peerTicker: string) => {
     if (!baseTicker) {
       showToast("Base ticker is missing.", "error");
       return;
@@ -204,18 +389,25 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       showToast("Peer ticker is missing.", "error");
       return;
     }
+    setConfirmPayload({ action, peerTicker });
+  };
+
+  /** Fires after the user clicks the confirm button in the dialog */
+  const handleConfirmedAction = async () => {
+    if (!confirmPayload || !apiUrl) return;
+
+    const { action, peerTicker } = confirmPayload;
+    setConfirmPayload(null); // close dialog immediately
 
     try {
-      const payload = {
-        action,
-        ticker: baseTicker,
-        peer_ticker: peerTicker,
-      };
-
       const res = await fetch(`${apiUrl}/api/update_peer_tickers/`, {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          action,
+          ticker: baseTicker,
+          peer_ticker: peerTicker,
+        }),
       });
 
       if (!res.ok) {
@@ -224,17 +416,16 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
           `update_peer_tickers failed (${res.status})${txt ? `: ${txt}` : ""}`,
         );
       }
-
       await res.json().catch(() => null);
 
       showToast(
         action === "add"
           ? "Peer added successfully."
-          : "Peer deleted successfully.",
+          : "Peer removed successfully.",
         "success",
       );
 
-      setSelectedPeerTicker(null);
+      if (action === "add") setSelectedPeerTicker(null);
       await fetchPeers();
     } catch (e: any) {
       console.error(e);
@@ -242,7 +433,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
     }
   };
 
-  // remove duplicates + stable order
+  // ── derived rows ──────────────────────────────────────────────────────────
   const displayRows = useMemo(() => {
     const seen = new Set<string>();
     const out: PeerRow[] = [];
@@ -252,14 +443,45 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       seen.add(key);
       out.push(r);
     }
-    // sort latest first (pricing_date)
     out.sort((a, b) =>
       String(b.pricing_date).localeCompare(String(a.pricing_date)),
     );
     return out;
   }, [rows]);
 
+  // ── columns ───────────────────────────────────────────────────────────────
   const columns: GridColDef[] = [
+    // ── DELETE (sticky left, first column) ──────────────────────────────────
+    {
+      field: "actions",
+      headerName: "",
+      width: 62,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      align: "center",
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={() =>
+            requestConfirmation("delete", String(params.row.ticker))
+          }
+          sx={{
+            bgcolor: "rgba(239,68,68,0.08)",
+            color: "#dc2626",
+            "&:hover": {
+              bgcolor: "rgba(239,68,68,0.18)",
+              color: "#b91c1c",
+            },
+            transition: "background 0.18s, color 0.18s",
+          }}
+          aria-label="Delete peer"
+        >
+          <DeleteOutlineRoundedIcon fontSize="small" />
+        </IconButton>
+      ),
+    },
+
     {
       field: "ticker",
       headerName: "Ticker",
@@ -278,7 +500,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
     { field: "issuer_name", headerName: "Issuer Name", width: 240 },
     { field: "pricing_date", headerName: "Pricing Date", width: 125 },
     { field: "deal_type", headerName: "Deal Type", width: 90 },
-
     {
       field: "number_of_shares_offered",
       headerName: "Shares Offered",
@@ -291,7 +512,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       },
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "issue_offer_price",
       headerName: "Issue Offer Price",
@@ -299,7 +519,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtMoney(params.row.issue_offer_price),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "deal_size",
       headerName: "Deal Size",
@@ -307,7 +526,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtMoney(params.row.deal_size, 0),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "allocation_deal_size_percentage",
       headerName: "Allocation % of Deal Size",
@@ -316,7 +534,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
         fmtPct(params.row.allocation_deal_size_percentage, 2),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "allocation_percentage",
       headerName: "Allocation IOI %",
@@ -324,7 +541,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtPct(params.row.allocation_percentage, 2),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "t1d_return_from_bloomberg",
       headerName: "T+1 Day Return",
@@ -332,7 +548,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtPct(params.row.t1d_return_from_bloomberg, 2),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "t1w_percent_change",
       headerName: "T+1 Week Return",
@@ -340,7 +555,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtPct(params.row.t1w_percent_change, 2),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
     {
       field: "t1m_return_from_bloomberg",
       headerName: "T+1 Month Return",
@@ -348,32 +562,9 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
       renderCell: (params) => fmtPct(params.row.t1m_return_from_bloomberg, 2),
       sortComparator: (v1, v2) => cleanNumber(v1) - cleanNumber(v2),
     },
-
-    // ACTIONS (sticky right)
-    {
-      field: "actions",
-      headerName: "",
-      width: 80,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      align: "center",
-      renderCell: (params) => (
-        <IconButton
-          size="small"
-          onClick={() => handleUpdatePeer("delete", String(params.row.ticker))}
-          sx={{
-            bgcolor: "rgba(239,68,68,0.10)",
-            "&:hover": { bgcolor: "rgba(239,68,68,0.18)" },
-          }}
-          aria-label="Delete peer"
-        >
-          <DeleteOutlineRoundedIcon fontSize="small" />
-        </IconButton>
-      ),
-    },
   ];
 
+  // ── render ────────────────────────────────────────────────────────────────
   return (
     <>
       {!baseTicker ? (
@@ -382,7 +573,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
         </Alert>
       ) : null}
 
-      {/* SUMMARY + ADD PEER CONTROLS */}
+      {/* ── SUMMARY + ADD PEER CONTROLS ───────────────────────────────────── */}
       <Paper
         elevation={0}
         sx={{
@@ -420,7 +611,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
             </Typography>
           </Box>
 
-          {/* RIGHT CORNER: searchable dropdown + add */}
+          {/* searchable dropdown + add button */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={1.25}
@@ -436,7 +627,6 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
               filterOptions={(opts, state) => {
                 const q = state.inputValue.trim().toLowerCase();
                 if (!q) return opts.slice(0, 200);
-                // simple, fast ticker search
                 return opts
                   .filter((t) => t.toLowerCase().includes(q))
                   .slice(0, 200);
@@ -467,7 +657,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
               disabled={!selectedPeerTicker || loading}
               onClick={() =>
                 selectedPeerTicker &&
-                handleUpdatePeer("add", selectedPeerTicker)
+                requestConfirmation("add", selectedPeerTicker)
               }
               sx={{
                 borderRadius: 2,
@@ -481,7 +671,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
           </Stack>
         </Stack>
 
-        {/* Summary tiles */}
+        {/* summary tiles */}
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -489,7 +679,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
           justifyContent="space-between"
           sx={{ mt: 2 }}
         >
-            {[
+          {[
             {
               label: "Average Deal Size",
               value: summary ? fmtMoney(summary.average_deal_size, 0) : "-",
@@ -498,13 +688,15 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
             {
               label: "Avg Allocation % of Deal Size",
               value: summary
-              ? fmtPct(summary.avg_allocation_as_percent_of_deal_size, 2)
-              : "-",
+                ? fmtPct(summary.avg_allocation_as_percent_of_deal_size, 2)
+                : "-",
               bg: "#ecfdf3",
             },
             {
               label: "Avg Allocation IOI %",
-              value: summary ? fmtPct(summary.avg_allocation_of_ioi, 2) : "-",
+              value: summary
+                ? fmtPct(summary.avg_allocation_of_ioi, 2)
+                : "-",
               bg: "#fff4e6",
             },
             {
@@ -522,40 +714,40 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
               value: summary ? fmtPct(summary.avg_t1m_return, 2) : "-",
               bg: "#f1f5f9",
             },
-            ].map((tile) => (
+          ].map((tile) => (
             <Box
               key={tile.label}
               sx={{
-              px: 1.25,
-              py: 0.8,
-              borderRadius: 2,
-              bgcolor: tile.bg,
-              display: "inline-flex",
-              gap: 1,
-              alignItems: "center",
-              width: { xs: "100%", md: "auto" },
-              justifyContent: { xs: "space-between", md: "flex-start" },
-              border: "1px solid rgba(15, 23, 42, 0.06)",
+                px: 1.25,
+                py: 0.8,
+                borderRadius: 2,
+                bgcolor: tile.bg,
+                display: "inline-flex",
+                gap: 1,
+                alignItems: "center",
+                width: { xs: "100%", md: "auto" },
+                justifyContent: { xs: "space-between", md: "flex-start" },
+                border: "1px solid rgba(15, 23, 42, 0.06)",
               }}
             >
               <Typography
-              variant="caption"
-              sx={{ color: "#475569", fontWeight: 900 }}
+                variant="caption"
+                sx={{ color: "#475569", fontWeight: 900 }}
               >
-              {tile.label}
+                {tile.label}
               </Typography>
               <Typography
-              variant="h6"
-              sx={{ fontWeight: 1000, color: "#0b1844" }}
+                variant="h6"
+                sx={{ fontWeight: 1000, color: "#0b1844" }}
               >
-              {tile.value}
+                {tile.value}
               </Typography>
             </Box>
-            ))}
+          ))}
         </Stack>
       </Paper>
 
-      {/* DATA TABLE */}
+      {/* ── DATA TABLE ────────────────────────────────────────────────────── */}
       <Box
         sx={{
           height: 520,
@@ -588,6 +780,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
             "& .MuiDataGrid-columnHeaderTitle": {
               fontWeight: 1000,
               fontSize: "13px",
+              color: "#002060",
             },
             "& .MuiDataGrid-sortIcon": {
               color: "#fff",
@@ -612,25 +805,28 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
               cursor: "pointer",
             },
 
-            /* STICKY ACTION COLUMN (always visible) */
-            "& .MuiDataGrid-cell:last-child": {
+            /* ── STICKY LEFT: actions column (first) ── */
+            "& .MuiDataGrid-cell:first-of-type": {
               position: "sticky",
-              right: 0,
-              backgroundColor: "#ffffff",
+              left: 0,
               zIndex: 10,
-              borderLeft: "1px solid #e2e8f0",
+              backgroundColor: "#002060",
+              borderRight: "1px solid #002060",
             },
-            "& .MuiDataGrid-row:nth-of-type(even) .MuiDataGrid-cell:last-child":
+            "& .MuiDataGrid-row:nth-of-type(even) .MuiDataGrid-cell:first-of-type":
               {
                 backgroundColor: "#f8fafc",
               },
-            "& .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader:last-child":
+            "& .MuiDataGrid-row:hover .MuiDataGrid-cell:first-of-type": {
+              backgroundColor: "#e0f2fe",
+            },
+            "& .MuiDataGrid-columnHeaders .MuiDataGrid-columnHeader:first-of-type":
               {
                 position: "sticky",
-                right: 0,
-                background: "linear-gradient(90deg, #002060, #003a8c)",
+                left: 0,
                 zIndex: 11,
-                borderLeft: "1px solid rgba(255,255,255,0.25)",
+                background: "linear-gradient(90deg, #002060, #003a8c)",
+                borderRight: "1px solid rgba(255,255,255,0.20)",
               },
 
             /* FOOTER */
@@ -642,6 +838,16 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
         />
       </Box>
 
+      {/* ── CONFIRMATION DIALOG ────────────────────────────────────────── */}
+      <ConfirmDialog
+        open={!!confirmPayload}
+        payload={confirmPayload}
+        baseTicker={baseTicker}
+        onConfirm={handleConfirmedAction}
+        onCancel={() => setConfirmPayload(null)}
+      />
+
+      {/* ── TOAST ───────────────────────────────────────────────────────── */}
       <Snackbar
         open={toast.open}
         autoHideDuration={2500}
