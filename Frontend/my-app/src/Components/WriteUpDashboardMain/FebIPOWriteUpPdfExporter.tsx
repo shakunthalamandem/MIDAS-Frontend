@@ -470,8 +470,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           backgroundColor: "#002060",
           color: "#fff",
           textTransform: "none",
-          px: 2.5,
-          minWidth: 180
+          px: 1.5,
+          minWidth: 180,
+          fontSize: 12,
         }}
         startIcon={loading ? <CircularProgress color="inherit" size={18} /> : null}
       >

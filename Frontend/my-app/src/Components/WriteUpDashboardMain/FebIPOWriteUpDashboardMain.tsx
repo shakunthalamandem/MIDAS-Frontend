@@ -128,11 +128,11 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         <CardContent sx={{ p: 2.5 }}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, mb: 2, textAlign: "center", color: "#1d2b5a" }}
+            sx={{ fontWeight: 600, mb: 2, textAlign: "center", color: "#1d2b5a" }}
           >
             IPO Write-up
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
             <FebIPOWriteUpPdfExporter
               targetId={pdfRootId}
               headerTitle="IPO Write-up"
@@ -146,7 +146,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
             />
           </Box>
 
-          <List sx={{ p: 0, display: "grid", gap: 0.5 }}>
+          <List sx={{ p: 0, display: "grid", gap: 0.1 }}>
             {sections.map((section) => {
               const isActive = activeSection === section.id
               return (
@@ -167,7 +167,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
                   <ListItemText
                     primary={section.label}
                     primaryTypographyProps={{
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: isActive ? 700 : 600
                     }}
                   />
