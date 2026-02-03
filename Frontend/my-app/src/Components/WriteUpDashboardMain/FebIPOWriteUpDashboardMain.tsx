@@ -20,8 +20,9 @@ import IPOWriteUpMetaDataFinancialHighlights from "./IPOWriteUpMetaData/IPOWrite
 import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetrics"
 import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
-import IPOWriteUpMetaDataTrends from "./IPOWriteUpMetaData/IPOWriteUpMetaDataTrends"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
+import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
+import FebIPOWriteUpPdfExporter from "./FebIPOWriteUpPdfExporter"
 
 interface FebIPOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
@@ -48,6 +49,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   )
 
   const [activeSection, setActiveSection] = useState(sections[0].id)
+  const [pdfMode, setPdfMode] = useState(false)
   const sectionCardSx = {
     borderRadius: 3,
     border: "1px solid #edf0faff",
@@ -55,6 +57,12 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)",
     scrollMarginTop: 220
   }
+  const pdfRootId = "feb-ipo-writeup-pdf-root"
+
+  const fileSafeTicker = (basicDealDetails?.ticker || "IPO").toUpperCase()
+  const todayIso = new Date().toISOString().slice(0, 10)
+  const pdfFileName = `${fileSafeTicker}_${todayIso}.pdf`
+
 
   const handleNavClick = (sectionId: string) => {
     setActiveSection(sectionId)
@@ -124,6 +132,14 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           >
             IPO Write-up
           </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+            <FebIPOWriteUpPdfExporter
+              targetId={pdfRootId}
+              headerTitle="IPO Write-up"
+              fileName={pdfFileName}
+              onTogglePdfMode={setPdfMode}
+            />
+          </Box>
 
           <List sx={{ p: 0, display: "grid", gap: 0.5 }}>
             {sections.map((section) => {
@@ -162,69 +178,95 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
       {/* Right Content */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        <Card id="deal-info" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+        {pdfMode ? (
+          <FebIPOWriteUpPdfContent
+            basicDealDetails={basicDealDetails}
+            sectionCardSx={sectionCardSx}
+            rootId={pdfRootId}
+          />
+        ) : (
+          <>
+            <Card id="deal-info" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
+              </CardContent>
+            </Card>
 
-        <Card id="deal-indication" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="deal-indication" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataDealIndication
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="market-strategy" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="market-strategy" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataMarketStatergy
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="business-overview" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataBusinessOverview basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="business-overview" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataBusinessOverview
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="key-metrics" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="key-metrics" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataKeyMetrics
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="financial-highlights" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
-{/* 
-        <Box id="trends" sx={{ scrollMarginTop: 96 }}>
-          <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
-        </Box> */}
+            <Card id="financial-highlights" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataFinancialHighlights
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
+            {/* 
+            <Box id="trends" sx={{ scrollMarginTop: 96 }}>
+              <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
+            </Box> */}
 
-        <Card id="comps" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="comps" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
+              </CardContent>
+            </Card>
 
-        <Card id="valuation-analysis" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="valuation-analysis" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataValuationAnalysis
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="red-flag" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="red-flag" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataRedFlag
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
 
-        <Card id="final-verdict" sx={sectionCardSx}>
-          <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-            <IPOWriteUpMetaDataFinalVerdict basicDealDetails={basicDealDetails} />
-          </CardContent>
-        </Card>
+            <Card id="final-verdict" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
+                <IPOWriteUpMetaDataFinalVerdict
+                  basicDealDetails={basicDealDetails}
+                />
+              </CardContent>
+            </Card>
+          </>
+        )}
       </Box>
     </Box>
   )
