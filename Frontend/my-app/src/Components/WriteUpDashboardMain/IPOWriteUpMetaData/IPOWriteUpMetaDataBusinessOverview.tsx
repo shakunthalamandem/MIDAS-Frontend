@@ -17,9 +17,11 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import GroupsIcon from "@mui/icons-material/Groups"
 import AccountTreeIcon from "@mui/icons-material/AccountTree"
+import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
+import { BasicDealDetails, WriteupRatings } from "../types/DealInformation"
 
 /* ===================== TYPES ===================== */
 
@@ -30,13 +32,12 @@ interface WriteUpData {
   principal_stockholders_preipo: string[]
   key_management_personnel: string[]
   differentiated_summary: string[]
-  [key: string]: string | string[] | undefined
+  [key: string]: string | string[] | WriteupRatings | undefined
+  writeup_ratings?: WriteupRatings
 }
 
 interface Props {
-  basicDealDetails: {
-    ticker: string
-  }
+  basicDealDetails: BasicDealDetails
 }
 
 type AccordionSection = {
@@ -88,6 +89,27 @@ const quillFormats = [
   "bullet",
   "link"
 ]
+
+const parseSectionRating = (value?: number | string | null) => {
+  if (value === undefined || value === null) return null
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null
+  }
+  const trimmed = String(value).trim()
+  if (!trimmed) return null
+  const match = trimmed.match(/^-?\d+(\.\d+)?/)
+  if (match) {
+    const parsed = Number(match[0])
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  const fallback = Number(trimmed)
+  return Number.isFinite(fallback) ? fallback : null
+}
+
+const formatRating = (value: number) => {
+  const normalized = Math.round(value * 10) / 10
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
+}
 
 /* ===================== COMPONENT ===================== */
 
@@ -308,6 +330,15 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     )
   }
 
+  const businessOverviewRating =
+    parseSectionRating(
+      writeUpData.writeup_ratings?.["business-overview"] ??
+        basicDealDetails.writeup_ratings?.["business-overview"]
+    ) ?? null
+
+  const businessOverviewRatingText =
+    businessOverviewRating !== null ? formatRating(businessOverviewRating) : null
+
   return (
     <Paper
       elevation={0}
@@ -337,9 +368,39 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           )}
         </Box>
 
-        <Typography variant="h5" fontWeight={600} color="#124180" mb={2}>
-          Business Overview
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 2
+          }}
+        >
+          <Typography variant="h5" fontWeight={600} color="#124180">
+            Business Overview
+          </Typography>
+          {businessOverviewRatingText && (
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {businessOverviewRatingText}/10
+              </Typography>
+            </Box>
+          )}
+        </Box>
 
         {businessOverviewEditing ? (
           <ReactQuill
