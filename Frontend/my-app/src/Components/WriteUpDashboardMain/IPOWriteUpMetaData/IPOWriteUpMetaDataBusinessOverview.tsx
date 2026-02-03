@@ -5,9 +5,7 @@ import {
   AccordionDetails,
   Typography,
   IconButton,
-  TextField,
   Box,
-  Chip,
   Paper,
   CircularProgress
 } from "@mui/material"
@@ -27,11 +25,12 @@ import "react-quill/dist/quill.snow.css"
 
 interface WriteUpData {
   business_overview: string[]
-  key_highlights: string[]
+  key_highlights?: string[]
   concerns: string[]
   principal_stockholders_preipo: string[]
   key_management_personnel: string[]
-  [key: string]: string[]
+  differentiated_summary: string[]
+  [key: string]: string | string[] | undefined
 }
 
 interface Props {
@@ -50,8 +49,8 @@ type AccordionSection = {
 
 const ACCORDION_SECTIONS: AccordionSection[] = [
   {
-    section: 'key_highlights',
-    title: 'Key Highlights',
+    section: 'differentiated_summary',
+    title: 'Differentiated Summary',
     icon: <TrendingUpIcon />,
   },
   {
@@ -129,8 +128,16 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         if (!res.ok) throw new Error("Failed to fetch data")
 
         const data = await res.json()
-        setWriteUpData(data)
-        setUpdatedData(data)
+        const normalizedData = {
+          ...data,
+          differentiated_summary: Array.isArray(data.differentiated_summary)
+            ? data.differentiated_summary
+            : data.differentiated_summary
+            ? [data.differentiated_summary]
+            : []
+        }
+        setWriteUpData(normalizedData)
+        setUpdatedData(normalizedData)
         setBusinessOverviewDraft((data.business_overview || []).join(""))
       } catch (e: any) {
         setFetchError(e.message)
@@ -150,8 +157,16 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     value: string
   ) => {
     if (!updatedData) return
+
     const copy = { ...updatedData }
-    copy[section][index] = value
+    const sectionArray = [...(((copy[section] as string[]) ?? []))]
+
+    if (sectionArray[index] === value) {
+      return
+    }
+
+    sectionArray[index] = value
+    copy[section] = sectionArray
     setUpdatedData(copy)
   }
 
@@ -194,7 +209,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
     const apiUrl = process.env.REACT_APP_API_URL
     const token = localStorage.getItem("access_token")
-    const sectionValue = (updatedData[section] || []).join("")
+    const sectionValue = ((updatedData[section] as string[]) ?? []).join("")
 
     try {
       setSavingSection(section)
@@ -217,7 +232,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
       setWriteUpData((prev) =>
         prev
-          ? { ...prev, [section]: [...(updatedData[section] || [])] }
+          ? { ...prev, [section]: [...(((updatedData[section] as string[]) ?? []))] }
           : prev
       )
       setEditMode(null)
@@ -241,12 +256,18 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     }
   }
 
+  const getSectionData = (section: keyof WriteUpData): string[] => {
+    const source =
+      editMode === section ? updatedData : writeUpData
+
+    if (!source) return []
+
+    return [...(((source[section] as string[]) ?? []))]
+  }
+
   /* ===================== RENDER HELPERS ===================== */
 
-  const renderSectionContent = (
-    section: keyof WriteUpData,
-    data: string[]
-  ) =>
+  const renderSectionContent = (section: keyof WriteUpData, data: string[]) =>
     data.map((item, index) =>
       editMode === section ? (
         <Box key={index} mb={2}>
@@ -362,7 +383,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             </AccordionSummary>
 
             <AccordionDetails>
-              {renderSectionContent(section, writeUpData[section] || [])}
+              {renderSectionContent(section, getSectionData(section))}
             </AccordionDetails>
           </Accordion>
         ))}
