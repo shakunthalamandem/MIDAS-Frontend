@@ -322,7 +322,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
                 const computed = window.getComputedStyle(el)
                 const fontSize = parseFloat(computed.fontSize)
                 if (fontSize > 0) {
-                  el.style.fontSize = `${Math.max(fontSize * 1.15, 12)}px`
+                  // Increase font size with min 12px and max 24px to prevent oversized text
+                  const newSize = Math.max(fontSize * 1.15, 12)
+                  el.style.fontSize = `${Math.min(newSize, 24)}px`
                 }
                 // Ensure proper box sizing
                 el.style.boxSizing = 'border-box'

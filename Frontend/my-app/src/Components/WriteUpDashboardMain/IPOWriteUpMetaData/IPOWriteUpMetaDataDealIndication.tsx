@@ -259,11 +259,13 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
             volatility={outlook.volatility}
             confidence={outlook.confidence}
           />
-          <ScenarioCards
-            base={scenarios.base}
-            bullish={scenarios.bullish}
-            bearish={scenarios.bearish}
-          />
+          <Box className="pdf-hidden">
+            <ScenarioCards
+              base={scenarios.base}
+              bullish={scenarios.bullish}
+              bearish={scenarios.bearish}
+            />
+          </Box>
         </>
       )}
     </Stack>
