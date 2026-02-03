@@ -20,7 +20,7 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
-import "react-quill/dist/quill.snow.css"
+import 'react-quill/dist/quill.snow.css'
 import { BasicDealDetails, WriteupRatings } from "../types/DealInformation"
 
 /* ===================== TYPES ===================== */
@@ -38,6 +38,7 @@ interface WriteUpData {
 
 interface Props {
   basicDealDetails: BasicDealDetails
+  pdfMode?: boolean
 }
 
 type AccordionSection = {
@@ -427,15 +428,58 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         }}
       >
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
-          <Accordion key={section}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Box display="flex" alignItems="center" gap={1.5}>
-                {icon}
-                <Typography fontWeight={600}>{title}</Typography>
+          <Accordion
+            key={section}
+            sx={{
+              borderRadius: 2,
+              border: "1px solid #E6ECF5",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              "&:before": { display: "none" },
+              background: "linear-gradient(135deg, #ffffff, #f8fbff)"
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon sx={{ color: "#124180" }} />}
+              sx={{
+                minHeight: 64,
+                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
+                borderRadius: "8px 8px 0 0",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #e8f0fe, #dae7fc)"
+                }
+              }}
+            >
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap={1.5}
+                width="100%"
+              >
+                <Box
+                  sx={{
+                    color: "#124180",
+                    display: "flex",
+                    alignItems: "center"
+                  }}
+                >
+                  {icon}
+                </Box>
+                <Typography
+                  fontWeight={700}
+                  color="#124180"
+                  sx={{ fontSize: "1rem" }}
+                >
+                  {title}
+                </Typography>
               </Box>
 
               <IconButton
-                sx={{ ml: "auto" }}
+                sx={{
+                  ml: "auto",
+                  color: "#124180",
+                  "&:hover": { backgroundColor: "rgba(18, 65, 128, 0.1)" }
+                }}
                 disabled={savingSection === section}
                 onClick={(e) => handleAccordionAction(section, e)}
               >
@@ -443,7 +487,13 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               </IconButton>
             </AccordionSummary>
 
-            <AccordionDetails>
+            <AccordionDetails
+              sx={{
+                p: 3,
+                background: "linear-gradient(135deg, #f8fbff, #ffffff)",
+                borderRadius: "0 0 8px 8px"
+              }}
+            >
               {renderSectionContent(section, getSectionData(section))}
             </AccordionDetails>
           </Accordion>
