@@ -3,6 +3,7 @@ import { Alert, Box, Card, CardContent, CircularProgress, Stack, Typography } fr
 import DealTopMetrics from "./DealTopMetrics";
 import DealSecondRow from "./DealSecondRow";
 import DealAMStrategy from "./DealAMStrategy";
+import NoDataNotice from "../AIFewshotAnalysis/NoDataNotice";
 
 export interface DealRecommendationResponse {
   fair_value_estimate: string;
@@ -124,10 +125,10 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
 
           {/* Error */}
           {effectiveTicker && state === "error" && (
-            <Alert severity="error" variant="outlined">
-              <Typography fontWeight={700}>Could not load data</Typography>
-              <Typography variant="body2">{error}</Typography>
-            </Alert>
+            <NoDataNotice
+              title="No data found"
+              subtitle="There is no deal recommendation for this ticker. We will update soon."
+            />
           )}
 
           {/* Content */}
