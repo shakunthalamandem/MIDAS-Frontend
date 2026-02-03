@@ -102,6 +102,9 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   const [businessOverviewDraft, setBusinessOverviewDraft] = useState("")
   const [savingBusinessOverview, setSavingBusinessOverview] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [savingSection, setSavingSection] = useState<keyof WriteUpData | null>(
+    null
+  )
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
 
@@ -161,7 +164,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       setSavingBusinessOverview(true)
       const payload = {
         ticker_name: basicDealDetails.ticker,
-        business_overview: [businessOverviewDraft]
+        business_overview: businessOverviewDraft
       }
 
       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
@@ -183,6 +186,58 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       setSaveError(e.message)
     } finally {
       setSavingBusinessOverview(false)
+    }
+  }
+
+  const handleSaveSection = async (section: keyof WriteUpData) => {
+    if (!updatedData) return
+
+    const apiUrl = process.env.REACT_APP_API_URL
+    const token = localStorage.getItem("access_token")
+    const sectionValue = (updatedData[section] || []).join("")
+
+    try {
+      setSavingSection(section)
+
+      const payload: Record<string, string> = {
+        ticker_name: basicDealDetails.ticker,
+        [section]: sectionValue
+      }
+
+      const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : ""
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!res.ok) throw new Error("Save failed")
+
+      setWriteUpData((prev) =>
+        prev
+          ? { ...prev, [section]: [...(updatedData[section] || [])] }
+          : prev
+      )
+      setEditMode(null)
+    } catch (e: any) {
+      setSaveError(e.message)
+    } finally {
+      setSavingSection(null)
+    }
+  }
+
+  const handleAccordionAction = (
+    section: keyof WriteUpData,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation()
+
+    if (editMode === section) {
+      handleSaveSection(section)
+    } else {
+      setEditMode(section)
     }
   }
 
@@ -299,10 +354,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
               <IconButton
                 sx={{ ml: "auto" }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setEditMode(editMode === section ? null : section)
-                }}
+                disabled={savingSection === section}
+                onClick={(e) => handleAccordionAction(section, e)}
               >
                 {editMode === section ? <SaveIcon /> : <EditIcon />}
               </IconButton>
