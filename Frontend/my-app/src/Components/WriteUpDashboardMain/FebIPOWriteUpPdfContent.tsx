@@ -29,16 +29,16 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
         id: "page-1",
         sections: [
           { id: "deal-info", content: <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} /> },
-          { id: "deal-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} /> }
+          {
+            id: "market-strategy",
+            content: <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
+          }
         ]
       },
       {
         id: "page-2",
         sections: [
-          {
-            id: "market-strategy",
-            content: <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
-          }
+          { id: "deal-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} /> }
         ]
       },
       {
