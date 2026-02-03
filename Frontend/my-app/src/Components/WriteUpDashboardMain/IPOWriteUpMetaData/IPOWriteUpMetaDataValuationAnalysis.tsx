@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 import {
   Box,
   CircularProgress,
   IconButton,
   Stack,
-  TextField,
   Typography
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
@@ -29,11 +29,25 @@ const normalizeValuation = (value: string | string[] | undefined) => {
   return value
 }
 
-const splitValuationLines = (value: string) =>
-  value
-    .split("\n")
-    .map((line) => line.replace(/^[\u2022\-]\s*/, "").trim())
-    .filter(Boolean)
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
@@ -171,30 +185,44 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           }}
         >
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              minRows={4}
-              placeholder="Enter valuation notes"
-              value={draftValuationText}
-              onChange={(event) => setDraftValuationText(event.target.value)}
+            <Box
               sx={{
                 mt: 1,
                 background: "#ffffff",
                 borderRadius: 1,
-                "& .MuiOutlinedInput-root": { borderRadius: 1 }
+                px: 0.5,
+                py: 0.5
               }}
+            >
+              <ReactQuill
+                theme="snow"
+                value={draftValuationText}
+                onChange={setDraftValuationText}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
+          ) : valuationText ? (
+            <Box
+              sx={{
+                mt: 1,
+                minHeight: 120,
+                color: "#1f2a44",
+                lineHeight: 1.7
+              }}
+              dangerouslySetInnerHTML={{ __html: valuationText }}
             />
           ) : (
-            <Box component="ul" sx={{ mt: 1.5, pl: 3, mb: 0 }}>
-              {splitValuationLines(valuationText).map((line, index) => (
-                <li key={`${line}-${index}`}>
-                  <Typography variant="body2" sx={{ color: "#2b3a67" }}>
-                    {line}
-                  </Typography>
-                </li>
-              ))}
-            </Box>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                fontStyle: "italic",
+                color: "#6b7280"
+              }}
+            >
+              --
+            </Typography>
           )}
         </Box>
 

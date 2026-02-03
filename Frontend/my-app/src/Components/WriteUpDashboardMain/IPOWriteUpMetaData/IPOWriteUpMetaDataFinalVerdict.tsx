@@ -8,7 +8,6 @@ import {
   LinearProgress,
   Slider,
   Stack,
-  TextField,
   Typography
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
@@ -17,6 +16,28 @@ import CancelIcon from "@mui/icons-material/Cancel"
 import { BasicDealDetails } from "../types/DealInformation"
 import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 interface IPOWriteUpMetaDataFinalVerdictProps {
   basicDealDetails: BasicDealDetails
@@ -123,7 +144,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
     }
   }, [metadata, finalVerdictText, overallRating])
 
-  const sectionDefaults = [
+const sectionDefaults = [
     { id: "deal-info", label: "Deal Info" },
     // { id: "deal-indication", label: "Deal Indication" },
     // { id: "market-strategy", label: "Market Strategy" },
@@ -340,46 +361,66 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Stack spacing={2}>
-            <Box display="flex" justifyContent="flex-end">
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="flex-start"
+            sx={{ width: "100%" }}
+          >
+            <Box flex={1}>
               {editMode ? (
-                <>
-                  <IconButton color="primary" onClick={handleSave}>
-                    <SaveIcon />
-                  </IconButton>
-                  <IconButton color="secondary" onClick={handleCancel}>
-                    <CancelIcon />
-                  </IconButton>
-                </>
+                <Box
+                  sx={{
+                    background: "#ffffff",
+                    borderRadius: 1.5,
+                    px: 0.5,
+                    py: 0.5
+                  }}
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={draftFinalVerdictText}
+                    onChange={setDraftFinalVerdictText}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                </Box>
+              ) : finalVerdictText ? (
+                <Box
+                  sx={{
+                    color: "#1f2a44",
+                    lineHeight: 1.7,
+                    minHeight: 120
+                  }}
+                  dangerouslySetInnerHTML={{ __html: finalVerdictText }}
+                />
               ) : (
-                <IconButton onClick={handleEditMode}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#6b7280", fontStyle: "italic" }}
+                >
+                  Provide a concise verdict summary with valuation view, risks, and entry stance.
+                </Typography>
               )}
             </Box>
 
-            {editMode ? (
-              <TextField
-                fullWidth
-                multiline
-                minRows={5}
-                placeholder="Enter final verdict summary"
-                value={draftFinalVerdictText}
-                onChange={(event) => setDraftFinalVerdictText(event.target.value)}
-                sx={{
-                  background: "#ffffff",
-                  borderRadius: 1.5,
-                  "& .MuiOutlinedInput-root": { borderRadius: 1.5 }
-                }}
-              />
-            ) : (
-              <Typography variant="body2" sx={{ color: "#1f2a44" }}>
-                {finalVerdictText ||
-                  metadata?.final_verdict_summary ||
-                  metadata?.final_verdict ||
-                  "Provide a concise verdict summary with valuation view, risks, and entry stance."}
-              </Typography>
-            )}
+            <Stack spacing={1} alignItems="flex-end">
+              {editMode ? (
+                <>
+                  <IconButton size="small" color="primary" onClick={handleSave}>
+                    <SaveIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton size="small" color="secondary" onClick={handleCancel}>
+                    <CancelIcon fontSize="small" />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton size="small" onClick={handleEditMode}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Stack>
+          </Stack>
 
             <Stack alignItems="center" spacing={1.5}>
               <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -474,7 +515,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<
                 {metadata.final_verdict_note}
               </Typography>
             )}
-          </Stack>
+          {/* </Stack> */}
         </Grid>
       </Grid>
     </IPOWriteUpMetaDataSectionCard>
