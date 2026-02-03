@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Box, Card, CardContent, CircularProgress, Stack, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Box, Stack, Typography } from "@mui/material";
 import DealTopMetrics from "./DealTopMetrics";
 import DealSecondRow from "./DealSecondRow";
 import DealAMStrategy from "./DealAMStrategy";
@@ -11,7 +11,6 @@ export interface DealRecommendationResponse {
   after_market_threshold: string;
 
   valuation: string;
-
   potential_am_quantity: number | null;
 
   t1d_pred: string;
@@ -25,24 +24,22 @@ export interface DealRecommendationResponse {
   fs_1m_sentiment: string;
   fs_expected_volatility: string;
   fs_confidence_level: string;
+  executive_summary: string;
 
   one_week_sentiment: string;
   one_month_sentiment: string;
 
-  last_5_t1d_avg_price: number;
-  last_10_t1d_avg_price: number;
-  last_5_t1w_avg_price: number;
-  last_10_t1w_avg_price: number;
-  last_5_t1m_avg_price: number;
-  last_10_t1m_avg_price: number;
+  peers_t1d_avg_price: number;
+  peers_t1w_avg_price: number;
+  peers_t1m_avg_price: number;
+  peers_count: number;
 
   t1d_overall_prediction: string;
   t1w_overall_prediction: string;
   t1m_overall_prediction: string;
 
-  writeup_overall_rating: number;  // out of 100
-  ai_ml_overall_rating: number;    // out of 100
-
+  writeup_overall_rating: number;
+  ai_ml_overall_rating: number;
 
   AM_strategy_recommendation: string;
 }
@@ -58,7 +55,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 async function fetchDealRecommendation(ticker: string): Promise<DealRecommendationResponse> {
   const token = localStorage.getItem("access_token");
 
-  const res = await fetch(`${apiUrl}/api/deal_recommendation/`, {
+  const res = await fetch(`${apiUrl}/api/get_deal_recommendation/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -82,13 +79,8 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
 
   const effectiveTicker = useMemo(() => (ticker || "").trim(), [ticker]);
 
-  useEffect(() => {
-    if (!effectiveTicker) {
-      setData(null);
-      setState("idle");
-      setError("");
-      return;
-    }
+  const reload = useCallback(() => {
+    if (!effectiveTicker) return;
 
     let cancelled = false;
     setState("loading");
@@ -111,19 +103,26 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
     };
   }, [effectiveTicker]);
 
+  useEffect(() => {
+    if (!effectiveTicker) {
+      setData(null);
+      setState("idle");
+      setError("");
+      return;
+    }
+    return reload();
+  }, [effectiveTicker, reload]);
+
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 }}>
+      <Box sx={{ maxWidth: 1280, mx: "auto", px: 2, py: 2 ,background:"#d6e0ef"}}>
         <Stack spacing={2}>
-          {/* Header */}
-
           {!effectiveTicker && (
             <Alert severity="info" variant="outlined">
               Please provide a ticker to fetch the deal recommendation.
             </Alert>
           )}
 
-          {/* Error */}
           {effectiveTicker && state === "error" && (
             <NoDataNotice
               title="No data found"
@@ -131,7 +130,6 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
             />
           )}
 
-          {/* Content */}
           {effectiveTicker && data && (
             <>
               <DealTopMetrics
@@ -146,6 +144,12 @@ const DealRecomendation: React.FC<DashboardProps> = ({ ticker }) => {
                 recommendation={data.AM_strategy_recommendation}
                 potentialQty={data.potential_am_quantity}
                 ticker={effectiveTicker}
+                overallSummary={{
+                  t1d: data.t1d_overall_prediction,
+                  t1w: data.t1w_overall_prediction,
+                  t1m: data.t1m_overall_prediction,
+                }}
+                onSaved={() => reload()}
               />
             </>
           )}

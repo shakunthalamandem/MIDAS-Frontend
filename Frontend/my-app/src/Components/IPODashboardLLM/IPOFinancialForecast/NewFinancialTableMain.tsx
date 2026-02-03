@@ -16,9 +16,10 @@ interface NewFinancialTableMainProps {
   deal_id?: string;
 }
 
-const NewFinancialTableMain: React.FC<
-  NewFinancialTableMainProps
-> = ({ defaultTicker = "", deal_id }) => {
+const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
+  defaultTicker = "",
+  deal_id,
+}) => {
   const [forecastsInput, setForecastsInput] = useState(defaultTicker);
   const [forecastsTicker, setForecastsTicker] = useState(defaultTicker);
   const [forecasts, setForecasts] = useState<any | null>(null);
@@ -29,7 +30,7 @@ const NewFinancialTableMain: React.FC<
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
+    "success",
   );
 
   const handleCloseSnackbar = () => setSnackbarOpen(false);
@@ -45,30 +46,29 @@ const NewFinancialTableMain: React.FC<
       if (!apiUrl) throw new Error("API URL not set");
 
       const tickerToFetch = customTicker ?? forecastsInput;
-      const response = await fetch(
-        `${apiUrl}/api/financial_forecasts_data/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({
-            ticker: tickerToFetch,
-            ...(deal_id ? { deal_id } : {}),
-          }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          ticker: tickerToFetch,
+          ...(deal_id ? { deal_id } : {}),
+        }),
+      });
 
       const json = await response.json();
       if (!response.ok) {
         throw new Error(
-          json.error || json.message || "Failed to fetch forecasts"
+          json.error || json.message || "Failed to fetch forecasts",
         );
       }
 
       if (!json?.status) {
-        throw new Error(json?.error || json?.message || "Failed to fetch forecasts");
+        throw new Error(
+          json?.error || json?.message || "Failed to fetch forecasts",
+        );
       }
 
       const items = Array.isArray(json?.data) ? json.data : [];
@@ -76,7 +76,7 @@ const NewFinancialTableMain: React.FC<
         items.find(
           (item: any) =>
             String(item?.ticker || "").toUpperCase() ===
-            String(tickerToFetch || "").toUpperCase()
+            String(tickerToFetch || "").toUpperCase(),
         ) || items[0];
 
       if (!matched) {
@@ -116,7 +116,7 @@ const NewFinancialTableMain: React.FC<
   const handleEditChange = (
     metricName: string,
     yearKey: string,
-    value: string
+    value: string,
   ) => {
     setEditedData((prev: any) => {
       const updated = {
@@ -185,7 +185,9 @@ const NewFinancialTableMain: React.FC<
 
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.error || result.message || "Failed to update data");
+        throw new Error(
+          result.error || result.message || "Failed to update data",
+        );
       }
       setSnackbarMessage("Financial forecasts updated successfully!");
       setSnackbarSeverity("success");
@@ -200,10 +202,10 @@ const NewFinancialTableMain: React.FC<
 
   // ---------------------- Render ----------------------
   return (
-    <Container sx={{ maxWidth: "xl", mb: 4 ,background: "#f0f5ff"}}>
+    <Container sx={{ maxWidth: "xl", mb: 2, background: "#f0f5ff",borderRadius: 3 }}>
       <Typography
         variant="h6"
-        sx={{ mb: 2, mt: 4 }}
+        sx={{ p: 3 }}
         color="#002060"
         fontWeight={600}
         align="center"
@@ -216,28 +218,27 @@ const NewFinancialTableMain: React.FC<
       {forecastsLoading && <CircularProgress />}
       {forecastsError && <Alert severity="error">{forecastsError}</Alert>}
 
-      {!forecastsLoading &&
-        forecasts &&
-        forecasts?.meta_data && (
-          <NewFinancialTableData
-            data={
-              editing ? editedData : forecasts?.meta_data
-            }
-            editing={editing}
-            onEdit={handleEdit}
-            onSave={handleSave}
-            onCancel={handleCancelEdit}
-            onChange={handleEditChange}
-          />
-        )}
+      {!forecastsLoading && forecasts && forecasts?.meta_data && (
+        <NewFinancialTableData
+          data={editing ? editedData : forecasts?.meta_data}
+          editing={editing}
+          onEdit={handleEdit}
+          onSave={handleSave}
+          onCancel={handleCancelEdit}
+          onChange={handleEditChange}
+        />
+      )}
       {forecastsTicker.toUpperCase() !== "MINIMAX" && (
-        <Box display="flex" alignItems="center" justifyContent="center" mt={2}>
-  <InfoIcon sx={{ mr: 1 }} />
-  <Typography sx={{ mr: 3 }} variant="body2">Above values are in local currency</Typography>
-  <InfoIcon sx={{ mr: 1 }} />
-  <Typography variant="body2">High positive and negative values are shown as NM (Not Meaningful)</Typography>
-</Box>
-
+        <Box display="flex" alignItems="center" justifyContent="center" mt={2} pb={2}>
+          <InfoIcon sx={{ mr: 1 }} />
+          <Typography sx={{ mr: 3 }} variant="body2">
+            Above values are in local currency
+          </Typography>
+          <InfoIcon sx={{ mr: 1 }} />
+          <Typography variant="body2">
+            High positive and negative values are shown as NM (Not Meaningful)
+          </Typography>
+        </Box>
       )}
       <Snackbar
         open={snackbarOpen}

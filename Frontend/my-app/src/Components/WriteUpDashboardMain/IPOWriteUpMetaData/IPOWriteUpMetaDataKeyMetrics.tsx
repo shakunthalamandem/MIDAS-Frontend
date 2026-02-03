@@ -19,6 +19,7 @@ import CancelIcon from "@mui/icons-material/Cancel"
 import CircleIcon from "@mui/icons-material/Circle"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
+import DeleteIcon from "@mui/icons-material/Delete"
 import { motion } from "framer-motion"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
@@ -216,6 +217,16 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }))
   }
 
+  const handleDelete = (key: string) => {
+    setEditedMetrics((prev) => ({
+      ...prev,
+      [key]: {
+        category: "",
+        color: null
+      }
+    }))
+  }
+
   const handleSave = async () => {
     try {
       const payload = {
@@ -364,6 +375,14 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
                 Notes
               </TableCell>
+              {editMode && (
+                <TableCell
+                  align="center"
+                  sx={{ color: "#fff", fontWeight: 700 }}
+                >
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
 
@@ -431,6 +450,23 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                       <Typography variant="body2">{value}</Typography>
                     )}
                   </TableCell>
+
+                  {editMode && (
+                    <TableCell align="center">
+                      <Tooltip title="Delete this metric data">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(item.key)}
+                          sx={{
+                            color: "#d32f2f",
+                            "&:hover": { backgroundColor: "#ffebee" }
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             })}
@@ -442,6 +478,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           <Box
             mt={2}
             p={1.5}
+            className="pdf-hidden"
             sx={{
               border: "1px dashed #c7cfe4",
               background: "#fafafa",

@@ -70,7 +70,7 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
       sx={{
         borderRadius: 3,
         border: "1px solid #e5e7ef",
-        background: "#f7f9ff",
+        background: "linear-gradient(#f0f5ff)",
         boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
       }}
     >
@@ -84,14 +84,7 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
               </SectionCard>
 
               <DealMomentum data={data} />
-
-              <OverallAISummary
-                t1d={data.t1d_overall_prediction}
-                t1w={data.t1w_overall_prediction}
-                t1m={data.t1m_overall_prediction}
-              />
-
-              {/* ✅ BELOW DEAL MOMENTUM */}
+              <MarketSentiment oneWeek={data.one_week_sentiment} oneMonth={data.one_month_sentiment} />
             </Stack>
           </Grid>
 
@@ -101,18 +94,13 @@ export default function DealSecondRow({ data }: { data: DealRecommendationRespon
               <AIMLPredictions data={data} />
 
               <OutlookSummary data={data} />
-
-              <MarketSentiment oneWeek={data.one_week_sentiment} oneMonth={data.one_month_sentiment} />
-
-              {/* <Divider /> */}
-
-              {/* ✅ BELOW OVERALL AI SUMMARY */}
-              {/* <RatingRing title="Overall Rating" value={data.ai_ml_overall_rating} /> */}
+              
             </Stack>
           </Grid>
         </Grid>
       </CardContent>
-      <RatingRing title="Overall Rating" value={data.writeup_overall_rating} />
+      {/* ✅ BELOW OVERALL AI SUMMARY */}
+      {/* <RatingRing title="Overall Rating" value={data.writeup_overall_rating} /> */}
 
     </Card>
   );

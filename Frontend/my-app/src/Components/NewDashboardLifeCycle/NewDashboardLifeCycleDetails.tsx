@@ -258,7 +258,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 pricing_date: activePayload.pricing_date ?? null,
               }}
             />
-          ) : tabItems[tabValue]?.label === "AI- Sentiment View" ? (
+          ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
