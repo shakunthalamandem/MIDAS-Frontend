@@ -138,6 +138,11 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               headerTitle="IPO Write-up"
               fileName={pdfFileName}
               onTogglePdfMode={setPdfMode}
+              buttonLabel="Generate Monashee PDF"
+              loadingLabel="Generating..."
+              className="pdf-hidden"
+              ticker={basicDealDetails?.ticker}
+              pricingDate={basicDealDetails?.pricing_date}
             />
           </Box>
 

@@ -2,12 +2,19 @@ import React, { useState } from "react"
 import { Box, Button, CircularProgress } from "@mui/material"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import introImage from "../../Assets/images/monashee_page1.png"
+import monasheeLogo from "../../Assets/images/monashee_logo.png"
 
 type FebIPOWriteUpPdfExporterProps = {
   targetId: string
   fileName: string
   headerTitle?: string
   onTogglePdfMode?: (active: boolean) => void
+  buttonLabel?: string
+  loadingLabel?: string
+  className?: string
+  ticker?: string | null
+  pricingDate?: string | null
 }
 
 const waitForLayout = () =>
@@ -49,23 +56,31 @@ const drawHeader = (pdf: jsPDF, headerTitle: string) => {
   return 20
 }
 
-const addFooter = (pdf: jsPDF) => {
+const drawFooter = (pdf: jsPDF, dataAsOfText: string) => {
   const pdfWidth = pdf.internal.pageSize.getWidth()
   const pdfHeight = pdf.internal.pageSize.getHeight()
-  const pageCount = pdf.getNumberOfPages()
-
-  for (let i = 1; i <= pageCount; i++) {
-    pdf.setPage(i)
-    pdf.setFontSize(9)
-    pdf.setTextColor(80, 80, 80)
-    pdf.text(`Page ${i} of ${pageCount}`, pdfWidth - 38, pdfHeight - 10)
-    pdf.setFont("helvetica", "bold")
-    pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, {
-      align: "center"
-    })
-    pdf.setFont("helvetica", "normal")
-    pdf.setTextColor(0, 0, 0)
-  }
+  const marginX = 10
+  const footerTextTopY = pdfHeight - 22
+  pdf.setDrawColor(0, 32, 96)
+  pdf.setLineWidth(1)
+  pdf.line(marginX, footerTextTopY - 4, pdfWidth - marginX, footerTextTopY - 4)
+  pdf.setFontSize(7)
+  pdf.setTextColor(100)
+  pdf.setFont("helvetica", "normal")
+  const asOfLabel = dataAsOfText ? `Data as of ${dataAsOfText}. ` : ""
+  pdf.text(
+    `${asOfLabel}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
+    marginX,
+    footerTextTopY,
+    { maxWidth: pdfWidth - marginX * 2 }
+  )
+  pdf.setFontSize(9)
+  pdf.setFont("helvetica", "bold")
+  pdf.setTextColor(128)
+  pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, {
+    align: "center"
+  })
+  pdf.setTextColor(0, 0, 0)
 }
 
 const getCanvasScale = () => {
@@ -102,9 +117,24 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
   targetId,
   fileName,
   headerTitle = "IPO Write-up",
-  onTogglePdfMode
+  onTogglePdfMode,
+  buttonLabel = "Generate Monashee PDF",
+  loadingLabel = "Generating...",
+  className,
+  ticker,
+  pricingDate
 }) => {
   const [loading, setLoading] = useState(false)
+
+  const formatDataAsOf = (value?: string | null) => {
+    if (!value) return ""
+    const cleanValue = value.replace(/(\d+)(st|nd|rd|th)/, "$1")
+    const dateObj = new Date(cleanValue)
+    if (Number.isNaN(dateObj.getTime())) return value
+    const month = dateObj.toLocaleString("default", { month: "short" })
+    const year = dateObj.getFullYear()
+    return `${month} ${year}`
+  }
 
   const handleExport = async () => {
     setLoading(true)
@@ -125,7 +155,33 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       const marginX = 10
       const bottomMargin = 18
       const contentWidth = pdfWidth - marginX * 2
+      const dataAsOfText = formatDataAsOf(pricingDate)
 
+      const logoImg = new Image()
+      logoImg.src = monasheeLogo
+      await new Promise<void>((resolve) => {
+        logoImg.onload = () => resolve()
+      })
+
+      const introImg = new Image()
+      introImg.src = introImage
+      await new Promise<void>((resolve) => {
+        introImg.onload = () => resolve()
+      })
+
+      // Intro page
+      pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight)
+      if (ticker) {
+        const label = pricingDate
+          ? `${ticker.toUpperCase()} • ${pricingDate}`
+          : ticker.toUpperCase()
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(14)
+        pdf.setTextColor(0, 32, 96)
+        pdf.text(label, pdfWidth - marginX - pdf.getTextWidth(label), 24)
+      }
+
+      pdf.addPage()
       let cursorY = drawHeader(pdf, headerTitle)
 
       const rawSections =
@@ -159,12 +215,14 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         }
 
         if (breakBefore && !isFirstSection) {
+          drawFooter(pdf, dataAsOfText)
           pdf.addPage()
           cursorY = drawHeader(pdf, headerTitle)
         } else if (
           !breakBefore &&
           cursorY > pdfHeight - bottomMargin - minRemainingMm
         ) {
+          drawFooter(pdf, dataAsOfText)
           pdf.addPage()
           cursorY = drawHeader(pdf, headerTitle)
         }
@@ -204,13 +262,24 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
 
         relaxLayout(section)
 
+        const captureViewportWidth = 1536
+        const captureWidth = Math.max(section.scrollWidth, captureViewportWidth)
         const canvas = await html2canvas(section, {
           scale: getCanvasScale(),
           useCORS: true,
           backgroundColor: "#ffffff",
-          windowWidth: section.scrollWidth,
+          width: captureWidth,
+          windowWidth: captureWidth,
           windowHeight: section.scrollHeight,
-          scrollY: -window.scrollY
+          scrollY: -window.scrollY,
+          onclone: (doc) => {
+            const cloned = doc.getElementById(section.id)
+            if (cloned) {
+              cloned.style.width = `${captureWidth}px`
+              cloned.style.maxWidth = `${captureWidth}px`
+              cloned.style.minWidth = `${captureWidth}px`
+            }
+          }
         })
 
         const mmPerPx = contentWidth / canvas.width
@@ -223,6 +292,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           const availableHeightMm = pdfHeight - bottomMargin - cursorY
 
           if (availableHeightMm <= 0) {
+            drawFooter(pdf, dataAsOfText)
             pdf.addPage()
             cursorY = drawHeader(pdf, headerTitle)
             continue
@@ -279,6 +349,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           cursorY += sliceHeightMm + gapMm
 
           if (cursorY > pdfHeight - bottomMargin) {
+            drawFooter(pdf, dataAsOfText)
             pdf.addPage()
             cursorY = drawHeader(pdf, headerTitle)
           }
@@ -291,7 +362,94 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         isFirstSection = false
       }
 
-      addFooter(pdf)
+      drawFooter(pdf, dataAsOfText)
+
+      // Disclaimer page (last)
+      pdf.addPage()
+      const headerLogoWidth = 55
+      const headerLogoHeight = 16.5
+      const headerLogoX = pdfWidth - headerLogoWidth - 10
+      const headerLogoY = 10
+      pdf.addImage(
+        logoImg,
+        "JPEG",
+        headerLogoX,
+        headerLogoY,
+        headerLogoWidth,
+        headerLogoHeight,
+        undefined,
+        "FAST"
+      )
+      const headerLineY = headerLogoY + headerLogoHeight + 2
+      pdf.setDrawColor(0, 32, 96)
+      pdf.setLineWidth(1)
+      pdf.line(10, headerLineY, pdfWidth - 10, headerLineY)
+
+      const titleY = headerLineY + 6
+      pdf.setTextColor(0, 32, 96)
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(16)
+      pdf.text("Disclaimer", marginX, titleY)
+
+      const bodyY = titleY + 10
+      const disclaimerText =
+        "The information contained herein has been compiled by Monashee internally and may be based on unaudited data from the relevant funds' books and records, and hypothetical information that has not been verified or reconciled by such funds' administrator. As such, the information contained herein should not serve as any kind of basis for any investment decision.\n\n" +
+        "This document does not constitute advice or a recommendation or offer to sell or a solicitation to deal in any security or financial product. It is provided for information purposes only and on the understanding that the recipient has sufficient knowledge and experience to be able to understand and make their own evaluation of the proposals and services described herein, any risks associated therewith and any related legal, tax, accounting or other material considerations. To the extent that the reader has any questions regarding the applicability of any specific issue discussed above to their specific portfolio or situation, prospective investors are encouraged to contact Monashee Investment Management or consult with the professional advisor of their choosing.\n\n" +
+        "Certain information contained herein has been obtained from third party sources and such information has not been independently verified by Monashee Investment Management. No representation, warranty, or undertaking, expressed or implied, is given to the accuracy or completeness of such information by Monashee Investment Management or any other person. While such sources are believed to be reliable. Monashee Investment Management does not assume any responsibility for the accuracy or completeness of such information. Monashee Investment Management does not undertake any obligation to update the information contained herein as of any future date.\n\n" +
+        "Except where otherwise indicated, the information contained in this presentation is based on matters as they exist as of the date of preparation of such material and not as of the date of distribution or any future date. Recipients should not rely on this material in making any future investment decision.\n\n" +
+        "This presentation is confidential, is intended only for the person to whom it has been directly provided and under no circumstances may a copy be shown, copied, transmitted or otherwise be given to any person other than the authorized recipient without the prior written consent of Monashee Investment Management.\n\n" +
+        "There is no guarantee that the investment objectives will be achieved. Moreover, the past performance is not a guarantee or indicator of future results.\n\n" +
+        'Certain information contained herein constitutes "forward-looking statements," which can be identified by the use of forward-looking terminology such as "may," "will." "should," "expect," "anticipate," "project," "estimate," "intend," "continue," or "believe." or the negatives thereof or other variations thereon or comparable terminology. Due to various risks and uncertainties, actual events, results or actual performance may differ materially from those reflected or contemplated in such forward-looking statements. Nothing contained herein may be relied upon as a guarantee, promise, assurance or a representation as to the future'
+
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(10.5)
+      pdf.setTextColor(60)
+      const maxWidth = pdfWidth - marginX * 2
+      const lines: string[] = (pdf as any).splitTextToSize(
+        disclaimerText,
+        maxWidth
+      )
+      const lineHeightMm = pdf.getFontSize() * 0.3528 * 1.2
+      let yCursor = bodyY
+      const bottomLimit = pdfHeight - 28
+      let idx = 0
+      while (idx < lines.length) {
+        const linesFit = Math.max(
+          1,
+          Math.floor((bottomLimit - yCursor) / lineHeightMm)
+        )
+        const chunk = lines.slice(idx, idx + linesFit)
+        pdf.text(chunk, marginX, yCursor, { maxWidth })
+        idx += linesFit
+        if (idx < lines.length) {
+          drawFooter(pdf, dataAsOfText)
+          pdf.addPage()
+          pdf.addImage(
+            logoImg,
+            "JPEG",
+            headerLogoX,
+            headerLogoY,
+            headerLogoWidth,
+            headerLogoHeight,
+            undefined,
+            "FAST"
+          )
+          const headerLineYC = headerLogoY + headerLogoHeight + 2
+          pdf.setDrawColor(0, 32, 96)
+          pdf.setLineWidth(1)
+          pdf.line(10, headerLineYC, pdfWidth - 10, headerLineYC)
+          pdf.setTextColor(0, 32, 96)
+          pdf.setFont("helvetica", "bold")
+          pdf.setFontSize(16)
+          pdf.text("Disclaimer", marginX, headerLineYC + 6)
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(10.5)
+          pdf.setTextColor(60)
+          yCursor = headerLineYC + 16
+        }
+      }
+
+      drawFooter(pdf, dataAsOfText)
       pdf.save(fileName)
     } catch (err) {
       console.error("Failed to generate IPO write-up PDF:", err)
@@ -307,6 +465,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         variant="contained"
         onClick={handleExport}
         disabled={loading}
+        className={className}
         sx={{
           backgroundColor: "#002060",
           color: "#fff",
@@ -314,25 +473,10 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           px: 2.5,
           minWidth: 180
         }}
+        startIcon={loading ? <CircularProgress color="inherit" size={18} /> : null}
       >
-        {loading ? "Generating PDF..." : "Generate PDF"}
+        {loading ? loadingLabel : buttonLabel}
       </Button>
-      {loading && (
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          width="100%"
-          height="100%"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          bgcolor="rgba(255,255,255,0.5)"
-          borderRadius={1}
-        >
-          <CircularProgress size={22} />
-        </Box>
-      )}
     </Box>
   )
 }
