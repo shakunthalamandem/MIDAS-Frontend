@@ -117,9 +117,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             mb: 3,
             p: 2,
             borderRadius: 3,
-            backgroundColor: "rgba(151, 187, 240, 0.12)",
-            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(245, 248, 255, 0.92)",
+            backdropFilter: "blur(14px)",
             border: `1px solid ${theme.palette.divider}`,
+            position: "sticky",
+            top: { xs: 90, md: 95 },
+            zIndex: theme.zIndex.appBar + 10,
+            boxShadow: "0 16px 32px rgba(15, 23, 42, 0.12)",
           })}
         >
           <DealHeaderCard
@@ -197,7 +201,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           </Tabs>
         </Paper>
 
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
            <FebWriteUpDashboardMain
@@ -262,6 +266,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCycleMeetingNotes
               ticker={activePayload.ticker}
               pricingDate={activePayload.pricing_date}
+              dealType={activePayload.deal_type}
             />
           ) : (
             <PageUnderDevelopment />

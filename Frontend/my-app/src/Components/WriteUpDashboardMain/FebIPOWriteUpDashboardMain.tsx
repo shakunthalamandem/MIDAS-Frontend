@@ -52,7 +52,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     borderRadius: 3,
     border: "1px solid #edf0faff",
     background: "#d6e0ef",
-    boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)"
+    boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)",
+    scrollMarginTop: 220
   }
 
   const handleNavClick = (sectionId: string) => {
@@ -112,7 +113,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           background: "#dbe9ff",
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)",
           position: { md: "sticky" },
-          top: { md: 24 }
+          top: { md: 300 },
+          alignSelf: "start"
         }}
       >
         <CardContent sx={{ p: 2.5 }}>
@@ -160,37 +162,37 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
       {/* Right Content */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        <Card id="deal-info" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="deal-info" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="deal-indication" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="deal-indication" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="market-strategy" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="market-strategy" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="business-overview" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="business-overview" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataBusinessOverview basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="key-metrics" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="key-metrics" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="financial-highlights" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="financial-highlights" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
           </CardContent>
@@ -200,25 +202,25 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
         </Box> */}
 
-        <Card id="comps" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="comps" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="valuation-analysis" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="valuation-analysis" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="red-flag" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="red-flag" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} />
           </CardContent>
         </Card>
 
-        <Card id="final-verdict" sx={{ ...sectionCardSx, scrollMarginTop: 96 }}>
+        <Card id="final-verdict" sx={sectionCardSx}>
           <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
             <IPOWriteUpMetaDataFinalVerdict basicDealDetails={basicDealDetails} />
           </CardContent>
