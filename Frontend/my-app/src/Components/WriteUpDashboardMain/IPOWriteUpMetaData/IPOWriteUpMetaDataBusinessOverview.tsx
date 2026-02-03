@@ -342,6 +342,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     businessOverviewRating !== null ? formatRating(businessOverviewRating) : null
 
   return (
+    <>
     <Paper
       elevation={0}
       sx={{
@@ -498,6 +499,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         ))}
       </Box>
     </Paper>
+    </>
   )
 }
 
