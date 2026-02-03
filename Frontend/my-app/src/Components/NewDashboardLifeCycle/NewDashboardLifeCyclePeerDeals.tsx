@@ -346,9 +346,10 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
     }
     setOptionsLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/get_mdd_tickers/`, {
-        method: "GET",
+      const res = await fetch(`${apiUrl}/api/get_peer_mdd_tickers/`, {
+        method: "POST",
         headers: authHeaders,
+        body: JSON.stringify({ticker: baseTicker}),
       });
       if (!res.ok) throw new Error(`Failed to fetch tickers (${res.status})`);
       const json = await res.json();
