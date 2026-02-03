@@ -36,6 +36,7 @@ interface Props {
   basicDealDetails: {
     ticker: string
   }
+  pdfMode?: boolean
 }
 
 type AccordionSection = {
@@ -72,7 +73,8 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
 /* ===================== COMPONENT ===================== */
 
 const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
-  basicDealDetails
+  basicDealDetails,
+  pdfMode = false
 }) => {
   const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null)
   const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null)
@@ -251,25 +253,27 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     >
       {/* ================= BUSINESS OVERVIEW ================= */}
       <Box textAlign="center" mb={4}>
-        <Box display="flex" justifyContent="flex-end" mb={1}>
-          {businessOverviewEditing ? (
-            <>
-              <IconButton
-                onClick={handleSaveBusinessOverview}
-                disabled={savingBusinessOverview}
-              >
-                <SaveIcon />
+        {!pdfMode && (
+          <Box display="flex" justifyContent="flex-end" mb={1}>
+            {businessOverviewEditing ? (
+              <>
+                <IconButton
+                  onClick={handleSaveBusinessOverview}
+                  disabled={savingBusinessOverview}
+                >
+                  <SaveIcon />
+                </IconButton>
+                <IconButton onClick={handleCancelBusinessOverview}>
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton onClick={() => setBusinessOverviewEditing(true)}>
+                <EditIcon />
               </IconButton>
-              <IconButton onClick={handleCancelBusinessOverview}>
-                <CancelIcon />
-              </IconButton>
-            </>
-          ) : (
-            <IconButton onClick={() => setBusinessOverviewEditing(true)}>
-              <EditIcon />
-            </IconButton>
-          )}
-        </Box>
+            )}
+          </Box>
+        )}
 
         <Typography
           variant="h5"
@@ -311,13 +315,17 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
           <Accordion
             key={section}
+            defaultExpanded={pdfMode}
             sx={{
               borderRadius: 2,
               border: "1px solid #E6ECF5",
               "&:before": { display: "none" }
             }}
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary
+              expandIcon={pdfMode ? null : <ExpandMoreIcon />}
+              sx={pdfMode ? { cursor: 'default !important' } : {}}
+            >
               <Box display="flex" alignItems="center" gap={1.5}>
                 <Box
                   sx={{
@@ -337,15 +345,17 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 <Typography fontWeight={600} color="#124180">{title}</Typography>
               </Box>
 
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setEditMode(editMode === section ? null : section)
-                }}
-                sx={{ ml: "auto" }}
-              >
-                {editMode === section ? <SaveIcon /> : <EditIcon />}
-              </IconButton>
+              {!pdfMode && (
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setEditMode(editMode === section ? null : section)
+                  }}
+                  sx={{ ml: "auto" }}
+                >
+                  {editMode === section ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
+              )}
             </AccordionSummary>
 
             <AccordionDetails>

@@ -217,6 +217,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataBusinessOverview
                   basicDealDetails={basicDealDetails}
+                  pdfMode={pdfMode}
                 />
               </CardContent>
             </Card>
