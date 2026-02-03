@@ -284,7 +284,7 @@ export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
         {[
           { label: "1-Week", value: data.fs_1w_sentiment },
           { label: "1-Month", value: data.fs_1m_sentiment },
-          { label: "Expected Volatility", value: data.fs_expected_volatility },
+          { label: "Volatility", value: data.fs_expected_volatility },
           { label: "Confidence", value: data.fs_confidence_level },
         ].map(({ label, value }) => (
           <Grid item xs={12} md={3} key={label}>
@@ -300,7 +300,7 @@ export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
               }}
             >
               <Stack spacing={1} alignItems="center">
-                <Typography variant="body2" fontWeight={700} color="#111827">
+                <Typography variant="body2" fontWeight={600} color="#111827">
                   {label}
                 </Typography>
                 <SentimentChip text={value} />
