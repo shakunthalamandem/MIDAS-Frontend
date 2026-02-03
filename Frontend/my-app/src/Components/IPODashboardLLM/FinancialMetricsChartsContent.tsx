@@ -420,6 +420,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
                 />
               }
               label="Include in the PDF"
+              className="pdf-hidden"
             />
           </Box>
         </Box>

@@ -15,6 +15,7 @@ interface IPOWriteUpMetaDataSectionCardProps {
   basicDealDetails: BasicDealDetails
   accentColor?: string
   showSummary?: boolean
+  showTitle?: boolean
   showNotes?: boolean
   children?: React.ReactNode
 }
@@ -24,6 +25,7 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
 > = ({
   title,
   basicDealDetails,
+  showTitle = true,
   // accentColor = "#dadadaff",
   showSummary = true,
   showNotes = true,
@@ -60,12 +62,14 @@ const IPOWriteUpMetaDataSectionCard: React.FC<
     >
       <CardContent sx={{ p: { xs: 2.5, md: 3 }, pl: { xs: 3, md: 3.5 } }}>
         <Stack spacing={2.5}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: headingColor, textAlign: "center" }}
-          >
-            {title}
-          </Typography>
+          {showTitle ? (
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: headingColor, textAlign: "center" }}
+            >
+              {title}
+            </Typography>
+          ) : null}
 
           {showSummary ? (
             <Grid container spacing={2}>

@@ -13,6 +13,28 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 interface IPOWriteUpMetaDataMarketStatergyProps {
   basicDealDetails: BasicDealDetails
@@ -316,6 +338,7 @@ IOI and After-Market Strategy          </Typography>
       </Box>
 
       <Box
+        className="pdf-hidden"
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
@@ -384,23 +407,33 @@ IOI and After-Market Strategy          </Typography>
           </Box>
 
           {isEditingNotes ? (
-            <TextField
-              multiline
-              minRows={6}
-              value={draftNotes}
-              onChange={(event) => setDraftNotes(event.target.value)}
-              sx={{ background: "#ffffff" }}
+            <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={draftNotes}
+                onChange={setDraftNotes}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
+          ) : data?.internal_notes ? (
+            <Box
+              sx={{
+                color: "#1f2937",
+                lineHeight: 1.7,
+                minHeight: 144
+              }}
+              dangerouslySetInnerHTML={{ __html: data.internal_notes }}
             />
           ) : (
             <Typography
               variant="body2"
               sx={{
-                whiteSpace: "pre-line",
-                color: "#1f2937",
-                lineHeight: 1.7
+                fontStyle: "italic",
+                color: "#6b7280"
               }}
             >
-              {data?.internal_notes || "--"}
+              --
             </Typography>
           )}
         </Stack>

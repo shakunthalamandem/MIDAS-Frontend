@@ -19,8 +19,10 @@ import CancelIcon from "@mui/icons-material/Cancel"
 import CircleIcon from "@mui/icons-material/Circle"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
+import DeleteIcon from "@mui/icons-material/Delete"
 import { motion } from "framer-motion"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 
 /* -------------------- TYPES -------------------- */
 
@@ -73,6 +75,27 @@ const lightColorMap: Record<string, string> = {
   green: "#dff5e1"
 }
 
+const parseRatingValue = (value?: number | string | null) => {
+  if (value === undefined || value === null) return null
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null
+  }
+  const trimmed = String(value).trim()
+  if (!trimmed) return null
+  const match = trimmed.match(/^-?\d+(\.\d+)?/)
+  if (match) {
+    const parsed = Number(match[0])
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  const fallback = Number(trimmed)
+  return Number.isFinite(fallback) ? fallback : null
+}
+
+const formatRating = (value: number) => {
+  const normalized = Math.round(value * 10) / 10
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
+}
+
 /* -------------------- COMPONENT -------------------- */
 
 const IPOWriteUpMetaDataKeyMetrics: React.FC<
@@ -81,6 +104,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [sectionScores, setSectionScores] = useState<Record<string, number> | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [metrics, setMetrics] = useState<KeyMetricsResponse>({})
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
@@ -95,6 +119,12 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }),
     [token]
   )
+
+  const ratingValue = parseRatingValue(
+    sectionScores?.["key-metrics"] ??
+      basicDealDetails.writeup_ratings?.["key-metrics"]
+  )
+  const ratingText = ratingValue !== null ? formatRating(ratingValue) : null
 
   /* -------------------- FETCH -------------------- */
 
@@ -127,6 +157,41 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }
   }, [apiUrl, basicDealDetails.ticker, headers])
 
+  useEffect(() => {
+    let active = true
+    const fetchScores = async () => {
+      if (!basicDealDetails.ticker) return
+
+      try {
+        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ ticker: basicDealDetails.ticker })
+        })
+
+        if (!res.ok) return
+
+        const data = await res.json()
+        if (!active) return
+
+        const incoming =
+          data?.writeup_ratings ??
+          data?.section_scores ??
+          data?.final_verdict_section_scores ??
+          {}
+
+        setSectionScores(typeof incoming === "object" ? incoming : null)
+      } catch {
+        // ignore
+      }
+    }
+
+    fetchScores()
+    return () => {
+      active = false
+    }
+  }, [apiUrl, basicDealDetails.ticker, headers])
+
   /* -------------------- DERIVED ROW LOGIC -------------------- */
 
   const filledCriteria = criteriaList.filter(
@@ -148,6 +213,16 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         ...prev[key],
         color,
         category: prev[key]?.category ?? metrics[key]?.category ?? ""
+      }
+    }))
+  }
+
+  const handleDelete = (key: string) => {
+    setEditedMetrics((prev) => ({
+      ...prev,
+      [key]: {
+        category: "",
+        color: null
       }
     }))
   }
@@ -213,18 +288,31 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         }}
       >
         {/* ---------- HEADER ---------- */}
-        <Box
-          display="grid"
-          gridTemplateColumns="1fr auto 1fr"
-          alignItems="center"
-          mb={2}
-        >
-          <Box />
+        <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-           Top 5 performance of Key Metrics
+              Key Metrics - Top 5 Performance
             </Typography>
-
+            {ratingText && (
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  borderRadius: 999,
+                  border: "1px solid rgba(52, 144, 220, 0.4)",
+                  background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                  px: 1.5,
+                  py: 0.4,
+                  boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+                }}
+              >
+                <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                  Rating - {ratingText}/10
+                </Typography>
+              </Box>
+            )}
             <Tooltip
               arrow
               title={
@@ -253,7 +341,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             </Tooltip>
           </Box>
 
-          <Box textAlign="right">
+          <Box marginLeft="auto">
             {editMode ? (
               <>
                 <IconButton onClick={handleSave} color="primary">
@@ -287,6 +375,14 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
                 Notes
               </TableCell>
+              {editMode && (
+                <TableCell
+                  align="center"
+                  sx={{ color: "#fff", fontWeight: 700 }}
+                >
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
 
@@ -354,6 +450,23 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                       <Typography variant="body2">{value}</Typography>
                     )}
                   </TableCell>
+
+                  {editMode && (
+                    <TableCell align="center">
+                      <Tooltip title="Delete this metric data">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(item.key)}
+                          sx={{
+                            color: "#d32f2f",
+                            "&:hover": { backgroundColor: "#ffebee" }
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             })}
@@ -365,6 +478,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           <Box
             mt={2}
             p={1.5}
+            className="pdf-hidden"
             sx={{
               border: "1px dashed #c7cfe4",
               background: "#fafafa",
