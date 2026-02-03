@@ -240,6 +240,10 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           cursorY = drawHeader(pdf, headerTitle)
         }
 
+        // Calculate optimal capture width for clean PDF rendering
+        const captureViewportWidth = 1200
+        const captureWidth = captureViewportWidth
+
         const prevStyles: Array<{
           el: HTMLElement
           key: string
@@ -251,36 +255,39 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         }
 
         const relaxLayout = (el: HTMLElement) => {
-          const width = Math.max(el.scrollWidth, el.clientWidth)
-          remember(el, "backgroundColor", "#ffffff")
+          const width = Math.max(el.scrollWidth, el.clientWidth, captureViewportWidth)
           remember(el, "overflow", "visible")
           remember(el, "overflowX", "visible")
           remember(el, "overflowY", "visible")
           remember(el, "maxHeight", "none")
           remember(el, "height", "auto")
           remember(el, "width", `${width}px`)
+          remember(el, "minWidth", `${width}px`)
+          remember(el, "boxSizing", "border-box")
 
           const children = Array.from(el.querySelectorAll<HTMLElement>("*"))
           children.forEach((child) => {
-            const childWidth = Math.max(child.scrollWidth, child.clientWidth)
-            remember(child, "backgroundColor", "#ffffff")
             remember(child, "overflow", "visible")
             remember(child, "overflowX", "visible")
             remember(child, "overflowY", "visible")
             remember(child, "maxHeight", "none")
             remember(child, "height", "auto")
-            remember(child, "width", `${childWidth}px`)
+            remember(child, "boxSizing", "border-box")
+
+            // Ensure tables and wide elements scale properly
+            if (child.tagName === 'TABLE' || child.classList.contains('MuiTable-root')) {
+              remember(child, "width", "100%")
+            }
           })
         }
 
         relaxLayout(section)
 
-        const captureViewportWidth = 1536
-        const captureWidth = Math.max(section.scrollWidth, captureViewportWidth)
         const canvas = await html2canvas(section, {
-          scale: getCanvasScale(),
+          scale: Math.max(getCanvasScale(), 2.5),
           useCORS: true,
-          backgroundColor: "#ffffff",
+          backgroundColor: null,
+          allowTaint: true,
           width: captureWidth,
           windowWidth: captureWidth,
           windowHeight: section.scrollHeight,
@@ -293,6 +300,21 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
               cloned.style.width = `${captureWidth}px`
               cloned.style.maxWidth = `${captureWidth}px`
               cloned.style.minWidth = `${captureWidth}px`
+              cloned.style.margin = '0'
+              cloned.style.padding = '0'
+              cloned.style.boxSizing = 'border-box'
+
+              // Enhance font sizes for better PDF readability
+              const allText = cloned.querySelectorAll<HTMLElement>('*')
+              allText.forEach((el) => {
+                const computed = window.getComputedStyle(el)
+                const fontSize = parseFloat(computed.fontSize)
+                if (fontSize > 0) {
+                  el.style.fontSize = `${Math.max(fontSize * 1.15, 12)}px`
+                }
+                // Ensure proper box sizing
+                el.style.boxSizing = 'border-box'
+              })
             }
           }
         })
@@ -338,12 +360,12 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
             )
           }
 
-          const sliceImg = sliceCanvas.toDataURL("image/jpeg", 0.95)
+          const sliceImg = sliceCanvas.toDataURL("image/png", 1.0)
           const sliceHeightMm = sliceHeightPx * mmPerPx
 
           pdf.addImage(
             sliceImg,
-            "JPEG",
+            "PNG",
             marginX,
             cursorY,
             contentWidth,
