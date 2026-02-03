@@ -38,7 +38,6 @@ interface WriteUpData {
 
 interface Props {
   basicDealDetails: BasicDealDetails
-  pdfMode?: boolean
 }
 
 type AccordionSection = {
@@ -115,8 +114,7 @@ const formatRating = (value: number) => {
 /* ===================== COMPONENT ===================== */
 
 const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
-  basicDealDetails,
-  pdfMode = false
+  basicDealDetails
 }) => {
   const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null)
   const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null)
@@ -342,7 +340,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     businessOverviewRating !== null ? formatRating(businessOverviewRating) : null
 
   return (
-    <>
     <Paper
       elevation={0}
       sx={{
@@ -370,28 +367,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             </IconButton>
           )}
         </Box>
-      <Box textAlign="center" mb={4}>
-        {!pdfMode && (
-          <Box display="flex" justifyContent="flex-end" mb={1}>
-            {businessOverviewEditing ? (
-              <>
-                <IconButton
-                  onClick={handleSaveBusinessOverview}
-                  disabled={savingBusinessOverview}
-                >
-                  <SaveIcon />
-                </IconButton>
-                <IconButton onClick={handleCancelBusinessOverview}>
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setBusinessOverviewEditing(true)}>
-                <EditIcon />
-              </IconButton>
-            )}
-          </Box>
-        )}
 
         <Box
           sx={{
@@ -454,19 +429,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
           <Accordion key={section}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Accordion
-            key={section}
-            defaultExpanded={pdfMode}
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #E6ECF5",
-              "&:before": { display: "none" }
-            }}
-          >
-            <AccordionSummary
-              expandIcon={pdfMode ? null : <ExpandMoreIcon />}
-              sx={pdfMode ? { cursor: 'default !important' } : {}}
-            >
               <Box display="flex" alignItems="center" gap={1.5}>
                 {icon}
                 <Typography fontWeight={600}>{title}</Typography>
@@ -479,17 +441,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               >
                 {editMode === section ? <SaveIcon /> : <EditIcon />}
               </IconButton>
-              {!pdfMode && (
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setEditMode(editMode === section ? null : section)
-                  }}
-                  sx={{ ml: "auto" }}
-                >
-                  {editMode === section ? <SaveIcon /> : <EditIcon />}
-                </IconButton>
-              )}
             </AccordionSummary>
 
             <AccordionDetails>
@@ -499,7 +450,6 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         ))}
       </Box>
     </Paper>
-    </>
   )
 }
 
