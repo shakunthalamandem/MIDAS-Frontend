@@ -139,6 +139,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
   const handleExport = async () => {
     setLoading(true)
     onTogglePdfMode?.(true)
+    const hiddenEls: Array<{ el: HTMLElement; display: string }> = []
 
     try {
       await waitForLayout()
@@ -150,6 +151,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       await waitForContentReady(root)
 
       const pdf = new jsPDF("p", "mm", "a4")
+      if (typeof (pdf as any).setDisplayMode === "function") {
+        ;(pdf as any).setDisplayMode(150)
+      }
       const pdfWidth = pdf.internal.pageSize.getWidth()
       const pdfHeight = pdf.internal.pageSize.getHeight()
       const marginX = 10
@@ -183,6 +187,15 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
 
       pdf.addPage()
       let cursorY = drawHeader(pdf, headerTitle)
+
+      const hideForPdf = (el: HTMLElement) => {
+        hiddenEls.push({ el, display: el.style.display })
+        el.style.display = "none"
+      }
+
+      root
+        .querySelectorAll<HTMLElement>(".MuiIconButton-root, .pdf-hidden")
+        .forEach(hideForPdf)
 
       const rawSections =
         Array.from(root.querySelectorAll<HTMLElement>(".mdr-pdf-section")) || []
@@ -272,6 +285,8 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           windowWidth: captureWidth,
           windowHeight: section.scrollHeight,
           scrollY: -window.scrollY,
+          ignoreElements: (el) =>
+            (el as HTMLElement).classList?.contains("pdf-hidden") ?? false,
           onclone: (doc) => {
             const cloned = doc.getElementById(section.id)
             if (cloned) {
@@ -454,6 +469,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
     } catch (err) {
       console.error("Failed to generate IPO write-up PDF:", err)
     } finally {
+      hiddenEls.forEach(({ el, display }) => {
+        el.style.display = display
+      })
       onTogglePdfMode?.(false)
       setLoading(false)
     }
