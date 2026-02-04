@@ -5,7 +5,8 @@ import {
   CircularProgress,
   IconButton,
   Stack,
-  Typography
+  Typography,
+  Button
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
@@ -83,6 +84,9 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const [valuationImageUrl, setValuationImageUrl] = useState<string>("")
   const [draftValuationText, setDraftValuationText] = useState("")
   const [draftImageUrl, setDraftImageUrl] = useState("")
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showToggle, setShowToggle] = useState(false)
+  const valuationRef = React.useRef<HTMLDivElement | null>(null)
   const [ratingValue, setRatingValue] = useState<number | null>(
     parseRatingValue(
       basicDealDetails.writeup_ratings?.["valuation-analysis"] ??
@@ -133,6 +137,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           setDraftValuationText(normalized)
           setDraftImageUrl(data?.valuation_image_url ?? "")
           setFetchError(null)
+          setIsExpanded(false)
           const incomingRating:
             | number
             | string
@@ -170,6 +175,26 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
+
+  useEffect(() => {
+    if (editMode) {
+      setShowToggle(false)
+      return
+    }
+
+    const updateToggleVisibility = () => {
+      const el = valuationRef.current
+      if (!el) return
+      const computed = window.getComputedStyle(el)
+      const lineHeight = parseFloat(computed.lineHeight) || 24
+      const maxHeight = lineHeight * 8
+      setShowToggle(el.scrollHeight > maxHeight + 1)
+    }
+
+    updateToggleVisibility()
+    window.addEventListener("resize", updateToggleVisibility)
+    return () => window.removeEventListener("resize", updateToggleVisibility)
+  }, [valuationText, editMode])
 
   const handleSave = async () => {
     try {
@@ -254,11 +279,16 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
             </Box>
           ) : valuationText ? (
             <Box
+              ref={valuationRef}
               sx={{
                 mt: 1,
                 minHeight: 120,
                 color: "#1f2a44",
-                lineHeight: 1.7
+                lineHeight: 1.7,
+                overflow: isExpanded ? "visible" : "hidden",
+                display: isExpanded ? "block" : "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: isExpanded ? "unset" : 8
               }}
               dangerouslySetInnerHTML={{ __html: valuationText }}
             />
@@ -274,8 +304,24 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
               --
             </Typography>
           )}
+          {!editMode && valuationText && showToggle ? (
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+              <Button
+                size="small"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                sx={{
+                  textTransform: "none",
+                  color: "#005512ff",
+                  fontWeight: 600,
+                  px: 0,
+                  minWidth: "auto"
+                }}
+              >
+                {isExpanded ? "...Read less" : "...Read more"}
+              </Button>
+            </Box>
+          ) : null}
         </Box>
-
 
       </Stack>
     )

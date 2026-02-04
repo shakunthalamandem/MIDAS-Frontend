@@ -413,6 +413,23 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
                   el.style.borderColor = borderColor
                 }
               })
+
+              // Special handling for risk meter elements
+              const riskMeterBars = cloned.querySelectorAll<HTMLElement>('.risk-meter-bar')
+              riskMeterBars.forEach((bar) => {
+                bar.style.backgroundImage = 'linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)'
+                bar.style.background = 'linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)'
+                bar.style.height = '12px'
+                bar.style.width = '100%'
+                bar.style.borderRadius = '999px'
+              })
+
+              const riskMeterBadges = cloned.querySelectorAll<HTMLElement>('.risk-meter-badge')
+              riskMeterBadges.forEach((badge) => {
+                badge.style.backgroundColor = '#6b5bd2'
+                badge.style.color = '#ffffff'
+                badge.style.zIndex = '10'
+              })
             }
           }
         })
