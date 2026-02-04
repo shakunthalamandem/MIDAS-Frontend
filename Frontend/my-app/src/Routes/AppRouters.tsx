@@ -92,6 +92,7 @@ import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
 import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
+import TickerChange from "../Components/TickerChange/TickerChange";
 import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
 
 const AppRouters: React.FC = () => {
@@ -290,6 +291,8 @@ const AppRouters: React.FC = () => {
 
 
         <Route path='/deals/future_pipeline' element={<AuthGuard><FuturePipelineDealsMain /></AuthGuard>} />
+        <Route path="/ticker-change" element={<AuthGuard><TickerChange /></AuthGuard>} />
+
 
 
         

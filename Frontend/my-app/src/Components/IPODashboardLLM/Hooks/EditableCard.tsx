@@ -195,18 +195,21 @@ const EditableCard: React.FC<EditableCardProps> = ({
             </Button>
           </Box>
         ) : (
-          <List dense>
+          <Box display="flex" flexDirection="column" gap={1}>
             {content?.map((item: string, idx: number) => (
-              <ListItem key={idx} sx={{ pl: 0 }}>
-                <ListItemIcon sx={{ minWidth: 24, mt: "5px" }}>
-                  <FiberManualRecordIcon
-                    sx={{ fontSize: 8, color: "#002060" }}
-                  />
-                </ListItemIcon>
-                <ListItemText primary={item} />
-              </ListItem>
+              <Box
+                key={idx}
+                sx={{
+                  color: "#1f2a44",
+                  lineHeight: 1.6,
+                  borderRadius: 1,
+                  p: 0.5,
+                  "& ul": { margin: 0, pl: 3 },
+                }}
+                dangerouslySetInnerHTML={{ __html: item }}
+              />
             ))}
-          </List>
+          </Box>
         )}
       </AccordionDetails>
     </Accordion>

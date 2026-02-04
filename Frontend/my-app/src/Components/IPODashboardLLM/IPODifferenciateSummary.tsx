@@ -363,12 +363,14 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                     }
                   />
                 ) : (
-                  <Typography
-                    sx={{ color: "#333", whiteSpace: "pre-line", mt: 2 }}
-                  >
-                    {dealData.differentiated_summary ||
-                      "No differentiated summary provided."}
-                  </Typography>
+                  <Box
+                    sx={{ color: "#333", mt: 2 }}
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        dealData.differentiated_summary ||
+                        "<p>No differentiated summary provided.</p>",
+                    }}
+                  />
                 )}
 
                 {uploadError && (

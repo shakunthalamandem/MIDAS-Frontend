@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
+import { BasicDealDetails, WriteupRatings } from "../types/DealInformation"
 import {
   Box,
   CircularProgress,
   IconButton,
   Stack,
-  TextField,
   Typography
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
+import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
@@ -21,6 +22,7 @@ interface IPOWriteUpMetaDataValuationAnalysisProps {
 interface ValuationWriteUp {
   valuation?: string | string[]
   valuation_image_url?: string | null
+  writeup_ratings?: WriteupRatings
 }
 
 const normalizeValuation = (value: string | string[] | undefined) => {
@@ -29,11 +31,46 @@ const normalizeValuation = (value: string | string[] | undefined) => {
   return value
 }
 
-const splitValuationLines = (value: string) =>
-  value
-    .split("\n")
-    .map((line) => line.replace(/^[\u2022\-]\s*/, "").trim())
-    .filter(Boolean)
+const parseRatingValue = (value?: number | string | null) => {
+  if (value === undefined || value === null) return null
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null
+  }
+  const trimmed = String(value).trim()
+  if (!trimmed) return null
+  const match = trimmed.match(/^-?\d+(\.\d+)?/)
+  if (match) {
+    const parsed = Number(match[0])
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  const fallback = Number(trimmed)
+  return Number.isFinite(fallback) ? fallback : null
+}
+
+const formatRating = (value: number) => {
+  const normalized = Math.round(value * 10) / 10
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
+}
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
@@ -46,6 +83,12 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const [valuationImageUrl, setValuationImageUrl] = useState<string>("")
   const [draftValuationText, setDraftValuationText] = useState("")
   const [draftImageUrl, setDraftImageUrl] = useState("")
+  const [ratingValue, setRatingValue] = useState<number | null>(
+    parseRatingValue(
+      basicDealDetails.writeup_ratings?.["valuation-analysis"] ??
+        basicDealDetails.writeup_ratings?.["valuation_analysis"]
+    )
+  )
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -90,6 +133,17 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           setDraftValuationText(normalized)
           setDraftImageUrl(data?.valuation_image_url ?? "")
           setFetchError(null)
+          const incomingRating:
+            | number
+            | string
+            | null
+            | undefined =
+            data?.writeup_ratings?.["valuation-analysis"] ??
+            data?.writeup_ratings?.["valuation_analysis"] ??
+            basicDealDetails.writeup_ratings?.["valuation-analysis"] ??
+            basicDealDetails.writeup_ratings?.["valuation_analysis"]
+
+          setRatingValue(parseRatingValue(incomingRating))
         }
       } catch (err: any) {
         if (isActive) setFetchError(err.message || "No data found.")
@@ -102,8 +156,18 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       fetchValuation()
     }
 
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      if (basicDealDetails.ticker) {
+        fetchValuation()
+      }
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       isActive = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
 
@@ -171,30 +235,44 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           }}
         >
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              minRows={4}
-              placeholder="Enter valuation notes"
-              value={draftValuationText}
-              onChange={(event) => setDraftValuationText(event.target.value)}
+            <Box
               sx={{
                 mt: 1,
                 background: "#ffffff",
                 borderRadius: 1,
-                "& .MuiOutlinedInput-root": { borderRadius: 1 }
+                px: 0.5,
+                py: 0.5
               }}
+            >
+              <ReactQuill
+                theme="snow"
+                value={draftValuationText}
+                onChange={setDraftValuationText}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
+          ) : valuationText ? (
+            <Box
+              sx={{
+                mt: 1,
+                minHeight: 120,
+                color: "#1f2a44",
+                lineHeight: 1.7
+              }}
+              dangerouslySetInnerHTML={{ __html: valuationText }}
             />
           ) : (
-            <Box component="ul" sx={{ mt: 1.5, pl: 3, mb: 0 }}>
-              {splitValuationLines(valuationText).map((line, index) => (
-                <li key={`${line}-${index}`}>
-                  <Typography variant="body2" sx={{ color: "#2b3a67" }}>
-                    {line}
-                  </Typography>
-                </li>
-              ))}
-            </Box>
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                fontStyle: "italic",
+                color: "#6b7280"
+              }}
+            >
+              --
+            </Typography>
           )}
         </Box>
 
@@ -206,34 +284,76 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   return (
 
       <Box>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
-            alignItems: "center",
-            gap: 2,
-            mb: 2
-          }}
-        >
-          <Box sx={{ display: { xs: "none", sm: "block" } }} />
-          <Typography
-            variant="subtitle1"
-            sx={{ fontWeight: 700, color: "#1d2b5a", textAlign: "center" }}
-          >
-            Valuation Details
-          </Typography>
-          <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
+        <Box sx={{ position: "relative", mb: 2 }}>
+          {/* Rating - Left aligned */}
+          {ratingValue !== null && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {formatRating(ratingValue)}/10
+              </Typography>
+            </Box>
+          )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+              Valuation Analysis
+            </Typography>
+          </Box>
+
+          {/* Edit buttons - Right aligned */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
             {editMode ? (
               <>
-                <IconButton color="primary" onClick={handleSave}>
-                  <SaveIcon />
+                <IconButton
+                  color="primary"
+                  onClick={handleSave}
+                  sx={{
+                    color: "#16a34a",
+                    backgroundColor: "#f0fdf4",
+                    "&:hover": { backgroundColor: "#dcfce7" }
+                  }}
+                >
+                  <SaveIcon fontSize="small" />
                 </IconButton>
-                <IconButton color="secondary" onClick={handleCancel}>
-                  <CancelIcon />
+                <IconButton
+                  color="secondary"
+                  onClick={handleCancel}
+                  sx={{
+                    color: "#dc2626",
+                    backgroundColor: "#fef2f2",
+                    "&:hover": { backgroundColor: "#fee2e2" }
+                  }}
+                >
+                  <CancelIcon fontSize="small" />
                 </IconButton>
               </>
             ) : (
-              <IconButton onClick={() => setEditMode(true)}>
+              <IconButton
+                onClick={() => setEditMode(true)}
+                sx={{
+                  color: "#124180",
+                  backgroundColor: "#f0f5ff",
+                  "&:hover": { backgroundColor: "#e0e7ff" }
+                }}
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             )}
