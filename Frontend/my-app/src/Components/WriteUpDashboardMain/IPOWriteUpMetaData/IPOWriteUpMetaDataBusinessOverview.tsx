@@ -377,7 +377,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 gap: 0.5,
                 borderRadius: 999,
                 border: "1px solid rgba(52, 144, 220, 0.4)",
-                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
                 px: 1.5,
                 py: 0.4,
                 boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
@@ -448,7 +448,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               border: "1px solid #E6ECF5",
               boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
               "&:before": { display: "none" },
-              background: "linear-gradient(135deg, #ffffff, #f8fbff)"
+                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
             }}
           >
             <AccordionSummary
