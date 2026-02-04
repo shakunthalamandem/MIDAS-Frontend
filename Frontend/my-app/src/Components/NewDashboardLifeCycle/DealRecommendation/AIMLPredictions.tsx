@@ -1,57 +1,51 @@
 import React from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Chip,
   Grid,
   LinearProgress,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
+import { TrendingUp, TrendingDown, TrendingFlat } from "@mui/icons-material";
 import { DealRecommendationResponse } from "./DealRecommendationHome";
 import { SectionCard } from "./SectionCard";
 
-function toneFromText(text: string): Tone {
-  const t = (text || "").toLowerCase();
-  if (t.includes("positive") || t.includes("bull") || t.includes("up"))
-    return "success";
-  if (t.includes("low") || t.includes("negative") || t.includes("bear"))
-    return "warning";
-  if (t.includes("high")) return "info";
-  return "default";
-}
-
-
-
+// ─── Types ──────────────────────────────────────────────────────────────────
 type Tone = "success" | "warning" | "default" | "info";
 type Timeframe = "t1d" | "t1w" | "t1m";
 
-const INDICATION_BG: Record<Tone, string> = {
-  success: "rgba(34, 197, 94, 0.12)",
-  warning: "rgba(234, 179, 8, 0.12)",
-  info: "rgba(59, 130, 246, 0.10)",
-  default: "rgba(107, 114, 128, 0.10)",
-};
-const INDICATION_TEXT: Record<Tone, string> = {
-  success: "#15803d",
-  warning: "#a16207",
-  info: "#1d4ed8",
-  default: "#4b5563",
-};
-const INDICATION_BORDER: Record<Tone, string> = {
-  success: "rgba(34, 197, 94, 0.28)",
-  warning: "rgba(234, 179, 8, 0.28)",
-  info: "rgba(59, 130, 246, 0.22)",
-  default: "rgba(107, 114, 128, 0.22)",
-};
+interface PredictionData {
+  title: string;
+  prediction: string;
+  confidence: number;
+  timeframe: Timeframe;
+}
 
+// ─── Constants ───────────────────────────────────────────────────────────────
+const TONE_CONFIG: Record<Tone, { bg: string; text: string; border: string }> =
+  {
+    success: {
+      bg: "rgba(34, 197, 94, 0.12)",
+      text: "#15803d",
+      border: "rgba(34, 197, 94, 0.28)",
+    },
+    warning: {
+      bg: "rgba(234, 179, 8, 0.12)",
+      text: "#a16207",
+      border: "rgba(234, 179, 8, 0.28)",
+    },
+    info: {
+      bg: "rgba(59, 130, 246, 0.10)",
+      text: "#1d4ed8",
+      border: "rgba(59, 130, 246, 0.22)",
+    },
+    default: {
+      bg: "rgba(107, 114, 128, 0.10)",
+      text: "#4b5563",
+      border: "rgba(107, 114, 128, 0.22)",
+    },
+  };
 
 const INDICATION_MAP: Record<Timeframe, Record<string, string>> = {
   t1d: {
@@ -71,73 +65,152 @@ const INDICATION_MAP: Record<Timeframe, Record<string, string>> = {
   },
 };
 
-function getIndication(timeframe: Timeframe, pred: string): string | null {
-  // case-insensitive key lookup
+// ─── Utility Functions ───────────────────────────────────────────────────────
+/**
+ * Determines tone (color theme) based on prediction text
+ */
+function getToneFromPrediction(text: string): Tone {
+  const normalized = (text || "").toLowerCase();
+
+  if (
+    normalized.includes("positive") ||
+    normalized.includes("bull") ||
+    normalized.includes("up")
+  )
+    return "success";
+  if (
+    normalized.includes("low") ||
+    normalized.includes("negative") ||
+    normalized.includes("bear")
+  )
+    return "warning";
+  if (normalized.includes("high")) return "info";
+
+  return "default";
+}
+
+/**
+ * Gets indication value (e.g., "> 8%") for a given timeframe and prediction
+ */
+function getIndicationValue(timeframe: Timeframe, pred: string): string | null {
   const bucket = INDICATION_MAP[timeframe];
   if (!bucket) return null;
+
   const match = Object.keys(bucket).find(
-    (key) => key.toLowerCase() === (pred || "").toLowerCase()
+    (key) => key.toLowerCase() === (pred || "").toLowerCase(),
   );
+
   return match ? bucket[match] : null;
 }
 
-
-export function formatPct(n: number) {
-  if (typeof n !== "number" || Number.isNaN(n)) return "-";
-  return `${n.toFixed(1)}%`;
-}
-export function formatNum(n: number) {
-  if (typeof n !== "number" || Number.isNaN(n)) return "-";
-  return n.toFixed(2);
+/**
+ * Formats number as percentage with 1 decimal place
+ */
+function formatPercentage(value: number): string {
+  if (typeof value !== "number" || Number.isNaN(value)) return "-";
+  return `${value.toFixed(1)}%`;
 }
 
+/**
+ * Formats number to 2 decimal places
+ */
+function formatNumber(value: number): string {
+  if (typeof value !== "number" || Number.isNaN(value)) return "-";
+  return value.toFixed(2);
+}
+
+/**
+ * Returns appropriate trend icon based on tone
+ */
+function getTrendIcon(tone: Tone) {
+  switch (tone) {
+    case "success":
+      return <TrendingUp sx={{ fontSize: 14, color: "#15803d" }} />;
+    case "warning":
+      return <TrendingDown sx={{ fontSize: 14, color: "#a16207" }} />;
+    case "info":
+      return <TrendingFlat sx={{ fontSize: 14, color: "#1d4ed8" }} />;
+    default:
+      return <TrendingFlat sx={{ fontSize: 14, color: "#4b5563" }} />;
+  }
+}
+
+// ─── PredictionTile Component ───────────────────────────────────────────────
+interface PredictionTileProps {
+  title: string;
+  prediction: string;
+  confidence: number;
+  timeframe: Timeframe;
+}
 
 function PredictionTile({
   title,
-  pred,
+  prediction,
   confidence,
   timeframe,
-}: {
-  title: string;
-  pred: string;
-  confidence: number;
-  timeframe: Timeframe;
-}) {
-  const tone: Tone = toneFromText(pred);
-  const chipColor =
+}: PredictionTileProps) {
+  const tone = getToneFromPrediction(prediction);
+  const toneStyles = TONE_CONFIG[tone];
+  const indication = getIndicationValue(timeframe, prediction);
+  const chipColor: any =
     tone === "success"
       ? "success"
       : tone === "warning"
         ? "warning"
         : tone === "info"
           ? "info"
-          : "inherit";
+          : "default";
 
-  const indication = getIndication(timeframe, pred);
+  const confidenceValue = Math.max(0, Math.min(100, confidence || 0));
 
   return (
     <Box
       sx={{
-        borderRadius: 2,
+        position: "relative",
+        borderRadius: 2.5,
         border: "1px solid #e5e7ef",
-        background: "#eceff5",
-        boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-        p: 2.25,
-        minHeight: 120,
+        background: "linear-gradient(135deg, #eceff5 0%, #f5f7fb 100%)",
+        boxShadow: "0 4px 12px rgba(72, 100, 170, 0.08)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        p: 2.5,
+        minHeight: 140,
         display: "flex",
         flexDirection: "column",
+        "&:hover": {
+          boxShadow: "0 12px 24px rgba(72, 100, 170, 0.16)",
+          transform: "translateY(-2px)",
+          border: "1px solid #d8dde5",
+        },
       }}
     >
-      <Stack spacing={1.25}>
-        {/* title */}
+      {/* Accent bar at the top */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: toneStyles.text,
+          borderRadius: "2.5px 2.5px 0 0",
+        }}
+      />
+
+      <Stack spacing={1.5} sx={{ mt: 0.5 }}>
+        {/* Title */}
         <Typography
           variant="subtitle2"
-          sx={{ fontWeight: 700, color: "#1d2b5a" }}
+          sx={{
+            fontWeight: 700,
+            color: "#1d2b5a",
+            fontSize: "0.875rem",
+            letterSpacing: 0.3,
+          }}
         >
           {title}
         </Typography>
 
-        {/* prediction chip  +  indication pill on the same row */}
+        {/* Prediction Chip + Indication Badge */}
         <Box
           sx={{
             display: "flex",
@@ -148,9 +221,14 @@ function PredictionTile({
         >
           <Chip
             size="small"
-            label={(pred || "NEUTRAL").toUpperCase()}
-            color={chipColor as any}
+            label={(prediction || "NEUTRAL").toUpperCase()}
+            color={chipColor}
             variant={tone === "default" ? "outlined" : "filled"}
+            sx={{
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              letterSpacing: 0.5,
+            }}
           />
 
           {indication && (
@@ -158,32 +236,23 @@ function PredictionTile({
               sx={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 0.35,
-                background: INDICATION_BG[tone],
-                border: `1px solid ${INDICATION_BORDER[tone]}`,
-                borderRadius: 99,
-                px: 1,
-                py: 0.2,
+                gap: 0.5,
+                background: toneStyles.bg,
+                border: `1px solid ${toneStyles.border}`,
+                borderRadius: 20,
+                px: 1.25,
+                py: 0.35,
+                transition: "all 0.2s ease",
               }}
             >
-              {/* tiny trend arrow */}
+              {getTrendIcon(tone)}
               <Typography
                 component="span"
                 sx={{
-                  fontSize: 10,
-                  lineHeight: 1,
-                  color: INDICATION_TEXT[tone],
-                }}
-              >
-                {tone === "success" ? "↑" : tone === "warning" ? "↓" : "→"}
-              </Typography>
-              <Typography
-                component="span"
-                sx={{
-                  fontSize: 11,
+                  fontSize: "0.75rem",
                   fontWeight: 700,
-                  color: INDICATION_TEXT[tone],
-                  letterSpacing: 0.2,
+                  color: toneStyles.text,
+                  letterSpacing: 0.3,
                 }}
               >
                 {indication}
@@ -192,75 +261,134 @@ function PredictionTile({
           )}
         </Box>
 
-        {/* progress bar + probability */}
-        <Box>
+        {/* Confidence Section */}
+        <Box sx={{ mt: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 0.75,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: "#4b5563",
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: 0.5,
+              }}
+            >
+              Confidence
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 800,
+                color: toneStyles.text,
+                fontSize: "0.8rem",
+              }}
+            >
+              {formatPercentage(confidence)}
+            </Typography>
+          </Box>
           <LinearProgress
             variant="determinate"
-            value={Math.max(0, Math.min(100, confidence || 0))}
-            sx={{ height: 8, borderRadius: 99 }}
-            color={
-              tone === "success"
-                ? "success"
-                : tone === "warning"
-                  ? "warning"
-                  : "inherit"
-            }
+            value={confidenceValue}
+            sx={{
+              height: 6,
+              borderRadius: 99,
+              backgroundColor: "rgba(107, 114, 128, 0.12)",
+              "& .MuiLinearProgress-bar": {
+                borderRadius: 99,
+                background: `linear-gradient(90deg, ${toneStyles.text}, ${toneStyles.text}dd)`,
+              },
+            }}
           />
-          <Typography
-            variant="caption"
-            color="#000000"
-            sx={{ mt: 0.75, display: "block" }}
-          >
-            Prob.{" "}
-            <Typography
-              component="span"
-              variant="caption"
-              fontWeight={800}
-              color="text.primary"
-            >
-              {formatPct(confidence)}
-            </Typography>
-          </Typography>
         </Box>
       </Stack>
     </Box>
   );
 }
 
-
-// ─── AIMLPredictions ─────────────────────────────────────────────────────────
-export function AIMLPredictions({
-  data,
-}: {
+// ─── Main Component ─────────────────────────────────────────────────────────
+interface AIMLPredictionsProps {
   data: DealRecommendationResponse;
-}) {
+}
+
+export function AIMLPredictions({ data }: AIMLPredictionsProps) {
+  const predictions: PredictionData[] = [
+    {
+      title: "1st Day Close from Issue",
+      prediction: data.t1d_pred,
+      confidence: data.t1d_confidence,
+      timeframe: "t1d",
+    },
+    {
+      title: "1st Week from 1st Day Close",
+      prediction: data.t1w_pred,
+      confidence: data.t1w_confidence,
+      timeframe: "t1w",
+    },
+    {
+      title: "1st Month from 1st Day Close",
+      prediction: data.t1m_pred,
+      confidence: data.t1m_confidence,
+      timeframe: "t1m",
+    },
+  ];
+
   return (
     <SectionCard title="ML Model Predictions">
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          <PredictionTile
-            title="1st Day Close from Issue"
-            pred={data.t1d_pred}
-            confidence={data.t1d_confidence}
-            timeframe="t1d"
-          />
+      {/* Context */}
+      <Box mb={2}>
+        <Grid container spacing={1.5}>
+          {/* Column 1 */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="body2" lineHeight={1.6}>
+              • Deal Structure — Evaluates issue size, allocation mix, and
+              sponsor backing to assess pricing support and demand quality.
+            </Typography>
+
+            <Typography variant="body2" lineHeight={1.6}>
+              • Sector & Peers — Analyzes recent sector performance and
+              comparable IPO outcomes to measure relative momentum.
+            </Typography>
+
+            <Typography variant="body2" lineHeight={1.6}>
+              • Company Fundamentals — Incorporates revenue scale, growth
+              trajectory, and profitability to anchor valuation context.
+            </Typography>
+          </Grid>
+
+          {/* Column 2 */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="body2" lineHeight={1.6}>
+              • Macro & Market — Adjusts forecasts based on equity trends,
+              interest rates, inflation, and market liquidity.
+            </Typography>
+
+            <Typography variant="body2" lineHeight={1.6}>
+              • New-Issue Flow — Tracks issuance momentum, recent deal quality,
+              and sector-specific flow dynamics.
+            </Typography>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <PredictionTile
-            title="1st Week from 1st Day Close"
-            pred={data.t1w_pred}
-            confidence={data.t1w_confidence}
-            timeframe="t1w"
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <PredictionTile
-            title="1st Month from 1st Day Close"
-            pred={data.t1m_pred}
-            confidence={data.t1m_confidence}
-            timeframe="t1m"
-          />
-        </Grid>
+      </Box>
+
+      <Grid container spacing={2.5}>
+        {predictions.map((pred, idx) => (
+          <Grid item xs={12} md={4} key={idx}>
+            <PredictionTile
+              title={pred.title}
+              prediction={pred.prediction}
+              confidence={pred.confidence}
+              timeframe={pred.timeframe}
+            />
+          </Grid>
+        ))}
       </Grid>
     </SectionCard>
   );
