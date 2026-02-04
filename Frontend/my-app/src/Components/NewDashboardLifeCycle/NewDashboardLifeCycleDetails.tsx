@@ -211,7 +211,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               pricing_date: activePayload.pricing_date,
               region: activePayload.region,
               deal_type: activePayload.deal_type,
-              issuer_name: activePayload.issuer_name
+              issuer_name: activePayload.issuer_name,
+              exchange: activePayload.exchange,
             }}
           />
 
