@@ -1,6 +1,17 @@
 import { SectionCard } from "./SectionCard";
 import { Box, Stack, Typography } from "@mui/material";
 
+type SummaryPayload = {
+  one_week?: string;
+  one_month?: string;
+};
+
+const splitLines = (text?: string) =>
+  (text || "")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
 export function MarketSentimentCard({
   one_week_sentiment,
   one_month_sentiment,
@@ -11,6 +22,22 @@ export function MarketSentimentCard({
   sentiment_summary: string;
 }) {
   const hasSummary = !!sentiment_summary?.trim();
+  const parsedSummary: SummaryPayload | null = (() => {
+    if (!sentiment_summary) return null;
+    try {
+      const parsed = JSON.parse(sentiment_summary);
+      if (
+        typeof parsed === "object" &&
+        parsed !== null &&
+        ("one_week" in parsed || "one_month" in parsed)
+      ) {
+        return parsed as SummaryPayload;
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  })();
   const sentimentStyle = (value: string) => {
     const normalized = value?.toLowerCase() || "";
     if (normalized.includes("bull")) {
@@ -29,25 +56,103 @@ export function MarketSentimentCard({
     <SectionCard title="Market Sentiment">
       <Stack spacing={2}>
         {hasSummary && (
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid rgba(23, 70, 161, 0.1)",
-              boxShadow: "0 12px 24px rgba(15, 23, 42, 0.08)",
-              background: "#ffffff",
-              p: { xs: 2, md: 3 },
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{ color: "#172346", lineHeight: 1.7, whiteSpace: "pre-line" }}
-            >
-              {sentiment_summary}
-            </Typography>
-          </Box>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            {(parsedSummary?.one_week || !parsedSummary) && (
+              <Box
+                sx={{
+                  flex: 1,
+                  borderRadius: 2,
+                  border: "1px solid rgba(209, 213, 226, 0.9)",
+                  background: "#ffffff",
+                  p: 2,
+                  boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
+                }}
+              >
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1d2b5a" }}>
+                    1-Week Narrative
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: sentimentStyle(one_week_sentiment).color,
+                      background: sentimentStyle(one_week_sentiment).bg,
+                      borderRadius: 1,
+                      px: 0.75,
+                      py: 0.25,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {one_week_sentiment || "-"}
+                  </Typography>
+                </Stack>
+                <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
+                  {(parsedSummary?.one_week
+                    ? splitLines(parsedSummary.one_week)
+                    : splitLines(sentiment_summary)
+                  ).map((line, idx) => (
+                    <Typography
+                      key={`week-li-${idx}`}
+                      component="li"
+                      variant="body2"
+                      sx={{ color: "#141414", lineHeight: 1.6, mb: 0.5 }}
+                    >
+                      {line}
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+            )}
+            {(parsedSummary?.one_month || !parsedSummary) && (
+              <Box
+                sx={{
+                  flex: 1,
+                  borderRadius: 2,
+                  border: "1px solid rgba(209, 213, 226, 0.9)",
+                  background: "#ffffff",
+                  p: 2,
+                  boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
+                }}
+              >
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#1d2b5a" }}>
+                    1-Month Narrative
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: sentimentStyle(one_month_sentiment).color,
+                      background: sentimentStyle(one_month_sentiment).bg,
+                      borderRadius: 1,
+                      px: 0.75,
+                      py: 0.25,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {one_month_sentiment || "-"}
+                  </Typography>
+                </Stack>
+                <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
+                  {(parsedSummary?.one_month
+                    ? splitLines(parsedSummary.one_month)
+                    : splitLines(sentiment_summary)
+                  ).map((line, idx) => (
+                    <Typography
+                      key={`month-li-${idx}`}
+                      component="li"
+                      variant="body2"
+                      sx={{ color: "#141414", lineHeight: 1.6, mb: 0.5 }}
+                    >
+                      {line}
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </Stack>
         )}
 
-        <Box
+        {/* <Box
           sx={{
             borderRadius: 2,
             // border: "1px solid rgba(207, 217, 240, 0.9)",
@@ -142,7 +247,7 @@ export function MarketSentimentCard({
               })()}
             </Box>
           </Stack>
-        </Box>
+        </Box> */}
       </Stack>
     </SectionCard>
   );
