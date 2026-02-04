@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Grid, TextField, Button, Stack } from "@mui/material";
-import { SectionCard } from "./SectionCard";
 import { AIMLPredictions } from "./AIMLPredictions";
 import { ValuationCard } from "./ValuationCard";
 import { AIModelCard } from "./AIModelCard";
@@ -77,6 +76,9 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
   // editable valuation state
   const [valuationSummary, setValuationSummary] = useState("");
   const [savingValuation, setSavingValuation] = useState(false);
+
+  // IOI save state
+  const [savingIOI, setSavingIOI] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -180,6 +182,55 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
     [apiUrl, data, onSaveValuation, ticker, token]
   );
 
+  const handleSaveIOI = useCallback(
+    async (ioi_dollar_value: number) => {
+      if (!data) return;
+      setSavingIOI(true);
+      setErrorMsg(null);
+      const previousValue = data;
+      const updatedData = { ...data, ioi_dollar_value };
+      setData(updatedData);
+
+      try {
+        if (onSaveValuation) {
+          await onSaveValuation(data.valuation_summary, updatedData);
+          return;
+        }
+
+        if (!apiUrl) {
+          throw new Error("Missing REACT_APP_API_URL");
+        }
+        if (!ticker) {
+          throw new Error("Missing ticker");
+        }
+
+        const res = await fetch(`${apiUrl}/api/deal_recommendation_data/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            ticker,
+            ioi_dollar_value,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || `Request failed (${res.status})`);
+        }
+      } catch (err: any) {
+        setErrorMsg(err?.message ?? "Unable to save IOI value");
+        setData(previousValue);
+        throw err;
+      } finally {
+        setSavingIOI(false);
+      }
+    },
+    [apiUrl, data, onSaveValuation, ticker, token]
+  );
+
   const cards = useMemo(() => {
     if (!data) return null;
 
@@ -226,7 +277,12 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
 
         {/* 6) IOI */}
         <Grid item xs={12}>
-          <IOICard ioi_dollar_value={data.ioi_dollar_value} deal_size={data.deal_size} />
+          <IOICard
+            ioi_dollar_value={data.ioi_dollar_value}
+            deal_size={data.deal_size}
+            onSave={handleSaveIOI}
+            saving={savingIOI}
+          />
         </Grid>
 
         {/* 7) AM output */}
@@ -241,7 +297,7 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
         </Grid>
       </Grid>
     );
-  }, [data, handleSaveValuation, savingValuation, valuationSummary]);
+  }, [data, handleSaveValuation, savingValuation, valuationSummary, handleSaveIOI, savingIOI]);
 
   if (loading) return <div>Loading...</div>;
   if (errorMsg) return <div style={{ color: "crimson" }}>Error: {errorMsg}</div>;
