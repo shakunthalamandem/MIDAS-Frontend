@@ -193,7 +193,8 @@ const ClampedContent: React.FC<ClampedContentProps> = ({
 /* ===================== COMPONENT ===================== */
 
 const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
-  basicDealDetails
+  basicDealDetails,
+  pdfMode = false
 }) => {
   const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null)
   const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null)
@@ -551,7 +552,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             formats={quillFormats}
           />
         ) : (
-          <ClampedContent>
+          <ClampedContent disabled={pdfMode}>
             <Box dangerouslySetInnerHTML={{ __html: businessOverviewDraft }} />
           </ClampedContent>
         )}
@@ -633,6 +634,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               }}
             >
               {editMode === section ? (
+                renderSectionContent(section, getSectionData(section))
+              ) : pdfMode ? (
                 renderSectionContent(section, getSectionData(section))
               ) : (
                 <ClampedContent>

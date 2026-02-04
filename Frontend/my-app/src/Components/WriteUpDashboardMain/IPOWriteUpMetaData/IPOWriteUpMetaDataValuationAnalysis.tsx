@@ -18,6 +18,7 @@ import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
+  pdfMode?: boolean
 }
 
 interface ValuationWriteUp {
@@ -75,7 +76,7 @@ const quillFormats = [
 
 const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
-> = ({ basicDealDetails }) => {
+> = ({ basicDealDetails, pdfMode = false }) => {
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -177,7 +178,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
 
   useEffect(() => {
-    if (editMode) {
+    if (editMode || pdfMode) {
       setShowToggle(false)
       return
     }
@@ -285,10 +286,10 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
                 minHeight: 120,
                 color: "#1f2a44",
                 lineHeight: 1.7,
-                overflow: isExpanded ? "visible" : "hidden",
-                display: isExpanded ? "block" : "-webkit-box",
+                overflow: pdfMode || isExpanded ? "visible" : "hidden",
+                display: pdfMode || isExpanded ? "block" : "-webkit-box",
                 WebkitBoxOrient: "vertical",
-                WebkitLineClamp: isExpanded ? "unset" : 8
+                WebkitLineClamp: pdfMode || isExpanded ? "unset" : 8
               }}
               dangerouslySetInnerHTML={{ __html: valuationText }}
             />
@@ -304,7 +305,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
               --
             </Typography>
           )}
-          {!editMode && valuationText && showToggle ? (
+          {!editMode && !pdfMode && valuationText && showToggle ? (
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
               <Button
                 size="small"
