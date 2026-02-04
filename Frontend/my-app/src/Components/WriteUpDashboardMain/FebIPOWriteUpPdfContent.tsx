@@ -37,7 +37,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
         ]
       },
       {
-        id: "page-2b",
+        id: "page-2",
         sections: [
           { id: "business-overview", content: <IPOWriteUpMetaDataBusinessOverview basicDealDetails={basicDealDetails} pdfMode={true} /> }
         ]
@@ -79,7 +79,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 3,
+        gap: 0,
         alignItems: "center",
         width: "100%"
       }}
@@ -96,7 +96,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: 3,
+              gap: 1,
               alignItems: "center",
               width: "100%"
             }}

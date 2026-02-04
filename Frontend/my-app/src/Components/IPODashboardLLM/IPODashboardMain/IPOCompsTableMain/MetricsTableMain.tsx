@@ -343,6 +343,7 @@ const MetricsTableMain: React.FC<Props> = ({
               ))}
               <TableCell
                 sx={{ ...headerCellSx, minWidth: 55 }}
+                className="pdf-hidden"
               >
                 Action
               </TableCell>
