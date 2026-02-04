@@ -525,22 +525,24 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-            {businessOverviewEditing ? (
-              <>
-                <IconButton onClick={handleSaveBusinessOverview}>
-                  <SaveIcon />
+          {!pdfMode && (
+            <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+              {businessOverviewEditing ? (
+                <>
+                  <IconButton onClick={handleSaveBusinessOverview}>
+                    <SaveIcon />
+                  </IconButton>
+                  <IconButton onClick={() => setBusinessOverviewEditing(false)}>
+                    <CancelIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton onClick={() => setBusinessOverviewEditing(true)}>
+                  <EditIcon />
                 </IconButton>
-                <IconButton onClick={() => setBusinessOverviewEditing(false)}>
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setBusinessOverviewEditing(true)}>
-                <EditIcon />
-              </IconButton>
-            )}
-          </Box>
+              )}
+            </Box>
+          )}
         </Box>
 
         {businessOverviewEditing ? (
@@ -562,13 +564,14 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gridTemplateColumns: pdfMode ? "1fr" : { xs: "1fr", md: "1fr 1fr" },
           gap: 2
         }}
       >
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
           <Accordion
             key={section}
+            defaultExpanded={pdfMode}
             sx={{
               borderRadius: 2,
               border: "1px solid #E6ECF5",
@@ -578,7 +581,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: "#124180" }} />}
+              expandIcon={!pdfMode ? <ExpandMoreIcon sx={{ color: "#124180" }} /> : null}
               sx={{
                 minHeight: 64,
                 background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
@@ -613,17 +616,19 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 </Typography>
               </Box>
 
-              <IconButton
-                sx={{
-                  ml: "auto",
-                  color: "#124180",
-                  "&:hover": { backgroundColor: "rgba(18, 65, 128, 0.1)" }
-                }}
-                disabled={savingSection === section}
-                onClick={(e) => handleAccordionAction(section, e)}
-              >
-                {editMode === section ? <SaveIcon /> : <EditIcon />}
-              </IconButton>
+              {!pdfMode && (
+                <IconButton
+                  sx={{
+                    ml: "auto",
+                    color: "#124180",
+                    "&:hover": { backgroundColor: "rgba(18, 65, 128, 0.1)" }
+                  }}
+                  disabled={savingSection === section}
+                  onClick={(e) => handleAccordionAction(section, e)}
+                >
+                  {editMode === section ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
+              )}
             </AccordionSummary>
 
             <AccordionDetails

@@ -260,7 +260,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       }
 
       root
-        .querySelectorAll<HTMLElement>(".MuiIconButton-root, .pdf-hidden")
+        .querySelectorAll<HTMLElement>(".MuiIconButton-root, .pdf-hidden, button[aria-label='add-item'], button[aria-label='delete-item']")
         .forEach(hideForPdf)
 
       const rawSections =

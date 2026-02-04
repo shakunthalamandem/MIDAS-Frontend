@@ -366,45 +366,47 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-            {editMode ? (
-              <>
+          {!pdfMode && (
+            <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+              {editMode ? (
+                <>
+                  <IconButton
+                    color="primary"
+                    onClick={handleSave}
+                    sx={{
+                      color: "#16a34a",
+                      backgroundColor: "#f0fdf4",
+                      "&:hover": { backgroundColor: "#dcfce7" }
+                    }}
+                  >
+                    <SaveIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
+                    onClick={handleCancel}
+                    sx={{
+                      color: "#dc2626",
+                      backgroundColor: "#fef2f2",
+                      "&:hover": { backgroundColor: "#fee2e2" }
+                    }}
+                  >
+                    <CancelIcon fontSize="small" />
+                  </IconButton>
+                </>
+              ) : (
                 <IconButton
-                  color="primary"
-                  onClick={handleSave}
+                  onClick={() => setEditMode(true)}
                   sx={{
-                    color: "#16a34a",
-                    backgroundColor: "#f0fdf4",
-                    "&:hover": { backgroundColor: "#dcfce7" }
+                    color: "#124180",
+                    backgroundColor: "#f0f5ff",
+                    "&:hover": { backgroundColor: "#e0e7ff" }
                   }}
                 >
-                  <SaveIcon fontSize="small" />
+                  <EditIcon fontSize="small" />
                 </IconButton>
-                <IconButton
-                  color="secondary"
-                  onClick={handleCancel}
-                  sx={{
-                    color: "#dc2626",
-                    backgroundColor: "#fef2f2",
-                    "&:hover": { backgroundColor: "#fee2e2" }
-                  }}
-                >
-                  <CancelIcon fontSize="small" />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton
-                onClick={() => setEditMode(true)}
-                sx={{
-                  color: "#124180",
-                  backgroundColor: "#f0f5ff",
-                  "&:hover": { backgroundColor: "#e0e7ff" }
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
+              )}
+            </Box>
+          )}
         </Box>
         {renderValuationContent()}
         {saveError ? (
