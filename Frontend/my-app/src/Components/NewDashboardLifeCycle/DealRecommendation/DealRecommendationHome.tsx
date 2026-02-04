@@ -43,7 +43,7 @@ export type DealRecommendationResponse = {
   peers_t1w_avg_price: number;
   peers_t1m_avg_price: number;
 
-  ioi_dollar_value: string;
+  ioi_dollar_value: number;
 
   deal_size: number;
 
@@ -226,7 +226,7 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
 
         {/* 6) IOI */}
         <Grid item xs={12}>
-          <IOICard ioi_dollar_value={data.ioi_dollar_value} />
+          <IOICard ioi_dollar_value={data.ioi_dollar_value} deal_size={data.deal_size} />
         </Grid>
 
         {/* 7) AM output */}
