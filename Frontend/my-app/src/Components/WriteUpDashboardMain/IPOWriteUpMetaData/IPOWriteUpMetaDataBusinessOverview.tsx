@@ -490,7 +490,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             <AccordionDetails
               sx={{
                 p: 3,
-                background: "linear-gradient(135deg, #f8fbff, #ffffff)",
+                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
                 borderRadius: "0 0 8px 8px"
               }}
             >
