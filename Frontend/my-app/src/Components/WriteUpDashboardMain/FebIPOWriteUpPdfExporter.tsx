@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Button, CircularProgress } from "@mui/material"
+import { Box, Button, CircularProgress, Dialog, DialogContent, Stack, Typography } from "@mui/material"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import introImage from "../../Assets/images/monashee_page1.png"
@@ -514,25 +514,50 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
   }
 
   return (
-    <Box position="relative" display="inline-flex">
-      <Button
-        variant="contained"
-        onClick={handleExport}
-        disabled={loading}
-        className={className}
-        sx={{
-          backgroundColor: "#002060",
-          color: "#fff",
-          textTransform: "none",
-          px: 1.5,
-          minWidth: 180,
-          fontSize: 12,
-        }}
-        startIcon={loading ? <CircularProgress color="inherit" size={18} /> : null}
-      >
-        {loading ? loadingLabel : buttonLabel}
-      </Button>
-    </Box>
+    <>
+      <Dialog open={loading} PaperProps={{
+        sx: {
+          borderRadius: 3,
+          px: 4,
+          py: 3,
+          minWidth: 320
+        }
+      }}>
+        <DialogContent>
+          <Stack spacing={3} alignItems="center">
+            <CircularProgress size={60} thickness={4} sx={{ color: "#002060" }} />
+            <Stack spacing={1} alignItems="center">
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "#002060" }}>
+                Downloading the Monashee PDF
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#6b7280", textAlign: "center" }}>
+                Please wait while we generate your document...
+              </Typography>
+            </Stack>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+
+      <Box position="relative" display="inline-flex">
+        <Button
+          variant="contained"
+          onClick={handleExport}
+          disabled={loading}
+          className={className}
+          sx={{
+            backgroundColor: "#002060",
+            color: "#fff",
+            textTransform: "none",
+            px: 1.5,
+            minWidth: 180,
+            fontSize: 12
+          }}
+          startIcon={loading ? <CircularProgress color="inherit" size={18} /> : null}
+        >
+          {loading ? loadingLabel : buttonLabel}
+        </Button>
+      </Box>
+    </>
   )
 }
 
