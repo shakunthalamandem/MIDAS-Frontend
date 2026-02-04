@@ -156,8 +156,18 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       fetchValuation()
     }
 
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      if (basicDealDetails.ticker) {
+        fetchValuation()
+      }
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       isActive = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
 
@@ -274,53 +284,76 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   return (
 
       <Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            mb: 2
-          }}
-        >
-          <Box display="flex" alignItems="center" gap={1.25}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1d2b5a" }}>
-              Valuation Details
+        <Box sx={{ position: "relative", mb: 2 }}>
+          {/* Rating - Left aligned */}
+          {ratingValue !== null && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {formatRating(ratingValue)}/10
+              </Typography>
+            </Box>
+          )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+              Valuation Analysis
             </Typography>
-            {ratingValue !== null && (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  borderRadius: 999,
-                  border: "1px solid rgba(52, 144, 220, 0.4)",
-                  background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
-                  px: 1.4,
-                  py: 0.35,
-                  boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
-                }}
-              >
-                <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
-                  Rating - {formatRating(ratingValue)}/10
-                </Typography>
-              </Box>
-            )}
           </Box>
-          <Box>
+
+          {/* Edit buttons - Right aligned */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
             {editMode ? (
               <>
-                <IconButton color="primary" onClick={handleSave}>
-                  <SaveIcon />
+                <IconButton
+                  color="primary"
+                  onClick={handleSave}
+                  sx={{
+                    color: "#16a34a",
+                    backgroundColor: "#f0fdf4",
+                    "&:hover": { backgroundColor: "#dcfce7" }
+                  }}
+                >
+                  <SaveIcon fontSize="small" />
                 </IconButton>
-                <IconButton color="secondary" onClick={handleCancel}>
-                  <CancelIcon />
+                <IconButton
+                  color="secondary"
+                  onClick={handleCancel}
+                  sx={{
+                    color: "#dc2626",
+                    backgroundColor: "#fef2f2",
+                    "&:hover": { backgroundColor: "#fee2e2" }
+                  }}
+                >
+                  <CancelIcon fontSize="small" />
                 </IconButton>
               </>
             ) : (
-              <IconButton onClick={() => setEditMode(true)}>
+              <IconButton
+                onClick={() => setEditMode(true)}
+                sx={{
+                  color: "#124180",
+                  backgroundColor: "#f0f5ff",
+                  "&:hover": { backgroundColor: "#e0e7ff" }
+                }}
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             )}

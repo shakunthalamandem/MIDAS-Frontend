@@ -187,8 +187,17 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }
 
     fetchScores()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchScores()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       active = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, headers])
 
@@ -196,10 +205,6 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   const filledCriteria = criteriaList.filter(
     (c) => metrics[c.key]?.category?.trim()
-  )
-
-  const emptyCriteria = criteriaList.filter(
-    (c) => !metrics[c.key]?.category?.trim()
   )
 
   const rowsToRender = editMode ? criteriaList : filledCriteria
@@ -218,13 +223,19 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   }
 
   const handleDelete = (key: string) => {
-    setEditedMetrics((prev) => ({
-      ...prev,
-      [key]: {
-        category: "",
-        color: null
-      }
-    }))
+    // Mark for deletion by setting to undefined
+    setEditedMetrics((prev) => {
+      const updated = { ...prev }
+      updated[key] = { category: "", color: null }
+      return updated
+    })
+
+    // Immediately remove from metrics for UI update
+    setMetrics((prev) => {
+      const updated = { ...prev }
+      delete updated[key]
+      return updated
+    })
   }
 
   const handleSave = async () => {
@@ -288,71 +299,121 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         }}
       >
         {/* ---------- HEADER ---------- */}
-        <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={2}>
-          <Box display="flex" alignItems="center" gap={1}>
+        <Box sx={{ position: "relative", mb: 2 }}>
+          {/* Rating - Left aligned */}
+          {ratingText && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {ratingText}/10
+              </Typography>
+            </Box>
+          )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1 }}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-              Key Metrics - Top 5 Performance
-            </Typography>
-            {ratingText && (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  borderRadius: 999,
-                  border: "1px solid rgba(52, 144, 220, 0.4)",
-                  background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
-                  px: 1.5,
-                  py: 0.4,
-                  boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
-                }}
-              >
-                <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
-                  Rating - {ratingText}/10
-                </Typography>
-              </Box>
-            )}
+        Key Metrics - Top 5 Performance            </Typography>
             <Tooltip
               arrow
+              placement="right"
               title={
-                <Box>
-                  <Typography fontWeight={700} mb={1}>
-                    Color Key
+                <Box sx={{ p: 0.5 }}>
+                  <Typography fontWeight={700} mb={1} fontSize="0.875rem">
+                    Status Color Guide
                   </Typography>
                   {[
                     ["Red", "Negative"],
                     ["Yellow", "Neutral"],
                     ["Green", "Positive"]
                   ].map(([c, label]) => (
-                    <Box key={c} display="flex" gap={1} alignItems="center">
+                    <Box key={c} display="flex" gap={1} alignItems="center" mb={0.5}>
                       <FiberManualRecordIcon
-                        sx={{ fontSize: 12, color: getColorHex(c) }}
+                        sx={{ fontSize: 14, color: getColorHex(c) }}
                       />
-                      <Typography variant="body2">{label}</Typography>
+                      <Typography variant="body2" fontSize="0.8rem">{label}</Typography>
                     </Box>
                   ))}
                 </Box>
               }
             >
-              <IconButton size="small">
-                <InfoOutlinedIcon sx={{ color: "#7e7e7e" }} />
+              <IconButton
+                size="small"
+                sx={{
+                  color: "#6b7280",
+                  "&:hover": {
+                    color: "#124180",
+                    backgroundColor: "#f3f4f6"
+                  }
+                }}
+              >
+                <InfoOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
 
-          <Box marginLeft="auto">
+          {/* Edit buttons - Right aligned */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1}>
             {editMode ? (
               <>
-                <IconButton onClick={handleSave} color="primary">
-                  <SaveIcon />
+                <IconButton
+                  onClick={handleSave}
+                  sx={{
+                    color: "#16a34a",
+                    backgroundColor: "#f0fdf4",
+                    "&:hover": {
+                      backgroundColor: "#dcfce7",
+                      transform: "scale(1.05)"
+                    },
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <SaveIcon fontSize="small" />
                 </IconButton>
-                <IconButton onClick={handleCancel} color="secondary">
-                  <CancelIcon />
+                <IconButton
+                  onClick={handleCancel}
+                  sx={{
+                    color: "#dc2626",
+                    backgroundColor: "#fef2f2",
+                    "&:hover": {
+                      backgroundColor: "#fee2e2",
+                      transform: "scale(1.05)"
+                    },
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <CancelIcon fontSize="small" />
                 </IconButton>
               </>
             ) : (
-              <IconButton onClick={() => setEditMode(true)}>
+              <IconButton
+                onClick={() => setEditMode(true)}
+                sx={{
+                  color: "#124180",
+                  backgroundColor: "#f0f5ff",
+                  "&:hover": {
+                    backgroundColor: "#e0e7ff",
+                    transform: "scale(1.05)"
+                  },
+                  transition: "all 0.2s ease"
+                }}
+              >
                 <EditIcon fontSize="small" />
               </IconButton>
             )}
@@ -360,25 +421,25 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         </Box>
 
         {/* ---------- TABLE ---------- */}
-        <Table sx={{ border: "1px solid #e0e6f5" }}>
+        <Table sx={{ border: "1px solid #e0e6f5", borderRadius: 2, overflow: "hidden" }}>
           <TableHead>
-            <TableRow sx={{ background: "#1d2b5a" }}>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
+            <TableRow sx={{ background: "linear-gradient(135deg, #1d2b5a, #2a3f6f)" }}>
+              <TableCell sx={{ color: "#fff", fontWeight: 700, fontSize: "0.95rem" }}>
                 Criteria
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ color: "#fff", fontWeight: 700 }}
+                sx={{ color: "#fff", fontWeight: 700, fontSize: "0.95rem", width: "120px" }}
               >
-                Color
+                Status
               </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
+              <TableCell sx={{ color: "#fff", fontWeight: 700, fontSize: "0.95rem" }}>
                 Notes
               </TableCell>
               {editMode && (
                 <TableCell
                   align="center"
-                  sx={{ color: "#fff", fontWeight: 700 }}
+                  sx={{ color: "#fff", fontWeight: 700, fontSize: "0.95rem", width: "100px" }}
                 >
                   Actions
                 </TableCell>
@@ -398,32 +459,41 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                 : original.color
 
               return (
-                <TableRow key={item.key}>
-                  <TableCell >{item.label}</TableCell>
+                <TableRow
+                  key={item.key}
+                  sx={{
+                    "&:nth-of-type(odd)": { background: "#f9fafb" },
+                    "&:hover": { background: "#f0f4f8" },
+                    transition: "background 0.2s ease"
+                  }}
+                >
+                  <TableCell sx={{ fontWeight: 600, color: "#1f2937" }}>{item.label}</TableCell>
 
                   <TableCell align="center">
                     {editMode ? (
-                      <Box display="flex" justifyContent="center" gap={1}>
+                      <Box display="flex" justifyContent="center" gap={0.5}>
                         {["red", "yellow", "green"].map((c) => (
                           <IconButton
                             key={c}
                             size="small"
                             onClick={() => handleColorChange(item.key, c)}
                             sx={{
-                              backgroundColor:
-                                color === c
-                                  ? getColorHex(c)
-                                  : lightColorMap[c],
-                              border: "1px solid #c7cfe4",
-                              width: 26,
-                              height: 26
+                              backgroundColor: color === c ? getColorHex(c) : lightColorMap[c],
+                              border: color === c ? `2px solid ${getColorHex(c)}` : "2px solid transparent",
+                              width: 32,
+                              height: 32,
+                              transition: "all 0.2s ease",
+                              "&:hover": {
+                                transform: "scale(1.1)",
+                                border: `2px solid ${getColorHex(c)}`
+                              }
                             }}
                           />
                         ))}
                       </Box>
                     ) : (
                       <CircleIcon
-                        fontSize="small"
+                        fontSize="medium"
                         sx={{ color: getColorHex(color) }}
                       />
                     )}
@@ -445,21 +515,37 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                             }
                           }))
                         }
+                        placeholder="Enter notes..."
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            background: "#ffffff",
+                            "&:hover fieldset": {
+                              borderColor: "#124180"
+                            }
+                          }
+                        }}
                       />
                     ) : (
-                      <Typography variant="body2">{value}</Typography>
+                      <Typography variant="body2" sx={{ color: "#374151" }}>
+                        {value || "--"}
+                      </Typography>
                     )}
                   </TableCell>
 
                   {editMode && (
                     <TableCell align="center">
-                      <Tooltip title="Delete this metric data">
+                      <Tooltip title="Delete row" arrow>
                         <IconButton
                           size="small"
                           onClick={() => handleDelete(item.key)}
                           sx={{
-                            color: "#d32f2f",
-                            "&:hover": { backgroundColor: "#ffebee" }
+                            color: "#dc2626",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              backgroundColor: "#fee2e2",
+                              color: "#b91c1c",
+                              transform: "scale(1.1)"
+                            }
                           }}
                         >
                           <DeleteIcon fontSize="small" />
@@ -473,34 +559,21 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </TableBody>
         </Table>
 
-        {/* ---------- EMPTY FIELDS HINT ---------- */}
-        {!editMode && emptyCriteria.length > 0 && (
+        {saveError && (
           <Box
             mt={2}
             p={1.5}
-            className="pdf-hidden"
             sx={{
-              border: "1px dashed #c7cfe4",
-              background: "#fafafa",
+              background: "#fee2e2",
+              border: "1px solid #fca5a5",
               borderRadius: 1
             }}
           >
-            <Typography fontWeight={600} variant="body2">
-              Empty fields:
-            </Typography>
-            <Typography variant="body2">
-              {emptyCriteria.map((c) => c.label).join(", ")}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Click edit to fill these metrics.
+            <Typography color="error" variant="body2" fontWeight={600}>
+              {saveError}
             </Typography>
           </Box>
         )}
-        {saveError ? (
-          <Typography color="error" sx={{ mt: 2 }}>
-            {saveError}
-          </Typography>
-        ) : null}
       </Box>
     </motion.div>
   )
