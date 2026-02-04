@@ -43,24 +43,21 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
 
-  const activePayload = selectedOption || payload;
-  const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
-  const status = activePayload?.deal_status ?? "Announced";
-  const isUpcoming = ["Announced", "Price Range"].includes(status);
   const tabItems = useMemo(
     () => [
       { label: "Write Up New" },
       { label: "Write Up Old" },
+      // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
       { label: "AI Unsupervised" },
       { label: "ML Model" },
-      { label: isIpo ? "S1 AI Query" : "Technical Analysis" },
+      { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
-    [isIpo]
+    []
   );
 
 
@@ -97,6 +94,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     );
   }
 
+  const activePayload = selectedOption || payload;
+  const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
+  const status = activePayload?.deal_status ?? "Announced";
+  const isUpcoming = ["Announced", "Price Range"].includes(status);
 
 
   return (
@@ -259,7 +260,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
-          ) : ["S1 AI Query", "Technical Analysis"].includes(tabItems[tabValue]?.label) ? (
+          ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
             <NewDashboardLifeCycleMeetingNotes
