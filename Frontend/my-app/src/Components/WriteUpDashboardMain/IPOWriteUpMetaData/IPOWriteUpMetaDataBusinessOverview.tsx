@@ -7,7 +7,8 @@ import {
   IconButton,
   Box,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Button
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import EditIcon from "@mui/icons-material/Edit"
@@ -112,6 +113,81 @@ const parseSectionRating = (value?: number | string | null) => {
 const formatRating = (value: number) => {
   const normalized = Math.round(value * 10) / 10
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
+}
+
+type ClampedContentProps = {
+  children: React.ReactNode
+  disabled?: boolean
+  clampLines?: number
+}
+
+const ClampedContent: React.FC<ClampedContentProps> = ({
+  children,
+  disabled = false,
+  clampLines = 6
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showToggle, setShowToggle] = useState(false)
+  const contentRef = React.useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (disabled) {
+      setShowToggle(false)
+      return
+    }
+
+    const updateToggleVisibility = () => {
+      const el = contentRef.current
+      if (!el) return
+      const computed = window.getComputedStyle(el)
+      const lineHeight = parseFloat(computed.lineHeight) || 24
+      const maxHeight = lineHeight * clampLines
+      setShowToggle(el.scrollHeight > maxHeight + 1)
+    }
+
+    updateToggleVisibility()
+    window.addEventListener("resize", updateToggleVisibility)
+    return () => window.removeEventListener("resize", updateToggleVisibility)
+  }, [children, disabled, clampLines])
+
+  if (disabled) {
+    return <>{children}</>
+  }
+
+  return (
+    <Box>
+      <Box
+        ref={contentRef}
+        sx={{
+          color: "#1f2a44",
+          lineHeight: 1.7,
+          overflow: isExpanded ? "visible" : "hidden",
+          display: isExpanded ? "block" : "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: isExpanded ? "unset" : clampLines
+        }}
+      >
+        {children}
+      </Box>
+      {showToggle ? (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          <Button
+            size="small"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            sx={{
+              textTransform: "none",
+              color: "#115f02ff",
+              fontWeight: 600,
+              px: 0,
+              minWidth: "auto"
+            }}
+          >
+            {isExpanded ? "...Read less" : "...Read more"}
+          </Button>
+        </Box>
+      ) : null}
+    </Box>
+  )
 }
 
 /* ===================== COMPONENT ===================== */
@@ -475,10 +551,9 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             formats={quillFormats}
           />
         ) : (
-          <Box
-            sx={{ color: "#1f2a44" }}
-            dangerouslySetInnerHTML={{ __html: businessOverviewDraft }}
-          />
+          <ClampedContent>
+            <Box dangerouslySetInnerHTML={{ __html: businessOverviewDraft }} />
+          </ClampedContent>
         )}
       </Box>
 
@@ -557,7 +632,20 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 borderRadius: "0 0 8px 8px"
               }}
             >
-              {renderSectionContent(section, getSectionData(section))}
+              {editMode === section ? (
+                renderSectionContent(section, getSectionData(section))
+              ) : (
+                <ClampedContent>
+                  {getSectionData(section).map((item, index) => (
+                    <Box
+                      key={index}
+                      mb={2}
+                      sx={{ color: "#124180" }}
+                      dangerouslySetInnerHTML={{ __html: item }}
+                    />
+                  ))}
+                </ClampedContent>
+              )}
             </AccordionDetails>
           </Accordion>
         ))}
