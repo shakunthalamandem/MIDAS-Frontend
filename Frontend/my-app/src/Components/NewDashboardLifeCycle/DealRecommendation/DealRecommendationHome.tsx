@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Grid, TextField, Button, Stack } from "@mui/material";
-import { SectionCard } from "./SectionCard";
 import { AIMLPredictions } from "./AIMLPredictions";
 import { ValuationCard } from "./ValuationCard";
 import { AIModelCard } from "./AIModelCard";
@@ -17,7 +16,7 @@ export type FewShotReview = {
 
 export type DealRecommendationResponse = {
   valuation_summary: string;
-  potential_am_quantity: string;
+  potential_am_quantity: number;
   writeup_overall_rating: string;
 
   t1d_pred: string;
@@ -54,12 +53,11 @@ export type DealRecommendationResponse = {
   AM_strategy_recommendation: string;
 };
 
-
 interface DashboardProps {
   ticker?: string;
   onSaveValuation?: (
     valuationSummary: string,
-    next: DealRecommendationResponse
+    next: DealRecommendationResponse,
   ) => Promise<void> | void;
 }
 
@@ -77,6 +75,11 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
   // editable valuation state
   const [valuationSummary, setValuationSummary] = useState("");
   const [savingValuation, setSavingValuation] = useState(false);
+
+  // IOI save state
+  const [savingIOI, setSavingIOI] = useState(false);
+
+  const [savingAM, setSavingAM] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -177,7 +180,111 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
         setSavingValuation(false);
       }
     },
-    [apiUrl, data, onSaveValuation, ticker, token]
+    [apiUrl, data, onSaveValuation, ticker, token],
+  );
+
+  const handleSaveAM = useCallback(
+    async (payload: {
+      t1d_overall_rating: string;
+      t1w_overall_rating: string;
+      t1m_overall_rating: string;
+      AM_strategy_recommendation: string;
+      potential_am_quantity: number;
+    }) => {
+      if (!data) return;
+
+      setSavingAM(true);
+      setErrorMsg(null);
+
+      const previous = data;
+
+      const updatedData = {
+        ...data,
+        ...payload,
+      };
+
+      // Optimistic update
+      setData(updatedData);
+
+      try {
+        if (!apiUrl) throw new Error("Missing API URL");
+        if (!ticker) throw new Error("Missing ticker");
+
+        const res = await fetch(`${apiUrl}/api/deal_recommendation_data/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            ticker,
+            ...payload,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || "AM update failed");
+        }
+      } catch (err: any) {
+        // rollback
+        setData(previous);
+        setErrorMsg(err?.message ?? "Unable to save AM output");
+        throw err;
+      } finally {
+        setSavingAM(false);
+      }
+    },
+    [apiUrl, data, ticker, token],
+  );
+
+  const handleSaveIOI = useCallback(
+    async (ioi_dollar_value: number) => {
+      if (!data) return;
+      setSavingIOI(true);
+      setErrorMsg(null);
+      const previousValue = data;
+      const updatedData = { ...data, ioi_dollar_value };
+      setData(updatedData);
+
+      try {
+        if (onSaveValuation) {
+          await onSaveValuation(data.valuation_summary, updatedData);
+          return;
+        }
+
+        if (!apiUrl) {
+          throw new Error("Missing REACT_APP_API_URL");
+        }
+        if (!ticker) {
+          throw new Error("Missing ticker");
+        }
+
+        const res = await fetch(`${apiUrl}/api/deal_recommendation_data/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            ticker,
+            ioi_dollar_value,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || `Request failed (${res.status})`);
+        }
+      } catch (err: any) {
+        setErrorMsg(err?.message ?? "Unable to save IOI value");
+        setData(previousValue);
+        throw err;
+      } finally {
+        setSavingIOI(false);
+      }
+    },
+    [apiUrl, data, onSaveValuation, ticker, token],
   );
 
   const cards = useMemo(() => {
@@ -226,7 +333,12 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
 
         {/* 6) IOI */}
         <Grid item xs={12}>
-          <IOICard ioi_dollar_value={data.ioi_dollar_value} deal_size={data.deal_size} />
+          <IOICard
+            ioi_dollar_value={data.ioi_dollar_value}
+            deal_size={data.deal_size}
+            onSave={handleSaveIOI}
+            saving={savingIOI}
+          />
         </Grid>
 
         {/* 7) AM output */}
@@ -237,14 +349,25 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
             t1m_overall_rating={data.t1m_overall_rating}
             AM_strategy_recommendation={data.AM_strategy_recommendation}
             potential_am_quantity={data.potential_am_quantity}
+            deal_type={data.deal_type}
+            saving={savingAM}
+            onSave={handleSaveAM}
           />
         </Grid>
       </Grid>
     );
-  }, [data, handleSaveValuation, savingValuation, valuationSummary]);
+  }, [
+    data,
+    handleSaveValuation,
+    savingValuation,
+    valuationSummary,
+    handleSaveIOI,
+    savingIOI,
+  ]);
 
   if (loading) return <div>Loading...</div>;
-  if (errorMsg) return <div style={{ color: "crimson" }}>Error: {errorMsg}</div>;
+  if (errorMsg)
+    return <div style={{ color: "crimson" }}>Error: {errorMsg}</div>;
   if (!data) return <div>No data</div>;
 
   return <>{cards}</>;
