@@ -28,6 +28,13 @@ type TickerItem = {
   pricing_date?: string | null;
 };
 
+const normalizePricingDate = (value?: string | null): string => {
+  if (!value) return "";
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return value.trim();
+  return new Date(parsed).toISOString().split("T")[0];
+};
+
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("access_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -222,15 +229,25 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
   const hasError = status === "error";
 
   useEffect(() => {
-    if (!prefillTicker?.ticker || !tickers.length) return;
+    if (!prefillTicker?.ticker) return;
+
+    const normalizedTargetDate = normalizePricingDate(prefillTicker.pricing_date);
     const match = tickers.find(
       (opt) =>
         opt.ticker === prefillTicker.ticker &&
-        (opt.pricing_date ?? "") === (prefillTicker.pricing_date ?? ""),
+        normalizePricingDate(opt.pricing_date) === normalizedTargetDate,
     );
+
     if (match) {
       setSelectedTicker(match);
+      return;
     }
+
+    setSelectedTicker({
+      ticker: prefillTicker.ticker,
+      pricing_date: prefillTicker.pricing_date ?? null,
+      id: `${prefillTicker.ticker}-${normalizedTargetDate || "manual"}`,
+    });
   }, [prefillTicker, tickers]);
 
   const companyName = selectedTicker?.ticker ?? "the selected company";

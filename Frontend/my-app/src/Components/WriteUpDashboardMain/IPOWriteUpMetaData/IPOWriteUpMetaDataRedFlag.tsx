@@ -5,7 +5,6 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
 import {
   Box,
   Button,
-  Chip,
   CircularProgress,
   IconButton,
   Slider,
@@ -15,8 +14,8 @@ import {
 } from "@mui/material"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -52,6 +51,11 @@ const riskBandColors = [
   "#fff2c2",
   "#dbe9ff"
 ]
+
+const formatRating = (value: number) => {
+  const normalized = Math.round(value * 10) / 10
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
+}
 
 const toPercent = (score?: number) => {
   const numericScore = typeof score === "number" ? score : Number(score)
@@ -181,6 +185,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const [saveLoading, setSaveLoading] = useState(false)
   const [pendingDeleteIndices, setPendingDeleteIndices] = useState<number[]>([])
   const [draftRatingScore, setDraftRatingScore] = useState<number | null>(null)
+  const [writeupRatings, setWriteupRatings] = useState<Record<string, number>>({})
 
   const apiUrl = process.env.REACT_APP_API_URL
   const ticker = basicDealDetails.ticker
@@ -217,6 +222,58 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     fetchRedFlags()
     return () => {
       isActive = false
+    }
+  }, [apiUrl, ticker])
+
+  useEffect(() => {
+    if (!apiUrl || !ticker) return
+    let isActive = true
+
+    const fetchWriteupRatings = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({ ticker })
+        })
+
+        if (!response.ok) throw new Error("Failed to load writeup ratings")
+        const payload = await response.json()
+        if (!isActive) return
+
+        const sectionRatings = payload?.writeup_ratings
+        if (sectionRatings && typeof sectionRatings === "object") {
+          const normalized: Record<string, number> = {}
+          Object.entries(sectionRatings).forEach(([key, value]) => {
+            const numeric = typeof value === "number" ? value : Number(value)
+            if (!Number.isNaN(numeric)) normalized[key] = numeric
+          })
+          setWriteupRatings(normalized)
+        } else {
+          setWriteupRatings({})
+        }
+      } catch {
+        if (isActive) {
+          setWriteupRatings({})
+        }
+      }
+    }
+
+    fetchWriteupRatings()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchWriteupRatings()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
+    return () => {
+      isActive = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, ticker])
 
@@ -266,7 +323,16 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     return null
   }, [analysis?.red_flag_analysis_rating])
 
-  const ratingScore = draftRatingScore ?? parsedRatingScore ?? 0
+  const writeupRedFlagScore = useMemo(() => {
+    const rating = writeupRatings["red-flag"]
+    return typeof rating === "number" ? rating : null
+  }, [writeupRatings])
+
+  const ratingSourceScore = writeupRedFlagScore ?? parsedRatingScore
+  const baseRatingScore = ratingSourceScore ?? 0
+  const ratingScore = draftRatingScore ?? baseRatingScore
+  const showRatingHeadingValue =
+    draftRatingScore !== null ? draftRatingScore : ratingSourceScore
   const ratingLabel = useMemo(() => {
     if (ratingScore >= 0 && ratingScore < 4) return "High Risk"
     if (ratingScore >= 4 && ratingScore < 7) return "Moderate Risk"
@@ -297,7 +363,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       const snapshot = items.map((item) => ({ ...item }))
       originalItemsRef.current = snapshot.map((item) => ({ ...item }))
       setDraftItems(snapshot)
-      setDraftRatingScore(parsedRatingScore ?? 0)
+      setDraftRatingScore(baseRatingScore)
     } else {
       setPendingDeleteIndices([])
       setDraftRatingScore(null)
@@ -404,57 +470,64 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   }
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Red Flag Analysis"
-      basicDealDetails={basicDealDetails}
-      showSummary={false}
-      showNotes={false}
-      accentColor="#ef4444"
-    >
+    <Box>
       <Stack spacing={2.5}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 2,
-            flexWrap: "wrap"
-          }}
-        >
-          {isEditing ? (
-            <TextField
-              size="small"
-              type="number"
-              inputProps={{ min: 0, max: 10, step: 0.1 }}
-              value={ratingScore}
-              onChange={(event) =>
-                setDraftRatingScore(Number(event.target.value))
-              }
+        <Box sx={{ position: "relative", mb: 2 }}>
+          {/* Rating - Left aligned */}
+          {!isEditing && showRatingHeadingValue !== null && (
+            <Box
               sx={{
-                width: 70,
-                background: "#ffffff",
-                "& .MuiOutlinedInput-root": { borderRadius: 999 }
-              }}
-            />
-          ) : (
-            <Chip
-              label={`Rating - ${badgeRating}`}
-              size="small"
-              variant="outlined"
-              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
                 borderRadius: 999,
-                borderColor: "#b6d4ff",
-                color: "#1f3b73",
-                fontWeight: 700
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
               }}
-            />
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {formatRating(showRatingHeadingValue)}/10
+              </Typography>
+            </Box>
           )}
-          <Stack direction="row" spacing={1} alignItems="center">
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1.25 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+              Red Flag Analysis
+            </Typography>
+            {isEditing && (
+              <TextField
+                size="small"
+                type="number"
+                inputProps={{ min: 0, max: 10, step: 0.1 }}
+                value={ratingScore}
+                onChange={(event) => setDraftRatingScore(Number(event.target.value))}
+                sx={{
+                  width: 70,
+                  background: "#ffffff",
+                  "& .MuiOutlinedInput-root": { borderRadius: 999 }
+                }}
+              />
+            )}
+          </Box>
+
+          {/* Edit buttons - Right aligned */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+            <Stack direction="row" spacing={1} alignItems="center">
             <Typography
               variant="subtitle2"
               sx={{ color: "#1f2937", fontWeight: 700 }}
             >
-              Avg Score: {(avgScore * 2).toFixed(2)}/10 
+              Avg Score: {(avgScore * 2).toFixed(2)}/10
             </Typography>
             <IconButton
               size="small"
@@ -479,7 +552,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                 {saveLoading ? "Saving..." : "Save"}
               </Button>
             ) : null}
-          </Stack>
+            </Stack>
+          </Box>
         </Box>
 
         {loading ? (
@@ -692,7 +766,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           and based on the analysis of available information.
         </Typography> */}
       </Stack>
-    </IPOWriteUpMetaDataSectionCard>
+    </Box>
   )
 }
 

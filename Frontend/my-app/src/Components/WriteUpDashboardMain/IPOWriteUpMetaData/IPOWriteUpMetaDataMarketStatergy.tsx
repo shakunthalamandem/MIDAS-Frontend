@@ -4,7 +4,6 @@ import {
   Grid,
   IconButton,
   Stack,
-  TextField,
   Typography
 } from "@mui/material"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
@@ -13,6 +12,28 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
+]
 
 interface IPOWriteUpMetaDataMarketStatergyProps {
   basicDealDetails: BasicDealDetails
@@ -43,6 +64,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   const [draftNotes, setDraftNotes] = useState("")
   const [isSavingCards, setIsSavingCards] = useState(false)
   const [isSavingNotes, setIsSavingNotes] = useState(false)
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
 
   const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -97,22 +119,40 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
     }
   }, [API_URL, basicDealDetails.ticker])
 
+  // Format numbers with commas
+  const formatNumberWithCommas = (value: string | number | null | undefined): string => {
+    if (!value || value === "--") return "--"
+    const strValue = String(value).trim()
+
+    // Check if it's a number
+    const numMatch = strValue.match(/^[\$]?([0-9,]+\.?[0-9]*)/)
+    if (numMatch) {
+      const cleanNum = numMatch[1].replace(/,/g, '')
+      const num = parseFloat(cleanNum)
+      if (!isNaN(num)) {
+        const formatted = num.toLocaleString('en-US', { maximumFractionDigits: 2 })
+        return strValue.startsWith('$') ? `$${formatted}` : formatted
+      }
+    }
+    return strValue
+  }
+
   const formattedCards = useMemo(
     () => [
       {
         label: "Fair Value Estimate",
         key: "fair_value_estimate",
-        value: data?.fair_value_estimate ?? "--"
+        value: formatNumberWithCommas(data?.fair_value_estimate)
       },
       {
         label: "Indication of Interest",
         key: "indication_of_interest",
-        value: data?.indication_of_interest ?? "--"
+        value: formatNumberWithCommas(data?.indication_of_interest)
       },
       {
         label: "After Market Threshold",
         key: "after_market_threshold",
-        value: data?.after_market_threshold ?? "--"
+        value: formatNumberWithCommas(data?.after_market_threshold)
       }
     ],
     [data]
@@ -264,58 +304,138 @@ IOI and After-Market Strategy          </Typography>
           </Box>
         ) : (
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            {formattedCards.map((card) => (
-              <Grid item xs={12} md={4} key={card.key}>
-                <Box
-                  sx={{
-                    borderRadius: 2,
-                    border: "1px solid #e5e7ef",
-                    background: "#eceff5",
-                    boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-                    p: 2.25,
-                    minHeight: 90,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "center"
-                  }}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontSize:"1rem",fontWeight: 700, color: "#124180" }}
+            {formattedCards.map((card) => {
+              const cardValue = String(card.value)
+              const lines = cardValue.split('\n').filter(line => line.trim())
+              const isLongText = lines.length > 4
+              const isExpanded = expandedCards[card.key] || false
+
+              return (
+                <Grid item xs={12} md={4} key={card.key}>
+                  <Box
+                    sx={{
+                      borderRadius: 2,
+                      border: "1px solid #e5e7ef",
+                      background: "#eceff5",
+                      boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+                      p: 2.25,
+                      minHeight: 90,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      justifyContent: "flex-start"
+                    }}
                   >
-                    {card.label}
-                  </Typography>
-                  {isEditingCards ? (
-                    <TextField
-                      size="small"
-                      value={draftCards[card.key] ?? ""}
-                      onChange={(event) =>
-                        setDraftCards((prev) => ({
-                          ...prev,
-                          [card.key]: event.target.value
-                        }))
-                      }
-                      sx={{ mt: 1, background: "#ffffff", maxWidth: 240 }}
-                      fullWidth
-                    />
-                  ) : (
                     <Typography
-                      variant="body1"
-                      sx={{ mt: 1, fontWeight: 600, color: "#111827" }}
+                      variant="subtitle2"
+                      sx={{ fontSize:"1rem",fontWeight: 700, color: "#124180", mb: 1 }}
                     >
-                      {card.value}
+                      {card.label}
                     </Typography>
-                  )}
-                </Box>
-              </Grid>
-            ))}
+                    {isEditingCards ? (
+                      <Box sx={{ background: "#ffffff", borderRadius: 1, width: "100%" }}>
+                        <ReactQuill
+                          theme="snow"
+                          value={draftCards[card.key] ?? ""}
+                          onChange={(value) =>
+                            setDraftCards((prev) => ({
+                              ...prev,
+                              [card.key]: value
+                            }))
+                          }
+                          modules={quillModules}
+                          formats={quillFormats}
+                          style={{ minHeight: "100px" }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box sx={{ width: "100%" }}>
+                        {cardValue.startsWith('<') ? (
+                          <Box>
+                            <Box
+                              sx={{
+                                fontWeight: 400,
+                                color: "#111827",
+                                lineHeight: 1.6,
+                                display: isLongText && !isExpanded ? '-webkit-box' : 'block',
+                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
+                                WebkitBoxOrient: 'vertical',
+                                overflow: isLongText && !isExpanded ? 'hidden' : 'visible',
+                                '& p': { margin: 0, marginBottom: 0.5, display: 'inline' },
+                                '& ul, & ol': { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 }
+                              }}
+                              dangerouslySetInnerHTML={{ __html: cardValue }}
+                            />
+                            {isLongText && (
+                              <Typography
+                                component="span"
+                                className="pdf-hidden"
+                                sx={{
+                                  color: "#059669",
+                                  cursor: "pointer",
+                                  fontStyle: "italic",
+                                  fontSize: "0.875rem",
+                                  ml: 0.5,
+                                  "&:hover": { textDecoration: "underline" }
+                                }}
+                                onClick={() => setExpandedCards(prev => ({ ...prev, [card.key]: !isExpanded }))}
+                              >
+                                {isExpanded ? "Read Less" : "Read More"}
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          <Typography
+                            variant="body1"
+                            component="div"
+                            sx={{
+                              fontWeight: 400,
+                              color: "#111827",
+                              lineHeight: 1.6
+                            }}
+                          >
+                            <Box
+                              component="span"
+                              sx={{
+                                display: isLongText && !isExpanded ? '-webkit-box' : 'inline',
+                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
+                                WebkitBoxOrient: 'vertical',
+                                overflow: isLongText && !isExpanded ? 'hidden' : 'visible'
+                              }}
+                            >
+                              {cardValue}
+                            </Box>
+                            {isLongText && (
+                              <Typography
+                                component="span"
+                                className="pdf-hidden"
+                                sx={{
+                                  color: "#059669",
+                                  cursor: "pointer",
+                                  fontStyle: "italic",
+                                  fontSize: "0.875rem",
+                                  ml: 0.5,
+                                  "&:hover": { textDecoration: "underline" }
+                                }}
+                                onClick={() => setExpandedCards(prev => ({ ...prev, [card.key]: !isExpanded }))}
+                              >
+                                {isExpanded ? "Read Less" : "Read More"}
+                              </Typography>
+                            )}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  </Box>
+                </Grid>
+              )
+            })}
           </Grid>
         )}
       </Box>
 
       <Box
+        className="pdf-hidden"
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
@@ -384,23 +504,33 @@ IOI and After-Market Strategy          </Typography>
           </Box>
 
           {isEditingNotes ? (
-            <TextField
-              multiline
-              minRows={6}
-              value={draftNotes}
-              onChange={(event) => setDraftNotes(event.target.value)}
-              sx={{ background: "#ffffff" }}
+            <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={draftNotes}
+                onChange={setDraftNotes}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
+          ) : data?.internal_notes ? (
+            <Box
+              sx={{
+                color: "#1f2937",
+                lineHeight: 1.7,
+                minHeight: 144
+              }}
+              dangerouslySetInnerHTML={{ __html: data.internal_notes }}
             />
           ) : (
             <Typography
               variant="body2"
               sx={{
-                whiteSpace: "pre-line",
-                color: "#1f2937",
-                lineHeight: 1.7
+                fontStyle: "italic",
+                color: "#6b7280"
               }}
             >
-              {data?.internal_notes || "--"}
+              --
             </Typography>
           )}
         </Stack>

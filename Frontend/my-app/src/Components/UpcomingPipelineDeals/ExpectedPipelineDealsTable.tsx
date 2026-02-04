@@ -206,6 +206,7 @@ const columnSets: Record<Category, GridColDef[]> = {
   ],
   ipo_international: [
     { field: "ticker", headerName: "XTicker", renderHeader: () => renderHeader("XTicker"), flex: 0.8, minWidth: 110 },
+    { field: "consumer_retail", headerName: "Company Name", renderHeader: () => renderHeader("Company Name"), flex: 1, minWidth: 150 },
     { field: "backers", headerName: "Backers", renderHeader: () => renderHeader("Backers"), flex: 1, minWidth: 150 },
     { field: "sectors", headerName: "Sectors", renderHeader: () => renderHeader("Sectors"), flex: 1.1, minWidth: 140 },
     { field: "country", headerName: "Country", renderHeader: () => renderHeader("Country"), flex: 0.9, minWidth: 120 },

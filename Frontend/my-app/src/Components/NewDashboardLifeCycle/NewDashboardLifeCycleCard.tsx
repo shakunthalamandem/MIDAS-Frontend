@@ -158,20 +158,39 @@ const DealCard: React.FC<DealCardProps> = ({
           {actionCards.map((item) => (
             <Grid item xs={6} key={item.label}>
               <Box
+                data-label={item.label}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onActionClick?.(item.label);
+                  const isWriteUpAction =
+                    item.label === "Write Up" && writeupAvailable !== true;
+                  if (!isWriteUpAction) {
+                    onActionClick?.(item.label);
+                  }
                 }}
                 onKeyDown={(event) => {
                   if (!onActionClick) return;
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
                     event.stopPropagation();
-                    onActionClick(item.label);
+                    const isWriteUpAction =
+                      item.label === "Write Up" && writeupAvailable !== true;
+                    if (!isWriteUpAction) {
+                      onActionClick(item.label);
+                    }
                   }
                 }}
-                role={onActionClick ? "button" : undefined}
-                tabIndex={onActionClick ? 0 : -1}
+                role={
+                  onActionClick &&
+                  !(item.label === "Write Up" && writeupAvailable !== true)
+                    ? "button"
+                    : undefined
+                }
+                tabIndex={
+                  onActionClick &&
+                  !(item.label === "Write Up" && writeupAvailable !== true)
+                    ? 0
+                    : -1
+                }
                 sx={{
                   borderRadius: 2.5,
                   backgroundColor: item.bg,
@@ -186,11 +205,24 @@ const DealCard: React.FC<DealCardProps> = ({
                   textAlign: "center",
                   minHeight: 72,
                   justifyContent: "center",
-                  cursor: onActionClick ? "pointer" : "default",
-                  "&:hover": onActionClick
-                    ? { boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
-                      bgcolor:"#ceccf3ff"}
-                    : undefined,
+                  cursor:
+                    item.label === "Write Up" && writeupAvailable !== true
+                      ? "not-allowed"
+                      : onActionClick
+                      ? "pointer"
+                      : "default",
+                  opacity:
+                    item.label === "Write Up" && writeupAvailable !== true
+                      ? 0.65
+                      : 1,
+                  "&:hover":
+                    onActionClick &&
+                    !(item.label === "Write Up" && writeupAvailable !== true)
+                      ? {
+                          boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
+                          bgcolor: "#ceccf3ff",
+                        }
+                      : undefined,
                     mt:2,
                     mb:2
                 }}

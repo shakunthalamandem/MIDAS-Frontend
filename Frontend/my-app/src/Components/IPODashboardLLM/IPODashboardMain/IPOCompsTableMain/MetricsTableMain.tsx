@@ -17,7 +17,28 @@ import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { createColumns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
-import { overflow } from "html2canvas/dist/types/css/property-descriptors/overflow";
+import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined";
+
+const parseRatingValue = (value?: number | string | null) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^-?\d+(\.\d+)?/);
+  if (match) {
+    const parsed = Number(match[0]);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  const fallback = Number(trimmed);
+  return Number.isFinite(fallback) ? fallback : null;
+};
+
+const formatRatingValue = (value: number) => {
+  const normalized = Math.round(value * 10) / 10;
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1);
+};
 
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
@@ -41,6 +62,7 @@ const MetricsTableMain: React.FC<Props> = ({
   pricingYear,
 }) => {
   const [rows, setRows] = useState<ComparableMetric[]>([]);
+  const [ratingText, setRatingText] = useState<string | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -69,6 +91,58 @@ const MetricsTableMain: React.FC<Props> = ({
     );
     setRows(highlightRow ? [highlightRow, ...otherRows] : otherRows);
   }, [data, ticker]);
+
+  useEffect(() => {
+    let active = true;
+    const apiUrl = process.env.REACT_APP_API_URL;
+    if (!ticker || !apiUrl) return;
+
+    const fetchRating = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : ""
+        };
+
+        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ ticker })
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!active) return;
+
+        const incoming =
+          (data?.writeup_ratings as Record<string, any>) ??
+          data?.section_scores ??
+          data?.final_verdict_section_scores ??
+          {};
+        const parsed = parseRatingValue(incoming?.["comps"] ?? incoming?.["key-metrics"]);
+        if (parsed !== null) {
+          setRatingText(formatRatingValue(parsed));
+        }
+      } catch (err) {
+        console.error("Failed to fetch rating", err);
+      }
+    };
+
+    fetchRating();
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchRating();
+    };
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+
+    return () => {
+      active = false;
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
+    };
+  }, [ticker]);
 
   const handleSave = async (idx: number) => {
     try {
@@ -211,17 +285,44 @@ const MetricsTableMain: React.FC<Props> = ({
 
   return (
     <Box style={{ marginTop: 20, overflow: "auto" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h6" color="#002060" fontWeight={600}>
-          Comparative Trading Multiples         </Typography>
-        <CompetitorSearch onSelect={handleAddCompetitor} />
+      <Box sx={{ position: "relative", mb: 2 }}>
+        {/* Rating - Left aligned */}
+        {ratingText && (
+          <Box
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              borderRadius: 999,
+              border: "1px solid rgba(52, 144, 220, 0.4)",
+              background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+              px: 1.5,
+              py: 0.4,
+              boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+            }}
+          >
+            <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+              Rating - {ratingText}/10
+            </Typography>
+          </Box>
+        )}
+
+        {/* Heading - Center aligned */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+            Comparative Trading Multiples
+          </Typography>
+        </Box>
+
+        {/* Search - Right aligned */}
+        <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+          <CompetitorSearch onSelect={handleAddCompetitor} />
+        </Box>
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>

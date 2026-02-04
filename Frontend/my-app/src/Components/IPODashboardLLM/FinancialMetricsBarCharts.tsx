@@ -65,7 +65,13 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
   const token = localStorage.getItem("access_token");
 
   const [data, setData] = useState<MetricsRow[]>([]);
-  const [includeInPdf, setIncludeInPdf] = useState<boolean>(false);
+  const getIncludeStorageKey = (value: string) =>
+    `ipo-metrics-include-pdf:${value || "unknown"}`;
+  const [includeInPdf, setIncludeInPdf] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const stored = localStorage.getItem(getIncludeStorageKey(ticker));
+    return stored === "true";
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [peData, setPeData] = useState<TickerSeries[]>([]);
@@ -163,6 +169,19 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
     fetchPeData();
   }, [apiUrl, ticker, token, refreshToken]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem(getIncludeStorageKey(ticker));
+    setIncludeInPdf(stored === "true");
+  }, [ticker]);
+
+  const handleIncludeInPdfChange = (checked: boolean) => {
+    setIncludeInPdf(checked);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(getIncludeStorageKey(ticker), String(checked));
+    }
+  };
+
   // Check conditions here, without conditionally calling hooks
   const peChartSection = useMemo(() => {
     if (apiUrl && ticker) {
@@ -217,7 +236,7 @@ const FinancialMetricsBarCharts: React.FC<Props> = ({ ticker, refreshToken }) =>
         ticker={ticker}
         data={data}
         includeInPdf={includeInPdf}
-        onIncludeInPdfChange={setIncludeInPdf}
+        onIncludeInPdfChange={handleIncludeInPdfChange}
       />
       {peChartSection}
     </Box>
