@@ -313,7 +313,8 @@ const MetricsTableMain: React.FC<Props> = ({
         )}
 
         {/* Heading - Center aligned */}
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box sx={{ display: "flex", justifyContent: "center",          paddingTop:1
+ }}>
           <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
             Comparative Trading Multiples
           </Typography>
