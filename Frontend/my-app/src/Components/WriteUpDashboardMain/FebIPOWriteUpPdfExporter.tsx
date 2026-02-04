@@ -15,6 +15,8 @@ type FebIPOWriteUpPdfExporterProps = {
   className?: string
   ticker?: string | null
   pricingDate?: string | null
+  companyName?: string | null
+  exchange?: string | null
 }
 
 const waitForLayout = () =>
@@ -42,42 +44,81 @@ const waitForContentReady = async (
   }
 }
 
-const drawHeader = (pdf: jsPDF, headerTitle: string) => {
+const drawHeader = (
+  pdf: jsPDF,
+  headerTitle: string,
+  logoImg?: HTMLImageElement | null
+) => {
   const pdfWidth = pdf.internal.pageSize.getWidth()
+  const marginX = 10
+  const logoWidth = 55
+  const logoHeight = 16.5
+  const logoX = pdfWidth - marginX - logoWidth
+  const logoY = 8
+
+  if (logoImg) {
+    pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight, undefined, "FAST")
+  }
+
   pdf.setFont("helvetica", "bold")
   pdf.setFontSize(12)
   pdf.setTextColor(0, 32, 96)
   const title = headerTitle?.trim?.() || "IPO Write-up"
-  pdf.text(title, 10, 12)
+  pdf.text(title, marginX, 14)
   pdf.setDrawColor(0, 32, 96)
   pdf.setLineWidth(0.3)
-  pdf.line(10, 15, pdfWidth - 10, 15)
+  const lineY = logoY + logoHeight + 2
+  pdf.line(marginX, lineY, pdfWidth - marginX, lineY)
   pdf.setTextColor(0, 0, 0)
-  return 20
+  return lineY + 5
 }
 
-const drawFooter = (pdf: jsPDF, dataAsOfText: string) => {
+const getFooterLayout = (pdf: jsPDF, dataAsOfText: string, marginX: number) => {
   const pdfWidth = pdf.internal.pageSize.getWidth()
   const pdfHeight = pdf.internal.pageSize.getHeight()
-  const marginX = 10
-  const footerTextTopY = pdfHeight - 22
-  pdf.setDrawColor(0, 32, 96)
-  pdf.setLineWidth(1)
-  pdf.line(marginX, footerTextTopY - 4, pdfWidth - marginX, footerTextTopY - 4)
   pdf.setFontSize(7)
   pdf.setTextColor(100)
   pdf.setFont("helvetica", "normal")
   const asOfLabel = dataAsOfText ? `Data as of ${dataAsOfText}. ` : ""
-  pdf.text(
-    `${asOfLabel}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
-    marginX,
-    footerTextTopY,
-    { maxWidth: pdfWidth - marginX * 2 }
+  const footerText = `${asOfLabel}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`
+  const footerLines: string[] = (pdf as any).splitTextToSize(
+    footerText,
+    pdfWidth - marginX * 2
   )
+  const lineHeightMm = pdf.getFontSize() * 0.3528 * 1.2
+  const bottomTextY = pdfHeight - 10
+  const footerTextHeight = footerLines.length * lineHeightMm
+  const footerTextTopY = bottomTextY - 6 - footerTextHeight
+  const footerLineY = footerTextTopY - 3
+  const footerTopY = footerLineY - 2
+  const footerHeight = pdfHeight - footerTopY
+
+  return {
+    footerLines,
+    footerTextTopY,
+    footerLineY,
+    footerHeight,
+    bottomTextY
+  }
+}
+
+const drawFooter = (pdf: jsPDF, dataAsOfText: string, marginX = 10) => {
+  const pdfWidth = pdf.internal.pageSize.getWidth()
+  const layout = getFooterLayout(pdf, dataAsOfText, marginX)
+
+  pdf.setDrawColor(0, 32, 96)
+  pdf.setLineWidth(1)
+  pdf.line(marginX, layout.footerLineY, pdfWidth - marginX, layout.footerLineY)
+  pdf.setFontSize(7)
+  pdf.setTextColor(100)
+  pdf.setFont("helvetica", "normal")
+  pdf.text(layout.footerLines, marginX, layout.footerTextTopY, {
+    maxWidth: pdfWidth - marginX * 2
+  })
   pdf.setFontSize(9)
   pdf.setFont("helvetica", "bold")
   pdf.setTextColor(128)
-  pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, {
+  pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, layout.bottomTextY, {
     align: "center"
   })
   pdf.setTextColor(0, 0, 0)
@@ -122,7 +163,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
   loadingLabel = "Generating...",
   className,
   ticker,
-  pricingDate
+  pricingDate,
+  companyName,
+  exchange
 }) => {
   const [loading, setLoading] = useState(false)
 
@@ -157,7 +200,6 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       const pdfWidth = pdf.internal.pageSize.getWidth()
       const pdfHeight = pdf.internal.pageSize.getHeight()
       const marginX = 10
-      const bottomMargin = 18
       const contentWidth = pdfWidth - marginX * 2
       const dataAsOfText = formatDataAsOf(pricingDate)
 
@@ -176,9 +218,13 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       // Intro page
       pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight)
       if (ticker) {
-        const label = pricingDate
-          ? `${ticker.toUpperCase()} • ${pricingDate}`
-          : ticker.toUpperCase()
+        const labelParts = [
+          ticker.toUpperCase(),
+          companyName?.trim(),
+          exchange?.trim(),
+          pricingDate?.trim()
+        ].filter(Boolean)
+        const label = labelParts.join(" | ")
         pdf.setFont("helvetica", "bold")
         pdf.setFontSize(14)
         pdf.setTextColor(0, 32, 96)
@@ -186,7 +232,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       }
 
       pdf.addPage()
-      let cursorY = drawHeader(pdf, headerTitle)
+      let cursorY = drawHeader(pdf, headerTitle, logoImg)
+      const footerLayout = getFooterLayout(pdf, dataAsOfText, marginX)
+      const bottomMargin = Math.max(footerLayout.footerHeight + 4, 30)
 
       const hideForPdf = (el: HTMLElement) => {
         hiddenEls.push({ el, display: el.style.display })
@@ -230,14 +278,14 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         if (breakBefore && !isFirstSection) {
           drawFooter(pdf, dataAsOfText)
           pdf.addPage()
-          cursorY = drawHeader(pdf, headerTitle)
+          cursorY = drawHeader(pdf, headerTitle, logoImg)
         } else if (
           !breakBefore &&
           cursorY > pdfHeight - bottomMargin - minRemainingMm
         ) {
           drawFooter(pdf, dataAsOfText)
           pdf.addPage()
-          cursorY = drawHeader(pdf, headerTitle)
+          cursorY = drawHeader(pdf, headerTitle, logoImg)
         }
 
         // Calculate optimal capture width for clean PDF rendering
@@ -345,7 +393,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           if (availableHeightMm <= 0) {
             drawFooter(pdf, dataAsOfText)
             pdf.addPage()
-            cursorY = drawHeader(pdf, headerTitle)
+            cursorY = drawHeader(pdf, headerTitle, logoImg)
             continue
           }
 
@@ -402,7 +450,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           if (cursorY > pdfHeight - bottomMargin) {
             drawFooter(pdf, dataAsOfText)
             pdf.addPage()
-            cursorY = drawHeader(pdf, headerTitle)
+            cursorY = drawHeader(pdf, headerTitle, logoImg)
           }
         }
 

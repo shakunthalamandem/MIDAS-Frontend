@@ -143,6 +143,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               className="pdf-hidden"
               ticker={basicDealDetails?.ticker}
               pricingDate={basicDealDetails?.pricing_date}
+              companyName={basicDealDetails?.company_name}
+              exchange={basicDealDetails?.exchange}
             />
           </Box>
 
