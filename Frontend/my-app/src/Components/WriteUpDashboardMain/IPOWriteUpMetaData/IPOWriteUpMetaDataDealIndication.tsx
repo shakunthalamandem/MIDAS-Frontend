@@ -243,10 +243,17 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
           <Typography variant="body2">Loading deal indication...</Typography>
         </Box>
       ) : error ? (
+                <Box 
+                    className="pdf-hidden"
+
+                sx={{ display: "flex", alignItems: "center", gap: 1.5 }} >
+
         <NoDataNotice
           title="No data found"
           subtitle="There is no data for this ticker. We will update soon."
         />
+          </Box>
+
       ) : (
         <>
           <ExecutiveSummaryCard
