@@ -242,7 +242,10 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
-            <TechnicalMain initialTicker={activePayload.ticker ?? null} />
+            <TechnicalMain
+              initialTicker={activePayload.ticker ?? null}
+              initialRegion={activePayload.region ?? null}
+            />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
             <NewDashboardLifeCycleMeetingNotes
               ticker={activePayload.ticker}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import TickerDropdown from "../Tradingview/TickerDropdown";
 import TradingViewWidget from "../Tradingview/TradingViewWidget";
@@ -13,13 +13,24 @@ import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
 
 type TechnicalMainProps = {
   initialTicker?: string | null;
+  initialRegion?: string | null;
 };
 
-const TechnicalMain: React.FC<TechnicalMainProps> = ({ initialTicker = null }) => {
+const TechnicalMain: React.FC<TechnicalMainProps> = ({
+  initialTicker = null,
+  initialRegion = null,
+}) => {
   const { ticker: paramTicker } = useParams<{ ticker?: string }>();
   const [selectedTicker, setSelectedTicker] = useState<string | null>(
     initialTicker ?? paramTicker ?? ""
   );
+  const [region, setRegion] = useState<string | null>(initialRegion ?? null);
+  const allowedRegions = useMemo(() => ["emea", "apac"], []);
+  const showRegionalBlock =
+    !!region && allowedRegions.includes(region.toLowerCase());
+  const noticeDetail = region
+    ? `Technical analysis is not available for ${region.toUpperCase()} tickers yet.`
+    : "Technical analysis is not available for this ticker.";
 
   useEffect(() => {
     if (initialTicker) {
@@ -30,6 +41,10 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({ initialTicker = null }) =
       setSelectedTicker(paramTicker);
     }
   }, [initialTicker, paramTicker]);
+
+  useEffect(() => {
+    setRegion(initialRegion ?? null);
+  }, [initialRegion]);
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
@@ -43,14 +58,44 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({ initialTicker = null }) =
 
         {selectedTicker && (
           <>
-            {/* TradingViewData and CompanyDetails side by side */}
-            <Grid container spacing={2} sx={{ marginTop: 3 }}>
-              <Grid item xs={12} md={4}>
-                <TradingViewData ticker={selectedTicker} />
+            {showRegionalBlock ? (
+              <Grid container justifyContent="center" sx={{ mt: 4 }}>
+                <Grid item xs={12} md={8}>
+                  <Box
+                    sx={{
+                      borderRadius: 3,
+                      border: "1px dashed #cbd5f5",
+                      background: "#f8fafc",
+                      p: 4,
+                      textAlign: "center",
+                      boxShadow: "0 6px 18px rgba(15, 23, 42, 0.08)",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, color: "#0f172a" }}
+                    >
+                      No data found for this ticker.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#475569", mt: 1, fontWeight: 600 }}
+                    >
+                      {noticeDetail}
+                    </Typography>
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={8}>
-              </Grid>
-            </Grid>
+            ) : (
+              <>
+                {/* TradingViewData and CompanyDetails side by side */}
+                <Grid container spacing={2} sx={{ marginTop: 3 }}>
+                  <Grid item xs={12} md={4}>
+                    <TradingViewData ticker={selectedTicker} />
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                  </Grid>
+                </Grid>
 
             <TradingViewWidget ticker={selectedTicker} />
             <FundamentalMetricsCard ticker={selectedTicker} />
@@ -66,9 +111,10 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({ initialTicker = null }) =
               </Grid>
             </Grid>
 
-            <VolatilityChart ticker={selectedTicker} />
-            <CompanyDetails ticker={selectedTicker} />
-
+                <VolatilityChart ticker={selectedTicker} />
+                <CompanyDetails ticker={selectedTicker} />
+              </>
+            )}
           </>
         )}
       </Box>
