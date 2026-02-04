@@ -95,7 +95,7 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
       setErrorMsg(null);
 
       try {
-        const res = await fetch(`${apiUrl}/api/get_deal_recommendation/`, {
+        const res = await fetch(`${apiUrl}/api/deal_recommendation_data/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
