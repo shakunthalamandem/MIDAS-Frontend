@@ -31,7 +31,7 @@ export function SectionCard({
             sx={{ fontWeight: 700, color: "#121f44" }}
             align="center"
           >
-            {title}
+            {title || ""}
           </Typography>
           {children}
         </Stack>
