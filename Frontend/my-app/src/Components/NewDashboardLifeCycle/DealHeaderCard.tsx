@@ -83,7 +83,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               color: "#22252a",
             }}
           >
-            {activePayload?.ticker || "N/A"} • US
+            {activePayload?.ticker || "N/A"} 
           </Typography>
         </Box>
 
