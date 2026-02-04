@@ -130,8 +130,17 @@ const MetricsTableMain: React.FC<Props> = ({
     };
 
     fetchRating();
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchRating();
+    };
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+
     return () => {
       active = false;
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
     };
   }, [ticker]);
 
@@ -276,45 +285,44 @@ const MetricsTableMain: React.FC<Props> = ({
 
   return (
     <Box style={{ marginTop: 20, overflow: "auto" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 2,
-          mb: 2,
-        }}
-      >
-        <Box display="flex" alignItems="center" gap={1.25}>
-          <Typography variant="h6" color="#002060" fontWeight={600}>
+      <Box sx={{ position: "relative", mb: 2 }}>
+        {/* Rating - Left aligned */}
+        {ratingText && (
+          <Box
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              borderRadius: 999,
+              border: "1px solid rgba(52, 144, 220, 0.4)",
+              background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+              px: 1.5,
+              py: 0.4,
+              boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+            }}
+          >
+            <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+              Rating - {ratingText}/10
+            </Typography>
+          </Box>
+        )}
+
+        {/* Heading - Center aligned */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
             Comparative Trading Multiples
           </Typography>
-          {ratingText && (
-            <Box
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 0.5,
-                borderRadius: 999,
-                border: "1px solid rgba(52, 144, 220, 0.4)",
-                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
-                px: 1.25,
-                py: 0.35,
-                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)",
-              }}
-            >
-              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "#0d4dec" }}
-              >
-                Rating - {ratingText}/10
-              </Typography>
-            </Box>
-          )}
         </Box>
-        <CompetitorSearch onSelect={handleAddCompetitor} />
+
+        {/* Search - Right aligned */}
+        <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+          <CompetitorSearch onSelect={handleAddCompetitor} />
+        </Box>
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>

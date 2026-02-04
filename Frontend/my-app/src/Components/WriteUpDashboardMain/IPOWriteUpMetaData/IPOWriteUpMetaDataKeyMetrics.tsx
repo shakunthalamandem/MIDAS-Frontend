@@ -187,8 +187,17 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }
 
     fetchScores()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchScores()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       active = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, headers])
 
@@ -291,29 +300,37 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       >
         {/* ---------- HEADER ---------- */}
         <Box sx={{ position: "relative", mb: 2 }}>
-          <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
+          {/* Rating - Left aligned */}
+          {ratingText && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {ratingText}/10
+              </Typography>
+            </Box>
+          )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1 }}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-              Key Metrics - Top 5 Performance            </Typography>
-            {ratingText && (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  borderRadius: 999,
-                  border: "1px solid rgba(52, 144, 220, 0.4)",
-                  background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
-                  px: 1.5,
-                  py: 0.4,
-                  boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
-                }}
-              >
-                <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
-                  Rating - {ratingText}/10
-                </Typography>
-              </Box>
-            )}
+              Key Metrics
+            </Typography>
             <Tooltip
               arrow
               placement="right"
@@ -352,6 +369,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             </Tooltip>
           </Box>
 
+          {/* Edit buttons - Right aligned */}
           <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1}>
             {editMode ? (
               <>

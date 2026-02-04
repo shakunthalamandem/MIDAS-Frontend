@@ -170,6 +170,17 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     }
 
     fetchData()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchData()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
+    return () => {
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
+    }
   }, [basicDealDetails])
 
   /* ===================== HANDLERS ===================== */
@@ -352,38 +363,15 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     >
       {/* ================= BUSINESS OVERVIEW ================= */}
       <Box mb={4}>
-        <Box display="flex" justifyContent="flex-end">
-          {businessOverviewEditing ? (
-            <>
-              <IconButton onClick={handleSaveBusinessOverview}>
-                <SaveIcon />
-              </IconButton>
-              <IconButton onClick={() => setBusinessOverviewEditing(false)}>
-                <CancelIcon />
-              </IconButton>
-            </>
-          ) : (
-            <IconButton onClick={() => setBusinessOverviewEditing(true)}>
-              <EditIcon />
-            </IconButton>
-          )}
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-            mb: 2
-          }}
-        >
-          <Typography variant="h5" fontWeight={600} color="#124180">
-            Business Overview
-          </Typography>
+        <Box sx={{ position: "relative", mb: 2 }}>
+          {/* Rating - Left aligned */}
           {businessOverviewRatingText && (
             <Box
               sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 0.5,
@@ -401,6 +389,31 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               </Typography>
             </Box>
           )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Typography variant="h6" fontWeight={700} color="#124180">
+              Business Overview
+            </Typography>
+          </Box>
+
+          {/* Edit buttons - Right aligned */}
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+            {businessOverviewEditing ? (
+              <>
+                <IconButton onClick={handleSaveBusinessOverview}>
+                  <SaveIcon />
+                </IconButton>
+                <IconButton onClick={() => setBusinessOverviewEditing(false)}>
+                  <CancelIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton onClick={() => setBusinessOverviewEditing(true)}>
+                <EditIcon />
+              </IconButton>
+            )}
+          </Box>
         </Box>
 
         {businessOverviewEditing ? (

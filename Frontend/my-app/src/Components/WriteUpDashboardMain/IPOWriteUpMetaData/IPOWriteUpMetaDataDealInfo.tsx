@@ -86,6 +86,17 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
     };
 
     fetchData();
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchData();
+    };
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+
+    return () => {
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
+    };
   }, [basicDealDetails]);
 
   if (loading) {
@@ -119,21 +130,15 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
 
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 2,
-          mb: 2
-        }}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#124180" }} align='center'>
-          Deal Information
-        </Typography>
+      <Box sx={{ position: "relative", mb: 2 }}>
+        {/* Rating - Left aligned */}
         {ratingText && (
           <Box
             sx={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
               display: "inline-flex",
               alignItems: "center",
               gap: 0.5,
@@ -151,6 +156,13 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
             </Typography>
           </Box>
         )}
+
+        {/* Heading - Center aligned */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+            Deal Information
+          </Typography>
+        </Box>
       </Box>
 
       <FebWriteupDashboardLine

@@ -67,8 +67,17 @@ const IPOWriteUpMetaDataFinancialHighlights: React.FC<
     }
 
     fetchRating()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchRating()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       active = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker])
 
@@ -79,22 +88,15 @@ const IPOWriteUpMetaDataFinancialHighlights: React.FC<
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          gap: 1.5,
-          mb: 2
-        }}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
-          Financial Highlights
-        </Typography>
+      <Box sx={{ position: "relative", mb: 2 }}>
+        {/* Rating - Left aligned */}
         {ratingText && (
           <Box
             sx={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
               display: "inline-flex",
               alignItems: "center",
               gap: 0.5,
@@ -112,6 +114,13 @@ const IPOWriteUpMetaDataFinancialHighlights: React.FC<
             </Typography>
           </Box>
         )}
+
+        {/* Heading - Center aligned */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
+            Financial Highlights
+          </Typography>
+        </Box>
       </Box>
 
       <NewFinancialTableMain

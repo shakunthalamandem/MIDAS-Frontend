@@ -252,6 +252,14 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
 
       // Refresh full panel from writeup_data
       await fetchWriteupData()
+
+      // Dispatch custom event to notify other components to refresh their ratings
+      window.dispatchEvent(new CustomEvent('ratingsUpdated', {
+        detail: {
+          ticker: basicDealDetails.ticker,
+          ratings: draftSectionScores
+        }
+      }))
     } catch (err: any) {
       setSaveError(err?.message || "Save failed")
     } finally {

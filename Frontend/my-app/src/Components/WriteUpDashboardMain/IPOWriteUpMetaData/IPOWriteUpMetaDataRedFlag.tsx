@@ -264,8 +264,16 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
 
     fetchWriteupRatings()
 
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchWriteupRatings()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       isActive = false
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, ticker])
 
@@ -465,19 +473,38 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     <Box>
       <Stack spacing={2.5}>
         <Box sx={{ position: "relative", mb: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 1.25,
-              flexWrap: "wrap"
-            }}
-          >
+          {/* Rating - Left aligned */}
+          {!isEditing && showRatingHeadingValue !== null && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                borderRadius: 999,
+                border: "1px solid rgba(52, 144, 220, 0.4)",
+                background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+                px: 1.5,
+                py: 0.4,
+                boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+              }}
+            >
+              <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+                Rating - {formatRating(showRatingHeadingValue)}/10
+              </Typography>
+            </Box>
+          )}
+
+          {/* Heading - Center aligned */}
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1.25 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
               Red Flag Analysis
             </Typography>
-            {isEditing ? (
+            {isEditing && (
               <TextField
                 size="small"
                 type="number"
@@ -490,27 +517,10 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                   "& .MuiOutlinedInput-root": { borderRadius: 999 }
                 }}
               />
-            ) : showRatingHeadingValue !== null ? (
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  borderRadius: 999,
-                  border: "1px solid rgba(52, 144, 220, 0.4)",
-                  background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
-                  px: 1.5,
-                  py: 0.4,
-                  boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
-                }}
-              >
-                <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
-                  Rating - {formatRating(showRatingHeadingValue)}/10
-                </Typography>
-              </Box>
-            ) : null}
+            )}
           </Box>
+
+          {/* Edit buttons - Right aligned */}
           <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
             <Stack direction="row" spacing={1} alignItems="center">
             <Typography
