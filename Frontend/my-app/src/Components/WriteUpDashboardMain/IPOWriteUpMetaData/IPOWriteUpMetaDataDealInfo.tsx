@@ -128,7 +128,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
           mb: 2
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#1d2b5a" }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, color: "#124180" }} align='center'>
           Deal Information
         </Typography>
         {ratingText && (

@@ -83,12 +83,13 @@ const IPOWriteUpMetaDataFinancialHighlights: React.FC<
         sx={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           flexWrap: "wrap",
           gap: 1.5,
           mb: 2
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#124180" }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
           Financial Highlights
         </Typography>
         {ratingText && (

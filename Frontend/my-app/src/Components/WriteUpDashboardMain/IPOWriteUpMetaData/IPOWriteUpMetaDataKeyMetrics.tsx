@@ -290,11 +290,10 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         }}
       >
         {/* ---------- HEADER ---------- */}
-        <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={2}>
-          <Box display="flex" alignItems="center" gap={1}>
+        <Box sx={{ position: "relative", mb: 2 }}>
+          <Box display="flex" justifyContent="center" alignItems="center" gap={1}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-              Key Metrics - Top 5 Performance
-            </Typography>
+              Key Metrics - Top 5 Performance            </Typography>
             {ratingText && (
               <Box
                 sx={{
@@ -353,7 +352,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             </Tooltip>
           </Box>
 
-          <Box marginLeft="auto" display="flex" gap={1}>
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1}>
             {editMode ? (
               <>
                 <IconButton

@@ -14,7 +14,6 @@ import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
 import { BasicDealDetails } from "../types/DealInformation"
-import IPOWriteUpMetaDataSectionCard from "./IPOWriteUpMetaDataSectionCard"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
@@ -277,12 +276,10 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
   }
 
   return (
-    <IPOWriteUpMetaDataSectionCard
-      title="Final Verdict"
-      basicDealDetails={basicDealDetails}
-      showSummary={false}
-      showNotes={false}
-    >
+    <Box>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center", mb: 3 }}>
+        Final Verdict
+      </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Stack spacing={2}>
@@ -495,7 +492,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
           </Stack>
         </Grid>
       </Grid>
-    </IPOWriteUpMetaDataSectionCard>
+    </Box>
   )
 }
 
