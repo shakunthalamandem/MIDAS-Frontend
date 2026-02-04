@@ -11,15 +11,25 @@ import VolumeChart from "./VolumeChart";
 import VolatilityChart from "./VolatilityChart";
 import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
 
-const TechnicalMain = () => {
-  const { ticker } = useParams();
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(ticker || "");
+type TechnicalMainProps = {
+  initialTicker?: string | null;
+};
+
+const TechnicalMain: React.FC<TechnicalMainProps> = ({ initialTicker = null }) => {
+  const { ticker: paramTicker } = useParams<{ ticker?: string }>();
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(
+    initialTicker ?? paramTicker ?? ""
+  );
 
   useEffect(() => {
-    if (ticker) {
-      setSelectedTicker(ticker);
+    if (initialTicker) {
+      setSelectedTicker(initialTicker);
+      return;
     }
-  }, [ticker]);
+    if (paramTicker) {
+      setSelectedTicker(paramTicker);
+    }
+  }, [initialTicker, paramTicker]);
 
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>

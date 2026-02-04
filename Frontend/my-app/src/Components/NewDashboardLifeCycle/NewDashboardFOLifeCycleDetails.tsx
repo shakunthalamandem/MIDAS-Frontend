@@ -25,10 +25,10 @@ import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
+import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
-import S1QueryBot from "./S1QueryBot";
 import DealRecomendation from "./DealRecomendation";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -45,7 +45,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-    //   { label: "Write Up New" },
+    //   {label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
@@ -53,7 +53,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "AI - Sentiment View" },
       { label: "AI Unsupervised" },
       { label: "ML Model" },
-      { label: "S1 AI Query" },
+      { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
@@ -202,26 +202,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up New" ? (
-            isIpo ? (
-           <FebWriteUpDashboardMain
-            basicDealDetails={{
-              deal_id: activePayload.deal_id,
-              ticker: activePayload.ticker,
-              pricing_date: activePayload.pricing_date,
-              region: activePayload.region,
-              deal_type: activePayload.deal_type
-            }}
-          />
-
-              
-            ) : (
-              <NewDashboardLifeCycleOverviewFO
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-              />
-            )
-          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
+          {tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
@@ -260,8 +241,8 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
-          ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
-            <S1QueryBot ticker={activePayload.ticker} />
+          ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
+            <TechnicalMain initialTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
             <NewDashboardLifeCycleMeetingNotes
               ticker={activePayload.ticker}
