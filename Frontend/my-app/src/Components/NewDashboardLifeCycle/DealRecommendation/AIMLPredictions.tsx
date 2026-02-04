@@ -235,11 +235,11 @@ export function AIMLPredictions({
   data: DealRecommendationResponse;
 }) {
   return (
-    <SectionCard title="AI-ML Predictions">
+    <SectionCard title="ML Model Predictions">
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
           <PredictionTile
-            title="T+1 Day"
+            title="1st Day Close from Issue"
             pred={data.t1d_pred}
             confidence={data.t1d_confidence}
             timeframe="t1d"
@@ -247,7 +247,7 @@ export function AIMLPredictions({
         </Grid>
         <Grid item xs={12} md={4}>
           <PredictionTile
-            title="T+1 Week"
+            title="1st Week from 1st Day Close"
             pred={data.t1w_pred}
             confidence={data.t1w_confidence}
             timeframe="t1w"
@@ -255,7 +255,7 @@ export function AIMLPredictions({
         </Grid>
         <Grid item xs={12} md={4}>
           <PredictionTile
-            title="T+1 Month"
+            title="1st Month from 1st Day Close"
             pred={data.t1m_pred}
             confidence={data.t1m_confidence}
             timeframe="t1m"
