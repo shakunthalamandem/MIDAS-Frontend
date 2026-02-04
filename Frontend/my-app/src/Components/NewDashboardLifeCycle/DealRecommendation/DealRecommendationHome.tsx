@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Grid, TextField, Button, Stack } from "@mui/material";
 import { SectionCard } from "./SectionCard";
 import { AIMLPredictions } from "./AIMLPredictions";
@@ -129,6 +129,57 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
     };
   }, [apiUrl, token, ticker]);
 
+  const handleSaveValuation = useCallback(
+    async (nextValuation: string) => {
+      if (!data) return;
+      setSavingValuation(true);
+      setErrorMsg(null);
+      const previousValue = data;
+      const updatedData = { ...data, valuation_summary: nextValuation };
+      setData(updatedData);
+      setValuationSummary(nextValuation);
+
+      try {
+        if (onSaveValuation) {
+          await onSaveValuation(nextValuation, updatedData);
+          return;
+        }
+
+        if (!apiUrl) {
+          throw new Error("Missing REACT_APP_API_URL");
+        }
+        if (!ticker) {
+          throw new Error("Missing ticker");
+        }
+
+        const res = await fetch(`${apiUrl}/api/deal_recommendation_data/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            ticker,
+            valuation_summary: nextValuation,
+          }),
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || `Request failed (${res.status})`);
+        }
+      } catch (err: any) {
+        setErrorMsg(err?.message ?? "Unable to save valuation summary");
+        setData(previousValue);
+        setValuationSummary(previousValue.valuation_summary ?? "");
+        throw err;
+      } finally {
+        setSavingValuation(false);
+      }
+    },
+    [apiUrl, data, onSaveValuation, ticker, token]
+  );
+
   const cards = useMemo(() => {
     if (!data) return null;
 
@@ -138,19 +189,8 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
         <Grid item xs={12}>
           <ValuationCard
             value={valuationSummary}
-            onChange={setValuationSummary}
             saving={savingValuation}
-            onSave={async () => {
-              setSavingValuation(true);
-              try {
-                const next = { ...data, valuation_summary: valuationSummary };
-                setData(next); // optimistic
-
-                await onSaveValuation?.(valuationSummary, next);
-              } finally {
-                setSavingValuation(false);
-              }
-            }}
+            onSave={handleSaveValuation}
           />
         </Grid>
 
@@ -201,7 +241,7 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
         </Grid>
       </Grid>
     );
-  }, [data, onSaveValuation, savingValuation, valuationSummary]);
+  }, [data, handleSaveValuation, savingValuation, valuationSummary]);
 
   if (loading) return <div>Loading...</div>;
   if (errorMsg) return <div style={{ color: "crimson" }}>Error: {errorMsg}</div>;
