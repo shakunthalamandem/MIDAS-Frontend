@@ -358,7 +358,7 @@ IOI and After-Market Strategy          </Typography>
                                 color: "#111827",
                                 lineHeight: 1.6,
                                 display: isLongText && !isExpanded ? '-webkit-box' : 'block',
-                                WebkitLineClamp: isLongText && !isExpanded ? 4 : 'unset',
+                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
                                 WebkitBoxOrient: 'vertical',
                                 overflow: isLongText && !isExpanded ? 'hidden' : 'visible',
                                 '& p': { margin: 0, marginBottom: 0.5, display: 'inline' },
@@ -398,7 +398,7 @@ IOI and After-Market Strategy          </Typography>
                               component="span"
                               sx={{
                                 display: isLongText && !isExpanded ? '-webkit-box' : 'inline',
-                                WebkitLineClamp: isLongText && !isExpanded ? 4 : 'unset',
+                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
                                 WebkitBoxOrient: 'vertical',
                                 overflow: isLongText && !isExpanded ? 'hidden' : 'visible'
                               }}
