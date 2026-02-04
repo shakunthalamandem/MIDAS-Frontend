@@ -22,6 +22,8 @@ export interface BasicDealDetails {
   region: string
   writeup_ratings?: WriteupRatings
   deal_type: 'IPO' | 'FO'
+  company_name?: string
+  exchange?: string
 }
 
 

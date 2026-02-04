@@ -216,6 +216,7 @@ const DashboardcompsMetricsMain: React.FC<Props> = ({
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
+          paddingTop:2
         }}
       >
         <Typography variant="h6" color="#002060" fontWeight={600}>

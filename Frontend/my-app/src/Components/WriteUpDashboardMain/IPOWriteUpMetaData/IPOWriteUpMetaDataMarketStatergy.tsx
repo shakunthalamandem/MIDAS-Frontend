@@ -35,6 +35,21 @@ const quillFormats = [
   "link"
 ]
 
+const stripHtml = (value: string) =>
+  value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+
+const getWordStats = (value: string, limit = 50) => {
+  const cleaned = stripHtml(value)
+  const words = cleaned ? cleaned.split(" ") : []
+  const isLong = words.length > limit
+  const preview = isLong ? `${words.slice(0, limit).join(" ")}…` : cleaned
+  return { isLong, preview }
+}
+
 interface IPOWriteUpMetaDataMarketStatergyProps {
   basicDealDetails: BasicDealDetails
   metadata?: Record<string, any>
@@ -303,20 +318,20 @@ IOI and After-Market Strategy          </Typography>
             <Typography variant="body2">Loading fair value data...</Typography>
           </Box>
         ) : (
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid container spacing={2} sx={{ mt: 1, mb: 4 }} alignItems="stretch">
             {formattedCards.map((card) => {
               const cardValue = String(card.value)
-              const lines = cardValue.split('\n').filter(line => line.trim())
-              const isLongText = lines.length > 4
+              const { isLong: isLongText, preview } = getWordStats(cardValue, 50)
               const isExpanded = expandedCards[card.key] || false
 
               return (
                 <Grid item xs={12} md={4} key={card.key}>
                   <Box
                     sx={{
+                      height: "100%",
                       borderRadius: 2,
                       border: "1px solid #e5e7ef",
-                      background: "#eceff5",
+                      background: "#ecf0f5ff",
                       boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
                       p: 2.25,
                       minHeight: 90,
@@ -357,14 +372,10 @@ IOI and After-Market Strategy          </Typography>
                                 fontWeight: 400,
                                 color: "#111827",
                                 lineHeight: 1.6,
-                                display: isLongText && !isExpanded ? '-webkit-box' : 'block',
-                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
-                                WebkitBoxOrient: 'vertical',
-                                overflow: isLongText && !isExpanded ? 'hidden' : 'visible',
                                 '& p': { margin: 0, marginBottom: 0.5, display: 'inline' },
                                 '& ul, & ol': { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 }
                               }}
-                              dangerouslySetInnerHTML={{ __html: cardValue }}
+                              dangerouslySetInnerHTML={{ __html: isExpanded ? cardValue : preview }}
                             />
                             {isLongText && (
                               <Typography
@@ -394,16 +405,8 @@ IOI and After-Market Strategy          </Typography>
                               lineHeight: 1.6
                             }}
                           >
-                            <Box
-                              component="span"
-                              sx={{
-                                display: isLongText && !isExpanded ? '-webkit-box' : 'inline',
-                                WebkitLineClamp: isLongText && !isExpanded ? 3 : 'unset',
-                                WebkitBoxOrient: 'vertical',
-                                overflow: isLongText && !isExpanded ? 'hidden' : 'visible'
-                              }}
-                            >
-                              {cardValue}
+                            <Box component="span">
+                              {isExpanded ? cardValue : preview}
                             </Box>
                             {isLongText && (
                               <Typography

@@ -23,6 +23,7 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
   const [loading, setLoading] = useState(false); // for search
   const [adding, setAdding] = useState(false); // for add button
   const [selected, setSelected] = useState<any>(null);
+  const [inputValue, setInputValue] = useState("");
 
   const handleSearch = async (query: string) => {
     if (!query) {
@@ -60,8 +61,19 @@ const CompetitorSearch: React.FC<CompetitorSearchProps> = ({ onSelect }) => {
         getOptionLabel={(option: any) => option.ticker}
         filterOptions={filterOptions}
         loading={loading}
-        onInputChange={(_, value) => handleSearch(value)}
+        inputValue={inputValue}
+        onInputChange={(_, value) => {
+          setInputValue(value);
+          handleSearch(value);
+        }}
         onChange={(_, newValue) => setSelected(newValue)}
+        noOptionsText={
+          inputValue.trim()
+            ? loading
+              ? "Searching..."
+              : "No options found"
+            : "Please search here"
+        }
         renderOption={(props, option: any) => (
           <li {...props} key={option.ticker}>
             <Box>
