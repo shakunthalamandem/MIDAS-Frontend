@@ -10,10 +10,42 @@ import {
 import { TrendingUp, TrendingDown, TrendingFlat } from "@mui/icons-material";
 import { DealRecommendationResponse } from "./DealRecommendationHome";
 import { SectionCard } from "./SectionCard";
+import BusinessIcon from "@mui/icons-material/Business";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import PublicIcon from "@mui/icons-material/Public";
+import TimelineIcon from "@mui/icons-material/Timeline";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 type Tone = "success" | "warning" | "default" | "info";
 type Timeframe = "t1d" | "t1w" | "t1m";
+const modelPillars = [
+  {
+    title: "Deal Structure",
+    desc: "Issue size, allocation mix, and sponsor backing to assess demand quality.",
+    icon: <BusinessIcon />,
+  },
+  {
+    title: "Sector & Peers",
+    desc: "Sector momentum and comparable IPO performance analysis.",
+    icon: <BarChartIcon />,
+  },
+  {
+    title: "Fundamentals",
+    desc: "Revenue scale, growth trajectory, and profitability signals.",
+    icon: <AccountBalanceIcon />,
+  },
+  {
+    title: "Macro & Market",
+    desc: "Equity trends, rates, inflation, and market liquidity.",
+    icon: <PublicIcon />,
+  },
+  {
+    title: "New-Issue Flow",
+    desc: "Issuance momentum and recent deal quality tracking.",
+    icon: <TimelineIcon />,
+  },
+];
 
 interface PredictionData {
   title: string;
@@ -343,38 +375,53 @@ export function AIMLPredictions({ data }: AIMLPredictionsProps) {
   return (
     <SectionCard title="ML Model Predictions">
       {/* Context */}
-      <Box mb={2}>
-        <Grid container spacing={1.5}>
-          {/* Column 1 */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="body2" lineHeight={1.6}>
-              • Deal Structure — Evaluates issue size, allocation mix, and
-              sponsor backing to assess pricing support and demand quality.
-            </Typography>
+      <Box
+        mb={3}
+        sx={{
+          p: 2.5,
+          borderRadius: 2,
+          backgroundColor: "#f9fafb",
+          border: "1px solid #e5e7eb",
+        }}
+      >
+        <Grid container spacing={2}>
+          {modelPillars.map((item, idx) => (
+            <Grid item xs={12} sm={6} md={4} key={idx}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1.5,
+                  alignItems: "flex-start",
+                }}
+              >
+                {/* Icon */}
+                <Box
+                  sx={{
+                    mt: "2px",
+                    color: "primary.main",
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.icon}
+                </Box>
 
-            <Typography variant="body2" lineHeight={1.6}>
-              • Sector & Peers — Analyzes recent sector performance and
-              comparable IPO outcomes to measure relative momentum.
-            </Typography>
+                {/* Text */}
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={600} mb={0.3}>
+                    {item.title}
+                  </Typography>
 
-            <Typography variant="body2" lineHeight={1.6}>
-              • Company Fundamentals — Incorporates revenue scale, growth
-              trajectory, and profitability to anchor valuation context.
-            </Typography>
-          </Grid>
-
-          {/* Column 2 */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="body2" lineHeight={1.6}>
-              • Macro & Market — Adjusts forecasts based on equity trends,
-              interest rates, inflation, and market liquidity.
-            </Typography>
-
-            <Typography variant="body2" lineHeight={1.6}>
-              • New-Issue Flow — Tracks issuance momentum, recent deal quality,
-              and sector-specific flow dynamics.
-            </Typography>
-          </Grid>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    lineHeight={1.5}
+                  >
+                    {item.desc}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
       </Box>
 
