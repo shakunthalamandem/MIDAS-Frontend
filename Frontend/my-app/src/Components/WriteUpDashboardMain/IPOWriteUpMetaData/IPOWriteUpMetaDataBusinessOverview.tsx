@@ -13,6 +13,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Cancel"
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
 import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import GroupsIcon from "@mui/icons-material/Groups"
@@ -204,6 +206,25 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     setUpdatedData(copy)
   }
 
+  const handleAddPoint = (section: keyof WriteUpData, index?: number) => {
+    if (!updatedData) return
+    const copy = { ...updatedData }
+    const sectionArray = [...(((copy[section] as string[]) ?? []))]
+    const insertAt = index === undefined ? sectionArray.length : index + 1
+    sectionArray.splice(insertAt, 0, "")
+    copy[section] = sectionArray
+    setUpdatedData(copy)
+  }
+
+  const handleDeletePoint = (section: keyof WriteUpData, index: number) => {
+    if (!updatedData) return
+    const copy = { ...updatedData }
+    const sectionArray = [...(((copy[section] as string[]) ?? []))]
+    sectionArray.splice(index, 1)
+    copy[section] = sectionArray
+    setUpdatedData(copy)
+  }
+
   const handleSaveBusinessOverview = async () => {
     if (!updatedData) return
     const apiUrl = process.env.REACT_APP_API_URL
@@ -304,7 +325,36 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   const renderSectionContent = (section: keyof WriteUpData, data: string[]) =>
     data.map((item, index) =>
       editMode === section ? (
-        <Box key={index} mb={2}>
+        <Box key={index} mb={2} sx={{ position: "relative" }}>
+          <Box
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              zIndex: 2,
+              display: "flex",
+              gap: 0.5,
+              background: "rgba(240, 245, 255, 0.9)",
+              borderRadius: 2,
+              px: 0.5
+            }}
+          >
+            <IconButton
+              size="small"
+              onClick={() => handleAddPoint(section, index)}
+              aria-label="add-item"
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => handleDeletePoint(section, index)}
+              aria-label="delete-item"
+              disabled={data.length <= 1}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
           <ReactQuill
             theme="snow"
             value={item}
