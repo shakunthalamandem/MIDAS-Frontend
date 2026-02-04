@@ -318,7 +318,7 @@ IOI and After-Market Strategy          </Typography>
             <Typography variant="body2">Loading fair value data...</Typography>
           </Box>
         ) : (
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid container spacing={2} sx={{ mt: 1, mb: 4 }} alignItems="stretch">
             {formattedCards.map((card) => {
               const cardValue = String(card.value)
               const { isLong: isLongText, preview } = getWordStats(cardValue, 50)
@@ -328,9 +328,10 @@ IOI and After-Market Strategy          </Typography>
                 <Grid item xs={12} md={4} key={card.key}>
                   <Box
                     sx={{
+                      height: "100%",
                       borderRadius: 2,
                       border: "1px solid #e5e7ef",
-                      background: "#eceff5",
+                      background: "#ecf0f5ff",
                       boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
                       p: 2.25,
                       minHeight: 90,
