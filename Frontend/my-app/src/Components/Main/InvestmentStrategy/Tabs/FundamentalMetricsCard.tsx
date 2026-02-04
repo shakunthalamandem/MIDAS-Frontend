@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -20,17 +20,24 @@ interface Props {
   ticker: string;
 }
 
+const sanitizeTicker = (value: string) => value.replace(/\s*\([^)]*\)/g, '').trim();
+
 const FundamentalMetricsCard: React.FC<Props> = ({ ticker }) => {
   const [data, setData] = useState<Record<string, Record<string, string>> | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = process.env.REACT_APP_API_URL;
-const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("access_token");
+  const normalizedTicker = useMemo(() => sanitizeTicker(ticker) || ticker, [ticker]);
 
   useEffect(() => {
+    if (!normalizedTicker) return;
+    setLoading(true);
+    setError(null);
+    setData(null);
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/fundamentals/${ticker}`, {
+        const response = await fetch(`${apiUrl}/api/fundamentals/${normalizedTicker}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +55,7 @@ const token = localStorage.getItem("access_token");
       }
     };
     fetchData();
-  }, [apiUrl, ticker]);
+  }, [apiUrl, normalizedTicker]);
 
   const renderSection = (title: string, sectionData: Record<string, string>) => (
     <Grid item xs={12} sm={6} md={6} lg={6} key={title}>
@@ -183,7 +190,7 @@ const token = localStorage.getItem("access_token");
       <CardContent>
         <Typography variant="h5" align="center" sx={{ marginBottom: 3, fontWeight: 'bold' }}>
           <span style={{ color: '#002060' }}>Fundamental Metrics for</span>{' '}
-          <span style={{ color: '#006e18' }}>{ticker}</span>
+          <span style={{ color: '#006e18' }}>{normalizedTicker}</span>
         </Typography>
 
         {/* First row with two tables */}
