@@ -23,6 +23,7 @@ export interface BasicDealDetails {
   writeup_ratings?: WriteupRatings
   deal_type: 'IPO' | 'FO'
   company_name?: string
+  issuer_name?: string
   exchange?: string
 }
 
