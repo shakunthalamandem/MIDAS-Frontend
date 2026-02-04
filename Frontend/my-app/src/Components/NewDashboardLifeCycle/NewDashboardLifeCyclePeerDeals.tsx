@@ -236,6 +236,7 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
 
       setSelectedPeerTicker(null);
       await fetchPeers();
+      await fetchTickerOptions();
     } catch (e: any) {
       console.error(e);
       showToast(e?.message || "Failed to update peers.", "error");
