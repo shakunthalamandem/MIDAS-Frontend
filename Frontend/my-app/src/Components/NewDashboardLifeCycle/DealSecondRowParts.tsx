@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import type { DealRecommendationResponse } from "./DealRecomendation";
 
+// ─── helpers ─────────────────────────────────────────────────────────────────
 export function formatPct(n: number) {
   if (typeof n !== "number" || Number.isNaN(n)) return "-";
   return `${n.toFixed(1)}%`;
@@ -38,9 +39,62 @@ function toneFromText(text: string): Tone {
   return "default";
 }
 
+// ─── indication map ──────────────────────────────────────────────────────────
+// Each timeframe → each possible label → the meaning to display
+type Timeframe = "t1d" | "t1w" | "t1m";
+
+const INDICATION_MAP: Record<Timeframe, Record<string, string>> = {
+  t1d: {
+    "Low Return": "< 3%",
+    "Neutral Return": "3% – 5%",
+    "Positive Return": "> 8%",
+    Positive: "> 0%",
+    Negative: "< 0%",
+  },
+  t1w: {
+    Positive: "> 0%",
+    Negative: "< 0%",
+  },
+  t1m: {
+    Positive: "> 0%",
+    Negative: "< 0%",
+  },
+};
+
+/** Returns the meaning string for a given timeframe + prediction label, or null */
+function getIndication(timeframe: Timeframe, pred: string): string | null {
+  // case-insensitive key lookup
+  const bucket = INDICATION_MAP[timeframe];
+  if (!bucket) return null;
+  const match = Object.keys(bucket).find(
+    (key) => key.toLowerCase() === (pred || "").toLowerCase()
+  );
+  return match ? bucket[match] : null;
+}
+
+/** Colours for the indication pill, keyed by tone */
+const INDICATION_BG: Record<Tone, string> = {
+  success: "rgba(34, 197, 94, 0.12)",
+  warning: "rgba(234, 179, 8, 0.12)",
+  info: "rgba(59, 130, 246, 0.10)",
+  default: "rgba(107, 114, 128, 0.10)",
+};
+const INDICATION_TEXT: Record<Tone, string> = {
+  success: "#15803d",
+  warning: "#a16207",
+  info: "#1d4ed8",
+  default: "#4b5563",
+};
+const INDICATION_BORDER: Record<Tone, string> = {
+  success: "rgba(34, 197, 94, 0.28)",
+  warning: "rgba(234, 179, 8, 0.28)",
+  info: "rgba(59, 130, 246, 0.22)",
+  default: "rgba(107, 114, 128, 0.22)",
+};
+
+// ─── SentimentChip ──────────────────────────────────────────────────────────
 function SentimentChip({ text }: { text: string }) {
   const tone = toneFromText(text);
-
   const color =
     tone === "success"
       ? "success"
@@ -63,10 +117,10 @@ function SentimentChip({ text }: { text: string }) {
         borderRadius: 1,
         "& .MuiChip-label": {
           padding: "0 6px",
-          whiteSpace: "nowrap",      // ❌ no wrapping
+          whiteSpace: "nowrap",
           overflow: "hidden",
-          textOverflow: "ellipsis",  // cut, don’t grow
-          maxWidth: 80,              // hard cap
+          textOverflow: "ellipsis",
+          maxWidth: 80,
           textAlign: "center",
         },
       }}
@@ -74,7 +128,7 @@ function SentimentChip({ text }: { text: string }) {
   );
 }
 
-
+// ─── SectionCard ─────────────────────────────────────────────────────────────
 export function SectionCard({
   title,
   children,
@@ -108,17 +162,20 @@ export function SectionCard({
   );
 }
 
+// ─── PredictionTile ─────────────────────────────────────────────────────────
 function PredictionTile({
   title,
   pred,
   confidence,
+  timeframe,
 }: {
   title: string;
   pred: string;
   confidence: number;
+  timeframe: Timeframe;
 }) {
   const tone = toneFromText(pred);
-  const color =
+  const chipColor =
     tone === "success"
       ? "success"
       : tone === "warning"
@@ -126,6 +183,8 @@ function PredictionTile({
         : tone === "info"
           ? "info"
           : "inherit";
+
+  const indication = getIndication(timeframe, pred);
 
   return (
     <Box
@@ -141,6 +200,7 @@ function PredictionTile({
       }}
     >
       <Stack spacing={1.25}>
+        {/* title */}
         <Typography
           variant="subtitle2"
           sx={{ fontWeight: 700, color: "#1d2b5a" }}
@@ -148,14 +208,62 @@ function PredictionTile({
           {title}
         </Typography>
 
-        <Chip
-          size="small"
-          label={(pred || "NEUTRAL").toUpperCase()}
-          color={color as any}
-          variant={tone === "default" ? "outlined" : "filled"}
-          sx={{ alignSelf: "flex-start" }}
-        />
+        {/* prediction chip  +  indication pill on the same row */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
+          <Chip
+            size="small"
+            label={(pred || "NEUTRAL").toUpperCase()}
+            color={chipColor as any}
+            variant={tone === "default" ? "outlined" : "filled"}
+          />
 
+          {indication && (
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.35,
+                background: INDICATION_BG[tone],
+                border: `1px solid ${INDICATION_BORDER[tone]}`,
+                borderRadius: 99,
+                px: 1,
+                py: 0.2,
+              }}
+            >
+              {/* tiny trend arrow */}
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: 10,
+                  lineHeight: 1,
+                  color: INDICATION_TEXT[tone],
+                }}
+              >
+                {tone === "success" ? "↑" : tone === "warning" ? "↓" : "→"}
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: INDICATION_TEXT[tone],
+                  letterSpacing: 0.2,
+                }}
+              >
+                {indication}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* progress bar + probability */}
         <Box>
           <LinearProgress
             variant="determinate"
@@ -190,6 +298,7 @@ function PredictionTile({
   );
 }
 
+// ─── DealMomentum ────────────────────────────────────────────────────────────
 export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
   return (
     <SectionCard title="Deal Momentum (Peers Avg Price)">
@@ -224,18 +333,9 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
               <TableCell sx={{ fontWeight: 400 }}>
                 Peers Average (Top {data.peers_count || 0})
               </TableCell>
-
-              <TableCell>
-                {formatNum(data.peers_t1d_avg_price)}%
-              </TableCell>
-
-              <TableCell>
-                {formatNum(data.peers_t1w_avg_price)}%
-              </TableCell>
-
-              <TableCell>
-                {formatNum(data.peers_t1m_avg_price)}%
-              </TableCell>
+              <TableCell>{formatNum(data.peers_t1d_avg_price)}%</TableCell>
+              <TableCell>{formatNum(data.peers_t1w_avg_price)}%</TableCell>
+              <TableCell>{formatNum(data.peers_t1m_avg_price)}%</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -244,7 +344,7 @@ export function DealMomentum({ data }: { data: DealRecommendationResponse }) {
   );
 }
 
-
+// ─── OutlookSummary ─────────────────────────────────────────────────────────
 export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
   return (
     <SectionCard title="AI Unsupervised Summary">
@@ -267,14 +367,7 @@ export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
         >
           Executive Summary
         </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#374151",
-            lineHeight: 1.6,
-          }}
-        >
+        <Typography variant="body2" sx={{ color: "#374151", lineHeight: 1.6 }}>
           {data.executive_summary || "No executive summary available."}
         </Typography>
       </Box>
@@ -313,6 +406,7 @@ export function OutlookSummary({ data }: { data: DealRecommendationResponse }) {
   );
 }
 
+// ─── MarketSentiment ─────────────────────────────────────────────────────────
 export function MarketSentiment({
   oneWeek,
   oneMonth,
@@ -366,6 +460,7 @@ export function MarketSentiment({
   );
 }
 
+// ─── OverallAISummary ────────────────────────────────────────────────────────
 export function OverallAISummary({
   t1d,
   t1w,
@@ -378,74 +473,39 @@ export function OverallAISummary({
   return (
     <SectionCard title="Overall AI Summary">
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#eceff5",
-              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-              p: 2,
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 700, color: "#1d2b5a" }}
+        {[
+          { label: "T+1 Day", value: t1d },
+          { label: "T+1 Week", value: t1w },
+          { label: "T+1 Month", value: t1m },
+        ].map(({ label, value }) => (
+          <Grid item xs={12} md={4} key={label}>
+            <Box
+              sx={{
+                borderRadius: 2,
+                border: "1px solid #e5e7ef",
+                background: "#eceff5",
+                boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
+                p: 2,
+              }}
             >
-              T+1 Day
-            </Typography>
-            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
-              {t1d || "-"}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#eceff5",
-              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-              p: 2,
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 700, color: "#1d2b5a" }}
-            >
-              T+1 Week
-            </Typography>
-            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
-              {t1w || "-"}
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: "1px solid #e5e7ef",
-              background: "#eceff5",
-              boxShadow: "0 8px 16px rgba(72, 100, 170, 0.12)",
-              p: 2,
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 700, color: "#1d2b5a" }}
-            >
-              T+1 Month
-            </Typography>
-            <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
-              {t1m || "-"}
-            </Typography>
-          </Box>
-        </Grid>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, color: "#1d2b5a" }}
+              >
+                {label}
+              </Typography>
+              <Typography sx={{ mt: 1, fontWeight: 700, color: "#111827" }}>
+                {value || "-"}
+              </Typography>
+            </Box>
+          </Grid>
+        ))}
       </Grid>
     </SectionCard>
   );
 }
 
+// ─── AIMLPredictions ─────────────────────────────────────────────────────────
 export function AIMLPredictions({
   data,
 }: {
@@ -459,6 +519,7 @@ export function AIMLPredictions({
             title="T+1 Day"
             pred={data.t1d_pred}
             confidence={data.t1d_confidence}
+            timeframe="t1d"
           />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -466,6 +527,7 @@ export function AIMLPredictions({
             title="T+1 Week"
             pred={data.t1w_pred}
             confidence={data.t1w_confidence}
+            timeframe="t1w"
           />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -473,6 +535,7 @@ export function AIMLPredictions({
             title="T+1 Month"
             pred={data.t1m_pred}
             confidence={data.t1m_confidence}
+            timeframe="t1m"
           />
         </Grid>
       </Grid>
