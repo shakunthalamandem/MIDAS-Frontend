@@ -15,6 +15,7 @@ import {
   Grid,
 } from "@mui/material";
 import { CheckCircle, Cancel, Edit, Save } from "@mui/icons-material";
+import { SectionCard } from "./SectionCard";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 type IOILevel = "low" | "average" | "high" | "custom";
@@ -305,6 +306,9 @@ export function IOI({
   };
 
   return (
+  <SectionCard title="Indication of Interest">
+
+
     <Card
       sx={{
         borderRadius: 2.5,
@@ -330,17 +334,7 @@ export function IOI({
         >
           
           <Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 800,
-                color: "#1d2b5a",
-                mb: 1,
-                fontSize: "1.1rem",
-              }}
-            >
-              IOI (Indication of Interest)
-            </Typography>
+
             <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography
@@ -555,6 +549,7 @@ export function IOI({
         </Box>
       </Collapse>
     </Card>
+  </SectionCard>
   );
 }
 
