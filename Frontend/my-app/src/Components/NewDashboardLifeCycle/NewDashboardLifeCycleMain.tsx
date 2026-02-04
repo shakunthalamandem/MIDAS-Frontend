@@ -356,6 +356,12 @@ const NewDealsLifecycleCards: React.FC = () => {
     });
   };
 
+    const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
+    navigate("/deals/new_dashboard/fo_details", {
+      state: { payload: row, viewMode, ...(extraState || {}) },
+    });
+  };
+
   const actionTabMap: Record<string, string> = {
     "Write Up": "Write up",
     "ML Model": "ML Model",

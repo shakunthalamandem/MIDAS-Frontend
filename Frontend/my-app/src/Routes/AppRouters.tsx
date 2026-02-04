@@ -92,6 +92,7 @@ import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
 import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
 import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
+import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
 
 const AppRouters: React.FC = () => {
   return (
@@ -224,6 +225,8 @@ const AppRouters: React.FC = () => {
         <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
          <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
         <Route path="/deals/new_dashboard/details" element={<AuthGuard><NewDashboardLifeCycleDetails /></AuthGuard>} />
+        <Route path="/deals/new_dashboard/fo_details" element={<AuthGuard><NewDashboardFOLifeCycleDetails /></AuthGuard>} />
+
 
 
 
