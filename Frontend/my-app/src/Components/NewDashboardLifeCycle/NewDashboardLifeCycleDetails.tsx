@@ -204,13 +204,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
-           <FebWriteUpDashboardMain
+          <FebWriteUpDashboardMain
             basicDealDetails={{
               deal_id: activePayload.deal_id,
               ticker: activePayload.ticker,
               pricing_date: activePayload.pricing_date,
               region: activePayload.region,
-              deal_type: activePayload.deal_type
+              deal_type: activePayload.deal_type,
+              issuer_name: activePayload.issuer_name,
+              exchange: activePayload.exchange,
             }}
           />
 

@@ -7,7 +7,8 @@ import {
   IconButton,
   Box,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Button
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import EditIcon from "@mui/icons-material/Edit"
@@ -114,10 +115,86 @@ const formatRating = (value: number) => {
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
 }
 
+type ClampedContentProps = {
+  children: React.ReactNode
+  disabled?: boolean
+  clampLines?: number
+}
+
+const ClampedContent: React.FC<ClampedContentProps> = ({
+  children,
+  disabled = false,
+  clampLines = 6
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showToggle, setShowToggle] = useState(false)
+  const contentRef = React.useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (disabled) {
+      setShowToggle(false)
+      return
+    }
+
+    const updateToggleVisibility = () => {
+      const el = contentRef.current
+      if (!el) return
+      const computed = window.getComputedStyle(el)
+      const lineHeight = parseFloat(computed.lineHeight) || 24
+      const maxHeight = lineHeight * clampLines
+      setShowToggle(el.scrollHeight > maxHeight + 1)
+    }
+
+    updateToggleVisibility()
+    window.addEventListener("resize", updateToggleVisibility)
+    return () => window.removeEventListener("resize", updateToggleVisibility)
+  }, [children, disabled, clampLines])
+
+  if (disabled) {
+    return <>{children}</>
+  }
+
+  return (
+    <Box>
+      <Box
+        ref={contentRef}
+        sx={{
+          color: "#1f2a44",
+          lineHeight: 1.7,
+          overflow: isExpanded ? "visible" : "hidden",
+          display: isExpanded ? "block" : "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: isExpanded ? "unset" : clampLines
+        }}
+      >
+        {children}
+      </Box>
+      {showToggle ? (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          <Button
+            size="small"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            sx={{
+              textTransform: "none",
+              color: "#115f02ff",
+              fontWeight: 600,
+              px: 0,
+              minWidth: "auto"
+            }}
+          >
+            {isExpanded ? "...Read less" : "...Read more"}
+          </Button>
+        </Box>
+      ) : null}
+    </Box>
+  )
+}
+
 /* ===================== COMPONENT ===================== */
 
 const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
-  basicDealDetails
+  basicDealDetails,
+  pdfMode = false
 }) => {
   const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null)
   const [updatedData, setUpdatedData] = useState<WriteUpData | null>(null)
@@ -448,22 +525,24 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-            {businessOverviewEditing ? (
-              <>
-                <IconButton onClick={handleSaveBusinessOverview}>
-                  <SaveIcon />
+          {!pdfMode && (
+            <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+              {businessOverviewEditing ? (
+                <>
+                  <IconButton onClick={handleSaveBusinessOverview}>
+                    <SaveIcon />
+                  </IconButton>
+                  <IconButton onClick={() => setBusinessOverviewEditing(false)}>
+                    <CancelIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <IconButton onClick={() => setBusinessOverviewEditing(true)}>
+                  <EditIcon />
                 </IconButton>
-                <IconButton onClick={() => setBusinessOverviewEditing(false)}>
-                  <CancelIcon />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton onClick={() => setBusinessOverviewEditing(true)}>
-                <EditIcon />
-              </IconButton>
-            )}
-          </Box>
+              )}
+            </Box>
+          )}
         </Box>
 
         {businessOverviewEditing ? (
@@ -475,10 +554,9 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             formats={quillFormats}
           />
         ) : (
-          <Box
-            sx={{ color: "#1f2a44" }}
-            dangerouslySetInnerHTML={{ __html: businessOverviewDraft }}
-          />
+          <ClampedContent disabled={pdfMode}>
+            <Box dangerouslySetInnerHTML={{ __html: businessOverviewDraft }} />
+          </ClampedContent>
         )}
       </Box>
 
@@ -486,13 +564,14 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gridTemplateColumns: pdfMode ? "1fr" : { xs: "1fr", md: "1fr 1fr" },
           gap: 2
         }}
       >
         {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
           <Accordion
             key={section}
+            defaultExpanded={pdfMode}
             sx={{
               borderRadius: 2,
               border: "1px solid #E6ECF5",
@@ -502,7 +581,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: "#124180" }} />}
+              expandIcon={!pdfMode ? <ExpandMoreIcon sx={{ color: "#124180" }} /> : null}
               sx={{
                 minHeight: 64,
                 background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
@@ -537,17 +616,19 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 </Typography>
               </Box>
 
-              <IconButton
-                sx={{
-                  ml: "auto",
-                  color: "#124180",
-                  "&:hover": { backgroundColor: "rgba(18, 65, 128, 0.1)" }
-                }}
-                disabled={savingSection === section}
-                onClick={(e) => handleAccordionAction(section, e)}
-              >
-                {editMode === section ? <SaveIcon /> : <EditIcon />}
-              </IconButton>
+              {!pdfMode && (
+                <IconButton
+                  sx={{
+                    ml: "auto",
+                    color: "#124180",
+                    "&:hover": { backgroundColor: "rgba(18, 65, 128, 0.1)" }
+                  }}
+                  disabled={savingSection === section}
+                  onClick={(e) => handleAccordionAction(section, e)}
+                >
+                  {editMode === section ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
+              )}
             </AccordionSummary>
 
             <AccordionDetails
@@ -557,7 +638,22 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 borderRadius: "0 0 8px 8px"
               }}
             >
-              {renderSectionContent(section, getSectionData(section))}
+              {editMode === section ? (
+                renderSectionContent(section, getSectionData(section))
+              ) : pdfMode ? (
+                renderSectionContent(section, getSectionData(section))
+              ) : (
+                <ClampedContent>
+                  {getSectionData(section).map((item, index) => (
+                    <Box
+                      key={index}
+                      mb={2}
+                      sx={{ color: "#124180" }}
+                      dangerouslySetInnerHTML={{ __html: item }}
+                    />
+                  ))}
+                </ClampedContent>
+              )}
             </AccordionDetails>
           </Accordion>
         ))}

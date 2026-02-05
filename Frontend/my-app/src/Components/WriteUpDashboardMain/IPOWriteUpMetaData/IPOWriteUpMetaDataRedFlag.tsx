@@ -77,23 +77,27 @@ const RiskMeter: React.FC<{
           position: "relative",
           height: 16,
           display: "flex",
-          alignItems: "center"
+          alignItems: "center",
+          mb: 3
         }}
       >
         <Box
+          className="risk-meter-badge"
           sx={{
             position: "absolute",
             top: -22,
             left: `${percent}%`,
             transform: "translateX(-50%)",
-            background: "#6b5bd2",
-            color: "#ffffff",
+            background: "#6b5bd2 !important",
+            color: "#ffffff !important",
             borderRadius: 999,
             fontSize: 10,
             fontWeight: 700,
             px: 1,
             py: "2px",
-            letterSpacing: 0.3
+            letterSpacing: 0.3,
+            zIndex: 2,
+            whiteSpace: "nowrap"
           }}
         >
           RISK
@@ -129,7 +133,7 @@ const RiskMeter: React.FC<{
                 height: 12,
                 borderRadius: 999,
                 background:
-                  "linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)",
+                  "linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%) !important",
                 boxShadow: "inset 0 0 0 1px rgba(16, 24, 40, 0.08)"
               },
               "& .MuiSlider-track": { display: "none" },
@@ -143,12 +147,15 @@ const RiskMeter: React.FC<{
           />
         ) : (
           <Box
+            className="risk-meter-bar"
             sx={{
               height: 12,
               width: "100%",
               borderRadius: 999,
               background:
-                "linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)",
+                "linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%) !important",
+              backgroundImage:
+                "linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%) !important",
               boxShadow: "inset 0 0 0 1px rgba(16, 24, 40, 0.08)"
             }}
           />
@@ -527,7 +534,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
               variant="subtitle2"
               sx={{ color: "#1f2937", fontWeight: 700 }}
             >
-              Avg Score: {(avgScore * 2).toFixed(2)}/10
+              Risk Score: {(avgScore * 2).toFixed(2)}/10
             </Typography>
             <IconButton
               size="small"
