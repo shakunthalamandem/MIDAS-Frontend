@@ -5,7 +5,6 @@ import {
   CircularProgress,
   Grid,
   IconButton,
-  LinearProgress,
   Slider,
   Stack,
   Typography
@@ -333,19 +332,35 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                       }}
                     />
                   ) : (
-                    <LinearProgress
-                      variant="determinate"
-                      value={progressValue}
+                    <Box
+                      className="pdf-progress-bar-container"
                       sx={{
-                        height: 8,
-                        borderRadius: 999,
+                        width: "100%",
+                        height: "8px",
+                        borderRadius: "999px",
                         backgroundColor: "#e6e9f2",
-                        "& .MuiLinearProgress-bar": {
-                          borderRadius: 999,
-                          backgroundColor: getScoreColor(section.score)
-                        }
+                        overflow: "hidden",
+                        position: "relative",
+                        display: "block !important",
+                        visibility: "visible !important"
                       }}
-                    />
+                    >
+                      <Box
+                        className="pdf-progress-bar-fill"
+                        sx={{
+                          width: `${progressValue}%`,
+                          height: "100%",
+                          borderRadius: "999px",
+                          backgroundColor: getScoreColor(section.score),
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          display: "block !important",
+                          visibility: "visible !important",
+                          transition: "width 0.3s ease"
+                        }}
+                      />
+                    </Box>
                   )}
                 </Stack>
               )

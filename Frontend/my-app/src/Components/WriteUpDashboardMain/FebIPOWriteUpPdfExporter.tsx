@@ -447,6 +447,35 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
                 badge.style.color = '#ffffff'
                 badge.style.zIndex = '10'
               })
+
+              // Special handling for final verdict progress bars
+              const progressContainers = cloned.querySelectorAll<HTMLElement>('.pdf-progress-bar-container')
+              progressContainers.forEach((container) => {
+                container.style.width = '100%'
+                container.style.height = '8px'
+                container.style.borderRadius = '999px'
+                container.style.backgroundColor = '#e6e9f2'
+                container.style.overflow = 'hidden'
+                container.style.position = 'relative'
+                container.style.display = 'block'
+                container.style.visibility = 'visible'
+              })
+
+              const progressFills = cloned.querySelectorAll<HTMLElement>('.pdf-progress-bar-fill')
+              progressFills.forEach((fill) => {
+                const computed = window.getComputedStyle(fill)
+                const bgColor = computed.backgroundColor
+                fill.style.height = '100%'
+                fill.style.borderRadius = '999px'
+                fill.style.position = 'absolute'
+                fill.style.top = '0'
+                fill.style.left = '0'
+                fill.style.display = 'block'
+                fill.style.visibility = 'visible'
+                if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+                  fill.style.backgroundColor = bgColor
+                }
+              })
             }
           }
         })
