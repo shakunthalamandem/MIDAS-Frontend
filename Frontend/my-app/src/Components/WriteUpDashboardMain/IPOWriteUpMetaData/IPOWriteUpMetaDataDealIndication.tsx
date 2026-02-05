@@ -1,10 +1,12 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material"
 import { useEffect, useMemo, useState } from "react"
-import { BasicDealDetails } from "../types/DealInformation"
+// import { BasicDealDetails } from "../types/DealInformation"
+import { BasicDealDetails, WriteupRatings } from "../types/DealInformation";
 import ExecutiveSummaryCard from "./AiUnsupervised/ExecutiveSummaryCard"
 import OutlookSummaryRow from "./AiUnsupervised/OutlookSummaryRow"
 import ScenarioCards from "./AiUnsupervised/ScenarioCards"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
+import StarRateOutlinedIcon from '@mui/icons-material/StarRateOutlined';
 
 type AiAnalysisRecord = {
   [key: string]: unknown
@@ -18,6 +20,8 @@ type AiAnalysisRecord = {
 type AiAnalysisApiResponse = {
   answer?: AiAnalysisRecord[]
   message?: string
+  writeup_ratings?: WriteupRatings
+  writeup_overall_rating?: number
 }
 
 type FinalOutlook = {
@@ -31,6 +35,24 @@ type ScenarioParts = {
   base?: string
   bullish?: string
   bearish?: string
+}
+interface WriteUpData {
+  ticker_name: string;
+  exchange: string;
+  company_name: string;
+  pricing_date: string;
+  deal_size: number;
+  industry: string;
+  shares_offered: number;
+  nosh: number;
+  established_year: number;
+  lower_bound: number;
+  upper_bound: number;
+  filed_date: string;
+  term_date: string;
+  trade_date: string;
+  bookrunners: string[];
+  writeup_ratings?: WriteupRatings;
 }
 
 const DEFAULT_OUTLOOK: FinalOutlook = {
@@ -168,6 +190,7 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
 
   useEffect(() => {
     let cancelled = false
@@ -234,9 +257,65 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
   const executiveSummary = useMemo(
     () => stripMarkdown(analysis?.["Executive Summary"] as string),
     [analysis]
-  )
+  )  
+  
+const parseDealInfoRating = (value?: number | string | null) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^-?\d+(\.\d+)?/);
+  if (match) {
+    const parsed = Number(match[0]);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  const fallback = Number(trimmed);
+  return Number.isFinite(fallback) ? fallback : null;
+};
+
+  const formatRatingValue = (value: number) => {
+  const normalized = Math.round(value * 10) / 10;
+  return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1);
+};
+  const ratingValue = parseDealInfoRating(
+    writeUpData?.writeup_ratings?.["ai_indication"] ??
+      basicDealDetails.writeup_ratings?.["ai_indication"]
+  );
+
+  const ratingText = ratingValue !== null ? formatRatingValue(ratingValue) : null;
+
 
   return (
+    <>
+          <Box sx={{ position: "relative", mb: 2 }}>
+    
+           {ratingText && (
+          <Box
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              borderRadius: 999,
+              border: "1px solid rgba(52, 144, 220, 0.4)",
+              background: "linear-gradient(135deg, #e9f2ff, #ffffff)",
+              px: 1.5,
+              py: 0.4,
+              boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
+            }}
+          >
+            <StarRateOutlinedIcon fontSize="small" sx={{ color: "#0d4dec" }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "#0d4dec" }}>
+              Rating - {ratingText}/10
+            </Typography>
+          </Box>
+        )}
+   
     <Stack spacing={3}>
       {loading ? (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -277,6 +356,8 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
         </>
       )}
     </Stack>
+    </Box>
+     </>
   )
 }
 
