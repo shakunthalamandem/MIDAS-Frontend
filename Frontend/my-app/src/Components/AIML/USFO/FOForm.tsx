@@ -10,12 +10,12 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
-import FOPredictionResults from "./FOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
+import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 import FOFormFieldsSection from "./FOFormFieldsSection";
-import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
-import { Block } from "../GhcAi/Utils/ComponentsUtils";
+import FOPredictionResults from "./FOPredictionResults";
+import FOWeeklyMonthlyPredictionResults from "./FOWeeklyMonthlyPredictionResults";
 
 interface PredictionModel {
   prediction: string | null;
