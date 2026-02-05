@@ -43,15 +43,15 @@ const RATINGS: Rating[] = ["Positive", "Neutral", "Negative"];
 /* ================= Strategies ================= */
 
 const IPO_OPTIONS = [
-  "(a) If close < issue price → Stay away",
-  "(b) Return 0–25% → Participate if close > open",
-  "(c) Return >25% → Stay away",
+  "(a) If 1st day close is below issue price, do not participate in AM.",
+  "(b) If 1st day return is 0% to 25% and close > open, participate in AM.",
+  "(c) If 1st day return is above 25%, do not participate in AM.",
 ];
 
 const FO_OPTIONS = [
-  "(a) Drop >5% → Stay away",
-  "(b) -5% to 10% → Participate if close > open",
-  "(c) >10% → Stay away",
+  "(a) If 1st day close is below issue price by more than 5%, do not participate in AM.",
+  "(b) If 1st day return is -5% to 10% and close > open, participate in AM.",
+  "(c) If 1st day return is above 10%, do not participate in AM.",
 ];
 
 export function AMOutputCard({
@@ -253,7 +253,27 @@ export function AMOutputCard({
             ))}
           </TextField>
         ) : (
-          <Typography variant="body2">{form.strategy || "-"}</Typography>
+          <>
+            <Typography variant="body2">{form.strategy || "-"}</Typography>
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              minRows={options.length}
+              value={options.join("\n")}
+              InputProps={{
+                readOnly: true,
+                sx: { fontSize: "0.85rem", color: "#4b5563" },
+              }}
+              sx={{
+                mt: 1,
+                bgcolor: "#f8fafc",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#e5e7eb",
+                },
+              }}
+            />
+          </>
         )}
         </Box>
 
