@@ -293,11 +293,12 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           breakBefore = true
         }
 
-        if (breakBefore && !isFirstSection) {
-          drawFooter(pdf, dataAsOfText)
-          pdf.addPage()
-          cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
-        } else if (
+        // if (breakBefore && !isFirstSection) {
+        //   drawFooter(pdf, dataAsOfText)
+        //   pdf.addPage()
+        //   cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
+        // } 
+        else if (
           !breakBefore &&
           cursorY > pdfHeight - bottomMargin - minRemainingMm
         ) {
@@ -439,73 +440,58 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         const overlapPx = 80
         let offsetPx = 0
 
-        while (offsetPx < canvas.height) {
-          const remainingPx = canvas.height - offsetPx
-          const availableHeightMm = pdfHeight - bottomMargin - cursorY
+while (offsetPx < canvas.height) {
+  const remainingPx = canvas.height - offsetPx
+  const availableHeightMm = pdfHeight - cursorY - bottomMargin
+  const availableHeightPx = availableHeightMm / mmPerPx
 
-          if (availableHeightMm <= 0) {
-            drawFooter(pdf, dataAsOfText)
-            pdf.addPage()
-            cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
-            continue
-          }
+  const sliceHeightPx = Math.min(remainingPx, Math.floor(availableHeightPx))
+  if (sliceHeightPx <= 0) {
+    pdf.addPage()
+    cursorY = marginX
+    continue
+  }
 
-          const availableHeightPx = availableHeightMm / mmPerPx
-          const sliceHeightPx = Math.min(
-            remainingPx,
-            Math.floor(availableHeightPx)
-          )
-          if (sliceHeightPx <= 0) break
+  const sliceCanvas = document.createElement("canvas")
+  sliceCanvas.width = canvas.width
+  sliceCanvas.height = sliceHeightPx
 
-          const sliceCanvas = document.createElement("canvas")
-          sliceCanvas.width = canvas.width
-          sliceCanvas.height = Math.ceil(sliceHeightPx)
-          const ctx = sliceCanvas.getContext("2d")
-          if (ctx) {
-            ctx.drawImage(
-              canvas,
-              0,
-              offsetPx,
-              canvas.width,
-              sliceHeightPx,
-              0,
-              0,
-              canvas.width,
-              sliceHeightPx
-            )
-          }
+  const ctx = sliceCanvas.getContext("2d")
+  ctx?.drawImage(
+    canvas,
+    0,
+    offsetPx,
+    canvas.width,
+    sliceHeightPx,
+    0,
+    0,
+    canvas.width,
+    sliceHeightPx
+  )
 
-          const sliceImg = sliceCanvas.toDataURL("image/png", 1.0)
-          const sliceHeightMm = sliceHeightPx * mmPerPx
+  const sliceImg = sliceCanvas.toDataURL("image/png", 1.0)
+  const sliceHeightMm = sliceHeightPx * mmPerPx
 
-          pdf.addImage(
-            sliceImg,
-            "PNG",
-            marginX,
-            cursorY,
-            contentWidth,
-            sliceHeightMm,
-            undefined,
-            "FAST"
-          )
+  // 🚨 ONLY add page if it DOES NOT FIT
+  if (cursorY + sliceHeightMm > pdfHeight - bottomMargin) {
+    pdf.addPage()
+    cursorY = marginX
+  }
 
-          const isLastSlice = remainingPx <= availableHeightPx
-          if (isLastSlice) {
-            offsetPx = canvas.height
-          } else {
-            const stepPx =
-              sliceHeightPx - Math.min(overlapPx, sliceHeightPx * 0.2)
-            offsetPx += stepPx > 0 ? stepPx : sliceHeightPx
-          }
+  pdf.addImage(
+    sliceImg,
+    "PNG",
+    marginX,
+    cursorY,
+    contentWidth,
+    sliceHeightMm,
+    undefined,
+    "FAST"
+  )
 
-          cursorY += sliceHeightMm + gapMm
-
-          if (cursorY > pdfHeight - bottomMargin) {
-            drawFooter(pdf, dataAsOfText)
-            pdf.addPage()
-            cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
-          }
-        }
+  cursorY += sliceHeightMm + gapMm
+  offsetPx += sliceHeightPx
+}
 
         prevStyles.forEach(({ el, key, val }) => {
           ;(el.style as any)[key] = val ?? ""
