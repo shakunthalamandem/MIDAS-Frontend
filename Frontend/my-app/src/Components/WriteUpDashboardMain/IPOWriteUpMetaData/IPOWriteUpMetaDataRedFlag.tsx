@@ -534,7 +534,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
               variant="subtitle2"
               sx={{ color: "#1f2937", fontWeight: 700 }}
             >
-              Avg Score: {(avgScore * 2).toFixed(2)}/10
+              Risk Score: {(avgScore * 2).toFixed(2)}/10
             </Typography>
             <IconButton
               size="small"
