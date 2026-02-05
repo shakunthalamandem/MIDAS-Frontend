@@ -9,7 +9,6 @@ import {
   Stack,
   CircularProgress,
   IconButton,
-  Button,
 } from "@mui/material";
 
 import { SectionCard } from "./SectionCard";
