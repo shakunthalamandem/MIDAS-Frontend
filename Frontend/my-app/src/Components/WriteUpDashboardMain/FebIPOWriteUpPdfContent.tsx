@@ -45,26 +45,28 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
       {
         id: "page-3",
         sections: [
-          { id: "key-metrics", content: <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} /> },
-          {
-            id: "financial-highlights",
-            content: <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
-          }
+          { id: "key-metrics", content: <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} /> }
+
         ]
       },
       {
         id: "page-4",
         sections: [
+                    {
+            id: "financial-highlights",
+            content: <IPOWriteUpMetaDataFinancialHighlights basicDealDetails={basicDealDetails} />
+          },
           { id: "comps", content: <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} /> },
-          {
-            id: "valuation-analysis",
-            content: <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} pdfMode={true} />
-          }
+
         ]
       },
       {
         id: "page-5",
         sections: [
+            {
+              id: "valuation-analysis",
+              content: <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} pdfMode={true} />
+            },
           { id: "red-flag", content: <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} /> },
           { id: "final-verdict", content: <IPOWriteUpMetaDataFinalVerdict basicDealDetails={basicDealDetails} /> }
         ]
