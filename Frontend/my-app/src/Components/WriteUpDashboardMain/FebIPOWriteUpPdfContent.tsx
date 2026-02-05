@@ -68,6 +68,12 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
               content: <IPOWriteUpMetaDataValuationAnalysis basicDealDetails={basicDealDetails} pdfMode={true} />
             },
           { id: "red-flag", content: <IPOWriteUpMetaDataRedFlag basicDealDetails={basicDealDetails} /> },
+        ]
+      },
+            {
+        id: "page-6",
+        sections: [
+
           { id: "final-verdict", content: <IPOWriteUpMetaDataFinalVerdict basicDealDetails={basicDealDetails} /> }
         ]
       }
