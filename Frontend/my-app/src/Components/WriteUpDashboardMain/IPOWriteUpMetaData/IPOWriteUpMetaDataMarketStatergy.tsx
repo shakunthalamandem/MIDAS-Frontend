@@ -260,7 +260,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
           borderRadius: 3,
           border: "1px solid #e5e7ef",
           // background: "#f7f9ff",
-                    background: "linear-gradient(#f0f5ff)",
+          background: "#ffffff",
           p: { xs: 2.5, md: 3 },
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
         }}
@@ -370,7 +370,7 @@ IOI and After-Market Strategy          </Typography>
                             <Box
                               sx={{
                                 fontWeight: 400,
-                                color: "#111827",
+                                color: "#000000",
                                 lineHeight: 1.6,
                                 '& p': { margin: 0, marginBottom: 0.5, display: 'inline' },
                                 '& ul, & ol': { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 }
@@ -442,7 +442,7 @@ IOI and After-Market Strategy          </Typography>
         sx={{
           borderRadius: 3,
           border: "1px solid #e5e7ef",
-          background: "#f3f5ff",
+          background: "#ffffff",
           p: { xs: 2.5, md: 3 },
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
         }}

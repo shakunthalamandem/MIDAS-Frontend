@@ -103,7 +103,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   const sectionCardSx = {
     borderRadius: 3,
     border: "1px solid #edf0faff",
-    background: "#d6e0ef",
+    background: "#c7d8f1",
     boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)",
     scrollMarginTop: 220
   }
@@ -168,7 +168,9 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
         sx={{
           borderRadius: 3,
           border: "1px solid #e2e8f5",
-          background: "#dbe9ff",
+          // background: "#eaeaff",
+                      backgroundColor: "rgba(206, 225, 233, 0.92)",
+
           boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)",
           position: { md: "sticky" },
           top: { md: 300 },

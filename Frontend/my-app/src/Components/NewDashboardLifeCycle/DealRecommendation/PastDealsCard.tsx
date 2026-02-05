@@ -34,7 +34,9 @@ export function PastDealsCard({
       elevation={1}
       sx={{
         borderRadius: 2,
-        bgcolor: "#fff",
+        // bgcolor: "#fff",
+            background: "#dae6f8",
+
       }}
     >
       <CardContent>
@@ -57,9 +59,9 @@ export function PastDealsCard({
             overflowX: "auto",
           }}
         >
-          <Table size="small">
+          <Table size="small" sx={{ bgcolor: "#f8fafc" }}>
             <TableHead>
-              <TableRow sx={{ bgcolor: "#f8fafc" }}>
+              <TableRow >
                 <TableCell sx={{ fontWeight: 600, width: "20%" }}>
                   Peers
                 </TableCell>

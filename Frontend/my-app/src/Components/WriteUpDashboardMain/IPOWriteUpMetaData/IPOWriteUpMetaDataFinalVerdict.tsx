@@ -283,8 +283,16 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
   }
 
   return (
-    <Box>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center", mb: 3 }}>
+    <Box
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #e5e7ef",
+        // background: "#f7f9ff",
+        background: "#ffffff",
+        p: { xs: 2.5, md: 3 },
+        boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+      }}
+    >      <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center", mb: 3 }}>
         Final Verdict
       </Typography>
       <Grid container spacing={3}>

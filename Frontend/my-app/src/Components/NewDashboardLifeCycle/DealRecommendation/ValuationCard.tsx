@@ -67,6 +67,7 @@ export function ValuationCard({
   };
 
   return (
+    
     <SectionCard title="Valuation Summary">
       <Stack
         spacing={2}

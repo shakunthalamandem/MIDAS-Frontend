@@ -478,8 +478,18 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #e5e7ef",
+        // background: "#f7f9ff",
+        background: "#ffffff",
+        p: { xs: 2.5, md: 3 },
+        boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+      }}
+    >
       <Stack spacing={2.5}>
+
         <Box sx={{ position: "relative", mb: 2 }}>
           {/* Rating - Left aligned */}
           {!isEditing && showRatingHeadingValue !== null && (

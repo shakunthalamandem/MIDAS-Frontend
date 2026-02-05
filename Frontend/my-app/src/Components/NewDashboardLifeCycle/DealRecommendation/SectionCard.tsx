@@ -20,7 +20,9 @@ export function SectionCard({
       sx={{
         borderRadius: 3,
         border: "1px solid #e5e7ef",
-        background: "#f7f9ff",
+        // background: "#f7f9ff",
+            background: "#dae6f8",
+
         boxShadow: "0 10px 20px rgba(32, 70, 150, 0.08)",
       }}
     >
