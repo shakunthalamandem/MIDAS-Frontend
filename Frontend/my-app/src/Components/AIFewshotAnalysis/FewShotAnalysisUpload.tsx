@@ -23,7 +23,7 @@ type ApiState = "idle" | "loading" | "success" | "error";
 
 type TickerItem = {
   ticker: string;
-  pricing_date?: string | null;
+  unique_deal_id?: string | null;
   deal_colour_present?: string;
   deal_captain?: string;
   deal_type?: string;
@@ -39,9 +39,8 @@ const formatFileSize = (bytes: number) => {
   return `${(kb / 1024).toFixed(1)} MB`;
 };
 
-const formatPricingDate = (dateStr?: string | null) => {
-  if (!dateStr) return "N/A";
-  return dateStr; // API gives YYYY-MM-DD
+const formatUniqueDealId = (id?: string | null) => {
+  return id || "N/A";
 };
 
 /**
@@ -121,7 +120,7 @@ const FewShotAnalysisUpload: React.FC = () => {
         const stillExists = items.some(
           (t) =>
             t.ticker === prev.ticker &&
-            (t.pricing_date ?? "") === (prev.pricing_date ?? "") &&
+            (t.unique_deal_id ?? "") === (prev.unique_deal_id ?? "") &&
             (t.region ?? "") === (prev.region ?? "")
         );
         return stillExists ? prev : null;
@@ -176,7 +175,7 @@ const FewShotAnalysisUpload: React.FC = () => {
     const formData = new FormData();
     formData.append("ticker", selectedTicker.ticker);
     formData.append("region", selectedTicker.region ?? region ?? "");
-    formData.append("pricing_date", selectedTicker.pricing_date ?? "");
+    formData.append("unique_deal_id", selectedTicker.unique_deal_id ?? "");
     formData.append("pre_listing_file", file);
     
 
@@ -326,23 +325,23 @@ const FewShotAnalysisUpload: React.FC = () => {
                       if (!q) return options;
                       return options.filter((o) => {
                         const t = (o.ticker || "").toLowerCase();
-                        const d = (o.pricing_date || "").toLowerCase();
+                        const d = (o.unique_deal_id || "").toLowerCase();
                         const r = (o.region || "").toLowerCase();
                         return t.includes(q) || d.includes(q) || r.includes(q);
                       });
                     }}
                     getOptionLabel={(option) =>
-                      `${option.ticker} - ${formatPricingDate(option.pricing_date)}${
+                      `${option.ticker} - ${formatUniqueDealId(option.unique_deal_id)}${
                         option.region ? ` - ${option.region}` : ""
                       }`
                     }
                     isOptionEqualToValue={(opt, val) =>
                       opt.ticker === val.ticker &&
-                      (opt.pricing_date ?? "") === (val.pricing_date ?? "") &&
+                      (opt.unique_deal_id ?? "") === (val.unique_deal_id ?? "") &&
                       (opt.region ?? "") === (val.region ?? "")
                     }
                     renderOption={(props, option) => (
-                      <li {...props} key={`${option.ticker}-${option.pricing_date ?? ""}-${option.region ?? ""}`}>
+                      <li {...props} key={`${option.ticker}-${option.unique_deal_id ?? ""}-${option.region ?? ""}`}>
                         <Box sx={{ display: "flex", width: "100%", justifyContent: "space-between", gap: 2 }}>
                           <Typography sx={{ fontWeight: 700 }}>{option.ticker}</Typography>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -352,7 +351,7 @@ const FewShotAnalysisUpload: React.FC = () => {
                               </Typography>
                             )}
                             <Typography variant="body2" color="text.secondary">
-                              {formatPricingDate(option.pricing_date)}
+                              {formatUniqueDealId(option.unique_deal_id)}
                             </Typography>
                           </Box>
                         </Box>
@@ -362,7 +361,7 @@ const FewShotAnalysisUpload: React.FC = () => {
                       <TextField
                         {...params}
                         label="Ticker"
-                        placeholder={isTickersLoading ? "Loading..." : "Search ticker, date, or region..."}
+                        placeholder={isTickersLoading ? "Loading..." : "Search ticker, deal ID, or region..."}
                         fullWidth
                         InputProps={{
                           ...params.InputProps,
