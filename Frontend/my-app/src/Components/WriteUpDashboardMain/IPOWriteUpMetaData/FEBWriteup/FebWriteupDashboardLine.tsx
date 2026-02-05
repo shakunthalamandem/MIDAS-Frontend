@@ -244,7 +244,7 @@ useEffect(() => {
       <Card
         sx={{
           borderRadius: 4,
-          background: "linear-gradient(#f0f5ff)",
+          background: "#ffffff",
           boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
           overflowX: "auto",
           p: 2,
@@ -358,7 +358,7 @@ useEffect(() => {
                           mt: 1,
                           display: "block",
                           fontWeight: 500,
-                          color: ipodata?.[item.key] ? "#333" : "#999",
+                          color: ipodata?.[item.key] ? "#000000" : "#999",
                         }}
                       >
                         {ipodata?.[item.key] ? String(ipodata[item.key]).trim() : "N/A"}

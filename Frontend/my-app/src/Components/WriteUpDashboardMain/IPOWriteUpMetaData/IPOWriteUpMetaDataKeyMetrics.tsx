@@ -292,7 +292,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       <Box
         sx={{
           // background: "#553939ff",
-          background: "linear-gradient(#f0f5ff)",
+          // background: "linear-gradient(#f0f5ff)",
+          background: "#ffffff",
           borderRadius: 2,
           boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
           p: 2

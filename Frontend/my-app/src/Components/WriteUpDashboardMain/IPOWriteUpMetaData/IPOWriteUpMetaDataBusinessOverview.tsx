@@ -484,7 +484,9 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       sx={{
         p: 3,
         borderRadius: 3,
-        background: "linear-gradient(#f0f5ff)",
+        // background: "linear-gradient(#ffffff)",
+                  background: "#ffffff",
+
         border: "1px solid #E6ECF5"
       }}
     >
@@ -504,7 +506,9 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 gap: 0.5,
                 borderRadius: 999,
                 border: "1px solid rgba(52, 144, 220, 0.4)",
-                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
+                // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
+                background: "#ffffff",
+
                 px: 1.5,
                 py: 0.4,
                 boxShadow: "0 4px 10px rgba(15, 81, 166, 0.08)"
@@ -577,14 +581,18 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               border: "1px solid #E6ECF5",
               boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
               "&:before": { display: "none" },
-                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
+                // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
+                                  background: "#ffffff",
+
             }}
           >
             <AccordionSummary
               expandIcon={!pdfMode ? <ExpandMoreIcon sx={{ color: "#124180" }} /> : null}
               sx={{
                 minHeight: 64,
-                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
+                // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
+                                  background: "#ffffff",
+
                 borderRadius: "8px 8px 0 0",
                 "&:hover": {
                   background: "linear-gradient(135deg, #e8f0fe, #dae7fc)"
@@ -634,7 +642,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
             <AccordionDetails
               sx={{
                 p: 3,
-                background: "linear-gradient(135deg, #f0f5ff, #e9f2ff)",
+                // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
+                background: "#ffffff",
                 borderRadius: "0 0 8px 8px"
               }}
             >

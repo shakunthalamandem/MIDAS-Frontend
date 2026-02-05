@@ -182,7 +182,7 @@ const handleSaveSummary = async () => {
             <Card
               sx={{
                 borderRadius: 4,
-                background: "linear-gradient(#f0f5ff)",
+                background: "#ffffff",
                 boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
                 p: 2,
               }}
