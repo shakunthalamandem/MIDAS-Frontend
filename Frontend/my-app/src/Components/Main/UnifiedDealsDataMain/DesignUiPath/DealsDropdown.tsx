@@ -48,7 +48,7 @@ const DealsDropdown: React.FC = () => {
           "& .MuiToggleButton-root": {
             textTransform: "none",
             fontWeight: 500,
-            color: "text.secondary",
+            color: "#000000",
             paddingX: 3,
             justifyContent: "center",
             minWidth: 180,

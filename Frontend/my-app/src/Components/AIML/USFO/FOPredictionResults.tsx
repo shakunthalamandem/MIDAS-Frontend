@@ -164,7 +164,7 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
         );
       case "Neutral":
         return (
-          <Box display="flex" alignItems="center" color="text.secondary">
+          <Box display="flex" alignItems="center" color="#000000">
             <TrendingFlatIcon sx={{ mr: 1 }} />
             Neutral Deal
           </Box>
@@ -324,7 +324,7 @@ const FOPredictionResults: React.FC<PredictionResultsProps> = ({
                   {openReturn != null ? `${openReturn.toFixed(2)} %` : "—"}
                 </Typography>
                 {issuePrice != null && (
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" color="#000000">
                     Issue Price: {issuePrice}
                   </Typography>
                 )}

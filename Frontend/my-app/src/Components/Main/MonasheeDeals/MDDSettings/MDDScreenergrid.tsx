@@ -363,7 +363,7 @@ const MDDScreenergrid: React.FC<MDDScreenergridProps> = ({
               height={200}
               sx={{ border: "1px dashed #ccc", borderRadius: 1 }}
             >
-              <Typography color="text.secondary" fontWeight={600}>
+              <Typography color="#000000" fontWeight={600}>
                 No matching ticker available here.
               </Typography>
             </Box>

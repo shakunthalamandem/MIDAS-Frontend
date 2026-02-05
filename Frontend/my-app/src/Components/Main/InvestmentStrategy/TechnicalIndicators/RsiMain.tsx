@@ -116,7 +116,7 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             Loading data...
           </Typography>
         )}

@@ -116,7 +116,7 @@ const handleChange = (event: any) => {
                       <ListItemText
                         primary={<Typography fontWeight="bold">{item.ticker}    <span style={{ color: "#007780ff", fontWeight: 400 ,fontSize:'0.8rem' }}>{item.id}</span></Typography>}
                         secondary={
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" color="#000000">
                             {item.trade_date}{" "}
                             <span style={{ color: "#c40303ff", fontWeight: 600 }}>
                               {item.deal_type}

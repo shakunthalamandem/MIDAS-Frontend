@@ -150,7 +150,7 @@ const UnifiedDealSelector: React.FC<UnifiedDealSelectorProps> = ({
                 <Checkbox checked={selected} sx={{ mr: 1 }} />
                 <Box>
                   <Typography fontWeight="bold">{option.ticker}</Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" color="#000000">
                     {option.deal_id}
                   </Typography>
                 </Box>

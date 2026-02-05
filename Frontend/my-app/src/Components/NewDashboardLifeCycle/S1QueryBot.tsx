@@ -122,7 +122,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             S1 AI Query
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             Ask a question for {ticker || "the selected ticker"}.
           </Typography>
         </Box>

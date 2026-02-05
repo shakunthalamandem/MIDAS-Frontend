@@ -22,7 +22,7 @@ const CustomNoRowsOverlay: React.FC<{ message: string }> = ({ message }) => (
       alignItems: "center",
       justifyContent: "center",
       py: 3,
-      color: "text.secondary",
+      color: "#000000",
       fontSize: "0.85rem",
     }}
   >

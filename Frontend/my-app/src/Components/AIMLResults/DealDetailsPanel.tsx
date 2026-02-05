@@ -53,7 +53,7 @@ const AIInsightBlock: React.FC<AIInsightBlockProps> = ({
           fontWeight: 700,
           letterSpacing: 0.4,
           textTransform: "uppercase",
-          color: "text.secondary",
+          color: "#000000",
         }}
       >
         {title}
@@ -62,7 +62,7 @@ const AIInsightBlock: React.FC<AIInsightBlockProps> = ({
       {subtitle && (
         <Typography
           variant="caption"
-          sx={{ fontSize: 11, color: "text.secondary" }}
+          sx={{ fontSize: 11, color: "#000000" }}
         >
           {subtitle}
         </Typography>
@@ -113,7 +113,7 @@ const DetailRow: React.FC<{
   >
     <Typography
       variant="caption"
-      color="text.secondary"
+      color="#000000"
       sx={{ textTransform: "uppercase", letterSpacing: 0.4 }}
     >
       {label}
@@ -176,7 +176,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
           letterSpacing: 0.7,
           fontSize: 11,
           fontWeight: 700,
-          color: "text.secondary",
+          color: "#000000",
         }}
       >
         {title}
@@ -246,7 +246,7 @@ const PredictionBlock: React.FC<PredictionBlockProps> = ({
     >
       <Typography
         variant="caption"
-        color="text.secondary"
+        color="#000000"
         sx={{ fontWeight: 600, letterSpacing: 0.2 }}
       >
         Actual return
@@ -267,7 +267,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
           <Typography variant="subtitle1" fontWeight={600}>
             Deal details
           </Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.5}>
+          <Typography variant="body2" color="#000000" mt={0.5}>
             Select a row in the table to view full deal analytics here.
           </Typography>
         </CardContent>
@@ -306,7 +306,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   textTransform: "uppercase",
                   letterSpacing: 0.6,
                   fontSize: 11,
-                  color: "text.secondary",
+                  color: "#000000",
                 }}
               >
                 Deal parameters & market sentiment
@@ -401,7 +401,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                   textTransform: "uppercase",
                   letterSpacing: 0.6,
                   fontSize: 11,
-                  color: "text.secondary",
+                  color: "#000000",
                 }}
               >
                 ML model predictions & outcomes
@@ -462,7 +462,7 @@ const DealDetailsPanel: React.FC<{ deal: DealRecord | null }> = ({ deal }) => {
                       textTransform: "uppercase",
                       letterSpacing: 0.6,
                       fontSize: 11,
-                      color: "text.secondary",
+                      color: "#000000",
                     }}
                   >
                     AI model predictions

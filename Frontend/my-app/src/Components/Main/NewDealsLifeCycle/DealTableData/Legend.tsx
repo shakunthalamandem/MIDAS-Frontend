@@ -28,7 +28,7 @@ const Legend = () => {
               backgroundColor: color,
             }}
           />
-          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1 }}>
+          <Typography variant="body2" color="#000000" sx={{ lineHeight: 1 }}>
             {label}
           </Typography>
         </Box>

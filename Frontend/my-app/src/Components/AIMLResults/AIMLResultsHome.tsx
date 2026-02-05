@@ -78,7 +78,7 @@ const AIMLResultsHome: React.FC = () => {
                 p: 2,
                 borderRadius: 2,
                 textAlign: "center",
-                color: "text.secondary",
+                color: "#000000",
               }}
             >
               Click a ticker in the table to view its price timeseries.

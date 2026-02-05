@@ -177,7 +177,7 @@ const FOBusinessHighlights: React.FC<FOBusinessHighlightsProps> = ({
               ))}
             </Box>
           ) : (
-            <Typography variant="body2" sx={{ color: "text.secondary", fontStyle: "italic" }}>
+            <Typography variant="body2" sx={{ color: "#000000", fontStyle: "italic" }}>
               No highlights available.
             </Typography>
           )}

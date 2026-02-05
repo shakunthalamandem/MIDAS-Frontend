@@ -23,7 +23,7 @@ const PageUnderDevelopment: React.FC = () => {
       <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
         Page Under Development
       </Typography>
-      <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
+      <Typography variant="body1" sx={{ color: "#000000", mb: 3 }}>
         We’re working hard to bring you this feature. Please check back soon!
       </Typography>
       <Button

@@ -172,7 +172,7 @@ const IPOWriteUpTable: React.FC<IPOWriteUpTableProps> = ({
           sx={{
             py: 6,
             textAlign: "center",
-            color: "text.secondary",
+            color: "#000000",
             border: "1px dashed #cbd5e1",
             borderRadius: 2,
             backgroundColor: "#fff",

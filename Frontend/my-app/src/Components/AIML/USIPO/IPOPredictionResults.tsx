@@ -181,7 +181,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
 
       case "Neutral Return":
         return (
-          <Box display="flex" alignItems="center" color="text.secondary">
+          <Box display="flex" alignItems="center" color="#000000">
             <TrendingFlatIcon sx={{ mr: 1 }} />
             Neutral Return Deal
           </Box>
@@ -258,7 +258,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
             sx={{
               fontStyle: "italic",
               ml: 1,
-              color: "text.secondary",
+              color: "#000000",
               fontWeight: "bold",
             }}
           >
@@ -387,7 +387,7 @@ const IPOPredictionResults: React.FC<PredictionResultsProps> = ({
                   {openReturn != null ? `${openReturn.toFixed(2)} %` : "—"}
                 </Typography>
                 {issuePrice != null && (
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" color="#000000">
                     Issue Price: {issuePrice}
                   </Typography>
                 )}

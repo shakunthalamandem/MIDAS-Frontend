@@ -323,7 +323,7 @@ const IPOCompsChart: React.FC<Props> = ({ ticker, data, pricingYear }) => {
                 justifyContent: "center",
               }}
             >
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#000000">
                 No comparable metrics available to visualize.
               </Typography>
             </Box>

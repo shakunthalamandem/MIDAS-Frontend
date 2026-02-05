@@ -150,7 +150,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
               letterSpacing: 0.7,
               fontSize: 11,
               fontWeight: 600,
-              color: "text.secondary",
+              color: "#000000",
               lineHeight: 1, // ✅ visual alignment
             }}
           >
@@ -253,7 +253,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
                     {/* timestamp */}
                     <Typography
                       variant="caption"
-                      color="text.secondary"
+                      color="#000000"
                       sx={{ mt: 0.6, fontWeight: 600 }}
                     >
                       {ts}
@@ -304,7 +304,7 @@ const DealNewsPanel: React.FC<DealNewsPanelProps> = ({ ticker }) => {
               })}
             </Box>
           ) : (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="#000000">
               No news found for {normalizedTicker}.
             </Typography>
           )}

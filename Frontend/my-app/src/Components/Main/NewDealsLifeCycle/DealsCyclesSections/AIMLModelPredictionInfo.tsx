@@ -117,7 +117,7 @@ useEffect(() => {
     if (formData.deal_type === "IPO") {
       return (
         <Box mt={2}>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="#000000">
             Classifies the expected return into categories:
           </Typography>
           <br></br>
@@ -131,7 +131,7 @@ useEffect(() => {
     } else if (formData.deal_type === "FO") {
       return (
         <Box mt={2}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             Classifies the expected return into categories:
           </Typography>
           <Typography variant="body2">📉 <b>Negative</b>: Return &lt;  1.8%</Typography>

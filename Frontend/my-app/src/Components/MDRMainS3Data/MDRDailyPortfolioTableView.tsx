@@ -498,13 +498,13 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
                     justifyContent="center"
                     spacing={0.5}
                   >
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="#000000">
                       No data available.
                     </Typography>
                     {onRefresh && (
                       <Typography
                         variant="caption"
-                        color="text.secondary"
+                        color="#000000"
                         sx={{ cursor: "pointer" }}
                         onClick={onRefresh}
                       >
