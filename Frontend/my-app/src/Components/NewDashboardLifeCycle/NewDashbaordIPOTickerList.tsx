@@ -61,13 +61,23 @@ const NewDashbaordIPOTickerList: React.FC<
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
           },
-          body: JSON.stringify({ type: "ticker_list" }),
+          body: JSON.stringify({ type: "ticker_list", deal_type: "IPO" }),
         });
         if (!response.ok) throw new Error("Failed to fetch tickers");
         const data = await response.json();
         const list = Array.isArray(data?.tickers) ? data.tickers : [];
+
+        // Filter: show only deals with pricing_date empty or >= Jan 15, 2026
+        const cutoffDate = new Date("2026-01-10").getTime();
+        const filteredList = list.filter((ticker: TickerOption) => {
+          if (!ticker.pricing_date) return true; // Show if pricing_date is empty
+          const pricingTime = Date.parse(ticker.pricing_date);
+          if (Number.isNaN(pricingTime)) return true; // Show if invalid date
+          return pricingTime >= cutoffDate; // Show if >= Jan 15, 2026
+        });
+
         if (isActive) {
-          setOptions(list);
+          setOptions(filteredList);
         }
       } catch (error) {
         console.error("Ticker list fetch failed", error);
