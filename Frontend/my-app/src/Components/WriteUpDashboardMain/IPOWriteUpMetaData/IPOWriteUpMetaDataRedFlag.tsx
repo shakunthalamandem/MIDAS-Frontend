@@ -477,8 +477,18 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #e5e7ef",
+        // background: "#f7f9ff",
+        background: "#ffffff",
+        p: { xs: 2.5, md: 3 },
+        boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
+      }}
+    >
       <Stack spacing={2.5}>
+
         <Box sx={{ position: "relative", mb: 2 }}>
           {/* Rating - Left aligned */}
           {!isEditing && showRatingHeadingValue !== null && (
@@ -530,35 +540,35 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           {/* Edit buttons - Right aligned */}
           <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
             <Stack direction="row" spacing={1} alignItems="center">
-            <Typography
-              variant="subtitle2"
-              sx={{ color: "#1f2937", fontWeight: 700 }}
-            >
-              Risk Score: {(avgScore * 2).toFixed(2)}/10
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={handleEditToggle}
-              sx={{ color: "#1f3b73" }}
-            >
-              <EditOutlinedIcon fontSize="small" />
-            </IconButton>
-            {isEditing ? (
-              <Button
-                size="small"
-                variant="contained"
-                startIcon={<SaveOutlinedIcon fontSize="small" />}
-                onClick={handleSaveAll}
-                disabled={saveLoading}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 700,
-                  background: "#1f3b73"
-                }}
+              <Typography
+                variant="subtitle2"
+                sx={{ color: "#1f2937", fontWeight: 700 }}
               >
-                {saveLoading ? "Saving..." : "Save"}
-              </Button>
-            ) : null}
+                Risk Score: {(avgScore * 2).toFixed(2)}/10
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={handleEditToggle}
+                sx={{ color: "#1f3b73" }}
+              >
+                <EditOutlinedIcon fontSize="small" />
+              </IconButton>
+              {isEditing ? (
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<SaveOutlinedIcon fontSize="small" />}
+                  onClick={handleSaveAll}
+                  disabled={saveLoading}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 700,
+                    background: "#1f3b73"
+                  }}
+                >
+                  {saveLoading ? "Saving..." : "Save"}
+                </Button>
+              ) : null}
             </Stack>
           </Box>
         </Box>

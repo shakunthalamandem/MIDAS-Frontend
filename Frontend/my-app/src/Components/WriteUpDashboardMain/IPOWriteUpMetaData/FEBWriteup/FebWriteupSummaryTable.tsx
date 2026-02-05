@@ -38,7 +38,16 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
       ? `$${ipodata.lower_bound} - $${ipodata.upper_bound}`
       : "N/A";
   }
-  if (key === "deal_size" || key === "shares_offered") {
+  if (key === "deal_size") {
+    if (value === undefined || value === null || value === "") return "N/A";
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) return "N/A";
+    return `$ ${parsed.toLocaleString(undefined, {
+      minimumFractionDigits: parsed % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: 2
+    })} M`;
+  }
+  if (key === "shares_offered") {
     return value ? Number(value).toLocaleString() : "N/A";
   }
   if (key === "nosh") {
@@ -173,7 +182,7 @@ const handleSaveSummary = async () => {
             <Card
               sx={{
                 borderRadius: 4,
-                background: "linear-gradient(#f0f5ff)",
+                background: "#ffffff",
                 boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
                 p: 2,
               }}
