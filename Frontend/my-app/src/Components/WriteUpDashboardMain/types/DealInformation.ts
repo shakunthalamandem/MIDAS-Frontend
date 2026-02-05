@@ -16,7 +16,7 @@ export interface WriteupRatings {
 
 
 export interface BasicDealDetails {
-  deal_id: number
+  deal_id: string
   unique_deal_id?: string
   ticker: string
   pricing_date?: string
