@@ -146,7 +146,13 @@ export function AMOutputCard({
         <Chip
           label={form[key] || "-"}
           size="small"
-          color={form[key] === "Positive" ? "success" : form[key] === "Negative" ? "error" : "default"}
+          color={
+            form[key] === "Positive"
+              ? "success"
+              : form[key] === "Negative"
+              ? "error"
+              : "default"
+          }
           sx={{
             borderRadius: 1.5,
             px: 1,
@@ -205,7 +211,16 @@ export function AMOutputCard({
       </Box>
       <Box display="flex" gap={2} flexWrap="wrap">
         {/* Summary */}
-        <Box flex={1} border="1px solid #eee" borderRadius={2} p={2}>
+        <Box
+          flex={1}
+          borderRadius={3}
+          p={2}
+          sx={{
+            background: "#fefefe",
+            border: "1px solid rgba(15, 23, 42, 0.08)",
+            boxShadow: "0 14px 30px rgba(15, 23, 42, 0.08)",
+          }}
+        >
           <Typography fontWeight={600} mb={1}>
             Overall Ratings
           </Typography>
@@ -218,72 +233,92 @@ export function AMOutputCard({
         </Box>
 
         {/* Strategy */}
-        <Box flex={2} border="1px solid #eee" borderRadius={2} p={2}>
-        <Typography fontWeight={600} mb={1}>
-          AM Strategy Recommendation
-        </Typography>
+        <Box
+          flex={2}
+          borderRadius={3}
+          p={2}
+          sx={{
+            background: "#fcfdff",
+            border: "1px solid rgba(15, 23, 42, 0.08)",
+            boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
+          }}
+        >
+          <Typography fontWeight={600} mb={1}>
+            AM Strategy Recommendation
+          </Typography>
 
-        {editMode ? (
-          <TextField
-            fullWidth
-            size="small"
-            disabled={saving}
-            select
-            value={form.strategy}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                strategy: e.target.value,
-              })
-            }
-            SelectProps={{
-              IconComponent: () => <></>,
-              MenuProps: { disableScrollLock: true },
-            }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#dbeafe",
-              },
-            }}
-          >
-            {options.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
-              </MenuItem>
-            ))}
-          </TextField>
-        ) : (
-          <>
-            <Typography variant="body2">{form.strategy || "-"}</Typography>
+          {editMode ? (
             <TextField
               fullWidth
               size="small"
-              multiline
-              minRows={options.length}
-              value={options.join("\n")}
-              InputProps={{
-                readOnly: true,
-                sx: { fontSize: "0.85rem", color: "#4b5563" },
+              disabled={saving}
+              select
+              value={form.strategy}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  strategy: e.target.value,
+                })
+              }
+              SelectProps={{
+                MenuProps: { disableScrollLock: true },
               }}
               sx={{
-                mt: 1,
-                bgcolor: "#f8fafc",
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e5e7eb",
+                  borderColor: "#dbeafe",
                 },
               }}
-            />
-          </>
-        )}
+            >
+              {options.map((opt) => (
+                <MenuItem key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <Stack spacing={1}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, color: "#0f172a" }}
+              >
+                {form.strategy || "-"}
+              </Typography>
+              <Box
+                sx={{
+                  mt: 1,
+                  background: "#f8fafc",
+                  borderRadius: 2,
+                  p: 2,
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <Stack spacing={1}>
+                  {options.map((option) => (
+                    <Typography
+                      variant="body2"
+                      key={option}
+                      sx={{ color: "#1f2937" }}
+                    >
+                      {option}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Box>
+            </Stack>
+          )}
         </Box>
 
         {/* Quantity */}
         <Box
           width={160}
-          border="1px solid #eee"
-          borderRadius={2}
+          borderRadius={3}
           p={2}
           textAlign="center"
+          sx={{
+            background: "#fefefe",
+            border: "1px solid rgba(15, 23, 42, 0.08)",
+            boxShadow: "0 12px 30px rgba(15, 23, 42, 0.07)",
+          }}
         >
           <Typography fontWeight={600} mb={1}>
             Potential AM Qty
