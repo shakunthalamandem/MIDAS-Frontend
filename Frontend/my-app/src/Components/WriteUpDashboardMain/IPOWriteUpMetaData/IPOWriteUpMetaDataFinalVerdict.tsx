@@ -74,7 +74,8 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
 
   const sectionDefaults = useMemo(
     () => [
-      { id: "deal-info", label: "Deal Info" },
+      // { id: "deal-info", label: "Deal Info" },
+      {id: "ai_indication", label: "AI Indication"},
       { id: "business-overview", label: "Business Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },

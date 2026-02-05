@@ -146,7 +146,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
     <>
       <Box sx={{ position: "relative", mb: 2 }}>
         {/* Rating - Left aligned */}
-        {ratingText && (
+        {/* {ratingText && (
           <Box
             sx={{
               position: "absolute",
@@ -169,7 +169,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
               Rating - {ratingText}/10
             </Typography>
           </Box>
-        )}
+        )} */}
 
         {/* Heading - Center aligned */}
         <Box sx={{ display: "flex", justifyContent: "center" }}>

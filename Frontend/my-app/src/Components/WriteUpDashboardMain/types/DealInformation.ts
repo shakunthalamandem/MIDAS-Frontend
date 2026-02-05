@@ -11,6 +11,8 @@ export interface WriteupRatings {
   "valuation_analysis"?: number
   "red-flag"?: number
   "red_flag"?: number
+  "ai_indication"?: number
+  "ai-indication"?: number
 }
 
 
