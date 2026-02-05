@@ -12,6 +12,7 @@ import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 type DashboardSentimentAnalysisProps = {
   focusTicker: string | null;
+  region?: string | null;
 };
 
 const parseLooseJson = (value: string): any | null => {
@@ -46,6 +47,7 @@ const normalizeBlocks = (val: any): Block[] => {
 
 const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   focusTicker,
+  region,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -76,7 +78,12 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
       setStatus(null);
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/get_us_sentiment_analysis/`, {
+        const normalizedRegion = (region || "").toString().trim().toUpperCase();
+        const endpoint =
+          normalizedRegion === "APAC"
+            ? "/api/get_apac_sentiment_analysis/"
+            : "/api/get_us_sentiment_analysis/";
+        const res = await fetch(`${apiUrl}${endpoint}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -138,7 +145,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusTicker]);
+  }, [apiUrl, focusTicker, region]);
 
   const showPlaceholder =
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length);

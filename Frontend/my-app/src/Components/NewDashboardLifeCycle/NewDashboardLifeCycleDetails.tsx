@@ -265,7 +265,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               }}
             />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
-            <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
+            <DashboardSentimentAnalysis
+              focusTicker={activePayload.ticker ?? null}
+              region={activePayload.region ?? null}
+            />
           ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
