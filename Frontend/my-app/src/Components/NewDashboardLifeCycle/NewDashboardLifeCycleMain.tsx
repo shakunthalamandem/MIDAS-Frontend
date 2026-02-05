@@ -351,10 +351,17 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [pipelineData, pipelineCategory, pipelineSearch]);
 
   const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
-    navigate("/deals/new_dashboard/details", {
-      state: { payload: row, viewMode, ...(extraState || {}) },
-    });
-  };
+  const dealType = (row?.deal_type || "").toLowerCase();
+  const targetPath =
+    dealType && dealType.includes("fo")
+      ? "/deals/new_dashboard/fo_details"
+      : "/deals/new_dashboard/details";
+
+  navigate(targetPath, {
+    state: { payload: row, viewMode, ...(extraState || {}) },
+  });
+};
+
 
   const actionTabMap: Record<string, string> = {
     "Write Up": "Write up",

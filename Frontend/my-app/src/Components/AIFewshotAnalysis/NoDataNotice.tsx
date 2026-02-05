@@ -13,7 +13,10 @@ const NoDataNotice: React.FC<NoDataNoticeProps> = ({
 }) => (
   <Card
     elevation={0}
+    className="pdf-hidden"
     sx={{
+      width: "100%",
+      maxWidth: "100%",
       borderRadius: 4,
       border: "1px solid #dbe3f0",
       background: "linear-gradient(180deg, #ffffff 0%, #f4f7ff 100%)",

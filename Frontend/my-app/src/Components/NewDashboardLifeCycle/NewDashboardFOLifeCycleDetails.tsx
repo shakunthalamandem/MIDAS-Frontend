@@ -16,19 +16,24 @@ import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
+import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
 import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
+import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
 import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
-import S1QueryBot from "./S1QueryBot";
+import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
+
+import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
+import RecentDealRecomendation from "./RecentDealRecomendation";
+import DealRecomendation from "./DealRecomendation";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
-import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 
-const NewDashboardLifeCycleDetails: React.FC = () => {
+const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const payload = (location.state as { payload?: any } | null)?.payload;
@@ -40,7 +45,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-      { label: "Write Up New" },
+    //   {label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
@@ -48,7 +53,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "AI - Sentiment View" },
       { label: "AI Unsupervised" },
       { label: "ML Model" },
-      { label: "S1 AI Query" },
+      { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
@@ -112,7 +117,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             mb: 3,
             p: 2,
             borderRadius: 3,
-            backgroundColor: "rgba(206, 225, 233, 0.92)",
+            backgroundColor: "rgba(245, 248, 255, 0.92)",
             backdropFilter: "blur(14px)",
             border: `1px solid ${theme.palette.divider}`,
             position: "sticky",
@@ -197,28 +202,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up New" ? (
-            isIpo ? (
-          <FebWriteUpDashboardMain
-            basicDealDetails={{
-              deal_id: activePayload.deal_id,
-              ticker: activePayload.ticker,
-              pricing_date: activePayload.pricing_date,
-              region: activePayload.region,
-              deal_type: activePayload.deal_type,
-              issuer_name: activePayload.issuer_name,
-              exchange: activePayload.exchange,
-            }}
-          />
-
-              
-            ) : (
-              <NewDashboardLifeCycleOverviewFO
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-              />
-            )
-          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
+          {tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
@@ -233,11 +217,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             isUpcoming ? (
               // <UpcomingDealRecomendation ticker={activePayload.ticker}
               // />
-              <DealRecommendationHome ticker={activePayload.ticker} />
+              <DealRecomendation ticker={activePayload.ticker} />
             ) : (
               // <RecentDealRecomendation ticker={activePayload.ticker}
               // />
-              <DealRecommendationHome ticker={activePayload.ticker} />
+              <DealRecomendation ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
@@ -257,8 +241,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
-          ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
-            <S1QueryBot ticker={activePayload.ticker} />
+          ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
+            <TechnicalMain
+              initialTicker={activePayload.ticker ?? null}
+              initialRegion={activePayload.region ?? null}
+            />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
             <NewDashboardLifeCycleMeetingNotes
               ticker={activePayload.ticker}
@@ -274,5 +261,5 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   );
 };
 
-export default NewDashboardLifeCycleDetails;
+export default NewDashboardFOLifeCycleDetails;
 
