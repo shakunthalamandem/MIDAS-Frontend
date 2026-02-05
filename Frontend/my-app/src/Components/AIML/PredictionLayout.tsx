@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Grid, Typography, Button } from "@mui/material";
 import FormSwitcher from "./FormSwitcher";
-import FOForm from "./FOForm";
-import IPOForm from "./IPOForm";
 import RecentPredictionsPanel from "./RecentPredictionsPanel";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
+import IPOForm from "./USIPO/IPOForm";
+import FOForm from "./USFO/FOForm";
 
 // ---- Helpers ----
 const toNullableNumber = (v: unknown): number | null => {
