@@ -181,9 +181,13 @@ function PredictionTile({
   confidence,
   timeframe,
 }: PredictionTileProps) {
-  const tone = getToneFromPrediction(prediction);
+  const normalizedPrediction = (prediction || "").trim();
+  const hasPrediction = normalizedPrediction.length > 0;
+  const tone = getToneFromPrediction(normalizedPrediction);
   const toneStyles = TONE_CONFIG[tone];
-  const indication = getIndicationValue(timeframe, prediction);
+  const indication = hasPrediction
+    ? getIndicationValue(timeframe, normalizedPrediction)
+    : null;
   const chipColor: any =
     tone === "success"
       ? "success"
@@ -253,16 +257,20 @@ function PredictionTile({
         >
           <Chip
             size="small"
-            label={(prediction || "NEUTRAL").toUpperCase()}
+            label={
+              hasPrediction
+                ? normalizedPrediction.toUpperCase()
+                : "Prediction not yet done"
+            }
             color={chipColor}
             variant={tone === "default" ? "outlined" : "filled"}
             sx={{
               fontWeight: 600,
               fontSize: "0.75rem",
               letterSpacing: 0.5,
+              alignContent: "center",
             }}
           />
-
           {indication && (
             <Box
               sx={{
@@ -294,52 +302,54 @@ function PredictionTile({
         </Box>
 
         {/* Confidence Section */}
-        <Box sx={{ mt: 1 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 0.75,
-            }}
-          >
-            <Typography
-              variant="caption"
+        {hasPrediction && (
+          <Box sx={{ mt: 1 }}>
+            <Box
               sx={{
-                fontWeight: 600,
-                color: "#4b5563",
-                fontSize: "0.7rem",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0.75,
               }}
             >
-              Confidence
-            </Typography>
-            <Typography
-              variant="caption"
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: "#4b5563",
+                  fontSize: "0.7rem",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                }}
+              >
+                Confidence
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 800,
+                  color: toneStyles.text,
+                  fontSize: "0.8rem",
+                }}
+              >
+                {formatPercentage(confidence)}
+              </Typography>
+            </Box>
+            <LinearProgress
+              variant="determinate"
+              value={confidenceValue}
               sx={{
-                fontWeight: 800,
-                color: toneStyles.text,
-                fontSize: "0.8rem",
-              }}
-            >
-              {formatPercentage(confidence)}
-            </Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={confidenceValue}
-            sx={{
-              height: 6,
-              borderRadius: 99,
-              backgroundColor: "rgba(107, 114, 128, 0.12)",
-              "& .MuiLinearProgress-bar": {
+                height: 6,
                 borderRadius: 99,
-                background: `linear-gradient(90deg, ${toneStyles.text}, ${toneStyles.text}dd)`,
-              },
-            }}
-          />
-        </Box>
+                backgroundColor: "rgba(107, 114, 128, 0.12)",
+                "& .MuiLinearProgress-bar": {
+                  borderRadius: 99,
+                  background: `linear-gradient(90deg, ${toneStyles.text}, ${toneStyles.text}dd)`,
+                },
+              }}
+            />
+          </Box>
+        )}
       </Stack>
     </Box>
   );
@@ -413,7 +423,7 @@ export function AIMLPredictions({ data }: AIMLPredictionsProps) {
 
                   <Typography
                     variant="body2"
-                    color="text.secondary"
+                    color="#000000"
                     lineHeight={1.5}
                   >
                     {item.desc}
