@@ -139,7 +139,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
             </ComposedChart>
           </ResponsiveContainer>
         ) : (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             Loading data...
           </Typography>
         )}

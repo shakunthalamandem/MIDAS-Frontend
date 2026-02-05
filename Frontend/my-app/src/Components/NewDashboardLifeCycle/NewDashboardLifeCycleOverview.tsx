@@ -136,7 +136,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
         <Typography sx={{ fontWeight: 700, color: "#0f172a" }}>
           Overview data not available
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="#000000">
           Please try another ticker or refresh.
         </Typography>
       </Paper>
@@ -230,7 +230,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                 </Typography>
               </Box>
               {overviewLines.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="#000000">
                   Overview not available.
                 </Typography>
               ) : (
@@ -257,7 +257,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
                 </Typography>
               </Box>
               {summaryLines.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="#000000">
                   Summary not available.
                 </Typography>
               ) : (
@@ -284,7 +284,7 @@ const NewDashboardLifeCycleOverview: React.FC<NewDashboardLifeCycleOverviewProps
           </Typography>
         </Box>
         {valuationLines.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             Valuation data not available.
           </Typography>
         ) : (

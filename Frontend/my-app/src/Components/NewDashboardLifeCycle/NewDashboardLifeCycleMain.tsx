@@ -709,7 +709,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                 <Typography sx={{ fontWeight: 600, color: "#002060" }}>
                   No pipeline deals available
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="#000000">
                   There are no pipeline deals for this filter selection.
                 </Typography>
               </Container>
@@ -746,7 +746,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     <Typography sx={{ fontWeight: 600, color: "#002060" }}>
                       No deals available
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="#000000">
                       There are no upcoming deals with pricing dates for this filter.
                     </Typography>
                   </Container>
@@ -777,7 +777,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                     <Typography sx={{ fontWeight: 600, color: "#002060" }}>
                       No deals available
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="#000000">
                       There are no to-be-announced deals for this filter.
                     </Typography>
                   </Container>
@@ -798,7 +798,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               <Typography sx={{ fontWeight: 600, color: "#002060" }}>
                 No deals available
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#000000">
                 There are no deals for this filter selection.
               </Typography>
             </Container>

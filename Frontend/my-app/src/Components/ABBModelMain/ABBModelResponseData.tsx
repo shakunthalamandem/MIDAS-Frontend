@@ -230,7 +230,7 @@ const ABBModelResponseData = ({
   if (loading) {
     return (
       <Box sx={{ mt: 3 }}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="#000000">
           Loading ABB response...
         </Typography>
       </Box>

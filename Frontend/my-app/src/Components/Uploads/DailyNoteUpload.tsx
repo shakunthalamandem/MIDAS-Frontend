@@ -178,7 +178,7 @@ const DailyNoteUpload = () => {
             </label>
 
             {uploadedFileName && (
-              <Typography variant="body2" color="text.secondary" mt={1}>
+              <Typography variant="body2" color="#000000" mt={1}>
                 <strong>Selected:</strong> {uploadedFileName}
               </Typography>
             )}

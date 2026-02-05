@@ -122,7 +122,7 @@ const FormSwitcher: React.FC<FormSwitcherProps> = ({
 
       {/* Optional subtle hint (hover) */}
       {/* <Tooltip title="Switch forms. Recent predictions on the right will follow this filter." arrow>
-        <Box sx={{ ml: 1.5, fontSize: 12, color: "text.secondary", display: { xs: "none", md: "block" } }}>
+        <Box sx={{ ml: 1.5, fontSize: 12, color: "#000000", display: { xs: "none", md: "block" } }}>
           IPO and FO use different inputs & models
         </Box>
       </Tooltip> */}

@@ -130,7 +130,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
       <Table size="small" sx={{ "& td": { borderBottom: "none", py: 0.35 } }}>
         <TableBody>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1, width: 70 }}>
+            <TableCell sx={{ color: "#000000", pr: 1, width: 70 }}>
               Open
             </TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
@@ -138,19 +138,19 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>High</TableCell>
+            <TableCell sx={{ color: "#000000", pr: 1 }}>High</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.high)}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>Low</TableCell>
+            <TableCell sx={{ color: "#000000", pr: 1 }}>Low</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.low)}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ color: "text.secondary", pr: 1 }}>Close</TableCell>
+            <TableCell sx={{ color: "#000000", pr: 1 }}>Close</TableCell>
             <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
               {formatPrice(point.close)}
             </TableCell>
@@ -580,7 +580,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
                 >
                   <Typography
                     variant="caption"
-                    sx={{ display: "block", fontWeight: 700, color: "text.secondary", mb: 0.5 }}
+                    sx={{ display: "block", fontWeight: 700, color: "#000000", mb: 0.5 }}
                   >
                     Future predictions
                   </Typography>
@@ -762,7 +762,7 @@ const DealPricesChart: React.FC<DealPricesChartProps> = ({
 
               <Box display="flex" alignItems="center" mt={0.5}>
                 <InfoOutlinedIcon fontSize="small" sx={{ color: "grey.500", mr: 0.5 }} />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="#000000">
                   Data is from Trade date to one week
                 </Typography>
               </Box>

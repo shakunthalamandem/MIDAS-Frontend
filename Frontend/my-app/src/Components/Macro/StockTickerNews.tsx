@@ -98,7 +98,7 @@ const mdComponents = {
     </Box>
   ),
   li: ({ children }: any) => (
-    <Box component="li" sx={{ m: 0, "&::marker": { color: "text.secondary" } }}>
+    <Box component="li" sx={{ m: 0, "&::marker": { color: "#000000" } }}>
       <Typography
         variant="body2"
         sx={{ m: 0, lineHeight: 1.6, color: "text.primary" }}
@@ -255,7 +255,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                 </Stack>
                 <Typography
                   variant="body2"
-                  color="text.secondary"
+                  color="#000000"
                   sx={{ fontWeight: 600, mt: 0.5 }}
                 >
                   AI-powered market insights and real-time analysis
@@ -384,7 +384,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
           <Typography color="error" sx={{ fontWeight: 600 }}>
             Something went wrong
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             {error}
           </Typography>
         </Paper>
@@ -419,7 +419,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
             >
               <Typography
                 variant="subtitle2"
-                sx={{ fontWeight: 600, color: "text.secondary" }}
+                sx={{ fontWeight: 600, color: "#000000" }}
               >
                 Headlines ({filtered.length})
               </Typography>
@@ -440,7 +440,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                   </Typography>
                   <Typography
                     variant="body2"
-                    color="text.secondary"
+                    color="#000000"
                     sx={{ mt: 0.5 }}
                   >
                     Try a different ticker or sentiment filter.
@@ -533,11 +533,11 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                           alignItems="center"
                         >
                           <AccessTimeIcon
-                            sx={{ fontSize: 14, color: "text.secondary" }}
+                            sx={{ fontSize: 14, color: "#000000" }}
                           />
                           <Typography
                             variant="caption"
-                            color="text.secondary"
+                            color="#000000"
                             sx={{ fontWeight: 600 }}
                           >
                             {formatStamp(n.date, n.gmt_time)}
@@ -607,11 +607,11 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                   />
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <AccessTimeIcon
-                      sx={{ fontSize: 14, color: "text.secondary" }}
+                      sx={{ fontSize: 14, color: "#000000" }}
                     />
                     <Typography
                       variant="caption"
-                      color="text.secondary"
+                      color="#000000"
                       sx={{ fontWeight: 600 }}
                     >
                       {formatStamp(selected?.date, selected?.gmt_time)}
@@ -720,11 +720,11 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                     </Typography>
                     <Stack direction="row" spacing={0.5} alignItems="center">
                       <StarsRoundedIcon
-                        sx={{ fontSize: 16, color: "text.secondary" }}
+                        sx={{ fontSize: 16, color: "#000000" }}
                       />
                       <Typography
                         variant="caption"
-                        color="text.secondary"
+                        color="#000000"
                         sx={{ fontWeight: 600 }}
                       >
                         {confidenceText || "Confidence score unavailable"}
@@ -741,7 +741,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
                   ) : (
                     <Typography
                       variant="body2"
-                      color="text.secondary"
+                      color="#000000"
                       sx={{ m: 0 }}
                     >
                       No summary available.
@@ -751,7 +751,7 @@ const StockTickerNews: React.FC<StockTickerNewsProps> = ({ ticker }) => {
 
                 <Typography
                   variant="caption"
-                  color="text.secondary"
+                  color="#000000"
                   sx={{ mt: 1.5, display: "block", fontWeight: 600 }}
                 >
                   Want the full article? Use{" "}

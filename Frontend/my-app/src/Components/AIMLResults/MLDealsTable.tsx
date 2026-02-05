@@ -190,7 +190,7 @@ const MLDealsTable: React.FC<MLDealsTableProps> = ({
             >
               {row.ticker}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
+            <Typography variant="caption" color="#000000" sx={{ lineHeight: 1.2 }}>
               {row.issuer_name}
             </Typography>
           </Box>
@@ -494,7 +494,7 @@ const MLDealsTable: React.FC<MLDealsTableProps> = ({
       </TableContainer>
 
       <Box mt={0.75} px={1.25} pb={1} display="flex" justifyContent="flex-end">
-        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+        <Typography variant="caption" color="#000000" sx={{ fontStyle: "italic" }}>
           Indicators: ✓ = prediction aligns with actual, ✕ = prediction disagrees, blank = missing/neutral.
         </Typography>
       </Box>

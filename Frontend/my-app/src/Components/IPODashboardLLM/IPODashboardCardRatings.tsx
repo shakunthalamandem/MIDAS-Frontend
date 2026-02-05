@@ -492,7 +492,7 @@ const IPODashboardCardRatings: React.FC<IPODashboardCardRatingsProps> = ({
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
                   {emptyCriteria.map((c) => c.label).join(", ")}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="#000000">
                   You can click on the edit icon to fill these metrics.
                 </Typography>
               </Box>

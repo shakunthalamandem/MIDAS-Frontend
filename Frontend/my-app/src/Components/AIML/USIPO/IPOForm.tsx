@@ -595,14 +595,14 @@ const IPOForm: React.FC<IPOFormProps> = ({
           sx={{
             mt: 2,
             textAlign: { xs: "center", sm: "right" },
-            color: "text.secondary",
+            color: "#000000",
             display: "flex",
             alignItems: "center",
             justifyContent: { xs: "center", sm: "flex-end" },
             gap: 0.5,
           }}
         >
-          <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
+          <InfoOutlinedIcon fontSize="small" sx={{ color: "#000000" }} />
           {values.deal_status === "Issued"
             ? "Values treated as confirmed"
             : "Values used for temporary assumptions"}
@@ -709,7 +709,7 @@ const IPOForm: React.FC<IPOFormProps> = ({
                 <Typography variant="h6" fontWeight={700} color="primary">
                   Sentiment Highlights
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="#000000">
                   Generated summary for this deal
                 </Typography>
               </Box>

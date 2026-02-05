@@ -179,7 +179,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
               <Typography variant="h6" fontWeight={600} color="#002060" align="center">
                 Sentiment Analysis{focusTicker ? ` for ${focusTicker}` : ""}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.6 }}>
+              <Typography variant="body2" color="#000000" sx={{ mt: 0.5, lineHeight: 1.6 }}>
                 A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, aggregating market data, news sentiment, analyst commentary, and historical IPO performance signals to deliver consistent yet deal-specific insights on first-week and first-month performance drivers.
               </Typography>
             </Box>
@@ -277,7 +277,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
         )}
 
           {showPlaceholder && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="#000000">
               {focusTicker ? "Sentiment analysis will appear here once available." : "Pick a ticker to load sentiment."}
             </Typography>
           )}

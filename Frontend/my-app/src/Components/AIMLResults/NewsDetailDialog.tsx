@@ -76,7 +76,7 @@ const ScoreTooltipTable: React.FC<{ news: ApiNewsItem }> = ({ news }) => {
     <Box sx={{ p: 1 }}>
       <Typography
         variant="caption"
-        sx={{ fontWeight: 600, color: "text.secondary" }}
+        sx={{ fontWeight: 600, color: "#000000" }}
       >
         Sentiment breakdown
       </Typography>
@@ -90,7 +90,7 @@ const ScoreTooltipTable: React.FC<{ news: ApiNewsItem }> = ({ news }) => {
                   borderBottom: "none",
                   py: 0.35,
                   pr: 2,
-                  color: "text.secondary",
+                  color: "#000000",
                   fontSize: 12,
                 }}
               >
@@ -175,7 +175,7 @@ const NewsDetailDialog: React.FC<NewsDetailDialogProps> = ({
             >
               <Typography
                 variant="caption"
-                color="text.secondary"
+                color="#000000"
                 sx={{ fontWeight: 600 }}
               >
                 {ts}
@@ -340,7 +340,7 @@ const NewsDetailDialog: React.FC<NewsDetailDialogProps> = ({
             <LinkOutlinedIcon fontSize="small" />
             <Typography
               variant="caption"
-              sx={{ color: "text.secondary", fontWeight: 600 }}
+              sx={{ color: "#000000", fontWeight: 600 }}
             >
               Want the full article? Click{" "}
               <Box component="span" sx={{ fontWeight: 600, color: "text.primary" }}>

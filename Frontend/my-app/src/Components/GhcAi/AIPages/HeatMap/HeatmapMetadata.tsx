@@ -42,7 +42,7 @@ const HeatmapMetadata: React.FC<HeatmapMetadataProps> = ({
       <Typography variant="h5" fontWeight={600} color="#002060" gutterBottom>
          Heat Map of Portfolio Sentiment by Sector
       </Typography>
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+      <Typography variant="subtitle1" color="#000000" gutterBottom>
         Data updated on: {formatDate(updated_us_time)} 
         {/* at {formatTime(updated_us_time)} */}
       </Typography>

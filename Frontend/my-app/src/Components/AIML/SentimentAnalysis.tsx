@@ -373,7 +373,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
                 <Typography variant="subtitle1" fontWeight={600}>
                   {loading ? "Loading IPOs..." : `Ready with ${visibleItems.length} IPOs`}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="#000000">
                   {running
                     ? `Processing ${currentTicker || "queue"}`
                     : "Runs Perplexity sentiment for each mainboard IPO and saves it to backend."}
@@ -407,7 +407,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
 
             <Box sx={{ mt: 3 }}>
               <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="#000000">
                 {completedCount}/{visibleItems.length} completed
               </Typography>
             </Box>
@@ -431,7 +431,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Box>
                     <Typography fontWeight={600}>{item.ticker}</Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="#000000">
                       {[item.unique_deal_id, item.deal_type, item.fo_type, item.region].filter(Boolean).join(" | ") ||
                         "Deal details NA"}
                     </Typography>
