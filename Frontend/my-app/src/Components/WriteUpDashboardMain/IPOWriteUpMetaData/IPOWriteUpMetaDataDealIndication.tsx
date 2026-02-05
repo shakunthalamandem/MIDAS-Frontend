@@ -188,9 +188,10 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ticker: basicDealDetails.ticker,
-            pricing_date: basicDealDetails.pricing_date ?? null
+            unique_deal_id: basicDealDetails.unique_deal_id ?? null
           })
         })
+
 
         const raw = await res.text()
         if (!res.ok) {
