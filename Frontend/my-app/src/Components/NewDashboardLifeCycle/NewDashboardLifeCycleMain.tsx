@@ -436,6 +436,8 @@ const NewDealsLifecycleCards: React.FC = () => {
             row.writeup_available == null
               ? null
               : row.writeup_available.toString().toLowerCase() === "yes";
+          const mlPredAvailable =
+            row.t1d_pred != null && row.t1d_pred !== "" ? true : null;
           const displayTags = allTags.filter((tag) => {
             const label = tag.label.toLowerCase();
             return !label.includes("write-up") && !label.includes("price range");
@@ -452,6 +454,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               title={row.ticker || "N/A"}
               subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
               writeupAvailable={writeupAvailable}
+              mlPredAvailable={mlPredAvailable}
               meta={meta}
               tags={[
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
