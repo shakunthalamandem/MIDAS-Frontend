@@ -207,6 +207,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <FebWriteUpDashboardMain
             basicDealDetails={{
               deal_id: activePayload.deal_id,
+              unique_deal_id: activePayload.unique_deal_id,
               ticker: activePayload.ticker,
               pricing_date: activePayload.pricing_date,
               region: activePayload.region,
