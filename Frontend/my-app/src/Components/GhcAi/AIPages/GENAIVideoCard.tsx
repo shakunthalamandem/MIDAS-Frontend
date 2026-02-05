@@ -65,7 +65,7 @@ const GENAIVideoCard: React.FC<Props> = ({
         <Typography variant="subtitle1" fontWeight={600} sx={{ color: "#1a237e", mb: 0.5 }}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.875rem" }}>
+        <Typography variant="body2" color="#000000" sx={{ fontSize: "0.875rem" }}>
           {description}
         </Typography>
       </CardContent>

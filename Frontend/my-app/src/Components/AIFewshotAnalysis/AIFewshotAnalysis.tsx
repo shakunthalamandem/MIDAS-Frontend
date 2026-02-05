@@ -204,7 +204,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography fontWeight={900}>{option.ticker}</Typography>
 
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="#000000">
                       {formatPricingDate(option.pricing_date)}
                     </Typography>
 
@@ -257,7 +257,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               </Box>
 
               <Collapse in={isDescriptionExpanded}>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                  <Typography variant="body2" color="#000000" sx={{ lineHeight: 1.7 }}>
                     This analysis explains how an IPO is likely to behave in its early trading period rather than
                     predicting exact prices or returns. It evaluates the company's pre-listing fundamentals and compares
                     them with five to ten similar past IPOs that traded under comparable conditions. By reviewing how

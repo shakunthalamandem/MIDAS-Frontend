@@ -430,7 +430,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
             variant="caption"
             align="center"
             display="block"
-            sx={{ color: "text.secondary", mb: 2, textAlign: "center" }}
+            sx={{ color: "#000000", mb: 2, textAlign: "center" }}
           >
             Snapshot: {selectedSnapshot.date} · Price:{" "}
             {selectedSnapshot.price !== null &&
@@ -463,7 +463,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
             variant="caption"
             align="center"
             display="block"
-            sx={{ mt: 0.5, color: "text.secondary" }}
+            sx={{ mt: 0.5, color: "#000000" }}
           >
             Select up to {MAX_SELECTED_PEERS} peers to compare
           </Typography>

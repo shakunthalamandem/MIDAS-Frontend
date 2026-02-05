@@ -203,7 +203,7 @@ const DealMeetingNotesMain: React.FC = () => {
             <Typography sx={{ fontWeight: 800, color: "#002060", fontSize: { xs: 20, md: 24 } }}>
                    Listed Company Meeting Notes
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="#000000">
 Meetings can only be created for existing companies. Select a company to proceed.
                   </Typography>
                 </Box>

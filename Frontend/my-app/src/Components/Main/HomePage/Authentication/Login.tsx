@@ -310,7 +310,7 @@ const Login: React.FC = () => {
             mt={3}
           >
             <Grid item>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#000000">
                 Don&apos;t have an account?
               </Typography>
             </Grid>

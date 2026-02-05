@@ -311,7 +311,7 @@ const FinancialforecastUpload: React.FC = () => {
                 </Button>
               </label>
               {file && (
-                <Typography sx={{ mt: 1 }} color="text.secondary">
+                <Typography sx={{ mt: 1 }} color="#000000">
                   <strong>Selected:</strong> {file.name}
                 </Typography>
               )}

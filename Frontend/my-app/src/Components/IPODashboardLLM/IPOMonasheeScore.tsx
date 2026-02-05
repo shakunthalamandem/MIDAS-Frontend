@@ -149,7 +149,7 @@ const IPOMonasheeScore: React.FC<IPOMonasheeScoreProps> = ({
       </TableContainer>
 
       <Box mt={2} p={2} sx={{ backgroundColor: "#f9fafb", borderRadius: 2 }}>
-        <Typography variant="body2" color="text.secondary" align="center">
+        <Typography variant="body2" color="#000000" align="center">
           Based on the current IPO and market data - considering deal count,
           deal volume, positively performed deals, opportunity value excess, and
           excess returns.

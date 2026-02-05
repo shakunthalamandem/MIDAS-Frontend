@@ -138,7 +138,7 @@ const UploadDataCard: React.FC<Props> = ({
             </label>
 
             {uploadedFileName && (
-              <Typography sx={{ mt: 1 }} color="text.secondary">
+              <Typography sx={{ mt: 1 }} color="#000000">
                 <strong>Selected:</strong> {uploadedFileName}
               </Typography>
             )}

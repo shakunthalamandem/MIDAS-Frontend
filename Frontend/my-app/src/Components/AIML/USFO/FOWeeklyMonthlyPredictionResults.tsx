@@ -199,7 +199,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
         );
       case "Neutral":
         return (
-          <Box display="flex" alignItems="center" color="text.secondary">
+          <Box display="flex" alignItems="center" color="#000000">
             <TrendingFlatIcon sx={{ mr: 1 }} /> Neutral Deal
           </Box>
         );
@@ -267,7 +267,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
             sx={{
               fontStyle: "italic",
               ml: 1,
-              color: "text.secondary",
+              color: "#000000",
               fontWeight: "bold",
             }}
           >
@@ -460,7 +460,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
               <Box>
                 <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
                   {issuePrice != null && (
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="#000000">
                       Issue Price: {issuePrice}
                     </Typography>
                   )}
@@ -626,7 +626,7 @@ const FOWeeklyMonthlyPredictionResults: React.FC<
           </>
         ) : (
           <Box sx={{ textAlign: "center", py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
+            <Typography variant="h6" color="#000000">
               Enter the <b>1st Day Close Price</b> to predict the 1W and 1M
               outcomes.
             </Typography>

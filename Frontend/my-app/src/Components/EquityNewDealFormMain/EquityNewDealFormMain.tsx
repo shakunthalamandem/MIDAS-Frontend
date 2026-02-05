@@ -336,7 +336,7 @@ const EquityNewDealFormMain: React.FC = () => {
 
                       <Typography
                         variant="body2"
-                        color="text.secondary"
+                        color="#000000"
                         sx={{
                           textAlign: "left",
                           width: "100%",

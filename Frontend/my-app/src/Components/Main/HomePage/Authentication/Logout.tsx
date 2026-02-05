@@ -102,7 +102,7 @@ const Logout: React.FC<LogoutProps> = ({
         <Typography
           id="logout-dialog-description"
           variant="body2"
-          color="text.secondary"
+          color="#000000"
         >
           {username ? (
             <>

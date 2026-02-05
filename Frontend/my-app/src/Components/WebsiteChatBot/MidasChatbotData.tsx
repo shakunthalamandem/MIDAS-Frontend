@@ -119,7 +119,7 @@ const MidasChatbotData: React.FC = () => {
                 <Typography variant="h5" color="#002060" sx={{ letterSpacing: 0.2 }}>
                   Midas Chatbot
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="#000000" sx={{ mt: 0.5 }}>
                   Ask a question and get an answer with sources.
                 </Typography>
               </Box>
@@ -237,7 +237,7 @@ const MidasChatbotData: React.FC = () => {
                             ))}
                           </Stack>
 
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" color="#000000">
                             Tip: click a source chip to open it in a new tab.
                           </Typography>
                         </Stack>

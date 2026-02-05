@@ -192,7 +192,7 @@ const FOManagementWriteup: React.FC<FOManagementWriteupProps> = ({
               ))}
             </Box>
           ) : (
-            <Typography variant="body2" sx={{ color: "text.secondary", fontStyle: "italic" }}>
+            <Typography variant="body2" sx={{ color: "#000000", fontStyle: "italic" }}>
               No management details available.
             </Typography>
           )}

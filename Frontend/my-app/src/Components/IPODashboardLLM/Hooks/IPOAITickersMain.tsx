@@ -135,7 +135,7 @@ const IPOAITickersMain: React.FC<Props> = ({ selectedData }) => {
       >
         <AutoAwesome fontSize="small" /> AI Suggested Tickers
         {comparativeTickers.length > 0 && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             ({comparativeTickers.length})
           </Typography>
         )}

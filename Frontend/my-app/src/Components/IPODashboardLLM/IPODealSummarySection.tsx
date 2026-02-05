@@ -281,7 +281,7 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
             <Box ml="auto" display="flex" alignItems="center" gap={1}>
               <Typography
                 variant="body2"
-                sx={{ color: "text.secondary", fontStyle: "italic" }}
+                sx={{ color: "#000000", fontStyle: "italic" }}
               >
                 (For internal use only, not included in PDF)
               </Typography>

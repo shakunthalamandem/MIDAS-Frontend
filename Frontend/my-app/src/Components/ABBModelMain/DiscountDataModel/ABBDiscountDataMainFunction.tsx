@@ -145,7 +145,7 @@ const FactsetDataCard: React.FC<{ entries: [string, unknown][] }> = ({ entries }
         ))}
       </Box>
     ) : (
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="#000000">
         No Public Market Data available.
       </Typography>
     )}
@@ -182,7 +182,7 @@ const DiscountsListCard: React.FC<{ entries: [string, number][] }> = ({ entries 
             ))}
           </Stack>
         ) : (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="#000000">
             No discount data available.
           </Typography>
     )}
