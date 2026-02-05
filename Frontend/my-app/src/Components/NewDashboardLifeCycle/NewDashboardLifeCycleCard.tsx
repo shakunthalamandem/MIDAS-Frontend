@@ -12,30 +12,33 @@ import {
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { DealCardTag } from "./NewDashboardLifeCycleUtils";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { NewDashboardLifeCycleCardTag } from "./NewDashboardLifeCycleUtils";
 
-export type DealCardMeta = {
+export type NewDashboardLifeCycleCardMeta = {
   label: string;
   value: string;
   icon: React.ReactNode;
 };
 
-type DealCardProps = {
+type NewDashboardLifeCycleCardProps = {
   title: string;
   subtitle?: string;
-  meta: DealCardMeta[];
-  tags?: DealCardTag[];
+  meta: NewDashboardLifeCycleCardMeta[];
+  tags?: NewDashboardLifeCycleCardTag[];
   writeupAvailable?: boolean | null;
+  mlPredAvailable?: boolean | null;
   onViewDetails?: () => void;
   onActionClick?: (label: string) => void;
 };
 
-const DealCard: React.FC<DealCardProps> = ({
+const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
   title,
   subtitle,
   meta,
   tags,
   writeupAvailable,
+  mlPredAvailable,
   onViewDetails,
   onActionClick,
 }) => {
@@ -54,6 +57,7 @@ const DealCard: React.FC<DealCardProps> = ({
       : writeupAvailable === false
       ? "Write Up Not Ready"
       : null;
+
   const actionCards = [
     {
       label: "Write Up",
@@ -62,7 +66,14 @@ const DealCard: React.FC<DealCardProps> = ({
       tone: "#4b5bff",
       status: writeupStatus,
     },
-    { label: "ML Model", icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
+    {
+      label: "ML Model",
+      icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />,
+      tone: "#2e7fb0",
+            bg: "#eeeffcff",
+
+      showTick: mlPredAvailable === true,
+    },
     // { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
     // { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
   ];
@@ -254,6 +265,15 @@ const DealCard: React.FC<DealCardProps> = ({
                     {item.status}
                   </Typography>
                 ) : null}
+                {item.showTick ? (
+                  <CheckCircleIcon
+                    sx={{
+                      fontSize: 18,
+                      color: "#03722fff",
+                      mt: 0.3,
+                    }}
+                  />
+                ) : null}
               </Box>
             </Grid>
           ))}
@@ -408,4 +428,4 @@ const DealCard: React.FC<DealCardProps> = ({
   );
 };
 
-export default DealCard;
+export default NewDashboardLifeCycleCard;

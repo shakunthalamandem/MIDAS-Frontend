@@ -27,6 +27,7 @@ import S1QueryBot from "./S1QueryBot";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
+import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -131,7 +132,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             }
             SearchComponent={
               <Box sx={{ width: { xs: "100%", md: 320 } }}>
-                <NewDashboardLifeCycleTickerSearch
+                <NewDashbaordIPOTickerList
                   selectedTicker={activePayload.ticker}
                   onSelect={setSelectedOption}
                 />

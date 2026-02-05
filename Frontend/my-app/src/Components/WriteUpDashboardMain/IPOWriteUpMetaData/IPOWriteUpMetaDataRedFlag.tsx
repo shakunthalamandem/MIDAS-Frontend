@@ -1,4 +1,5 @@
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined"
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
@@ -540,35 +541,39 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           {/* Edit buttons - Right aligned */}
           <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography
-                variant="subtitle2"
-                sx={{ color: "#1f2937", fontWeight: 700 }}
-              >
-                Risk Score: {(avgScore * 2).toFixed(2)}/10
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={handleEditToggle}
-                sx={{ color: "#1f3b73" }}
-              >
-                <EditOutlinedIcon fontSize="small" />
-              </IconButton>
+            {/* <Typography
+              variant="subtitle2"
+              sx={{ color: "#1f2937", fontWeight: 700 }}
+            >
+              Risk Score: {(avgScore * 2).toFixed(2)}/10
+            </Typography> */}
+            <IconButton
+              size="small"
+              onClick={handleEditToggle}
+              sx={{ color: "#1f3b73" }}
+            >
               {isEditing ? (
-                <Button
-                  size="small"
-                  variant="contained"
-                  startIcon={<SaveOutlinedIcon fontSize="small" />}
-                  onClick={handleSaveAll}
-                  disabled={saveLoading}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 700,
-                    background: "#1f3b73"
-                  }}
-                >
-                  {saveLoading ? "Saving..." : "Save"}
-                </Button>
-              ) : null}
+                <CloseOutlinedIcon fontSize="small" />
+              ) : (
+                <EditOutlinedIcon fontSize="small" />
+              )}
+            </IconButton>
+            {isEditing ? (
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<SaveOutlinedIcon fontSize="small" />}
+                onClick={handleSaveAll}
+                disabled={saveLoading}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  background: "#1f3b73"
+                }}
+              >
+                {saveLoading ? "Saving..." : "Save"}
+              </Button>
+            ) : null}
             </Stack>
           </Box>
         </Box>

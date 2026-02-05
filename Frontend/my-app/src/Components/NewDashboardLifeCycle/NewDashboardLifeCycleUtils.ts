@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export type DealCardTag = {
+export type NewDashboardLifeCycleCardTag = {
   label: string;
   color?: string;
   bg?: string;
@@ -51,8 +51,8 @@ export const formatPriceValue = (row: any): string => {
   return "TBD";
 };
 
-export const buildCardTags = (row: any): DealCardTag[] => {
-  const tags: DealCardTag[] = [];
+export const buildCardTags = (row: any): NewDashboardLifeCycleCardTag[] => {
+  const tags: NewDashboardLifeCycleCardTag[] = [];
 
   if (row?.writeup_available) {
     const hasWriteup = row.writeup_available.toString().toLowerCase() === "yes";
