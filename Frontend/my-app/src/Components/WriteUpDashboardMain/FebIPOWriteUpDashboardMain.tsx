@@ -79,13 +79,24 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     };
 
     fetchData();
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchData();
+    };
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+
+    return () => {
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
+    };
   }, [basicDealDetails]);
 
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
       { id: "market-strategy", label: "IOI and After-Market Strategy" },
-      { id: "deal-indication", label: "AI Indication" },
+      { id: "ai-indication", label: "AI Indication" },
       { id: "business-overview", label: "Business Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
@@ -266,7 +277,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="deal-indication" sx={sectionCardSx}>
+            <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataDealIndication
                   basicDealDetails={basicDealDetails}

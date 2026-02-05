@@ -251,8 +251,17 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
     }
 
     fetchAnalysis()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchAnalysis()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       cancelled = true
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [API_URL, basicDealDetails])
 
@@ -287,8 +296,8 @@ const parseDealInfoRating = (value?: number | string | null) => {
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1);
 };
   const ratingValue = parseDealInfoRating(
-    writeUpData?.writeup_ratings?.["ai_indication"] ??
-      basicDealDetails.writeup_ratings?.["ai_indication"]
+    writeUpData?.writeup_ratings?.["ai-indication"] ??
+      basicDealDetails.writeup_ratings?.["ai-indication"]
   );
 
   const ratingText = ratingValue !== null ? formatRatingValue(ratingValue) : null;
