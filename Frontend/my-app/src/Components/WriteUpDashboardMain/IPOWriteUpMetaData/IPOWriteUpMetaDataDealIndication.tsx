@@ -251,8 +251,17 @@ const IPOWriteUpMetaDataDealIndication: React.FC<
     }
 
     fetchAnalysis()
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchAnalysis()
+    }
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate)
+
     return () => {
       cancelled = true
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [API_URL, basicDealDetails])
 

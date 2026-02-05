@@ -79,6 +79,17 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     };
 
     fetchData();
+
+    // Listen for ratings update event from Final Verdict
+    const handleRatingsUpdate = () => {
+      fetchData();
+    };
+
+    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+
+    return () => {
+      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
+    };
   }, [basicDealDetails]);
 
   const sections = useMemo(
