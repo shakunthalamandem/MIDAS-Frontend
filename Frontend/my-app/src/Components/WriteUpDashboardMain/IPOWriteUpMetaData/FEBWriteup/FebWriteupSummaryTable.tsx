@@ -38,7 +38,16 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
       ? `$${ipodata.lower_bound} - $${ipodata.upper_bound}`
       : "N/A";
   }
-  if (key === "deal_size" || key === "shares_offered") {
+  if (key === "deal_size") {
+    if (value === undefined || value === null || value === "") return "N/A";
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) return "N/A";
+    return `$ ${parsed.toLocaleString(undefined, {
+      minimumFractionDigits: parsed % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: 2
+    })} M`;
+  }
+  if (key === "shares_offered") {
     return value ? Number(value).toLocaleString() : "N/A";
   }
   if (key === "nosh") {
