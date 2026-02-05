@@ -22,7 +22,7 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
-import DealCard, { DealCardMeta } from "./NewDashboardLifeCycleCard";
+import NewDashboardLifeCycleCard, { NewDashboardLifeCycleCardMeta } from "./NewDashboardLifeCycleCard";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
 import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
@@ -409,7 +409,7 @@ const NewDealsLifecycleCards: React.FC = () => {
     >
       <Grid container spacing={2}>
         {list.map((row) => {
-          const meta: DealCardMeta[] = [
+          const meta: NewDashboardLifeCycleCardMeta[] = [
             {
               label: "Pricing Date",
               value: formatDate(row.pricing_date),
@@ -448,7 +448,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               lg={3}
               key={row.id ?? `${row.ticker}-${row.pricing_date}`}
             >
-            <DealCard
+            <NewDashboardLifeCycleCard
               title={row.ticker || "N/A"}
               subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
               writeupAvailable={writeupAvailable}
@@ -489,7 +489,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             row.sectors ||
             row.sector ||
             "Pipeline Deal";
-          const meta: DealCardMeta[] = [
+          const meta: NewDashboardLifeCycleCardMeta[] = [
             {
               label: "Expected Date",
               value: formatDate(row.expected_date || row.last_placement_date || row.lockup_date),
@@ -518,7 +518,7 @@ const NewDealsLifecycleCards: React.FC = () => {
           ];
           return (
             <Grid item xs={12} md={4} lg={3} key={row.id ?? `${title}-${index}`}>
-              <DealCard
+              <NewDashboardLifeCycleCard
                 title={title}
                 subtitle={subtitle}
                 meta={meta}

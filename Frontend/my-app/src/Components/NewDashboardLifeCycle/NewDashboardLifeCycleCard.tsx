@@ -12,25 +12,25 @@ import {
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { DealCardTag } from "./NewDashboardLifeCycleUtils";
+import { NewDashboardLifeCycleCardTag } from "./NewDashboardLifeCycleUtils";
 
-export type DealCardMeta = {
+export type NewDashboardLifeCycleCardMeta = {
   label: string;
   value: string;
   icon: React.ReactNode;
 };
 
-type DealCardProps = {
+type NewDashboardLifeCycleCardProps = {
   title: string;
   subtitle?: string;
-  meta: DealCardMeta[];
-  tags?: DealCardTag[];
+  meta: NewDashboardLifeCycleCardMeta[];
+  tags?: NewDashboardLifeCycleCardTag[];
   writeupAvailable?: boolean | null;
   onViewDetails?: () => void;
   onActionClick?: (label: string) => void;
 };
 
-const DealCard: React.FC<DealCardProps> = ({
+const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
   title,
   subtitle,
   meta,
@@ -408,4 +408,4 @@ const DealCard: React.FC<DealCardProps> = ({
   );
 };
 
-export default DealCard;
+export default NewDashboardLifeCycleCard;
