@@ -67,7 +67,7 @@ export function ValuationCard({
   };
 
   return (
-    <SectionCard title="Valuation (Editable)">
+    <SectionCard title="Valuation Summary">
       <Stack
         spacing={2}
         sx={{
