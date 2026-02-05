@@ -363,6 +363,8 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
     valuationSummary,
     handleSaveIOI,
     savingIOI,
+    handleSaveAM,
+    savingAM,
   ]);
 
   if (loading) return <div>Loading...</div>;

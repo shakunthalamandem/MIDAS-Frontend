@@ -6,7 +6,6 @@ import {
   Stack,
   TextField,
   Typography,
-  FormControlLabel,
   Radio,
   Divider,
   Chip,
@@ -15,7 +14,8 @@ import {
   Collapse,
   Grid,
 } from "@mui/material";
-import { CheckCircle, Cancel, Edit } from "@mui/icons-material";
+import { CheckCircle, Cancel, Edit, Save } from "@mui/icons-material";
+import { SectionCard } from "./SectionCard";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 type IOILevel = "low" | "average" | "high" | "custom";
@@ -62,7 +62,7 @@ const IOI_OPTIONS: IOIOption[] = [
  * Formats number as currency (millions)
  */
 function formatCurrency(value: number): string {
-  return `$${(value / 1_000_000).toFixed(2)}M`;
+  return `$${(value / 1_000_000)}M`;
 }
 
 /**
@@ -111,8 +111,8 @@ function IOIOptionCard({
         position: "relative",
         overflow: "hidden",
         cursor: isEditMode ? "pointer" : "default",
-        p: 2,
-        borderRadius: 1.5,
+        p: 1.5,
+        borderRadius: 1.25,
         border: isSelected ? "2px solid #2563eb" : "1px solid #e5e7ef",
         background: isSelected
           ? "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)"
@@ -120,9 +120,9 @@ function IOIOptionCard({
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         boxShadow: isSelected
           ? "0 4px 12px rgba(37, 99, 235, 0.15)"
-          : "0 1px 3px rgba(0, 0, 0, 0.05)",
+          : "0 1px 3px rgba(0, 0, 0, 0.03)",
         opacity: isEditMode ? 1 : 0.7,
-        height: "100%",
+        height: "75%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -150,7 +150,7 @@ function IOIOptionCard({
       />
 
       {/* Content */}
-      <Stack spacing={1.25} sx={{ mt: 0.5 }}>
+        <Stack spacing={0.85} sx={{ mt: 0.3 }}>
         {/* Header with label */}
         <Box
           sx={{
@@ -306,6 +306,9 @@ export function IOI({
   };
 
   return (
+  <SectionCard title="Indication of Interest">
+
+
     <Card
       sx={{
         borderRadius: 2.5,
@@ -320,121 +323,117 @@ export function IOI({
       }}
     >
       {/* Header Section */}
-      <Box
-        sx={{
-          p: 2.5,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          position: "relative",
-        }}
-      >
-        <Box>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 800,
-              color: "#1d2b5a",
-              mb: 1,
-              fontSize: "1.1rem",
-            }}
-          >
-            IOI (Indication of Interest)
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: "#6b7280",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                fontSize: "0.7rem",
-                letterSpacing: 0.5,
-              }}
-            >
-              Deal Size
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 800,
-                color: "#1d2b5a",
-                fontSize: "1rem",
-              }}
-            >
-              {formatCurrency(deal_size)}
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* Edit Button (Only shown when NOT in edit mode) */}
-        {!isEditMode && (
-          <IconButton
-            onClick={handleEnterEditMode}
-            size="small"
-            sx={{
-              background: "#f3f4f6",
-              color: "#4b5563",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                background: "#2563eb",
-                color: "#ffffff",
-              },
-            }}
-          >
-            <Edit sx={{ fontSize: 18 }} />
-          </IconButton>
-        )}
-      </Box>
-
-      {/* Current Value Display (View Mode) */}
-      {!isEditMode && ioi_dollar_value !== undefined && (
         <Box
           sx={{
-            px: 2.5,
-            py: 2,
-            background: "rgba(37, 99, 235, 0.05)",
-            borderBottom: "1px solid #e5e7ef",
+            p: 2.5,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            position: "relative",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                color: "#6b7280",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                fontSize: "0.7rem",
-                letterSpacing: 0.5,
-              }}
-            >
-              Current Amount
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 800,
-                color: "#2563eb",
-                fontSize: "1.25rem",
-              }}
-            >
-              {formatCurrency(ioi_dollar_value)}
-            </Typography>
+          
+          <Box>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#2563eb",
+                    fontWeight: 600,
+                    // textTransform: "uppercase",
+                    fontSize: "0.9rem",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Deal Size:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 800,
+                    color: "#1d2b5a",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {formatCurrency(deal_size)}
+                </Typography>
+              </Box>
+              {!isEditMode && ioi_dollar_value !== undefined && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#2563eb",
+                    fontSize: "0.95rem",
+                  }}
+                >
+                  Indication of Interest: {formatCurrency(ioi_dollar_value)}
+                </Typography>
+              )}
+            </Box>
           </Box>
-        </Box>
-      )}
+
+        {/* Action buttons */}
+        <Stack direction="row" spacing={1}>
+          {!isEditMode ? (
+            <IconButton
+              onClick={handleEnterEditMode}
+              size="small"
+              sx={{
+                background: "#f3f4f6",
+                color: "#4b5563",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  background: "#2563eb",
+                  color: "#ffffff",
+                },
+              }}
+            >
+              <Edit sx={{ fontSize: 18 }} />
+            </IconButton>
+          ) : (
+            <>
+
+              <IconButton
+                onClick={handleSave}
+                disabled={(selectedLevel === "custom" && !!customError) || saving}
+                size="small"
+                sx={{
+                  // background: "#16a34a",
+                  color: "#4947da",
+                  // "&:hover": {
+                  //   background: "#15803d",
+                  // },
+                }}
+              >
+                <Save />
+              </IconButton>
+                            <IconButton
+                onClick={handleCancel}
+                size="small"
+                sx={{
+                  background: "#f3f4f6",
+                  color: "#4b5563",
+                  // "&:hover": {
+                  //   background: "#fee2e2",
+                  //   color: "#b91c1c",
+                  // },
+                }}
+              >
+                <Cancel />
+              </IconButton>
+            </>
+          )}
+        </Stack>
+      </Box>
 
       {/* Edit Mode Content */}
       <Collapse in={isEditMode} timeout="auto">
         <Box sx={{ p: 2.5 }}>
           {/* IOI Options - VERTICAL SPLIT (3 COLUMNS) */}
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ mb: 2 }}>
             <Typography
               variant="subtitle2"
               sx={{
@@ -449,7 +448,7 @@ export function IOI({
               Select IOI Amount
             </Typography>
 
-            <Grid container spacing={2}>
+            <Grid container spacing={1.5}>
               {IOI_OPTIONS.map((option) => (
                 <Grid item xs={12} sm={6} md={4} key={option.level}>
                   <IOIOptionCard
@@ -464,174 +463,93 @@ export function IOI({
             </Grid>
           </Box>
 
-          <Divider sx={{ mb: 3, opacity: 0.5 }} />
+          {/* <Divider sx={{ mb: 3, opacity: 0.5 }} /> */}
 
-          {/* Custom Amount Section */}
-          <Box sx={{ mb: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                mb: 2,
-              }}
+          {/* Custom Amount Inline Row */}
+          <Box >
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              flexWrap="wrap"
             >
               <Radio
                 checked={selectedLevel === "custom"}
                 onChange={() => handleLevelChange("custom")}
                 sx={{
                   ml: -1,
-                  p: 0.5,
+                  p: 0.35,
                   "& .MuiSvgIcon-root": {
-                    fontSize: 18,
+                    fontSize: 16,
                   },
                 }}
               />
               <Typography
-                variant="subtitle2"
+                variant="body2"
                 sx={{
                   fontWeight: 700,
                   color:
                     selectedLevel === "custom" ? "#1e40af" : "#1d2b5a",
-                  fontSize: "0.9rem",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.3,
                 }}
               >
                 Custom Amount (Millions)
               </Typography>
-            </Box>
-
-            <TextField
-              fullWidth
-              type="number"
-              placeholder="Enter custom amount in millions"
-              value={customAmount}
-              onChange={(e) => handleCustomAmountChange(e.target.value)}
-              disabled={selectedLevel !== "custom"}
-              error={!!customError}
-              helperText={customError}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  background:
-                    selectedLevel === "custom"
-                      ? "#ffffff"
-                      : "#f3f4f6",
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: "#ffffff",
-                  },
-                  "&.Mui-focused": {
-                    background: "#ffffff",
-                    boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
-                  },
-                },
-                "& .MuiOutlinedInput-input::placeholder": {
-                  color: "#9ca3af",
-                  opacity: 0.7,
-                },
-              }}
-            />
-
-            {/* Display percentage below custom amount */}
-            {selectedLevel === "custom" && customAmount && !customError && (
-              <Box sx={{ mt: 2 }}>
-                <Alert
-                  severity="success"
-                  sx={{
+              <TextField
+                type="number"
+                placeholder="Amount"
+                value={customAmount}
+                onChange={(e) => handleCustomAmountChange(e.target.value)}
+                disabled={selectedLevel !== "custom"}
+                error={!!customError}
+                helperText={customError}
+                sx={{
+                  width: 140,
+                  "& .MuiOutlinedInput-root": {
                     borderRadius: 1.5,
-                    background: "rgba(34, 197, 94, 0.1)",
-                    border: "1px solid rgba(34, 197, 94, 0.3)",
-                    "& .MuiAlert-message": {
-                      fontWeight: 600,
-                      color: "#15803d",
-                      width: "100%",
+                    background:
+                      selectedLevel === "custom"
+                        ? "#ffffff"
+                        : "#f3f4f6",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      background: "#ffffff",
                     },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 600,
-                        color: "#15803d",
-                      }}
-                    >
-                      {formatCurrency(parseFloat(customAmount) * 1_000_000)}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 700,
-                        color: "#15803d",
-                        fontSize: "1.1rem",
-                      }}
-                    >
-                      {customPercentage.toFixed(2)}% of deal size
-                    </Typography>
-                  </Box>
-                </Alert>
-              </Box>
+                    "&.Mui-focused": {
+                      background: "#ffffff",
+                      boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
+                    },
+                  },
+                  "& .MuiOutlinedInput-input::placeholder": {
+                    color: "#9ca3af",
+                    opacity: 0.7,
+                  },
+                }}
+              />
+            </Stack>
+
+            {selectedLevel === "custom" && customAmount && !customError && (
+              <Typography
+                variant="caption"
+                sx={{
+                  mt: 0.75,
+                  display: "block",
+                  fontWeight: 600,
+                  color: "#15803d",
+                }}
+              >
+                {formatCurrency(parseFloat(customAmount) * 1_000_000)} ·{" "}
+                {customPercentage.toFixed(2)}% of deal size
+              </Typography>
             )}
           </Box>
 
-          <Divider sx={{ mb: 3, opacity: 0.5 }} />
-
-          {/* Action Buttons (Save & Cancel) */}
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              justifyContent: "flex-end",
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={handleCancel}
-              startIcon={<Cancel />}
-              sx={{
-                fontWeight: 700,
-                px: 3,
-                textTransform: "uppercase",
-                fontSize: "0.85rem",
-                letterSpacing: 0.5,
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleSave}
-              disabled={
-                (selectedLevel === "custom" && !!customError) || saving
-              }
-              startIcon={<CheckCircle />}
-              sx={{
-                fontWeight: 700,
-                px: 3,
-                textTransform: "uppercase",
-                fontSize: "0.85rem",
-                letterSpacing: 0.5,
-              }}
-            >
-              {saving ? "Saving..." : "Save"}
-            </Button>
-          </Box>
         </Box>
       </Collapse>
     </Card>
+  </SectionCard>
   );
 }
 
