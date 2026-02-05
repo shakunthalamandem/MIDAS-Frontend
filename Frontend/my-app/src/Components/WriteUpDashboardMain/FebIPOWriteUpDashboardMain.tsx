@@ -31,6 +31,7 @@ interface FebIPOWriteUpDashboardMainProps {
 const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   basicDealDetails
 }) => {
+  console.log("BASIC DEAL DETAILS:", basicDealDetails);
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
