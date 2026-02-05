@@ -42,6 +42,7 @@ const getAuthHeaders = (): Record<string, string> => {
 
 interface DashboardAIFewShotAnalysisProps {
   prefillTicker?: { ticker: string; pricing_date?: string | null } | null;
+  basicDealDetails?: { unique_deal_id?: string | null } | null;
 }
 
 function FeatureRow({
@@ -145,6 +146,7 @@ function StepRow({
 
 const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
   prefillTicker,
+  basicDealDetails,
 }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -539,6 +541,7 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
             <AiAnalysis
               ticker={selectedTicker?.ticker ?? null}
               pricingDate={selectedTicker?.pricing_date ?? null}
+              uniqueDealId={basicDealDetails?.unique_deal_id ?? null}
             />
           </Box>
         </CardContent>

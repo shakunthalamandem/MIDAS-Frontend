@@ -18,6 +18,9 @@ type TickerOption = {
   deal_type?: string | null;
   allocation_as_percentage_of_deal_size?: number | null;
   region?: string | null;
+  exchange?: string | null;
+  deal_id?: string | null;
+  unique_deal_id?: string | null;
 };
 
 type NewDashboardLifeCycleTickerSearchProps = {

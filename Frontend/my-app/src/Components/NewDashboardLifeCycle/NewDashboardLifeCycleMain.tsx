@@ -126,6 +126,9 @@ const NewDealsLifecycleCards: React.FC = () => {
       const fieldOrder = [
         "ticker",
         "region",
+        "exchange",
+        "deal_id",
+        "unique_deal_id",
         "sector",
         "issuer_name",
         "deal_size",

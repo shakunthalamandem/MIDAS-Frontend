@@ -207,6 +207,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <FebWriteUpDashboardMain
             basicDealDetails={{
               deal_id: activePayload.deal_id,
+              unique_deal_id: activePayload.unique_deal_id,
               ticker: activePayload.ticker,
               pricing_date: activePayload.pricing_date,
               region: activePayload.region,
@@ -255,13 +256,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
             <DashboardAIFewShotAnalysis
+                basicDealDetails={{
+                  unique_deal_id: activePayload.unique_deal_id,
+                }}
               prefillTicker={{
                 ticker: activePayload.ticker,
                 pricing_date: activePayload.pricing_date ?? null,
               }}
             />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
-            <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
+            <DashboardSentimentAnalysis
+              focusTicker={activePayload.ticker ?? null}
+              region={activePayload.region ?? null}
+            />
           ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
             <S1QueryBot ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Meeting Notes" ? (

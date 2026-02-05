@@ -22,6 +22,7 @@ import NoDataNotice from "./NoDataNotice";
 type AiAnalysisProps = {
   ticker: string | null;
   pricingDate?: string | null;
+  uniqueDealId?: string | null;
 };
 
 type AiAnalysisRecord = {
@@ -460,7 +461,7 @@ const DetailBigCard: React.FC<{
 
 type StatusState = { kind: "message"; text: string } | { kind: "error"; text: string } | null;
 
-const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
+const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate, uniqueDealId }) => {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null);
@@ -491,13 +492,17 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
       setAnalysis(null);
 
       try {
+        const payload: Record<string, unknown> = { ticker };
+        if (uniqueDealId?.trim()) {
+          payload.unique_deal_id = uniqueDealId.trim();
+        } else {
+          payload.pricing_date = pricingDate ?? null;
+        }
+
         const res = await fetch(`${API_URL}/api/get_few_shot_review/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ticker,
-            pricing_date: pricingDate ?? null,
-          }),
+          body: JSON.stringify(payload),
         });
 
         const raw = await res.text();
@@ -549,7 +554,7 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate }) => {
     return () => {
       cancelled = true;
     };
-  }, [API_URL, ticker, pricingDate]);
+  }, [API_URL, ticker, pricingDate, uniqueDealId]);
 
   const outlook = useMemo(() => parseFinalOutlook(analysis || undefined), [analysis]);
   const scenarios = useMemo(
