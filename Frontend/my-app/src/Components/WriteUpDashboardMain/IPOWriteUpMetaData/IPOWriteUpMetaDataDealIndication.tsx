@@ -182,15 +182,22 @@ const parseScenarioParts = (text?: unknown): ScenarioParts => {
 
 interface IPOWriteUpMetaDataDealIndicationProps {
   basicDealDetails: BasicDealDetails
+  writeUpData?: WriteUpData | null
+  onDataLoaded?: (data: WriteUpData) => void
 }
 const IPOWriteUpMetaDataDealIndication: React.FC<
   IPOWriteUpMetaDataDealIndicationProps
-> = ({ basicDealDetails }) => {
+> = ({ basicDealDetails, writeUpData, onDataLoaded }) => {
   const API_URL = process.env.REACT_APP_API_URL
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
+
+  useEffect(() => {
+    if (writeUpData) {
+      onDataLoaded?.(writeUpData)
+    }
+  }, [onDataLoaded, writeUpData])
 
   useEffect(() => {
     let cancelled = false
@@ -290,11 +297,9 @@ const parseDealInfoRating = (value?: number | string | null) => {
   return (
     <>
           <Box sx={{ position: "relative", mb: 2 }}>
-    
-           {ratingText && (
+                      {ratingText && (
           <Box
             sx={{
-              position: "absolute",
               left: 0,
               top: "50%",
               transform: "translateY(-50%)",
@@ -315,6 +320,7 @@ const parseDealInfoRating = (value?: number | string | null) => {
             </Typography>
           </Box>
         )}
+ 
    
     <Stack spacing={3}>
       {loading ? (
