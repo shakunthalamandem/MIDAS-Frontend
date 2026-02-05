@@ -14,8 +14,8 @@ import IPOPredictionResults from "./IPOPredictionResults";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import IPOWeeklyMonthlyPredictionResults from "./IPOWeeklyMonthlyPredictionResults";
 import IPOFormFieldsSection from "./IPOFormFieldsSection";
-import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
-import { Block } from "../GhcAi/Utils/ComponentsUtils";
+import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
+import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 
 interface OptionsData {
   region: string[];
