@@ -234,6 +234,9 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
             <DashboardAIFewShotAnalysis
+              basicDealDetails={{
+                unique_deal_id: activePayload.unique_deal_id ?? null,
+              }}
               prefillTicker={{
                 ticker: activePayload.ticker,
                 pricing_date: activePayload.pricing_date ?? null,
