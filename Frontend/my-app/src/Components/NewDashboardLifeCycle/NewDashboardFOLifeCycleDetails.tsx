@@ -29,9 +29,9 @@ import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/Techni
 
 import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
 import RecentDealRecomendation from "./RecentDealRecomendation";
-import DealRecomendation from "./DealRecomendation";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
+import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -217,11 +217,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             isUpcoming ? (
               // <UpcomingDealRecomendation ticker={activePayload.ticker}
               // />
-              <DealRecomendation ticker={activePayload.ticker} />
+              <DealRecommendationHome ticker={activePayload.ticker} />
             ) : (
               // <RecentDealRecomendation ticker={activePayload.ticker}
               // />
-              <DealRecomendation ticker={activePayload.ticker} />
+              <DealRecommendationHome ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
