@@ -264,7 +264,7 @@ const FewShotAnalysisUpload: React.FC = () => {
             <Typography variant="h4" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1.1 }}>
               Upload pre-listing notes
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="#000000">
               Select a ticker and upload a .txt file to trigger the analysis workflow.
             </Typography>
           </Box>
@@ -346,11 +346,11 @@ const FewShotAnalysisUpload: React.FC = () => {
                           <Typography sx={{ fontWeight: 700 }}>{option.ticker}</Typography>
                           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                             {option.region && (
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography variant="body2" color="#000000">
                                 {option.region}
                               </Typography>
                             )}
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" color="#000000">
                               {formatUniqueDealId(option.unique_deal_id)}
                             </Typography>
                           </Box>
@@ -442,7 +442,7 @@ const FewShotAnalysisUpload: React.FC = () => {
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                       Drag & drop or click to upload
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" display="block">
+                    <Typography variant="caption" color="#000000" display="block">
                       Only .txt files are accepted
                     </Typography>
                     <Typography

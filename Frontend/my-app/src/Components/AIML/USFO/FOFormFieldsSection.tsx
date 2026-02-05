@@ -354,7 +354,7 @@ const FOFormFieldsSection: React.FC<FOFormFieldsSectionProps> = ({
           <Typography
             variant="caption"
             sx={{
-              color: "text.secondary",
+              color: "#000000",
               display: "flex",
               alignItems: "center",
             }}

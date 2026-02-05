@@ -199,7 +199,7 @@ const PNLLmvDataTablesMain: React.FC<PNLLmvDataTablesMainProps> = ({ fund }) => 
 
   if (!data) {
     return (
-      <Typography align="center" color="text.secondary">
+      <Typography align="center" color="#000000">
         No data available
       </Typography>
     );

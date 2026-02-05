@@ -45,7 +45,7 @@ const WriteUpIPODashbaord: React.FC<WriteUpIPODashbaordProps> = ({ ticker }) => 
             }}
           >
             <CircularProgress />
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
+            <Typography variant="body2" color="#000000" sx={{ mt: 1.5 }}>
               Loading IPO write-up for <strong>{selectedTicker}</strong>
             </Typography>
           </Box>

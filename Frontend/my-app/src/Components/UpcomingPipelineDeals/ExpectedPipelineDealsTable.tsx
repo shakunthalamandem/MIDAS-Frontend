@@ -625,7 +625,7 @@ const ExpectedPipelineDealsTable: React.FC<ExpectedPipelineDealsTableProps> = ({
           </Box>
 
           <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="#000000">
               The Link column provides direct access to the source in the Bloomberg Terminal.
             </Typography>
           </Box>

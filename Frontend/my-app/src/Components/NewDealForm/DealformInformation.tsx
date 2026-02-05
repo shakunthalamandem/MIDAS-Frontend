@@ -161,7 +161,7 @@ const DealformInformation = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: "text.secondary" }} />
+                    <SearchIcon sx={{ color: "#000000" }} />
                   </InputAdornment>
                 ),
               }}

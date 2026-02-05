@@ -113,7 +113,7 @@ const RecentSearchBar: React.FC<RecentSearchBarProps> = ({
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ ml: "auto", color: "text.secondary" }}
+                sx={{ ml: "auto", color: "#000000" }}
               >
                 {datePart}
               </Typography>

@@ -92,7 +92,7 @@ const UploadAiInsights: React.FC = () => {
         <Typography variant="h5" mt={2}>
           Upload AI Insights
         </Typography>
-        <Typography variant="body2" color="text.secondary" mt={1}>
+        <Typography variant="body2" color="#000000" mt={1}>
           Select a valid Excel file (.xls or .xlsx) containing AI insights.
         </Typography>
 

@@ -79,7 +79,7 @@ function StatRow({
         <Typography
           variant="body2"
           sx={{
-            color: "text.secondary",
+            color: "#000000",
             fontWeight: 700,
             whiteSpace: "nowrap",
           }}

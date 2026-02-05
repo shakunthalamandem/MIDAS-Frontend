@@ -284,8 +284,8 @@ return (
   </Stack>
 
   <Stack direction="row" spacing={1} alignItems="center" mt={2}>
-    <InfoOutlinedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-    <Typography variant="body2" color="text.secondary">
+    <InfoOutlinedIcon fontSize="small" sx={{ color: "#000000" }} />
+    <Typography variant="body2" color="#000000">
       The table below shows the performance of the past 15 deals in which Monashee participated
     </Typography>
   </Stack>

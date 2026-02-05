@@ -151,7 +151,7 @@ const MDRFundPerfomanceMain: React.FC = () => {
           {loading && (
             <Stack direction="row" spacing={1} alignItems="center">
               <CircularProgress size={18} />
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#000000">
                 Loading...
               </Typography>
             </Stack>

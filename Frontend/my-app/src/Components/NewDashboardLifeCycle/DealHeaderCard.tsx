@@ -73,7 +73,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
 
           <Typography
             variant="body2"
-            color="text.secondary"
+            color="#000000"
             sx={{
               fontWeight: 600,
               mt: 0.3,

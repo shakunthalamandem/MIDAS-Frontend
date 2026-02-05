@@ -22,7 +22,7 @@ const GENAIImageCard: React.FC<Props> = ({ title, description, url, alt }) => {
         <Typography variant="subtitle1" fontWeight={600}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="#000000">
           {description}
         </Typography>
       </CardContent>

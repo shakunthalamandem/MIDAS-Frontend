@@ -133,7 +133,7 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
 
   if (!selectedOption) {
     return (
-      <Box textAlign="center" py={4} color="text.secondary">
+      <Box textAlign="center" py={4} color="#000000">
         Please select a ticker from the search or click "Create New" to start
       </Box>
     );

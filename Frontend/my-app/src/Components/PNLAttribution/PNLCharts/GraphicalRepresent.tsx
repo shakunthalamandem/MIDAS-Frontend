@@ -167,7 +167,7 @@ const GraphicalRepresent: React.FC<GraphicalRepresentProps> = ({
             variant="subtitle2"
             sx={{
               mb: 2,
-              color: "text.secondary",
+              color: "#000000",
               fontWeight: "bold",
               fontSize: "1.1rem",
             }}

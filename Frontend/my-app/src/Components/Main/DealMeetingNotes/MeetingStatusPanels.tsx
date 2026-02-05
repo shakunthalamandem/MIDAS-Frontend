@@ -29,7 +29,7 @@ const MeetingStatusPanels: React.FC<MeetingStatusPanelsProps> = ({
               <Typography fontWeight={700} color="#002060">
                 Meeting notes do not exist for this ticker.
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#000000">
                 Create a new meeting note using the latest template.
               </Typography>
             </Stack>

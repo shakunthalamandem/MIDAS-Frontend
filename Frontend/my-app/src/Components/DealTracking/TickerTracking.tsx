@@ -297,7 +297,7 @@ const TickerTracking: React.FC<{ ticker: string; pricing_date: string }> = ({
                         {step.extra && (
                           <Typography
                             variant="body2"
-                            color="text.secondary"
+                            color="#000000"
                             sx={{ textAlign: "left", mt: 0.5 }}
                           >
                             {step.extra}
