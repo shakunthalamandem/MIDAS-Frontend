@@ -12,23 +12,43 @@ import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMet
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
 
+interface WriteUpData {
+  ticker_name: string;
+  exchange: string;
+  company_name: string;
+  pricing_date: string;
+  deal_size: number;
+  industry: string;
+  shares_offered: number;
+  nosh: number;
+  established_year: number;
+  lower_bound: number;
+  upper_bound: number;
+  filed_date: string;
+  term_date: string;
+  trade_date: string;
+  bookrunners: string[];
+}
+
 type FebIPOWriteUpPdfContentProps = {
   basicDealDetails: BasicDealDetails
   sectionCardSx: Record<string, unknown>
   rootId: string
+  writeUpData?: WriteUpData | null
 }
 
 const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
   basicDealDetails,
   sectionCardSx,
-  rootId
+  rootId,
+  writeUpData
 }) => {
   const pdfPages = useMemo(
     () => [
       {
         id: "page-1",
         sections: [
-          { id: "deal-info", content: <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} /> },
+          { id: "deal-info", content: <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} writeUpData={writeUpData} /> },
           {
             id: "market-strategy",
             content: <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
@@ -78,7 +98,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
         ]
       }
     ],
-    [basicDealDetails]
+    [basicDealDetails, writeUpData]
   )
 
   return (

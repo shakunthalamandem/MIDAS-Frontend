@@ -8,6 +8,8 @@ import StarRateOutlinedIcon from '@mui/icons-material/StarRateOutlined';
 
 interface IPOWriteUpMetaDataDealInfoProps {
   basicDealDetails: BasicDealDetails;
+  writeUpData?: WriteUpData | null;
+  onDataLoaded?: (data: WriteUpData) => void;
 }
 
 interface WriteUpData {
@@ -50,12 +52,23 @@ const formatRatingValue = (value: number) => {
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1);
 };
 
-const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({ basicDealDetails }) => {
-  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
+  basicDealDetails,
+  writeUpData: externalWriteUpData,
+  onDataLoaded
+}) => {
+  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(externalWriteUpData || null);
+  const [loading, setLoading] = useState<boolean>(!externalWriteUpData);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // If data is already provided, don't fetch
+    if (externalWriteUpData) {
+      setWriteUpData(externalWriteUpData);
+      setLoading(false);
+      return;
+    }
+
     const { ticker } = basicDealDetails;
 
     const fetchData = async () => {
@@ -78,6 +91,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
 
         const data = await res.json();
         setWriteUpData(data);
+        onDataLoaded?.(data);
       } catch (error) {
         setError('An error occurred while fetching the data');
       } finally {
@@ -97,7 +111,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
     return () => {
       window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
     };
-  }, [basicDealDetails]);
+  }, [basicDealDetails, externalWriteUpData, onDataLoaded]);
 
   if (loading) {
     return <div>Loading...</div>;

@@ -235,15 +235,32 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         }
 
         // Exchange and pricing date below company name
+        // Format date as "05 Feb 2026"
+        const formatPricingDate = (dateStr?: string | null) => {
+          if (!dateStr) return null
+          try {
+            const cleanValue = dateStr.replace(/(\d+)(st|nd|rd|th)/, "$1")
+            const dateObj = new Date(cleanValue)
+            if (Number.isNaN(dateObj.getTime())) return dateStr
+            const day = dateObj.getDate().toString().padStart(2, '0')
+            const month = dateObj.toLocaleString("default", { month: "short" })
+            const year = dateObj.getFullYear()
+            return `${day} ${month} ${year}`
+          } catch {
+            return dateStr
+          }
+        }
+
+        const formattedDate = formatPricingDate(pricingDate)
         const additionalParts = [
           exchange?.trim(),
-          pricingDate?.trim()
+          formattedDate
         ].filter(Boolean)
         if (additionalParts.length > 0) {
           const additionalText = additionalParts.join(" | ")
-          pdf.setFont("helvetica", "normal")
+          pdf.setFont("helvetica", "bold")
           pdf.setFontSize(10)
-          pdf.setTextColor(60, 60, 60)
+          pdf.setTextColor(0, 32, 96)
           pdf.text(additionalText, pdfWidth - marginX - pdf.getTextWidth(additionalText), 35)
         }
       }

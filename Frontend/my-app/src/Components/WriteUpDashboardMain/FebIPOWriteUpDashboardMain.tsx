@@ -28,10 +28,59 @@ interface FebIPOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
 }
 
+interface WriteUpData {
+  ticker_name: string;
+  exchange: string;
+  company_name: string;
+  pricing_date: string;
+  deal_size: number;
+  industry: string;
+  shares_offered: number;
+  nosh: number;
+  established_year: number;
+  lower_bound: number;
+  upper_bound: number;
+  filed_date: string;
+  term_date: string;
+  trade_date: string;
+  bookrunners: string[];
+}
+
 const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   basicDealDetails
 }) => {
-  console.log("BASIC DEAL DETAILS:", basicDealDetails);
+  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
+
+  // Fetch writeup_data API to get exchange and pricing_date
+  useEffect(() => {
+    const { ticker } = basicDealDetails;
+
+    const fetchData = async () => {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify({ ticker }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setWriteUpData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching writeup data:', error);
+      }
+    };
+
+    fetchData();
+  }, [basicDealDetails]);
+
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
@@ -143,9 +192,9 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               loadingLabel="Generating..."
               className="pdf-hidden"
               ticker={basicDealDetails?.ticker}
-              pricingDate={basicDealDetails?.pricing_date}
-              issuerName={basicDealDetails?.issuer_name}
-              exchange={basicDealDetails?.exchange}
+              pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
+              issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
+              exchange={writeUpData?.exchange || basicDealDetails?.exchange}
             />
           </Box>
 
@@ -191,12 +240,17 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
             basicDealDetails={basicDealDetails}
             sectionCardSx={sectionCardSx}
             rootId={pdfRootId}
+            writeUpData={writeUpData}
           />
         ) : (
           <>
             <Card id="deal-info" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
+                <IPOWriteUpMetaDataDealInfo
+                  basicDealDetails={basicDealDetails}
+                  writeUpData={writeUpData}
+                  onDataLoaded={setWriteUpData}
+                />
               </CardContent>
             </Card>
 
