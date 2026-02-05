@@ -235,15 +235,32 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         }
 
         // Exchange and pricing date below company name
+        // Format date as "05 Feb 2026"
+        const formatPricingDate = (dateStr?: string | null) => {
+          if (!dateStr) return null
+          try {
+            const cleanValue = dateStr.replace(/(\d+)(st|nd|rd|th)/, "$1")
+            const dateObj = new Date(cleanValue)
+            if (Number.isNaN(dateObj.getTime())) return dateStr
+            const day = dateObj.getDate().toString().padStart(2, '0')
+            const month = dateObj.toLocaleString("default", { month: "short" })
+            const year = dateObj.getFullYear()
+            return `${day} ${month} ${year}`
+          } catch {
+            return dateStr
+          }
+        }
+
+        const formattedDate = formatPricingDate(pricingDate)
         const additionalParts = [
           exchange?.trim(),
-          pricingDate?.trim()
+          formattedDate
         ].filter(Boolean)
         if (additionalParts.length > 0) {
           const additionalText = additionalParts.join(" | ")
-          pdf.setFont("helvetica", "normal")
+          pdf.setFont("helvetica", "bold")
           pdf.setFontSize(10)
-          pdf.setTextColor(60, 60, 60)
+          pdf.setTextColor(0, 32, 96)
           pdf.text(additionalText, pdfWidth - marginX - pdf.getTextWidth(additionalText), 35)
         }
       }
@@ -429,6 +446,35 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
                 badge.style.backgroundColor = '#6b5bd2'
                 badge.style.color = '#ffffff'
                 badge.style.zIndex = '10'
+              })
+
+              // Special handling for final verdict progress bars
+              const progressContainers = cloned.querySelectorAll<HTMLElement>('.pdf-progress-bar-container')
+              progressContainers.forEach((container) => {
+                container.style.width = '100%'
+                container.style.height = '8px'
+                container.style.borderRadius = '999px'
+                container.style.backgroundColor = '#e6e9f2'
+                container.style.overflow = 'hidden'
+                container.style.position = 'relative'
+                container.style.display = 'block'
+                container.style.visibility = 'visible'
+              })
+
+              const progressFills = cloned.querySelectorAll<HTMLElement>('.pdf-progress-bar-fill')
+              progressFills.forEach((fill) => {
+                const computed = window.getComputedStyle(fill)
+                const bgColor = computed.backgroundColor
+                fill.style.height = '100%'
+                fill.style.borderRadius = '999px'
+                fill.style.position = 'absolute'
+                fill.style.top = '0'
+                fill.style.left = '0'
+                fill.style.display = 'block'
+                fill.style.visibility = 'visible'
+                if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+                  fill.style.backgroundColor = bgColor
+                }
               })
             }
           }
