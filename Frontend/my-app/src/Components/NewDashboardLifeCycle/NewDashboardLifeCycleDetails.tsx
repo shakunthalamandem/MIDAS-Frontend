@@ -117,7 +117,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             mb: 3,
             p: 2,
             borderRadius: 3,
-            backgroundColor: "rgba(245, 248, 255, 0.92)",
+            backgroundColor: "rgba(206, 225, 233, 0.92)",
             backdropFilter: "blur(14px)",
             border: `1px solid ${theme.palette.divider}`,
             position: "sticky",
@@ -204,13 +204,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
-           <FebWriteUpDashboardMain
+          <FebWriteUpDashboardMain
             basicDealDetails={{
               deal_id: activePayload.deal_id,
               ticker: activePayload.ticker,
               pricing_date: activePayload.pricing_date,
               region: activePayload.region,
-              deal_type: activePayload.deal_type
+              deal_type: activePayload.deal_type,
+              issuer_name: activePayload.issuer_name,
+              exchange: activePayload.exchange,
             }}
           />
 

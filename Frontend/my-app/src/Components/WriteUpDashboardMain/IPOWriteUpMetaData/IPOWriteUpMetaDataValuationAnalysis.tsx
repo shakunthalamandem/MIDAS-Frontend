@@ -5,7 +5,8 @@ import {
   CircularProgress,
   IconButton,
   Stack,
-  Typography
+  Typography,
+  Button
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
@@ -17,6 +18,7 @@ import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
+  pdfMode?: boolean
 }
 
 interface ValuationWriteUp {
@@ -74,7 +76,7 @@ const quillFormats = [
 
 const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
-> = ({ basicDealDetails }) => {
+> = ({ basicDealDetails, pdfMode = false }) => {
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -83,6 +85,9 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const [valuationImageUrl, setValuationImageUrl] = useState<string>("")
   const [draftValuationText, setDraftValuationText] = useState("")
   const [draftImageUrl, setDraftImageUrl] = useState("")
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showToggle, setShowToggle] = useState(false)
+  const valuationRef = React.useRef<HTMLDivElement | null>(null)
   const [ratingValue, setRatingValue] = useState<number | null>(
     parseRatingValue(
       basicDealDetails.writeup_ratings?.["valuation-analysis"] ??
@@ -133,6 +138,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           setDraftValuationText(normalized)
           setDraftImageUrl(data?.valuation_image_url ?? "")
           setFetchError(null)
+          setIsExpanded(false)
           const incomingRating:
             | number
             | string
@@ -170,6 +176,26 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       window.removeEventListener('ratingsUpdated', handleRatingsUpdate)
     }
   }, [apiUrl, basicDealDetails.ticker, getAuthHeaders])
+
+  useEffect(() => {
+    if (editMode || pdfMode) {
+      setShowToggle(false)
+      return
+    }
+
+    const updateToggleVisibility = () => {
+      const el = valuationRef.current
+      if (!el) return
+      const computed = window.getComputedStyle(el)
+      const lineHeight = parseFloat(computed.lineHeight) || 24
+      const maxHeight = lineHeight * 8
+      setShowToggle(el.scrollHeight > maxHeight + 1)
+    }
+
+    updateToggleVisibility()
+    window.addEventListener("resize", updateToggleVisibility)
+    return () => window.removeEventListener("resize", updateToggleVisibility)
+  }, [valuationText, editMode])
 
   const handleSave = async () => {
     try {
@@ -254,11 +280,16 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
             </Box>
           ) : valuationText ? (
             <Box
+              ref={valuationRef}
               sx={{
                 mt: 1,
                 minHeight: 120,
                 color: "#1f2a44",
-                lineHeight: 1.7
+                lineHeight: 1.7,
+                overflow: pdfMode || isExpanded ? "visible" : "hidden",
+                display: pdfMode || isExpanded ? "block" : "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: pdfMode || isExpanded ? "unset" : 8
               }}
               dangerouslySetInnerHTML={{ __html: valuationText }}
             />
@@ -274,8 +305,24 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
               --
             </Typography>
           )}
+          {!editMode && !pdfMode && valuationText && showToggle ? (
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+              <Button
+                size="small"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                sx={{
+                  textTransform: "none",
+                  color: "#005512ff",
+                  fontWeight: 600,
+                  px: 0,
+                  minWidth: "auto"
+                }}
+              >
+                {isExpanded ? "...Read less" : "...Read more"}
+              </Button>
+            </Box>
+          ) : null}
         </Box>
-
 
       </Stack>
     )
@@ -319,45 +366,47 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-            {editMode ? (
-              <>
+          {!pdfMode && (
+            <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+              {editMode ? (
+                <>
+                  <IconButton
+                    color="primary"
+                    onClick={handleSave}
+                    sx={{
+                      color: "#16a34a",
+                      backgroundColor: "#f0fdf4",
+                      "&:hover": { backgroundColor: "#dcfce7" }
+                    }}
+                  >
+                    <SaveIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
+                    onClick={handleCancel}
+                    sx={{
+                      color: "#dc2626",
+                      backgroundColor: "#fef2f2",
+                      "&:hover": { backgroundColor: "#fee2e2" }
+                    }}
+                  >
+                    <CancelIcon fontSize="small" />
+                  </IconButton>
+                </>
+              ) : (
                 <IconButton
-                  color="primary"
-                  onClick={handleSave}
+                  onClick={() => setEditMode(true)}
                   sx={{
-                    color: "#16a34a",
-                    backgroundColor: "#f0fdf4",
-                    "&:hover": { backgroundColor: "#dcfce7" }
+                    color: "#124180",
+                    backgroundColor: "#f0f5ff",
+                    "&:hover": { backgroundColor: "#e0e7ff" }
                   }}
                 >
-                  <SaveIcon fontSize="small" />
+                  <EditIcon fontSize="small" />
                 </IconButton>
-                <IconButton
-                  color="secondary"
-                  onClick={handleCancel}
-                  sx={{
-                    color: "#dc2626",
-                    backgroundColor: "#fef2f2",
-                    "&:hover": { backgroundColor: "#fee2e2" }
-                  }}
-                >
-                  <CancelIcon fontSize="small" />
-                </IconButton>
-              </>
-            ) : (
-              <IconButton
-                onClick={() => setEditMode(true)}
-                sx={{
-                  color: "#124180",
-                  backgroundColor: "#f0f5ff",
-                  "&:hover": { backgroundColor: "#e0e7ff" }
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
+              )}
+            </Box>
+          )}
         </Box>
         {renderValuationContent()}
         {saveError ? (

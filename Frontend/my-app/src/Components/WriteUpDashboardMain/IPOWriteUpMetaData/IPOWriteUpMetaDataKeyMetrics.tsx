@@ -329,7 +329,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1 }}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-        Key Metrics - Top 5 Performance            </Typography>
+        Key Metrics - Performance Highlights           </Typography>
             <Tooltip
               arrow
               placement="right"

@@ -15,6 +15,8 @@ type FebIPOWriteUpPdfExporterProps = {
   className?: string
   ticker?: string | null
   pricingDate?: string | null
+  issuerName?: string | null
+  exchange?: string | null
 }
 
 const waitForLayout = () =>
@@ -42,42 +44,81 @@ const waitForContentReady = async (
   }
 }
 
-const drawHeader = (pdf: jsPDF, headerTitle: string) => {
+const drawHeader = (
+  pdf: jsPDF,
+  headerTitle: string,
+  logoImg?: HTMLImageElement | null
+) => {
   const pdfWidth = pdf.internal.pageSize.getWidth()
+  const marginX = 10
+  const logoWidth = 45
+  const logoHeight = 13.5
+  const logoX = pdfWidth - marginX - logoWidth
+  const logoY = 8
+
+  if (logoImg) {
+    pdf.addImage(logoImg, "PNG", logoX, logoY, logoWidth, logoHeight, undefined, "FAST")
+  }
+
   pdf.setFont("helvetica", "bold")
   pdf.setFontSize(12)
   pdf.setTextColor(0, 32, 96)
   const title = headerTitle?.trim?.() || "IPO Write-up"
-  pdf.text(title, 10, 12)
+  pdf.text(title, marginX, 14)
   pdf.setDrawColor(0, 32, 96)
   pdf.setLineWidth(0.3)
-  pdf.line(10, 15, pdfWidth - 10, 15)
+  const lineY = logoY + logoHeight + 2
+  pdf.line(marginX, lineY, pdfWidth - marginX, lineY)
   pdf.setTextColor(0, 0, 0)
-  return 20
+  return lineY + 5
 }
 
-const drawFooter = (pdf: jsPDF, dataAsOfText: string) => {
+const getFooterLayout = (pdf: jsPDF, dataAsOfText: string, marginX: number) => {
   const pdfWidth = pdf.internal.pageSize.getWidth()
   const pdfHeight = pdf.internal.pageSize.getHeight()
-  const marginX = 10
-  const footerTextTopY = pdfHeight - 22
-  pdf.setDrawColor(0, 32, 96)
-  pdf.setLineWidth(1)
-  pdf.line(marginX, footerTextTopY - 4, pdfWidth - marginX, footerTextTopY - 4)
   pdf.setFontSize(7)
   pdf.setTextColor(100)
   pdf.setFont("helvetica", "normal")
   const asOfLabel = dataAsOfText ? `Data as of ${dataAsOfText}. ` : ""
-  pdf.text(
-    `${asOfLabel}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`,
-    marginX,
-    footerTextTopY,
-    { maxWidth: pdfWidth - marginX * 2 }
+  const footerText = `${asOfLabel}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management. The reader should not assume that investment decisions identified and discussed were or will be profitable. Specific investment advice references provided herein are for illustrative purposes only and are not necessarily representative of investments that will be made in the future.`
+  const footerLines: string[] = (pdf as any).splitTextToSize(
+    footerText,
+    pdfWidth - marginX * 2
   )
+  const lineHeightMm = pdf.getFontSize() * 0.3528 * 1.2
+  const bottomTextY = pdfHeight - 10
+  const footerTextHeight = footerLines.length * lineHeightMm
+  const footerTextTopY = bottomTextY - 6 - footerTextHeight
+  const footerLineY = footerTextTopY - 3
+  const footerTopY = footerLineY - 2
+  const footerHeight = pdfHeight - footerTopY
+
+  return {
+    footerLines,
+    footerTextTopY,
+    footerLineY,
+    footerHeight,
+    bottomTextY
+  }
+}
+
+const drawFooter = (pdf: jsPDF, dataAsOfText: string, marginX = 10) => {
+  const pdfWidth = pdf.internal.pageSize.getWidth()
+  const layout = getFooterLayout(pdf, dataAsOfText, marginX)
+
+  pdf.setDrawColor(0, 32, 96)
+  pdf.setLineWidth(1)
+  pdf.line(marginX, layout.footerLineY, pdfWidth - marginX, layout.footerLineY)
+  pdf.setFontSize(7)
+  pdf.setTextColor(100)
+  pdf.setFont("helvetica", "normal")
+  pdf.text(layout.footerLines, marginX, layout.footerTextTopY, {
+    maxWidth: pdfWidth - marginX * 2
+  })
   pdf.setFontSize(9)
   pdf.setFont("helvetica", "bold")
   pdf.setTextColor(128)
-  pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, pdfHeight - 10, {
+  pdf.text("Do not copy. Do not distribute.", pdfWidth / 2, layout.bottomTextY, {
     align: "center"
   })
   pdf.setTextColor(0, 0, 0)
@@ -122,7 +163,9 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
   loadingLabel = "Generating...",
   className,
   ticker,
-  pricingDate
+  pricingDate,
+  issuerName,
+  exchange
 }) => {
   const [loading, setLoading] = useState(false)
 
@@ -157,7 +200,6 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       const pdfWidth = pdf.internal.pageSize.getWidth()
       const pdfHeight = pdf.internal.pageSize.getHeight()
       const marginX = 10
-      const bottomMargin = 18
       const contentWidth = pdfWidth - marginX * 2
       const dataAsOfText = formatDataAsOf(pricingDate)
 
@@ -176,17 +218,41 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       // Intro page
       pdf.addImage(introImg, "PNG", 0, 0, pdfWidth, pdfHeight)
       if (ticker) {
-        const label = pricingDate
-          ? `${ticker.toUpperCase()} • ${pricingDate}`
-          : ticker.toUpperCase()
+        // Ticker at top right
         pdf.setFont("helvetica", "bold")
-        pdf.setFontSize(14)
+        pdf.setFontSize(16)
         pdf.setTextColor(0, 32, 96)
-        pdf.text(label, pdfWidth - marginX - pdf.getTextWidth(label), 24)
+        const tickerText = ticker.toUpperCase()
+        pdf.text(tickerText, pdfWidth - marginX - pdf.getTextWidth(tickerText), 20)
+
+        // Company name below ticker
+        if (issuerName?.trim()) {
+          pdf.setFont("helvetica", "bold")
+          pdf.setFontSize(12)
+          pdf.setTextColor(0, 32, 96)
+          const displayName = issuerName.trim()
+          pdf.text(displayName, pdfWidth - marginX - pdf.getTextWidth(displayName), 28)
+        }
+
+        // Exchange and pricing date below company name
+        const additionalParts = [
+          exchange?.trim(),
+          pricingDate?.trim()
+        ].filter(Boolean)
+        if (additionalParts.length > 0) {
+          const additionalText = additionalParts.join(" | ")
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(10)
+          pdf.setTextColor(60, 60, 60)
+          pdf.text(additionalText, pdfWidth - marginX - pdf.getTextWidth(additionalText), 35)
+        }
       }
 
       pdf.addPage()
-      let cursorY = drawHeader(pdf, headerTitle)
+      const displayHeaderTitle = issuerName?.trim() || headerTitle
+      let cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
+      const footerLayout = getFooterLayout(pdf, dataAsOfText, marginX)
+      const bottomMargin = Math.max(footerLayout.footerHeight + 4, 30)
 
       const hideForPdf = (el: HTMLElement) => {
         hiddenEls.push({ el, display: el.style.display })
@@ -194,7 +260,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
       }
 
       root
-        .querySelectorAll<HTMLElement>(".MuiIconButton-root, .pdf-hidden")
+        .querySelectorAll<HTMLElement>(".MuiIconButton-root, .pdf-hidden, button[aria-label='add-item'], button[aria-label='delete-item']")
         .forEach(hideForPdf)
 
       const rawSections =
@@ -230,14 +296,14 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
         if (breakBefore && !isFirstSection) {
           drawFooter(pdf, dataAsOfText)
           pdf.addPage()
-          cursorY = drawHeader(pdf, headerTitle)
+          cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
         } else if (
           !breakBefore &&
           cursorY > pdfHeight - bottomMargin - minRemainingMm
         ) {
           drawFooter(pdf, dataAsOfText)
           pdf.addPage()
-          cursorY = drawHeader(pdf, headerTitle)
+          cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
         }
 
         // Calculate optimal capture width for clean PDF rendering
@@ -328,6 +394,41 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
                 }
                 // Ensure proper box sizing
                 el.style.boxSizing = 'border-box'
+
+                // Preserve background colors and gradients from computed styles
+                const backgroundColor = computed.backgroundColor
+                if (backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
+                  el.style.backgroundColor = backgroundColor
+                }
+
+                // Preserve background images (includes gradients)
+                const backgroundImage = computed.backgroundImage
+                if (backgroundImage && backgroundImage !== 'none') {
+                  el.style.backgroundImage = backgroundImage
+                }
+
+                // Preserve border colors
+                const borderColor = computed.borderColor
+                if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)' && borderColor !== 'transparent') {
+                  el.style.borderColor = borderColor
+                }
+              })
+
+              // Special handling for risk meter elements
+              const riskMeterBars = cloned.querySelectorAll<HTMLElement>('.risk-meter-bar')
+              riskMeterBars.forEach((bar) => {
+                bar.style.backgroundImage = 'linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)'
+                bar.style.background = 'linear-gradient(90deg, #22c55e 0%, #facc15 55%, #ef4444 100%)'
+                bar.style.height = '12px'
+                bar.style.width = '100%'
+                bar.style.borderRadius = '999px'
+              })
+
+              const riskMeterBadges = cloned.querySelectorAll<HTMLElement>('.risk-meter-badge')
+              riskMeterBadges.forEach((badge) => {
+                badge.style.backgroundColor = '#6b5bd2'
+                badge.style.color = '#ffffff'
+                badge.style.zIndex = '10'
               })
             }
           }
@@ -345,7 +446,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           if (availableHeightMm <= 0) {
             drawFooter(pdf, dataAsOfText)
             pdf.addPage()
-            cursorY = drawHeader(pdf, headerTitle)
+            cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
             continue
           }
 
@@ -402,7 +503,7 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
           if (cursorY > pdfHeight - bottomMargin) {
             drawFooter(pdf, dataAsOfText)
             pdf.addPage()
-            cursorY = drawHeader(pdf, headerTitle)
+            cursorY = drawHeader(pdf, displayHeaderTitle, logoImg)
           }
         }
 
@@ -417,8 +518,8 @@ const FebIPOWriteUpPdfExporter: React.FC<FebIPOWriteUpPdfExporterProps> = ({
 
       // Disclaimer page (last)
       pdf.addPage()
-      const headerLogoWidth = 55
-      const headerLogoHeight = 16.5
+      const headerLogoWidth = 45
+      const headerLogoHeight = 13.5
       const headerLogoX = pdfWidth - headerLogoWidth - 10
       const headerLogoY = 10
       pdf.addImage(
