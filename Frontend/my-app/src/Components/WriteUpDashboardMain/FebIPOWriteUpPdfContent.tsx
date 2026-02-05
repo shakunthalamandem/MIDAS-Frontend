@@ -53,7 +53,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
             id: "market-strategy",
             content: <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
           },
-          { id: "deal-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} writeUpData={writeUpData} /> }
+          { id: "ai-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} writeUpData={writeUpData} /> }
         ]
       },
       {

@@ -13,6 +13,7 @@ export interface WriteupRatings {
   "red_flag"?: number
   "ai_indication"?: number
   "ai-indication"?: number
+  
 }
 
 
