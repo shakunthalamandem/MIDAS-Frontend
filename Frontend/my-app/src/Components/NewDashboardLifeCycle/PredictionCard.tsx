@@ -35,11 +35,34 @@ type Props = {
   toNumber: (v: number | string | null | undefined) => number | null;
 };
 
+function isBlank(v: any) {
+  if (v === null || v === undefined) return true;
+  const s = String(v).trim().toLowerCase();
+  return s === "" || s === "-" || s === "na" || s === "n/a" || s === "none" || s === "null";
+}
+
+function isPredictionDone(dirRaw: string | null | undefined, confidence: any) {
+  // Treat empty/placeholder values as "not done"
+  if (isBlank(dirRaw)) return false;
+
+  const s = String(dirRaw).trim().toLowerCase();
+
+  // If backend sends "neutral" when prediction is not generated, use confidence to disambiguate.
+  if (s === "neutral" || s === "neut" || s.includes("neutral")) {
+    // If confidence missing/blank/0 => assume prediction not done
+    if (isBlank(confidence)) return false;
+    const n = Number(confidence);
+    if (!Number.isFinite(n) || n === 0) return false;
+  }
+
+  return true;
+}
+
 function parseDirection(raw: string | null | undefined): Direction {
   const s = String(raw || "").toLowerCase();
   if (s.includes("extreme") || s.includes("flash")) return "EXTREME";
   if (s.includes("low return")) return "LOW_RETURN";
-  if (s.includes("neutral return")) return "NEUTRAL";
+  if (s.includes("neutral return")) return "NEUTRAL_RETURN";
   if (s.includes("positive return")) return "POSITIVE_RETURN";
   if (s.includes("positive") || s.includes("up")) return "POSITIVE";
   if (s.includes("negative") || s.includes("down")) return "NEGATIVE";
@@ -109,20 +132,20 @@ function classifyReturnRange(
 function getReturnRangeLabel(dir: Direction): string {
   switch (dir) {
     case "LOW_RETURN":
-      return "LOW RETURN (<3%)";
+      return "(<3%)";
     case "NEUTRAL_RETURN":
-      return "NEUTRAL RETURN (>3% and <8%)";
+      return "(>3% and <8%)";
     case "POSITIVE_RETURN":
-      return "POSITIVE RETURN (>8%)";
+      return "(>8%)";
     case "POSITIVE":
-      return "POSITIVE (>0%)";
+      return "(>0%)";
     case "NEGATIVE":
-      return "NEGATIVE (<0%)";
+      return "(<0%)";
     case "EXTREME":
-      return "EXTREME";
+      return "Could be Extreme Return";
     case "NEUTRAL":
     default:
-      return "NEUTRAL";
+      return "";
   }
 }
 
@@ -152,17 +175,17 @@ const PredictionCard: React.FC<Props> = ({
   fmtPct,
   toNumber,
 }) => {
-  const isPredictionDone = dirRaw && String(dirRaw).trim() !== "";
+  const predictionDone = isPredictionDone(dirRaw, confidence);
   const dir = parseDirection(dirRaw);
   const tone = getCardTone(dir);
   const prob = confidenceProgressValue(confidence, toNumber);
 
-  // Get the expected return label based on prediction direction
   const returnRangeLabel = getReturnRangeLabel(dir);
-  const actualReturnFormatted =
-    actualReturn === "-" || !actualReturn
-      ? "Not Done"
-      : fmtPct(actualReturn, 2);
+
+  // Actual return: if empty -> show "-" and a 1-word status that period isn't finished yet.
+  const hasActual = !isBlank(actualReturn);
+  const actualReturnValue = hasActual ? fmtPct(actualReturn, 2) : "-";
+  const actualReturnStatus = hasActual ? "" : "Pending"; // 1-word status
 
   return (
     <Card
@@ -181,13 +204,11 @@ const PredictionCard: React.FC<Props> = ({
       }}
     >
       <CardContent sx={{ p: 2.4 }}>
-        <Typography
-          sx={{ fontWeight: 900, fontSize: 14, lineHeight: 1.25, mb: 1.6 }}
-        >
+        <Typography sx={{ fontWeight: 900, fontSize: 14, lineHeight: 1.25, mb: 1.6 }}>
           {title}
         </Typography>
 
-        {isPredictionDone ? (
+        {predictionDone ? (
           <>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1.8 }}>
               <DirectionChip dir={dir} />
@@ -222,9 +243,7 @@ const PredictionCard: React.FC<Props> = ({
               />
             </Box>
 
-            <Typography
-              sx={{ fontSize: 13, color: "#111827", fontWeight: 700, mb: 1.2 }}
-            >
+            <Typography sx={{ fontSize: 13, color: "#111827", fontWeight: 700, mb: 1.2 }}>
               Prob. {prob.toFixed(1)}%
             </Typography>
 
@@ -240,9 +259,17 @@ const PredictionCard: React.FC<Props> = ({
               <Typography sx={{ fontSize: 13, color: "#6B7280", fontWeight: 700 }}>
                 Actual return
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#111827", fontWeight: 900 }}>
-                {actualReturnFormatted}
-              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                <Typography sx={{ fontSize: 13, color: "#111827", fontWeight: 900 }}>
+                  {actualReturnValue}
+                </Typography>
+                {!!actualReturnStatus && (
+                  <Typography sx={{ fontSize: 12, color: "#9CA3AF", fontWeight: 700 }}>
+                    {actualReturnStatus}
+                  </Typography>
+                )}
+              </Box>
             </Box>
           </>
         ) : (
@@ -254,9 +281,7 @@ const PredictionCard: React.FC<Props> = ({
               height: 140,
             }}
           >
-            <Typography
-              sx={{ fontSize: 14, color: "#9CA3AF", fontWeight: 600 }}
-            >
+            <Typography sx={{ fontSize: 14, color: "#9CA3AF", fontWeight: 600 }}>
               Not Done
             </Typography>
           </Box>
