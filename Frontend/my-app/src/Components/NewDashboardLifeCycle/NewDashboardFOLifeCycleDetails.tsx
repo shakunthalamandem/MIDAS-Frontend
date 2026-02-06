@@ -222,7 +222,20 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               selectedDeal={activePayload}
             />
           ) : tabItems[tabValue]?.label === "Write Up New" ? (
-            <FebFOWriteUpDashboardMain ticker={activePayload.ticker} />
+            <FebFOWriteUpDashboardMain
+              basicDealDetails={{
+                deal_id: activePayload.deal_id,
+                unique_deal_id: activePayload.unique_deal_id,
+                ticker: activePayload.ticker,
+                pricing_date: activePayload.pricing_date,
+                region: activePayload.region,
+                deal_type: "FO",
+                company_name: activePayload.company_name,
+                issuer_name: activePayload.issuer_name,
+                exchange: activePayload.exchange,
+                writeup_ratings: activePayload.writeup_ratings,
+              }}
+            />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (

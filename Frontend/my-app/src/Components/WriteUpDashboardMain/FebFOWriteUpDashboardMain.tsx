@@ -193,7 +193,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             variant="h6"
             sx={{ fontWeight: 600, mb: 2, textAlign: "center", color: "#1d2b5a" }}
           >
-            IPO Write-up
+            FO Write-up
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
             <FebIPOWriteUpPdfExporter
