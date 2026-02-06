@@ -18,7 +18,6 @@ import IPOWriteUpMetaDataDealInfo from "./IPOWriteUpMetaData/IPOWriteUpMetaDataD
 import IPOWriteUpMetaDataFinalVerdict from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinalVerdict"
 import IPOWriteUpMetaDataFinancialHighlights from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinancialHighlights"
 import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetrics"
-import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
 import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
@@ -95,15 +94,13 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
-      { id: "market-strategy", label: "IOI and After-Market Strategy" },
       { id: "ai-indication", label: "Proprietary Model Indication" },
       { id: "business-overview", label: "Business Overview" },
-      { id: "key-metrics", label: "Key Metrics" },
+      { id: "key-risks", label: "Key Risks" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comparative Multiples" },
-      // { id: "trends", label: "Trends" },
       { id: "valuation-analysis", label: "Valuation Analysis" },
-      { id: "red-flag", label: "Red Flag Analysis" },
+      { id: "investment-highlights", label: "Investment Highlights" },
       { id: "final-verdict", label: "Final Verdict" }
     ],
     []
@@ -267,15 +264,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            
 
-            <Card id="market-strategy" sx={sectionCardSx}>
-              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataMarketStatergy
-                  basicDealDetails={basicDealDetails}
-                />
-              </CardContent>
-            </Card>
 
             <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
@@ -294,7 +283,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="key-metrics" sx={sectionCardSx}>
+            <Card id="key-risks" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataKeyMetrics
                   basicDealDetails={basicDealDetails}
@@ -328,7 +317,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="red-flag" sx={sectionCardSx}>
+            <Card id="investment-highlights" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataRedFlag
                   basicDealDetails={basicDealDetails}
