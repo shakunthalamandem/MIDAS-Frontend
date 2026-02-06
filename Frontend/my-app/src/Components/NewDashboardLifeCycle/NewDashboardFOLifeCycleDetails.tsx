@@ -27,6 +27,7 @@ import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
+import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -210,19 +211,18 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
-              // <UpcomingDealRecomendation ticker={activePayload.ticker}
-              // />
+
               <DealRecommendationHome ticker={activePayload.ticker} />
             ) : (
-              // <RecentDealRecomendation ticker={activePayload.ticker}
-              // />
+
               <DealRecommendationHome ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
-            
+          ) : tabItems[tabValue]?.label === "Write Up New" ? (
+            <FebFOWriteUpDashboardMain ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
