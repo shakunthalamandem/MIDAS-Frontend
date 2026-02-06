@@ -11,16 +11,14 @@ import {
 import { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "./types/DealInformation"
 
-import IPOWriteUpMetaDataBusinessOverview from "./IPOWriteUpMetaData/IPOWriteUpMetaDataBusinessOverview"
-import IPOWriteUpMetaDataComps from "./IPOWriteUpMetaData/IPOWriteUpMetaDataComps"
-import IPOWriteUpMetaDataDealIndication from "./IPOWriteUpMetaData/IPOWriteUpMetaDataDealIndication"
-import IPOWriteUpMetaDataDealInfo from "./IPOWriteUpMetaData/IPOWriteUpMetaDataDealInfo"
-import IPOWriteUpMetaDataFinalVerdict from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinalVerdict"
-import IPOWriteUpMetaDataFinancialHighlights from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinancialHighlights"
-import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetrics"
-import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
-import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
-import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
+import FOWriteUpMetaDataAIIndication from "./FoWriteUpMetaData/FOWriteUpMetaDataAIIndication"
+import FOWriteUpMetaDataBusinessOverview from "./FoWriteUpMetaData/FOWriteUpMetaDataBusinessOverview"
+import FOWriteUpMetaDataComps from "./FoWriteUpMetaData/FOWriteUpMetaDataComps"
+import FOWriteUpMetaDataDealInfo from "./FoWriteUpMetaData/FOWriteUpMetaDataDealInfo"
+import FOWriteUpMetaDataFinancialHighlights from "./FoWriteUpMetaData/FOWriteUpMetaDataFinancialHighlights"
+import FOWriteUpMetaDataInvestmentHighlights from "./FoWriteUpMetaData/FOWriteUpMetaDataInvestmentHighlights"
+import FOWriteUpMetaDataKeyRisks from "./FoWriteUpMetaData/FOWriteUpMetaDataKeyRisks"
+import FOWriteUpMetaDataValuationAnalysis from "./FoWriteUpMetaData/FOWriteUpMetaDataValuationAnalysis"
 import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
 import FebIPOWriteUpPdfExporter from "./FebIPOWriteUpPdfExporter"
 
@@ -95,16 +93,13 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
-      { id: "market-strategy", label: "IOI and After-Market Strategy" },
       { id: "ai-indication", label: "Proprietary Model Indication" },
       { id: "business-overview", label: "Business Overview" },
-      { id: "key-metrics", label: "Key Metrics" },
+      { id: "key-risks", label: "Key Risks" },
+      { id: "investment-highlights", label: "Investment Highlights" },
+      { id: "valuation-analysis", label: "Valuation Analysis" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comparative Multiples" },
-      // { id: "trends", label: "Trends" },
-      { id: "valuation-analysis", label: "Valuation Analysis" },
-      { id: "red-flag", label: "Red Flag Analysis" },
-      { id: "final-verdict", label: "Final Verdict" }
     ],
     []
   )
@@ -193,7 +188,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             variant="h6"
             sx={{ fontWeight: 600, mb: 2, textAlign: "center", color: "#1d2b5a" }}
           >
-            IPO Write-up
+            FO Write-up
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
             <FebIPOWriteUpPdfExporter
@@ -259,52 +254,37 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
           <>
             <Card id="deal-info" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataDealInfo
-                  basicDealDetails={basicDealDetails}
-                  writeUpData={writeUpData}
-                  onDataLoaded={setWriteUpData}
-                />
+                <FOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
               </CardContent>
             </Card>
 
-            
 
-            <Card id="market-strategy" sx={sectionCardSx}>
-              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataMarketStatergy
-                  basicDealDetails={basicDealDetails}
-                />
-              </CardContent>
-            </Card>
 
             <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataDealIndication
+                <FOWriteUpMetaDataAIIndication
                   basicDealDetails={basicDealDetails}
-                  writeUpData={writeUpData}
                 />
               </CardContent>
             </Card>
 
             <Card id="business-overview" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataBusinessOverview
+                <FOWriteUpMetaDataBusinessOverview
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
             </Card>
 
-            <Card id="key-metrics" sx={sectionCardSx}>
+            <Card id="key-risks" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataKeyMetrics
-                  basicDealDetails={basicDealDetails}
-                />
+                <FOWriteUpMetaDataKeyRisks basicDealDetails={basicDealDetails} />
               </CardContent>
             </Card>
 
-            <Card id="financial-highlights" sx={sectionCardSx}>
+            <Card id="investment-highlights" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataFinancialHighlights
+                <FOWriteUpMetaDataInvestmentHighlights
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
@@ -314,33 +294,25 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
             </Box> */}
 
-            <Card id="comps" sx={sectionCardSx}>
-              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
-              </CardContent>
-            </Card>
-
             <Card id="valuation-analysis" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataValuationAnalysis
+                <FOWriteUpMetaDataValuationAnalysis
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
             </Card>
 
-            <Card id="red-flag" sx={sectionCardSx}>
+            <Card id="financial-highlights" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataRedFlag
+                <FOWriteUpMetaDataFinancialHighlights
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
             </Card>
 
-            <Card id="final-verdict" sx={sectionCardSx}>
+            <Card id="comps" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataFinalVerdict
-                  basicDealDetails={basicDealDetails}
-                />
+                <FOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
               </CardContent>
             </Card>
           </>
