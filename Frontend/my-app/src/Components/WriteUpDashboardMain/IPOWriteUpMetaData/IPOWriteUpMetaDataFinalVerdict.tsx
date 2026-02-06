@@ -327,7 +327,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                       value={typeof displayScore === "number" ? displayScore : 0}
                       min={0}
                       max={10}
-                      step={0.5}
+                      step={1}
                       onChange={(_, value) => {
                         const numeric = Array.isArray(value) ? value[0] : value
                         setDraftSectionScores((prev) => ({
