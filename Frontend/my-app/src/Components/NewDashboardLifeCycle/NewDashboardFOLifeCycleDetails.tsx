@@ -16,22 +16,18 @@ import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
-import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
-import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
-import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
-import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 
-import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
-import RecentDealRecomendation from "./RecentDealRecomendation";
+
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
+import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
+import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -45,13 +41,13 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-    //   {label: "Write Up New" },
+      {label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
-      { label: "AI Unsupervised" },
+      { label: "Previous FO deals" },
       { label: "ML Model" },
       { label: "Technical Analysis" },
       { label: "NEWS" },
@@ -215,33 +211,24 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
           )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
-              // <UpcomingDealRecomendation ticker={activePayload.ticker}
-              // />
+
               <DealRecommendationHome ticker={activePayload.ticker} />
             ) : (
-              // <RecentDealRecomendation ticker={activePayload.ticker}
-              // />
+
               <DealRecommendationHome ticker={activePayload.ticker} />
             )
           ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
-            
+          ) : tabItems[tabValue]?.label === "Write Up New" ? (
+            <FebFOWriteUpDashboardMain ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
-            <DashboardAIFewShotAnalysis
-              basicDealDetails={{
-                unique_deal_id: activePayload.unique_deal_id ?? null,
-              }}
-              prefillTicker={{
-                ticker: activePayload.ticker,
-                pricing_date: activePayload.pricing_date ?? null,
-              }}
-            />
+          ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
+            <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
