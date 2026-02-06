@@ -16,23 +16,17 @@ import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
 import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
 import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
 import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
-import NewDashboardLifeCycleOverview from "./NewDashboardLifeCycleOverview";
-import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
-import StockTickerNews from "../Macro/StockTickerNews";
 import DealHeaderCard from "./DealHeaderCard";
-import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
 import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 
-import UpcomingDealRecomendation from "./UpcomingDealRecomendation";
-import RecentDealRecomendation from "./RecentDealRecomendation";
+
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
-import MDDSelectedTicker from "../Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
+import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -234,7 +228,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
-            <MDDSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
+            <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
