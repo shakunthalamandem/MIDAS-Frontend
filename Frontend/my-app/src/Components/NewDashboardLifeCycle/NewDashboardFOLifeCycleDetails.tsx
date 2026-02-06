@@ -32,6 +32,7 @@ import RecentDealRecomendation from "./RecentDealRecomendation";
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
+import MDDSelectedTicker from "../Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -45,13 +46,13 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-    //   {label: "Write Up New" },
+      {label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
-      { label: "AI Unsupervised" },
+      { label: "Previous FO deals" },
       { label: "ML Model" },
       { label: "Technical Analysis" },
       { label: "NEWS" },
@@ -232,16 +233,8 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "AI Unsupervised" ? (
-            <DashboardAIFewShotAnalysis
-              basicDealDetails={{
-                unique_deal_id: activePayload.unique_deal_id ?? null,
-              }}
-              prefillTicker={{
-                ticker: activePayload.ticker,
-                pricing_date: activePayload.pricing_date ?? null,
-              }}
-            />
+          ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
+            <MDDSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
           ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
