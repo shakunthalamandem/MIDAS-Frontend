@@ -22,7 +22,7 @@ const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({ companyName
         variant="h6"
         sx={{ color: "#1d2b5a", fontWeight: 600, textAlign: "center" }}
       >
-       AI Indication 
+      Proprietary Model Indication 
       </Typography>
       <Typography
         variant="body1"
