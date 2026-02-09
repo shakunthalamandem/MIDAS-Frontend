@@ -194,15 +194,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
         {error && <Alert severity="error">{error}</Alert>}
 
         {blocks.length > 0 && (
-          // <Box
-          //   sx={{
-          //     border: "1px solid",
-          //     borderColor: "divider",
-          //     borderRadius: 2,
-          //     bgcolor: "white",
-          //     overflow: "hidden",
-          //   }}
-          // >
+
             <GENAIRenderer
               blocks={blocks}
               setQuestion={setQuestion}
@@ -210,7 +202,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
               renderAll
               disableMotion
             />
-          // </Box>
         )}
       </Stack>
     </Paper>
