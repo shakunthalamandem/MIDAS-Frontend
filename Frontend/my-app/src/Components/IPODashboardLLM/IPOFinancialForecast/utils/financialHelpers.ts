@@ -31,6 +31,8 @@ export const getMetricKeys = (dataObj: any) =>
 export const priorityOrder = [
   "Sales",
   "Sales Growth",
+  "Collaboration Revenue",
+  "Collaboration Revenue Growth",
   "Total Revenue & Financial Income",
   "Revenue Growth",
   "Net Interest Income",
@@ -55,6 +57,8 @@ export const priorityOrder = [
 
 export const growthPairs: Record<string, string> = {
   "Sales": "Sales Growth",
+  "Collaboration Revenue": "Collaboration Revenue Growth",
+  "Total Revenue & Financial Income": "Revenue Growth",
   "Net Operating Income": "Net Operating Income Growth",
   "Net Interest Income": "Net Interest Income Growth",
   "NII after provision for credit losses": "NII after provision for credit losses Growth",
