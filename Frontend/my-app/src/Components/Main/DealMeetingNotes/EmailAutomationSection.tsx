@@ -43,7 +43,7 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
     controllerRef.current = controller;
 
     try {
-      const response = await fetch(`${apiUrl}/api/email-recipients/`, {
+      const response = await fetch(`${apiUrl}/api/email_recipients/`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
