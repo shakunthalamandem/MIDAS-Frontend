@@ -23,10 +23,20 @@ interface FinancialForecastResponse {
   data: FinancialForecastItem[];
 }
 
-interface FOWriteUpMetaDataFinancialHighlightsProps {
+interface BasicDealDetails {
+  deal_id: string;
+  unique_deal_id?: string;
   ticker: string;
   pricing_date?: string;
-  unique_deal_id?: string;
+  region: string;
+  deal_type: "IPO" | "FO";
+  company_name?: string;
+  issuer_name?: string;
+  exchange?: string;
+}
+
+interface FOWriteUpMetaDataFinancialHighlightsProps {
+  basicDealDetails: BasicDealDetails;
 }
 
 // Metrics that should be displayed as percentages
@@ -58,8 +68,9 @@ const formatValue = (value: number | undefined, isPercentage: boolean) => {
 };
 
 const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialHighlightsProps> = ({
-  ticker,
+  basicDealDetails,
 }) => {
+  const { ticker } = basicDealDetails;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
