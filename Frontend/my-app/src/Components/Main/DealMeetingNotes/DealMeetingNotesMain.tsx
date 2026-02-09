@@ -139,7 +139,7 @@ const DealMeetingNotesMain: React.FC = () => {
       {/* HEADER */}
 
 
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ pb: { xs: 4, md: 6 } }}>
         {/* MODE TABS */}
         <Paper
           elevation={0}
