@@ -3,9 +3,12 @@ import {
   Autocomplete,
   Box,
   Checkbox,
+  Chip,
   CircularProgress,
   MenuItem,
   Paper,
+  Popper,
+  PopperProps,
   Stack,
   TextField,
   Typography,
@@ -30,6 +33,7 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
   const [recipientOptions, setRecipientOptions] = useState<string[]>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
+  const [recipientInputValue, setRecipientInputValue] = useState("");
 
   const fetchRecipients = useCallback(async () => {
     if (!apiUrl || loadingRecipients) return;
@@ -69,6 +73,28 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
   const handleRecipientsOpen = useCallback(() => {
     fetchRecipients();
   }, [fetchRecipients]);
+
+  const selectedRecipients = useMemo(() => {
+    if (!capitalStructure.emailRecipients) return [];
+    return capitalStructure.emailRecipients
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }, [capitalStructure.emailRecipients]);
+
+  const DownwardPopper = useCallback(
+    (props: PopperProps) => (
+      <Popper
+        {...props}
+        placement="bottom-start"
+        modifiers={[
+          { name: "flip", enabled: false },
+          { name: "preventOverflow", enabled: false },
+        ]}
+      />
+    ),
+    []
+  );
 
   return (
     <Paper sx={{ ...sectionCardSx }}>
@@ -237,23 +263,23 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
             <Autocomplete
               freeSolo
               disableClearable
+              multiple
               openOnFocus
+              disablePortal
+              PopperComponent={DownwardPopper}
               options={recipientOptions}
-              value={capitalStructure.emailRecipients || ""}
-              inputValue={capitalStructure.emailRecipients || ""}
+              value={selectedRecipients}
+              inputValue={recipientInputValue}
               onChange={(event, newValue) => {
-                if (typeof newValue === "string") {
-                  setCapitalStructure((prev) => ({
-                    ...prev,
-                    emailRecipients: newValue,
-                  }));
-                }
-              }}
-              onInputChange={(event, newInputValue) => {
+                const normalized = Array.isArray(newValue) ? newValue : [];
                 setCapitalStructure((prev) => ({
                   ...prev,
-                  emailRecipients: newInputValue || "",
+                  emailRecipients: normalized.join(", "),
                 }));
+                setRecipientInputValue("");
+              }}
+              onInputChange={(event, newInputValue) => {
+                setRecipientInputValue(newInputValue);
               }}
               disabled={!isEditing}
               loading={loadingRecipients}
@@ -262,8 +288,19 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
                 minWidth: { xs: "100%", md: 260 },
                 "& .MuiInputBase-input": {
                   fontFamily: uiFontFamily,
+                  minHeight: 32,
                 },
               }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option}
+                    size="small"
+                    {...getTagProps({ index })}
+                    key={`${option}-${index}`}
+                  />
+                ))
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
