@@ -344,8 +344,8 @@ const parseDealInfoRating = (value?: number | string | null) => {
                 sx={{ display: "flex", alignItems: "center", gap: 1.5 }} >
 
         <NoDataNotice
-          title="No data found"
-          subtitle="There is no data for this ticker. We will update soon."
+          title="Proprietary Model Indication is not available."
+          subtitle=" We will update soon."
         />
           </Box>
 

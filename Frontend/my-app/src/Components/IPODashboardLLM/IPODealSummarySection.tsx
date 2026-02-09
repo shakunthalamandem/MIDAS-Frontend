@@ -7,7 +7,6 @@ import {
   Box,
   Grid,
   CircularProgress,
-  TextField,
   IconButton,
   Container,
 } from "@mui/material";
@@ -20,6 +19,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import { SelectedData } from "./IPODealsS1DealData";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 type DealData = {
   fair_value_estimate: string;
@@ -43,6 +44,25 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "list",
+    "bullet",
+    "link",
+  ];
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -212,29 +232,31 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
                       </Typography>
                     </Box>
                     {editMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        multiline
-                        minRows={2}
-                        value={
-                          editedDealData?.[field.key as EditableField] ??
-                          dealData[field.key as EditableField] ??
-                          ""
-                        }
-                        onChange={(e) =>
-                          setEditedDealData((prev) => ({
-                            ...prev!,
-                            [field.key]: e.target.value,
-                          }))
-                        }
-                      />
+                      <Box sx={{ border: "1px solid #e0e0e0", borderRadius: 1 }}>
+                        <ReactQuill
+                          theme="snow"
+                          value={
+                            editedDealData?.[field.key as EditableField] ??
+                            dealData[field.key as EditableField] ??
+                            ""
+                          }
+                          onChange={(value) =>
+                            setEditedDealData((prev) => ({
+                              ...prev!,
+                              [field.key]: value,
+                            }))
+                          }
+                          modules={quillModules}
+                          formats={quillFormats}
+                        />
+                      </Box>
                     ) : (
-                      <Typography
-                        sx={{ color: "#333", whiteSpace: "pre-line" }}
-                      >
-                        {dealData[field.key as EditableField] ?? ""}
-                      </Typography>
+                      <Box
+                        sx={{ color: "#333", mt: 1, "& ul": { m: 0, pl: 3 } }}
+                        dangerouslySetInnerHTML={{
+                          __html: dealData[field.key as EditableField] ?? "",
+                        }}
+                      />
                     )}
                   </CardContent>
                 </Card>
@@ -304,23 +326,24 @@ const IPODealSummarySection: React.FC<Props> = ({ selectedData }) => {
           </Box>
 
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              minRows={4}
-              placeholder="Enter internal notes here..."
-              value={
-                editedDealData?.internal_notes ??
-                dealData.internal_notes ??
-                ""
-              }
-              onChange={(e) =>
-                setEditedDealData((prev) => ({
-                  ...prev!,
-                  internal_notes: e.target.value,
-                }))
-              }
-            />
+            <Box sx={{ border: "1px solid #e0e0e0", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={
+                  editedDealData?.internal_notes ??
+                  dealData.internal_notes ??
+                  ""
+                }
+                onChange={(value) =>
+                  setEditedDealData((prev) => ({
+                    ...prev!,
+                    internal_notes: value,
+                  }))
+                }
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
           ) : dealData.internal_notes ? (
             <Box
               sx={{

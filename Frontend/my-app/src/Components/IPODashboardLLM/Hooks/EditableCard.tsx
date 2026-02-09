@@ -6,7 +6,6 @@ import {
   Typography,
   IconButton,
   Box,
-  TextField,
   Button,
   List,
   ListItem,
@@ -20,6 +19,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface EditableCardProps {
   section: { key: string; title: string };
@@ -89,6 +90,26 @@ const EditableCard: React.FC<EditableCardProps> = ({
     stopAccordionToggle(event);
     handleCancelCard(key);
   };
+
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "list",
+    "bullet",
+    "link",
+  ];
 
   return (
     <Accordion
@@ -164,17 +185,15 @@ const EditableCard: React.FC<EditableCardProps> = ({
                     sx={{ fontSize: 8, color: "#002060" }}
                   />
                 </Box>
-                <TextField
-                  fullWidth
-                  multiline
-                  size="small"
-                  value={item}
-                  onChange={(e) =>
-                    handleItemChange(key, idx, e.target.value)
-                  }
-                  placeholder="Enter text..."
-                  sx={{ mr: 1 }}
-                />
+                <Box sx={{ flex: 1, mr: 1, border: "1px solid #e0e0e0", borderRadius: 1 }}>
+                  <ReactQuill
+                    theme="snow"
+                    value={item}
+                    onChange={(value) => handleItemChange(key, idx, value)}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                </Box>
                 <IconButton
                   color="error"
                   onClick={() => handleDeleteItem(key, idx)}

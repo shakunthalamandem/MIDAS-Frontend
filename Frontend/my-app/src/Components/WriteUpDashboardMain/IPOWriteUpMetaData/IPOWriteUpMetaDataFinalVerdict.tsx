@@ -277,8 +277,8 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
   if (!loading && fetchError) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="Final Verdict is not available. No data found"
+        subtitle=" We will update soon."
       />
     )
   }

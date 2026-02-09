@@ -278,8 +278,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   if (fetchError)
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="Key Metrics is not available."
+        subtitle=" We will update soon."
       />
     )
 
