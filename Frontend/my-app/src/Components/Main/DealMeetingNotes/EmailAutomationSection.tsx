@@ -264,6 +264,7 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
               freeSolo
               disableClearable
               multiple
+              disableCloseOnSelect
               openOnFocus
               disablePortal
               PopperComponent={DownwardPopper}
@@ -271,7 +272,11 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
               value={selectedRecipients}
               inputValue={recipientInputValue}
               onChange={(event, newValue) => {
-                const normalized = Array.isArray(newValue) ? newValue : [];
+                const normalized = Array.isArray(newValue)
+                  ? newValue
+                  : newValue
+                    ? [newValue]
+                    : [];
                 setCapitalStructure((prev) => ({
                   ...prev,
                   emailRecipients: normalized.join(", "),
@@ -285,22 +290,80 @@ const EmailAutomationSection: React.FC<EmailAutomationSectionProps> = ({
               loading={loadingRecipients}
               onOpen={handleRecipientsOpen}
               sx={{
-                minWidth: { xs: "100%", md: 260 },
+                minWidth: { xs: "100%", md: 360 },
                 "& .MuiInputBase-input": {
                   fontFamily: uiFontFamily,
                   minHeight: 32,
                 },
               }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    label={option}
+              componentsProps={{
+                paper: {
+                  sx: {
+                    width: 360,
+                    maxHeight: 300,
+                    borderRadius: 2,
+                  },
+                },
+              }}
+              ListboxProps={{
+                sx: {
+                  maxHeight: 260,
+                  overflowY: "auto",
+                  px: 0,
+                  "&::-webkit-scrollbar": {
+                    width: 6,
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    borderRadius: 999,
+                    backgroundColor: "rgba(11, 44, 111, 0.35)",
+                  },
+                },
+              }}
+              renderOption={(props, option, { selected }) => (
+                <Box
+                  component="li"
+                  {...props}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    px: 1.5,
+                    py: 0.75,
+                    minWidth: 320,
+                  }}
+                >
+                  <Checkbox
                     size="small"
-                    {...getTagProps({ index })}
-                    key={`${option}-${index}`}
+                    checked={selected}
+                    disableRipple
+                    sx={{ mr: 1 }}
                   />
-                ))
-              }
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontFamily: uiFontFamily,
+                      color: selected ? "primary.main" : "text.primary",
+                    }}
+                  >
+                    {option}
+                  </Typography>
+                </Box>
+              )}
+              renderTags={(value, getTagProps) => {
+                if (!value.length) return null;
+                return (
+                  <Stack direction="row" spacing={0.5}>
+                    <Chip
+                      label={value[0]}
+                      size="small"
+                      {...getTagProps({ index: 0 })}
+                      sx={{ textOverflow: "ellipsis", maxWidth: 120 }}
+                    />
+                    {value.length > 1 ? (
+                      <Chip label={`+${value.length - 1}`} size="small" />
+                    ) : null}
+                  </Stack>
+                );
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
