@@ -238,8 +238,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && fetchError) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="IOI and After-Market Strategy is not available."
+        subtitle=" We will update soon."
       />
     )
   }
@@ -247,8 +247,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && !data) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="IOI and After-Market Strategy is not available."
+        subtitle=" We will update soon."
       />
     )
   }

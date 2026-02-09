@@ -463,8 +463,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   if (fetchError || !writeUpData) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker."
+        title="Business Overview is not available."
+        subtitle=" We will update soon."
       />
     )
   }
