@@ -2,6 +2,7 @@ import React from "react";
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Paper,
@@ -22,6 +23,8 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
   const [blocks, setBlocks] = React.useState<Block[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [s1Link, setS1Link] = React.useState<string | null>(null);
+  const [s1Loading, setS1Loading] = React.useState(false);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
 
@@ -29,7 +32,38 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
     setBlocks([]);
     setError(null);
     setQuestion("");
+    setS1Link(null);
   }, [ticker]);
+
+  React.useEffect(() => {
+    const fetchS1Link = async () => {
+      if (!ticker || !apiUrl) return;
+      const token = localStorage.getItem("access_token");
+      setS1Loading(true);
+      try {
+        const res = await fetch(`${apiUrl}/api/ipo_s1_document_data/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ ticker }),
+        });
+        if (!res.ok) {
+          setS1Link(null);
+          return;
+        }
+        const data = await res.json();
+        setS1Link(data?.s1_document_link || null);
+      } catch {
+        setS1Link(null);
+      } finally {
+        setS1Loading(false);
+      }
+    };
+
+    fetchS1Link();
+  }, [apiUrl, ticker]);
 
   const toBlocks = (data: any): Block[] => {
     if (Array.isArray(data)) {
@@ -118,13 +152,50 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
       }}
     >
       <Stack spacing={2}>
-        <Box sx={{ textAlign: "center" }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            S1 AI Query
-          </Typography>
-          <Typography variant="body2" color="#000000">
-            Ask a question for {ticker || "the selected ticker"}.
-          </Typography>
+        <Box sx={{ position: "relative", minHeight: 52 }}>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              S1 AI Query
+            </Typography>
+            <Typography variant="body2" color="#000000">
+              Ask a question for {ticker || "the selected ticker"}.
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              position: { xs: "static", sm: "absolute" },
+              right: 0,
+              top: "50%",
+              transform: { sm: "translateY(-50%)" },
+              mt: { xs: 1, sm: 0 },
+              display: "flex",
+              justifyContent: { xs: "center", sm: "flex-end" },
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            {s1Loading ? (
+              <CircularProgress size={18} />
+            ) : s1Link ? (
+              <Button
+                size="small"
+                variant="outlined"
+                href={s1Link}
+                target="_blank"
+                rel="noreferrer"
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  borderRadius: 999,
+                  borderColor: "rgba(47, 129, 192, 0.6)",
+                  color: "#1f3b73",
+                  px: 2,
+                }}
+              >
+                View S1 Document
+              </Button>
+            ) : null}
+          </Box>
         </Box>
 
         <Box
