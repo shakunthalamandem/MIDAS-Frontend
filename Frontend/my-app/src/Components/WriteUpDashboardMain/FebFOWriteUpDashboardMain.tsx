@@ -3,13 +3,15 @@ import {
   Box,
   Card,
   CardContent,
+  CircularProgress,
   List,
   ListItemButton,
   ListItemText,
   Typography
 } from "@mui/material"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "./types/DealInformation"
+import { FOWriteUpApiResponse } from "./types/FOWriteUpData"
 
 import FOWriteUpMetaDataAIIndication from "./FoWriteUpMetaData/FOWriteUpMetaDataAIIndication"
 import FOWriteUpMetaDataBusinessOverview from "./FoWriteUpMetaData/FOWriteUpMetaDataBusinessOverview"
@@ -48,6 +50,44 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
   basicDealDetails
 }) => {
   const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
+  const [foWriteUpData, setFoWriteUpData] = useState<FOWriteUpApiResponse | null>(null);
+  const [foDataLoading, setFoDataLoading] = useState(false);
+
+  // Fetch FO WriteUp details via POST API
+  const fetchFoWriteUpData = useCallback(async () => {
+    const { ticker, unique_deal_id, pricing_date } = basicDealDetails;
+    if (!ticker) return;
+
+    setFoDataLoading(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, unique_deal_id, pricing_date }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFoWriteUpData(data);
+      } else {
+        console.error("Failed to fetch FO writeup data");
+      }
+    } catch (error) {
+      console.error("Error fetching FO writeup data:", error);
+    } finally {
+      setFoDataLoading(false);
+    }
+  }, [basicDealDetails]);
+
+  useEffect(() => {
+    fetchFoWriteUpData();
+  }, [fetchFoWriteUpData]);
 
   // Fetch writeup_data API to get exchange and pricing_date
   useEffect(() => {
@@ -250,15 +290,25 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             rootId={pdfRootId}
             writeUpData={writeUpData}
           />
+        ) : foDataLoading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+            <CircularProgress />
+          </Box>
         ) : (
           <>
             <Card id="deal-info" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <FOWriteUpMetaDataDealInfo basicDealDetails={basicDealDetails} />
+                <FOWriteUpMetaDataDealInfo
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.deal_information}
+                  tradingDetails={foWriteUpData?.trading_details}
+                  sharePricePerformance={foWriteUpData?.share_price_performance}
+                  onUpdate={fetchFoWriteUpData}
+                />
               </CardContent>
             </Card>
-
-
 
             <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
@@ -271,33 +321,47 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             <Card id="business-overview" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataBusinessOverview
-                  basicDealDetails={basicDealDetails}
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.business_details}
+                  onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>
             </Card>
 
             <Card id="key-risks" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <FOWriteUpMetaDataKeyRisks basicDealDetails={basicDealDetails} />
+                <FOWriteUpMetaDataKeyRisks
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.key_risks}
+                  onUpdate={fetchFoWriteUpData}
+                />
               </CardContent>
             </Card>
 
             <Card id="investment-highlights" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataInvestmentHighlights
-                  basicDealDetails={basicDealDetails}
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.investment_highlights}
+                  onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>
             </Card>
-            {/* 
-            <Box id="trends" sx={{ scrollMarginTop: 96 }}>
-              <IPOWriteUpMetaDataTrends basicDealDetails={basicDealDetails} />
-            </Box> */}
 
             <Card id="valuation-analysis" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataValuationAnalysis
-                  basicDealDetails={basicDealDetails}
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.valuation_writeup}
+                  onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>
             </Card>
@@ -305,7 +369,11 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             <Card id="financial-highlights" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataFinancialHighlights
-                  basicDealDetails={basicDealDetails}
+                  ticker={basicDealDetails.ticker}
+                  pricing_date={basicDealDetails.pricing_date}
+                  unique_deal_id={basicDealDetails.unique_deal_id}
+                  data={foWriteUpData?.financial_highlights}
+                  onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>
             </Card>
