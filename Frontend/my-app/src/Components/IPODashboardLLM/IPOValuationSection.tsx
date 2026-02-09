@@ -7,7 +7,6 @@ import {
   Container,
   Typography,
   IconButton,
-  TextField,
   Button,
   CircularProgress,
 } from "@mui/material";
@@ -18,6 +17,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { SelectedData } from "./IPODealsS1DealData";
 import ValuationImagePanel from "./ValuationImagePanel";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface Props {
   selectedData: SelectedData;
@@ -42,6 +43,25 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   const [valuationImageId, setValuationImageId] = useState<string | null>(
     initialValuationImageId
   );
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "list",
+    "bullet",
+    "link",
+  ];
 
   useEffect(() => {
     setValuationImageId(
@@ -175,19 +195,20 @@ const IPOValuationSection: React.FC<Props> = ({ selectedData }) => {
   const renderEditValuation = () => (
     <>
       {editedValuation.map((item, index) => (
-        <Box key={index} display="flex" alignItems="center" gap={1} mb={1}>
-          <TextField
-            value={item}
-            onChange={(e) => {
-              const updated = [...editedValuation];
-              updated[index] = e.target.value;
-              setEditedValuation(updated);
-            }}
-            fullWidth
-            multiline
-            size="small"
-            InputProps={{ style: { backgroundColor: "#fff" } }}
-          />
+        <Box key={index} display="flex" alignItems="flex-start" gap={1} mb={1}>
+          <Box sx={{ flex: 1, border: "1px solid #e0e0e0", borderRadius: 1 }}>
+            <ReactQuill
+              theme="snow"
+              value={item}
+              onChange={(value) => {
+                const updated = [...editedValuation];
+                updated[index] = value;
+                setEditedValuation(updated);
+              }}
+              modules={quillModules}
+              formats={quillFormats}
+            />
+          </Box>
           <IconButton
             color="primary"
             onClick={() => handleAddValuationLine(index)}

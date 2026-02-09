@@ -584,8 +584,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           </Box>
         ) : fetchError ? (
           <NoDataNotice
-            title="No data found"
-            subtitle="There is no data for this ticker. We will update soon."
+            title="Red Flag Analysis is not available."
+            subtitle=" We will update soon."
           />
         ) : items.length === 0 ? (
           <Typography variant="body2" sx={{ color: "#5c6c8a" }}>

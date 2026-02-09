@@ -665,9 +665,13 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
   };
 
   const handleItemChange = (key: string, index: number, value: string) => {
-    const updated = [...editedContent[key]];
-    updated[index] = value;
-    setEditedContent((prev) => ({ ...prev, [key]: updated }));
+    setEditedContent((prev) => {
+      const current = prev[key] ?? [];
+      if (current[index] === value) return prev;
+      const updated = [...current];
+      updated[index] = value;
+      return { ...prev, [key]: updated };
+    });
   };
 
   return (

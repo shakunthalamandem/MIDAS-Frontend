@@ -5,7 +5,6 @@ import {
   Typography,
   Box,
   CircularProgress,
-  TextField,
   IconButton,
   Container,
 } from "@mui/material";
@@ -14,6 +13,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import ValuationImagePanel from "./ValuationImagePanel";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 
 
@@ -58,6 +59,25 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
   const token = localStorage.getItem("access_token");
 
   const [hasNotified, setHasNotified] = useState(false);
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "list",
+    "bullet",
+    "link",
+  ];
 
   useEffect(() => {
     setHasNotified(false);
@@ -344,24 +364,24 @@ const IPODifferenciateSummary: React.FC<IPODifferenciateSummaryProps> = ({
                 }}
               >
                 {editMode ? (
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    minRows={4}
-                    placeholder="Enter differentiated summary..."
-                    value={
-                      editedDealData?.differentiated_summary ??
-                      dealData.differentiated_summary ??
-                      ""
-                    }
-                    onChange={(e) =>
-                      setEditedDealData((prev) => ({
-                        ...prev!,
-                        differentiated_summary: e.target.value,
-                      }))
-                    }
-                  />
+                  <Box sx={{ border: "1px solid #e0e0e0", borderRadius: 1 }}>
+                    <ReactQuill
+                      theme="snow"
+                      value={
+                        editedDealData?.differentiated_summary ??
+                        dealData.differentiated_summary ??
+                        ""
+                      }
+                      onChange={(value) =>
+                        setEditedDealData((prev) => ({
+                          ...prev!,
+                          differentiated_summary: value,
+                        }))
+                      }
+                      modules={quillModules}
+                      formats={quillFormats}
+                    />
+                  </Box>
                 ) : (
                   <Box
                     sx={{ color: "#333", mt: 2 }}

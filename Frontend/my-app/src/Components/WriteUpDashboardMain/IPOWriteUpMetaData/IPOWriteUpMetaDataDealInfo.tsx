@@ -120,8 +120,8 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
   if (error) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="Deal Info is not available."
+        subtitle=" We will update soon."
       />
     );
   }
@@ -129,8 +129,8 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
   if (!writeUpData) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="Deal Info is not available."
+        subtitle=" We will update soon."
       />
     );
   }

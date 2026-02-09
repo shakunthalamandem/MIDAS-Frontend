@@ -238,8 +238,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && fetchError) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="IOI and After-Market Strategy is not available."
+        subtitle=" We will update soon."
       />
     )
   }
@@ -247,8 +247,8 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && !data) {
     return (
       <NoDataNotice
-        title="No data found"
-        subtitle="There is no data for this ticker. We will update soon."
+        title="IOI and After-Market Strategy is not available."
+        subtitle=" We will update soon."
       />
     )
   }
@@ -365,17 +365,21 @@ IOI and After-Market Strategy          </Typography>
                       </Box>
                     ) : (
                       <Box sx={{ width: "100%" }}>
-                        {cardValue.startsWith('<') ? (
+                        {cardValue.startsWith("<") ? (
                           <Box>
                             <Box
                               sx={{
                                 fontWeight: 400,
                                 color: "#000000",
                                 lineHeight: 1.6,
-                                '& p': { margin: 0, marginBottom: 0.5, display: 'inline' },
-                                '& ul, & ol': { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 }
+                                "& p": { margin: 0, marginBottom: 0.5 },
+                                "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                                overflow: isExpanded ? "visible" : "hidden",
+                                display: isExpanded ? "block" : "-webkit-box",
+                                WebkitBoxOrient: "vertical",
+                                WebkitLineClamp: isExpanded ? "unset" : 6
                               }}
-                              dangerouslySetInnerHTML={{ __html: isExpanded ? cardValue : preview }}
+                              dangerouslySetInnerHTML={{ __html: cardValue }}
                             />
                             {isLongText && (
                               <Typography
@@ -389,25 +393,34 @@ IOI and After-Market Strategy          </Typography>
                                   ml: 0.5,
                                   "&:hover": { textDecoration: "underline" }
                                 }}
-                                onClick={() => setExpandedCards(prev => ({ ...prev, [card.key]: !isExpanded }))}
+                                onClick={() =>
+                                  setExpandedCards((prev) => ({
+                                    ...prev,
+                                    [card.key]: !isExpanded
+                                  }))
+                                }
                               >
                                 {isExpanded ? "Read Less" : "Read More"}
                               </Typography>
                             )}
                           </Box>
                         ) : (
-                          <Typography
-                            variant="body1"
-                            component="div"
-                            sx={{
-                              fontWeight: 400,
-                              color: "#111827",
-                              lineHeight: 1.6
-                            }}
-                          >
-                            <Box component="span">
-                              {isExpanded ? cardValue : preview}
-                            </Box>
+                          <Box>
+                            <Typography
+                              variant="body1"
+                              component="div"
+                              sx={{
+                                fontWeight: 400,
+                                color: "#111827",
+                                lineHeight: 1.6,
+                                overflow: isExpanded ? "visible" : "hidden",
+                                display: isExpanded ? "block" : "-webkit-box",
+                                WebkitBoxOrient: "vertical",
+                                WebkitLineClamp: isExpanded ? "unset" : 6
+                              }}
+                            >
+                              {cardValue}
+                            </Typography>
                             {isLongText && (
                               <Typography
                                 component="span"
@@ -420,12 +433,17 @@ IOI and After-Market Strategy          </Typography>
                                   ml: 0.5,
                                   "&:hover": { textDecoration: "underline" }
                                 }}
-                                onClick={() => setExpandedCards(prev => ({ ...prev, [card.key]: !isExpanded }))}
+                                onClick={() =>
+                                  setExpandedCards((prev) => ({
+                                    ...prev,
+                                    [card.key]: !isExpanded
+                                  }))
+                                }
                               >
                                 {isExpanded ? "Read Less" : "Read More"}
                               </Typography>
                             )}
-                          </Typography>
+                          </Box>
                         )}
                       </Box>
                     )}
