@@ -23,6 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import { motion } from "framer-motion"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
+import AddIcon from "@mui/icons-material/Add"
 
 /* -------------------- TYPES -------------------- */
 
@@ -55,6 +56,11 @@ const criteriaList = [
   { label: "ESG Focus", key: "esg_focus" },
   { label: "M&A Opportunities", key: "ma_opportunities" }
 ]
+
+interface CriteriaItem {
+  label: string
+  key: string
+}
 
 const getColorHex = (color?: string | null) => {
   switch (color?.toLowerCase()) {
@@ -108,6 +114,9 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [editMode, setEditMode] = useState(false)
   const [metrics, setMetrics] = useState<KeyMetricsResponse>({})
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
+  const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
+  const [newRowCount, setNewRowCount] = useState(1)
+  const [labelOverrides, setLabelOverrides] = useState<Record<string, string>>({})
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -203,11 +212,16 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   /* -------------------- DERIVED ROW LOGIC -------------------- */
 
-  const filledCriteria = criteriaList.filter(
+  const allCriteria = useMemo(
+    () => [...dynamicCriteria, ...criteriaList],
+    [dynamicCriteria]
+  )
+
+  const filledCriteria = allCriteria.filter(
     (c) => metrics[c.key]?.category?.trim()
   )
 
-  const rowsToRender = editMode ? criteriaList : filledCriteria
+  const rowsToRender = editMode ? allCriteria : filledCriteria
 
   /* -------------------- HANDLERS -------------------- */
 
@@ -222,6 +236,33 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     }))
   }
 
+  const handleAddRow = () => {
+    const newKey = `custom_${Date.now()}`
+    const label = `New Metric ${newRowCount}`
+    setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev])
+    setNewRowCount((count) => count + 1)
+    setEditedMetrics((prev) => ({
+      ...prev,
+      [newKey]: { category: "", color: null }
+    }))
+    setMetrics((prev) => ({
+      [newKey]: { category: "", color: null },
+      ...prev
+    }))
+    if (!editMode) setEditMode(true)
+  }
+
+  const handleLabelOverride = (key: string, label: string) => {
+    setLabelOverrides((prev) => ({
+      ...prev,
+      [key]: label
+    }))
+
+    setDynamicCriteria((prev) =>
+      prev.map((item) => (item.key === key ? { ...item, label } : item))
+    )
+  }
+
   const handleDelete = (key: string) => {
     // Mark for deletion by setting to undefined
     setEditedMetrics((prev) => {
@@ -232,6 +273,13 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
     // Immediately remove from metrics for UI update
     setMetrics((prev) => {
+      const updated = { ...prev }
+      delete updated[key]
+      return updated
+    })
+
+    setDynamicCriteria((prev) => prev.filter((item) => item.key !== key))
+    setLabelOverrides((prev) => {
       const updated = { ...prev }
       delete updated[key]
       return updated
@@ -370,7 +418,25 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1}>
+          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1} alignItems="center">
+            <Tooltip title="Add new row" arrow>
+              <span>
+                <IconButton
+                  onClick={handleAddRow}
+                  sx={{
+                    color: "#0b2c6a",
+                    backgroundColor: "#eef2ff",
+                    "&:hover": {
+                      backgroundColor: "#dbeafe",
+                      transform: "scale(1.05)"
+                    },
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
             {editMode ? (
               <>
                 <IconButton
@@ -449,7 +515,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </TableHead>
 
           <TableBody>
-            {rowsToRender.map((item, idx) => {
+            {rowsToRender.map((item) => {
               const original = metrics[item.key] || {}
               const edited = editedMetrics[item.key] || {}
               const value = editMode
@@ -458,6 +524,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               const color = editMode
                 ? edited.color ?? original.color
                 : original.color
+              const labelValue = labelOverrides[item.key] ?? item.label
 
               return (
                 <TableRow
@@ -468,7 +535,32 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                     transition: "background 0.2s ease"
                   }}
                 >
-                  <TableCell sx={{ fontWeight: 600, color: "#1f2937" }}>{item.label}</TableCell>
+                  <TableCell>
+                    {editMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={labelValue}
+                        onChange={(e) => handleLabelOverride(item.key, e.target.value)}
+                        placeholder="Enter criteria"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            background: "#ffffff",
+                            "&:hover fieldset": {
+                              borderColor: "#124180"
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#1d4ed8"
+                            }
+                          }
+                        }}
+                      />
+                    ) : (
+                      <Typography sx={{ fontWeight: 600, color: "#1f2937" }}>
+                        {labelValue}
+                      </Typography>
+                    )}
+                  </TableCell>
 
                   <TableCell align="center">
                     {editMode ? (
