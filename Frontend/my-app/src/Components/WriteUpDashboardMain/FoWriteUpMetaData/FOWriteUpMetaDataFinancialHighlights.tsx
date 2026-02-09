@@ -1,114 +1,190 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, IconButton, CircularProgress } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, Typography, CircularProgress, IconButton, TextField } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { FinancialHighlights } from "../types/FOWriteUpData";
+
+interface FinancialYearData {
+  [key: string]: number | undefined;
+}
+
+interface FinancialForecastItem {
+  id: number;
+  ticker: string;
+  pricing_date: string | null;
+  deal_id: string | null;
+  deal_type: string;
+  flag_for_writeup: boolean;
+  meta_data: Record<string, FinancialYearData>;
+}
+
+interface FinancialForecastResponse {
+  status: boolean;
+  data: FinancialForecastItem[];
+}
 
 interface FOWriteUpMetaDataFinancialHighlightsProps {
   ticker: string;
   pricing_date?: string;
   unique_deal_id?: string;
-  data?: FinancialHighlights;
-  onUpdate?: () => void;
 }
 
-const financialFields: {
-  label: string;
-  currentKey: keyof FinancialHighlights;
-  previousKey: keyof FinancialHighlights;
-  changeKey: keyof FinancialHighlights;
-}[] = [
-  {
-    label: "Total Revenue",
-    currentKey: "total_revenue_current_year",
-    previousKey: "total_revenue_previous_year",
-    changeKey: "total_revenue_yoy_change",
-  },
-  {
-    label: "Gross Profit",
-    currentKey: "gross_profit_current_year",
-    previousKey: "gross_profit_previous_year",
-    changeKey: "gross_profit_yoy_change",
-  },
-  {
-    label: "Operating Income",
-    currentKey: "operating_income_current_year",
-    previousKey: "operating_income_previous_year",
-    changeKey: "operating_income_yoy_change",
-  },
-  {
-    label: "Net Income",
-    currentKey: "net_income_current_year",
-    previousKey: "net_income_previous_year",
-    changeKey: "net_income_yoy_change",
-  },
+// Metrics that should be displayed as percentages
+const percentageMetrics = [
+  "Sales Growth",
+  "EBITDA Margin",
+  "Net Income Margin",
+  "Gross Profit Margin",
 ];
 
-const formatValue = (value: number | undefined) => {
-  if (value === undefined || value === null) return "N/A";
-  return `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-};
+// Define preferred order for metrics
+const metricOrder = [
+  "Sales",
+  "Sales Growth",
+  "Gross Profit",
+  "Gross Profit Margin",
+  "EBITDA",
+  "EBITDA Margin",
+  "Net Income",
+  "Net Income Margin",
+];
 
-const formatPercentage = (value: number | undefined) => {
+const formatValue = (value: number | undefined, isPercentage: boolean) => {
   if (value === undefined || value === null) return "N/A";
-  return `${Number(value).toFixed(2)}%`;
+  if (isPercentage) {
+    return `${Number(value).toFixed(2)}%`;
+  }
+  return `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}M`;
 };
 
 const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialHighlightsProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
-  data: initialData,
-  onUpdate,
 }) => {
-  const [formData, setFormData] = useState<FinancialHighlights>(initialData ?? {});
-  const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [metaData, setMetaData] = useState<Record<string, FinancialYearData> | null>(null);
+  const [editData, setEditData] = useState<Record<string, FinancialYearData> | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchFinancialData = useCallback(async () => {
+    if (!ticker) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker }),
+      });
+
+      if (response.ok) {
+        const result: FinancialForecastResponse = await response.json();
+        if (result.status && result.data && result.data.length > 0) {
+          setMetaData(result.data[0].meta_data);
+          setEditData(JSON.parse(JSON.stringify(result.data[0].meta_data)));
+        } else {
+          setError("No financial data available");
+        }
+      } else {
+        setError("Failed to fetch financial data");
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Error fetching financial data");
+    } finally {
+      setLoading(false);
+    }
+  }, [ticker]);
 
   useEffect(() => {
-    setFormData(initialData ?? {});
-  }, [initialData]);
+    fetchFinancialData();
+  }, [fetchFinancialData]);
 
-  const handleChange = (key: keyof FinancialHighlights, value: string) => {
+  const handleChange = (year: string, metric: string, value: string) => {
+    if (!editData) return;
+
     const parsed = parseFloat(value);
-    setFormData({ ...formData, [key]: isNaN(parsed) ? undefined : parsed });
+    setEditData({
+      ...editData,
+      [year]: {
+        ...editData[year],
+        [metric]: value === "" ? undefined : isNaN(parsed) ? editData[year]?.[metric] : parsed,
+      },
+    });
   };
 
   const handleSave = async () => {
+    if (!editData) return;
+
     setSaving(true);
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const payload: Record<string, any> = {
-        ticker,
-        unique_deal_id,
-        pricing_date,
-        financial_highlights: formData,
-      };
-
-      const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
+      const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ticker,
+          meta_data: editData,
+        }),
       });
 
       if (response.ok) {
+        setMetaData(JSON.parse(JSON.stringify(editData)));
         setEditMode(false);
-        onUpdate?.();
       } else {
         console.error("Save failed");
       }
-    } catch (error) {
-      console.error("Save error:", error);
+    } catch (err) {
+      console.error("Save error:", err);
     } finally {
       setSaving(false);
     }
   };
+
+  const handleEditClick = () => {
+    if (editMode) {
+      handleSave();
+    } else {
+      setEditData(JSON.parse(JSON.stringify(metaData)));
+      setEditMode(true);
+    }
+  };
+
+  // Get dynamic year columns sorted
+  const displayData = editMode ? editData : metaData;
+  const yearColumns = displayData ? Object.keys(displayData).sort() : [];
+
+  // Get all unique metrics from the data dynamically
+  const allMetrics = displayData
+    ? Array.from(
+        new Set(
+          Object.values(displayData).flatMap((yearData) => Object.keys(yearData))
+        )
+      )
+    : [];
+
+  // Sort metrics by preferred order, unknown metrics go to the end
+  const sortedMetrics = [...allMetrics].sort((a, b) => {
+    const indexA = metricOrder.indexOf(a);
+    const indexB = metricOrder.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
 
   return (
     <motion.div
@@ -124,109 +200,114 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
       }}
     >
       <IconButton
-        onClick={() => (editMode ? handleSave() : setEditMode(true))}
-        disabled={saving}
+        onClick={handleEditClick}
+        disabled={saving || loading}
         sx={{ position: "absolute", top: 12, right: 12, color: "#002060" }}
       >
         {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
       </IconButton>
 
       <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3 }}>
-        Financial Highlights
+        Financial Forecasts
       </Typography>
 
-      <Box sx={{ overflowX: "auto" }}>
-        <Box
-          component="table"
-          sx={{
-            width: "100%",
-            borderCollapse: "collapse",
-            "& th, & td": {
-              padding: "12px 16px",
-              textAlign: "left",
-              borderBottom: "1px solid #e0e0e0",
-            },
-            "& th": {
-              fontWeight: 600,
-              color: "#124180",
-              backgroundColor: "#f5f8ff",
-            },
-            "& td": {
-              color: "#333333",
-            },
-          }}
-        >
-          <thead>
-            <tr>
-              <th>Metric</th>
-              <th>Current Year</th>
-              <th>Previous Year</th>
-              <th>YoY Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {financialFields.map((field) => (
-              <tr key={field.label}>
-                <td style={{ fontWeight: 600 }}>{field.label}</td>
-                <td>
-                  {editMode ? (
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={formData[field.currentKey] ?? ""}
-                      onChange={(e) => handleChange(field.currentKey, e.target.value)}
-                      sx={{ width: "120px" }}
-                    />
-                  ) : (
-                    formatValue(formData[field.currentKey])
-                  )}
-                </td>
-                <td>
-                  {editMode ? (
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={formData[field.previousKey] ?? ""}
-                      onChange={(e) => handleChange(field.previousKey, e.target.value)}
-                      sx={{ width: "120px" }}
-                    />
-                  ) : (
-                    formatValue(formData[field.previousKey])
-                  )}
-                </td>
-                <td>
-                  {editMode ? (
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={formData[field.changeKey] ?? ""}
-                      onChange={(e) => handleChange(field.changeKey, e.target.value)}
-                      sx={{ width: "100px" }}
-                    />
-                  ) : (
-                    <Typography
-                      component="span"
-                      sx={{
-                        color:
-                          formData[field.changeKey] !== undefined
-                            ? formData[field.changeKey]! > 0
-                              ? "#2e7d32"
-                              : formData[field.changeKey]! < 0
-                              ? "#d32f2f"
-                              : "#333333"
-                            : "#333333",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {formatPercentage(formData[field.changeKey])}
-                    </Typography>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress />
         </Box>
-      </Box>
+      ) : error ? (
+        <Typography color="error" sx={{ textAlign: "center", py: 2 }}>
+          {error}
+        </Typography>
+      ) : displayData && yearColumns.length > 0 ? (
+        <Box sx={{ overflowX: "auto" }}>
+          <Box
+            component="table"
+            sx={{
+              width: "100%",
+              borderCollapse: "collapse",
+              "& th, & td": {
+                padding: "12px 16px",
+                textAlign: "right",
+                borderBottom: "1px solid #e0e0e0",
+              },
+              "& th:first-of-type, & td:first-of-type": {
+                textAlign: "left",
+              },
+              "& th": {
+                fontWeight: 600,
+                color: "#124180",
+                backgroundColor: "#f5f8ff",
+              },
+              "& td": {
+                color: "#333333",
+              },
+            }}
+          >
+            <thead>
+              <tr>
+                <th>Metric</th>
+                {yearColumns.map((year) => (
+                  <th key={year}>{year}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedMetrics.map((metric) => {
+                const isPercentage = percentageMetrics.includes(metric);
+                return (
+                  <tr key={metric}>
+                    <td style={{ fontWeight: 600 }}>{metric}</td>
+                    {yearColumns.map((year) => {
+                      const value = displayData[year]?.[metric];
+                      return (
+                        <td key={year}>
+                          {editMode ? (
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={value ?? ""}
+                              onChange={(e) => handleChange(year, metric, e.target.value)}
+                              sx={{
+                                width: "100px",
+                                "& .MuiInputBase-input": {
+                                  textAlign: "right",
+                                  padding: "6px 8px",
+                                },
+                              }}
+                            />
+                          ) : (
+                            <Typography
+                              component="span"
+                              sx={{
+                                fontWeight: 500,
+                                color:
+                                  value !== undefined && isPercentage
+                                    ? value > 0
+                                      ? "#2e7d32"
+                                      : value < 0
+                                      ? "#d32f2f"
+                                      : "#333333"
+                                    : "#333333",
+                              }}
+                            >
+                              {formatValue(value, isPercentage)}
+                            </Typography>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Box>
+        </Box>
+      ) : (
+        <Typography sx={{ textAlign: "center", py: 2, color: "#666" }}>
+          No financial data available
+        </Typography>
+      )}
     </motion.div>
   );
 };

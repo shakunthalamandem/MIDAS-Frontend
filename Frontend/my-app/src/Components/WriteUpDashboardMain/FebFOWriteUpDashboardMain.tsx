@@ -370,10 +370,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataFinancialHighlights
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
-                  data={foWriteUpData?.financial_highlights}
-                  onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>
             </Card>
