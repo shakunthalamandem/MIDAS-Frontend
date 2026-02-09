@@ -18,6 +18,7 @@ type TickerItem = {
   pricing_date?: string | null;
   deal_type?: string | null;
   deal_id?: string | null;
+  unique_deal_id?: string | null;
   flag_for_writeup?: string | null;
 };
 
@@ -113,6 +114,7 @@ const FinancialforecastUpload: React.FC = () => {
     formData.append("deal_id", selected?.deal_id ?? "");
     formData.append("deal_type", selected?.deal_type ?? "");
     formData.append("pricing_date", selected?.pricing_date ?? "");
+    formData.append("unique_deal_id", selected?.unique_deal_id ?? "");
     formData.append(
       "flag_for_writeup",
       selected?.flag_for_writeup === null ||
