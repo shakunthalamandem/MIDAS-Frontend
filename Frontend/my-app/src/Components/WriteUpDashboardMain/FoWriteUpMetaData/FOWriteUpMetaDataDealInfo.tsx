@@ -4,57 +4,43 @@ import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import {
-  DealInformation,
   TradingDetails,
   SharePricePerformance,
 } from "../types/FOWriteUpData";
 
 interface FOWriteUpMetaDataDealInfoProps {
   ticker: string;
-  data?: DealInformation;
   tradingDetails?: TradingDetails;
   sharePricePerformance?: SharePricePerformance;
   onUpdate?: () => void;
 }
 
-const dealFields: { label: string; key: keyof DealInformation; type?: string; suffix?: string }[] = [
-  { label: "Ticker", key: "ticker", type: "text" },
-  { label: "Pricing Date", key: "pricing_date", type: "text" },
-  { label: "Issue Price", key: "issue_price", type: "number", suffix: "$" },
-  { label: "Deal Size (M)", key: "deal_size", type: "number", suffix: "$" },
-  { label: "Industry", key: "industry", type: "text" },
-  { label: "Shares Offered", key: "shares_offered", type: "number" },
-  { label: "Shares Outstanding", key: "number_of_shares_outstanding", type: "number" },
-  { label: "Greenshoe", key: "greenshoe", type: "number" },
-  { label: "Bookrunners", key: "bookrunners", type: "text" },
-];
-
-const tradingFields: { label: string; key: keyof TradingDetails; type?: string; suffix?: string }[] = [
-  { label: "Current Share Price", key: "current_share_price", type: "number", suffix: "$" },
-  { label: "Current Market Cap", key: "current_market_cap", type: "number", suffix: "$" },
-  { label: "Float %", key: "float_as_percent_shares_outstanding", type: "number", suffix: "%" },
-  { label: "Short Interest %", key: "short_interest_as_percent_float", type: "number", suffix: "%" },
-  { label: "30-Day Avg Volume", key: "volume_30day_average", type: "number" },
-  { label: "Mean Target Price", key: "mean_target_price", type: "number", suffix: "$" },
-  { label: "Consensus Recommendation", key: "concensus_recomendations", type: "text" },
+const tradingFields: { label: string; key: keyof TradingDetails; type?: string; prefix?: string; suffix?: string }[] = [
+  { label: "Current Share Price", key: "current_share_price", type: "number", prefix: "$" },
+  { label: "Market Cap (M)", key: "current_market_cap", type: "number", prefix: "$" },
+  { label: "Float (% Shares Outstanding)", key: "float_as_percent_shares_outstanding", type: "number", suffix: "%" },
+  { label: "Short Interest (% Float)", key: "short_interest_as_percent_float", type: "number", suffix: "%" },
+  { label: "Volume (30-day Avg)", key: "volume_30day_average", type: "number" },
+  { label: "Mean Target Price", key: "mean_target_price", type: "number", prefix: "$" },
+  { label: "Consensus Recommendations", key: "concensus_recomendations", type: "text" },
   { label: "% of 52-Week High", key: "percentage_of_52_week_high", type: "number", suffix: "%" },
 ];
 
 const performanceFields: { label: string; key: keyof SharePricePerformance; suffix?: string }[] = [
-  { label: "1 Year Return", key: "_1_year_total_return", suffix: "%" },
-  { label: "3 Year Return", key: "_3_year_total_return", suffix: "%" },
-  { label: "YTD Return", key: "ytd_return", suffix: "%" },
-  { label: "6 Month Return", key: "_6_month_return", suffix: "%" },
-  { label: "3 Month Return", key: "_3_month_return", suffix: "%" },
-  { label: "1 Month Return", key: "_1_month_return", suffix: "%" },
+  { label: "3-Year Total Return (%)", key: "_3_year_total_return", suffix: "%" },
+  { label: "1-Year Total Return (%)", key: "_1_year_total_return", suffix: "%" },
+  { label: "YTD Return (%)", key: "ytd_return", suffix: "%" },
+  { label: "6-Month Return (%)", key: "_6_month_return", suffix: "%" },
+  { label: "3-Month Return (%)", key: "_3_month_return", suffix: "%" },
+  { label: "1-Month Return (%)", key: "_1_month_return", suffix: "%" },
 ];
 
-const formatValue = (value: any, suffix?: string) => {
+const formatValue = (value: any, prefix?: string, suffix?: string) => {
   if (value === undefined || value === null) return "N/A";
   if (typeof value === "number") {
     const formatted = Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    if (suffix === "$") return `$${formatted}`;
-    if (suffix === "%") return `${formatted}%`;
+    if (prefix) return `${prefix}${formatted}`;
+    if (suffix) return `${formatted}${suffix}`;
     return formatted;
   }
   return value;
@@ -62,31 +48,21 @@ const formatValue = (value: any, suffix?: string) => {
 
 const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
   ticker,
-  data: initialData,
   tradingDetails: initialTradingDetails,
   sharePricePerformance: initialPerformance,
   onUpdate,
 }) => {
-  const [dealData, setDealData] = useState<DealInformation>(initialData ?? {});
   const [tradingData, setTradingData] = useState<TradingDetails>(initialTradingDetails ?? {});
   const [performanceData, setPerformanceData] = useState<SharePricePerformance>(initialPerformance ?? {});
-  const [editMode, setEditMode] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [editTradingMode, setEditTradingMode] = useState(false);
+  const [editPerformanceMode, setEditPerformanceMode] = useState(false);
+  const [savingTrading, setSavingTrading] = useState(false);
+  const [savingPerformance, setSavingPerformance] = useState(false);
 
   useEffect(() => {
-    setDealData(initialData ?? {});
     setTradingData(initialTradingDetails ?? {});
     setPerformanceData(initialPerformance ?? {});
-  }, [initialData, initialTradingDetails, initialPerformance]);
-
-  const handleDealChange = (key: keyof DealInformation, value: string, type?: string) => {
-    if (type === "number") {
-      const parsed = parseFloat(value);
-      setDealData({ ...dealData, [key]: isNaN(parsed) ? undefined : parsed });
-    } else {
-      setDealData({ ...dealData, [key]: value });
-    }
-  };
+  }, [initialTradingDetails, initialPerformance]);
 
   const handleTradingChange = (key: keyof TradingDetails, value: string, type?: string) => {
     if (type === "number") {
@@ -102,18 +78,11 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
     setPerformanceData({ ...performanceData, [key]: isNaN(parsed) ? undefined : parsed });
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSaveTrading = async () => {
+    setSavingTrading(true);
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
-
-      const payload: Record<string, any> = {
-        ticker,
-        ...dealData,
-        ...tradingData,
-        ...performanceData,
-      };
 
       const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
         method: "PATCH",
@@ -121,122 +90,166 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ticker, ...tradingData }),
       });
 
       if (response.ok) {
-        setEditMode(false);
+        setEditTradingMode(false);
         onUpdate?.();
-      } else {
-        console.error("Save failed");
       }
     } catch (error) {
       console.error("Save error:", error);
     } finally {
-      setSaving(false);
+      setSavingTrading(false);
     }
+  };
+
+  const handleSavePerformance = async () => {
+    setSavingPerformance(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, ...performanceData }),
+      });
+
+      if (response.ok) {
+        setEditPerformanceMode(false);
+        onUpdate?.();
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setSavingPerformance(false);
+    }
+  };
+
+  const cardStyle = {
+    flex: 1,
+    borderRadius: 3,
+    background: "#f0f4ff",
+    p: 3,
+    position: "relative" as const,
+  };
+
+  const titleStyle = {
+    fontWeight: 700,
+    color: "#1e3a5f",
+    fontSize: "18px",
+    mb: 3,
+    textAlign: "center" as const,
+  };
+
+  const labelStyle = {
+    fontWeight: 600,
+    color: "#1e3a5f",
+    fontSize: "14px",
+    mb: 0.5,
+  };
+
+  const valueStyle = {
+    fontWeight: 400,
+    fontSize: "14px",
+    color: "#4a5568",
+    mb: 2,
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      style={{
-        borderRadius: 16,
-        background: "linear-gradient(#f0f5ff)",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-        padding: "20px",
-        position: "relative",
-      }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
     >
-      <IconButton
-        onClick={() => (editMode ? handleSave() : setEditMode(true))}
-        disabled={saving}
-        sx={{ position: "absolute", top: 12, right: 12, color: "#002060" }}
-      >
-        {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
-      </IconButton>
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        {/* Trading Details Card */}
+        <Box sx={cardStyle}>
+          <IconButton
+            onClick={() => (editTradingMode ? handleSaveTrading() : setEditTradingMode(true))}
+            disabled={savingTrading}
+            size="small"
+            sx={{ position: "absolute", top: 16, right: 16, color: "#1e3a5f" }}
+          >
+            {savingTrading ? <CircularProgress size={18} /> : editTradingMode ? <SaveIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+          </IconButton>
 
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3 }}>
-        Deal Information
-      </Typography>
+          <Typography sx={titleStyle}>Trading Details</Typography>
 
-      <Box display="flex" flexWrap="wrap" gap={3} justifyContent="space-between">
-        {dealFields.map((field) => (
-          <Box key={field.key} flex="1 1 calc(50% - 12px)" minWidth="250px" mb={2}>
-            <Typography sx={{ fontWeight: 600, color: "#124180", fontSize: "16px" }}>
-              {field.label}
-            </Typography>
-            {editMode ? (
-              <TextField
-                fullWidth
-                size="small"
-                type={field.type === "number" ? "number" : "text"}
-                value={dealData[field.key] ?? ""}
-                onChange={(e) => handleDealChange(field.key, e.target.value, field.type)}
-              />
-            ) : (
-              <Typography sx={{ fontWeight: 400, fontSize: "16px", color: "#333333" }}>
-                {formatValue(dealData[field.key], field.suffix)}
-              </Typography>
-            )}
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(3, 1fr)"
+            gap={2}
+          >
+            {tradingFields.map((field) => (
+              <Box key={field.key}>
+                <Typography sx={labelStyle}>{field.label}</Typography>
+                {editTradingMode ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type={field.type === "number" ? "number" : "text"}
+                    value={tradingData[field.key] ?? ""}
+                    onChange={(e) => handleTradingChange(field.key, e.target.value, field.type)}
+                    sx={{
+                      "& .MuiInputBase-input": { fontSize: "14px", py: 0.75 }
+                    }}
+                  />
+                ) : (
+                  <Typography sx={valueStyle}>
+                    {formatValue(tradingData[field.key], field.prefix, field.suffix)}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </Box>
-        ))}
-      </Box>
+        </Box>
 
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, mt: 4 }}>
-        Trading Details
-      </Typography>
+        {/* Share Price Performance Card */}
+        <Box sx={cardStyle}>
+          <IconButton
+            onClick={() => (editPerformanceMode ? handleSavePerformance() : setEditPerformanceMode(true))}
+            disabled={savingPerformance}
+            size="small"
+            sx={{ position: "absolute", top: 16, right: 16, color: "#1e3a5f" }}
+          >
+            {savingPerformance ? <CircularProgress size={18} /> : editPerformanceMode ? <SaveIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+          </IconButton>
 
-      <Box display="flex" flexWrap="wrap" gap={3} justifyContent="space-between">
-        {tradingFields.map((field) => (
-          <Box key={field.key} flex="1 1 calc(50% - 12px)" minWidth="250px" mb={2}>
-            <Typography sx={{ fontWeight: 600, color: "#124180", fontSize: "16px" }}>
-              {field.label}
-            </Typography>
-            {editMode ? (
-              <TextField
-                fullWidth
-                size="small"
-                type={field.type === "number" ? "number" : "text"}
-                value={tradingData[field.key] ?? ""}
-                onChange={(e) => handleTradingChange(field.key, e.target.value, field.type)}
-              />
-            ) : (
-              <Typography sx={{ fontWeight: 400, fontSize: "16px", color: "#333333" }}>
-                {formatValue(tradingData[field.key], field.suffix)}
-              </Typography>
-            )}
+          <Typography sx={titleStyle}>Share Price Performance</Typography>
+
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(3, 1fr)"
+            gap={2}
+          >
+            {performanceFields.map((field) => (
+              <Box key={field.key}>
+                <Typography sx={labelStyle}>{field.label}</Typography>
+                {editPerformanceMode ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type="number"
+                    value={performanceData[field.key] ?? ""}
+                    onChange={(e) => handlePerformanceChange(field.key, e.target.value)}
+                    sx={{
+                      "& .MuiInputBase-input": { fontSize: "14px", py: 0.75 }
+                    }}
+                  />
+                ) : (
+                  <Typography sx={valueStyle}>
+                    {formatValue(performanceData[field.key], undefined, field.suffix)}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </Box>
-        ))}
-      </Box>
-
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, mt: 4 }}>
-        Share Price Performance
-      </Typography>
-
-      <Box display="flex" flexWrap="wrap" gap={3} justifyContent="space-between">
-        {performanceFields.map((field) => (
-          <Box key={field.key} flex="1 1 calc(33% - 12px)" minWidth="180px" mb={2}>
-            <Typography sx={{ fontWeight: 600, color: "#124180", fontSize: "16px" }}>
-              {field.label}
-            </Typography>
-            {editMode ? (
-              <TextField
-                fullWidth
-                size="small"
-                type="number"
-                value={performanceData[field.key] ?? ""}
-                onChange={(e) => handlePerformanceChange(field.key, e.target.value)}
-              />
-            ) : (
-              <Typography sx={{ fontWeight: 400, fontSize: "16px", color: "#333333" }}>
-                {formatValue(performanceData[field.key], field.suffix)}
-              </Typography>
-            )}
-          </Box>
-        ))}
+        </Box>
       </Box>
     </motion.div>
   );
