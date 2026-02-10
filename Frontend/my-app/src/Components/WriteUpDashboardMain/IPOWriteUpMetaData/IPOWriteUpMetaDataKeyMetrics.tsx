@@ -34,6 +34,7 @@ interface IPOWriteUpMetaDataKeyMetricsProps {
 interface KeyMetricItem {
   category?: string
   color?: string | null
+  label?: string
 }
 
 type KeyMetricsResponse = Record<string, KeyMetricItem>
@@ -116,7 +117,6 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
   const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
   const [newRowCount, setNewRowCount] = useState(1)
-  const [labelOverrides, setLabelOverrides] = useState<Record<string, string>>({})
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -152,7 +152,22 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         if (!res.ok) throw new Error("Failed to load key metrics")
 
         const data = await res.json()
-        if (active) setMetrics(data || {})
+        if (active) {
+          // ensure every metric has a label fallback so UI stays readable
+          const normalized: KeyMetricsResponse = {}
+          Object.entries(data || {}).forEach(([key, value]: [string, any]) => {
+            normalized[key] = {
+              category: value?.category ?? "",
+              color: value?.color ?? null,
+              // backend sends label; if missing, fall back to humanized label or default list label
+              label:
+                value?.label ??
+                criteriaList.find((c) => c.key === key)?.label ??
+                key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+            }
+          })
+          setMetrics(normalized)
+        }
       } catch (err: any) {
         if (active) setFetchError(err.message || "No data found.")
       } finally {
@@ -230,6 +245,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       ...prev,
       [key]: {
         ...prev[key],
+        label: prev[key]?.label ?? metrics[key]?.label ?? criteriaList.find((c) => c.key === key)?.label,
         color,
         category: prev[key]?.category ?? metrics[key]?.category ?? ""
       }
@@ -243,47 +259,31 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     setNewRowCount((count) => count + 1)
     setEditedMetrics((prev) => ({
       ...prev,
-      [newKey]: { category: "", color: null }
+      [newKey]: { category: "", color: null, label }
     }))
     setMetrics((prev) => ({
-      [newKey]: { category: "", color: null },
+      [newKey]: { category: "", color: null, label },
       ...prev
     }))
     if (!editMode) setEditMode(true)
   }
 
-  const handleLabelOverride = (key: string, label: string) => {
-    setLabelOverrides((prev) => ({
-      ...prev,
-      [key]: label
-    }))
-
-    setDynamicCriteria((prev) =>
-      prev.map((item) => (item.key === key ? { ...item, label } : item))
-    )
-  }
-
   const handleDelete = (key: string) => {
     // Mark for deletion by setting to undefined
-    setEditedMetrics((prev) => {
+    setEditedMetrics((prev: KeyMetricsResponse) => {
       const updated = { ...prev }
       updated[key] = { category: "", color: null }
       return updated
     })
 
     // Immediately remove from metrics for UI update
-    setMetrics((prev) => {
+    setMetrics((prev: KeyMetricsResponse) => {
       const updated = { ...prev }
       delete updated[key]
       return updated
     })
 
-    setDynamicCriteria((prev) => prev.filter((item) => item.key !== key))
-    setLabelOverrides((prev) => {
-      const updated = { ...prev }
-      delete updated[key]
-      return updated
-    })
+    setDynamicCriteria((prev: CriteriaItem[]) => prev.filter((item) => item.key !== key))
   }
 
   const handleSave = async () => {
@@ -531,7 +531,10 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               const color = editMode
                 ? edited.color ?? original.color
                 : original.color
-              const labelValue = labelOverrides[item.key] ?? item.label
+              const labelValue =
+                (editMode ? edited.label : undefined) ??
+                original.label ??
+                item.label
 
               return (
                 <TableRow
@@ -548,7 +551,17 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                         fullWidth
                         size="small"
                         value={labelValue}
-                        onChange={(e) => handleLabelOverride(item.key, e.target.value)}
+                        onChange={(e) =>
+                          setEditedMetrics((prev) => ({
+                            ...prev,
+                            [item.key]: {
+                              ...prev[item.key],
+                              label: e.target.value,
+                              category: prev[item.key]?.category ?? original.category ?? "",
+                              color: prev[item.key]?.color ?? original.color ?? null
+                            }
+                          }))
+                        }
                         placeholder="Enter criteria"
                         sx={{
                           "& .MuiOutlinedInput-root": {
