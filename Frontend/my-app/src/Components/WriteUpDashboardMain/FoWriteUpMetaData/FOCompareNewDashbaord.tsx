@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, Container } from "@mui/material";
 import FOMetricsTableMain from "../../Main/FOWriteUpMain/FOWriteSections/FOComparisionData/FOMetricsTableMain";
+import { ExportProvider } from "../../../contexts/ExportContext";
 
 interface FOCompareNewDashbaordProps {
   ticker: string;
@@ -39,6 +40,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [forceExpand, setForceExpand] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -54,7 +56,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ ticker, deal_id }),
+        body: JSON.stringify({ ticker }),
       });
 
       const json = await response.json();
@@ -68,7 +70,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [ticker, deal_id]);
+  }, [ticker]);
 
   useEffect(() => {
     fetchData();
@@ -78,20 +80,22 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-        <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
-          {data && (
-            <FOMetricsTableMain
-              ticker={ticker}
-              data={data}
-              pricingYear={getPricingYearFromDate(pricingDate)}
-              onRefresh={fetchData} 
-            />
-          )}
-        </CardContent>
-      </Card>
-    </Container>
+    <ExportProvider forceExpand={forceExpand} setForceExpand={setForceExpand}>
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
+          <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
+            {data && (
+              <FOMetricsTableMain
+                ticker={ticker}
+                data={data}
+                pricingYear={getPricingYearFromDate(pricingDate)}
+                onRefresh={fetchData}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </Container>
+    </ExportProvider>
   );
 };
 
