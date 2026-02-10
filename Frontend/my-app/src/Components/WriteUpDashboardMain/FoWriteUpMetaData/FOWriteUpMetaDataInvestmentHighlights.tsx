@@ -6,16 +6,12 @@ import SaveIcon from "@mui/icons-material/Save";
 
 interface FOWriteUpMetaDataInvestmentHighlightsProps {
   ticker: string;
-  pricing_date?: string;
-  unique_deal_id?: string;
   data?: string;
   onUpdate?: () => void;
 }
 
 const FOWriteUpMetaDataInvestmentHighlights: React.FC<FOWriteUpMetaDataInvestmentHighlightsProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
   data: initialData,
   onUpdate,
 }) => {
@@ -35,8 +31,6 @@ const FOWriteUpMetaDataInvestmentHighlights: React.FC<FOWriteUpMetaDataInvestmen
 
       const payload: Record<string, any> = {
         ticker,
-        unique_deal_id,
-        pricing_date,
         investment_highlights: investmentHighlights,
       };
 

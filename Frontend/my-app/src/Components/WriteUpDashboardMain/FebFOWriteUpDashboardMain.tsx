@@ -55,7 +55,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
 
   // Fetch FO WriteUp details via POST API
   const fetchFoWriteUpData = useCallback(async () => {
-    const { ticker, unique_deal_id, pricing_date } = basicDealDetails;
+    const { ticker } = basicDealDetails;
     if (!ticker) return;
 
     setFoDataLoading(true);
@@ -69,7 +69,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({ ticker, unique_deal_id, pricing_date }),
+        body: JSON.stringify({ ticker }),
       });
 
       if (response.ok) {
@@ -89,46 +89,46 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
     fetchFoWriteUpData();
   }, [fetchFoWriteUpData]);
 
-  // Fetch writeup_data API to get exchange and pricing_date
-  useEffect(() => {
-    const { ticker } = basicDealDetails;
+  // // Fetch writeup_data API to get exchange and pricing_date
+  // useEffect(() => {
+  //   const { ticker } = basicDealDetails;
 
-    const fetchData = async () => {
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem("access_token");
+  //   const fetchData = async () => {
+  //     const apiUrl = process.env.REACT_APP_API_URL;
+  //     const token = localStorage.getItem("access_token");
 
-      try {
-        const res = await fetch(`${apiUrl}/api/writeup_data/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify({ ticker }),
-        });
+  //     try {
+  //       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: token ? `Bearer ${token}` : '',
+  //         },
+  //         body: JSON.stringify({ ticker }),
+  //       });
 
-        if (res.ok) {
-          const data = await res.json();
-          setWriteUpData(data);
-        }
-      } catch (error) {
-        console.error('Error fetching writeup data:', error);
-      }
-    };
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         setWriteUpData(data);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching writeup data:', error);
+  //     }
+  //   };
 
-    fetchData();
+  //   fetchData();
 
-    // Listen for ratings update event from Final Verdict
-    const handleRatingsUpdate = () => {
-      fetchData();
-    };
+  //   // Listen for ratings update event from Final Verdict
+  //   const handleRatingsUpdate = () => {
+  //     fetchData();
+  //   };
 
-    window.addEventListener('ratingsUpdated', handleRatingsUpdate);
+  //   window.addEventListener('ratingsUpdated', handleRatingsUpdate);
 
-    return () => {
-      window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
-    };
-  }, [basicDealDetails]);
+  //   return () => {
+  //     window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
+  //   };
+  // }, [basicDealDetails]);
 
   const sections = useMemo(
     () => [
@@ -300,8 +300,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataDealInfo
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
                   data={foWriteUpData?.deal_information}
                   tradingDetails={foWriteUpData?.trading_details}
                   sharePricePerformance={foWriteUpData?.share_price_performance}
@@ -322,8 +320,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataBusinessOverview
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
                   data={foWriteUpData?.business_details}
                   onUpdate={fetchFoWriteUpData}
                 />
@@ -334,8 +330,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataKeyRisks
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
                   data={foWriteUpData?.key_risks}
                   onUpdate={fetchFoWriteUpData}
                 />
@@ -346,8 +340,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataInvestmentHighlights
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
                   data={foWriteUpData?.investment_highlights}
                   onUpdate={fetchFoWriteUpData}
                 />
@@ -358,8 +350,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataValuationAnalysis
                   ticker={basicDealDetails.ticker}
-                  pricing_date={basicDealDetails.pricing_date}
-                  unique_deal_id={basicDealDetails.unique_deal_id}
                   data={foWriteUpData?.valuation_writeup}
                   onUpdate={fetchFoWriteUpData}
                 />

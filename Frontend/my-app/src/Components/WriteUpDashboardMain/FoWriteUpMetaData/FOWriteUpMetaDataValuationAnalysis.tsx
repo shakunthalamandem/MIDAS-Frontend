@@ -7,16 +7,12 @@ import { ValuationWriteup } from "../types/FOWriteUpData";
 
 interface FOWriteUpMetaDataValuationAnalysisProps {
   ticker: string;
-  pricing_date?: string;
-  unique_deal_id?: string;
   data?: ValuationWriteup;
   onUpdate?: () => void;
 }
 
 const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAnalysisProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
   data: initialData,
   onUpdate,
 }) => {
@@ -40,8 +36,6 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
 
       const payload: Record<string, any> = {
         ticker,
-        unique_deal_id,
-        pricing_date,
         ...formData,
       };
 

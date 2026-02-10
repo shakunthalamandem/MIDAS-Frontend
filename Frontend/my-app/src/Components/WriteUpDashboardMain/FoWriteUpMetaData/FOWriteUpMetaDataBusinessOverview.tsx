@@ -7,16 +7,12 @@ import { BusinessDetails } from "../types/FOWriteUpData";
 
 interface FOWriteUpMetaDataBusinessOverviewProps {
   ticker: string;
-  pricing_date?: string;
-  unique_deal_id?: string;
   data?: BusinessDetails;
   onUpdate?: () => void;
 }
 
 const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverviewProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
   data: initialData,
   onUpdate,
 }) => {
@@ -40,8 +36,6 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
 
       const payload: Record<string, any> = {
         ticker,
-        unique_deal_id,
-        pricing_date,
         ...formData,
       };
 

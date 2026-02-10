@@ -26,8 +26,6 @@ interface TradingDetails {
 
 interface FODealInformationMainTableProps {
   ticker: string;
-  pricing_date?: string;
-  deal_id?: string;
 }
 
 const shareFields: { label: string; key: keyof SharePricePerformance }[] = [
@@ -58,8 +56,6 @@ const formatValue = (value: any, suffix?: string) => {
 
 const FODealInformationMainTable: React.FC<FODealInformationMainTableProps> = ({
   ticker,
-  pricing_date,
-  deal_id
 }) => {
   const [shareLocal, setShareLocal] = useState<SharePricePerformance>({});
   const [tradingLocal, setTradingLocal] = useState<TradingDetails>({});
@@ -77,8 +73,6 @@ const FODealInformationMainTable: React.FC<FODealInformationMainTableProps> = ({
       const token = localStorage.getItem("access_token");
 
       const params = new URLSearchParams({ ticker });
-      if (deal_id) params.append("deal_id", deal_id);
-      if (pricing_date) params.append("pricing_date", pricing_date);
 
       const response = await fetch(`${apiUrl}/api/fo_writeup_details/?${params.toString()}`, {
         method: "GET",
@@ -100,7 +94,7 @@ const FODealInformationMainTable: React.FC<FODealInformationMainTableProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [ticker, deal_id, pricing_date]);
+  }, [ticker]);
 
   useEffect(() => {
     fetchData();
@@ -122,7 +116,6 @@ const FODealInformationMainTable: React.FC<FODealInformationMainTableProps> = ({
       const token = localStorage.getItem("access_token");
 
       const payload: Record<string, any> = { ticker };
-      if (deal_id) payload.deal_id = deal_id;
 
       if (type === "share") {
         Object.assign(payload, shareLocal);

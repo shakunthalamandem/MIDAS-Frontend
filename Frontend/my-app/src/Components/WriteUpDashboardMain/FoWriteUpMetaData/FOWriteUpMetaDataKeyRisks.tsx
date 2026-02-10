@@ -6,16 +6,12 @@ import SaveIcon from "@mui/icons-material/Save";
 
 interface FOWriteUpMetaDataKeyRisksProps {
   ticker: string;
-  pricing_date?: string;
-  unique_deal_id?: string;
   data?: string;
   onUpdate?: () => void;
 }
 
 const FOWriteUpMetaDataKeyRisks: React.FC<FOWriteUpMetaDataKeyRisksProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
   data: initialData,
   onUpdate,
 }) => {
@@ -35,8 +31,6 @@ const FOWriteUpMetaDataKeyRisks: React.FC<FOWriteUpMetaDataKeyRisksProps> = ({
 
       const payload: Record<string, any> = {
         ticker,
-        unique_deal_id,
-        pricing_date,
         key_risks: keyRisks,
       };
 

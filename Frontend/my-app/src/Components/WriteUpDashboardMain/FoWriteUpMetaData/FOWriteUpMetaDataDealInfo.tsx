@@ -11,8 +11,6 @@ import {
 
 interface FOWriteUpMetaDataDealInfoProps {
   ticker: string;
-  pricing_date?: string;
-  unique_deal_id?: string;
   data?: DealInformation;
   tradingDetails?: TradingDetails;
   sharePricePerformance?: SharePricePerformance;
@@ -64,8 +62,6 @@ const formatValue = (value: any, suffix?: string) => {
 
 const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
   ticker,
-  pricing_date,
-  unique_deal_id,
   data: initialData,
   tradingDetails: initialTradingDetails,
   sharePricePerformance: initialPerformance,
@@ -114,8 +110,6 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
 
       const payload: Record<string, any> = {
         ticker,
-        unique_deal_id,
-        pricing_date,
         ...dealData,
         ...tradingData,
         ...performanceData,

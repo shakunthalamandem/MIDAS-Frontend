@@ -14,11 +14,11 @@ const FOWriteUpMetaDataComps: React.FC<FOWriteUpMetaDataCompsProps> = ({
       <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", mb: 2 }}>
         Comparative Multiples
       </Typography>
-      <FOCompareNewDashbaord
+      {/* <FOCompareNewDashbaord
         ticker={basicDealDetails.ticker}
         deal_id={basicDealDetails.deal_id}
         pricingDate={basicDealDetails.pricing_date}
-      />
+      /> */}
     </Box>
   )
 }
