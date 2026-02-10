@@ -220,7 +220,7 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
   const valueStyle = {
     fontWeight: 400,
     fontSize: "14px",
-    color: "#4a5568",
+    color: "#000000ff",
     mb: 2,
   };
 
