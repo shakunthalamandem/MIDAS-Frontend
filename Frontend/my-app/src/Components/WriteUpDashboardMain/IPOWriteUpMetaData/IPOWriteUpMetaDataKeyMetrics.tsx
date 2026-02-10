@@ -418,25 +418,32 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1} alignItems="center">
-            <Tooltip title="Add new row" arrow>
-              <span>
-                <IconButton
-                  onClick={handleAddRow}
-                  sx={{
-                    color: "#0b2c6a",
-                    backgroundColor: "#eef2ff",
-                    "&:hover": {
-                      backgroundColor: "#dbeafe",
-                      transform: "scale(1.05)"
-                    },
-                    transition: "all 0.2s ease"
-                  }}
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
+          <Box
+            sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}
+            display="flex"
+            gap={1}
+            alignItems="center"
+          >
+            {editMode && (
+              <Tooltip title="Add new row" arrow>
+                <span>
+                  <IconButton
+                    onClick={handleAddRow}
+                    sx={{
+                      color: "#0b2c6a",
+                      backgroundColor: "#eef2ff",
+                      "&:hover": {
+                        backgroundColor: "#dbeafe",
+                        transform: "scale(1.05)"
+                      },
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
             {editMode ? (
               <>
                 <IconButton
