@@ -89,46 +89,6 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
     fetchFoWriteUpData();
   }, [fetchFoWriteUpData]);
 
-  // // Fetch writeup_data API to get exchange and pricing_date
-  // useEffect(() => {
-  //   const { ticker } = basicDealDetails;
-
-  //   const fetchData = async () => {
-  //     const apiUrl = process.env.REACT_APP_API_URL;
-  //     const token = localStorage.getItem("access_token");
-
-  //     try {
-  //       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           Authorization: token ? `Bearer ${token}` : '',
-  //         },
-  //         body: JSON.stringify({ ticker }),
-  //       });
-
-  //       if (res.ok) {
-  //         const data = await res.json();
-  //         setWriteUpData(data);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching writeup data:', error);
-  //     }
-  //   };
-
-  //   fetchData();
-
-  //   // Listen for ratings update event from Final Verdict
-  //   const handleRatingsUpdate = () => {
-  //     fetchData();
-  //   };
-
-  //   window.addEventListener('ratingsUpdated', handleRatingsUpdate);
-
-  //   return () => {
-  //     window.removeEventListener('ratingsUpdated', handleRatingsUpdate);
-  //   };
-  // }, [basicDealDetails]);
 
   const sections = useMemo(
     () => [
