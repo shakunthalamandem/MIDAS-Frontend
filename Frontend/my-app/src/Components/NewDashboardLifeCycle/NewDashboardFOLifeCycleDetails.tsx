@@ -28,6 +28,7 @@ import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNot
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
 import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
+import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -132,7 +133,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             }
             SearchComponent={
               <Box sx={{ width: { xs: "100%", md: 320 } }}>
-                <NewDashboardLifeCycleTickerSearch
+                <FOWriteupTickerSearchData
                   selectedTicker={activePayload.ticker}
                   onSelect={setSelectedOption}
                 />
