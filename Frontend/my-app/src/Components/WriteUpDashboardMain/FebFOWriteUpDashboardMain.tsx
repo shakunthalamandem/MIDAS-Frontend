@@ -262,6 +262,8 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
                   ticker={basicDealDetails.ticker}
                   tradingDetails={foWriteUpData?.trading_details}
                   sharePricePerformance={foWriteUpData?.share_price_performance}
+                  useOfProceeds={foWriteUpData?.deal_information?.use_of_proceeds}
+                  trackRecord={foWriteUpData?.deal_information?.track_record}
                   onUpdate={fetchFoWriteUpData}
                 />
               </CardContent>

@@ -8,6 +8,10 @@ export interface DealInformation {
   number_of_shares_outstanding?: number;
   greenshoe?: number;
   bookrunners?: string;
+  exchange?: string;
+  company_name?: string;
+  use_of_proceeds?: string;
+  track_record?: string;
 }
 
 export interface TradingDetails {

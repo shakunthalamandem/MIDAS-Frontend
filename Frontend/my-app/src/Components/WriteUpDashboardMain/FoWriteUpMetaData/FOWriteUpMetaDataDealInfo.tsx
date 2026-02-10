@@ -12,6 +12,8 @@ interface FOWriteUpMetaDataDealInfoProps {
   ticker: string;
   tradingDetails?: TradingDetails;
   sharePricePerformance?: SharePricePerformance;
+  useOfProceeds?: string;
+  trackRecord?: string;
   onUpdate?: () => void;
 }
 
@@ -50,19 +52,29 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
   ticker,
   tradingDetails: initialTradingDetails,
   sharePricePerformance: initialPerformance,
+  useOfProceeds: initialUseOfProceeds,
+  trackRecord: initialTrackRecord,
   onUpdate,
 }) => {
   const [tradingData, setTradingData] = useState<TradingDetails>(initialTradingDetails ?? {});
   const [performanceData, setPerformanceData] = useState<SharePricePerformance>(initialPerformance ?? {});
+  const [useOfProceedsData, setUseOfProceedsData] = useState<string>(initialUseOfProceeds ?? "");
+  const [trackRecordData, setTrackRecordData] = useState<string>(initialTrackRecord ?? "");
   const [editTradingMode, setEditTradingMode] = useState(false);
   const [editPerformanceMode, setEditPerformanceMode] = useState(false);
+  const [editUseOfProceedsMode, setEditUseOfProceedsMode] = useState(false);
+  const [editTrackRecordMode, setEditTrackRecordMode] = useState(false);
   const [savingTrading, setSavingTrading] = useState(false);
   const [savingPerformance, setSavingPerformance] = useState(false);
+  const [savingUseOfProceeds, setSavingUseOfProceeds] = useState(false);
+  const [savingTrackRecord, setSavingTrackRecord] = useState(false);
 
   useEffect(() => {
     setTradingData(initialTradingDetails ?? {});
     setPerformanceData(initialPerformance ?? {});
-  }, [initialTradingDetails, initialPerformance]);
+    setUseOfProceedsData(initialUseOfProceeds ?? "");
+    setTrackRecordData(initialTrackRecord ?? "");
+  }, [initialTradingDetails, initialPerformance, initialUseOfProceeds, initialTrackRecord]);
 
   const handleTradingChange = (key: keyof TradingDetails, value: string, type?: string) => {
     if (type === "number") {
@@ -127,6 +139,58 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
       console.error("Save error:", error);
     } finally {
       setSavingPerformance(false);
+    }
+  };
+
+  const handleSaveUseOfProceeds = async () => {
+    setSavingUseOfProceeds(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, use_of_proceeds: useOfProceedsData }),
+      });
+
+      if (response.ok) {
+        setEditUseOfProceedsMode(false);
+        onUpdate?.();
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setSavingUseOfProceeds(false);
+    }
+  };
+
+  const handleSaveTrackRecord = async () => {
+    setSavingTrackRecord(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${apiUrl}/api/fo_writeup_details/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker, track_record: trackRecordData }),
+      });
+
+      if (response.ok) {
+        setEditTrackRecordMode(false);
+        onUpdate?.();
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setSavingTrackRecord(false);
     }
   };
 
@@ -249,6 +313,71 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
               </Box>
             ))}
           </Box>
+        </Box>
+      </Box>
+
+      {/* Use of Proceeds and Track Record Cards - Side by Side */}
+      <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+        {/* Use of Proceeds Card */}
+        <Box sx={cardStyle}>
+          <IconButton
+            onClick={() => (editUseOfProceedsMode ? handleSaveUseOfProceeds() : setEditUseOfProceedsMode(true))}
+            disabled={savingUseOfProceeds}
+            size="small"
+            sx={{ position: "absolute", top: 16, right: 16, color: "#1e3a5f" }}
+          >
+            {savingUseOfProceeds ? <CircularProgress size={18} /> : editUseOfProceedsMode ? <SaveIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+          </IconButton>
+
+          <Typography sx={titleStyle}>Use of Proceeds</Typography>
+
+          {editUseOfProceedsMode ? (
+            <TextField
+              fullWidth
+              multiline
+              minRows={4}
+              value={useOfProceedsData}
+              onChange={(e) => setUseOfProceedsData(e.target.value)}
+              sx={{
+                "& .MuiInputBase-input": { fontSize: "14px" }
+              }}
+            />
+          ) : (
+            <Typography sx={{ ...valueStyle, whiteSpace: "pre-wrap" }}>
+              {useOfProceedsData || "N/A"}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Track Record Card */}
+        <Box sx={cardStyle}>
+          <IconButton
+            onClick={() => (editTrackRecordMode ? handleSaveTrackRecord() : setEditTrackRecordMode(true))}
+            disabled={savingTrackRecord}
+            size="small"
+            sx={{ position: "absolute", top: 16, right: 16, color: "#1e3a5f" }}
+          >
+            {savingTrackRecord ? <CircularProgress size={18} /> : editTrackRecordMode ? <SaveIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+          </IconButton>
+
+          <Typography sx={titleStyle}>Track Record</Typography>
+
+          {editTrackRecordMode ? (
+            <TextField
+              fullWidth
+              multiline
+              minRows={4}
+              value={trackRecordData}
+              onChange={(e) => setTrackRecordData(e.target.value)}
+              sx={{
+                "& .MuiInputBase-input": { fontSize: "14px" }
+              }}
+            />
+          ) : (
+            <Typography sx={{ ...valueStyle, whiteSpace: "pre-wrap" }}>
+              {trackRecordData || "N/A"}
+            </Typography>
+          )}
         </Box>
       </Box>
     </motion.div>
