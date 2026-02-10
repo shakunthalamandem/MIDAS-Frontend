@@ -117,6 +117,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
   const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
   const [newRowCount, setNewRowCount] = useState(1)
+  const [removedKeys, setRemovedKeys] = useState<Set<string>>(new Set())
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -159,11 +160,10 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
             normalized[key] = {
               category: value?.category ?? "",
               color: value?.color ?? null,
-              // backend sends label; if missing, fall back to humanized label or default list label
               label:
                 value?.label ??
                 criteriaList.find((c) => c.key === key)?.label ??
-                key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+                key
             }
           })
           setMetrics(normalized)
@@ -227,16 +227,26 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   /* -------------------- DERIVED ROW LOGIC -------------------- */
 
-  const allCriteria = useMemo(
-    () => [...dynamicCriteria, ...criteriaList],
-    [dynamicCriteria]
-  )
+  const criteriaFromMetrics = useMemo(() => {
+    const metricKeys = Object.keys(metrics || {})
+    if (!metricKeys.length) return []
 
-  const filledCriteria = allCriteria.filter(
+    return metricKeys.map((key) => ({
+      key,
+      label:
+        metrics[key]?.label ??
+        criteriaList.find((c) => c.key === key)?.label ??
+        key
+    }))
+  }, [metrics])
+
+  const filledCriteria = criteriaFromMetrics.filter(
     (c) => metrics[c.key]?.category?.trim()
   )
 
-  const rowsToRender = editMode ? allCriteria : filledCriteria
+  const rowsToRender = (editMode ? criteriaFromMetrics : filledCriteria).filter(
+    (item) => !removedKeys.has(item.key)
+  )
 
   /* -------------------- HANDLERS -------------------- */
 
@@ -245,7 +255,11 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       ...prev,
       [key]: {
         ...prev[key],
-        label: prev[key]?.label ?? metrics[key]?.label ?? criteriaList.find((c) => c.key === key)?.label,
+        label:
+          prev[key]?.label ??
+          metrics[key]?.label ??
+          criteriaList.find((c) => c.key === key)?.label ??
+          key,
         color,
         category: prev[key]?.category ?? metrics[key]?.category ?? ""
       }
@@ -255,7 +269,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const handleAddRow = () => {
     const newKey = `custom_${Date.now()}`
     const label = `New Metric ${newRowCount}`
-    setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev])
+    setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev]) // kept for backwards compatibility
     setNewRowCount((count) => count + 1)
     setEditedMetrics((prev) => ({
       ...prev,
@@ -269,14 +283,12 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   }
 
   const handleDelete = (key: string) => {
-    // Mark for deletion by setting to undefined
-    setEditedMetrics((prev: KeyMetricsResponse) => {
-      const updated = { ...prev }
-      updated[key] = { category: "", color: null }
-      return updated
-    })
+    // Persist deletion to backend by sending blank values, but hide row locally
+    setEditedMetrics((prev: KeyMetricsResponse) => ({
+      ...prev,
+      [key]: { category: "", color: null, label: "" }
+    }))
 
-    // Immediately remove from metrics for UI update
     setMetrics((prev: KeyMetricsResponse) => {
       const updated = { ...prev }
       delete updated[key]
@@ -284,6 +296,11 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     })
 
     setDynamicCriteria((prev: CriteriaItem[]) => prev.filter((item) => item.key !== key))
+    setRemovedKeys((prev) => {
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
   }
 
   const handleSave = async () => {
@@ -303,6 +320,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
       setMetrics(payload.revenue_growth)
       setEditedMetrics({})
+      setRemovedKeys(new Set())
       setEditMode(false)
     } catch (err: any) {
       setSaveError(err.message || "Save failed")
@@ -534,7 +552,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               const labelValue =
                 (editMode ? edited.label : undefined) ??
                 original.label ??
-                item.label
+                item.label ??
+                item.key
 
               return (
                 <TableRow
