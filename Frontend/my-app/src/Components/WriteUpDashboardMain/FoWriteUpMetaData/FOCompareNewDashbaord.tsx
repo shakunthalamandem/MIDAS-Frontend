@@ -6,7 +6,6 @@ import { ExportProvider } from "../../../contexts/ExportContext";
 
 interface FOCompareNewDashbaordProps {
   ticker: string;
-  deal_id: string;
   pricingDate?: string | null;
 }
 
@@ -34,13 +33,13 @@ const getPricingYearFromDate = (pricingDate?: string | null) => {
 
 const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   ticker,
-  deal_id,
   pricingDate,
 }) => {
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [forceExpand, setForceExpand] = useState(false);
+  const forceExpand = false;
+  const setForceExpand = () => {};
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -81,7 +80,6 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
 
   return (
     <ExportProvider forceExpand={forceExpand} setForceExpand={setForceExpand}>
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
           <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
             {data && (
@@ -94,7 +92,6 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
             )}
           </CardContent>
         </Card>
-      </Container>
     </ExportProvider>
   );
 };
