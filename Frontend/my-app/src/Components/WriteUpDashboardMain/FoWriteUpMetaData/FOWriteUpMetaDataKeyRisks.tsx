@@ -1,8 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography, IconButton, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link",
+];
 
 interface FOWriteUpMetaDataKeyRisksProps {
   ticker: string;
@@ -83,18 +105,26 @@ const FOWriteUpMetaDataKeyRisks: React.FC<FOWriteUpMetaDataKeyRisksProps> = ({
 
       <Box>
         {editMode ? (
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            value={keyRisks}
-            onChange={(e) => setKeyRisks(e.target.value)}
-            placeholder="Enter key risks..."
-          />
+          <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+            <ReactQuill
+              theme="snow"
+              value={keyRisks}
+              onChange={setKeyRisks}
+              modules={quillModules}
+              formats={quillFormats}
+            />
+          </Box>
         ) : (
-          <Typography sx={{ color: "#333333", fontSize: "14px", whiteSpace: "pre-wrap" }}>
-            {keyRisks || "N/A"}
-          </Typography>
+          <Box
+            sx={{
+              color: "#333333",
+              fontSize: "14px",
+              lineHeight: 1.6,
+              "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+              "& p": { margin: 0, marginBottom: 0.5 },
+            }}
+            dangerouslySetInnerHTML={{ __html: keyRisks || "N/A" }}
+          />
         )}
       </Box>
     </motion.div>

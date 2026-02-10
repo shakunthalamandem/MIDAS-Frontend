@@ -1,8 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography, IconButton, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link",
+];
 
 interface FOWriteUpMetaDataInvestmentHighlightsProps {
   ticker: string;
@@ -83,18 +105,26 @@ const FOWriteUpMetaDataInvestmentHighlights: React.FC<FOWriteUpMetaDataInvestmen
 
       <Box>
         {editMode ? (
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            value={investmentHighlights}
-            onChange={(e) => setInvestmentHighlights(e.target.value)}
-            placeholder="Enter investment highlights..."
-          />
+          <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+            <ReactQuill
+              theme="snow"
+              value={investmentHighlights}
+              onChange={setInvestmentHighlights}
+              modules={quillModules}
+              formats={quillFormats}
+            />
+          </Box>
         ) : (
-          <Typography sx={{ color: "#333333", fontSize: "14px", whiteSpace: "pre-wrap" }}>
-            {investmentHighlights || "N/A"}
-          </Typography>
+          <Box
+            sx={{
+              color: "#333333",
+              fontSize: "14px",
+              lineHeight: 1.6,
+              "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+              "& p": { margin: 0, marginBottom: 0.5 },
+            }}
+            dangerouslySetInnerHTML={{ __html: investmentHighlights || "N/A" }}
+          />
         )}
       </Box>
     </motion.div>

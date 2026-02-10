@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  TextField,
   IconButton,
   CircularProgress,
   Accordion,
@@ -14,6 +13,28 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { BusinessDetails } from "../types/FOWriteUpData";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link",
+];
 
 interface FOWriteUpMetaDataBusinessOverviewProps {
   ticker: string;
@@ -128,17 +149,15 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
         <Typography sx={{ ...titleStyle, mb: 2 }}>Business Highlights</Typography>
 
         {editHighlights ? (
-          <TextField
-            fullWidth
-            multiline
-            minRows={4}
-            value={formData.business_highlights ?? ""}
-            onChange={(e) => handleChange("business_highlights", e.target.value)}
-            sx={{
-              "& .MuiInputBase-input": { fontSize: "14px" },
-              "& .MuiOutlinedInput-root": { borderRadius: 2 },
-            }}
-          />
+          <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+            <ReactQuill
+              theme="snow"
+              value={formData.business_highlights ?? ""}
+              onChange={(value) => handleChange("business_highlights", value)}
+              modules={quillModules}
+              formats={quillFormats}
+            />
+          </Box>
         ) : (
           <Box
             sx={{
@@ -149,9 +168,18 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
               border: "1px solid #e0e7ff",
             }}
           >
-            <Typography sx={{ color: "#000000ff", fontSize: "14px", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
-              {formData.business_highlights || "N/A"}
-            </Typography>
+            <Box
+              sx={{
+                color: "#000000ff",
+                fontSize: "14px",
+                lineHeight: 1.6,
+                "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                "& p": { margin: 0, marginBottom: 0.5 },
+              }}
+              dangerouslySetInnerHTML={{
+                __html: formData.business_highlights || "N/A",
+              }}
+            />
           </Box>
         )}
       </Box>
@@ -192,18 +220,15 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
             </AccordionSummary>
             <AccordionDetails sx={{ pt: 0, flex: 1, display: "flex", flexDirection: "column" }}>
               {editStrengths ? (
-                <TextField
-                  fullWidth
-                  multiline
-                  minRows={4}
-                  value={formData.strengths ?? ""}
-                  onChange={(e) => handleChange("strengths", e.target.value)}
-                  sx={{
-                    flex: 1,
-                    "& .MuiInputBase-input": { fontSize: "14px" },
-                    "& .MuiOutlinedInput-root": { borderRadius: 2, height: "100%" },
-                  }}
-                />
+                <Box sx={{ background: "#ffffff", borderRadius: 1, flex: 1 }}>
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.strengths ?? ""}
+                    onChange={(value) => handleChange("strengths", value)}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                </Box>
               ) : (
                 <Box
                   sx={{
@@ -214,9 +239,18 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
                     flex: 1,
                   }}
                 >
-                  <Typography sx={{ color: "#000000ff", fontSize: "14px", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
-                    {formData.strengths || "N/A"}
-                  </Typography>
+                  <Box
+                    sx={{
+                      color: "#000000ff",
+                      fontSize: "14px",
+                      lineHeight: 1.6,
+                      "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                      "& p": { margin: 0, marginBottom: 0.5 },
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: formData.strengths || "N/A",
+                    }}
+                  />
                 </Box>
               )}
             </AccordionDetails>
@@ -257,18 +291,15 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
             </AccordionSummary>
             <AccordionDetails sx={{ pt: 0, flex: 1, display: "flex", flexDirection: "column" }}>
               {editConcerns ? (
-                <TextField
-                  fullWidth
-                  multiline
-                  minRows={4}
-                  value={formData.weakness ?? ""}
-                  onChange={(e) => handleChange("weakness", e.target.value)}
-                  sx={{
-                    flex: 1,
-                    "& .MuiInputBase-input": { fontSize: "14px" },
-                    "& .MuiOutlinedInput-root": { borderRadius: 2, height: "100%" },
-                  }}
-                />
+                <Box sx={{ background: "#ffffff", borderRadius: 1, flex: 1 }}>
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.weakness ?? ""}
+                    onChange={(value) => handleChange("weakness", value)}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                </Box>
               ) : (
                 <Box
                   sx={{
@@ -279,9 +310,18 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
                     flex: 1,
                   }}
                 >
-                  <Typography sx={{ color: "#000000ff", fontSize: "14px", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
-                    {formData.weakness || "N/A"}
-                  </Typography>
+                  <Box
+                    sx={{
+                      color: "#000000ff",
+                      fontSize: "14px",
+                      lineHeight: 1.6,
+                      "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                      "& p": { margin: 0, marginBottom: 0.5 },
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: formData.weakness || "N/A",
+                    }}
+                  />
                 </Box>
               )}
             </AccordionDetails>

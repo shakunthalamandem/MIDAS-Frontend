@@ -1,9 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography, IconButton, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { ValuationWriteup } from "../types/FOWriteUpData";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link",
+];
 
 interface FOWriteUpMetaDataValuationAnalysisProps {
   ticker: string;
@@ -92,17 +114,26 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
             Company Overview
           </Typography>
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              value={formData.company_overview ?? ""}
-              onChange={(e) => handleChange("company_overview", e.target.value)}
-            />
+            <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={formData.company_overview ?? ""}
+                onChange={(value) => handleChange("company_overview", value)}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
           ) : (
-            <Typography sx={{ color: "#333333", fontSize: "14px", whiteSpace: "pre-wrap" }}>
-              {formData.company_overview || "N/A"}
-            </Typography>
+            <Box
+              sx={{
+                color: "#333333",
+                fontSize: "14px",
+                lineHeight: 1.6,
+                "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                "& p": { margin: 0, marginBottom: 0.5 },
+              }}
+              dangerouslySetInnerHTML={{ __html: formData.company_overview || "N/A" }}
+            />
           )}
         </Box>
 
@@ -111,17 +142,26 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
             Future Outlook
           </Typography>
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              value={formData.future_outlook ?? ""}
-              onChange={(e) => handleChange("future_outlook", e.target.value)}
-            />
+            <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={formData.future_outlook ?? ""}
+                onChange={(value) => handleChange("future_outlook", value)}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
           ) : (
-            <Typography sx={{ color: "#333333", fontSize: "14px", whiteSpace: "pre-wrap" }}>
-              {formData.future_outlook || "N/A"}
-            </Typography>
+            <Box
+              sx={{
+                color: "#000000ff",
+                fontSize: "14px",
+                lineHeight: 1.6,
+                "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                "& p": { margin: 0, marginBottom: 0.5 },
+              }}
+              dangerouslySetInnerHTML={{ __html: formData.future_outlook || "N/A" }}
+            />
           )}
         </Box>
 
@@ -130,17 +170,26 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
             Recent Developments
           </Typography>
           {editMode ? (
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              value={formData.recent_developments ?? ""}
-              onChange={(e) => handleChange("recent_developments", e.target.value)}
-            />
+            <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
+              <ReactQuill
+                theme="snow"
+                value={formData.recent_developments ?? ""}
+                onChange={(value) => handleChange("recent_developments", value)}
+                modules={quillModules}
+                formats={quillFormats}
+              />
+            </Box>
           ) : (
-            <Typography sx={{ color: "#333333", fontSize: "14px", whiteSpace: "pre-wrap" }}>
-              {formData.recent_developments || "N/A"}
-            </Typography>
+            <Box
+              sx={{
+                color: "#333333",
+                fontSize: "14px",
+                lineHeight: 1.6,
+                "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
+                "& p": { margin: 0, marginBottom: 0.5 },
+              }}
+              dangerouslySetInnerHTML={{ __html: formData.recent_developments || "N/A" }}
+            />
           )}
         </Box>
       </Box>
