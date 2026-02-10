@@ -78,6 +78,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
+    <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
         <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
           <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
             {data && (
@@ -90,6 +91,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
             )}
           </CardContent>
         </Card>
+      </Container>
   );
 };
 
