@@ -10,7 +10,6 @@ import {
   TableBody,
   TableContainer,
 } from "@mui/material";
-import { useExportContext } from "../../../../contexts/ExportContext";
 import { ColumnDef, createColumns } from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
 import CompetitorSearch from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/CompetitorSearch";
 import DeleteConfirmDialog from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DeleteConfirmDialog";
@@ -34,8 +33,7 @@ interface Props {
   pricingYear?: number;
 }
 const FOWriteUpCompsTableMainData: React.FC<Props> = ({ ticker, data, onRefresh, pricingYear }) => {
-  const { forceExpand } = useExportContext();
-  const showActions = !forceExpand;
+  const showActions = true;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const columns: ColumnDef[] = useMemo(() => createColumns(pricingYear), [pricingYear]);
   
@@ -171,7 +169,7 @@ const confirmDelete = async () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: forceExpand ? "flex-start" : "space-between",
+        justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
         }}
@@ -179,9 +177,7 @@ const confirmDelete = async () => {
         <Typography variant="h6" color="#002060" fontWeight={600}>
           Comparative Trading Multiples & Performance Metrics
         </Typography>
-        {!forceExpand && (
-          <CompetitorSearch onSelect={handleAddCompetitor} />
-        )}
+        <CompetitorSearch onSelect={handleAddCompetitor} />
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
