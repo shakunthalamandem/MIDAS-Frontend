@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, Container } from "@mui/material";
 import FOMetricsTableMain from "../../Main/FOWriteUpMain/FOWriteSections/FOComparisionData/FOMetricsTableMain";
-import { ExportProvider } from "../../../contexts/ExportContext";
+import FOWriteUpCompsTableMainData from "./Comps/FOWriteUpCompsTableMainData";
 
 interface FOCompareNewDashbaordProps {
   ticker: string;
@@ -38,8 +38,7 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   const [data, setData] = useState<ApiResponse>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const forceExpand = false;
-  const setForceExpand = () => {};
+
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -79,11 +78,10 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <ExportProvider forceExpand={forceExpand} setForceExpand={setForceExpand}>
         <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
           <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
             {data && (
-              <FOMetricsTableMain
+              <FOWriteUpCompsTableMainData
                 ticker={ticker}
                 data={data}
                 pricingYear={getPricingYearFromDate(pricingDate)}
@@ -92,7 +90,6 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
             )}
           </CardContent>
         </Card>
-    </ExportProvider>
   );
 };
 
