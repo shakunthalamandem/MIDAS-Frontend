@@ -21,6 +21,7 @@ type TickerOption = {
   exchange?: string | null;
   deal_id?: string | null;
   unique_deal_id?: string | null;
+  flag_for_writeup?: string | null;
 };
 
 type FOWriteupTickerSearchDataProps = {
@@ -55,17 +56,20 @@ const FOWriteupTickerSearchData: React.FC<
     const fetchTickers = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${apiUrl}/api/unified_new_deal_data/`, {
+        const response = await fetch(`${apiUrl}/api/unified_writeup_details/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
           },
-          body: JSON.stringify({ type: "ticker_list" }),
+          body: JSON.stringify({
+            deal_type: "FO",
+            flag_for_writeup: "Y",
+          }),
         });
         if (!response.ok) throw new Error("Failed to fetch tickers");
         const data = await response.json();
-        const list = Array.isArray(data?.tickers) ? data.tickers : [];
+        const list = Array.isArray(data) ? data : [];
         if (isActive) {
           setOptions(list);
         }
