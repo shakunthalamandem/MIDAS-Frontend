@@ -268,7 +268,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   const handleAddRow = () => {
     const newKey = `custom_${Date.now()}`
-    const label = `New Metric ${newRowCount}`
+    const label = ""
     setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev]) // kept for backwards compatibility
     setNewRowCount((count) => count + 1)
     setEditedMetrics((prev) => ({
