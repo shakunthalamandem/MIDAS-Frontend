@@ -15,6 +15,7 @@ export interface DealInformation {
 }
 
 export interface TradingDetails {
+  pricing_date?: string;
   current_share_price?: number;
   current_market_cap?: number;
   float_as_percent_shares_outstanding?: number;

@@ -35,7 +35,7 @@ const FebFOWriteUpPdfContent: React.FC<FebFOWriteUpPdfContentProps> = ({
             content: (
               <FOWriteUpMetaDataDealInfo
                 ticker={basicDealDetails.ticker}
-                tradingDetails={foWriteUpData?.trading_details}
+                tradingDetails={{ ...foWriteUpData?.trading_details, pricing_date: foWriteUpData?.deal_information?.pricing_date }}
                 sharePricePerformance={foWriteUpData?.share_price_performance}
                 useOfProceeds={foWriteUpData?.deal_information?.use_of_proceeds}
                 trackRecord={foWriteUpData?.deal_information?.track_record}

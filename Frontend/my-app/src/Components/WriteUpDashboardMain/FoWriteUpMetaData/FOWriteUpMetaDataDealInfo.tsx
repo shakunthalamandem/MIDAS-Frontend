@@ -17,7 +17,15 @@ interface FOWriteUpMetaDataDealInfoProps {
   onUpdate?: () => void;
 }
 
+const formatDate = (value: any) => {
+  if (!value) return "N/A";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+};
+
 const tradingFields: { label: string; key: keyof TradingDetails; type?: string; prefix?: string; suffix?: string }[] = [
+  {label: "Pricing Date", key: "pricing_date", type: "date"},
   { label: "Current Share Price", key: "current_share_price", type: "number", prefix: "$" },
   { label: "Market Cap (M)", key: "current_market_cap", type: "number", prefix: "$" },
   { label: "Float (% Shares Outstanding)", key: "float_as_percent_shares_outstanding", type: "number", suffix: "%" },
@@ -256,16 +264,19 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
                   <TextField
                     fullWidth
                     size="small"
-                    type={field.type === "number" ? "number" : "text"}
+                    type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
                     value={tradingData[field.key] ?? ""}
                     onChange={(e) => handleTradingChange(field.key, e.target.value, field.type)}
+                    slotProps={field.type === "date" ? { inputLabel: { shrink: true } } : undefined}
                     sx={{
                       "& .MuiInputBase-input": { fontSize: "14px", py: 0.75 }
                     }}
                   />
                 ) : (
                   <Typography sx={valueStyle}>
-                    {formatValue(tradingData[field.key], field.prefix, field.suffix)}
+                    {field.type === "date"
+                      ? formatDate(tradingData[field.key])
+                      : formatValue(tradingData[field.key], field.prefix, field.suffix)}
                   </Typography>
                 )}
               </Box>
