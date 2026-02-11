@@ -22,7 +22,7 @@ import FOWriteUpMetaDataInvestmentHighlights from "./FoWriteUpMetaData/FOWriteUp
 import FOWriteUpMetaDataKeyRisks from "./FoWriteUpMetaData/FOWriteUpMetaDataKeyRisks"
 import FOWriteUpMetaDataValuationAnalysis from "./FoWriteUpMetaData/FOWriteUpMetaDataValuationAnalysis"
 import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
-import FebIPOWriteUpPdfExporter from "./FebIPOWriteUpPdfExporter"
+import FEBFOWriteUpPdfExporter from "./FEBFOWriteUpPdfExporter"
 
 interface FebFOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
@@ -191,7 +191,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
             FO Write-up
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
-            <FebIPOWriteUpPdfExporter
+            <FEBFOWriteUpPdfExporter
               targetId={pdfRootId}
               headerTitle="IPO Write-up"
               fileName={pdfFileName}
