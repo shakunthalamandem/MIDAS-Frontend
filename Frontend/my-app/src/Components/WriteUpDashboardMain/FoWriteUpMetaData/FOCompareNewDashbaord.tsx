@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, Container } from "@mui/material";
 import FOMetricsTableMain from "../../Main/FOWriteUpMain/FOWriteSections/FOComparisionData/FOMetricsTableMain";
@@ -39,7 +38,6 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -48,14 +46,17 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
       const token = localStorage.getItem("access_token");
       if (!apiUrl) throw new Error("API URL not set");
 
-      const response = await fetch(`${apiUrl}/api/fo_newdashboard_companymetric_data/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+      const response = await fetch(
+        `${apiUrl}/api/fo_newdashboard_companymetric_data/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker }),
         },
-        body: JSON.stringify({ ticker }),
-      });
+      );
 
       const json = await response.json();
       if (!response.ok) {
@@ -78,20 +79,16 @@ const FOCompareNewDashbaord: React.FC<FOCompareNewDashbaordProps> = ({
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 3, mb: 3 }}>
-        <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
-          <CardContent sx={{ background: "linear-gradient(#f0f5ff, #f0f5ff)" }}>
-            {data && (
-              <FOWriteUpCompsTableMainData
-                ticker={ticker}
-                data={data}
-                pricingYear={getPricingYearFromDate(pricingDate)}
-                onRefresh={fetchData}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </Container>
+    <>
+      {data && (
+        <FOWriteUpCompsTableMainData
+          ticker={ticker}
+          data={data}
+          pricingYear={getPricingYearFromDate(pricingDate)}
+          onRefresh={fetchData}
+        />
+      )}
+    </>
   );
 };
 

@@ -307,8 +307,10 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="comps" >
+            <Card id="comps" sx={sectionCardSx}>
+              <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataComps basicDealDetails={basicDealDetails} />
+              </CardContent>
             </Card>
           </>
         )}

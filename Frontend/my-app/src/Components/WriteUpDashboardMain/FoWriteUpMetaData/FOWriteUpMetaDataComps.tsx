@@ -10,12 +10,12 @@ const FOWriteUpMetaDataComps: React.FC<FOWriteUpMetaDataCompsProps> = ({
   basicDealDetails
 }) => {
   return (
-    <Box>
+    <>
       <FOCompareNewDashbaord
         ticker={basicDealDetails.ticker}
         pricingDate={basicDealDetails.pricing_date}
       />
-    </Box>
+    </>
   )
 }
 
