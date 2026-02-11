@@ -175,13 +175,17 @@ const confirmDelete = async () => {
         }}
       >
         <Typography variant="h6" color="#002060" fontWeight={600}>
-          Comparative Trading Multiples & Performance Metrics
+          Comparative Trading Multiples & Performance 
         </Typography>
         <CompetitorSearch onSelect={handleAddCompetitor} />
       </Box>
 
-      <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
-        <Table size="small">
+      <TableContainer
+        component={Paper}
+        elevation={2}
+        sx={{ borderRadius: 2, width: "100%", maxWidth: "100%", overflowX: "auto" }}
+      >
+        <Table size="small" sx={{ tableLayout: "fixed", minWidth: 900 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {columns.map((col) => (
@@ -191,7 +195,10 @@ const confirmDelete = async () => {
                     color: "white",
                     fontWeight: "bold",
                     textAlign: "center",
-                                        minWidth: col.minWidth || 70,
+                    minWidth: col.minWidth || 60,
+                    fontSize: 12,
+                    padding: "6px 8px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {col.label}
@@ -199,7 +206,15 @@ const confirmDelete = async () => {
               ))}
               {showActions && (
                 <TableCell
-                  sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    minWidth: 60,
+                    fontSize: 12,
+                    padding: "6px 8px",
+                    whiteSpace: "nowrap",
+                  }}
                 >
                   Action
                 </TableCell>
