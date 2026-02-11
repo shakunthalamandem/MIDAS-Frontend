@@ -54,8 +54,8 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
   const [savingHighlights, setSavingHighlights] = useState(false);
   const [savingStrengths, setSavingStrengths] = useState(false);
   const [savingConcerns, setSavingConcerns] = useState(false);
-  const [expandedStrengths, setExpandedStrengths] = useState(true);
-  const [expandedConcerns, setExpandedConcerns] = useState(true);
+  const [expandedStrengths, setExpandedStrengths] = useState(false);
+  const [expandedConcerns, setExpandedConcerns] = useState(false);
 
   useEffect(() => {
     setFormData(initialData ?? {});

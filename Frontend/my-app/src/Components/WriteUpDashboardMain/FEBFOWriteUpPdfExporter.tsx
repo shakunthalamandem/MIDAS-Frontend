@@ -26,7 +26,7 @@ const waitForLayout = () =>
 
 const waitForContentReady = async (
   root: HTMLElement,
-  { timeoutMs = 8000, intervalMs = 250 } = {}
+  { timeoutMs = 15000, intervalMs = 300 } = {}
 ) => {
   const started = Date.now()
 

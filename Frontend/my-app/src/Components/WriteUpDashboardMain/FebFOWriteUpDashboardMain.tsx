@@ -21,35 +21,17 @@ import FOWriteUpMetaDataFinancialHighlights from "./FoWriteUpMetaData/FOWriteUpM
 import FOWriteUpMetaDataInvestmentHighlights from "./FoWriteUpMetaData/FOWriteUpMetaDataInvestmentHighlights"
 import FOWriteUpMetaDataKeyRisks from "./FoWriteUpMetaData/FOWriteUpMetaDataKeyRisks"
 import FOWriteUpMetaDataValuationAnalysis from "./FoWriteUpMetaData/FOWriteUpMetaDataValuationAnalysis"
-import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
+import FebFOWriteUpPdfContent from "./FebFOWriteUpPdfContent"
 import FEBFOWriteUpPdfExporter from "./FEBFOWriteUpPdfExporter"
 
 interface FebFOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
 }
 
-interface WriteUpData {
-  ticker_name: string;
-  exchange: string;
-  company_name: string;
-  pricing_date: string;
-  deal_size: number;
-  industry: string;
-  shares_offered: number;
-  nosh: number;
-  established_year: number;
-  lower_bound: number;
-  upper_bound: number;
-  filed_date: string;
-  term_date: string;
-  trade_date: string;
-  bookrunners: string[];
-}
 
 const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
   basicDealDetails
 }) => {
-  const [writeUpData, setWriteUpData] = useState<WriteUpData | null>(null);
   const [foWriteUpData, setFoWriteUpData] = useState<FOWriteUpApiResponse | null>(null);
   const [foDataLoading, setFoDataLoading] = useState(false);
 
@@ -200,9 +182,9 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               loadingLabel="Generating..."
               className="pdf-hidden"
               ticker={basicDealDetails?.ticker}
-              pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
-              issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
-              exchange={writeUpData?.exchange || basicDealDetails?.exchange}
+              pricingDate={foWriteUpData?.deal_information?.pricing_date || basicDealDetails?.pricing_date}
+              issuerName={foWriteUpData?.deal_information?.company_name || basicDealDetails?.issuer_name}
+              exchange={foWriteUpData?.deal_information?.exchange || basicDealDetails?.exchange}
             />
           </Box>
 
@@ -244,11 +226,11 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
       {/* Right Content */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {pdfMode ? (
-          <FebIPOWriteUpPdfContent
+          <FebFOWriteUpPdfContent
             basicDealDetails={basicDealDetails}
             sectionCardSx={sectionCardSx}
             rootId={pdfRootId}
-            writeUpData={writeUpData}
+            foWriteUpData={foWriteUpData}
           />
         ) : foDataLoading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
