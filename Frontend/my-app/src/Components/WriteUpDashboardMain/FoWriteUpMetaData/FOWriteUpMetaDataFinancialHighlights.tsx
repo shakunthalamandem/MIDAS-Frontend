@@ -73,7 +73,7 @@ const formatValue = (value: string | number | undefined) => {
 const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialHighlightsProps> = ({
   basicDealDetails,
 }) => {
-  const { ticker } = basicDealDetails;
+  const { ticker, pricing_date } = basicDealDetails;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -94,7 +94,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
+      const response = await fetch(`${apiUrl}/api/fo_financial_forecasts_data/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +185,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
       const apiUrl = process.env.REACT_APP_API_URL;
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
+      const response = await fetch(`${apiUrl}/api/fo_financial_forecasts_data/`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -193,6 +193,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
         },
         body: JSON.stringify({
           ticker,
+          pricing_date,
           meta_data: cleanedData,
         }),
       });
