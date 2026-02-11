@@ -183,9 +183,27 @@ const confirmDelete = async () => {
       <TableContainer
         component={Paper}
         elevation={2}
-        sx={{ borderRadius: 2, width: "100%", maxWidth: "100%", overflowX: "auto" }}
+        sx={{
+          borderRadius: 2,
+          maxWidth: 1100,
+          overflowX: "auto",
+          "&::-webkit-scrollbar": {
+            height: 6,
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "#f0f0f0",
+            borderRadius: 3,
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#b0b0b0",
+            borderRadius: 3,
+            "&:hover": {
+              backgroundColor: "#888",
+            },
+          },
+        }}
       >
-        <Table size="small" sx={{ tableLayout: "fixed", minWidth: 900 }}>
+        <Table size="small" sx={{ minWidth: 1200 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#002060" }}>
               {columns.map((col) => (
