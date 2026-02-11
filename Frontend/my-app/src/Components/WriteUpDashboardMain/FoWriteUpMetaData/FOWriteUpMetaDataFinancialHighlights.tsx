@@ -49,22 +49,6 @@ interface FOWriteUpMetaDataFinancialHighlightsProps {
   basicDealDetails: BasicDealDetails;
 }
 
-// Metrics to exclude from display
-const excludedMetrics = [
-  "Sales Growth",
-  "EBITDA Margin",
-  "Net Income Margin",
-  "Gross Profit Margin",
-];
-
-// Define preferred order for metrics
-const metricOrder = [
-  "Gross Profit",
-  "Net Income",
-  "Operating Income",
-  "Total Revenue",
-];
-
 const formatValue = (value: string | number | undefined) => {
   if (value === undefined || value === null || value === "") return "N/A";
   return String(value);
@@ -242,24 +226,14 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
         })
     : [];
 
-  // Get all unique metrics from the data dynamically, excluding unwanted ones
-  const allMetrics = displayData
+  // Get all unique metrics from the data dynamically
+  const sortedMetrics = displayData
     ? Array.from(
         new Set(
           Object.values(displayData).flatMap((yearData) => Object.keys(yearData))
         )
-      ).filter((metric) => !excludedMetrics.includes(metric))
+      )
     : [];
-
-  // Sort metrics by preferred order, unknown metrics go to the end
-  const sortedMetrics = [...allMetrics].sort((a, b) => {
-    const indexA = metricOrder.indexOf(a);
-    const indexB = metricOrder.indexOf(b);
-    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-    if (indexA === -1) return 1;
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
 
   return (
     <motion.div
