@@ -103,6 +103,17 @@ const formatRating = (value: number) => {
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
 }
 
+const toKeyFromLabel = (label?: string) => {
+  if (!label) return ""
+  const trimmed = label.trim()
+  if (!trimmed) return ""
+  const slug = trimmed
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+  return slug || trimmed
+}
+
 /* -------------------- COMPONENT -------------------- */
 
 const IPOWriteUpMetaDataKeyMetrics: React.FC<
@@ -116,7 +127,6 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [metrics, setMetrics] = useState<KeyMetricsResponse>({})
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
   const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
-  const [newRowCount, setNewRowCount] = useState(1)
   const [removedKeys, setRemovedKeys] = useState<Set<string>>(new Set())
 
   const apiUrl = process.env.REACT_APP_API_URL
@@ -156,7 +166,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         if (active) {
           // ensure every metric has a label fallback so UI stays readable
           const normalized: KeyMetricsResponse = {}
-          Object.entries(data || {}).forEach(([key, value]: [string, any]) => {
+          const incoming = data?.key_metrics || data?.revenue_growth || data || {}
+          Object.entries(incoming).forEach(([key, value]: [string, any]) => {
             normalized[key] = {
               category: value?.category ?? "",
               color: value?.color ?? null,
@@ -270,7 +281,6 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     const newKey = `custom_${Date.now()}`
     const label = ""
     setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev]) // kept for backwards compatibility
-    setNewRowCount((count) => count + 1)
     setEditedMetrics((prev) => ({
       ...prev,
       [newKey]: { category: "", color: null, label }
@@ -283,31 +293,49 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   }
 
   const handleDelete = (key: string) => {
-    // Persist deletion to backend by sending blank values, but hide row locally
-    setEditedMetrics((prev: KeyMetricsResponse) => ({
-      ...prev,
-      [key]: { category: "", color: null, label: "" }
-    }))
-
-    setMetrics((prev: KeyMetricsResponse) => {
-      const updated = { ...prev }
-      delete updated[key]
-      return updated
-    })
-
-    setDynamicCriteria((prev: CriteriaItem[]) => prev.filter((item) => item.key !== key))
+    // mark row for removal; we drop it from the payload when saving
     setRemovedKeys((prev) => {
       const next = new Set(prev)
       next.add(key)
       return next
     })
+
+    setEditedMetrics((prev) => {
+      const updated = { ...prev }
+      delete updated[key]
+      return updated
+    })
+
+    setMetrics((prev) => {
+      const updated = { ...prev }
+      delete updated[key]
+      return updated
+    })
+
+    setDynamicCriteria((prev) => prev.filter((item) => item.key !== key))
   }
 
   const handleSave = async () => {
     try {
+      // merge edits into base metrics and allow renaming based on label
+      const merged = { ...metrics, ...editedMetrics }
+      const keyMetrics = Object.entries(merged).reduce<KeyMetricsResponse>(
+        (acc, [key, value]) => {
+          if (removedKeys.has(key)) return acc
+          const targetKey = toKeyFromLabel(value.label) || key
+          acc[targetKey] = {
+            category: value.category ?? "",
+            color: value.color ?? null,
+            label: value.label ?? criteriaList.find((c) => c.key === key)?.label ?? key
+          }
+          return acc
+        },
+        {}
+      )
+
       const payload = {
-        ticker_name: basicDealDetails.ticker,
-        revenue_growth: { ...metrics, ...editedMetrics }
+        ticker: basicDealDetails.ticker,
+        key_metrics: keyMetrics
       }
 
       const res = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
@@ -318,7 +346,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
       if (!res.ok) throw new Error("Save failed")
 
-      setMetrics(payload.revenue_growth)
+      setMetrics(payload.key_metrics)
       setEditedMetrics({})
       setRemovedKeys(new Set())
       setEditMode(false)
