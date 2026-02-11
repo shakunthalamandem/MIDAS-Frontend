@@ -113,12 +113,7 @@ const FebFOWriteUpPdfContent: React.FC<FebFOWriteUpPdfContentProps> = ({
                 basicDealDetails={basicDealDetails}
               />
             )
-          }
-        ]
-      },
-      {
-        id: "fo-page-6",
-        sections: [
+          },
           {
             id: "comps",
             content: (
@@ -128,7 +123,8 @@ const FebFOWriteUpPdfContent: React.FC<FebFOWriteUpPdfContentProps> = ({
             )
           }
         ]
-      }
+      },
+
     ],
     [basicDealDetails, foWriteUpData]
   )
