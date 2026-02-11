@@ -11,10 +11,10 @@ const FOWriteUpMetaDataComps: React.FC<FOWriteUpMetaDataCompsProps> = ({
 }) => {
   return (
     <Box>
-
+{/* 
       <FOCompareNewDashbaord
         ticker={basicDealDetails.ticker}
-      />
+      /> */}
     </Box>
   )
 }
