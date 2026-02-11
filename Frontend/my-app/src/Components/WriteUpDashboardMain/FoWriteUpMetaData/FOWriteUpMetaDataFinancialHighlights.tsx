@@ -1,11 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography, CircularProgress, IconButton, TextField } from "@mui/material";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  IconButton,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface FinancialYearData {
-  [key: string]: number | undefined;
+  [key: string]: string | number | undefined;
 }
 
 interface FinancialForecastItem {
@@ -39,8 +49,8 @@ interface FOWriteUpMetaDataFinancialHighlightsProps {
   basicDealDetails: BasicDealDetails;
 }
 
-// Metrics that should be displayed as percentages
-const percentageMetrics = [
+// Metrics to exclude from display
+const excludedMetrics = [
   "Sales Growth",
   "EBITDA Margin",
   "Net Income Margin",
@@ -49,22 +59,15 @@ const percentageMetrics = [
 
 // Define preferred order for metrics
 const metricOrder = [
-  "Sales",
-  "Sales Growth",
   "Gross Profit",
-  "Gross Profit Margin",
-  "EBITDA",
-  "EBITDA Margin",
   "Net Income",
-  "Net Income Margin",
+  "Operating Income",
+  "Total Revenue",
 ];
 
-const formatValue = (value: number | undefined, isPercentage: boolean) => {
-  if (value === undefined || value === null) return "N/A";
-  if (isPercentage) {
-    return `${Number(value).toFixed(2)}%`;
-  }
-  return `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })}M`;
+const formatValue = (value: string | number | undefined) => {
+  if (value === undefined || value === null || value === "") return "N/A";
+  return String(value);
 };
 
 const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialHighlightsProps> = ({
@@ -77,6 +80,10 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
   const [metaData, setMetaData] = useState<Record<string, FinancialYearData> | null>(null);
   const [editData, setEditData] = useState<Record<string, FinancialYearData> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [newMetricName, setNewMetricName] = useState("");
+  const editDataRef = useRef(editData);
+  editDataRef.current = editData;
+  const deletedMetricsRef = useRef<Set<string>>(new Set());
 
   const fetchFinancialData = useCallback(async () => {
     if (!ticker) return;
@@ -120,20 +127,58 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
   }, [fetchFinancialData]);
 
   const handleChange = (year: string, metric: string, value: string) => {
-    if (!editData) return;
+    setEditData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [year]: {
+          ...prev[year],
+          [metric]: value,
+        },
+      };
+    });
+  };
 
-    const parsed = parseFloat(value);
-    setEditData({
-      ...editData,
-      [year]: {
-        ...editData[year],
-        [metric]: value === "" ? undefined : isNaN(parsed) ? editData[year]?.[metric] : parsed,
-      },
+  const handleAddRow = () => {
+    const current = editDataRef.current;
+    if (!current || !newMetricName.trim()) return;
+
+    const trimmed = newMetricName.trim();
+    const updated: Record<string, FinancialYearData> = {};
+    for (const year of Object.keys(current)) {
+      updated[year] = { ...current[year], [trimmed]: undefined };
+    }
+    setEditData(updated);
+    setNewMetricName("");
+  };
+
+  const handleDeleteRow = (metric: string) => {
+    deletedMetricsRef.current.add(metric);
+    setEditData((prev) => {
+      if (!prev) return prev;
+      const updated: Record<string, FinancialYearData> = {};
+      for (const year of Object.keys(prev)) {
+        const yearData = { ...prev[year] };
+        delete yearData[metric];
+        updated[year] = yearData;
+      }
+      return updated;
     });
   };
 
   const handleSave = async () => {
-    if (!editData) return;
+    const latestEditData = editDataRef.current;
+    if (!latestEditData) return;
+
+    // Strip any deleted metrics from the payload
+    const cleanedData: Record<string, FinancialYearData> = {};
+    for (const year of Object.keys(latestEditData)) {
+      const yearData = { ...latestEditData[year] };
+      Array.from(deletedMetricsRef.current).forEach((metric) => {
+        delete yearData[metric];
+      });
+      cleanedData[year] = yearData;
+    }
 
     setSaving(true);
     try {
@@ -148,12 +193,13 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
         },
         body: JSON.stringify({
           ticker,
-          meta_data: editData,
+          meta_data: cleanedData,
         }),
       });
 
       if (response.ok) {
-        setMetaData(JSON.parse(JSON.stringify(editData)));
+        deletedMetricsRef.current.clear();
+        setMetaData(JSON.parse(JSON.stringify(cleanedData)));
         setEditMode(false);
       } else {
         console.error("Save failed");
@@ -174,17 +220,34 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
     }
   };
 
-  // Get dynamic year columns sorted
-  const displayData = editMode ? editData : metaData;
-  const yearColumns = displayData ? Object.keys(displayData).sort() : [];
+  const handleCancelEdit = () => {
+    deletedMetricsRef.current.clear();
+    setEditData(JSON.parse(JSON.stringify(metaData)));
+    setEditMode(false);
+    setNewMetricName("");
+  };
 
-  // Get all unique metrics from the data dynamically
+  // Get dynamic year columns sorted, with YoY Change always last
+  const displayData = editMode ? editData : metaData;
+  const yearColumns = displayData
+    ? Object.keys(displayData)
+        .sort()
+        .sort((a, b) => {
+          const aIsYoY = a.toLowerCase().includes("yoy");
+          const bIsYoY = b.toLowerCase().includes("yoy");
+          if (aIsYoY && !bIsYoY) return 1;
+          if (!aIsYoY && bIsYoY) return -1;
+          return 0;
+        })
+    : [];
+
+  // Get all unique metrics from the data dynamically, excluding unwanted ones
   const allMetrics = displayData
     ? Array.from(
         new Set(
           Object.values(displayData).flatMap((yearData) => Object.keys(yearData))
         )
-      )
+      ).filter((metric) => !excludedMetrics.includes(metric))
     : [];
 
   // Sort metrics by preferred order, unknown metrics go to the end
@@ -210,13 +273,24 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
         position: "relative",
       }}
     >
-      <IconButton
-        onClick={handleEditClick}
-        disabled={saving || loading}
-        sx={{ position: "absolute", top: 12, right: 12, color: "#002060" }}
-      >
-        {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
-      </IconButton>
+      <Box sx={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 0.5 }}>
+        {editMode && (
+          <Tooltip title="Cancel">
+            <IconButton onClick={handleCancelEdit} sx={{ color: "#d32f2f" }}>
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title={editMode ? "Save" : "Edit"}>
+          <IconButton
+            onClick={handleEditClick}
+            disabled={saving || loading}
+            sx={{ color: "#002060" }}
+          >
+            {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
+          </IconButton>
+        </Tooltip>
+      </Box>
 
       <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, textAlign: "center" }}>
         Financial Forecasts
@@ -239,11 +313,11 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
               borderCollapse: "collapse",
               "& th, & td": {
                 padding: "12px 16px",
-                textAlign: "right",
+                textAlign: "left",
                 borderBottom: "1px solid #e0e0e0",
               },
-              "& th:first-of-type, & td:first-of-type": {
-                textAlign: "left",
+              "& th:last-of-type, & td:last-of-type": {
+                textAlign: "right",
               },
               "& th": {
                 fontWeight: 600,
@@ -261,11 +335,11 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
                 {yearColumns.map((year) => (
                   <th key={year}>{year}</th>
                 ))}
+                {editMode && <th style={{ textAlign: "center", width: 50 }}>Action</th>}
               </tr>
             </thead>
             <tbody>
               {sortedMetrics.map((metric) => {
-                const isPercentage = percentageMetrics.includes(metric);
                 return (
                   <tr key={metric}>
                     <td style={{ fontWeight: 600 }}>{metric}</td>
@@ -276,13 +350,13 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
                           {editMode ? (
                             <TextField
                               size="small"
-                              type="number"
+                              type="text"
                               value={value ?? ""}
                               onChange={(e) => handleChange(year, metric, e.target.value)}
                               sx={{
-                                width: "100px",
+                                width: "120px",
                                 "& .MuiInputBase-input": {
-                                  textAlign: "right",
+                                  textAlign: "left",
                                   padding: "6px 8px",
                                 },
                               }}
@@ -292,25 +366,66 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
                               component="span"
                               sx={{
                                 fontWeight: 500,
-                                color:
-                                  value !== undefined && isPercentage
-                                    ? value > 0
-                                      ? "#2e7d32"
-                                      : value < 0
-                                      ? "#d32f2f"
-                                      : "#333333"
-                                    : "#333333",
+                                color: "#333333",
                               }}
                             >
-                              {formatValue(value, isPercentage)}
+                              {formatValue(value)}
                             </Typography>
                           )}
                         </td>
                       );
                     })}
+                    {editMode && (
+                      <td style={{ textAlign: "center" }}>
+                        <Tooltip title="Delete row">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteRow(metric)}
+                            sx={{ color: "#d32f2f" }}
+                          >
+                            <DeleteOutlineIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
+
+              {/* Add new row in edit mode */}
+              {editMode && (
+                <tr>
+                  <td colSpan={yearColumns.length + 2}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                      <TextField
+                        size="small"
+                        placeholder="New metric name"
+                        value={newMetricName}
+                        onChange={(e) => setNewMetricName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddRow();
+                        }}
+                        sx={{
+                          width: "200px",
+                          "& .MuiInputBase-input": {
+                            padding: "6px 8px",
+                          },
+                        }}
+                      />
+                      <Tooltip title="Add row">
+                        <IconButton
+                          size="small"
+                          onClick={handleAddRow}
+                          disabled={!newMetricName.trim()}
+                          sx={{ color: "#2e7d32" }}
+                        >
+                          <AddCircleOutlineIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </Box>
         </Box>
