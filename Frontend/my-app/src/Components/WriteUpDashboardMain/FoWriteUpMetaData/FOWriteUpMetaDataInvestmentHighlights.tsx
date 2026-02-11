@@ -109,7 +109,7 @@ const FOWriteUpMetaDataInvestmentHighlights: React.FC<FOWriteUpMetaDataInvestmen
             <ReactQuill
               theme="snow"
               value={investmentHighlights}
-              onChange={setInvestmentHighlights}
+              onChange={(value) => setInvestmentHighlights((prev) => prev === value ? prev : value)}
               modules={quillModules}
               formats={quillFormats}
             />

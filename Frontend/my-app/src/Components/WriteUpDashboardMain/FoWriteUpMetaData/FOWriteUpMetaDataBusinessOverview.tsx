@@ -62,7 +62,10 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
   }, [initialData]);
 
   const handleChange = (key: keyof BusinessDetails, value: string) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData((prev) => {
+      if (prev[key] === value) return prev;
+      return { ...prev, [key]: value };
+    });
   };
 
   const handleSave = async (field: keyof BusinessDetails, setEditMode: (v: boolean) => void, setSaving: (v: boolean) => void) => {

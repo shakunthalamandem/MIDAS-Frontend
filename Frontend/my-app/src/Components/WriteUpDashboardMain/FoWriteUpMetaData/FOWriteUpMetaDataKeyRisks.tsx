@@ -109,7 +109,7 @@ const FOWriteUpMetaDataKeyRisks: React.FC<FOWriteUpMetaDataKeyRisksProps> = ({
             <ReactQuill
               theme="snow"
               value={keyRisks}
-              onChange={setKeyRisks}
+              onChange={(value) => setKeyRisks((prev) => prev === value ? prev : value)}
               modules={quillModules}
               formats={quillFormats}
             />

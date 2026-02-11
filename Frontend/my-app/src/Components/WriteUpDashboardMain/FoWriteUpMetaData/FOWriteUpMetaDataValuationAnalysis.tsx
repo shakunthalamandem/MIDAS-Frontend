@@ -47,7 +47,10 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
   }, [initialData]);
 
   const handleChange = (key: keyof ValuationWriteup, value: string) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData((prev) => {
+      if (prev[key] === value) return prev;
+      return { ...prev, [key]: value };
+    });
   };
 
   const handleSave = async () => {
