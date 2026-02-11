@@ -218,7 +218,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
         {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
       </IconButton>
 
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, textAlign: "center" }}>
         Financial Forecasts
       </Typography>
 

@@ -107,7 +107,7 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
 
   const titleStyle = {
     fontWeight: 700,
-    color: "#1e3a5f",
+    color: "#026269",
     fontSize: "18px",
     textAlign: "center" as const,
   };
@@ -198,7 +198,7 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
               sx={accordionSummaryStyle}
             >
               <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" pr={1}>
-                <Typography sx={{ fontWeight: 700, color: "#1e3a5f", fontSize: "16px" }}>
+                <Typography sx={{ fontWeight: 700, color: "#026269", fontSize: "16px", textAlign: "center" }}>
                   Strengths
                 </Typography>
                 <IconButton
@@ -269,7 +269,7 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
               sx={accordionSummaryStyle}
             >
               <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" pr={1}>
-                <Typography sx={{ fontWeight: 700, color: "#1e3a5f", fontSize: "16px" }}>
+                <Typography sx={{ fontWeight: 700, color: "#026269", fontSize: "16px", textAlign: "center" }}>
                   Concerns
                 </Typography>
                 <IconButton

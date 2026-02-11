@@ -104,7 +104,7 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
         {saving ? <CircularProgress size={20} /> : editMode ? <SaveIcon /> : <EditIcon />}
       </IconButton>
 
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3 }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, textAlign: "center" }}>
         Valuation Analysis
       </Typography>
 

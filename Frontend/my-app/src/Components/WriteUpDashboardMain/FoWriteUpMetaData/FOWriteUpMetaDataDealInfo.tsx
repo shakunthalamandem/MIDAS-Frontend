@@ -204,7 +204,7 @@ const FOWriteUpMetaDataDealInfo: React.FC<FOWriteUpMetaDataDealInfoProps> = ({
 
   const titleStyle = {
     fontWeight: 700,
-    color: "#1e3a5f",
+    color: "#026269",
     fontSize: "18px",
     mb: 3,
     textAlign: "center" as const,

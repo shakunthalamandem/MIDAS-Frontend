@@ -153,7 +153,7 @@ const MarketSentimentFOWriteUp: React.FC<MarketSentimentFOWriteUpProps> = ({
         <Stack spacing={1.5}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, color: "#121f44" }}
+            sx={{ fontWeight: 700, color: "#026269" }}
             align="center"
           >
             Market Sentiment
