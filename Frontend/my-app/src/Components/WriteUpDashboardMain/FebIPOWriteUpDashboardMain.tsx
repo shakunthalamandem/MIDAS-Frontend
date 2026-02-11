@@ -18,6 +18,7 @@ import IPOWriteUpMetaDataDealInfo from "./IPOWriteUpMetaData/IPOWriteUpMetaDataD
 import IPOWriteUpMetaDataFinalVerdict from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinalVerdict"
 import IPOWriteUpMetaDataFinancialHighlights from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinancialHighlights"
 import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetrics"
+import IPOWriteUpMetaDataKeyMetricsNew from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetricsNew"
 import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
@@ -296,7 +297,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
             <Card id="key-metrics" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataKeyMetrics
+                <IPOWriteUpMetaDataKeyMetricsNew
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>

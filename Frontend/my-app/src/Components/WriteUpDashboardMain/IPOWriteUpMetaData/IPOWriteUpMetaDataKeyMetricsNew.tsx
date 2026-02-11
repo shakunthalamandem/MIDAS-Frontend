@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import {
@@ -23,16 +24,18 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import { motion } from "framer-motion"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
+import AddIcon from "@mui/icons-material/Add"
 
 /* -------------------- TYPES -------------------- */
 
-interface IPOWriteUpMetaDataKeyMetricsProps {
+interface IPOWriteUpMetaDataKeyMetricsNewProps {
   basicDealDetails: BasicDealDetails
 }
 
 interface KeyMetricItem {
   category?: string
   color?: string | null
+  label?: string
 }
 
 type KeyMetricsResponse = Record<string, KeyMetricItem>
@@ -55,6 +58,11 @@ const criteriaList = [
   { label: "ESG Focus", key: "esg_focus" },
   { label: "M&A Opportunities", key: "ma_opportunities" }
 ]
+
+interface CriteriaItem {
+  label: string
+  key: string
+}
 
 const getColorHex = (color?: string | null) => {
   switch (color?.toLowerCase()) {
@@ -96,10 +104,21 @@ const formatRating = (value: number) => {
   return Number.isInteger(normalized) ? `${normalized}` : normalized.toFixed(1)
 }
 
+const toKeyFromLabel = (label?: string) => {
+  if (!label) return ""
+  const trimmed = label.trim()
+  if (!trimmed) return ""
+  const slug = trimmed
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+  return slug || trimmed
+}
+
 /* -------------------- COMPONENT -------------------- */
 
-const IPOWriteUpMetaDataKeyMetrics: React.FC<
-  IPOWriteUpMetaDataKeyMetricsProps
+const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
+  IPOWriteUpMetaDataKeyMetricsNewProps
 > = ({ basicDealDetails }) => {
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
@@ -108,6 +127,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   const [editMode, setEditMode] = useState(false)
   const [metrics, setMetrics] = useState<KeyMetricsResponse>({})
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
+  const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
+  const [removedKeys, setRemovedKeys] = useState<Set<string>>(new Set())
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -134,7 +155,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
     const fetchMetrics = async () => {
       try {
         setLoading(true)
-        const res = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+        const res = await fetch(`${apiUrl}/api/ipo-revenue-growth-new/`, {
           method: "POST",
           headers,
           body: JSON.stringify({ ticker: basicDealDetails.ticker })
@@ -143,7 +164,22 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
         if (!res.ok) throw new Error("Failed to load key metrics")
 
         const data = await res.json()
-        if (active) setMetrics(data || {})
+        if (active) {
+          // ensure every metric has a label fallback so UI stays readable
+          const normalized: KeyMetricsResponse = {}
+          const incoming = data?.key_metrics || data?.revenue_growth || data || {}
+          Object.entries(incoming).forEach(([key, value]: [string, any]) => {
+            normalized[key] = {
+              category: value?.category ?? "",
+              color: value?.color ?? null,
+              label:
+                value?.label ??
+                criteriaList.find((c) => c.key === key)?.label ??
+                key
+            }
+          })
+          setMetrics(normalized)
+        }
       } catch (err: any) {
         if (active) setFetchError(err.message || "No data found.")
       } finally {
@@ -203,11 +239,26 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
   /* -------------------- DERIVED ROW LOGIC -------------------- */
 
-  const filledCriteria = criteriaList.filter(
+  const criteriaFromMetrics = useMemo(() => {
+    const metricKeys = Object.keys(metrics || {})
+    if (!metricKeys.length) return []
+
+    return metricKeys.map((key) => ({
+      key,
+      label:
+        metrics[key]?.label ??
+        criteriaList.find((c) => c.key === key)?.label ??
+        key
+    }))
+  }, [metrics])
+
+  const filledCriteria = criteriaFromMetrics.filter(
     (c) => metrics[c.key]?.category?.trim()
   )
 
-  const rowsToRender = editMode ? criteriaList : filledCriteria
+  const rowsToRender = (editMode ? criteriaFromMetrics : filledCriteria).filter(
+    (item) => !removedKeys.has(item.key)
+  )
 
   /* -------------------- HANDLERS -------------------- */
 
@@ -216,36 +267,79 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
       ...prev,
       [key]: {
         ...prev[key],
+        label:
+          prev[key]?.label ??
+          metrics[key]?.label ??
+          criteriaList.find((c) => c.key === key)?.label ??
+          key,
         color,
         category: prev[key]?.category ?? metrics[key]?.category ?? ""
       }
     }))
   }
 
+  const handleAddRow = () => {
+    const newKey = `custom_${Date.now()}`
+    const label = ""
+    setDynamicCriteria((prev) => [{ key: newKey, label }, ...prev]) // kept for backwards compatibility
+    setEditedMetrics((prev) => ({
+      ...prev,
+      [newKey]: { category: "", color: null, label }
+    }))
+    setMetrics((prev) => ({
+      [newKey]: { category: "", color: null, label },
+      ...prev
+    }))
+    if (!editMode) setEditMode(true)
+  }
+
   const handleDelete = (key: string) => {
-    // Mark for deletion by setting to undefined
+    // mark row for removal; we drop it from the payload when saving
+    setRemovedKeys((prev) => {
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
+
     setEditedMetrics((prev) => {
       const updated = { ...prev }
-      updated[key] = { category: "", color: null }
+      delete updated[key]
       return updated
     })
 
-    // Immediately remove from metrics for UI update
     setMetrics((prev) => {
       const updated = { ...prev }
       delete updated[key]
       return updated
     })
+
+    setDynamicCriteria((prev) => prev.filter((item) => item.key !== key))
   }
 
   const handleSave = async () => {
     try {
+      // merge edits into base metrics and allow renaming based on label
+      const merged = { ...metrics, ...editedMetrics }
+      const keyMetrics = Object.entries(merged).reduce<KeyMetricsResponse>(
+        (acc, [key, value]) => {
+          if (removedKeys.has(key)) return acc
+          const targetKey = toKeyFromLabel(value.label) || key
+          acc[targetKey] = {
+            category: value.category ?? "",
+            color: value.color ?? null,
+            label: value.label ?? criteriaList.find((c) => c.key === key)?.label ?? key
+          }
+          return acc
+        },
+        {}
+      )
+
       const payload = {
-        ticker_name: basicDealDetails.ticker,
-        revenue_growth: { ...metrics, ...editedMetrics }
+        ticker: basicDealDetails.ticker,
+        key_metrics: keyMetrics
       }
 
-      const res = await fetch(`${apiUrl}/api/ipo-revenue-growth/`, {
+      const res = await fetch(`${apiUrl}/api/ipo-revenue-growth-new/`, {
         method: "PATCH",
         headers,
         body: JSON.stringify(payload)
@@ -253,8 +347,9 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
 
       if (!res.ok) throw new Error("Save failed")
 
-      setMetrics(payload.revenue_growth)
+      setMetrics(payload.key_metrics)
       setEditedMetrics({})
+      setRemovedKeys(new Set())
       setEditMode(false)
     } catch (err: any) {
       setSaveError(err.message || "Save failed")
@@ -278,8 +373,8 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   if (fetchError)
     return (
       <NoDataNotice
-        title="Key Metrics is not available."
-        subtitle=" We will update soon."
+        title="No data found"
+        subtitle="There is no data for this ticker. We will update soon."
       />
     )
 
@@ -370,7 +465,32 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </Box>
 
           {/* Edit buttons - Right aligned */}
-          <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }} display="flex" gap={1}>
+          <Box
+            sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}
+            display="flex"
+            gap={1}
+            alignItems="center"
+          >
+            {editMode && (
+              <Tooltip title="Add new row" arrow>
+                <span>
+                  <IconButton
+                    onClick={handleAddRow}
+                    sx={{
+                      color: "#0b2c6a",
+                      backgroundColor: "#eef2ff",
+                      "&:hover": {
+                        backgroundColor: "#dbeafe",
+                        transform: "scale(1.05)"
+                      },
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
             {editMode ? (
               <>
                 <IconButton
@@ -449,7 +569,7 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
           </TableHead>
 
           <TableBody>
-            {rowsToRender.map((item, idx) => {
+            {rowsToRender.map((item) => {
               const original = metrics[item.key] || {}
               const edited = editedMetrics[item.key] || {}
               const value = editMode
@@ -458,6 +578,11 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
               const color = editMode
                 ? edited.color ?? original.color
                 : original.color
+              const labelValue =
+                (editMode ? edited.label : undefined) ??
+                original.label ??
+                item.label ??
+                item.key
 
               return (
                 <TableRow
@@ -468,7 +593,42 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
                     transition: "background 0.2s ease"
                   }}
                 >
-                  <TableCell sx={{ fontWeight: 600, color: "#1f2937" }}>{item.label}</TableCell>
+                  <TableCell>
+                    {editMode ? (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={labelValue}
+                        onChange={(e) =>
+                          setEditedMetrics((prev) => ({
+                            ...prev,
+                            [item.key]: {
+                              ...prev[item.key],
+                              label: e.target.value,
+                              category: prev[item.key]?.category ?? original.category ?? "",
+                              color: prev[item.key]?.color ?? original.color ?? null
+                            }
+                          }))
+                        }
+                        placeholder="Enter criteria"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            background: "#ffffff",
+                            "&:hover fieldset": {
+                              borderColor: "#124180"
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#1d4ed8"
+                            }
+                          }
+                        }}
+                      />
+                    ) : (
+                      <Typography sx={{ fontWeight: 600, color: "#1f2937" }}>
+                        {labelValue}
+                      </Typography>
+                    )}
+                  </TableCell>
 
                   <TableCell align="center">
                     {editMode ? (
@@ -580,4 +740,4 @@ const IPOWriteUpMetaDataKeyMetrics: React.FC<
   )
 }
 
-export default IPOWriteUpMetaDataKeyMetrics
+export default IPOWriteUpMetaDataKeyMetricsNew
