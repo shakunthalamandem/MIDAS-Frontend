@@ -271,7 +271,10 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
             gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
             alignItems: "center",
             gap: 1.5,
-            px: 0.5
+            px: 0.5,
+            background: "#c7d8f1",
+            borderRadius: 2,
+            py: 1.5
           }}
         >
           <Box sx={{ display: { xs: "none", sm: "block" } }} />
@@ -471,7 +474,11 @@ IOI and After-Market Strategy          </Typography>
               display: "grid",
               gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
               alignItems: "center",
-              gap: 1
+              gap: 1,
+              background: "#c7d8f1",
+              borderRadius: 2,
+              py: 1.5,
+              px: 0.5
             }}
           >
             <Box sx={{ display: { xs: "none", sm: "block" } }} />

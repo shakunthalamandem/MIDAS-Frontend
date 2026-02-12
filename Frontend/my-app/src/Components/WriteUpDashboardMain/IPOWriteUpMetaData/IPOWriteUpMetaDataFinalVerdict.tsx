@@ -293,9 +293,11 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
         p: { xs: 2.5, md: 3 },
         boxShadow: "0 12px 24px rgba(32, 70, 150, 0.08)"
       }}
-    >      <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center", mb: 3 }}>
-        Final Verdict
-      </Typography>
+    >      <Box sx={{ background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2, mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}>
+          Final Verdict
+        </Typography>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Stack spacing={2}>
