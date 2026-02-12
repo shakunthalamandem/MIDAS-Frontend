@@ -402,6 +402,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           item.impact_risk !== original.impact_risk ||
           item.company_name !== original.company_name ||
           item.red_flag_analysis_rating !== original.red_flag_analysis_rating
+        const targetCategory = original?.category ?? item.category
         if (isDelete) {
           const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
             method: "PATCH",
@@ -411,7 +412,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             },
             body: JSON.stringify({
               ticker_name: ticker,
-              category: item.category,
+              category: targetCategory,
               action: "delete"
             })
           })
@@ -431,7 +432,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             changesPayload.red_flag_analysis_rating = item.red_flag_analysis_rating
           }
           if (Object.keys(changesPayload).length) {
-            updates.push({ category: item.category, changes: changesPayload })
+            // Use the original category as the identifier for the record, even if the label changed.
+            updates.push({ category: targetCategory, changes: changesPayload })
           }
         }
       }
@@ -594,7 +596,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         ) : (
           <Stack spacing={2}>
             {(isEditing ? draftItems : items).map((item, index) => {
-              const rowKey = `${item.category ?? "risk"}-${index}`
+              const rowKey = `red-flag-${index}`
               const color = riskBandColors[index % riskBandColors.length]
               const displayScore = item.score
               return (
