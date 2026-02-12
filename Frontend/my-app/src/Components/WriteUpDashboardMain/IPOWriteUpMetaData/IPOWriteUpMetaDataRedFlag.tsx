@@ -363,6 +363,11 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   }
 
   const handleDelete = async (item: RedFlagItem, index: number) => {
+    // If it's a newly added unsaved row, just drop it locally.
+    if (item._isNew) {
+      setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
+      return
+    }
     setPendingDeleteIndices((prev) =>
       prev.includes(index) ? prev.filter((id) => id !== index) : [...prev, index]
     )
@@ -511,16 +516,20 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     }
   }
   const handleAddItem = () => {
-    setDraftItems((prev) => [
-      ...prev,
+    // Start from whatever is currently shown in edit mode; if draft is empty fall back to loaded items.
+    const base = (isEditing ? draftItems : items) ?? []
+    const next = [
       {
         category: "",
         observation: "",
         impact_risk: "",
         score: 0,
         _isNew: true
-      }
-    ])
+      },
+      ...base
+    ]
+    setDraftItems(next)
+    if (!isEditing) setIsEditing(true)
   }
 
   return (
@@ -649,7 +658,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             title="Red Flag Analysis is not available."
             subtitle=" We will update soon."
           />
-        ) : items.length === 0 ? (
+        ) : (isEditing ? draftItems : items).length === 0 ? (
           <Typography variant="body2" sx={{ color: "#5c6c8a" }}>
             No red flag analysis available for this ticker.
           </Typography>
