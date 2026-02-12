@@ -492,7 +492,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     >
       {/* ================= BUSINESS OVERVIEW ================= */}
       <Box mb={4}>
-        <Box sx={{ position: "relative", mb: 2 }}>
+        <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
           {/* Rating - Left aligned */}
           {businessOverviewRatingText && (
             <Box
@@ -590,9 +590,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               expandIcon={!pdfMode ? <ExpandMoreIcon sx={{ color: "#124180" }} /> : null}
               sx={{
                 minHeight: 64,
-                // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
-                                  background: "#ffffff",
-
+                background: "#e8ecf1",
                 borderRadius: "8px 8px 0 0",
                 "&:hover": {
                   background: "linear-gradient(135deg, #e8f0fe, #dae7fc)"

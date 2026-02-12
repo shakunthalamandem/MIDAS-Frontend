@@ -144,7 +144,7 @@ const IPOWriteUpMetaDataDealInfo: React.FC<IPOWriteUpMetaDataDealInfoProps> = ({
 
   return (
     <>
-      <Box sx={{ position: "relative", mb: 2 }}>
+      <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
         {/* Rating - Left aligned */}
         {/* {ratingText && (
           <Box
