@@ -94,6 +94,7 @@ import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDa
 import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
 import TickerChange from "../Components/TickerChange/TickerChange";
 import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
+import FOSentimentAnalysisDumpDaily from "../Components/AIML/FOSentimentAnalysisDumpDaily";
 
 const AppRouters: React.FC = () => {
   return (
@@ -278,6 +279,7 @@ const AppRouters: React.FC = () => {
         <Route path="/notesui" element={<AuthGuard><NotesUI /></AuthGuard>} />
 
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
+        <Route path="/fo_sentiment_analysis" element={<AuthGuard><FOSentimentAnalysisDumpDaily /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
 
