@@ -297,7 +297,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
             <Card id="key-metrics" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
-                <IPOWriteUpMetaDataKeyMetrics
+                <IPOWriteUpMetaDataKeyMetricsNew
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
