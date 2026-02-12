@@ -365,14 +365,16 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   }
 
   const handleDelete = async (item: RedFlagItem, index: number) => {
+    const key = item._key ?? item._originalCategory ?? item.category ?? `idx-${index}`
     // If it's a newly added unsaved row, just drop it locally.
     if (item._isNew) {
       setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
       return
     }
-    const key = item._key ?? item._originalCategory ?? item.category ?? `idx-${index}`
+    // For existing rows: mark for delete AND remove from the draft list immediately.
+    setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
     setPendingDeleteCategories((prev) =>
-      prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]
+      prev.includes(key) ? prev : [...prev, key]
     )
   }
 
@@ -405,6 +407,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       const updates: Array<{ category: string; changes: Record<string, unknown> }> =
         []
       const additions: RedFlagItem[] = []
+      const deletions: string[] = []
       const ratingChanged =
         draftRatingScore !== null && draftRatingScore !== parsedRatingScore
       for (let index = 0; index < draftItems.length; index += 1) {
@@ -432,19 +435,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         const targetCategory =
           original?._originalCategory ?? original?.category ?? item.category
         if (isDelete) {
-          const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
-            },
-            body: JSON.stringify({
-              ticker_name: ticker,
-              category: targetCategory,
-              action: "delete"
-            })
-          })
-          if (!response.ok) throw new Error("Failed to delete red flag category")
+          if (targetCategory) deletions.push(targetCategory)
         } else if (hasChanges) {
           const changesPayload: Record<string, unknown> = {}
           if (item.score !== original?.score) changesPayload.score = item.score
@@ -520,6 +511,21 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           })
         })
         if (!response.ok) throw new Error("Failed to save rating")
+      }
+      if (deletions.length) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            action: "delete",
+            categories: deletions
+          })
+        })
+        if (!response.ok) throw new Error("Failed to delete red flag category")
       }
       setPendingDeleteCategories([])
       setIsEditing(false)
