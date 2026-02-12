@@ -3,6 +3,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined"
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined"
 import {
   Box,
   Button,
@@ -29,6 +30,7 @@ type RedFlagItem = {
   observation?: string
   company_name?: string
   red_flag_analysis_rating?: string | number | null
+  _isNew?: boolean
 }
 
 type RedFlagAnalysis = {
@@ -387,6 +389,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       const originalItems = originalItemsRef.current
       const updates: Array<{ category: string; changes: Record<string, unknown> }> =
         []
+      const additions: RedFlagItem[] = []
       const ratingChanged =
         draftRatingScore !== null && draftRatingScore !== parsedRatingScore
       for (let index = 0; index < draftItems.length; index += 1) {
@@ -394,6 +397,13 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         if (!item.category) continue
         const isDelete = pendingDeleteIndices.includes(index)
         const original = originalItems[index]
+        const isNewItem = !original
+        if (isNewItem) {
+          if (!isDelete) {
+            additions.push(item)
+          }
+          continue
+        }
         const hasChanges =
           !original ||
           item.score !== original.score ||
@@ -437,6 +447,28 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           }
         }
       }
+      if (additions.length) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            action: "add",
+            updates: additions.map((entry) => ({
+              category: entry.category,
+              score: entry.score ?? 0,
+              observation: entry.observation ?? "",
+              impact_risk: entry.impact_risk ?? "",
+              company_name: entry.company_name ?? "",
+              red_flag_analysis_rating: entry.red_flag_analysis_rating
+            }))
+          })
+        })
+        if (!response.ok) throw new Error("Failed to add red flag")
+      }
       if (updates.length) {
         const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
           method: "PATCH",
@@ -477,6 +509,18 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     } finally {
       setSaveLoading(false)
     }
+  }
+  const handleAddItem = () => {
+    setDraftItems((prev) => [
+      ...prev,
+      {
+        category: "",
+        observation: "",
+        impact_risk: "",
+        score: 0,
+        _isNew: true
+      }
+    ])
   }
 
   return (
@@ -549,6 +593,22 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             >
               Risk Score: {(avgScore * 2).toFixed(2)}/10
             </Typography> */}
+            {isEditing ? (
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<AddOutlinedIcon fontSize="small" />}
+                onClick={handleAddItem}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  borderColor: "#1f3b73",
+                  color: "#1f3b73"
+                }}
+              >
+                Add
+              </Button>
+            ) : null}
             <IconButton
               size="small"
               onClick={handleEditToggle}
