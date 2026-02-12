@@ -477,11 +477,11 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
               category: entry.category ?? `new-${addIndex}`,
               changes: {
                 category: entry.category ?? "",
-                observation: entry.observation ?? "",
-                impact_risk: entry.impact_risk ?? "",
                 score: entry.score ?? 0,
-                company_name: entry.company_name ?? "",
-                red_flag_analysis_rating: entry.red_flag_analysis_rating
+                impact_risk: entry.impact_risk ?? "",
+                observation: entry.observation ?? "",
+                // company_name: entry.company_name ?? "",
+                red_flag_analysis_rating: entry.red_flag_analysis_rating ?? ""
               }
             }))
           })
