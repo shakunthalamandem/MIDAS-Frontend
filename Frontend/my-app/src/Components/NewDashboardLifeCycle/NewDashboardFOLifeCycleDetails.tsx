@@ -42,11 +42,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-      {label: "Write Up New" },
-      { label: "Write Up Old" },
+      { label: "Write Up New", requiresWriteup: true },
+      { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
-      { label: "Peer Deals Performance" },
+      { label: "Peer Deals Performance", requiresWriteup: true },
       { label: "AI - Sentiment View" },
       { label: "Previous FO deals" },
       { label: "ML Model" },
@@ -56,6 +56,10 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     ],
     []
   );
+
+  const activePayload = selectedOption || payload;
+  const writeupEnabled = (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
+
 
 
   React.useEffect(() => {
@@ -91,7 +95,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     );
   }
 
-  const activePayload = selectedOption || payload;
   const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
@@ -179,22 +182,32 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               },
             }}
           >
-            {tabItems.map((item) => (
-              <Tab
-                key={item.label}
-                // icon={item.icon}
-                iconPosition="start"
-                label={item.label}
-                sx={{
-                  borderRadius: 999,
-                  mr: 1,
-                  "&.Mui-selected": {
-                    color: "#ffff",
-                    backgroundColor: "#262268ff",
-                  },
-                }}
-              />
-            ))}
+            {tabItems.map((item) => {
+              const isDisabled = item.requiresWriteup && !writeupEnabled;
+              return (
+                <Tab
+                  key={item.label}
+                  iconPosition="start"
+                  label={item.label}
+                  disabled={isDisabled}
+                  sx={{
+                    borderRadius: 999,
+                    mr: 1,
+                    "&.Mui-selected": {
+                      color: "#ffff",
+                      backgroundColor: "#262268ff",
+                    },
+                    "&.Mui-disabled": {
+                      color: "#a0a0a0",
+                      backgroundColor: "#e0e0e0",
+                      borderColor: "#d0d0d0",
+                      cursor: "not-allowed",
+                      pointerEvents: "auto",
+                    },
+                  }}
+                />
+              );
+            })}
           </Tabs>
         </Paper>
 
