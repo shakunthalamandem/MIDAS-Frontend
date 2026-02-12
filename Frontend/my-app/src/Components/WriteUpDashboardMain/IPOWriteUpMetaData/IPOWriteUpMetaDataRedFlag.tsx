@@ -30,6 +30,8 @@ type RedFlagItem = {
   observation?: string
   company_name?: string
   red_flag_analysis_rating?: string | number | null
+  _originalCategory?: string
+  _key?: string
   _isNew?: boolean
 }
 
@@ -193,7 +195,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [draftItems, setDraftItems] = useState<RedFlagItem[]>([])
   const [saveLoading, setSaveLoading] = useState(false)
-  const [pendingDeleteIndices, setPendingDeleteIndices] = useState<number[]>([])
+  const [pendingDeleteCategories, setPendingDeleteCategories] = useState<string[]>([])
   const [draftRatingScore, setDraftRatingScore] = useState<number | null>(null)
   const [writeupRatings, setWriteupRatings] = useState<Record<string, number>>({})
 
@@ -368,19 +370,24 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
       return
     }
-    setPendingDeleteIndices((prev) =>
-      prev.includes(index) ? prev.filter((id) => id !== index) : [...prev, index]
+    const key = item._key ?? item._originalCategory ?? item.category ?? `idx-${index}`
+    setPendingDeleteCategories((prev) =>
+      prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]
     )
   }
 
   const handleEditToggle = () => {
     if (!isEditing) {
-      const snapshot = items.map((item) => ({ ...item }))
+      const snapshot = items.map((item, index) => ({
+        ...item,
+        _originalCategory: item.category,
+        _key: `orig-${index}`
+      }))
       originalItemsRef.current = snapshot.map((item) => ({ ...item }))
       setDraftItems(snapshot)
       setDraftRatingScore(baseRatingScore)
     } else {
-      setPendingDeleteIndices([])
+      setPendingDeleteCategories([])
       setDraftRatingScore(null)
     }
     setIsEditing((prev) => !prev)
@@ -392,6 +399,9 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     setSaveError(null)
     try {
       const originalItems = originalItemsRef.current
+      const originalLookup = new Map(
+        originalItems.map((item) => [(item._key ?? item._originalCategory ?? item.category) ?? "", item])
+      )
       const updates: Array<{ category: string; changes: Record<string, unknown> }> =
         []
       const additions: RedFlagItem[] = []
@@ -400,8 +410,10 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
       for (let index = 0; index < draftItems.length; index += 1) {
         const item = draftItems[index]
         if (!item.category) continue
-        const isDelete = pendingDeleteIndices.includes(index)
-        const original = originalItems[index]
+        const originalKey =
+          item._key ?? item._originalCategory ?? item.category ?? `idx-${index}`
+        const isDelete = pendingDeleteCategories.includes(originalKey)
+        const original = originalLookup.get(originalKey)
         const isNewItem = !original
         if (isNewItem) {
           if (!isDelete) {
@@ -417,7 +429,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           item.impact_risk !== original.impact_risk ||
           item.company_name !== original.company_name ||
           item.red_flag_analysis_rating !== original.red_flag_analysis_rating
-        const targetCategory = original?.category ?? item.category
+        const targetCategory =
+          original?._originalCategory ?? original?.category ?? item.category
         if (isDelete) {
           const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
             method: "PATCH",
@@ -461,14 +474,17 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           },
           body: JSON.stringify({
             ticker_name: ticker,
-            action: "add",
-            updates: additions.map((entry) => ({
-              category: entry.category,
-              score: entry.score ?? 0,
-              observation: entry.observation ?? "",
-              impact_risk: entry.impact_risk ?? "",
-              company_name: entry.company_name ?? "",
-              red_flag_analysis_rating: entry.red_flag_analysis_rating
+            action: "create",
+            creates: additions.map((entry, addIndex) => ({
+              category: entry.category ?? `new-${addIndex}`,
+              changes: {
+                category: entry.category ?? "",
+                observation: entry.observation ?? "",
+                impact_risk: entry.impact_risk ?? "",
+                score: entry.score ?? 0,
+                company_name: entry.company_name ?? "",
+                red_flag_analysis_rating: entry.red_flag_analysis_rating
+              }
             }))
           })
         })
@@ -505,7 +521,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         })
         if (!response.ok) throw new Error("Failed to save rating")
       }
-      setPendingDeleteIndices([])
+      setPendingDeleteCategories([])
       setIsEditing(false)
       setDraftRatingScore(null)
       await refreshRedFlags()
@@ -524,7 +540,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         observation: "",
         impact_risk: "",
         score: 0,
-        _isNew: true
+        _isNew: true,
+        _key: `new-${Date.now()}-${base.length}`
       },
       ...base
     ]
@@ -833,7 +850,12 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                             color: "#ef4444"
                           }}
                         >
-                          {pendingDeleteIndices.includes(index)
+                          {pendingDeleteCategories.includes(
+                            item._key ??
+                              item._originalCategory ??
+                              item.category ??
+                              `idx-${index}`
+                          )
                             ? "Pending"
                             : "Delete"}
                         </Button>
