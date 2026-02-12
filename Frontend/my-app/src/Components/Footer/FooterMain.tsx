@@ -100,7 +100,24 @@ const FooterMain: React.FC = () => {
         }}
       >
         Monashee Insights & Data Application System
+        <Box
+          component="span"
+          onClick={() => navigate('/sentiment_analysis')}
+          sx={{
+            display: 'inline-block',
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor: '#2a2e39',
+            ml: 1,
+            cursor: 'pointer',
+            verticalAlign: 'middle',
+            opacity: 0.6,
+            '&:hover': { opacity: 1 },
+          }}
+        />
       </Typography>
+
       <Box
         sx={{
           display: 'flex',
