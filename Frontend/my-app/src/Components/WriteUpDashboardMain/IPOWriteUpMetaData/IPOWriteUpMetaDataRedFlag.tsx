@@ -580,7 +580,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     >
       <Stack spacing={2.5}>
 
-        <Box sx={{ position: "relative", mb: 2 }}>
+        <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
           {/* Rating - Left aligned */}
           {!isEditing && showRatingHeadingValue !== null && (
             <Box

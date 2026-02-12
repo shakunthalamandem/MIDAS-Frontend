@@ -268,7 +268,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
       </Box>
 
       <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, textAlign: "center" }}>
-        Financial Forecasts
+        Financial Highlights
       </Typography>
 
       {loading ? (

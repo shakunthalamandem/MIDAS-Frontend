@@ -141,6 +141,7 @@ const NewDealsLifecycleCards: React.FC = () => {
         "writeup_available",
         "deal_status",
         "t1d_pred",
+        "flag_for_writeup",
       ];
 
       const formattedRows = rowsSource.flatMap((item: any, index: number) => {

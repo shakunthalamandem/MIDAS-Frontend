@@ -84,7 +84,7 @@ import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
 import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
 import MattermostChat from "../Components/Discussion/MattermostChat";
 import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
-import SentimentAnalysis from "../Components/AIML/SentimentAnalysis";
+import SentimentAnalysisTabs from "../Components/AIML/SentimentAnalysisTabs";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
@@ -94,6 +94,7 @@ import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDa
 import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
 import TickerChange from "../Components/TickerChange/TickerChange";
 import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
+
 
 const AppRouters: React.FC = () => {
   return (
@@ -277,7 +278,7 @@ const AppRouters: React.FC = () => {
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
         <Route path="/notesui" element={<AuthGuard><NotesUI /></AuthGuard>} />
 
-        <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysis /></AuthGuard>} />
+        <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysisTabs /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
 
