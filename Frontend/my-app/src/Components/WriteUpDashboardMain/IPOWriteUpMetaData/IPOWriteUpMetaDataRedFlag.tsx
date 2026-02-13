@@ -767,7 +767,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         </Typography>
                       )}
                     </Stack>
-                    <Stack spacing={1} sx={{ mt: 1 }}>
+                    {/* <Stack spacing={1} sx={{ mt: 1 }}>
                       <Typography variant="body2" sx={{ color: "#1f2937" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
                           Observation:
@@ -826,7 +826,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                           item.impact_risk ?? "--"
                         )}
                       </Typography>
-                    </Stack>
+                    </Stack> */}
                   </Box>
                   <Box
                     sx={{
