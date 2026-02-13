@@ -97,7 +97,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     () => [
       { id: "deal-info", label: "Deal Info" },
       { id: "market-strategy", label: " Fair Value Estimate and IOI." },
-      { id: "ai-indication", label: "Proprietary Model Indication" },
+      // { id: "ai-indication", label: "Proprietary Model Indication" },
       { id: "business-overview", label: "Company Overview." },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
@@ -278,14 +278,14 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="ai-indication" sx={sectionCardSx}>
+            {/* <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataDealIndication
                   basicDealDetails={basicDealDetails}
                   writeUpData={writeUpData}
                 />
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card id="business-overview" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>

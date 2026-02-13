@@ -75,13 +75,13 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
   const sectionDefaults = useMemo(
     () => [
       // { id: "deal-info", label: "Deal Info" },
-      {id: "ai-indication", label: "Proprietary Model Indication"},
-      { id: "business-overview", label: "Business Overview" },
+      // {id: "ai-indication", label: "Proprietary Model Indication"},
+      { id: "business-overview", label: "Company Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comps & Peer Trends" },
-      { id: "valuation-analysis", label: "Valuation Analysis" },
-      { id: "red-flag", label: "Red Flag" }
+      { id: "valuation-analysis", label: "Valuation " },
+      { id: "red-flag", label: "Risk Assessment" }
     ],
     []
   )
