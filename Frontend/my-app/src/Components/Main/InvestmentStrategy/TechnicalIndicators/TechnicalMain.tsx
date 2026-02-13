@@ -57,6 +57,27 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
     setRegion(initialRegion ?? null);
   }, [initialRegion]);
 
+  // Hide small Trendlyne branding badges that appear after widgets
+  useEffect(() => {
+    const styleId = "hide-trendlyne-branding";
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.innerHTML = `
+      .tl-branding, .tl-powered, .tl-logo-wrapper, .tl-widget-logo, .tl-branding-container {
+        display: none !important;
+      }
+      /* Fallback: hide any direct Trendlyne anchors/images injected near widgets */
+      a[href*="trendlyne.com"], a[href*="trendlyne.in"] {
+        display: none !important;
+      }
+      img[src*="trendlyne"], img[data-src*="trendlyne"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
   return (
     <Container maxWidth="lg" sx={{ paddingY: 4 }}>
       <Box sx={{ width: "100%", backgroundColor: "#fff" }}>
@@ -125,36 +146,39 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
                 <VolatilityChart ticker={selectedTicker} />
 
                 {/* Trendlyne widgets block */}
-                <Box sx={{ mt: 4 }}>
+                <Box sx={{ mt: 4, pb: 4 }}>
                   <Typography
                     variant="h5"
                     sx={{ fontWeight: "bold", color: "#002060", mb: 2 }}
                   >
-                    Trendlyne Insights
+                    
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TrendlyneQVTWidget
                         companyCode={widgetTicker ?? undefined}
                         companyName={widgetTicker ?? ""}
+                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <TrendlyneWidget
                         companyCode={widgetTicker ?? undefined}
                         companyName={widgetTicker ?? ""}
+                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <TrendlyneTechnicalWidget
                         companyCode={widgetTicker ?? undefined}
-                        className="technical-widget"
+                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <TrendlyneChecklistWidget
                         companyCode={widgetTicker ?? undefined}
                         companyName={widgetTicker ?? ""}
+                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
                       />
                     </Grid>
                   </Grid>

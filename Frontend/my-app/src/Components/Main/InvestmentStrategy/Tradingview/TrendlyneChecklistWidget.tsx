@@ -49,11 +49,23 @@ export default function TrendlyneChecklistWidget({
   if (!widgetCompany) return null;
 
   return (
-    <div className={className}>
+    <div className={className} style={{ position: "relative" }}>
       <blockquote
         className="trendlyne-widgets"
         data-get-url={`https://us.trendlyne.com/us/web-widget/checklist-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}
         data-theme="light"
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: 8,
+          bottom: 8,
+          width: 48,
+          height: 32,
+          background: "#fff",
+          pointerEvents: "none",
+        }}
       />
     </div>
   );
