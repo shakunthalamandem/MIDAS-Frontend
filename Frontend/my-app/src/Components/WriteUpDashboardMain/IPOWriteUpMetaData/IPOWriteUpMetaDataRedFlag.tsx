@@ -767,11 +767,11 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         </Typography>
                       )}
                     </Stack>
-                    {/* <Stack spacing={1} sx={{ mt: 1 }}>
+                    <Stack spacing={1} sx={{ mt: 1 }}>
                       <Typography variant="body2" sx={{ color: "#1f2937" }}>
-                        <Box component="span" sx={{ fontWeight: 700 }}>
+                        {/* <Box component="span" sx={{ fontWeight: 700 }}>
                           Observation:
-                        </Box>{" "}
+                        </Box>{" "} */}
                         {isEditing ? (
                           <TextField
                             fullWidth
@@ -797,7 +797,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                           item.observation ?? "--"
                         )}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "#1f2937" }}>
+                      {/* <Typography variant="body2" sx={{ color: "#1f2937" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
                           Impact:
                         </Box>{" "}
@@ -825,8 +825,8 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         ) : (
                           item.impact_risk ?? "--"
                         )}
-                      </Typography>
-                    </Stack> */}
+                      </Typography> */}
+                    </Stack>
                   </Box>
                   <Box
                     sx={{
