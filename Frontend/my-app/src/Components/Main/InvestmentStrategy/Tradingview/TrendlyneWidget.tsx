@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 
 type TrendlyneWidgetProps = {
@@ -7,7 +6,7 @@ type TrendlyneWidgetProps = {
   companyName: string;
 };
 
-const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script";
+const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script-swot";
 
 const normalizeCompanyCode = (value?: string) => {
   const cleaned = (value ?? "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -28,10 +27,7 @@ export default function TrendlyneWidget({ companyCode, className,companyName }: 
 
   useEffect(() => {
     if (!widgetCompany) return;
-
-    // Force reload when ticker changes
-    const oldScript = document.getElementById(TRENDLYNE_SCRIPT_ID);
-    if (oldScript) oldScript.remove();
+    if (document.getElementById(TRENDLYNE_SCRIPT_ID)) return;
 
     const script = document.createElement("script");
     script.id = TRENDLYNE_SCRIPT_ID;
@@ -44,7 +40,7 @@ export default function TrendlyneWidget({ companyCode, className,companyName }: 
   if (!widgetCompany) return null;
 
   return (
-    <div className={className}>
+    <div className={className} style={{ position: "relative" }}>
       <blockquote
         className="trendlyne-widgets"
         data-get-url={`https://us.trendlyne.com/us/web-widget/swot-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}

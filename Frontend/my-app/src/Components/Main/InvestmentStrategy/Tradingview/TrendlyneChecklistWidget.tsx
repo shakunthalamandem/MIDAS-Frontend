@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 
 type TrendlyneChecklistWidgetProps = {
@@ -7,7 +6,7 @@ type TrendlyneChecklistWidgetProps = {
   companyName: string;
 };
 
-const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script";
+const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script-checklist";
 
 const normalizeCompanyCode = (value?: string) => {
   const cleaned = (value ?? "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -31,11 +30,10 @@ export default function TrendlyneChecklistWidget({
     }
   }, [widgetCompany, companyName]);
 
-  // 🔄 Reload Trendlyne script when ticker changes
+  // Load Trendlyne script once
   useEffect(() => {
     if (!widgetCompany) return;
-
-    document.getElementById(TRENDLYNE_SCRIPT_ID)?.remove();
+    if (document.getElementById(TRENDLYNE_SCRIPT_ID)) return;
 
     const script = document.createElement("script");
     script.id = TRENDLYNE_SCRIPT_ID;

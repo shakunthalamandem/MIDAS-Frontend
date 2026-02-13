@@ -6,7 +6,7 @@ type TrendlyneTechnicalWidgetProps = {
   className?: string;
 };
 
-const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script";
+const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script-technical";
 
 const normalizeCompanyCode = (value?: string) => {
   const cleaned = (value ?? "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
@@ -22,8 +22,7 @@ export default function TrendlyneTechnicalWidget({
   useEffect(() => {
     if (!widgetCompany) return;
 
-    const oldScript = document.getElementById(TRENDLYNE_SCRIPT_ID);
-    if (oldScript) oldScript.remove();
+    if (document.getElementById(TRENDLYNE_SCRIPT_ID)) return;
 
     const script = document.createElement("script");
     script.id = TRENDLYNE_SCRIPT_ID;
@@ -32,10 +31,6 @@ export default function TrendlyneTechnicalWidget({
     script.async = true;
     script.charset = "utf-8";
     document.body.appendChild(script);
-
-    return () => {
-      document.getElementById(TRENDLYNE_SCRIPT_ID)?.remove();
-    };
   }, [widgetCompany]);
 
   if (!widgetCompany) return null;
