@@ -47,7 +47,7 @@ export default function TrendlyneWidget({ companyCode, className,companyName }: 
     <div className={className}>
       <blockquote
         className="trendlyne-widgets"
-        data-get-url={`https://trendlyne.com/web-widget/swot-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}
+        data-get-url={`https://us.trendlyne.com/us/web-widget/swot-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}
         data-theme="light"
       />
     </div>

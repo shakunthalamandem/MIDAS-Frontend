@@ -10,6 +10,10 @@ import CompanyDetails from "./CompanyDetails";
 import VolumeChart from "./VolumeChart";
 import VolatilityChart from "./VolatilityChart";
 import FundamentalMetricsCard from "../Tabs/FundamentalMetricsCard";
+import TrendlyneWidget from "../Tradingview/TrendlyneWidget";
+import TrendlyneTechnicalWidget from "../Tradingview/TrendlyneTechnicalWidget";
+import TrendlyneChecklistWidget from "../Tradingview/TrendlyneChecklistWidget";
+import TrendlyneQVTWidget from "../Tradingview/TrendlyneQVTWidget";
 
 type TechnicalMainProps = {
   initialTicker?: string | null;
@@ -25,6 +29,13 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
     initialTicker ?? paramTicker ?? ""
   );
   const [region, setRegion] = useState<string | null>(initialRegion ?? null);
+  // Keep original ticker for rest of the page; use a cleaned code for Trendlyne widgets only
+  const widgetTicker = useMemo(() => {
+    if (!selectedTicker) return selectedTicker;
+    // Drop trailing "US" (e.g., "AAMI US" -> "AAMI"); otherwise return as-is
+    const cleaned = selectedTicker.replace(/\s*US\b/i, "").trim();
+    return cleaned || selectedTicker;
+  }, [selectedTicker]);
   const allowedRegions = useMemo(() => ["emea", "apac"], []);
   const showRegionalBlock =
     !!region && allowedRegions.includes(region.toLowerCase());
@@ -112,6 +123,43 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
             </Grid>
 
                 <VolatilityChart ticker={selectedTicker} />
+
+                {/* Trendlyne widgets block */}
+                <Box sx={{ mt: 4 }}>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: "bold", color: "#002060", mb: 2 }}
+                  >
+                    Trendlyne Insights
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TrendlyneQVTWidget
+                        companyCode={widgetTicker ?? undefined}
+                        companyName={widgetTicker ?? ""}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TrendlyneWidget
+                        companyCode={widgetTicker ?? undefined}
+                        companyName={widgetTicker ?? ""}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TrendlyneTechnicalWidget
+                        companyCode={widgetTicker ?? undefined}
+                        className="technical-widget"
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TrendlyneChecklistWidget
+                        companyCode={widgetTicker ?? undefined}
+                        companyName={widgetTicker ?? ""}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+
                 <CompanyDetails ticker={selectedTicker} />
               </>
             )}

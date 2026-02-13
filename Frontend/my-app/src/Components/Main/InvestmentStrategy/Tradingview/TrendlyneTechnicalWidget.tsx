@@ -45,7 +45,7 @@ export default function TrendlyneTechnicalWidget({
       <blockquote
         key={widgetCompany}
         className="trendlyne-widgets"
-        data-get-url={`https://trendlyne.com/web-widget/technical-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}
+        data-get-url={`https://us.trendlyne.com/us/web-widget/technical-widget/Poppins/${widgetCompany}/?posCol=00A25B&primaryCol=006AFF&negCol=EB3B00&neuCol=F7941E`}
         data-theme="light"
       />
     </div>
