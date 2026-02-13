@@ -238,7 +238,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && fetchError) {
     return (
       <NoDataNotice
-        title=" Fair Value Estimate and IOI. is not available."
+        title=" Fair Value Estimate and IOI is not available."
         subtitle=" We will update soon."
       />
     )
@@ -247,7 +247,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
   if (!loading && !data) {
     return (
       <NoDataNotice
-        title=" Fair Value Estimate and IOI. is not available."
+        title=" Fair Value Estimate and IOI is not available."
         subtitle=" We will update soon."
       />
     )
@@ -282,7 +282,7 @@ const IPOWriteUpMetaDataMarketStatergy: React.FC<
             variant="h6"
             sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}
           >
-         Fair Value Estimate and IOI.          </Typography>
+         Fair Value Estimate and IOI          </Typography>
           <Box sx={{ justifySelf: { xs: "end", sm: "end" } }}>
             {isEditingCards ? (
               <Stack direction="row" spacing={1}>
