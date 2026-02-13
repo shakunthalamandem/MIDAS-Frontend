@@ -463,7 +463,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   if (fetchError || !writeUpData) {
     return (
       <NoDataNotice
-        title="Business Overview is not available."
+        title="Company Overview is not available."
         subtitle=" We will update soon."
       />
     )
@@ -490,7 +490,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         border: "1px solid #E6ECF5"
       }}
     >
-      {/* ================= BUSINESS OVERVIEW ================= */}
+      {/* ================= COMPANY OVERVIEW ================= */}
       <Box mb={4}>
         <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
           {/* Rating - Left aligned */}
@@ -524,7 +524,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-              Business Overview
+              Company Overview
             </Typography>
           </Box>
 
