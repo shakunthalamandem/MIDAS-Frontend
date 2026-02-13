@@ -20,7 +20,7 @@ export const cardColors = [
 ];
 
   export const cardSections = [
-    { key: "business_overview", title: "Company Overview" },
+    { key: "business_overview", title: "Business Overview" },
     { key: "key_highlights", title: "Key Highlights" },
     { key: "strengths", title: "Strengths" },
     { key: "concerns", title: "Concerns" },

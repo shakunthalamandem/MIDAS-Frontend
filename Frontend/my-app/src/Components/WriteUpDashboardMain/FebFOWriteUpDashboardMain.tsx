@@ -76,7 +76,7 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
     () => [
       { id: "deal-info", label: "Deal Info" },
       { id: "ai-indication", label: "Proprietary Model Indication" },
-      { id: "business-overview", label: "Company Overview" },
+      { id: "business-overview", label: "Business Overview" },
       { id: "key-risks", label: "Key Risks" },
       { id: "investment-highlights", label: "Investment Highlights" },
       { id: "valuation-analysis", label: "Valuation Analysis" },
