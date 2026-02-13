@@ -9,6 +9,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  // InputBase,
   Slider,
   Stack,
   TextField,
@@ -18,6 +19,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -55,6 +58,26 @@ const riskBandColors = [
   "#ffe0c7",
   "#fff2c2",
   "#dbe9ff"
+]
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
 ]
 
 const formatRating = (value: number) => {
@@ -773,28 +796,37 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                           Observation:
                         </Box>{" "} */}
                         {isEditing ? (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            value={item.observation ?? ""}
-                            onChange={(event) =>
-                              setDraftItems((prev) =>
-                                prev.map((entry, idx) =>
-                                  idx === index
-                                    ? { ...entry, observation: event.target.value }
-                                    : entry
+                          <Box sx={{ mt: 0.5, background: "#ffffff", borderRadius: 1 }}>
+                            <ReactQuill
+                              theme="snow"
+                              value={item.observation ?? ""}
+                              onChange={(value) =>
+                                setDraftItems((prev) =>
+                                  prev.map((entry, idx) =>
+                                    idx === index ? { ...entry, observation: value } : entry
+                                  )
                                 )
-                              )
-                            }
-                            placeholder="Observation"
+                              }
+                              modules={quillModules}
+                              formats={quillFormats}
+                              placeholder="Observation"
+                              style={{ minHeight: 120, color: "#1f2a44", lineHeight: 1.7 }}
+                            />
+                          </Box>
+                        ) : (
+                          <Box
                             sx={{
                               mt: 0.5,
-                              background: "#ffffff",
-                              borderRadius: 1
+                              color: "#1f2a44",
+                              lineHeight: 1.7,
+                              fontSize: "0.98rem"
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                item.observation ||
+                                "<span style='color:#9ca3af'>--</span>"
                             }}
                           />
-                        ) : (
-                          item.observation ?? "--"
                         )}
                       </Typography>
                       {/* <Typography variant="body2" sx={{ color: "#1f2937" }}>
