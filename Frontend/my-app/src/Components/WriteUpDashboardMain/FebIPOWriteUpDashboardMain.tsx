@@ -96,16 +96,16 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
-      { id: "market-strategy", label: "IOI and After-Market Strategy" },
+      { id: "market-strategy", label: " Fair Value Estimate and IOI." },
       { id: "ai-indication", label: "Proprietary Model Indication" },
-      { id: "business-overview", label: "Business Overview" },
+      { id: "business-overview", label: "Company Overview." },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comparative Multiples" },
       // { id: "trends", label: "Trends" },
-      { id: "valuation-analysis", label: "Valuation Analysis" },
-      { id: "red-flag", label: "Red Flag Analysis" },
-      { id: "final-verdict", label: "Final Verdict" }
+      { id: "valuation-analysis", label: "Valuation " },
+      { id: "red-flag", label: "Risk Assessment" },
+      { id: "final-verdict", label: "Investment Summary" }
     ],
     []
   )

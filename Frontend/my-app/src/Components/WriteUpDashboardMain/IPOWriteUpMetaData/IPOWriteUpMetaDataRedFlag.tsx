@@ -610,7 +610,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1.25 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
-              Red Flag Analysis
+              Risk Assessment
             </Typography>
             {isEditing && (
               <TextField

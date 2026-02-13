@@ -295,7 +295,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
       }}
     >      <Box sx={{ background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2, mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}>
-          Final Verdict
+          Investment Summary.
         </Typography>
       </Box>
       <Grid container spacing={3}>
