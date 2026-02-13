@@ -295,7 +295,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
       }}
     >      <Box sx={{ background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2, mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}>
-          Investment Summary.
+          Investment Summary
         </Typography>
       </Box>
       <Grid container spacing={3}>
@@ -439,7 +439,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
           </Stack>
 
           <Stack alignItems="center" spacing={1.5} sx={{ mt: 2 }}>
-            <Box sx={{ position: "relative", display: "inline-flex" }}>
+            {/* <Box sx={{ position: "relative", display: "inline-flex" }}>
               <CircularProgress
                 variant="determinate"
                 value={overallPercent ?? 0}
@@ -468,11 +468,11 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                   {overallPercent !== null ? `${overallPercent}/100` : "--"}
                 </Typography>
               </Box>
-            </Box>
+            </Box> */}
 
-            <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
+            {/* <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
               Overall Rating{overallPercent !== null ? ` (${overallPercent}%)` : ""}
-            </Typography>
+            </Typography> */}
 
             <Stack direction="row" spacing={1} flexWrap="wrap">
               {metadata?.verdict_rating && (
