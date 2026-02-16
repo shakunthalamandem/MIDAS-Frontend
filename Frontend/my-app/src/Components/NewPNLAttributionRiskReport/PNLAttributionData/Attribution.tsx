@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import type { AttributionItem, AttributionGroupBy } from "./types";
 import { formatCurrency } from "./utils";
+import AttributionTable from "./AttributionTable";
 import "./Attribution.css";
 
 interface AttributionProps {
@@ -40,7 +41,6 @@ const Attribution: React.FC<AttributionProps> = ({
   const [data, setData] = useState<AttributionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
-  const [aum, setAum] = useState<number>(0);
 
   const fetchAttribution = useCallback(async () => {
     if (!selectedFund || !selectedDate) return;
@@ -65,7 +65,6 @@ const Attribution: React.FC<AttributionProps> = ({
       if (!res.ok) throw new Error("Failed to fetch attribution data");
       const result = await res.json();
       setData(result.attribution || []);
-      if (result.aum) setAum(result.aum);
     } catch {
       setData([]);
     } finally {
@@ -77,9 +76,9 @@ const Attribution: React.FC<AttributionProps> = ({
     fetchAttribution();
   }, [fetchAttribution]);
 
-  const formatValue = (value: number) => {
-    if (!showPct || !aum) return formatCurrency(value);
-    return `${((value / aum) * 100).toFixed(2)}%`;
+  const formatValue = (value: number, pctValue: number) => {
+    if (showPct) return `${pctValue.toFixed(2)}%`;
+    return formatCurrency(value);
   };
 
   return (
@@ -123,63 +122,67 @@ const Attribution: React.FC<AttributionProps> = ({
             <CircularProgress size={32} />
           </Box>
         ) : data.length > 0 ? (
-          <Box className="attribution-grid">
-            {data.map((item, idx) => {
-              const theme = CARD_THEMES[idx % CARD_THEMES.length];
-              return (
-                <Box
-                  key={item.name}
-                  className="attribution-item"
-                  sx={{
-                    borderLeftColor: theme.border,
-                    background: theme.bg,
-                  }}
-                >
-                  <Box className="attribution-item-name">{item.name}</Box>
+          groupBy === "issuer" ? (
+            <AttributionTable data={data} showPct={showPct} />
+          ) : (
+            <Box className="attribution-grid">
+              {data.map((item, idx) => {
+                const theme = CARD_THEMES[idx % CARD_THEMES.length];
+                return (
+                  <Box
+                    key={item.name}
+                    className="attribution-item"
+                    sx={{
+                      borderLeftColor: theme.border,
+                      background: theme.bg,
+                    }}
+                  >
+                    <Box className="attribution-item-name">{item.name}</Box>
 
-                  {/* P&L Row */}
-                  <Box className="attribution-item-metrics">
-                    <Box className="attribution-metric">
-                      <Box className="attribution-metric-label">DTD</Box>
-                      <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
-                        {formatValue(item.dtd_pnl)}
+                    {/* P&L Row */}
+                    <Box className="attribution-item-metrics">
+                      <Box className="attribution-metric">
+                        <Box className="attribution-metric-label">DTD</Box>
+                        <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
+                          {formatValue(item.dtd_pnl, item.dtd_pnl_pct)}
+                        </Box>
+                      </Box>
+                      <Box className="attribution-metric">
+                        <Box className="attribution-metric-label">MTD</Box>
+                        <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
+                          {formatValue(item.mtd_pnl, item.mtd_pnl_pct)}
+                        </Box>
+                      </Box>
+                      <Box className="attribution-metric">
+                        <Box className="attribution-metric-label">YTD</Box>
+                        <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
+                          {formatValue(item.ytd_pnl, item.ytd_pnl_pct)}
+                        </Box>
                       </Box>
                     </Box>
-                    <Box className="attribution-metric">
-                      <Box className="attribution-metric-label">MTD</Box>
-                      <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
-                        {formatValue(item.mtd_pnl)}
+
+                    {/* Exposure Row */}
+                    <Box className="attribution-item-exposures">
+                      <Box className="attribution-exposure">
+                        <Box className="attribution-exposure-label">Net Exp</Box>
+                        <Box className="attribution-exposure-value" sx={{ color: theme.exposure }}>
+                          {formatValue(item.net_exp, item.net_exp_pct)}
+                        </Box>
                       </Box>
-                    </Box>
-                    <Box className="attribution-metric">
-                      <Box className="attribution-metric-label">YTD</Box>
-                      <Box className="attribution-metric-value" sx={{ color: theme.metric }}>
-                        {formatValue(item.ytd_pnl)}
+                      <Box className="attribution-exposure">
+                        <Box className="attribution-exposure-label">
+                          &beta; Adj Net
+                        </Box>
+                        <Box className="attribution-exposure-value" sx={{ color: theme.exposure }}>
+                          {formatValue(item.beta_adj_net, item.beta_adj_net_pct)}
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-
-                  {/* Exposure Row */}
-                  <Box className="attribution-item-exposures">
-                    <Box className="attribution-exposure">
-                      <Box className="attribution-exposure-label">Net Exp</Box>
-                      <Box className="attribution-exposure-value" sx={{ color: theme.exposure }}>
-                        {formatValue(item.net_exp)}
-                      </Box>
-                    </Box>
-                    <Box className="attribution-exposure">
-                      <Box className="attribution-exposure-label">
-                        &beta; Adj Net
-                      </Box>
-                      <Box className="attribution-exposure-value" sx={{ color: theme.exposure }}>
-                        {formatValue(item.beta_adj_net)}
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
+                );
+              })}
+            </Box>
+          )
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
             No attribution data available
