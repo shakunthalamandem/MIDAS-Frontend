@@ -10,7 +10,8 @@ export const formatValue = (key: string, value: number | string) => {
     "one_year_later_ev_ebitda",
   ];
   const percentageColumns = ["sales_growth", "eps_growth"];
-  const numberColumns = ["market_cap", "ev_usd_million", "price_usd"];
+  const priceColumns = ["price_usd"];
+  const integerNumberColumns = ["market_cap", "ev_usd_million"];
 
   if (typeof value === "string") return value;
 
@@ -19,10 +20,16 @@ export const formatValue = (key: string, value: number | string) => {
     return value < 0 ? "nm" : `${Math.round(value * 10) / 10}x`;
   if (percentageColumns.includes(key))
     return value < 0 ? "nm" : `${Math.round(value * 10) / 10}%`;
-  if (numberColumns.includes(key))
-    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(
-      value
-    );
+  if (priceColumns.includes(key))
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: 1,
+    }).format(value);
+  if (integerNumberColumns.includes(key))
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0,
+    }).format(value);
 
   return value;
 };
