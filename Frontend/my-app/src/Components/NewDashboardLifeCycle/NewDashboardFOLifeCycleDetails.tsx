@@ -58,7 +58,9 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   );
 
   const activePayload = selectedOption || payload;
-  const writeupEnabled = (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
+  const isSearchingOtherTicker = selectedOption && selectedOption.ticker !== payload?.ticker;
+
+  const writeupEnabled = !isSearchingOtherTicker && (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
 
 
 
