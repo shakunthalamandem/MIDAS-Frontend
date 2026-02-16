@@ -6,6 +6,7 @@ import HeadlineRisks from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
+import Attribution from "./Attribution";
 import "./RiskDashboard.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -139,6 +140,11 @@ const RiskDashboard: React.FC = () => {
           <CumulativePnLChart
             chartData={chartData}
             loading={chartLoading}
+          />
+
+          <Attribution
+            selectedFund={selectedFund}
+            selectedDate={selectedDate}
           />
         </>
       )}

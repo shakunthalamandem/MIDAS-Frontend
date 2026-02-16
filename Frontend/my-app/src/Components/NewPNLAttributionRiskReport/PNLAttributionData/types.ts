@@ -52,3 +52,19 @@ export interface PortfolioResponse {
   max_position_date: string | null;
   portfolios: string[];
 }
+
+export interface AttributionItem {
+  name: string;
+  dtd_pnl: number;
+  mtd_pnl: number;
+  ytd_pnl: number;
+  net_exp: number;
+  beta_adj_net: number;
+}
+
+export type AttributionGroupBy =
+  | "analyst"
+  | "sector"
+  | "industry"
+  | "holding_period"
+  | "issuer";
