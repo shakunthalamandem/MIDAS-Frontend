@@ -341,7 +341,7 @@ const FOWriteUpMetaDataFinancialHighlights: React.FC<FOWriteUpMetaDataFinancialH
                               component="span"
                               sx={{
                                 fontWeight: 500,
-                                color: "#333333",
+                                color: "#000000",
                               }}
                             >
                               {formatValue(value)}
