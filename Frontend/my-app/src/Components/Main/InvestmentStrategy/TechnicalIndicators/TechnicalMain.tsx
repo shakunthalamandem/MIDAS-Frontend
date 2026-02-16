@@ -147,12 +147,12 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
 
                 {/* Trendlyne widgets block */}
                 <Box sx={{ mt: 4, pb: 4 }}>
-                  <Typography
+                  {/* <Typography
                     variant="h5"
                     sx={{ fontWeight: "bold", color: "#002060", mb: 2 }}
                   >
                     
-                  </Typography>
+                  </Typography> */}
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TrendlyneQVTWidget
