@@ -1,3 +1,16 @@
+const toNumberIfNumeric = (input: number | string) => {
+  if (typeof input === "number") return input;
+  if (typeof input !== "string") return input;
+
+  const trimmed = input.trim();
+  if (!trimmed) return input;
+
+  // Remove commas/currency symbols to allow parsing values like "1,056.94".
+  const cleaned = trimmed.replace(/[$,]/g, "");
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : input;
+};
+
 export const formatValue = (key: string, value: number | string) => {
   if (value === null || value === undefined || value === "") return "nm";
 
@@ -13,23 +26,25 @@ export const formatValue = (key: string, value: number | string) => {
   const priceColumns = ["price_usd"];
   const integerNumberColumns = ["market_cap", "ev_usd_million"];
 
-  if (typeof value === "string") return value;
+  const normalized = toNumberIfNumeric(value);
 
-  if (percentageColumns.includes(key) && value > 500) return "nm";
+  if (typeof normalized === "string") return normalized;
+
+  if (percentageColumns.includes(key) && normalized > 500) return "nm";
   if (negativeColumns.includes(key))
-    return value < 0 ? "nm" : `${Math.round(value * 10) / 10}x`;
+    return normalized < 0 ? "nm" : `${Math.round(normalized * 10) / 10}x`;
   if (percentageColumns.includes(key))
-    return value < 0 ? "nm" : `${Math.round(value * 10) / 10}%`;
+    return normalized < 0 ? "nm" : `${Math.round(normalized * 10) / 10}%`;
   if (priceColumns.includes(key))
     return new Intl.NumberFormat("en-US", {
       maximumFractionDigits: 1,
       minimumFractionDigits: 1,
-    }).format(value);
+    }).format(normalized);
   if (integerNumberColumns.includes(key))
     return new Intl.NumberFormat("en-US", {
       maximumFractionDigits: 0,
       minimumFractionDigits: 0,
-    }).format(value);
+    }).format(normalized);
 
-  return value;
+  return normalized;
 };
