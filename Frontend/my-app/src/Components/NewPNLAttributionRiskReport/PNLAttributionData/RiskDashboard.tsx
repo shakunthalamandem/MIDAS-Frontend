@@ -212,7 +212,7 @@ const RiskDashboard: React.FC = () => {
         <Box className="risk-dashboard-header-left">
           <Box className="risk-dashboard-logo">M</Box>
           <Box>
-            <Box className="risk-dashboard-title">MPAM Risk Dashboard</Box>
+            <Box className="risk-dashboard-title">{selectedFund ? `${selectedFund} Risk Dashboard` : "Risk Dashboard"}</Box>
             <Box className="risk-dashboard-subtitle">
               Portfolio Analytics &amp; Monitoring
             </Box>
@@ -257,40 +257,6 @@ const RiskDashboard: React.FC = () => {
               </MenuItem>
             ))}
           </TextField>
-
-          {/* Date Picker */}
-          <TextField
-            type="date"
-            size="small"
-            label="Date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={{
-              minWidth: 160,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "20px",
-                backgroundColor: "rgba(255,255,255,0.08)",
-                color: "#fff",
-                "& fieldset": {
-                  borderColor: "rgba(255,255,255,0.2)",
-                },
-                "&:hover fieldset": {
-                  borderColor: "rgba(255,255,255,0.4)",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#10b981",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                color: "#a0aec0",
-                "&.Mui-focused": { color: "#10b981" },
-              },
-              "& input::-webkit-calendar-picker-indicator": {
-                filter: "invert(1)",
-              },
-            }}
-          />
 
           {/* AUM Badge */}
           {data && (
