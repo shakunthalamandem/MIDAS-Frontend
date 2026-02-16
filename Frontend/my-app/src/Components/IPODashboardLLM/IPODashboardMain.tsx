@@ -224,7 +224,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
       "ipo-dashboard-page2", // Comparatives + performance metrics + financial forecasts
       "ipo-dashboard-financial-metrics", // Key Financial Metrics (only if toggled include)
       "ipo-dashboard-page4", // Differentiated summary + key metrics
-      "ipo-dashboard-page3", // Business overview + supporting cards (last before disclaimer)
+      "ipo-dashboard-page3", // Company overview + supporting cards (last before disclaimer)
     ];
 
     const pdf = new jsPDF({
@@ -731,7 +731,7 @@ const IPODashboardMain: React.FC<IPODashboardMainProps> = ({
               onPageReady={() => markSectionLoaded("page2")}
             />
 
-            {/* Page 3 (rendered last in DOM): Business overview and supporting cards */}
+            {/* Page 3 (rendered last in DOM): Company overview and supporting cards */}
             <IPODashboardPage3
               renderEditableCard={(section, index) => (
                 <EditableCard
