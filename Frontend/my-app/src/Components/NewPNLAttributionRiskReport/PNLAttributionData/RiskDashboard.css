@@ -486,6 +486,62 @@
   color: #64748b;
 }
 
+/* ── P&L Card Selected State ── */
+.pnl-card--selected {
+  box-shadow: 0 0 0 2px #7c3aed, 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+/* ── Historical P&L Chart ── */
+.pnl-chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.pnl-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pnl-chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pnl-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.pnl-chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  background: #7c3aed;
+  border-radius: 50%;
+}
+
+.pnl-chart-hint {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #d97706;
+  font-weight: 500;
+}
+
+.pnl-chart-hint::before {
+  content: "✦ ";
+}
+
 /* ── Loading & Error ── */
 .risk-dashboard-loading {
   display: flex;
