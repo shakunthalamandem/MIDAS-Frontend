@@ -108,7 +108,7 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
       </IconButton>
 
       <Typography variant="h6" sx={{ fontWeight: 700, color: "#026269", mb: 3, textAlign: "center" }}>
-        Valuation Analysis
+        Valuation 
       </Typography>
 
       <Box display="flex" flexDirection="column" gap={3}>

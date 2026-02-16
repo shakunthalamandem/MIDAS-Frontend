@@ -149,7 +149,7 @@ const FOWriteUpMetaDataBusinessOverview: React.FC<FOWriteUpMetaDataBusinessOverv
           {savingHighlights ? <CircularProgress size={18} /> : editHighlights ? <SaveIcon fontSize="small" /> : <EditIcon fontSize="small" />}
         </IconButton>
 
-        <Typography sx={{ ...titleStyle, mb: 2 }}>Business Highlights</Typography>
+        <Typography sx={{ ...titleStyle, mb: 2 }}>Company Overview</Typography>
 
         {editHighlights ? (
           <Box sx={{ background: "#ffffff", borderRadius: 1 }}>
