@@ -387,6 +387,105 @@
   color: #ef4444;
 }
 
+/* ── Index Comparison Cards Grid ── */
+.index-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+}
+
+@media (max-width: 1200px) {
+  .index-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .index-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .index-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Index Card ── */
+.index-card {
+  padding: 16px 20px;
+  cursor: default;
+  transition: transform 0.2s ease;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.index-card:last-child {
+  border-right: none;
+}
+
+.index-card:hover {
+  transform: translateY(-1px);
+}
+
+.index-card--blue {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%);
+}
+
+.index-card--cyan {
+  background: linear-gradient(135deg, #ecfeff 0%, #e0fafe 100%);
+}
+
+.index-card--orange {
+  background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+}
+
+.index-card--pink {
+  background: linear-gradient(135deg, #fef5f8 0%, #fdedf2 100%);
+}
+
+.index-card--red {
+  background: linear-gradient(135deg, #fef5f0 0%, #fdeee5 100%);
+}
+
+.index-card-label {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.index-card-label--blue {
+  color: #2563eb;
+}
+
+.index-card-label--cyan {
+  color: #0891b2;
+}
+
+.index-card-label--orange {
+  color: #ea580c;
+}
+
+.index-card-label--pink {
+  color: #db2777;
+}
+
+.index-card-label--red {
+  color: #b91c1c;
+}
+
+.index-card-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.index-card-sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
 /* ── Loading & Error ── */
 .risk-dashboard-loading {
   display: flex;

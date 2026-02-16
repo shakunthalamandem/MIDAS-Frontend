@@ -31,11 +31,25 @@ interface HeadlinePnl {
   ytd_pnl_pct: number;
 }
 
+interface IndexesComparison {
+  one_month_beta_sp: number;
+  three_month_beta_sp: number;
+  one_month_vol: number;
+  one_month_sp_vol: number;
+  three_month_vol: number;
+  three_month_sp_vol: number;
+  ytd_vol: number;
+  ytd_sp_vol: number;
+  drawdown: number;
+  sp_drawdown: number;
+}
+
 interface DashboardData {
   date: string;
   fund: string;
   headline_risks: HeadlineRisks;
   headline_pnl: HeadlinePnl;
+  indexes_comparison: IndexesComparison;
 }
 
 interface PortfolioResponse {
@@ -205,6 +219,47 @@ const RiskDashboard: React.FC = () => {
       ]
     : [];
 
+  const indexCards = data
+    ? [
+        {
+          label: "1m β S&P",
+          value: `${data.indexes_comparison.one_month_beta_sp.toFixed(2)}`,
+          subValue: "",
+          color: "blue",
+        },
+        {
+          label: "3m β S&P",
+          value: `${data.indexes_comparison.three_month_beta_sp.toFixed(2)}`,
+          subValue: "",
+          color: "blue",
+        },
+        {
+          label: "1m Vol / S&P",
+          value: `${data.indexes_comparison.one_month_vol.toFixed(2)}%`,
+          subValue: `(${data.indexes_comparison.one_month_sp_vol.toFixed(2)}%)`,
+          color: "cyan",
+        },
+        {
+          label: "3m Vol / S&P",
+          value: `${data.indexes_comparison.three_month_vol.toFixed(2)}%`,
+          subValue: `(${data.indexes_comparison.three_month_sp_vol.toFixed(2)}%)`,
+          color: "orange",
+        },
+        {
+          label: "YTD Vol / S&P",
+          value: `${data.indexes_comparison.ytd_vol.toFixed(2)}%`,
+          subValue: `(${data.indexes_comparison.ytd_sp_vol.toFixed(2)}%)`,
+          color: "pink",
+        },
+        {
+          label: "Drawdown / S&P",
+          value: `${data.indexes_comparison.drawdown.toFixed(2)}%`,
+          subValue: `(${data.indexes_comparison.sp_drawdown.toFixed(2)}%)`,
+          color: "red",
+        },
+      ]
+    : [];
+
   return (
     <Box className="risk-dashboard">
       {/* Header Bar */}
@@ -359,6 +414,30 @@ const RiskDashboard: React.FC = () => {
                   </Box>
                 );
               })}
+            </Box>
+          </Box>
+
+          {/* Indexes Comparison Section */}
+          <Box className="risk-dashboard-section">
+            <Box className="index-cards-grid">
+              {indexCards.map((card) => (
+                <Box
+                  key={card.label}
+                  className={`index-card index-card--${card.color}`}
+                >
+                  <Box className={`index-card-label index-card-label--${card.color}`}>
+                    {card.label}
+                  </Box>
+                  <Box className="index-card-value">
+                    {card.value}
+                    {card.subValue && (
+                      <Box component="span" className="index-card-sub">
+                        {"  "}{card.subValue}
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              ))}
             </Box>
           </Box>
         </>
