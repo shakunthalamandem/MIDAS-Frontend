@@ -7,7 +7,8 @@ import {
   Alert,
   Card,
   CardContent,
-  Stack
+  Stack,
+  TextField
 } from "@mui/material"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"
@@ -18,6 +19,8 @@ const NewPortfolioRiskUpload = () => {
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [dragOver, setDragOver] = useState(false)
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -46,9 +49,15 @@ const NewPortfolioRiskUpload = () => {
       setError("Please select a file")
       return
     }
+    if (!startDate || !endDate) {
+      setError("Please select both start date and end date")
+      return
+    }
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("start_date", startDate)
+    formData.append("end_date", endDate)
 
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = localStorage.getItem("access_token");
@@ -171,11 +180,30 @@ const NewPortfolioRiskUpload = () => {
             )}
           </Box>
 
+          <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+            <TextField
+              label="Start Date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
+            />
+            <TextField
+              label="End Date"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
+            />
+          </Stack>
+
           <Button
             variant="contained"
             fullWidth
             onClick={handleUpload}
-            disabled={loading || !file}
+            disabled={loading || !file || !startDate || !endDate}
             startIcon={loading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <CloudUploadIcon />}
             sx={{
               mt: 3,
