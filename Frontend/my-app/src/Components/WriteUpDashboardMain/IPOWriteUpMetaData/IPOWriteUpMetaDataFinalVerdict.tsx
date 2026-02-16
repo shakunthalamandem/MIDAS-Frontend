@@ -402,7 +402,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
               ) : finalVerdictText ? (
                 <Box
                   sx={{
-                    color: "#1f2a44",
+                    color: "#000000",
                     lineHeight: 1.7,
                     minHeight: 120
                   }}
