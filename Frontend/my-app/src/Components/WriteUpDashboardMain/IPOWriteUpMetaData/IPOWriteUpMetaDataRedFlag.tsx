@@ -3,11 +3,13 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined"
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined"
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined"
 import {
   Box,
   Button,
   CircularProgress,
   IconButton,
+  // InputBase,
   Slider,
   Stack,
   TextField,
@@ -17,6 +19,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -29,6 +33,9 @@ type RedFlagItem = {
   observation?: string
   company_name?: string
   red_flag_analysis_rating?: string | number | null
+  _originalCategory?: string
+  _key?: string
+  _isNew?: boolean
 }
 
 type RedFlagAnalysis = {
@@ -51,6 +58,26 @@ const riskBandColors = [
   "#ffe0c7",
   "#fff2c2",
   "#dbe9ff"
+]
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"]
+  ]
+}
+
+const quillFormats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "link"
 ]
 
 const formatRating = (value: number) => {
@@ -191,7 +218,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [draftItems, setDraftItems] = useState<RedFlagItem[]>([])
   const [saveLoading, setSaveLoading] = useState(false)
-  const [pendingDeleteIndices, setPendingDeleteIndices] = useState<number[]>([])
+  const [pendingDeleteCategories, setPendingDeleteCategories] = useState<string[]>([])
   const [draftRatingScore, setDraftRatingScore] = useState<number | null>(null)
   const [writeupRatings, setWriteupRatings] = useState<Record<string, number>>({})
 
@@ -360,20 +387,41 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     }))
   }
 
-  const handleDelete = async (item: RedFlagItem, index: number) => {
-    setPendingDeleteIndices((prev) =>
-      prev.includes(index) ? prev.filter((id) => id !== index) : [...prev, index]
+  const handleDelete = (item: RedFlagItem, index: number) => {
+  if (item._isNew) {
+    setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
+    return
+  }
+
+  // For existing rows → store ORIGINAL category name
+  const originalCategory =
+    item._originalCategory ?? item.category ?? ""
+
+  if (originalCategory) {
+    setPendingDeleteCategories((prev) =>
+      prev.includes(originalCategory)
+        ? prev
+        : [...prev, originalCategory]
     )
   }
 
+  // Remove from draft UI immediately
+  setDraftItems((prev) => prev.filter((_, idx) => idx !== index))
+}
+
+
   const handleEditToggle = () => {
     if (!isEditing) {
-      const snapshot = items.map((item) => ({ ...item }))
+      const snapshot = items.map((item, index) => ({
+        ...item,
+        _originalCategory: item.category,
+        _key: `orig-${index}`
+      }))
       originalItemsRef.current = snapshot.map((item) => ({ ...item }))
       setDraftItems(snapshot)
       setDraftRatingScore(baseRatingScore)
     } else {
-      setPendingDeleteIndices([])
+      setPendingDeleteCategories([])
       setDraftRatingScore(null)
     }
     setIsEditing((prev) => !prev)
@@ -385,15 +433,29 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     setSaveError(null)
     try {
       const originalItems = originalItemsRef.current
+      const originalLookup = new Map(
+        originalItems.map((item) => [(item._key ?? item._originalCategory ?? item.category) ?? "", item])
+      )
       const updates: Array<{ category: string; changes: Record<string, unknown> }> =
         []
+      const additions: RedFlagItem[] = []
+      const deletions: string[] = []
       const ratingChanged =
         draftRatingScore !== null && draftRatingScore !== parsedRatingScore
       for (let index = 0; index < draftItems.length; index += 1) {
         const item = draftItems[index]
         if (!item.category) continue
-        const isDelete = pendingDeleteIndices.includes(index)
-        const original = originalItems[index]
+        const originalKey =
+          item._key ?? item._originalCategory ?? item.category ?? `idx-${index}`
+        const isDelete = pendingDeleteCategories.includes(originalKey)
+        const original = originalLookup.get(originalKey)
+        const isNewItem = !original
+        if (isNewItem) {
+          if (!isDelete) {
+            additions.push(item)
+          }
+          continue
+        }
         const hasChanges =
           !original ||
           item.score !== original.score ||
@@ -402,21 +464,9 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           item.impact_risk !== original.impact_risk ||
           item.company_name !== original.company_name ||
           item.red_flag_analysis_rating !== original.red_flag_analysis_rating
-        if (isDelete) {
-          const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
-            },
-            body: JSON.stringify({
-              ticker_name: ticker,
-              category: item.category,
-              action: "delete"
-            })
-          })
-          if (!response.ok) throw new Error("Failed to delete red flag category")
-        } else if (hasChanges) {
+        const targetCategory =
+          original?._originalCategory ?? original?.category ?? item.category
+         if (hasChanges) {
           const changesPayload: Record<string, unknown> = {}
           if (item.score !== original?.score) changesPayload.score = item.score
           if (item.category !== original?.category)
@@ -431,9 +481,35 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             changesPayload.red_flag_analysis_rating = item.red_flag_analysis_rating
           }
           if (Object.keys(changesPayload).length) {
-            updates.push({ category: item.category, changes: changesPayload })
+            // Use the original category as the identifier for the record, even if the label changed.
+            updates.push({ category: targetCategory, changes: changesPayload })
           }
         }
+      }
+      if (additions.length) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            action: "create",
+            creates: additions.map((entry, addIndex) => ({
+              category: entry.category ?? `new-${addIndex}`,
+              changes: {
+                category: entry.category ?? "",
+                score: entry.score ?? 0,
+                impact_risk: entry.impact_risk ?? "",
+                observation: entry.observation ?? "",
+                // company_name: entry.company_name ?? "",
+                red_flag_analysis_rating: entry.red_flag_analysis_rating ?? ""
+              }
+            }))
+          })
+        })
+        if (!response.ok) throw new Error("Failed to add red flag")
       }
       if (updates.length) {
         const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
@@ -466,7 +542,27 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
         })
         if (!response.ok) throw new Error("Failed to save rating")
       }
-      setPendingDeleteIndices([])
+
+      if (pendingDeleteCategories.length) {
+        const response = await fetch(`${apiUrl}/api/red-flag-analysis/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
+          },
+          body: JSON.stringify({
+            ticker_name: ticker,
+            action: "delete",
+            categories: pendingDeleteCategories
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to delete red flag category")
+        }
+      }
+
+      setPendingDeleteCategories([])
       setIsEditing(false)
       setDraftRatingScore(null)
       await refreshRedFlags()
@@ -475,6 +571,23 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     } finally {
       setSaveLoading(false)
     }
+  }
+  const handleAddItem = () => {
+    // Start from whatever is currently shown in edit mode; if draft is empty fall back to loaded items.
+    const base = (isEditing ? draftItems : items) ?? []
+    const next = [
+      {
+        category: "",
+        observation: "",
+        impact_risk: "",
+        score: 0,
+        _isNew: true,
+        _key: `new-${Date.now()}-${base.length}`
+      },
+      ...base
+    ]
+    setDraftItems(next)
+    if (!isEditing) setIsEditing(true)
   }
 
   return (
@@ -520,7 +633,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 1.25 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
-              Red Flag Analysis
+              Risk Assessment
             </Typography>
             {isEditing && (
               <TextField
@@ -547,6 +660,22 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             >
               Risk Score: {(avgScore * 2).toFixed(2)}/10
             </Typography> */}
+            {isEditing ? (
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<AddOutlinedIcon fontSize="small" />}
+                onClick={handleAddItem}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  borderColor: "#1f3b73",
+                  color: "#1f3b73"
+                }}
+              >
+                Add
+              </Button>
+            ) : null}
             <IconButton
               size="small"
               onClick={handleEditToggle}
@@ -587,14 +716,14 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
             title="Red Flag Analysis is not available."
             subtitle=" We will update soon."
           />
-        ) : items.length === 0 ? (
+        ) : (isEditing ? draftItems : items).length === 0 ? (
           <Typography variant="body2" sx={{ color: "#5c6c8a" }}>
             No red flag analysis available for this ticker.
           </Typography>
         ) : (
           <Stack spacing={2}>
             {(isEditing ? draftItems : items).map((item, index) => {
-              const rowKey = `${item.category ?? "risk"}-${index}`
+              const rowKey = `red-flag-${index}`
               const color = riskBandColors[index % riskBandColors.length]
               const displayScore = item.score
               return (
@@ -663,35 +792,44 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                     </Stack>
                     <Stack spacing={1} sx={{ mt: 1 }}>
                       <Typography variant="body2" sx={{ color: "#1f2937" }}>
-                        <Box component="span" sx={{ fontWeight: 700 }}>
+                        {/* <Box component="span" sx={{ fontWeight: 700 }}>
                           Observation:
-                        </Box>{" "}
+                        </Box>{" "} */}
                         {isEditing ? (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            value={item.observation ?? ""}
-                            onChange={(event) =>
-                              setDraftItems((prev) =>
-                                prev.map((entry, idx) =>
-                                  idx === index
-                                    ? { ...entry, observation: event.target.value }
-                                    : entry
+                          <Box sx={{ mt: 0.5, background: "#ffffff", borderRadius: 1 }}>
+                            <ReactQuill
+                              theme="snow"
+                              value={item.observation ?? ""}
+                              onChange={(value) =>
+                                setDraftItems((prev) =>
+                                  prev.map((entry, idx) =>
+                                    idx === index ? { ...entry, observation: value } : entry
+                                  )
                                 )
-                              )
-                            }
-                            placeholder="Observation"
+                              }
+                              modules={quillModules}
+                              formats={quillFormats}
+                              placeholder="Observation"
+                              style={{ minHeight: 120, color: "#1f2a44", lineHeight: 1.7 }}
+                            />
+                          </Box>
+                        ) : (
+                          <Box
                             sx={{
                               mt: 0.5,
-                              background: "#ffffff",
-                              borderRadius: 1
+                              color: "#1f2a44",
+                              lineHeight: 1.7,
+                              fontSize: "0.98rem"
+                            }}
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                item.observation ||
+                                "<span style='color:#9ca3af'>--</span>"
                             }}
                           />
-                        ) : (
-                          item.observation ?? "--"
                         )}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "#1f2937" }}>
+                      {/* <Typography variant="body2" sx={{ color: "#1f2937" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
                           Impact:
                         </Box>{" "}
@@ -719,7 +857,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         ) : (
                           item.impact_risk ?? "--"
                         )}
-                      </Typography>
+                      </Typography> */}
                     </Stack>
                   </Box>
                   <Box
@@ -762,7 +900,12 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                             color: "#ef4444"
                           }}
                         >
-                          {pendingDeleteIndices.includes(index)
+                          {pendingDeleteCategories.includes(
+                            item._key ??
+                              item._originalCategory ??
+                              item.category ??
+                              `idx-${index}`
+                          )
                             ? "Pending"
                             : "Delete"}
                         </Button>
