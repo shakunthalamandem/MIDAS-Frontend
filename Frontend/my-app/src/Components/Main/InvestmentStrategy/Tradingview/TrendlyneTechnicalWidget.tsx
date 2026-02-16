@@ -6,7 +6,7 @@ type TrendlyneTechnicalWidgetProps = {
   className?: string;
 };
 
-const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script-technical";
+const TRENDLYNE_SCRIPT_ID = "trendlyne-widget-script";
 
 const normalizeCompanyCode = (value?: string) => {
   const cleaned = (value ?? "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
