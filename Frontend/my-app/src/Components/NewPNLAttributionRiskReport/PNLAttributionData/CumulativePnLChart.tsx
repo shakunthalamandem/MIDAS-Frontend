@@ -63,15 +63,15 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
               <XAxis
                 dataKey="date"
                 tickFormatter={formatChartXAxis}
-                tick={{ fontSize: 11, fill: "#94a3b8" }}
-                axisLine={{ stroke: "#e2e8f0" }}
+                tick={{ fontSize: 11, fill: "#000000" }}
+                axisLine={{ stroke: "#000000" }}
                 tickLine={false}
                 interval="preserveStartEnd"
               />
               <YAxis
                 tickFormatter={formatCurrency}
-                tick={{ fontSize: 11, fill: "#94a3b8" }}
-                axisLine={false}
+                tick={{ fontSize: 11, fill: "#000000" }}
+                axisLine={{ stroke: "#000000" }}
                 tickLine={false}
                 width={70}
               />
