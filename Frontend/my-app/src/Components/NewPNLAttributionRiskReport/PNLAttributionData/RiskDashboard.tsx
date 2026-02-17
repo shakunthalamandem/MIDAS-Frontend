@@ -120,8 +120,9 @@ const RiskDashboard: React.FC = () => {
         selectedFunds={selectedFunds}
         portfolios={portfolios}
         onFundsChange={setSelectedFunds}
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
         aum={data?.headline_risks?.aum}
-        asOfDate={data?.date}
       />
 
       {error && (

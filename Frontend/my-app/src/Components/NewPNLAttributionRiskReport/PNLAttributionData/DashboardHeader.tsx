@@ -1,13 +1,16 @@
 import React from "react";
-import { Box, TextField, MenuItem } from "@mui/material";
-import { formatCurrency, formatDate } from "./utils";
+import { Box, TextField, MenuItem, IconButton } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { formatCurrency } from "./utils";
 
 interface DashboardHeaderProps {
   selectedFunds: string[];
   portfolios: string[];
   onFundsChange: (funds: string[]) => void;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
   aum?: number;
-  asOfDate?: string;
 }
 
 const ALL_FUNDS = "All Funds";
@@ -29,19 +32,43 @@ const fundSelectSx = {
   "& .MuiSvgIcon-root": { color: "#a0aec0" },
 };
 
+const dateInputSx = {
+  width: 160,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "20px",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    color: "#fff",
+    fontSize: "13px",
+    "& fieldset": { borderColor: "rgba(255,255,255,0.2)" },
+    "&:hover fieldset": { borderColor: "rgba(255,255,255,0.4)" },
+    "&.Mui-focused fieldset": { borderColor: "#10b981" },
+  },
+  "& .MuiInputLabel-root": {
+    color: "#a0aec0",
+    "&.Mui-focused": { color: "#10b981" },
+  },
+  "& input": { color: "#fff" },
+  "& input::-webkit-calendar-picker-indicator": { filter: "invert(1)" },
+};
+
+const shiftDate = (dateStr: string, days: number): string => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split("T")[0];
+};
+
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedFunds,
   portfolios,
   onFundsChange,
+  selectedDate,
+  onDateChange,
   aum,
-  asOfDate,
 }) => {
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
-
-  // Derive the display value for the single-select
   const displayValue = allSelected ? ALL_FUNDS : (selectedFunds[0] || "");
 
-  const handleChange = (value: string) => {
+  const handleFundChange = (value: string) => {
     if (value === ALL_FUNDS) {
       onFundsChange([...portfolios]);
     } else {
@@ -74,7 +101,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           size="small"
           label="Fund"
           value={displayValue}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleFundChange(e.target.value)}
           className="risk-dashboard-fund-select"
           sx={fundSelectSx}
         >
@@ -95,14 +122,33 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </Box>
         )}
 
-        {asOfDate && (
-          <Box className="risk-dashboard-date-badge">
-            <Box className="risk-dashboard-date-label">AS OF</Box>
-            <Box className="risk-dashboard-date-value">
-              {formatDate(asOfDate)}
-            </Box>
-          </Box>
-        )}
+        <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          <IconButton
+            size="small"
+            onClick={() => onDateChange(shiftDate(selectedDate, -1))}
+            sx={{ color: "#a0aec0", "&:hover": { color: "#fff" } }}
+          >
+            <ChevronLeftIcon fontSize="small" />
+          </IconButton>
+
+          <TextField
+            type="date"
+            size="small"
+            label="Date"
+            value={selectedDate}
+            onChange={(e) => onDateChange(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            sx={dateInputSx}
+          />
+
+          <IconButton
+            size="small"
+            onClick={() => onDateChange(shiftDate(selectedDate, 1))}
+            sx={{ color: "#a0aec0", "&:hover": { color: "#fff" } }}
+          >
+            <ChevronRightIcon fontSize="small" />
+          </IconButton>
+        </Box>
 
         <Box className="risk-dashboard-live-indicator">
           <Box className="risk-dashboard-live-dot" />
