@@ -79,6 +79,9 @@ const RiskDashboard: React.FC = () => {
     fetchDashboard();
   }, [fetchDashboard]);
 
+  // Map metric key to API period param
+  const metricToPeriod = (metric: string) => metric.replace("_pnl", "");
+
   // Fetch chart data
   const fetchChartData = useCallback(async () => {
     if (!selectedFund || !selectedDate) return;
@@ -87,7 +90,11 @@ const RiskDashboard: React.FC = () => {
       const res = await fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
         method: "POST",
         headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({ date: selectedDate, fund: selectedFund }),
+        body: JSON.stringify({
+          date: selectedDate,
+          fund: selectedFund,
+          period: metricToPeriod(selectedMetric),
+        }),
       });
       if (!res.ok) throw new Error("Failed to fetch chart data");
       const result = await res.json();
@@ -97,7 +104,7 @@ const RiskDashboard: React.FC = () => {
     } finally {
       setChartLoading(false);
     }
-  }, [selectedFund, selectedDate]);
+  }, [selectedFund, selectedDate, selectedMetric]);
 
   useEffect(() => {
     fetchChartData();
@@ -140,6 +147,7 @@ const RiskDashboard: React.FC = () => {
           <CumulativePnLChart
             chartData={chartData}
             loading={chartLoading}
+            period={metricToPeriod(selectedMetric)}
           />
 
           <Attribution

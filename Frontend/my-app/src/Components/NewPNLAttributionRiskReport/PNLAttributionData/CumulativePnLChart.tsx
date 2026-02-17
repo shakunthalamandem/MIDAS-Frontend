@@ -15,18 +15,27 @@ import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
 interface CumulativePnLChartProps {
   chartData: ChartDataPoint[];
   loading: boolean;
+  period: string;
 }
+
+const PERIOD_LABELS: Record<string, string> = {
+  dtd: "DTD",
+  wtd: "WTD",
+  mtd: "MTD",
+  ytd: "YTD",
+};
 
 const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
   chartData,
   loading,
+  period,
 }) => {
   return (
     <Box className="risk-dashboard-section">
       <Box className="pnl-chart-card">
         <Box className="pnl-chart-header">
           <Box className="pnl-chart-title">
-            HISTORICAL: YTD P&L
+            HISTORICAL: {PERIOD_LABELS[period] || "YTD"} P&L
           </Box>
           <Box className="pnl-chart-legend">
             <Box className="pnl-chart-legend-dot" />
