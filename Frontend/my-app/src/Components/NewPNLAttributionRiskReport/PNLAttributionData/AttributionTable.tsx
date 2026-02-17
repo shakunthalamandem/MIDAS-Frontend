@@ -6,14 +6,23 @@ import {
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-import type { AttributionItem } from "./types";
+import type { AttributionItem, AttributionGroupBy } from "./types";
 import { formatCurrency } from "./utils";
 import "./AttributionTable.css";
 
 interface AttributionTableProps {
   data: AttributionItem[];
   showPct: boolean;
+  groupBy: AttributionGroupBy;
 }
+
+const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
+  analyst: "Analyst",
+  sector: "Sector",
+  industry: "Industry",
+  holding_period: "Holding Period",
+  issuer: "Issuer",
+};
 
 const formatPctVal = (value: number) => `${value.toFixed(2)}%`;
 
@@ -30,6 +39,7 @@ const CustomToolbar = () => (
 const AttributionTable: React.FC<AttributionTableProps> = ({
   data,
   showPct,
+  groupBy,
 }) => {
   const rows = useMemo(
     () => data.map((item, idx) => ({ id: idx, ...item })),
@@ -40,7 +50,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
     () => [
       {
         field: "name",
-        headerName: "Issuer",
+        headerName: GROUP_BY_LABELS[groupBy],
         flex: 1.4,
         minWidth: 200,
         cellClassName: "attr-datagrid-cell--name",
@@ -121,7 +131,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             : formatCurrency(row.beta_adj_net),
       },
     ],
-    [showPct]
+    [showPct, groupBy]
   );
 
   return (
@@ -147,7 +157,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           },
           /* ── Header ── */
           "& .MuiDataGrid-columnHeader": {
-            background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+            backgroundColor: "#1e293b",
             color: "#fff",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
