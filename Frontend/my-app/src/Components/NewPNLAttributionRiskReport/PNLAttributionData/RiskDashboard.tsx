@@ -116,7 +116,7 @@ const RiskDashboard: React.FC = () => {
         selectedFund={selectedFund}
         portfolios={portfolios}
         onFundChange={setSelectedFund}
-        aum={data?.headline_risks.aum}
+        aum={data?.headline_risks?.aum}
         asOfDate={data?.date}
       />
 
@@ -134,15 +134,17 @@ const RiskDashboard: React.FC = () => {
 
       {!loading && data && (
         <>
-          <HeadlineRisks data={data.headline_risks} />
+          {data.headline_risks && <HeadlineRisks data={data.headline_risks} />}
 
-          <HeadlinePnL
-            data={data.headline_pnl}
-            selectedMetric={selectedMetric}
-            onMetricSelect={setSelectedMetric}
-          />
+          {data.headline_pnl && (
+            <HeadlinePnL
+              data={data.headline_pnl}
+              selectedMetric={selectedMetric}
+              onMetricSelect={setSelectedMetric}
+            />
+          )}
 
-          <IndexesComparison data={data.indexes_comparison} />
+          {data.indexes_comparison && <IndexesComparison data={data.indexes_comparison} />}
 
           <CumulativePnLChart
             chartData={chartData}
