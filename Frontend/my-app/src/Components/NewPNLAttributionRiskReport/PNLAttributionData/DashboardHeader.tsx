@@ -3,12 +3,14 @@ import { Box, TextField, MenuItem } from "@mui/material";
 import { formatCurrency, formatDate } from "./utils";
 
 interface DashboardHeaderProps {
-  selectedFund: string;
+  selectedFunds: string[];
   portfolios: string[];
-  onFundChange: (fund: string) => void;
+  onFundsChange: (funds: string[]) => void;
   aum?: number;
   asOfDate?: string;
 }
+
+const ALL_FUNDS = "All Funds";
 
 const fundSelectSx = {
   minWidth: 200,
@@ -28,20 +30,38 @@ const fundSelectSx = {
 };
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
-  selectedFund,
+  selectedFunds,
   portfolios,
-  onFundChange,
+  onFundsChange,
   aum,
   asOfDate,
 }) => {
+  const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
+
+  // Derive the display value for the single-select
+  const displayValue = allSelected ? ALL_FUNDS : (selectedFunds[0] || "");
+
+  const handleChange = (value: string) => {
+    if (value === ALL_FUNDS) {
+      onFundsChange([...portfolios]);
+    } else {
+      onFundsChange([value]);
+    }
+  };
+
+  const titleLabel =
+    allSelected
+      ? "All Funds Risk Dashboard"
+      : selectedFunds.length === 1
+        ? `${selectedFunds[0]} Risk Dashboard`
+        : "Risk Dashboard";
+
   return (
     <Box className="risk-dashboard-header">
       <Box className="risk-dashboard-header-left">
         <Box className="risk-dashboard-logo">M</Box>
         <Box>
-          <Box className="risk-dashboard-title">
-            {selectedFund ? `${selectedFund} Risk Dashboard` : "Risk Dashboard"}
-          </Box>
+          <Box className="risk-dashboard-title">{titleLabel}</Box>
           <Box className="risk-dashboard-subtitle">
             Portfolio Analytics &amp; Monitoring
           </Box>
@@ -53,11 +73,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           select
           size="small"
           label="Fund"
-          value={selectedFund}
-          onChange={(e) => onFundChange(e.target.value)}
+          value={displayValue}
+          onChange={(e) => handleChange(e.target.value)}
           className="risk-dashboard-fund-select"
           sx={fundSelectSx}
         >
+          <MenuItem value={ALL_FUNDS}>{ALL_FUNDS}</MenuItem>
           {portfolios.map((p) => (
             <MenuItem key={p} value={p}>
               {p}

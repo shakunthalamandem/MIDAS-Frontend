@@ -5,7 +5,7 @@ import AttributionTable from "./AttributionTable";
 import "./Attribution.css";
 
 interface AttributionProps {
-  selectedFund: string;
+  selectedFunds: string[];
   selectedDate: string;
 }
 
@@ -94,7 +94,7 @@ const GROUP_BY_TABS: TabTheme[] = [
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const Attribution: React.FC<AttributionProps> = ({
-  selectedFund,
+  selectedFunds,
   selectedDate,
 }) => {
   const [groupBy, setGroupBy] = useState<AttributionGroupBy>("sector");
@@ -105,7 +105,7 @@ const Attribution: React.FC<AttributionProps> = ({
   const activeTheme = GROUP_BY_TABS.find((t) => t.key === groupBy)!;
 
   const fetchAttribution = useCallback(async () => {
-    if (!selectedFund || !selectedDate) return;
+    if (selectedFunds.length === 0 || !selectedDate) return;
     const token = localStorage.getItem("access_token");
     setLoading(true);
     try {
@@ -119,7 +119,7 @@ const Attribution: React.FC<AttributionProps> = ({
           },
           body: JSON.stringify({
             date: selectedDate,
-            fund: selectedFund,
+            fund: selectedFunds,
             group_by: groupBy,
           }),
         }
@@ -132,7 +132,7 @@ const Attribution: React.FC<AttributionProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [selectedFund, selectedDate, groupBy]);
+  }, [selectedFunds, selectedDate, groupBy]);
 
   useEffect(() => {
     fetchAttribution();

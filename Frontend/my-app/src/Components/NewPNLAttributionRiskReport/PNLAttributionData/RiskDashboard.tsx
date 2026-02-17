@@ -22,7 +22,7 @@ const getAuthHeaders = (contentType?: string) => {
 
 const RiskDashboard: React.FC = () => {
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  const [selectedFund, setSelectedFund] = useState("");
+  const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [data, setData] = useState<DashboardData | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -43,7 +43,7 @@ const RiskDashboard: React.FC = () => {
         const result: PortfolioResponse = await res.json();
         setPortfolios(result.portfolios || []);
         if (result.max_position_date) setSelectedDate(result.max_position_date);
-        if (result.portfolios?.length > 0) setSelectedFund(result.portfolios[0]);
+        if (result.portfolios?.length > 0) setSelectedFunds(result.portfolios);
       } catch (err: any) {
         setError(err.message || "Failed to load portfolios");
       }
@@ -53,14 +53,14 @@ const RiskDashboard: React.FC = () => {
 
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
-    if (!selectedFund || !selectedDate) return;
+    if (selectedFunds.length === 0 || !selectedDate) return;
     setLoading(true);
     setError("");
     try {
       const res = await fetch(`${apiUrl}/api/portfolio_risk_dashboard/`, {
         method: "POST",
         headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({ date: selectedDate, fund: selectedFund }),
+        body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -73,7 +73,7 @@ const RiskDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedFund, selectedDate]);
+  }, [selectedFunds, selectedDate]);
 
   useEffect(() => {
     fetchDashboard();
@@ -84,7 +84,7 @@ const RiskDashboard: React.FC = () => {
 
   // Fetch chart data
   const fetchChartData = useCallback(async () => {
-    if (!selectedFund || !selectedDate) return;
+    if (selectedFunds.length === 0 || !selectedDate) return;
     setChartLoading(true);
     try {
       const res = await fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
@@ -92,7 +92,7 @@ const RiskDashboard: React.FC = () => {
         headers: getAuthHeaders("application/json"),
         body: JSON.stringify({
           date: selectedDate,
-          fund: selectedFund,
+          fund: selectedFunds,
           period: metricToPeriod(selectedMetric),
         }),
       });
@@ -104,7 +104,7 @@ const RiskDashboard: React.FC = () => {
     } finally {
       setChartLoading(false);
     }
-  }, [selectedFund, selectedDate, selectedMetric]);
+  }, [selectedFunds, selectedDate, selectedMetric]);
 
   useEffect(() => {
     fetchChartData();
@@ -113,9 +113,9 @@ const RiskDashboard: React.FC = () => {
   return (
     <Box className="risk-dashboard">
       <DashboardHeader
-        selectedFund={selectedFund}
+        selectedFunds={selectedFunds}
         portfolios={portfolios}
-        onFundChange={setSelectedFund}
+        onFundsChange={setSelectedFunds}
         aum={data?.headline_risks?.aum}
         asOfDate={data?.date}
       />
@@ -153,7 +153,7 @@ const RiskDashboard: React.FC = () => {
           />
 
           <Attribution
-            selectedFund={selectedFund}
+            selectedFunds={selectedFunds}
             selectedDate={selectedDate}
           />
         </>
