@@ -96,6 +96,7 @@ import TickerChange from "../Components/TickerChange/TickerChange";
 import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
 import PNLAttributionSectionMain from "../Components/NewPNLAttributionRiskReport/PNLAttributionSectionMain";
 import NewPortfolioRiskUpload from "../Components/Uploads/NewPortfolioRiskUpload";
+import RiskDashboard from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard";
 
 
 const AppRouters: React.FC = () => {
@@ -301,7 +302,7 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path='/risk_report_pnl_report' element={<AuthGuard><PNLAttributionSectionMain /></AuthGuard>} />
+        <Route path='/risk_report_pnl_report' element={<AuthGuard><RiskDashboard /></AuthGuard>} />
         <Route path='/risk_upload' element={<AuthGuard><NewPortfolioRiskUpload /></AuthGuard>} />
 
         

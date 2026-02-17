@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress, Alert, Container, Typography } from "@mui/material";
 import type { DashboardData, ChartDataPoint, PortfolioResponse } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
@@ -111,6 +111,10 @@ const RiskDashboard: React.FC = () => {
   }, [fetchChartData]);
 
   return (
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h5" sx={{align:'center', color: "#002060", fontWeight: "600" }}>Risk & PNL Attribution Dashboard</Typography>
+      </Box>
     <Box className="risk-dashboard">
       <DashboardHeader
         selectedFunds={selectedFunds}
@@ -159,6 +163,8 @@ const RiskDashboard: React.FC = () => {
         </>
       )}
     </Box>
+    </Container>
+
   );
 };
 
