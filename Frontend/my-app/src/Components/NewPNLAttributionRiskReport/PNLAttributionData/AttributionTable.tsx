@@ -10,10 +10,21 @@ import type { AttributionItem, AttributionGroupBy } from "./types";
 import { formatCurrency } from "./utils";
 import "./AttributionTable.css";
 
+interface TabTheme {
+  headerBg: string;
+  evenRow: string;
+  hoverRow: string;
+  pnlColor: string;
+  expColor: string;
+  toolbarBg: string;
+  exportBg: string;
+}
+
 interface AttributionTableProps {
   data: AttributionItem[];
   showPct: boolean;
   groupBy: AttributionGroupBy;
+  theme: TabTheme;
 }
 
 const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
@@ -24,13 +35,15 @@ const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
   issuer: "Issuer",
 };
 
+const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
+
 const formatPctVal = (value: number) => `${value.toFixed(2)}%`;
 
 const CustomToolbar = () => (
   <Box className="attr-datagrid-toolbar">
     <GridToolbarExport
       printOptions={{ disableToolbarButton: true }}
-      csvOptions={{ fileName: "attribution_issuer_data" }}
+      csvOptions={{ fileName: "attribution_data" }}
     />
     <GridToolbarQuickFilter debounceMs={300} />
   </Box>
@@ -40,6 +53,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
   data,
   showPct,
   groupBy,
+  theme,
 }) => {
   const rows = useMemo(
     () => data.map((item, idx) => ({ id: idx, ...item })),
@@ -135,7 +149,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
   );
 
   return (
-    <Box className="attr-datagrid-wrapper">
+    <Box className="attr-datagrid-wrapper" sx={{ borderColor: theme.headerBg + "33" }}>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -150,6 +164,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           },
         }}
         sx={{
+          fontFamily: FONT,
           border: "none",
           borderRadius: "12px",
           "& .MuiDataGrid-main": {
@@ -157,54 +172,75 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           },
           /* ── Header ── */
           "& .MuiDataGrid-columnHeader": {
-            backgroundColor: "#1e293b",
-            color: "#fff",
+            backgroundColor: theme.headerBg,
+            color: "#1e293b",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
+            fontFamily: FONT,
             fontWeight: 700,
-            fontSize: "12.5px",
-            color: "#fff",
+            fontSize: "13px",
+            color: "#1e293b",
             textTransform: "uppercase",
             letterSpacing: "0.8px",
           },
           "& .MuiDataGrid-sortIcon": {
-            color: "#fff !important",
+            color: "#1e293b !important",
           },
           "& .MuiDataGrid-columnSeparator": {
             display: "none",
           },
           /* ── Cells ── */
           "& .MuiDataGrid-cell": {
+            fontFamily: FONT,
             fontSize: "13px",
-            borderBottom: "1px solid #f1f5f9",
+            borderBottom: "1px solid #e8ecf1",
           },
           "& .MuiDataGrid-row:nth-of-type(even)": {
-            backgroundColor: "#faf5ff",
+            backgroundColor: theme.evenRow,
           },
           "& .MuiDataGrid-row:nth-of-type(odd)": {
             backgroundColor: "#fff",
           },
           "& .MuiDataGrid-row:hover": {
-            backgroundColor: "#ede9fe !important",
+            backgroundColor: `${theme.hoverRow} !important`,
           },
           "& .attr-datagrid-cell--name": {
-            fontWeight: 600,
+            fontWeight: 500,
             color: "#1e293b",
+            textTransform: "uppercase",
           },
           "& .attr-datagrid-cell--pnl": {
-            fontWeight: 600,
-            color: "#7c3aed",
+            fontWeight: 500,
+            color: "#1e293b",
           },
           "& .attr-datagrid-cell--exposure": {
-            fontWeight: 600,
-            color: "#0891b2",
+            fontWeight: 500,
+            color: "#1e293b",
           },
           /* ── Toolbar ── */
           "& .MuiDataGrid-toolbarContainer": {
             padding: "0",
           },
+          "& .attr-datagrid-toolbar": {
+            background: theme.toolbarBg,
+          },
+          "& .attr-datagrid-toolbar .MuiButton-root": {
+            color: "#fff",
+            background: theme.exportBg,
+            fontWeight: 700,
+            fontSize: "12px",
+            padding: "6px 18px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+          },
+          "& .attr-datagrid-toolbar .MuiButton-root:hover": {
+            background: theme.exportBg,
+            filter: "brightness(0.85)",
+            color: "#fff",
+          },
           /* ── Footer ── */
           "& .MuiDataGrid-footerContainer": {
+            fontFamily: FONT,
             borderTop: "1px solid #e2e8f0",
           },
         }}

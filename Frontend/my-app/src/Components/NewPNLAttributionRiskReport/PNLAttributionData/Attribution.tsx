@@ -9,12 +9,86 @@ interface AttributionProps {
   selectedDate: string;
 }
 
-const GROUP_BY_TABS: { key: AttributionGroupBy; label: string }[] = [
-  { key: "analyst", label: "Analyst" },
-  { key: "sector", label: "Sector" },
-  { key: "industry", label: "Industry" },
-  { key: "holding_period", label: "Holding Period" },
-  { key: "issuer", label: "Issuer" },
+interface TabTheme {
+  key: AttributionGroupBy;
+  label: string;
+  headerBg: string;
+  activeTab: string;
+  activeTabHover: string;
+  evenRow: string;
+  hoverRow: string;
+  pnlColor: string;
+  expColor: string;
+  toolbarBg: string;
+  exportBg: string;
+}
+
+const GROUP_BY_TABS: TabTheme[] = [
+  {
+    key: "analyst",
+    label: "Analyst",
+    headerBg: "#a8c7fa",
+    activeTab: "#1565c0",
+    activeTabHover: "#0d47a1",
+    evenRow: "#e3f2fd",
+    hoverRow: "#bbdefb",
+    pnlColor: "#0d47a1",
+    expColor: "#00695c",
+    toolbarBg: "#e3f2fd",
+    exportBg: "#1565c0",
+  },
+  {
+    key: "sector",
+    label: "Sector",
+    headerBg: "#80cbc4",
+    activeTab: "#00796b",
+    activeTabHover: "#004d40",
+    evenRow: "#e0f2f1",
+    hoverRow: "#b2dfdb",
+    pnlColor: "#00695c",
+    expColor: "#e65100",
+    toolbarBg: "#e0f2f1",
+    exportBg: "#00796b",
+  },
+  {
+    key: "industry",
+    label: "Industry",
+    headerBg: "#ce93d8",
+    activeTab: "#7b1fa2",
+    activeTabHover: "#4a148c",
+    evenRow: "#f3e5f5",
+    hoverRow: "#e1bee7",
+    pnlColor: "#6a1b9a",
+    expColor: "#004d40",
+    toolbarBg: "#f3e5f5",
+    exportBg: "#7b1fa2",
+  },
+  {
+    key: "holding_period",
+    label: "Holding Period",
+    headerBg: "#a5d6a7",
+    activeTab: "#2e7d32",
+    activeTabHover: "#1b5e20",
+    evenRow: "#e8f5e9",
+    hoverRow: "#c8e6c9",
+    pnlColor: "#1b5e20",
+    expColor: "#4a148c",
+    toolbarBg: "#e8f5e9",
+    exportBg: "#2e7d32",
+  },
+  {
+    key: "issuer",
+    label: "Issuer",
+    headerBg: "#9fa8da",
+    activeTab: "#283593",
+    activeTabHover: "#1a237e",
+    evenRow: "#e8eaf6",
+    hoverRow: "#c5cae9",
+    pnlColor: "#1a237e",
+    expColor: "#00695c",
+    toolbarBg: "#e8eaf6",
+    exportBg: "#283593",
+  },
 ];
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -27,6 +101,8 @@ const Attribution: React.FC<AttributionProps> = ({
   const [data, setData] = useState<AttributionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
+
+  const activeTheme = GROUP_BY_TABS.find((t) => t.key === groupBy)!;
 
   const fetchAttribution = useCallback(async () => {
     if (!selectedFund || !selectedDate) return;
@@ -71,12 +147,14 @@ const Attribution: React.FC<AttributionProps> = ({
           <Box className="attribution-toggle">
             <Box
               className={`attribution-toggle-btn${!showPct ? " attribution-toggle-btn--active" : ""}`}
+              sx={!showPct ? { background: `${activeTheme.activeTab} !important`, color: "#fff !important" } : {}}
               onClick={() => setShowPct(false)}
             >
               $
             </Box>
             <Box
               className={`attribution-toggle-btn${showPct ? " attribution-toggle-btn--active" : ""}`}
+              sx={showPct ? { background: `${activeTheme.activeTab} !important`, color: "#fff !important" } : {}}
               onClick={() => setShowPct(true)}
             >
               % AUM
@@ -90,6 +168,11 @@ const Attribution: React.FC<AttributionProps> = ({
             <Box
               key={tab.key}
               className={`attribution-tab${groupBy === tab.key ? " attribution-tab--active" : ""}`}
+              sx={
+                groupBy === tab.key
+                  ? { background: `${tab.activeTab} !important`, color: "#fff !important" }
+                  : {}
+              }
               onClick={() => setGroupBy(tab.key)}
             >
               {tab.label}
@@ -103,7 +186,12 @@ const Attribution: React.FC<AttributionProps> = ({
             <CircularProgress size={32} />
           </Box>
         ) : data.length > 0 ? (
-          <AttributionTable data={data} showPct={showPct} groupBy={groupBy} />
+          <AttributionTable
+            data={data}
+            showPct={showPct}
+            groupBy={groupBy}
+            theme={activeTheme}
+          />
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
             No attribution data available
