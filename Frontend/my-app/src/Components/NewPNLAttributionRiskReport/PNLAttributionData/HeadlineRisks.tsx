@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import type { HeadlineRisks as HeadlineRisksData } from "./types";
-import { formatCurrency, formatPct } from "./utils";
+import { formatCurrency, formatFullCurrency, formatPct } from "./utils";
 
 interface HeadlineRisksProps {
   data: HeadlineRisksData;
@@ -27,15 +27,27 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
             : "";
           return (
             <Box key={cfg.key} className={`risk-card risk-card--${cfg.color}`}>
-              <Box className={`risk-card-icon risk-card-icon--${cfg.color}`}>
-                {cfg.icon}
-              </Box>
-              <Box>
+              {/* Top row: icon + label */}
+              <Box className="risk-card-top">
+                <Box className={`risk-card-icon risk-card-icon--${cfg.color}`}>
+                  {cfg.icon}
+                </Box>
                 <Box className="risk-card-label">{cfg.label}</Box>
+              </Box>
+
+              {/* Bottom: value + pct centered */}
+              <Box className="risk-card-body">
                 <Box className={`risk-card-value risk-card-value--${cfg.color}`}>
                   {formatCurrency(value)}
                 </Box>
                 {pct && <Box className="risk-card-pct">{pct}</Box>}
+              </Box>
+
+              {/* Hover overlay with full details */}
+              <Box className={`risk-card-hover-overlay risk-card-hover-overlay--${cfg.color}`}>
+                <Box className="risk-card-hover-label">{cfg.label}</Box>
+                <Box className="risk-card-hover-value">{formatFullCurrency(value)}</Box>
+                {pct && <Box className="risk-card-hover-pct">{pct}</Box>}
               </Box>
             </Box>
           );

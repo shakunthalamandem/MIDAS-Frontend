@@ -178,19 +178,20 @@
 /* ── Risk Card ── */
 .risk-card {
   border-radius: 14px;
-  padding: 20px;
+  padding: 22px 24px;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: default;
-  min-height: 120px;
+  min-height: 130px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden;
 }
 
 .risk-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 .risk-card--green {
@@ -218,53 +219,68 @@
   border: 1px solid #f9a8d4;
 }
 
+/* ── Card top row: icon + label side by side ── */
+.risk-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .risk-card-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .risk-card-icon--green {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.18);
   color: #059669;
 }
 
 .risk-card-icon--blue {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.18);
   color: #2563eb;
 }
 
 .risk-card-icon--cyan {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(6, 182, 212, 0.18);
   color: #0891b2;
 }
 
 .risk-card-icon--orange {
-  background: rgba(249, 115, 22, 0.15);
+  background: rgba(249, 115, 22, 0.18);
   color: #ea580c;
 }
 
 .risk-card-icon--pink {
-  background: rgba(236, 72, 153, 0.15);
+  background: rgba(236, 72, 153, 0.18);
   color: #db2777;
 }
 
 .risk-card-label {
-  font-size: 12px;
-  color: #64748b;
-  font-weight: 500;
-  margin-bottom: 6px;
+  font-size: 14px;
+  color: #000000;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ── Card bottom: value + pct centered ── */
+.risk-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .risk-card-value {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 2px;
+  letter-spacing: -0.3px;
 }
 
 .risk-card-value--green {
@@ -288,9 +304,69 @@
 }
 
 .risk-card-pct {
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #475569;
+}
+
+/* ── Hover overlay with full details ── */
+.risk-card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.risk-card:hover .risk-card-hover-overlay {
+  opacity: 1;
+}
+
+.risk-card-hover-overlay--green {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.92), rgba(5, 150, 105, 0.92));
+}
+
+.risk-card-hover-overlay--blue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.92), rgba(37, 99, 235, 0.92));
+}
+
+.risk-card-hover-overlay--cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.92), rgba(8, 145, 178, 0.92));
+}
+
+.risk-card-hover-overlay--orange {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.92), rgba(234, 88, 12, 0.92));
+}
+
+.risk-card-hover-overlay--pink {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.92), rgba(219, 39, 119, 0.92));
+}
+
+.risk-card-hover-label {
+  font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.risk-card-hover-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.risk-card-hover-pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* ── P&L Cards Grid ── */
@@ -346,7 +422,7 @@
 .pnl-card-title {
   font-size: 14px;
   font-weight: 600;
-  color: #334155;
+  color: #000000;
 }
 
 .pnl-card-arrow {

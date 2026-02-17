@@ -150,10 +150,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </IconButton>
         </Box>
 
-        <Box className="risk-dashboard-live-indicator">
-          <Box className="risk-dashboard-live-dot" />
-          <Box className="risk-dashboard-live-text">LIVE</Box>
-        </Box>
       </Box>
     </Box>
   );
