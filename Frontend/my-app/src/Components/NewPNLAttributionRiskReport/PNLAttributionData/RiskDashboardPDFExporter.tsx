@@ -165,8 +165,8 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         disabled={loading}
         startIcon={loading ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <PictureAsPdfIcon />}
         sx={{
-          backgroundColor: "#002060",
-          color: "#fff",
+          backgroundColor: "#fff",
+          color: "#002060",
           textTransform: "none",
           fontWeight: 600,
           fontSize: "13px",
@@ -174,15 +174,15 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
           px: 2.5,
           py: 0.8,
           "&:hover": {
-            backgroundColor: "#001540",
+            backgroundColor: "rgba(255,255,255,0.85)",
           },
           "&.Mui-disabled": {
-            backgroundColor: "#334155",
-            color: "rgba(255,255,255,0.5)",
+            backgroundColor: "rgba(255,255,255,0.3)",
+            color: "rgba(0,32,96,0.5)",
           },
         }}
       >
-        {loading ? "Generating..." : "Export PDF"}
+        {loading ? "Generating..." : "Export to PDF"}
       </Button>
 
       {/* Full-screen loading overlay */}
