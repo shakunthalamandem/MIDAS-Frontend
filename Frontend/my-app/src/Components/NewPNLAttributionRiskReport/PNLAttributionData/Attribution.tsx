@@ -97,7 +97,7 @@ const Attribution: React.FC<AttributionProps> = ({
   selectedFunds,
   selectedDate,
 }) => {
-  const [groupBy, setGroupBy] = useState<AttributionGroupBy>("sector");
+  const [groupBy, setGroupBy] = useState<AttributionGroupBy>("analyst");
   const [data, setData] = useState<AttributionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);

@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { Button, CircularProgress, Box, Backdrop, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Box,
+  Dialog,
+  DialogContent,
+  Typography,
+  LinearProgress,
+} from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 interface RiskDashboardPDFExporterProps {
@@ -12,12 +20,12 @@ interface RiskDashboardPDFExporterProps {
   reportDate?: string;
 }
 
-const waitForRender = () =>
-  new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      setTimeout(resolve, 300);
-    });
-  });
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const waitForRender = async () => {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  await wait(800);
+};
 
 const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
   exportContainerId,
@@ -27,17 +35,26 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
   reportDate = "",
 }) => {
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("");
 
   const handleExportPDF = async () => {
     const container = document.getElementById(exportContainerId);
     if (!container) return;
 
     setLoading(true);
+    setProgress(0);
+    setStatusText("Preparing report layout...");
 
     try {
       // Add pdf-export-mode class for clean rendering
       container.classList.add("pdf-export-mode");
+
+      // Wait for layout to settle (attribution tables become visible)
+      setStatusText("Loading attribution tables...");
       await waitForRender();
+      // Extra wait for DataGrid virtualization to fully render
+      await wait(1000);
 
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -49,17 +66,14 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
 
       // Draw PDF header on each page
       const drawPageHeader = () => {
-        // Header background
         pdf.setFillColor(0, 32, 96);
         pdf.rect(0, 0, pdfWidth, headerHeight, "F");
 
-        // Title text
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(14);
         pdf.setTextColor(255, 255, 255);
         pdf.text(headerTitle, marginX, 12);
 
-        // Subtitle with fund and date
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9);
         pdf.setTextColor(180, 200, 230);
@@ -68,7 +82,6 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
           pdf.text(subtitle, marginX, 19);
         }
 
-        // Right side - generated timestamp
         pdf.setFontSize(7);
         pdf.setTextColor(150, 170, 200);
         const now = new Date();
@@ -81,23 +94,32 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         });
         pdf.text(`Generated: ${timestamp}`, pdfWidth - marginX, 19, { align: "right" });
 
-        // Accent line
         pdf.setDrawColor(16, 185, 129);
         pdf.setLineWidth(0.8);
         pdf.line(0, headerHeight, pdfWidth, headerHeight);
 
         pdf.setTextColor(0, 0, 0);
-
         return headerHeight + 6;
       };
 
       let currentY = drawPageHeader();
 
-      // Get all pdf-section elements
+      // Get all visible pdf-section elements
       const sections = container.querySelectorAll<HTMLElement>(".pdf-section");
+      const totalSections = sections.length;
 
-      for (let i = 0; i < sections.length; i++) {
+      for (let i = 0; i < totalSections; i++) {
         const section = sections[i];
+
+        // Skip sections with no visible content
+        if (section.offsetHeight === 0) continue;
+
+        const sectionName = getSectionName(section, i);
+        setStatusText(`Capturing: ${sectionName}`);
+        setProgress(Math.round(((i + 1) / totalSections) * 90));
+
+        // Small delay before capturing each section
+        await wait(200);
 
         const canvas = await html2canvas(section, {
           scale: 2,
@@ -124,6 +146,9 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
       }
 
       // Add page numbers
+      setStatusText("Adding page numbers...");
+      setProgress(95);
+
       const pageCount = pdf.getNumberOfPages();
       for (let p = 1; p <= pageCount; p++) {
         pdf.setPage(p);
@@ -137,23 +162,25 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
           { align: "right" }
         );
 
-        // Footer line
         pdf.setDrawColor(200, 200, 200);
         pdf.setLineWidth(0.2);
         pdf.line(marginX, pdfHeight - 14, pdfWidth - marginX, pdfHeight - 14);
 
-        // Footer text
         pdf.setFontSize(7);
         pdf.setTextColor(160, 160, 160);
         pdf.text("MIDAS - Risk & PNL Attribution Report", marginX, pdfHeight - 8);
       }
 
+      setStatusText("Downloading PDF...");
+      setProgress(100);
       pdf.save(fileName);
     } catch (error) {
       console.error("PDF generation error:", error);
     } finally {
       container.classList.remove("pdf-export-mode");
       setLoading(false);
+      setProgress(0);
+      setStatusText("");
     }
   };
 
@@ -163,7 +190,7 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         variant="contained"
         onClick={handleExportPDF}
         disabled={loading}
-        startIcon={loading ? <CircularProgress size={16} sx={{ color: "#fff" }} /> : <PictureAsPdfIcon />}
+        startIcon={loading ? <CircularProgress size={16} sx={{ color: "#002060" }} /> : <PictureAsPdfIcon />}
         sx={{
           backgroundColor: "#fff",
           color: "#002060",
@@ -185,21 +212,77 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         {loading ? "Generating..." : "Export to PDF"}
       </Button>
 
-      {/* Full-screen loading overlay */}
-      <Backdrop
+      {/* Progress dialog */}
+      <Dialog
         open={loading}
-        sx={{ color: "#fff", zIndex: 9999, flexDirection: "column", gap: 2 }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            p: 1,
+            background: "linear-gradient(135deg, #002060, #001540)",
+          },
+        }}
       >
-        <CircularProgress color="inherit" size={48} />
-        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-          Generating PDF Report...
-        </Typography>
-        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
-          Please wait while we prepare your report
-        </Typography>
-      </Backdrop>
+        <DialogContent sx={{ textAlign: "center", py: 4 }}>
+          <CircularProgress size={48} sx={{ color: "#10b981", mb: 2 }} />
+          <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700, mb: 1 }}>
+            Generating PDF Report
+          </Typography>
+          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)", mb: 3 }}>
+            {statusText}
+          </Typography>
+          <Box sx={{ px: 2 }}>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: "rgba(255,255,255,0.15)",
+                "& .MuiLinearProgress-bar": {
+                  borderRadius: 4,
+                  background: "linear-gradient(90deg, #10b981, #34d399)",
+                },
+              }}
+            />
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", mt: 1, display: "block" }}>
+              {progress}% complete
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
+
+/** Try to identify a readable name for the section being captured */
+function getSectionName(section: HTMLElement, index: number): string {
+  // Check for attribution tab label
+  if (section.classList.contains("attribution-pdf-tab")) {
+    const label = section.querySelector(".risk-dashboard-section [class*='MuiBox']");
+    if (label?.textContent) return label.textContent;
+  }
+
+  // Check for known section titles
+  const title = section.querySelector(
+    ".risk-dashboard-section-title, .attribution-title, .pnl-chart-title"
+  );
+  if (title?.textContent) return title.textContent;
+
+  // Check for header
+  if (section.querySelector(".risk-dashboard-header")) return "Dashboard Header";
+
+  // Fallback
+  const names = [
+    "Dashboard Header",
+    "Headline Risks",
+    "Headline P&L",
+    "Index Comparison",
+    "Cumulative P&L Chart",
+  ];
+  return names[index] || `Section ${index + 1}`;
+}
 
 export default RiskDashboardPDFExporter;

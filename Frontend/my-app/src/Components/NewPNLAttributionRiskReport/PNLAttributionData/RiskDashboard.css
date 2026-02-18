@@ -797,6 +797,19 @@
 }
 
 /* Ensure DataGrid renders all rows */
+.pdf-export-mode .attr-datagrid-wrapper {
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-root {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.pdf-export-mode .MuiDataGrid-main {
+  overflow: visible !important;
+}
+
 .pdf-export-mode .MuiDataGrid-virtualScroller {
   overflow: visible !important;
   height: auto !important;
@@ -823,4 +836,22 @@
 
 .pdf-export-mode .risk-dashboard-section {
   margin-bottom: 16px;
+}
+
+/* ── Attribution All Tabs (PDF only) ── */
+.attribution-all-tabs-pdf {
+  position: absolute;
+  left: -9999px;
+  width: 100%;
+  visibility: hidden;
+}
+
+.pdf-export-mode .attribution-interactive {
+  display: none !important;
+}
+
+.pdf-export-mode .attribution-all-tabs-pdf {
+  position: static;
+  left: auto;
+  visibility: visible;
 }

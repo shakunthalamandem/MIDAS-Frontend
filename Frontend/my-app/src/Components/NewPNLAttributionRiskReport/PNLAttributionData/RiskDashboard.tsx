@@ -7,6 +7,7 @@ import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
 import Attribution from "./Attribution";
+import AttributionAllTabs from "./AttributionAllTabs";
 import RiskDashboardPDFExporter from "./RiskDashboardPDFExporter";
 import "./RiskDashboard.css";
 
@@ -187,8 +188,16 @@ const RiskDashboard: React.FC = () => {
             />
           </Box>
 
-          <Box className="pdf-section">
+          <Box className="pdf-section attribution-interactive">
             <Attribution
+              selectedFunds={selectedFunds}
+              selectedDate={selectedDate}
+            />
+          </Box>
+
+          {/* All 5 attribution tabs for PDF export (hidden on screen) */}
+          <Box className="attribution-all-tabs-pdf">
+            <AttributionAllTabs
               selectedFunds={selectedFunds}
               selectedDate={selectedDate}
             />
