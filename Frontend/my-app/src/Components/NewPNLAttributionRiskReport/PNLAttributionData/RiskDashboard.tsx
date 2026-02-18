@@ -7,6 +7,7 @@ import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
 import Attribution from "./Attribution";
+import RiskDashboardPDFExporter from "./RiskDashboardPDFExporter";
 import "./RiskDashboard.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -110,20 +111,40 @@ const RiskDashboard: React.FC = () => {
     fetchChartData();
   }, [fetchChartData]);
 
+  const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
+  const fundLabel = allSelected
+    ? "All Funds"
+    : selectedFunds.length === 1
+      ? selectedFunds[0]
+      : `${selectedFunds.length} Funds`;
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{align:'center', color: "#002060", fontWeight: "600" }}>Risk & PNL Attribution Dashboard</Typography>
+      <Box sx={{ mb: 3, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "600" }}>
+          Risk & PNL Attribution Dashboard
+        </Typography>
+        {!loading && data && (
+          <RiskDashboardPDFExporter
+            exportContainerId="risk-dashboard-pdf-root"
+            fileName={`Risk_PNL_Report_${fundLabel.replace(/\s+/g, "_")}_${selectedDate}.pdf`}
+            headerTitle="Risk & PNL Attribution Dashboard"
+            fundName={fundLabel}
+            reportDate={selectedDate}
+          />
+        )}
       </Box>
-    <Box className="risk-dashboard">
-      <DashboardHeader
-        selectedFunds={selectedFunds}
-        portfolios={portfolios}
-        onFundsChange={setSelectedFunds}
-        selectedDate={selectedDate}
-        onDateChange={setSelectedDate}
-        aum={data?.headline_risks?.aum}
-      />
+    <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
+      <Box className="pdf-section">
+        <DashboardHeader
+          selectedFunds={selectedFunds}
+          portfolios={portfolios}
+          onFundsChange={setSelectedFunds}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          aum={data?.headline_risks?.aum}
+        />
+      </Box>
 
       {error && (
         <Alert severity="error" className="risk-dashboard-error" onClose={() => setError("")}>
@@ -139,33 +160,46 @@ const RiskDashboard: React.FC = () => {
 
       {!loading && data && (
         <>
-          {data.headline_risks && <HeadlineRisks data={data.headline_risks} />}
-
-          {data.headline_pnl && (
-            <HeadlinePnL
-              data={data.headline_pnl}
-              selectedMetric={selectedMetric}
-              onMetricSelect={setSelectedMetric}
-            />
+          {data.headline_risks && (
+            <Box className="pdf-section">
+              <HeadlineRisks data={data.headline_risks} />
+            </Box>
           )}
 
-          {data.indexes_comparison && <IndexesComparison data={data.indexes_comparison} />}
+          {data.headline_pnl && (
+            <Box className="pdf-section">
+              <HeadlinePnL
+                data={data.headline_pnl}
+                selectedMetric={selectedMetric}
+                onMetricSelect={setSelectedMetric}
+              />
+            </Box>
+          )}
 
-          <CumulativePnLChart
-            chartData={chartData}
-            loading={chartLoading}
-            period={metricToPeriod(selectedMetric)}
-          />
+          {data.indexes_comparison && (
+            <Box className="pdf-section">
+              <IndexesComparison data={data.indexes_comparison} />
+            </Box>
+          )}
 
-          <Attribution
-            selectedFunds={selectedFunds}
-            selectedDate={selectedDate}
-          />
+          <Box className="pdf-section">
+            <CumulativePnLChart
+              chartData={chartData}
+              loading={chartLoading}
+              period={metricToPeriod(selectedMetric)}
+            />
+          </Box>
+
+          <Box className="pdf-section">
+            <Attribution
+              selectedFunds={selectedFunds}
+              selectedDate={selectedDate}
+            />
+          </Box>
         </>
       )}
     </Box>
     </Container>
-
   );
 };
 

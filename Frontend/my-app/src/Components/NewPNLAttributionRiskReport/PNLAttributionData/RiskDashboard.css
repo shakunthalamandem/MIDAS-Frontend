@@ -645,3 +645,129 @@
     justify-content: center;
   }
 }
+
+/* ── PDF Date Badge (hidden by default) ── */
+.risk-dashboard-pdf-date-badge {
+  display: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 6px 18px;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════
+   PDF EXPORT MODE — Clean, print-friendly overrides
+   ══════════════════════════════════════════════════ */
+
+.pdf-export-mode .risk-dashboard-header {
+  background: #002060;
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+}
+
+/* Hide interactive controls, show static date in PDF */
+.pdf-export-mode .risk-dashboard-header-right .MuiTextField-root,
+.pdf-export-mode .risk-dashboard-header-right .MuiIconButton-root,
+.pdf-export-mode .risk-dashboard-date-nav {
+  display: none !important;
+}
+
+.pdf-export-mode .risk-dashboard-pdf-date-badge {
+  display: block;
+}
+
+/* Remove hover effects in PDF mode */
+.pdf-export-mode .risk-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.pdf-export-mode .risk-card-hover-overlay {
+  display: none !important;
+}
+
+.pdf-export-mode .pnl-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.pdf-export-mode .index-card:hover {
+  transform: none;
+}
+
+/* Ensure grids don't break */
+.pdf-export-mode .risk-cards-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.pdf-export-mode .pnl-cards-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.pdf-export-mode .index-cards-grid {
+  grid-template-columns: repeat(6, 1fr) !important;
+}
+
+/* Clean card rendering for PDF */
+.pdf-export-mode .risk-card {
+  min-height: auto;
+  padding: 16px 18px;
+  border-radius: 10px;
+}
+
+.pdf-export-mode .pnl-card {
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* Chart section */
+.pdf-export-mode .pnl-chart-hint {
+  display: none;
+}
+
+.pdf-export-mode .pnl-chart-card {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Attribution section clean up */
+.pdf-export-mode .attribution-card {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Hide DataGrid toolbar (export/filter) in PDF */
+.pdf-export-mode .attr-datagrid-toolbar {
+  display: none !important;
+}
+
+/* Ensure DataGrid renders all rows */
+.pdf-export-mode .MuiDataGrid-virtualScroller {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-virtualScrollerContent {
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-virtualScrollerRenderZone {
+  position: relative !important;
+  transform: none !important;
+}
+
+/* Remove DataGrid footer in PDF */
+.pdf-export-mode .MuiDataGrid-footerContainer {
+  display: none !important;
+}
+
+/* Section spacing */
+.pdf-export-mode .pdf-section {
+  margin-bottom: 8px;
+}
+
+.pdf-export-mode .risk-dashboard-section {
+  margin-bottom: 16px;
+}

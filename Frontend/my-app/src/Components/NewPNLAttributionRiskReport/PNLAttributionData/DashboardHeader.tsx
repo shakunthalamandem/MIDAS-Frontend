@@ -122,7 +122,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </Box>
         )}
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        {/* Static date badge shown only in PDF mode */}
+        <Box className="risk-dashboard-pdf-date-badge">
+          <Box className="risk-dashboard-aum-badge-label">Date</Box>
+          <Box className="risk-dashboard-aum-badge-value" sx={{ color: "#fff !important" }}>
+            {selectedDate}
+          </Box>
+        </Box>
+
+        <Box className="risk-dashboard-date-nav" sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
           <IconButton
             size="small"
             onClick={() => onDateChange(shiftDate(selectedDate, -1))}
