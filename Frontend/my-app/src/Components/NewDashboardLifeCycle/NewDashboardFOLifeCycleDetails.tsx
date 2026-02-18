@@ -58,9 +58,39 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   );
 
   const activePayload = selectedOption || payload;
-  const isSearchingOtherTicker = selectedOption && selectedOption.ticker !== payload?.ticker;
+  const writeupEnabled =
+    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
+    (activePayload?.writeup_available || "").toUpperCase() === "YES";
 
-  const writeupEnabled = !isSearchingOtherTicker && (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
+  React.useEffect(() => {
+  const currentTab = tabItems[tabValue];
+  if (!currentTab) return;
+
+  const writeUpNewIndex = tabItems.findIndex(
+    (item) => item.label === "Write Up New"
+  );
+
+  const firstNonWriteupIndex = tabItems.findIndex(
+    (item) => !item.requiresWriteup
+  );
+
+  // CASE 1: Writeup NOT available
+  if (!writeupEnabled) {
+    if (currentTab.requiresWriteup && firstNonWriteupIndex !== -1) {
+      setTabValue(firstNonWriteupIndex);
+    }
+  }
+
+  // CASE 2: Writeup becomes available again
+  if (writeupEnabled) {
+    if (writeUpNewIndex !== -1 && tabValue !== writeUpNewIndex) {
+      setTabValue(writeUpNewIndex);
+    }
+  }
+
+}, [writeupEnabled]);
+
+
 
 
 
