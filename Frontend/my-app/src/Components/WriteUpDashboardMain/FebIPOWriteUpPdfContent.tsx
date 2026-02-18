@@ -11,6 +11,7 @@ import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDat
 import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
+import IPOWriteUpMetaDataKeyMetricsNew from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetricsNew"
 
 interface WriteUpData {
   ticker_name: string;
@@ -65,7 +66,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
       {
         id: "page-3",
         sections: [
-          { id: "key-metrics", content: <IPOWriteUpMetaDataKeyMetrics basicDealDetails={basicDealDetails} /> }
+          { id: "key-metrics", content: <IPOWriteUpMetaDataKeyMetricsNew basicDealDetails={basicDealDetails} /> }
 
         ]
       },
