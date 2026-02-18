@@ -17,6 +17,7 @@ export const formatFullCurrency = (value: number): string => {
 };
 
 export const formatPct = (value: number): string => {
+  if (value == null) return "";
   const digits = Math.abs(value) < 0.02 ? 2 : 1;
   return `(${value.toFixed(digits)}%)`;
 };
