@@ -39,9 +39,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
-  const [hasSearchedOtherTicker, setHasSearchedOtherTicker] = React.useState(false);
-  const initialTickerRef = React.useRef(payload?.ticker);
-
 
   const tabItems = useMemo(
     () => [
@@ -61,22 +58,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   );
 
   const activePayload = selectedOption || payload;
-  const isSearchingOtherTicker = selectedOption && selectedOption.ticker !== payload?.ticker;
-
-  const returningToInitialAfterSearch = hasSearchedOtherTicker && selectedOption?.ticker === initialTickerRef.current;
-
-  const writeupEnabled = !isSearchingOtherTicker && !returningToInitialAfterSearch && (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
-
-  React.useEffect(() => {
-    initialTickerRef.current = payload?.ticker;
-    setHasSearchedOtherTicker(false);
-    setSelectedOption(null);
-  }, [payload?.ticker]);
-  React.useEffect(() => {
-    if (selectedOption && selectedOption.ticker !== initialTickerRef.current) {
-      setHasSearchedOtherTicker(true);
-    }
-  }, [selectedOption]);
+  const writeupEnabled = (activePayload?.flag_for_writeup || "").toUpperCase() === "Y";
 
 
 
