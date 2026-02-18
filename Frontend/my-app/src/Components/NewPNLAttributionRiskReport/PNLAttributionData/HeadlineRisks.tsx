@@ -12,7 +12,7 @@ const RISK_CARDS_CONFIG = [
   { key: "gross_market_value", label: "Gross Market Value", color: "blue", icon: "\u{1F4CA}", showPct: true, pctKey: "gross_market_value_pct" },
   { key: "delta_adj_net_mv", label: "Delta Adj. Net MV", color: "cyan", icon: "\u{1F4C8}", showPct: true, pctKey: "delta_adj_net_mv_pct" },
   { key: "beta_adj_net_mv", label: "Beta Adj. Net MV", color: "orange", icon: "\u{1F4C9}", showPct: true, pctKey: "beta_adj_net_mv_pct" },
-  { key: "one_yr_1pct_var", label: "1Y 1% VaR", color: "pink", icon: "\u2298", showPct: true, pctKey: "one_yr_1pct_var_pct" },
+  { key: "one_yr_1pct_var", label: "1Y 1% VaR", color: "pink", icon: "\u2298", showPct: true, pctOnly: true, pctKey: "one_yr_1pct_var_pct" },
 ] as const;
 
 const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
@@ -25,6 +25,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
           const pct = cfg.showPct
             ? formatPct(data[cfg.pctKey as keyof HeadlineRisksData] as number)
             : "";
+          const isPctOnly = "pctOnly" in cfg && cfg.pctOnly;
           return (
             <Box key={cfg.key} className={`risk-card risk-card--${cfg.color}`}>
               {/* Top row: icon + label */}
@@ -37,17 +38,23 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
 
               {/* Bottom: value + pct centered */}
               <Box className="risk-card-body">
-                <Box className={`risk-card-value risk-card-value--${cfg.color}`}>
-                  {formatCurrency(value)}
-                </Box>
-                {pct && <Box className="risk-card-pct">{pct}</Box>}
+                {!isPctOnly && (
+                  <Box className={`risk-card-value risk-card-value--${cfg.color}`}>
+                    {formatCurrency(value)}
+                  </Box>
+                )}
+                {pct && (
+                  <Box className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}>
+                    {pct}
+                  </Box>
+                )}
               </Box>
 
               {/* Hover overlay with full details */}
               <Box className={`risk-card-hover-overlay risk-card-hover-overlay--${cfg.color}`}>
                 <Box className="risk-card-hover-label">{cfg.label}</Box>
-                <Box className="risk-card-hover-value">{formatFullCurrency(value)}</Box>
-                {pct && <Box className="risk-card-hover-pct">{pct}</Box>}
+                {!isPctOnly && <Box className="risk-card-hover-value">{formatFullCurrency(value)}</Box>}
+                {pct && <Box className={isPctOnly ? "risk-card-hover-value" : "risk-card-hover-pct"}>{pct}</Box>}
               </Box>
             </Box>
           );
