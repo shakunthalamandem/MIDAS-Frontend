@@ -121,9 +121,6 @@ const RiskDashboard: React.FC = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ mb: 3, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="h5" sx={{ color: "#002060", fontWeight: "600" }}>
-          Risk & PNL Attribution Dashboard
-        </Typography>
         {!loading && data && (
           <RiskDashboardPDFExporter
             exportContainerId="risk-dashboard-pdf-root"

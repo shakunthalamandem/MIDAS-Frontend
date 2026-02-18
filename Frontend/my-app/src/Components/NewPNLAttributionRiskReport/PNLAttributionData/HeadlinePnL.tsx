@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import type { HeadlinePnl } from "./types";
-import { formatCurrency } from "./utils";
+import { formatCurrency, formatFullCurrency } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
@@ -41,9 +41,6 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
             >
               <Box className="pnl-card-header">
                 <Box className="pnl-card-title">{cfg.title}</Box>
-                <Box className={`pnl-card-arrow pnl-card-arrow--${modifier}`}>
-                  {isPositive ? "\u2197" : "\u2198"}
-                </Box>
               </Box>
               <Box>
                 <Box
@@ -58,6 +55,13 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
                 >
                   ({pct.toFixed(2)}%)
                 </Box>
+              </Box>
+
+              {/* Hover overlay with full details */}
+              <Box className={`pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`}>
+                <Box className="pnl-card-hover-label">{cfg.title}</Box>
+                <Box className="pnl-card-hover-value">{formatFullCurrency(value)}</Box>
+                <Box className="pnl-card-hover-pct">({pct.toFixed(2)}%)</Box>
               </Box>
             </Box>
           );

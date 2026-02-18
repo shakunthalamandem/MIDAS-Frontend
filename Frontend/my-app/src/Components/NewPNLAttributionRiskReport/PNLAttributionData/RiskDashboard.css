@@ -397,6 +397,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: default;
   position: relative;
+  overflow: hidden;
 }
 
 .pnl-card:hover {
@@ -462,6 +463,53 @@
 
 .pnl-card-pct--negative {
   color: #ef4444;
+}
+
+/* ── P&L Card Hover Overlay ── */
+.pnl-card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.pnl-card:hover .pnl-card-hover-overlay {
+  opacity: 1;
+}
+
+.pnl-card-hover-overlay--positive {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.92), rgba(5, 150, 105, 0.92));
+}
+
+.pnl-card-hover-overlay--negative {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.92), rgba(220, 38, 38, 0.92));
+}
+
+.pnl-card-hover-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pnl-card-hover-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.pnl-card-hover-pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* ── Index Comparison Cards Grid ── */
@@ -685,6 +733,10 @@
 }
 
 .pdf-export-mode .risk-card-hover-overlay {
+  display: none !important;
+}
+
+.pdf-export-mode .pnl-card-hover-overlay {
   display: none !important;
 }
 

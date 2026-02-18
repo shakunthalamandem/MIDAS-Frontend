@@ -86,7 +86,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   return (
     <Box className="risk-dashboard-header">
       <Box className="risk-dashboard-header-left">
-        <Box className="risk-dashboard-logo">M</Box>
+        {/* <Box className="risk-dashboard-logo">M</Box> */}
         <Box>
           <Box className="risk-dashboard-title">{titleLabel}</Box>
           <Box className="risk-dashboard-subtitle">
