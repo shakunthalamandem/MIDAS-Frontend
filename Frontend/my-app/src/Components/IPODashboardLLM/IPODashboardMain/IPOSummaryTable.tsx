@@ -45,7 +45,9 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
     return value ? `${Number(value).toLocaleString()}M` : "N/A";
   }
   if (key === "bookrunners") {
-    return Array.isArray(value) && value.length > 0 ? value.join(", ") : "N/A";
+    if (Array.isArray(value) && value.length > 0) return value.join(", ");
+    if (typeof value === "string" && value.trim()) return value;
+    return "N/A";
   }
   return value || "N/A";
 };
@@ -73,26 +75,38 @@ const handleSaveSummary = async () => {
   try {
     if (!apiUrl) throw new Error("API URL not defined");
 
+    // Build full payload from current display values, then override with edits
+    const allValues: Record<string, any> = {};
+    for (const field of infoFields) {
+      if (field.key === "price_range") {
+        allValues.lower_bound = displayData.lower_bound ?? "";
+        allValues.upper_bound = displayData.upper_bound ?? "";
+      } else {
+        allValues[field.key] = displayData[field.key] ?? "";
+      }
+    }
+
     const payload: any = {
       ticker_name: selectedTicker,
+      ...allValues,
       ...editedSummaryData,
     };
 
-    if ("lower_bound" in editedSummaryData && editedSummaryData.lower_bound !== undefined) {
-      payload.lower_bound = parseFloat(editedSummaryData.lower_bound);
+    // Ensure lower_bound / upper_bound are numbers
+    if (payload.lower_bound !== undefined && payload.lower_bound !== "") {
+      payload.lower_bound = parseFloat(payload.lower_bound);
     }
-    if ("upper_bound" in editedSummaryData && editedSummaryData.upper_bound !== undefined) {
-      payload.upper_bound = parseFloat(editedSummaryData.upper_bound);
+    if (payload.upper_bound !== undefined && payload.upper_bound !== "") {
+      payload.upper_bound = parseFloat(payload.upper_bound);
     }
 
     await axios.patch(`${apiUrl}/api/writeup_data/`, payload, {
       headers: getAuthHeaders(),
     });
-        setLocalSummaryData((prev) => ({
-        ...prev,
-        ...editedSummaryData,
-      }));
-
+    setLocalSummaryData((prev) => ({
+      ...prev,
+      ...editedSummaryData,
+    }));
 
     setSummaryEditMode(false);
     setEditedSummaryData({});

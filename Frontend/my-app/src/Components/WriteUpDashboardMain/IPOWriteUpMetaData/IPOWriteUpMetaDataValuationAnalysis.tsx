@@ -284,7 +284,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
               sx={{
                 mt: 1,
                 minHeight: 120,
-                color: "#1f2a44",
+                color: "#000000",
                 lineHeight: 1.7,
                 overflow: pdfMode || isExpanded ? "visible" : "hidden",
                 display: pdfMode || isExpanded ? "block" : "-webkit-box",

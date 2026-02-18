@@ -200,7 +200,7 @@ const MarketSentimentFOWriteUp: React.FC<MarketSentimentFOWriteUpProps> = ({
                           key={`week-li-${idx}`}
                           component="li"
                           variant="body2"
-                          sx={{ color: "#141414", lineHeight: 1.6, mb: 0.5 }}
+                          sx={{ color: "#000000", lineHeight: 1.6, mb: 0.5 }}
                         >
                           {line}
                         </Typography>
@@ -246,7 +246,7 @@ const MarketSentimentFOWriteUp: React.FC<MarketSentimentFOWriteUpProps> = ({
                           key={`month-li-${idx}`}
                           component="li"
                           variant="body2"
-                          sx={{ color: "#141414", lineHeight: 1.6, mb: 0.5 }}
+                          sx={{ color: "#000000", lineHeight: 1.6, mb: 0.5 }}
                         >
                           {line}
                         </Typography>

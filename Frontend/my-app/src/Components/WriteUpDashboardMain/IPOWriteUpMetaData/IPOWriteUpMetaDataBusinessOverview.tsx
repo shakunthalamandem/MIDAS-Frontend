@@ -159,7 +159,7 @@ const ClampedContent: React.FC<ClampedContentProps> = ({
       <Box
         ref={contentRef}
         sx={{
-          color: "#1f2a44",
+          color: "#000000",
           lineHeight: 1.7,
           overflow: isExpanded ? "visible" : "hidden",
           display: isExpanded ? "block" : "-webkit-box",
@@ -655,7 +655,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                     <Box
                       key={index}
                       mb={2}
-                      sx={{ color: "#124180" }}
+                      sx={{ color: "#000000" }}
                       dangerouslySetInnerHTML={{ __html: item }}
                     />
                   ))}
