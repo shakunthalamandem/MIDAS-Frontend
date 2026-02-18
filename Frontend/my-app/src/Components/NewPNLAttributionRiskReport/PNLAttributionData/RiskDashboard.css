@@ -718,7 +718,8 @@
 /* Hide interactive controls, show static date in PDF */
 .pdf-export-mode .risk-dashboard-header-right .MuiTextField-root,
 .pdf-export-mode .risk-dashboard-header-right .MuiIconButton-root,
-.pdf-export-mode .risk-dashboard-date-nav {
+.pdf-export-mode .risk-dashboard-date-nav,
+.pdf-export-mode .risk-dashboard-export-btn {
   display: none !important;
 }
 

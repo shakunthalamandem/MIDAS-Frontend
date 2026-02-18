@@ -11,6 +11,7 @@ interface DashboardHeaderProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
   aum?: number;
+  exportButton?: React.ReactNode;
 }
 
 const ALL_FUNDS = "All Funds";
@@ -64,6 +65,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedDate,
   onDateChange,
   aum,
+  exportButton,
 }) => {
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
   const displayValue = allSelected ? ALL_FUNDS : (selectedFunds[0] || "");
@@ -158,6 +160,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </IconButton>
         </Box>
 
+        {exportButton && (
+          <Box className="risk-dashboard-export-btn">{exportButton}</Box>
+        )}
       </Box>
     </Box>
   );

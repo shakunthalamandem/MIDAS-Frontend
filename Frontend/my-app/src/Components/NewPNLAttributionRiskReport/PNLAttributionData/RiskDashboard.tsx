@@ -120,17 +120,6 @@ const RiskDashboard: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ mb: 3, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        {!loading && data && (
-          <RiskDashboardPDFExporter
-            exportContainerId="risk-dashboard-pdf-root"
-            fileName={`Risk_PNL_Report_${fundLabel.replace(/\s+/g, "_")}_${selectedDate}.pdf`}
-            headerTitle="Risk & PNL Attribution Dashboard"
-            fundName={fundLabel}
-            reportDate={selectedDate}
-          />
-        )}
-      </Box>
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
       <Box className="pdf-section">
         <DashboardHeader
@@ -140,6 +129,17 @@ const RiskDashboard: React.FC = () => {
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
+          exportButton={
+            !loading && data ? (
+              <RiskDashboardPDFExporter
+                exportContainerId="risk-dashboard-pdf-root"
+                fileName={`Risk_PNL_Report_${fundLabel.replace(/\s+/g, "_")}_${selectedDate}.pdf`}
+                headerTitle="Risk & PNL Attribution Dashboard"
+                fundName={fundLabel}
+                reportDate={selectedDate}
+              />
+            ) : undefined
+          }
         />
       </Box>
 
