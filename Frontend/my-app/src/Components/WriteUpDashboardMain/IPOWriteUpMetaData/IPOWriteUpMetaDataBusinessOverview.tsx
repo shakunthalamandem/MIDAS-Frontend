@@ -47,7 +47,7 @@ interface Props {
 type AccordionSection = {
   section: keyof WriteUpData
   title: string
-  icon: ReactElement
+  // icon: ReactElement
 }
 
 /* ===================== CONFIG ===================== */
@@ -56,22 +56,22 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
   {
     section: 'differentiated_summary',
     title: 'Differentiated Summary',
-    icon: <TrendingUpIcon />,
+    // icon: <TrendingUpIcon />,
   },
   {
     section: 'concerns',
     title: 'Concerns',
-    icon: <WarningAmberIcon />,
+    // icon: <WarningAmberIcon />,
   },
   {
     section: 'principal_stockholders_preipo',
-    title: 'Principal Stockholders Pre-IPO',
-    icon: <AccountTreeIcon />,
+    title: 'Principal Stockholders ',
+    // icon: <AccountTreeIcon />,
   },
   {
     section: "key_management_personnel",
     title: "Key Management Personnel",
-    icon: <GroupsIcon />
+    // icon: <GroupsIcon />
   }
 ]
 const quillModules = {
@@ -463,7 +463,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   if (fetchError || !writeUpData) {
     return (
       <NoDataNotice
-        title="Business Overview is not available."
+        title="Company Overview is not available."
         subtitle=" We will update soon."
       />
     )
@@ -490,7 +490,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         border: "1px solid #E6ECF5"
       }}
     >
-      {/* ================= BUSINESS OVERVIEW ================= */}
+      {/* ================= COMPANY OVERVIEW ================= */}
       <Box mb={4}>
         <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
           {/* Rating - Left aligned */}
@@ -524,7 +524,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Typography variant="h6" fontWeight={700} color="#124180">
-              Business Overview
+              Company Overview
             </Typography>
           </Box>
 
@@ -572,7 +572,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           gap: 2
         }}
       >
-        {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
+        {ACCORDION_SECTIONS.map(({ section, title,  }) => (
           <Accordion
             key={section}
             defaultExpanded={pdfMode}
@@ -604,7 +604,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 gap={1.5}
                 width="100%"
               >
-                <Box
+                {/* <Box
                   sx={{
                     color: "#124180",
                     display: "flex",
@@ -612,7 +612,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                   }}
                 >
                   {icon}
-                </Box>
+                </Box> */}
                 <Typography
                   fontWeight={700}
                   color="#124180"

@@ -75,13 +75,13 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
   const sectionDefaults = useMemo(
     () => [
       // { id: "deal-info", label: "Deal Info" },
-      {id: "ai-indication", label: "Proprietary Model Indication"},
-      { id: "business-overview", label: "Business Overview" },
+      // {id: "ai-indication", label: "Proprietary Model Indication"},
+      { id: "business-overview", label: "Company Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comps & Peer Trends" },
-      { id: "valuation-analysis", label: "Valuation Analysis" },
-      { id: "red-flag", label: "Red Flag" }
+      { id: "valuation-analysis", label: "Valuation " },
+      { id: "red-flag", label: "Risk Assessment" }
     ],
     []
   )
@@ -295,7 +295,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
       }}
     >      <Box sx={{ background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2, mb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180", textAlign: "center" }}>
-          Final Verdict
+          Investment Summary
         </Typography>
       </Box>
       <Grid container spacing={3}>
@@ -439,7 +439,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
           </Stack>
 
           <Stack alignItems="center" spacing={1.5} sx={{ mt: 2 }}>
-            <Box sx={{ position: "relative", display: "inline-flex" }}>
+            {/* <Box sx={{ position: "relative", display: "inline-flex" }}>
               <CircularProgress
                 variant="determinate"
                 value={overallPercent ?? 0}
@@ -468,11 +468,11 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                   {overallPercent !== null ? `${overallPercent}/100` : "--"}
                 </Typography>
               </Box>
-            </Box>
+            </Box> */}
 
-            <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
+            {/* <Typography variant="subtitle2" sx={{ color: "#4b5bff" }}>
               Overall Rating{overallPercent !== null ? ` (${overallPercent}%)` : ""}
-            </Typography>
+            </Typography> */}
 
             <Stack direction="row" spacing={1} flexWrap="wrap">
               {metadata?.verdict_rating && (
