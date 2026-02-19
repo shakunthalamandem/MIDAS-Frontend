@@ -515,9 +515,14 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
               {header.report_title}
             </Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: 12.5 }}>
-              {formatDate(header.date)}
-              {header.aum_formatted && ` · AUM: ${header.aum_formatted}`}
+            <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+              <Box component="span" sx={{ color: "#60a5fa", fontWeight: 600 }}>{formatDate(header.date)}</Box>
+              {header.aum_formatted && (
+                <>
+                  <Box component="span"> · </Box>
+                  <Box component="span" sx={{ color: "#34d399", fontWeight: 600 }}>AUM: {header.aum_formatted}</Box>
+                </>
+              )}
               {header.classification && ` · ${header.classification}`}
             </Typography>
           </Box>
