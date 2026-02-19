@@ -37,6 +37,7 @@ import WeeklyFocus from "./sections/WeeklyFocus";
 import MonthlyOutlook from "./sections/MonthlyOutlook";
 import ActionChecklists from "./sections/ActionChecklists";
 import ActionMatrix from "./sections/ActionMatrix";
+import GenericDataRenderer from "./sections/GenericDataRenderer";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -490,18 +491,26 @@ const PortfolioReportDocumentMain: React.FC = () => {
             px: 3,
             py: 1.5,
             borderBottom: "1px solid #e2e8f0",
-            backgroundColor: "#fff",
+            background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
             display: "flex",
             alignItems: "center",
             gap: 2,
-            minHeight: 64,
+            minHeight: 68,
           }}
         >
-          <IconButton size="small" onClick={handleBack} sx={{ mr: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={handleBack}
+            sx={{
+              mr: 0.5,
+              backgroundColor: "#f1f5f9",
+              "&:hover": { backgroundColor: "#e2e8f0" },
+            }}
+          >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 700, fontSize: 17 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.3 }}>
               {header.report_title}
             </Typography>
             <Typography sx={{ color: "#64748b", fontSize: 12.5 }}>
@@ -520,7 +529,8 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: 12,
-                height: 28,
+                height: 30,
+                boxShadow: "0 2px 8px rgba(168,85,247,0.3)",
               }}
             />
           )}
@@ -533,7 +543,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: 12,
-                height: 28,
+                height: 30,
               }}
             />
           )}
@@ -557,6 +567,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
             const isNumeric = /^\d+$/.test(item.section_number);
+            const gradient = sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)";
 
             return (
               <Box
@@ -567,19 +578,23 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 }}
                 sx={{ mb: 5 }}
               >
-                {/* Gradient Bar */}
+                {/* Section Header with Gradient */}
                 <Box
                   sx={{
-                    height: 4,
-                    borderRadius: 2,
-                    background: sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)",
-                    mb: 2,
+                    background: gradient,
+                    borderRadius: "12px 12px 0 0",
+                    px: 3,
+                    py: 1.5,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    mb: 0,
                   }}
-                />
-
-                {/* Section Header */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 20 }}>
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", minWidth: 28, justifyContent: "center", color: "#fff" }}>
+                    {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 18, color: "#fff", flex: 1 }}>
                     {isNumeric ? `${item.section_number}. ` : ""}
                     {item.label}
                   </Typography>
@@ -590,9 +605,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
                       sx={{
                         fontSize: 11,
                         height: 24,
-                        backgroundColor: "#f1f5f9",
-                        color: "#475569",
-                        fontWeight: 500,
+                        backgroundColor: "rgba(255,255,255,0.25)",
+                        color: "#fff",
+                        fontWeight: 600,
+                        backdropFilter: "blur(4px)",
                       }}
                     />
                   )}
@@ -603,26 +619,35 @@ const PortfolioReportDocumentMain: React.FC = () => {
                       sx={{
                         fontSize: 11,
                         height: 24,
-                        backgroundColor: "#f1f5f9",
-                        color: "#475569",
-                        fontWeight: 500,
+                        backgroundColor: "rgba(255,255,255,0.25)",
+                        color: "#fff",
+                        fontWeight: 600,
+                        backdropFilter: "blur(4px)",
                       }}
                     />
                   )}
                 </Box>
 
                 {/* Section Content */}
-                {SectionComponent && sectionData != null ? (
-                  <SectionComponent data={sectionData} />
-                ) : sectionData ? (
-                  <Box sx={{ p: 2, backgroundColor: "#f8fafc", borderRadius: 2 }}>
-                    <Typography sx={{ fontSize: 13, color: "#64748b", whiteSpace: "pre-wrap" }}>
-                      {typeof sectionData === "string"
-                        ? sectionData
-                        : JSON.stringify(sectionData, null, 2)}
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    borderTop: "none",
+                    borderRadius: "0 0 12px 12px",
+                    p: 3,
+                  }}
+                >
+                  {SectionComponent && sectionData != null ? (
+                    <SectionComponent data={sectionData} />
+                  ) : sectionData ? (
+                    <GenericDataRenderer data={sectionData} />
+                  ) : (
+                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
+                      No data available for this section.
                     </Typography>
-                  </Box>
-                ) : null}
+                  )}
+                </Box>
               </Box>
             );
           })}

@@ -1,9 +1,18 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import GenericDataRenderer from "./GenericDataRenderer";
 
 interface Props {
   data: any;
 }
+
+const extractRows = (val: any): any[] => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (val.rows && Array.isArray(val.rows)) return val.rows;
+  if (val.items && Array.isArray(val.items)) return val.items;
+  return [];
+};
 
 const priorityDot = (priority: number | string): string => {
   const p = typeof priority === "string" ? parseInt(priority, 10) : priority;
@@ -12,206 +21,90 @@ const priorityDot = (priority: number | string): string => {
   return "#eab308";
 };
 
+const SKIP_KEYS = ["badge", "overall", "section_number", "label", "key"];
+const formatHeader = (k: string) => k.replace(/_/g, " ").toUpperCase();
+
+const renderDynamicTable = (items: any[], accentColor: string, hoverBg: string) => {
+  if (items.length === 0) return null;
+  const keys = Object.keys(items[0]).filter((k) => !SKIP_KEYS.includes(k));
+  if (keys.length === 0) return null;
+
+  return (
+    <Box sx={{ border: `1px solid ${accentColor}40`, borderRadius: 2.5, overflow: "hidden" }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
+        background: "linear-gradient(135deg, #1e293b, #334155)", borderBottom: `2px solid ${accentColor}` }}>
+        {keys.map((k) => (
+          <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#fff", textTransform: "uppercase" }}>
+            {formatHeader(k)}
+          </Typography>
+        ))}
+      </Box>
+      {items.map((row: any, i: number) => (
+        <Box key={i} sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
+          borderBottom: i < items.length - 1 ? "1px solid #f1f5f9" : "none", alignItems: "center", "&:hover": { backgroundColor: hoverBg } }}>
+          {keys.map((k, j) => {
+            const val = row[k];
+            const displayVal = val === null || val === undefined ? "—" : typeof val === "object" ? JSON.stringify(val) : String(val);
+            const isExit = displayVal.toLowerCase().includes("exit");
+            return (
+              <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13,
+                fontWeight: j === 0 ? 600 : isExit ? 600 : 400,
+                color: isExit ? "#dc2626" : j === 0 ? "#1e293b" : "#475569",
+                fontFamily: k.includes("exposure") || k.includes("capital") || k.includes("price") ? "monospace" : "inherit",
+              }}>
+                {displayVal}
+              </Typography>
+            );
+          })}
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
 const WeeklyFocus: React.FC<Props> = ({ data }) => {
   if (!data) return null;
+  if (typeof data === "string") {
+    return (<Box sx={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 2.5, p: 2.5 }}>
+      <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+    </Box>);
+  }
 
-  const monitoring = data.immediate_monitoring || data.monitoring;
-  const earningsWatch: any[] = data.earnings_watch || [];
-  const actionPlan: any[] = data.action_plan || data.weekly_action_plan || [];
+  const monitoring = data.immediate_monitoring || data.monitoring || data.alert;
+  const earningsWatch: any[] = extractRows(data.earnings_watch || data.earnings || data.watch);
+  const macroWatch = data.macro_watch || data.macro_monitoring || data.macro;
+  const actionPlan: any[] = extractRows(data.action_plan || data.weekly_action_plan || data.actions || data.rows);
+  const hasStructuredData = monitoring || earningsWatch.length > 0 || actionPlan.length > 0 || macroWatch;
+  if (!hasStructuredData) return <GenericDataRenderer data={data} accentColor="#f97316" />;
 
   return (
     <Box>
-      {/* Immediate Monitoring Alert */}
       {monitoring && (
-        <Box
-          sx={{
-            backgroundColor: "#fff7ed",
-            border: "1px solid #fed7aa",
-            borderRadius: 2,
-            p: 2.5,
-            mb: 3,
-          }}
-        >
-          <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#ea580c", mb: 0.5 }}>
-            Immediate Monitoring
-          </Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-            {typeof monitoring === "string"
-              ? monitoring
-              : monitoring.content || monitoring.text || monitoring.description}
+        <Box sx={{ background: "linear-gradient(135deg, #fff7ed, #ffedd5)", border: "1px solid #fdba74", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#ea580c", mb: 1 }}>Immediate Monitoring Items</Typography>
+          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+            {typeof monitoring === "string" ? monitoring : monitoring.content || monitoring.text || monitoring.description}
           </Typography>
         </Box>
       )}
-
-      {/* Earnings Watch Table */}
       {earningsWatch.length > 0 && (
         <Box sx={{ mb: 3 }}>
-          <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1.5 }}>
-            Earnings Watch
-          </Typography>
-          <Box
-            sx={{
-              border: "1px solid #e2e8f0",
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "0.7fr 0.7fr 0.8fr 1.5fr 1.5fr",
-                backgroundColor: "#f8fafc",
-                borderBottom: "1px solid #e2e8f0",
-              }}
-            >
-              {["DATE", "TICKER", "EXPOSURE", "KEY RISK", "PREPARATION"].map((h) => (
-                <Typography
-                  key={h}
-                  sx={{
-                    px: 2,
-                    py: 1.2,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: 0.8,
-                    color: "#475569",
-                  }}
-                >
-                  {h}
-                </Typography>
-              ))}
-            </Box>
-
-            {earningsWatch.map((row: any, i: number) => (
-              <Box
-                key={i}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "0.7fr 0.7fr 0.8fr 1.5fr 1.5fr",
-                  borderBottom: i < earningsWatch.length - 1 ? "1px solid #f1f5f9" : "none",
-                  "&:hover": { backgroundColor: "#fafbfc" },
-                }}
-              >
-                <Typography
-                  sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b" }}
-                >
-                  {row.date}
-                </Typography>
-                <Typography
-                  sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 700, color: "#2563eb" }}
-                >
-                  {row.ticker}
-                </Typography>
-                <Typography
-                  sx={{
-                    px: 2,
-                    py: 1.5,
-                    fontSize: 13,
-                    color: "#475569",
-                    fontFamily: "monospace",
-                  }}
-                >
-                  {row.exposure}
-                </Typography>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#475569" }}>
-                  {row.key_risk}
-                </Typography>
-                <Typography
-                  sx={{
-                    px: 2,
-                    py: 1.5,
-                    fontSize: 13,
-                    color: row.preparation?.toLowerCase?.().includes("exit")
-                      ? "#dc2626"
-                      : "#475569",
-                    fontWeight: row.preparation?.toLowerCase?.().includes("exit")
-                      ? 600
-                      : 400,
-                  }}
-                >
-                  {row.preparation}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+          <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1.5, color: "#1e293b" }}>Earnings Watch (This Week and Next)</Typography>
+          {renderDynamicTable(earningsWatch, "#f97316", "#fff7ed")}
         </Box>
       )}
-
-      {/* Weekly Action Plan */}
+      {macroWatch && (
+        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #f1f5f9)", border: "1px solid #e2e8f0", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 1 }}>Macro Watch</Typography>
+          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+            {typeof macroWatch === "string" ? macroWatch : macroWatch.content || macroWatch.text || macroWatch.description}
+          </Typography>
+        </Box>
+      )}
       {actionPlan.length > 0 && (
         <Box>
-          <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1.5 }}>
-            Weekly Action Plan
-          </Typography>
-          <Box
-            sx={{
-              border: "1px solid #e2e8f0",
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "0.5fr 2fr 1.5fr 1fr",
-                backgroundColor: "#f8fafc",
-                borderBottom: "1px solid #e2e8f0",
-              }}
-            >
-              {["PRIORITY", "ACTION", "TRIGGER", "RESPONSIBLE"].map((h) => (
-                <Typography
-                  key={h}
-                  sx={{
-                    px: 2,
-                    py: 1.2,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: 0.8,
-                    color: "#475569",
-                  }}
-                >
-                  {h}
-                </Typography>
-              ))}
-            </Box>
-
-            {actionPlan.map((row: any, i: number) => (
-              <Box
-                key={i}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "0.5fr 2fr 1.5fr 1fr",
-                  borderBottom: i < actionPlan.length - 1 ? "1px solid #f1f5f9" : "none",
-                  alignItems: "center",
-                  "&:hover": { backgroundColor: "#fafbfc" },
-                }}
-              >
-                <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#475569" }}>
-                    {row.priority}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: "50%",
-                      backgroundColor: priorityDot(row.priority),
-                    }}
-                  />
-                </Box>
-                <Typography
-                  sx={{ px: 2, py: 1.5, fontSize: 13, color: "#1e293b", fontWeight: 500 }}
-                >
-                  {row.action}
-                </Typography>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#475569" }}>
-                  {row.trigger}
-                </Typography>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#64748b" }}>
-                  {row.responsible}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+          <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1.5, color: "#1e293b" }}>Weekly Action Plan</Typography>
+          {renderDynamicTable(actionPlan, "#f97316", "#fff7ed")}
         </Box>
       )}
     </Box>
