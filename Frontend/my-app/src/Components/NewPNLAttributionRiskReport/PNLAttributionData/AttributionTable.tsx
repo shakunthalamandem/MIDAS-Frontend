@@ -39,6 +39,21 @@ const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
 
 const formatPctVal = (value: number) => `${value.toFixed(2)}%`;
 
+// Sort comparator that always pins "OTHER" rows to the bottom
+const pinOtherComparator =
+  (defaultCompare: (a: any, b: any) => number) =>
+  (v1: any, v2: any, params1: any, params2: any) => {
+    const isOther1 = params1.api.getRow(params1.id)?.name?.toUpperCase() === "OTHER";
+    const isOther2 = params2.api.getRow(params2.id)?.name?.toUpperCase() === "OTHER";
+    if (isOther1 && !isOther2) return 1;
+    if (!isOther1 && isOther2) return -1;
+    if (isOther1 && isOther2) return 0;
+    return defaultCompare(v1, v2);
+  };
+
+const numericCompare = (a: any, b: any) => (a ?? 0) - (b ?? 0);
+const stringCompare = (a: any, b: any) => String(a ?? "").localeCompare(String(b ?? ""));
+
 const CustomToolbar = () => (
   <Box className="attr-datagrid-toolbar">
     <GridToolbarExport
@@ -68,6 +83,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         flex: 1.4,
         minWidth: 200,
         cellClassName: "attr-datagrid-cell--name",
+        sortComparator: pinOtherComparator(stringCompare),
       },
       {
         field: "dtd_pnl",
@@ -77,6 +93,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--pnl",
         headerAlign: "right",
         align: "right",
+        sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.dtd_pnl_pct : value,
         renderCell: ({ row }) =>
@@ -92,6 +109,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--pnl",
         headerAlign: "right",
         align: "right",
+        sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.mtd_pnl_pct : value,
         renderCell: ({ row }) =>
@@ -107,6 +125,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--pnl",
         headerAlign: "right",
         align: "right",
+        sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.ytd_pnl_pct : value,
         renderCell: ({ row }) =>
@@ -122,6 +141,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "right",
         align: "right",
+        sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.net_exp_pct : value,
         renderCell: ({ row }) =>
@@ -137,6 +157,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "right",
         align: "right",
+        sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.beta_adj_net_pct : value,
         renderCell: ({ row }) =>
