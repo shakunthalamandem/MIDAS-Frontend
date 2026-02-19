@@ -89,18 +89,18 @@ const sectionIconMap: Record<string, React.ReactNode> = {
 };
 
 const sectionGradients: Record<string, string> = {
-  executive_risk_dashboard: "linear-gradient(90deg, #ec4899, #a855f7)",
-  cio_decision_brief: "linear-gradient(90deg, #f97316, #ec4899)",
-  immediate_decisions: "linear-gradient(90deg, #ec4899, #a855f7)",
-  base_model_discipline_scorecard: "linear-gradient(90deg, #ec4899, #a855f7)",
-  sector_peer_news_map: "linear-gradient(90deg, #3b82f6, #a855f7)",
-  macro_event_risk_calendar: "linear-gradient(90deg, #3b82f6, #06b6d4)",
-  technical_risk_overlay: "linear-gradient(90deg, #06b6d4, #3b82f6)",
-  opportunity_engine: "linear-gradient(90deg, #10b981, #06b6d4)",
-  upcoming_week_focus: "linear-gradient(90deg, #f97316, #eab308)",
-  upcoming_month_strategic_outlook: "linear-gradient(90deg, #f97316, #ec4899)",
-  role_specific_action_checklists: "linear-gradient(90deg, #10b981, #06b6d4)",
-  final_prioritized_action_matrix: "linear-gradient(90deg, #a855f7, #3b82f6)",
+  executive_risk_dashboard: "linear-gradient(135deg, #1e3a5f, #2563eb)",
+  cio_decision_brief: "linear-gradient(135deg, #92400e, #d97706)",
+  immediate_decisions: "linear-gradient(135deg, #991b1b, #dc2626)",
+  base_model_discipline_scorecard: "linear-gradient(135deg, #4c1d95, #7c3aed)",
+  sector_peer_news_map: "linear-gradient(135deg, #0c4a6e, #0284c7)",
+  macro_event_risk_calendar: "linear-gradient(135deg, #1e3a5f, #2563eb)",
+  technical_risk_overlay: "linear-gradient(135deg, #164e63, #0891b2)",
+  opportunity_engine: "linear-gradient(135deg, #064e3b, #059669)",
+  upcoming_week_focus: "linear-gradient(135deg, #7c2d12, #ea580c)",
+  upcoming_month_strategic_outlook: "linear-gradient(135deg, #4c1d95, #7c3aed)",
+  role_specific_action_checklists: "linear-gradient(135deg, #064e3b, #059669)",
+  final_prioritized_action_matrix: "linear-gradient(135deg, #1e3a5f, #4f46e5)",
 };
 
 const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
@@ -242,7 +242,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+          background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -255,7 +255,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             width: "100%",
             backgroundColor: "#fff",
             borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.25)",
             p: 4,
             textAlign: "center",
           }}
@@ -265,7 +265,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
               width: 56,
               height: 56,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #ec4899, #a855f7)",
+              background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -275,10 +275,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
           >
             <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#0f172a" }}>
             CIO Report Viewer
           </Typography>
-          <Typography sx={{ color: "#64748b", fontSize: 14, mb: 3 }}>
+          <Typography sx={{ color: "#334155", fontSize: 14, mb: 3 }}>
             Select a report to view the daily capital allocation analysis
           </Typography>
 
@@ -327,12 +327,12 @@ const PortfolioReportDocumentMain: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#f8fafc",
+          background: "linear-gradient(135deg, #0f172a, #1e3a5f)",
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <CircularProgress sx={{ color: "#a855f7", mb: 2 }} />
-          <Typography sx={{ color: "#64748b" }}>Loading report...</Typography>
+          <CircularProgress sx={{ color: "#2563eb", mb: 2 }} />
+          <Typography sx={{ color: "#94a3b8" }}>Loading report...</Typography>
         </Box>
       </Box>
     );
@@ -346,18 +346,18 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
   return (  
     <Container maxWidth='xl' sx={{mb:4}}>
-    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#f8fafc" }}>
+    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#eef2ff" }}>
       {/* ===== Sidebar ===== */}
       <Box
         sx={{
           width: sw,
           minWidth: sw,
           transition: "width 0.3s ease, min-width 0.3s ease",
-          borderRight: "1px solid #e2e8f0",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#fff",
+          background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
           overflow: "hidden",
+          boxShadow: "4px 0 24px rgba(0,0,0,0.15)",
         }}
       >
         {/* Logo */}
@@ -368,7 +368,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 1.5,
-            borderBottom: "1px solid #f1f5f9",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
             minHeight: 52,
           }}
         >
@@ -378,7 +378,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
               height: 32,
               minWidth: 32,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #ec4899, #a855f7)",
+              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -394,6 +394,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 letterSpacing: 1.5,
                 whiteSpace: "nowrap",
                 flex: 1,
+                color: "#fff",
               }}
             >
               CIO REPORT
@@ -402,7 +403,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
           <IconButton
             size="small"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto" }}
+            sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto", color: "#94a3b8", "&:hover": { color: "#fff" } }}
           >
             {sidebarOpen ? (
               <ChevronLeftIcon fontSize="small" />
@@ -428,18 +429,19 @@ const PortfolioReportDocumentMain: React.FC = () => {
                   py: 1.1,
                   cursor: "pointer",
                   borderLeft: isActive
-                    ? "3px solid #a855f7"
+                    ? "3px solid #3b82f6"
                     : "3px solid transparent",
                   backgroundColor: isActive
-                    ? "rgba(168, 85, 247, 0.08)"
+                    ? "rgba(37, 99, 235, 0.15)"
                     : "transparent",
-                  color: isActive ? "#7c3aed" : "#64748b",
+                  color: isActive ? "#60a5fa" : "#94a3b8",
                   transition: "all 0.2s",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   "&:hover": {
                     backgroundColor: isActive
-                      ? "rgba(168, 85, 247, 0.08)"
-                      : "rgba(100, 116, 139, 0.06)",
+                      ? "rgba(37, 99, 235, 0.15)"
+                      : "rgba(255, 255, 255, 0.05)",
+                    color: isActive ? "#60a5fa" : "#cbd5e1",
                   },
                 }}
               >
@@ -472,9 +474,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
               px: 2,
               py: 1.5,
               fontSize: 10,
-              color: "#94a3b8",
+              color: "#64748b",
               letterSpacing: 0.5,
-              borderTop: "1px solid #f1f5f9",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
               textTransform: "uppercase",
             }}
           >
@@ -490,8 +492,8 @@ const PortfolioReportDocumentMain: React.FC = () => {
           sx={{
             px: 3,
             py: 1.5,
-            borderBottom: "1px solid #e2e8f0",
-            background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
+            borderBottom: "1px solid #c7d2fe",
+            background: "#fff",
             display: "flex",
             alignItems: "center",
             gap: 2,
@@ -503,17 +505,18 @@ const PortfolioReportDocumentMain: React.FC = () => {
             onClick={handleBack}
             sx={{
               mr: 0.5,
-              backgroundColor: "#f1f5f9",
-              "&:hover": { backgroundColor: "#e2e8f0" },
+              backgroundColor: "#eef2ff",
+              color: "#1e3a5f",
+              "&:hover": { backgroundColor: "#c7d2fe" },
             }}
           >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.3 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.3, color: "#0f172a" }}>
               {header.report_title}
             </Typography>
-            <Typography sx={{ color: "#64748b", fontSize: 12.5 }}>
+            <Typography sx={{ color: "#334155", fontSize: 12.5 }}>
               {formatDate(header.date)}
               {header.aum_formatted && ` · AUM: ${header.aum_formatted}`}
               {header.classification && ` · ${header.classification}`}
@@ -525,12 +528,12 @@ const PortfolioReportDocumentMain: React.FC = () => {
               label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
               size="small"
               sx={{
-                background: "linear-gradient(135deg, #ec4899, #a855f7)",
+                background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: 12,
                 height: 30,
-                boxShadow: "0 2px 8px rgba(168,85,247,0.3)",
+                boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
               }}
             />
           )}
@@ -539,7 +542,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
               label={`DTD: ${header.dtd}`}
               size="small"
               sx={{
-                backgroundColor: "#1e293b",
+                backgroundColor: "#0f172a",
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: 12,
@@ -632,7 +635,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    border: "1px solid #e2e8f0",
+                    border: "1px solid #c7d2fe",
                     borderTop: "none",
                     borderRadius: "0 0 12px 12px",
                     p: 3,

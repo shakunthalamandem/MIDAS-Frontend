@@ -22,7 +22,7 @@ const sensitivityColor = (level: string): string => {
   if (l.includes("CRITICAL")) return "#dc2626";
   if (l.includes("HIGH")) return "#ea580c";
   if (l.includes("MEDIUM")) return "#d97706";
-  return "#475569";
+  return "#1e293b";
 };
 
 const formatCurrency = (val: number): string => {
@@ -41,7 +41,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
   if (typeof data === "string") {
     return (
       <Box sx={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -65,7 +65,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
       {events.length > 0 && eventKeys.length > 0 && (
         <Box sx={{ mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1.5, color: "#1e293b" }}>Upcoming High-Impact Events</Typography>
-          <Box sx={{ border: "1px solid #e2e8f0", borderRadius: 2.5, overflow: "hidden" }}>
+          <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
             <Box
               sx={{
                 display: "grid",
@@ -86,7 +86,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: `repeat(${eventKeys.length}, 1fr)`,
-                  borderBottom: i < events.length - 1 ? "1px solid #f1f5f9" : "none",
+                  borderBottom: i < events.length - 1 ? "1px solid #e0e7ff" : "none",
                   alignItems: "center",
                   "&:hover": { backgroundColor: "#eff6ff" },
                 }}
@@ -103,7 +103,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
                         py: 1.5,
                         fontSize: 13,
                         fontWeight: j === 0 ? 600 : isSensitivity ? 700 : 400,
-                        color: isSensitivity ? sensitivityColor(displayVal) : j === 0 ? "#1e293b" : "#475569",
+                        color: isSensitivity ? sensitivityColor(displayVal) : j === 0 ? "#1e293b" : "#334155",
                       }}
                     >
                       {displayVal}
@@ -116,30 +116,30 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
         </Box>
       )}
       {sensitivity && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #eff6ff)", border: "1px solid #bfdbfe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #eff6ff)", border: "1px solid #bfdbfe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 1 }}>Portfolio Sensitivity to Volatility Increase</Typography>
           {typeof sensitivity === "string" ? (
-            <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>{sensitivity}</Typography>
+            <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>{sensitivity}</Typography>
           ) : (
             <Box>
               {(sensitivity.current_vix != null || sensitivity.scenario_vix != null) && (
                 <Box sx={{ display: "flex", gap: 3, mb: 1.5, flexWrap: "wrap" }}>
                   {sensitivity.current_vix != null && (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                      <Typography sx={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>Current VIX:</Typography>
+                      <Typography sx={{ fontSize: 12, color: "#334155", fontWeight: 600 }}>Current VIX:</Typography>
                       <Typography sx={{ fontSize: 14, color: "#1e293b", fontWeight: 700, fontFamily: "monospace" }}>{sensitivity.current_vix}</Typography>
                     </Box>
                   )}
                   {sensitivity.scenario_vix != null && (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                      <Typography sx={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>Scenario VIX:</Typography>
+                      <Typography sx={{ fontSize: 12, color: "#334155", fontWeight: 600 }}>Scenario VIX:</Typography>
                       <Typography sx={{ fontSize: 14, color: "#ea580c", fontWeight: 700, fontFamily: "monospace" }}>{sensitivity.scenario_vix}</Typography>
                     </Box>
                   )}
                 </Box>
               )}
               {sensitivity.scenario_description && (
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, mb: 1.5 }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, mb: 1.5 }}>
                   {sensitivity.scenario_description}
                 </Typography>
               )}
@@ -160,7 +160,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
               )}
               {/* Fallback for other string-like fields */}
               {!sensitivity.current_vix && !sensitivity.scenario_description && !sensitivity.estimated_portfolio_loss_dollars && (
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
                   {sensitivity.content || sensitivity.description || sensitivity.text || JSON.stringify(sensitivity)}
                 </Typography>
               )}
@@ -171,7 +171,7 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
       {scenario && (
         <Box sx={{ background: "linear-gradient(135deg, #fef2f2, #fff1f2)", border: "1px solid #fecaca", borderRadius: 2.5, p: 2.5 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#dc2626", mb: 1 }}>Most Dangerous Scenario Next 30 Days</Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
             {typeof scenario === "string" ? scenario : scenario.content || scenario.description || scenario.text}
           </Typography>
         </Box>

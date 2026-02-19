@@ -27,7 +27,7 @@ const CIODecisionBrief: React.FC<Props> = ({ data }) => {
   if (typeof data === "string") {
     return (
       <Box sx={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -44,7 +44,7 @@ const CIODecisionBrief: React.FC<Props> = ({ data }) => {
         const style = getUrgencyStyle(item.urgency || item.execution_window || item.timeline || item.time_sensitivity || "");
         return (
           <Box key={i} sx={{
-            backgroundColor: "#fff", border: "1px solid #e2e8f0", borderLeft: `4px solid ${style.dot}`,
+            backgroundColor: "#fff", border: "1px solid #c7d2fe", borderLeft: `4px solid ${style.dot}`,
             borderRadius: 2, p: 2.5, mb: 2, display: "flex", alignItems: "flex-start", gap: 2,
             transition: "all 0.2s", "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)", transform: "translateY(-1px)" },
           }}>
@@ -59,27 +59,27 @@ const CIODecisionBrief: React.FC<Props> = ({ data }) => {
               <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 0.5 }}>
                 {item.title || item.action || item.name || item.ticker}
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#64748b", mb: 1, lineHeight: 1.6 }}>
+              <Typography sx={{ fontSize: 13, color: "#334155", mb: 1, lineHeight: 1.6 }}>
                 {item.description || item.rationale || item.content || item.text || item.detail}
               </Typography>
               {item.base_model_tie_in && (
-                <Typography sx={{ fontSize: 12, color: "#64748b", mb: 1, lineHeight: 1.5, fontStyle: "italic" }}>
+                <Typography sx={{ fontSize: 12, color: "#334155", mb: 1, lineHeight: 1.5, fontStyle: "italic" }}>
                   {item.base_model_tie_in}
                 </Typography>
               )}
               <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                 {(item.capital_impact_formatted || item.capital || item.capital_impact) && (
-                  <Typography sx={{ fontSize: 12, color: "#475569" }}>
+                  <Typography sx={{ fontSize: 12, color: "#1e293b" }}>
                     Capital: <Box component="span" sx={{ fontWeight: 600, fontFamily: "monospace", color: "#1e293b" }}>{item.capital_impact_formatted || item.capital || item.capital_impact}</Box>
                   </Typography>
                 )}
                 {(item.responsible_role || item.responsible) && (
-                  <Typography sx={{ fontSize: 12, color: "#475569" }}>
+                  <Typography sx={{ fontSize: 12, color: "#1e293b" }}>
                     Responsible: <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>{item.responsible_role || item.responsible}</Box>
                   </Typography>
                 )}
                 {item.severity_score && (
-                  <Typography sx={{ fontSize: 12, color: "#475569" }}>
+                  <Typography sx={{ fontSize: 12, color: "#1e293b" }}>
                     Severity: <Box component="span" sx={{ fontWeight: 600, color: "#dc2626" }}>{item.severity_score}</Box>
                   </Typography>
                 )}

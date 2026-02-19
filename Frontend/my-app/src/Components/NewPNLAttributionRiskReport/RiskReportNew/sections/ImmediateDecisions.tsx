@@ -20,7 +20,7 @@ const ImmediateDecisions: React.FC<Props> = ({ data }) => {
   if (typeof data === "string") {
     return (
       <Box sx={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -37,7 +37,7 @@ const ImmediateDecisions: React.FC<Props> = ({ data }) => {
         const badge = urgencyBadge(item.urgency || item.time_sensitivity || item.timeline || "");
         return (
           <Box key={i} sx={{
-            backgroundColor: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${badge.dot}`,
+            backgroundColor: "#fff", border: "1px solid #c7d2fe", borderTop: `3px solid ${badge.dot}`,
             borderRadius: 2, p: 2.5, transition: "all 0.2s",
             "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.08)", transform: "translateY(-1px)" },
           }}>
@@ -70,13 +70,13 @@ const ImmediateDecisions: React.FC<Props> = ({ data }) => {
                 { label: "DESCRIPTION", value: item.description || item.rationale },
                 { label: "SEVERITY", value: item.severity_score },
               ].filter((f) => f.value).map((field, j) => (
-                <Box key={j} sx={{ backgroundColor: "#f8fafc", borderRadius: 1.5, p: 1.5 }}>
-                  <Typography sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, color: "#94a3b8", textTransform: "uppercase", mb: 0.5 }}>
+                <Box key={j} sx={{ backgroundColor: "#f0f7ff", borderRadius: 1.5, p: 1.5 }}>
+                  <Typography sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>
                     {field.label}
                   </Typography>
                   <Typography sx={{
                     fontSize: 12, lineHeight: 1.4,
-                    color: field.label === "RECOMMENDED ACTION" ? "#dc2626" : "#475569",
+                    color: field.label === "RECOMMENDED ACTION" ? "#dc2626" : "#1e293b",
                     fontWeight: field.label === "RECOMMENDED ACTION" ? 600 : 400,
                   }}>{field.value}</Typography>
                 </Box>

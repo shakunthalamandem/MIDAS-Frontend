@@ -12,7 +12,7 @@ const formatKey = (key: string): string =>
   key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 const cellColor = (value: string): string => {
-  if (!value) return "#475569";
+  if (!value) return "#1e293b";
   const v = value.toLowerCase();
   if (v.includes("immediate") || v.includes("critical") || v.includes("exit") || v.includes("fail"))
     return "#dc2626";
@@ -20,7 +20,7 @@ const cellColor = (value: string): string => {
     return "#ea580c";
   if (v.includes("pass") || v.includes("strong") || v.includes("add"))
     return "#059669";
-  return "#475569";
+  return "#1e293b";
 };
 
 const renderValue = (val: any): string => {
@@ -41,7 +41,7 @@ const renderArrayTable = (items: any[], accentColor?: string) => {
   return (
     <Box
       sx={{
-        border: "1px solid #e2e8f0",
+        border: "1px solid #c7d2fe",
         borderRadius: 2,
         overflow: "hidden",
         mb: 2,
@@ -51,9 +51,9 @@ const renderArrayTable = (items: any[], accentColor?: string) => {
         sx={{
           display: "grid",
           gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-          backgroundColor: accentColor ? `${accentColor}08` : "#f8fafc",
+          backgroundColor: accentColor ? `${accentColor}08` : "#f0f7ff",
           borderBottom: "2px solid",
-          borderColor: accentColor || "#e2e8f0",
+          borderColor: accentColor || "#c7d2fe",
         }}
       >
         {keys.map((k) => (
@@ -65,7 +65,7 @@ const renderArrayTable = (items: any[], accentColor?: string) => {
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: 0.8,
-              color: accentColor || "#475569",
+              color: accentColor || "#1e293b",
               textTransform: "uppercase",
             }}
           >
@@ -80,8 +80,8 @@ const renderArrayTable = (items: any[], accentColor?: string) => {
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-            borderBottom: i < items.length - 1 ? "1px solid #f1f5f9" : "none",
-            "&:hover": { backgroundColor: "#fafbfc" },
+            borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none",
+            "&:hover": { backgroundColor: "#f0f7ff" },
           }}
         >
           {keys.map((k, j) => (
@@ -115,7 +115,7 @@ const renderStringList = (items: string[]) => (
       <Typography
         component="li"
         key={i}
-        sx={{ fontSize: 13, color: "#475569", mb: 0.5, lineHeight: 1.6 }}
+        sx={{ fontSize: 13, color: "#1e293b", mb: 0.5, lineHeight: 1.6 }}
       >
         {item}
       </Typography>
@@ -125,8 +125,8 @@ const renderStringList = (items: string[]) => (
 
 /** Renders a single text block */
 const renderText = (text: string) => (
-  <Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2, p: 2.5 }}>
-    <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+  <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2, p: 2.5 }}>
+    <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
       {text}
     </Typography>
   </Box>
@@ -144,7 +144,7 @@ const renderObjectCards = (data: Record<string, any>) => {
           key={key}
           sx={{
             backgroundColor: "#fff",
-            border: "1px solid #e2e8f0",
+            border: "1px solid #c7d2fe",
             borderRadius: 2,
             p: 2,
             "&:hover": { boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
@@ -154,7 +154,7 @@ const renderObjectCards = (data: Record<string, any>) => {
             sx={{
               fontSize: 11,
               fontWeight: 700,
-              color: "#94a3b8",
+              color: "#475569",
               textTransform: "uppercase",
               letterSpacing: 0.8,
               mb: 1,
@@ -163,7 +163,7 @@ const renderObjectCards = (data: Record<string, any>) => {
             {formatKey(key)}
           </Typography>
           {typeof val === "string" ? (
-            <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+            <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
               {val}
             </Typography>
           ) : Array.isArray(val) && val.length > 0 ? (
@@ -172,14 +172,14 @@ const renderObjectCards = (data: Record<string, any>) => {
             ) : typeof val[0] === "object" ? (
               renderArrayTable(val)
             ) : (
-              <Typography sx={{ fontSize: 13, color: "#475569" }}>
+              <Typography sx={{ fontSize: 13, color: "#1e293b" }}>
                 {val.join(", ")}
               </Typography>
             )
           ) : typeof val === "object" && val !== null ? (
             <Box>
               {Object.entries(val).map(([subKey, subVal]) => (
-                <Typography key={subKey} sx={{ fontSize: 12, color: "#475569", mb: 0.3 }}>
+                <Typography key={subKey} sx={{ fontSize: 12, color: "#1e293b", mb: 0.3 }}>
                   <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>
                     {formatKey(subKey)}:
                   </Box>{" "}
@@ -188,7 +188,7 @@ const renderObjectCards = (data: Record<string, any>) => {
               ))}
             </Box>
           ) : (
-            <Typography sx={{ fontSize: 13, color: "#475569" }}>{renderValue(val)}</Typography>
+            <Typography sx={{ fontSize: 13, color: "#1e293b" }}>{renderValue(val)}</Typography>
           )}
         </Box>
       ))}
@@ -243,7 +243,7 @@ const GenericDataRenderer: React.FC<GenericDataRendererProps> = ({ data, accentC
                 key={key}
                 sx={{
                   backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
+                  border: "1px solid #c7d2fe",
                   borderRadius: 2,
                   p: 2,
                 }}
@@ -253,14 +253,14 @@ const GenericDataRenderer: React.FC<GenericDataRendererProps> = ({ data, accentC
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: 0.8,
-                    color: "#94a3b8",
+                    color: "#475569",
                     textTransform: "uppercase",
                     mb: 0.5,
                   }}
                 >
                   {formatKey(key)}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
                   {val as string}
                 </Typography>
               </Box>

@@ -32,7 +32,7 @@ const getSectionColor = (title: string) => {
   for (const [key, val] of Object.entries(sectionColors)) {
     if (lower.includes(key)) return val;
   }
-  return { title: "#475569", border: "#e2e8f0", headerBg: "linear-gradient(135deg, #f8fafc, #f1f5f9)", hoverBg: "#f8fafc" };
+  return { title: "#1e293b", border: "#c7d2fe", headerBg: "linear-gradient(135deg, #f0f7ff, #e0e7ff)", hoverBg: "#f0f7ff" };
 };
 
 const renderTable = (title: string, items: any) => {
@@ -56,14 +56,14 @@ const renderTable = (title: string, items: any) => {
         </Box>
         {rows.map((row: any, i: number) => (
           <Box key={i} sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-            borderBottom: i < rows.length - 1 ? "1px solid #f1f5f9" : "none", "&:hover": { backgroundColor: colors.hoverBg } }}>
+            borderBottom: i < rows.length - 1 ? "1px solid #e0e7ff" : "none", "&:hover": { backgroundColor: colors.hoverBg } }}>
             {keys.map((k) => {
               const val = row[k];
               const displayVal = val === null || val === undefined ? "—" : typeof val === "object" ? JSON.stringify(val) : String(val);
               const isTicker = k.toLowerCase() === "ticker" || k.toLowerCase() === "name" || k.toLowerCase() === "symbol";
               return (
                 <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13,
-                  color: isTicker ? "#1e293b" : "#475569", fontWeight: isTicker ? 700 : 400,
+                  color: isTicker ? "#1e293b" : "#334155", fontWeight: isTicker ? 700 : 400,
                   fontFamily: ["rsi", "price", "value"].some((s) => k.includes(s)) ? "monospace" : "inherit" }}>
                   {displayVal}
                 </Typography>
@@ -87,8 +87,8 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
   if (!data) return null;
   if (typeof data === "string") {
     return (
-      <Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+      <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -118,9 +118,9 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
         if (hasTableData(val)) return renderTable(key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), val);
         /* String narratives */
         if (typeof val === "string") return (
-          <Box key={key} sx={{ backgroundColor: "#f8fafc", borderRadius: 2, p: 2, mb: 2 }}>
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, mb: 0.5 }}>{key.replace(/_/g, " ")}</Typography>
-            <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{val}</Typography>
+          <Box key={key} sx={{ backgroundColor: "#f0f7ff", borderRadius: 2, p: 2, mb: 2 }}>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: 0.8, mb: 0.5 }}>{key.replace(/_/g, " ")}</Typography>
+            <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{val}</Typography>
           </Box>
         );
         return null;

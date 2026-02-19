@@ -41,7 +41,7 @@ const renderDynamicTable = (items: any[], accentColor: string, hoverBg: string) 
       </Box>
       {items.map((row: any, i: number) => (
         <Box key={i} sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-          borderBottom: i < items.length - 1 ? "1px solid #f1f5f9" : "none", alignItems: "center", "&:hover": { backgroundColor: hoverBg } }}>
+          borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none", alignItems: "center", "&:hover": { backgroundColor: hoverBg } }}>
           {keys.map((k, j) => {
             const val = row[k];
             const displayVal = val === null || val === undefined ? "—" : typeof val === "object" ? JSON.stringify(val) : String(val);
@@ -49,7 +49,7 @@ const renderDynamicTable = (items: any[], accentColor: string, hoverBg: string) 
             return (
               <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13,
                 fontWeight: j === 0 ? 600 : isExit ? 600 : 400,
-                color: isExit ? "#dc2626" : j === 0 ? "#1e293b" : "#475569",
+                color: isExit ? "#dc2626" : j === 0 ? "#1e293b" : "#334155",
                 fontFamily: k.includes("exposure") || k.includes("capital") || k.includes("price") ? "monospace" : "inherit",
               }}>
                 {displayVal}
@@ -66,7 +66,7 @@ const WeeklyFocus: React.FC<Props> = ({ data }) => {
   if (!data) return null;
   if (typeof data === "string") {
     return (<Box sx={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 2.5, p: 2.5 }}>
-      <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+      <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
     </Box>);
   }
 
@@ -82,7 +82,7 @@ const WeeklyFocus: React.FC<Props> = ({ data }) => {
       {monitoring && (
         <Box sx={{ background: "linear-gradient(135deg, #fff7ed, #ffedd5)", border: "1px solid #fdba74", borderRadius: 2.5, p: 2.5, mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#ea580c", mb: 1 }}>Immediate Monitoring Items</Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
             {typeof monitoring === "string" ? monitoring : monitoring.content || monitoring.text || monitoring.description}
           </Typography>
         </Box>
@@ -94,9 +94,9 @@ const WeeklyFocus: React.FC<Props> = ({ data }) => {
         </Box>
       )}
       {macroWatch && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #f1f5f9)", border: "1px solid #e2e8f0", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #e0e7ff)", border: "1px solid #c7d2fe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 1 }}>Macro Watch</Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
             {typeof macroWatch === "string" ? macroWatch : macroWatch.content || macroWatch.text || macroWatch.description}
           </Typography>
         </Box>

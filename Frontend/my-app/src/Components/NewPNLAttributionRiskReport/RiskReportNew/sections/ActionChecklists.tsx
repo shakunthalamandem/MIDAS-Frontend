@@ -21,14 +21,14 @@ const getRoleColor = (key: string) => {
   for (const [k, v] of Object.entries(roleColors)) {
     if (lower.includes(k)) return v;
   }
-  return { border: "#e2e8f0", title: "#1e293b", bg: "#f8fafc", headerBg: "linear-gradient(135deg, #f8fafc, #f1f5f9)" };
+  return { border: "#c7d2fe", title: "#1e293b", bg: "#f0f7ff", headerBg: "linear-gradient(135deg, #f0f7ff, #e0e7ff)" };
 };
 
 const ActionChecklists: React.FC<Props> = ({ data }) => {
   if (!data) return null;
   if (typeof data === "string") {
-    return (<Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2.5, p: 2.5 }}>
-      <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+    return (<Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+      <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
     </Box>);
   }
 
@@ -72,7 +72,7 @@ const ActionChecklists: React.FC<Props> = ({ data }) => {
             <Box sx={{ p: 2.5 }}>
               <Box component="ol" sx={{ m: 0, pl: 2.5 }}>
                 {role.items.map((item: string, j: number) => (
-                  <Typography component="li" key={j} sx={{ fontSize: 13, color: "#475569", mb: 0.8, lineHeight: 1.5 }}>{item}</Typography>
+                  <Typography component="li" key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.8, lineHeight: 1.5 }}>{item}</Typography>
                 ))}
               </Box>
             </Box>

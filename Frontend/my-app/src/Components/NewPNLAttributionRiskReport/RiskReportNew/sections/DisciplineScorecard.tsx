@@ -11,7 +11,7 @@ const statusColors: Record<string, { bg: string; color: string; border: string }
   breach: { bg: "#fff7ed", color: "#ea580c", border: "#fed7aa" },
   warning: { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
   pass: { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
-  unverifiable: { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0" },
+  unverifiable: { bg: "#e0e7ff", color: "#334155", border: "#c7d2fe" },
 };
 
 const getStatusStyle = (status: string) => {
@@ -37,8 +37,8 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
 
   if (typeof data === "string") {
     return (
-      <Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+      <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -80,7 +80,7 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
   return (
     <Box>
       {rules.length > 0 && dynamicKeys.length > 0 && (
-        <Box sx={{ border: "1px solid #e2e8f0", borderRadius: 2.5, overflow: "hidden", mb: 3 }}>
+        <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden", mb: 3 }}>
           <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
             background: "linear-gradient(135deg, #1e293b, #334155)", borderBottom: "2px solid #1e293b" }}>
             {dynamicKeys.map((h) => (
@@ -92,7 +92,7 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
             const sty = statusVal ? getStatusStyle(String(statusVal)) : undefined;
             return (
               <Box key={i} sx={{ display: "grid", gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-                borderBottom: i < rules.length - 1 ? "1px solid #f1f5f9" : "none", alignItems: "center", "&:hover": { backgroundColor: "#fdf2f8" } }}>
+                borderBottom: i < rules.length - 1 ? "1px solid #e0e7ff" : "none", alignItems: "center", "&:hover": { backgroundColor: "#f5f3ff" } }}>
                 {dynamicKeys.map((k) => {
                   const val = row[k];
                   const displayVal = val === null || val === undefined ? "—" : typeof val === "object" ? JSON.stringify(val) : String(val);
@@ -109,7 +109,7 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
                   return (
                     <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13,
                       fontWeight: isName ? 600 : 400,
-                      color: isName ? "#1e293b" : "#475569",
+                      color: isName ? "#1e293b" : "#334155",
                       fontFamily: isMonospaceCol(k) ? "monospace" : "inherit" }}>
                       {displayVal}
                     </Typography>
@@ -126,7 +126,7 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
             {(typeof assessment === "object" ? (assessment.label || assessment.title || "Discipline Assessment") : "Discipline Assessment")}
             {typeof assessment === "object" && assessment.grade ? `: ${assessment.grade}` : ""}
           </Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
             {typeof assessment === "string" ? assessment : assessment.content || assessment.description || assessment.text}
           </Typography>
         </Box>

@@ -70,8 +70,8 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
 
   if (typeof data === "string") {
     return (
-      <Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+      <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -157,7 +157,7 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
               <Typography sx={{ fontWeight: 700, fontSize: 16, color: "#1e293b", mb: 0.5 }}>
                 {sectorName}
                 {subtitle && (
-                  <Box component="span" sx={{ fontWeight: 400, fontSize: 13, color: "#64748b", ml: 1 }}>
+                  <Box component="span" sx={{ fontWeight: 400, fontSize: 13, color: "#334155", ml: 1 }}>
                     ({subtitle})
                   </Box>
                 )}
@@ -192,19 +192,19 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
                   ))}
                 </Box>
                 <Box>
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.8 }}>{catalystLabel}</Typography>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.8 }}>{catalystLabel}</Typography>
                   {catalystItems.map((item: any, j: number) => (
-                    <Typography key={j} sx={{ fontSize: 13, color: "#475569", mb: 0.3 }}>{renderItem(item)}</Typography>
+                    <Typography key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.3 }}>{renderItem(item)}</Typography>
                   ))}
                 </Box>
               </Box>
             ) : sector.peer_relative_strength && typeof sector.peer_relative_strength === "string" ? (
               /* peer_relative_strength exists but couldn't be split into Strong/Weak - render as text */
               <Box sx={{ mt: 1 }}>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>
                   PEER RELATIVE STRENGTH
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{sector.peer_relative_strength}</Typography>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>{sector.peer_relative_strength}</Typography>
               </Box>
             ) : (
               /* No strong/weak/catalysts columns matched -- render all properties dynamically */
@@ -214,14 +214,14 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
                   if (Array.isArray(val) && val.length > 0) {
                     return (
                       <Box key={key} sx={{ mb: 1.5 }}>
-                        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>{label}</Typography>
+                        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>{label}</Typography>
                         {typeof val[0] === "object" ? (
                           val.map((item: any, j: number) => (
-                            <Typography key={j} sx={{ fontSize: 13, color: "#475569", mb: 0.3 }}>{renderItem(item)}</Typography>
+                            <Typography key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.3 }}>{renderItem(item)}</Typography>
                           ))
                         ) : (
                           val.map((item: any, j: number) => (
-                            <Typography key={j} sx={{ fontSize: 13, color: "#475569", mb: 0.3 }}>{String(item)}</Typography>
+                            <Typography key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.3 }}>{String(item)}</Typography>
                           ))
                         )}
                       </Box>
@@ -230,7 +230,7 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
                   if (typeof val === "string" || typeof val === "number") {
                     return (
                       <Box key={key} sx={{ display: "flex", gap: 1, mb: 0.5 }}>
-                        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{label}:</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#475569" }}>{label}:</Typography>
                         <Typography sx={{ fontSize: 13, color: "#1e293b" }}>{String(val)}</Typography>
                       </Box>
                     );
@@ -238,9 +238,9 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
                   if (typeof val === "object" && val !== null) {
                     return (
                       <Box key={key} sx={{ mb: 1.5 }}>
-                        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>{label}</Typography>
+                        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>{label}</Typography>
                         {Object.entries(val).map(([subK, subV]) => (
-                          <Typography key={subK} sx={{ fontSize: 13, color: "#475569", mb: 0.3 }}>
+                          <Typography key={subK} sx={{ fontSize: 13, color: "#1e293b", mb: 0.3 }}>
                             <Box component="span" sx={{ fontWeight: 600, color: "#1e293b" }}>{subK.replace(/_/g, " ")}:</Box>{" "}
                             {typeof subV === "string" ? subV : JSON.stringify(subV)}
                           </Typography>
@@ -254,25 +254,25 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
             )}
             {/* Emerging themes */}
             {sector.emerging_themes && (
-              <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px dashed #cbd5e140" }}>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>
+              <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px dashed #c7d2fe40" }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>
                   EMERGING THEMES
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{sector.emerging_themes}</Typography>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{sector.emerging_themes}</Typography>
               </Box>
             )}
             {/* Momentum detail */}
             {sector.momentum_detail && (
-              <Box sx={{ mt: 1, pt: 1, borderTop: "1px dashed #cbd5e140" }}>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>
+              <Box sx={{ mt: 1, pt: 1, borderTop: "1px dashed #c7d2fe40" }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase", mb: 0.5 }}>
                   MOMENTUM DETAIL
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{sector.momentum_detail}</Typography>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{sector.momentum_detail}</Typography>
               </Box>
             )}
             {(sector.summary || sector.description || sector.overview) && (
-              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #e2e8f0" }}>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{sector.summary || sector.description || sector.overview}</Typography>
+              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #c7d2fe" }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>{sector.summary || sector.description || sector.overview}</Typography>
               </Box>
             )}
           </Box>
@@ -286,7 +286,7 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
               <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#dc2626", textTransform: "uppercase", mb: 0.5 }}>
                 RISK CLUSTERING
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{riskClustering}</Typography>
+              <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{riskClustering}</Typography>
             </Box>
           )}
           {systemicRiskFlag && (
@@ -294,7 +294,7 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
               <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#d97706", textTransform: "uppercase", mb: 0.5 }}>
                 SYSTEMIC RISK FLAG
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{systemicRiskFlag}</Typography>
+              <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{systemicRiskFlag}</Typography>
             </Box>
           )}
           {portfolioSentimentSkew && (
@@ -302,7 +302,7 @@ const SectorNewsMap: React.FC<Props> = ({ data }) => {
               <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#059669", textTransform: "uppercase", mb: 0.5 }}>
                 PORTFOLIO SENTIMENT SKEW
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{portfolioSentimentSkew}</Typography>
+              <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{portfolioSentimentSkew}</Typography>
             </Box>
           )}
         </Box>

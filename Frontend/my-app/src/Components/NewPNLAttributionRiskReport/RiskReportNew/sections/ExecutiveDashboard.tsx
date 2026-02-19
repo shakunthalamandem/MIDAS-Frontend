@@ -11,7 +11,7 @@ const cardColors: Record<string, { bg: string; border: string; dot: string; titl
   negative: { bg: "#fff7ed", border: "#ffedd5", dot: "#f97316", title: "#ea580c", gradient: "linear-gradient(135deg, #fff7ed, #ffedd5)" },
   risk: { bg: "#fef2f2", border: "#fecaca", dot: "#ef4444", title: "#dc2626", gradient: "linear-gradient(135deg, #fef2f2, #fecaca)" },
   opportunity: { bg: "#ecfdf5", border: "#d1fae5", dot: "#10b981", title: "#059669", gradient: "linear-gradient(135deg, #ecfdf5, #d1fae5)" },
-  neutral: { bg: "#f8fafc", border: "#e2e8f0", dot: "#64748b", title: "#475569", gradient: "linear-gradient(135deg, #f8fafc, #e2e8f0)" },
+  neutral: { bg: "#f0f7ff", border: "#c7d2fe", dot: "#334155", title: "#1e293b", gradient: "linear-gradient(135deg, #f0f7ff, #c7d2fe)" },
 };
 
 const metricCardGradients = [
@@ -69,7 +69,7 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
                     {card.title || card.label || card.name}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
                   {card.content || card.description || card.text || card.value}
                 </Typography>
               </Box>
@@ -88,13 +88,13 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
                 borderRadius: 2.5, p: 2, transition: "all 0.2s",
                 "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)", transform: "translateY(-1px)" },
               }}>
-                <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#64748b", textTransform: "uppercase", mb: 0.5 }}>
+                <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#334155", textTransform: "uppercase", mb: 0.5 }}>
                   {card.label || card.title || card.name}
                 </Typography>
                 <Typography sx={{ fontSize: 22, fontWeight: 700, color: metricValueColor(String(card.value || "")), fontFamily: "monospace", mb: 0.5 }}>
                   {card.value}
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
+                <Typography sx={{ fontSize: 12, color: "#334155", lineHeight: 1.5 }}>
                   {card.interpretation || card.description || card.text}
                 </Typography>
               </Box>
@@ -114,26 +114,26 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
           <Typography sx={{ fontSize: 24, fontWeight: 700, color: "#7c3aed", mb: 0.5 }}>
             {portfolioBias.value || (typeof portfolioBias === "string" ? portfolioBias : "")}
           </Typography>
-          <Typography sx={{ fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
+          <Typography sx={{ fontSize: 12, color: "#334155", lineHeight: 1.5 }}>
             {portfolioBias.text || portfolioBias.description || portfolioBias.interpretation}
           </Typography>
         </Box>
       )}
 
       {riskTable.length > 0 && (
-        <Box sx={{ border: "1px solid #e2e8f0", borderRadius: 2.5, overflow: "hidden" }}>
+        <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-            background: "linear-gradient(135deg, #f8fafc, #f1f5f9)", borderBottom: "2px solid #ec4899" }}>
+            background: "linear-gradient(135deg, #f0f7ff, #e0e7ff)", borderBottom: "2px solid #ec4899" }}>
             {["METRIC", "VALUE", "INTERPRETATION"].map((h) => (
               <Typography key={h} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#be185d" }}>{h}</Typography>
             ))}
           </Box>
           {riskTable.map((row: any, i: number) => (
             <Box key={i} sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-              borderBottom: i < riskTable.length - 1 ? "1px solid #f1f5f9" : "none", "&:hover": { backgroundColor: "#fdf2f8" } }}>
+              borderBottom: i < riskTable.length - 1 ? "1px solid #e0e7ff" : "none", "&:hover": { backgroundColor: "#fdf2f8" } }}>
               <Typography sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{row.metric || row.label || row.name}</Typography>
-              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#475569", fontFamily: "monospace" }}>{row.value}</Typography>
-              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#64748b" }}>{row.interpretation || row.description || row.text}</Typography>
+              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#1e293b", fontFamily: "monospace" }}>{row.value}</Typography>
+              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#334155" }}>{row.interpretation || row.description || row.text}</Typography>
             </Box>
           ))}
         </Box>

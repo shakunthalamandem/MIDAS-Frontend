@@ -28,7 +28,7 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
   if (typeof data === "string") {
     return (
       <Box sx={{ backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", borderRadius: 2.5, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -69,9 +69,9 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
     <Box>
       {/* IPO / FO Pipeline */}
       {ipoPipeline && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #eff6ff)", border: "1px solid #bfdbfe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #eff6ff)", border: "1px solid #bfdbfe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 1 }}>IPO / FO Pipeline</Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
             {typeof ipoPipeline === "string" ? ipoPipeline : ipoPipeline.content || ipoPipeline.text || ipoPipeline.description || JSON.stringify(ipoPipeline)}
           </Typography>
         </Box>
@@ -79,10 +79,10 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
 
       {/* Capital Freed if Stops Triggered */}
       {(capitalNarrative || capitalTotalDollars) && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #ecfdf5)", border: "1px solid #a7f3d0", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #ecfdf5)", border: "1px solid #a7f3d0", borderRadius: 2.5, p: 2.5, mb: 3 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#1e293b", mb: 1 }}>Capital Freed if Stops Triggered</Typography>
           {capitalNarrative && (
-            <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, mb: capitalTotalDollars ? 1.5 : 0 }}>
+            <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, mb: capitalTotalDollars ? 1.5 : 0 }}>
               {typeof capitalNarrative === "string" ? capitalNarrative : capitalNarrative.content || capitalNarrative.text || capitalNarrative.description}
             </Typography>
           )}
@@ -90,13 +90,13 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
             <Box sx={{ display: "flex", gap: 3, mt: 1 }}>
               {capitalTotalDollars !== null && (
                 <Box sx={{ background: "#fff", border: "1px solid #a7f3d0", borderRadius: 2, px: 2, py: 1.2 }}>
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>Total Freed</Typography>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: 0.8 }}>Total Freed</Typography>
                   <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#059669", fontFamily: "monospace" }}>{formatDollars(capitalTotalDollars)}</Typography>
                 </Box>
               )}
               {capitalTotalPctAum !== null && (
                 <Box sx={{ background: "#fff", border: "1px solid #a7f3d0", borderRadius: 2, px: 2, py: 1.2 }}>
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>% of AUM</Typography>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: 0.8 }}>% of AUM</Typography>
                   <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#059669", fontFamily: "monospace" }}>{capitalTotalPctAum}%</Typography>
                 </Box>
               )}
@@ -130,7 +130,7 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: `repeat(${upsideKeys.length}, 1fr)`,
-                  borderBottom: i < upsideTable.length - 1 ? "1px solid #f1f5f9" : "none",
+                  borderBottom: i < upsideTable.length - 1 ? "1px solid #e0e7ff" : "none",
                   "&:hover": { backgroundColor: "#ecfdf5" },
                 }}
               >
@@ -149,7 +149,7 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
                         py: 1.5,
                         fontSize: 13,
                         fontWeight: isTicker ? 700 : j === 0 ? 600 : isRiskReward ? 500 : 400,
-                        color: isTicker ? "#1e293b" : isUnfavorable ? "#ea580c" : displayVal.startsWith("+") ? "#059669" : "#475569",
+                        color: isTicker ? "#1e293b" : isUnfavorable ? "#ea580c" : displayVal.startsWith("+") ? "#059669" : "#334155",
                         fontFamily: isMonospace ? "monospace" : "inherit",
                       }}
                     >
@@ -165,9 +165,9 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
 
       {/* Sector Rotation Ideas */}
       {rotationIdeas && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #ecfdf5)", border: "1px solid #a7f3d0", borderRadius: 2.5, p: 2.5 }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #ecfdf5)", border: "1px solid #a7f3d0", borderRadius: 2.5, p: 2.5 }}>
           <Typography sx={{ fontWeight: 700, fontSize: 15, mb: 1, color: "#1e293b" }}>Sector Rotation Ideas</Typography>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
             {typeof rotationIdeas === "string" ? rotationIdeas : rotationIdeas.content || rotationIdeas.text || JSON.stringify(rotationIdeas)}
           </Typography>
         </Box>

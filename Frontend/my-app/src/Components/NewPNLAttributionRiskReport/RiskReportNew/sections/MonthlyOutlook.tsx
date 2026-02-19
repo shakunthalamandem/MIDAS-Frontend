@@ -23,8 +23,8 @@ const narrativeSections: { key: string; label: string; bg: string; border: strin
 const MonthlyOutlook: React.FC<Props> = ({ data }) => {
   if (!data) return null;
   if (typeof data === "string") {
-    return (<Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2.5, p: 2.5 }}>
-      <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
+    return (<Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+      <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
     </Box>);
   }
 
@@ -45,8 +45,8 @@ const MonthlyOutlook: React.FC<Props> = ({ data }) => {
   return (
     <Box>
       {narrative && (
-        <Box sx={{ background: "linear-gradient(135deg, #f8fafc, #f1f5f9)", border: "1px solid #e2e8f0", borderRadius: 2.5, p: 2.5, mb: 3 }}>
-          <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f0f7ff, #e0e7ff)", border: "1px solid #c7d2fe", borderRadius: 2.5, p: 2.5, mb: 3 }}>
+          <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
             {typeof narrative === "string" ? narrative : narrative.content || narrative.text}
           </Typography>
         </Box>
@@ -61,22 +61,22 @@ const MonthlyOutlook: React.FC<Props> = ({ data }) => {
             borderRadius: 2, p: 2.5, mb: 2, transition: "all 0.2s", "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)" } }}>
             <Typography sx={{ fontWeight: 700, fontSize: 15, color: color.title, mb: 0.5 }}>{phaseTitle}</Typography>
             {phaseSubtitle && (
-              <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#64748b", mb: 1, fontFamily: "monospace" }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#334155", mb: 1, fontFamily: "monospace" }}>
                 {phaseSubtitle}
               </Typography>
             )}
             {typeof phaseContent === "string" ? (
-              <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{phaseContent}</Typography>
+              <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{phaseContent}</Typography>
             ) : Array.isArray(phaseContent || week.items || week.bullets) ? (
               <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
                 {(phaseContent || week.items || week.bullets).map((bullet: any, j: number) => (
-                  <Typography component="li" key={j} sx={{ fontSize: 13, color: "#475569", mb: 0.5, lineHeight: 1.5 }}>
+                  <Typography component="li" key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.5, lineHeight: 1.5 }}>
                     {typeof bullet === "string" ? bullet : bullet?.text || bullet?.description || JSON.stringify(bullet)}
                   </Typography>
                 ))}
               </Box>
             ) : (
-              <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+              <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
                 {week.description || week.text || (typeof phaseContent === "object" && phaseContent !== null ? JSON.stringify(phaseContent) : "")}
               </Typography>
             )}
@@ -95,11 +95,11 @@ const MonthlyOutlook: React.FC<Props> = ({ data }) => {
             </Box>
             {actionPlan.map((row: any, i: number) => (
               <Box key={i} sx={{ display: "grid", gridTemplateColumns: "0.5fr 2fr 1.5fr 1fr",
-                borderBottom: i < actionPlan.length - 1 ? "1px solid #f1f5f9" : "none", "&:hover": { backgroundColor: "#fff7ed" } }}>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#475569" }}>{row.priority}</Typography>
+                borderBottom: i < actionPlan.length - 1 ? "1px solid #e0e7ff" : "none", "&:hover": { backgroundColor: "#fff7ed" } }}>
+                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{row.priority}</Typography>
                 <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#1e293b", fontWeight: 500 }}>{row.action}</Typography>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#475569" }}>{row.trigger}</Typography>
-                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#64748b" }}>{row.responsible}</Typography>
+                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#1e293b" }}>{row.trigger}</Typography>
+                <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#334155" }}>{row.responsible}</Typography>
               </Box>
             ))}
           </Box>
@@ -116,7 +116,7 @@ const MonthlyOutlook: React.FC<Props> = ({ data }) => {
                 <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color, textTransform: "uppercase", mb: 0.5 }}>
                   {label}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
                   {typeof value === "string" ? value : JSON.stringify(value)}
                 </Typography>
               </Box>

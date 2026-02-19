@@ -36,7 +36,7 @@ const sensitivityColor = (val: string): string => {
   if (v.includes("immediate") || v.includes("critical") || v.includes("exit") || v.includes("fail")) return "#dc2626";
   if (v.includes("high") || v.includes("24 hour") || v.includes("warning") || v.includes("breach")) return "#ea580c";
   if (v.includes("week") || v.includes("medium")) return "#d97706";
-  return "#475569";
+  return "#1e293b";
 };
 
 const formatHeader = (k: string) => k.replace(/_/g, " ").toUpperCase();
@@ -69,8 +69,8 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
 
   if (typeof data === "string") {
     return (
-      <Box sx={{ backgroundColor: "#f8fafc", borderRadius: 2, p: 2.5 }}>
-        <Typography sx={{ fontSize: 13, color: "#475569", whiteSpace: "pre-wrap" }}>{data}</Typography>
+      <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2, p: 2.5 }}>
+        <Typography sx={{ fontSize: 13, color: "#1e293b", whiteSpace: "pre-wrap" }}>{data}</Typography>
       </Box>
     );
   }
@@ -95,7 +95,7 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
   const severityKey = dynamicKeys.find((k) => ["severity", "severity_score", "score", "risk_level"].includes(k.toLowerCase()));
 
   return (
-    <Box sx={{ border: "1px solid #e2e8f0", borderRadius: 2.5, overflow: "hidden" }}>
+    <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
       {/* Table Header */}
       <Box
         sx={{
@@ -130,9 +130,9 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-            borderBottom: i < items.length - 1 ? "1px solid #f1f5f9" : "none",
+            borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none",
             alignItems: "center",
-            "&:hover": { backgroundColor: "#f8fafc" },
+            "&:hover": { backgroundColor: "#f0f7ff" },
           }}
         >
           {dynamicKeys.map((k) => {
@@ -186,7 +186,7 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
 
             if (isSeverity) {
               return (
-                <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#475569", textAlign: "center" }}>
+                <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b", textAlign: "center" }}>
                   {displayVal}
                 </Typography>
               );
@@ -199,7 +199,7 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
                   px: 2,
                   py: 1.5,
                   fontSize: 13,
-                  color: sensitivityColor(displayVal) !== "#475569" ? sensitivityColor(displayVal) : "#475569",
+                  color: sensitivityColor(displayVal) !== "#1e293b" ? sensitivityColor(displayVal) : "#1e293b",
                   fontWeight: displayVal.toLowerCase().includes("exit") ? 600 : 400,
                   fontFamily: k.toLowerCase().includes("capital") || k.toLowerCase().includes("impact") ? "monospace" : "inherit",
                 }}
