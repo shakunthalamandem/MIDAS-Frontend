@@ -34,6 +34,7 @@ export const priorityOrder = [
   "Collaboration Revenue",
   "Collaboration Revenue Growth",
   "Total Revenue & Financial Income",
+  "Revenue",
   "Revenue Growth",
   "Net Interest Income",
   "Net Interest Income Growth",
