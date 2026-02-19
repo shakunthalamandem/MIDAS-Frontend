@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
+  GridRowParams,
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
@@ -25,6 +27,8 @@ interface AttributionTableProps {
   showPct: boolean;
   groupBy: AttributionGroupBy;
   theme: TabTheme;
+  selectedFunds?: string[];
+  selectedDate?: string;
 }
 
 const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
@@ -69,7 +73,10 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
   showPct,
   groupBy,
   theme,
+  selectedFunds,
+  selectedDate,
 }) => {
+  const navigate = useNavigate();
   const rows = useMemo(
     () => data.map((item, idx) => ({ id: idx, ...item })),
     [data]
@@ -179,6 +186,18 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         disableRowSelectionOnClick
         disableColumnMenu
         slots={{ toolbar: CustomToolbar }}
+        onRowClick={(params: GridRowParams) => {
+          if (!selectedFunds || !selectedDate) return;
+          const name = params.row.name;
+          if (name?.toUpperCase() === "OTHER") return;
+          const searchParams = new URLSearchParams({
+            fund: JSON.stringify(selectedFunds),
+            date: selectedDate,
+            groupBy,
+            groupValue: name,
+          });
+          navigate(`/risk_report_pnl_report/ticker-detail?${searchParams.toString()}`);
+        }}
         initialState={{
           sorting: {
             sortModel: [{ field: "ytd_pnl", sort: "desc" }],
@@ -221,6 +240,9 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           },
           "& .MuiDataGrid-row:nth-of-type(odd)": {
             backgroundColor: "#fff",
+          },
+          "& .MuiDataGrid-row": {
+            cursor: selectedFunds && selectedDate ? "pointer" : "default",
           },
           "& .MuiDataGrid-row:hover": {
             backgroundColor: `${theme.hoverRow} !important`,

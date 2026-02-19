@@ -73,3 +73,23 @@ export type AttributionGroupBy =
   | "industry"
   | "holding_period"
   | "issuer";
+
+export interface TickerItem {
+  ticker: string;
+  issuer: string;
+  analyst: string;
+  sector: string;
+  industry: string;
+  holding_period: string;
+  days_hld: number | null;
+  dtd_pnl: number;
+  dtd_pnl_pct: number;
+  mtd_pnl: number;
+  mtd_pnl_pct: number;
+  ytd_pnl: number;
+  ytd_pnl_pct: number;
+  net_exp: number;
+  net_exp_pct: number;
+  beta_adj_net: number;
+  beta_adj_net_pct: number;
+}

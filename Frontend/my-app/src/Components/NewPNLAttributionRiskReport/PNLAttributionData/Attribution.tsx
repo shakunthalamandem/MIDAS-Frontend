@@ -191,6 +191,8 @@ const Attribution: React.FC<AttributionProps> = ({
             showPct={showPct}
             groupBy={groupBy}
             theme={activeTheme}
+            selectedFunds={selectedFunds}
+            selectedDate={selectedDate}
           />
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
