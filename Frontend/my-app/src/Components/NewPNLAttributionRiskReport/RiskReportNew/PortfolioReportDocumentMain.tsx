@@ -345,7 +345,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
   return (  
-    <Container maxWidth='xl'>
+    <Container maxWidth='xl' sx={{mb:4}}>
     <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#f8fafc" }}>
       {/* ===== Sidebar ===== */}
       <Box
