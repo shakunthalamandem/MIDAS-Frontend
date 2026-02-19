@@ -278,10 +278,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#0f172a" }}>
-            CIO Report Viewer
+            AI Portfolio Review
           </Typography>
           <Typography sx={{ color: "#334155", fontSize: 14, mb: 3 }}>
-            Select a report to view the daily capital allocation analysis
+            Select a report to view the AI-driven portfolio risk analysis
           </Typography>
 
           {error && (
@@ -399,7 +399,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 color: "#fff",
               }}
             >
-              CIO REPORT
+              AI REVIEW
             </Typography>
           )}
           <IconButton
