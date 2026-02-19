@@ -17,7 +17,11 @@ interface TabTheme {
   exportBg: string;
 }
 
-const GROUP_BY_TABS: TabTheme[] = [
+interface TabThemeWithPage extends TabTheme {
+  pdfPage: string; // page group for PDF layout
+}
+
+const GROUP_BY_TABS: TabThemeWithPage[] = [
   {
     key: "analyst",
     label: "Analyst",
@@ -30,6 +34,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     expColor: "#00695c",
     toolbarBg: "#e3f2fd",
     exportBg: "#1565c0",
+    pdfPage: "2",
   },
   {
     key: "sector",
@@ -43,19 +48,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     expColor: "#e65100",
     toolbarBg: "#e0f2f1",
     exportBg: "#00796b",
-  },
-  {
-    key: "industry",
-    label: "Industry",
-    headerBg: "#ce93d8",
-    activeTab: "#7b1fa2",
-    activeTabHover: "#4a148c",
-    evenRow: "#f3e5f5",
-    hoverRow: "#e1bee7",
-    pnlColor: "#6a1b9a",
-    expColor: "#004d40",
-    toolbarBg: "#f3e5f5",
-    exportBg: "#7b1fa2",
+    pdfPage: "2",
   },
   {
     key: "holding_period",
@@ -69,6 +62,21 @@ const GROUP_BY_TABS: TabTheme[] = [
     expColor: "#4a148c",
     toolbarBg: "#e8f5e9",
     exportBg: "#2e7d32",
+    pdfPage: "2",
+  },
+  {
+    key: "industry",
+    label: "Industry",
+    headerBg: "#ce93d8",
+    activeTab: "#7b1fa2",
+    activeTabHover: "#4a148c",
+    evenRow: "#f3e5f5",
+    hoverRow: "#e1bee7",
+    pnlColor: "#6a1b9a",
+    expColor: "#004d40",
+    toolbarBg: "#f3e5f5",
+    exportBg: "#7b1fa2",
+    pdfPage: "3",
   },
   {
     key: "issuer",
@@ -82,6 +90,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     expColor: "#00695c",
     toolbarBg: "#e8eaf6",
     exportBg: "#283593",
+    pdfPage: "4",
   },
 ];
 
@@ -163,7 +172,7 @@ const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTa
           const tabData = allData[tab.key] || [];
           if (tabData.length === 0) return null;
           return (
-            <Box key={tab.key} className="pdf-section attribution-pdf-tab">
+            <Box key={tab.key} className="pdf-section attribution-pdf-tab" data-pdf-page={tab.pdfPage}>
               <Box className="risk-dashboard-section">
                 <Box
                   sx={{

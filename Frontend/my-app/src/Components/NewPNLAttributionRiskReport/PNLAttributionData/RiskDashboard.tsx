@@ -122,7 +122,7 @@ const RiskDashboard: React.FC = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
-      <Box className="pdf-section">
+      <Box className="pdf-section" data-pdf-page="1">
         <DashboardHeader
           selectedFunds={selectedFunds}
           portfolios={portfolios}
@@ -159,13 +159,13 @@ const RiskDashboard: React.FC = () => {
       {!loading && data && (
         <>
           {data.headline_risks && (
-            <Box className="pdf-section">
+            <Box className="pdf-section" data-pdf-page="1">
               <HeadlineRisks data={data.headline_risks} />
             </Box>
           )}
 
           {data.headline_pnl && (
-            <Box className="pdf-section">
+            <Box className="pdf-section" data-pdf-page="1">
               <HeadlinePnL
                 data={data.headline_pnl}
                 selectedMetric={selectedMetric}
@@ -175,12 +175,12 @@ const RiskDashboard: React.FC = () => {
           )}
 
           {data.indexes_comparison && (
-            <Box className="pdf-section">
+            <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison data={data.indexes_comparison} />
             </Box>
           )}
 
-          <Box className="pdf-section">
+          <Box className="pdf-section" data-pdf-page="1">
             <CumulativePnLChart
               chartData={chartData}
               loading={chartLoading}

@@ -47,13 +47,10 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
     setStatusText("Preparing report layout...");
 
     try {
-      // Add pdf-export-mode class for clean rendering
       container.classList.add("pdf-export-mode");
 
-      // Wait for layout to settle (attribution tables become visible)
       setStatusText("Loading attribution tables...");
       await waitForRender();
-      // Extra wait for DataGrid virtualization to fully render
       await wait(1000);
 
       const pdf = new jsPDF("p", "mm", "a4");
@@ -64,7 +61,6 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
       const bottomMargin = 18;
       const headerHeight = 28;
 
-      // Draw PDF header on each page
       const drawPageHeader = () => {
         pdf.setFillColor(0, 32, 96);
         pdf.rect(0, 0, pdfWidth, headerHeight, "F");
@@ -92,7 +88,9 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
           hour: "2-digit",
           minute: "2-digit",
         });
-        pdf.text(`Generated: ${timestamp}`, pdfWidth - marginX, 19, { align: "right" });
+        pdf.text(`Generated: ${timestamp}`, pdfWidth - marginX, 19, {
+          align: "right",
+        });
 
         pdf.setDrawColor(16, 185, 129);
         pdf.setLineWidth(0.8);
@@ -102,51 +100,143 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         return headerHeight + 6;
       };
 
-      let currentY = drawPageHeader();
+      // Available content height on a page (below header, above footer)
+      const pageContentHeight = pdfHeight - (headerHeight + 6) - bottomMargin;
 
-      // Get all visible pdf-section elements
-      const sections = container.querySelectorAll<HTMLElement>(".pdf-section");
-      const totalSections = sections.length;
-
-      for (let i = 0; i < totalSections; i++) {
-        const section = sections[i];
-
-        // Skip sections with no visible content
-        if (section.offsetHeight === 0) continue;
-
-        const sectionName = getSectionName(section, i);
-        setStatusText(`Capturing: ${sectionName}`);
-        setProgress(Math.round(((i + 1) / totalSections) * 90));
-
-        // Small delay before capturing each section
+      // Capture a section to canvas
+      const captureSection = async (section: HTMLElement) => {
         await wait(200);
-
+        // Use a fixed wide width to prevent column cutoff
+        const captureWidth = Math.max(section.scrollWidth, 1200);
         const canvas = await html2canvas(section, {
           scale: 2,
           backgroundColor: "#ffffff",
           useCORS: true,
           logging: false,
-          windowWidth: section.scrollWidth,
-          windowHeight: section.scrollHeight,
+          width: captureWidth,
+          windowWidth: captureWidth,
         });
+        return canvas;
+      };
 
-        const imgData = canvas.toDataURL("image/jpeg", 0.92);
-        const imgProps = pdf.getImageProperties(imgData);
+      // Place an image that may span multiple pages by slicing the canvas
+      const addImageToPages = (
+        canvas: HTMLCanvasElement,
+        startY: number
+      ): number => {
         const imgWidth = contentWidth;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        const imgHeight =
+          (canvas.height * imgWidth) / canvas.width;
 
-        // Check if we need a new page
-        if (currentY + imgHeight > pdfHeight - bottomMargin) {
+        // If it fits on the current page, just place it
+        if (startY + imgHeight <= pdfHeight - bottomMargin) {
+          const imgData = canvas.toDataURL("image/jpeg", 0.92);
+          pdf.addImage(imgData, "JPEG", marginX, startY, imgWidth, imgHeight);
+          return startY + imgHeight + 4;
+        }
+
+        // Otherwise, slice into page-height chunks
+        const pxPerMm = canvas.height / imgHeight; // canvas pixels per mm
+        let remainingCanvasHeight = canvas.height;
+        let canvasY = 0;
+        let currentY = startY;
+
+        while (remainingCanvasHeight > 0) {
+          const availableMm = pdfHeight - bottomMargin - currentY;
+          const availablePx = Math.floor(availableMm * pxPerMm);
+          const sliceHeight = Math.min(availablePx, remainingCanvasHeight);
+          const sliceMm = sliceHeight / pxPerMm;
+
+          // Create a slice canvas
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceHeight;
+          const ctx = sliceCanvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(
+              canvas,
+              0,
+              canvasY,
+              canvas.width,
+              sliceHeight,
+              0,
+              0,
+              canvas.width,
+              sliceHeight
+            );
+          }
+
+          const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.92);
+          pdf.addImage(
+            sliceData,
+            "JPEG",
+            marginX,
+            currentY,
+            imgWidth,
+            sliceMm
+          );
+
+          canvasY += sliceHeight;
+          remainingCanvasHeight -= sliceHeight;
+
+          if (remainingCanvasHeight > 0) {
+            pdf.addPage();
+            currentY = drawPageHeader();
+          } else {
+            currentY = currentY + sliceMm + 4;
+          }
+        }
+
+        return currentY;
+      };
+
+      // Collect all visible sections
+      const allSections = Array.from(
+        container.querySelectorAll<HTMLElement>(".pdf-section")
+      ).filter((s) => s.offsetHeight > 0);
+
+      const totalSections = allSections.length;
+
+      // Group sections by data-pdf-page
+      const pageGroups: { page: string; sections: HTMLElement[] }[] = [];
+      let currentPageGroup = "";
+      for (const section of allSections) {
+        const page = section.getAttribute("data-pdf-page") || "";
+        if (page !== currentPageGroup) {
+          pageGroups.push({ page, sections: [section] });
+          currentPageGroup = page;
+        } else {
+          pageGroups[pageGroups.length - 1].sections.push(section);
+        }
+      }
+
+      let currentY = drawPageHeader();
+      let processedCount = 0;
+
+      for (let gi = 0; gi < pageGroups.length; gi++) {
+        const group = pageGroups[gi];
+
+        // Force new page for each new page group (except the first)
+        if (gi > 0) {
           pdf.addPage();
           currentY = drawPageHeader();
         }
 
-        pdf.addImage(imgData, "JPEG", marginX, currentY, imgWidth, imgHeight);
-        currentY += imgHeight + 4;
+        for (let si = 0; si < group.sections.length; si++) {
+          const section = group.sections[si];
+          processedCount++;
+
+          const sectionName = getSectionName(section, processedCount - 1);
+          setStatusText(`Capturing: ${sectionName}`);
+          setProgress(Math.round((processedCount / totalSections) * 90));
+
+          const canvas = await captureSection(section);
+          currentY = addImageToPages(canvas, currentY);
+        }
       }
 
-      // Add page numbers
-      setStatusText("Adding page numbers...");
+      // Add page numbers and footer
+      setStatusText("Finalizing report...");
       setProgress(95);
 
       const pageCount = pdf.getNumberOfPages();
@@ -164,11 +254,20 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
 
         pdf.setDrawColor(200, 200, 200);
         pdf.setLineWidth(0.2);
-        pdf.line(marginX, pdfHeight - 14, pdfWidth - marginX, pdfHeight - 14);
+        pdf.line(
+          marginX,
+          pdfHeight - 14,
+          pdfWidth - marginX,
+          pdfHeight - 14
+        );
 
         pdf.setFontSize(7);
         pdf.setTextColor(160, 160, 160);
-        pdf.text("MIDAS - Risk & PNL Attribution Report", marginX, pdfHeight - 8);
+        pdf.text(
+          "MIDAS - Risk & PNL Attribution Report",
+          marginX,
+          pdfHeight - 8
+        );
       }
 
       setStatusText("Downloading PDF...");
@@ -190,7 +289,13 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         variant="contained"
         onClick={handleExportPDF}
         disabled={loading}
-        startIcon={loading ? <CircularProgress size={16} sx={{ color: "#002060" }} /> : <PictureAsPdfIcon />}
+        startIcon={
+          loading ? (
+            <CircularProgress size={16} sx={{ color: "#002060" }} />
+          ) : (
+            <PictureAsPdfIcon />
+          )
+        }
         sx={{
           backgroundColor: "#fff",
           color: "#002060",
@@ -227,10 +332,16 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
       >
         <DialogContent sx={{ textAlign: "center", py: 4 }}>
           <CircularProgress size={48} sx={{ color: "#10b981", mb: 2 }} />
-          <Typography variant="h6" sx={{ color: "#fff", fontWeight: 700, mb: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{ color: "#fff", fontWeight: 700, mb: 1 }}
+          >
             Generating PDF Report
           </Typography>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)", mb: 3 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "rgba(255,255,255,0.7)", mb: 3 }}
+          >
             {statusText}
           </Typography>
           <Box sx={{ px: 2 }}>
@@ -247,7 +358,14 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
                 },
               }}
             />
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", mt: 1, display: "block" }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                mt: 1,
+                display: "block",
+              }}
+            >
               {progress}% complete
             </Typography>
           </Box>
@@ -257,24 +375,20 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
   );
 };
 
-/** Try to identify a readable name for the section being captured */
+/** Identify a readable name for the section being captured */
 function getSectionName(section: HTMLElement, index: number): string {
-  // Check for attribution tab label
   if (section.classList.contains("attribution-pdf-tab")) {
-    const label = section.querySelector(".risk-dashboard-section [class*='MuiBox']");
+    const label = section.querySelector(".risk-dashboard-section .MuiBox-root");
     if (label?.textContent) return label.textContent;
   }
 
-  // Check for known section titles
   const title = section.querySelector(
     ".risk-dashboard-section-title, .attribution-title, .pnl-chart-title"
   );
   if (title?.textContent) return title.textContent;
 
-  // Check for header
   if (section.querySelector(".risk-dashboard-header")) return "Dashboard Header";
 
-  // Fallback
   const names = [
     "Dashboard Header",
     "Headline Risks",
