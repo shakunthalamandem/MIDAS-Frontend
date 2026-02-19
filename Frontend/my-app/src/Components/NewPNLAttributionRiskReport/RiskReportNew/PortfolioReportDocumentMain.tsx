@@ -244,9 +244,11 @@ const PortfolioReportDocumentMain: React.FC = () => {
           minHeight: "100vh",
           background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "center",
-          p: 3,
+          pt: 6,
+          px: 3,
+          pb: 3,
         }}
       >
         <Box

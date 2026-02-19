@@ -165,21 +165,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         {exportButton && (
           <Box className="risk-dashboard-export-btn">{exportButton}</Box>
         )}
-
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => navigate("/risk_report_ai_view")}
-          sx={{
-            borderRadius: "20px",
-            textTransform: "none",
-            backgroundColor: "#10b981",
-            color: "#fff",
-            "&:hover": { backgroundColor: "#059669" },
-          }}
-        >
-          Click here
-        </Button>
       </Box>
     </Box>
   );
