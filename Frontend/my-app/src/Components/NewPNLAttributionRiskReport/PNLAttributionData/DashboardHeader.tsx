@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, TextField, MenuItem, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box, TextField, MenuItem, IconButton, Button } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { formatCurrency } from "./utils";
@@ -67,6 +68,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   aum,
   exportButton,
 }) => {
+  const navigate = useNavigate();
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
   const displayValue = allSelected ? ALL_FUNDS : (selectedFunds[0] || "");
 
@@ -163,6 +165,21 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         {exportButton && (
           <Box className="risk-dashboard-export-btn">{exportButton}</Box>
         )}
+
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => navigate("/risk_report_ai_view")}
+          sx={{
+            borderRadius: "20px",
+            textTransform: "none",
+            backgroundColor: "#10b981",
+            color: "#fff",
+            "&:hover": { backgroundColor: "#059669" },
+          }}
+        >
+          Click here
+        </Button>
       </Box>
     </Box>
   );
