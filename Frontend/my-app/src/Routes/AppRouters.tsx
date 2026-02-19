@@ -311,7 +311,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path='/risk_document_upload' element={<AuthGuard><RiskAIDocumentUpload /></AuthGuard>} />
-        <Route path='/risk_report_ai_view' element={<AuthGuard><PortfolioReportDocumentMain /></AuthGuard>} />
+        <Route path='/ai_portfolio_review' element={<AuthGuard><PortfolioReportDocumentMain /></AuthGuard>} />
 
 
         
