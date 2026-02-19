@@ -491,65 +491,66 @@ const PortfolioReportDocumentMain: React.FC = () => {
         <Box
           sx={{
             px: 3,
-            py: 1.5,
-            borderBottom: "1px solid #c7d2fe",
-            background: "#fff",
+            py: 2,
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
             display: "flex",
             alignItems: "center",
-            gap: 2,
-            minHeight: 68,
+            minHeight: 72,
           }}
         >
           <IconButton
             size="small"
             onClick={handleBack}
             sx={{
-              mr: 0.5,
-              backgroundColor: "#eef2ff",
-              color: "#1e3a5f",
-              "&:hover": { backgroundColor: "#c7d2fe" },
+              mr: 2,
+              backgroundColor: "rgba(255,255,255,0.1)",
+              color: "#fff",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
             }}
           >
             <ArrowBackIcon fontSize="small" />
           </IconButton>
-          <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: -0.3, color: "#0f172a" }}>
+          <Box sx={{ flex: 1, textAlign: "center" }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
               {header.report_title}
             </Typography>
-            <Typography sx={{ color: "#334155", fontSize: 12.5 }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: 12.5 }}>
               {formatDate(header.date)}
               {header.aum_formatted && ` · AUM: ${header.aum_formatted}`}
               {header.classification && ` · ${header.classification}`}
             </Typography>
           </Box>
 
-          {header.pnl && (
-            <Chip
-              label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
-              size="small"
-              sx={{
-                background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 12,
-                height: 30,
-                boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
-              }}
-            />
-          )}
-          {header.dtd && (
-            <Chip
-              label={`DTD: ${header.dtd}`}
-              size="small"
-              sx={{
-                backgroundColor: "#0f172a",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 12,
-                height: 30,
-              }}
-            />
-          )}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {header.pnl && (
+              <Chip
+                label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
+                size="small"
+                sx={{
+                  background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 12,
+                  height: 30,
+                  boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
+                }}
+              />
+            )}
+            {header.dtd && (
+              <Chip
+                label={`DTD: ${header.dtd}`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 12,
+                  height: 30,
+                }}
+              />
+            )}
+          </Box>
         </Box>
 
         {/* Scrollable Content */}
