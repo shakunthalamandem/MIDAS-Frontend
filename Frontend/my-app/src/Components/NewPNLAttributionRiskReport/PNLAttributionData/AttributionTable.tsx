@@ -43,20 +43,41 @@ const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
 
 const formatPctVal = (value: number) => `${value.toFixed(2)}%`;
 
-// Sort comparator that always pins "OTHER" rows to the bottom
+// Sort comparator that always pins "OTHER" rows to the bottom.
+// DataGrid multiplies comparator result by -1 for desc sort, so we
+// compensate by flipping our pin value when the active sort is descending.
 const pinOtherComparator =
   (defaultCompare: (a: any, b: any) => number) =>
   (v1: any, v2: any, params1: any, params2: any) => {
     const isOther1 = params1.api.getRow(params1.id)?.name?.toUpperCase() === "OTHER";
     const isOther2 = params2.api.getRow(params2.id)?.name?.toUpperCase() === "OTHER";
-    if (isOther1 && !isOther2) return 1;
-    if (!isOther1 && isOther2) return -1;
     if (isOther1 && isOther2) return 0;
-    return defaultCompare(v1, v2);
+    if (!isOther1 && !isOther2) return defaultCompare(v1, v2);
+
+    const sortModel = params1.api.getSortModel();
+    const isDesc = sortModel.length > 0 && sortModel[0].sort === "desc";
+    // In asc: return 1 puts OTHER after → bottom. DataGrid uses as-is.
+    // In desc: return -1, DataGrid negates to 1 → OTHER still at bottom.
+    if (isOther1) return isDesc ? -1 : 1;
+    return isDesc ? 1 : -1;
   };
 
 const numericCompare = (a: any, b: any) => (a ?? 0) - (b ?? 0);
 const stringCompare = (a: any, b: any) => String(a ?? "").localeCompare(String(b ?? ""));
+
+// Chronological order for holding period categories
+const HOLDING_PERIOD_ORDER: Record<string, number> = {
+  "0-30 DAYS": 1,
+  "31-90 DAYS": 2,
+  "91-180 DAYS": 3,
+  "181-365 DAYS": 4,
+  "> 365 DAYS": 5,
+};
+const holdingPeriodCompare = (a: any, b: any) => {
+  const orderA = HOLDING_PERIOD_ORDER[String(a ?? "").toUpperCase()] ?? 99;
+  const orderB = HOLDING_PERIOD_ORDER[String(b ?? "").toUpperCase()] ?? 99;
+  return orderA - orderB;
+};
 
 const CustomToolbar = () => (
   <Box className="attr-datagrid-toolbar">
@@ -90,7 +111,9 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         flex: 1.4,
         minWidth: 200,
         cellClassName: "attr-datagrid-cell--name",
-        sortComparator: pinOtherComparator(stringCompare),
+        sortComparator: pinOtherComparator(
+          groupBy === "holding_period" ? holdingPeriodCompare : stringCompare
+        ),
       },
       {
         field: "dtd_pnl",
@@ -200,7 +223,11 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         }}
         initialState={{
           sorting: {
-            sortModel: [{ field: "ytd_pnl", sort: "desc" }],
+            sortModel: [
+              groupBy === "holding_period"
+                ? { field: "name", sort: "asc" }
+                : { field: "ytd_pnl", sort: "desc" },
+            ],
           },
         }}
         sx={{
