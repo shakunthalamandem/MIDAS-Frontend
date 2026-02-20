@@ -106,7 +106,7 @@ const YearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMetric, che
           {visibleSectors.map((sector, index) => (
             <Line
               key={sector}
-              type="monotone"
+              type="linear"
               dataKey={sector}
               stroke={colors[index % colors.length]} // Assign color from the colors array
               activeDot={{ r: 8 }}

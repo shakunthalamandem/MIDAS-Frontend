@@ -188,25 +188,25 @@ const formatXAxis = (dateStr: string) => {
               <Tooltip formatter={formatTooltip} />
               <Legend />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="APAC"
                 stroke="#e2863a"
                 fill="url(#colorAPAC)"
               />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="US"
                 stroke="#0070C0"
                 fill="url(#colorUS)"
               />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="EMEA"
                 stroke="#96a700"
                 fill="url(#colorEMEA)"
               />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="Hedge"
                 stroke="#797979"
                 fill="url(#colorHedge)"

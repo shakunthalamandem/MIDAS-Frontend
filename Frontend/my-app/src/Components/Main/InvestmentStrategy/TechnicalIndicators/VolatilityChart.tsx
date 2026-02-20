@@ -105,7 +105,7 @@ const VolatilityChart: React.FC<VolatilityChartProps> = ({ ticker }) => {
               <YAxis />
               <Tooltip />
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="value"
                 stroke="#dc0d03"
                 strokeWidth={1}

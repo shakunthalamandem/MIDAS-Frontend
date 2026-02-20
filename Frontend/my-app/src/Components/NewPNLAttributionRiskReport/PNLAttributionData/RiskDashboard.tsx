@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Alert, Container, Typography } from "@mui/material";
-import type { DashboardData, ChartDataPoint, PortfolioResponse } from "./types";
+import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
+import TopBottomPnLTable from "./TopBottomPnLTable";
+import IndexComparisonChart from "./IndexComparisonChart";
 import Attribution from "./Attribution";
 import AttributionAllTabs from "./AttributionAllTabs";
 import RiskDashboardPDFExporter from "./RiskDashboardPDFExporter";
@@ -30,6 +32,12 @@ const RiskDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("ytd_pnl");
+  const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>(null);
+  const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
+  const [indexChartLoading, setIndexChartLoading] = useState(false);
+  const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
+  const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
+  const [topBottomLoading, setTopBottomLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -112,6 +120,63 @@ const RiskDashboard: React.FC = () => {
     fetchChartData();
   }, [fetchChartData]);
 
+  // Fetch top/bottom PNL tickers
+  const fetchTopBottomPnl = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate) return;
+    setTopBottomLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch top/bottom PNL");
+      const result = await res.json();
+      setTopBottomTop(result.top_10 || []);
+      setTopBottomBottom(result.bottom_10 || []);
+    } catch {
+      setTopBottomTop([]);
+      setTopBottomBottom([]);
+    } finally {
+      setTopBottomLoading(false);
+    }
+  }, [selectedFunds, selectedDate]);
+
+  useEffect(() => {
+    fetchTopBottomPnl();
+  }, [fetchTopBottomPnl]);
+
+  // Fetch index comparison chart data
+  const fetchIndexChartData = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate || !selectedIndexMetric) return;
+    setIndexChartLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/portfolio_index_comparison_chart/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({
+          date: selectedDate,
+          fund: selectedFunds,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch index chart data");
+      const result = await res.json();
+      setIndexChartData(result.chart_data || []);
+    } catch {
+      setIndexChartData([]);
+    } finally {
+      setIndexChartLoading(false);
+    }
+  }, [selectedFunds, selectedDate, selectedIndexMetric]);
+
+  useEffect(() => {
+    if (selectedIndexMetric) fetchIndexChartData();
+  }, [fetchIndexChartData, selectedIndexMetric]);
+
+  const handleIndexMetricSelect = (metricKey: string) => {
+    setSelectedIndexMetric((prev) => (prev === metricKey ? null : metricKey));
+  };
+
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
   const fundLabel = allSelected
     ? "All Funds"
@@ -176,7 +241,21 @@ const RiskDashboard: React.FC = () => {
 
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
-              <IndexesComparison data={data.indexes_comparison} />
+              <IndexesComparison
+                data={data.indexes_comparison}
+                selectedMetric={selectedIndexMetric ?? undefined}
+                onMetricSelect={handleIndexMetricSelect}
+              />
+            </Box>
+          )}
+
+          {selectedIndexMetric && (
+            <Box className="pdf-section" data-pdf-page="1">
+              <IndexComparisonChart
+                chartData={indexChartData}
+                loading={indexChartLoading}
+                selectedMetric={selectedIndexMetric}
+              />
             </Box>
           )}
 
@@ -185,6 +264,14 @@ const RiskDashboard: React.FC = () => {
               chartData={chartData}
               loading={chartLoading}
               period={metricToPeriod(selectedMetric)}
+            />
+          </Box>
+
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              loading={topBottomLoading}
             />
           </Box>
 

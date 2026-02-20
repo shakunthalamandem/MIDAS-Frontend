@@ -129,7 +129,7 @@ const VolumeChart: React.FC<VolumeChartProps> = ({ ticker }) => {
               />
               {/* 20 Day Volume as Line */}
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="20day_volume"
                 stroke="#2e006c"
                 strokeWidth={2}

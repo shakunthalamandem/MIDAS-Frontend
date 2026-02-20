@@ -143,7 +143,7 @@ const HYSpRatingPieChart: React.FC<HYSpRatingPieChartProps> = ({
           {visibleRegions.map((region, index) => (
             <Line
               key={region}
-              type="monotone"
+              type="linear"
               dataKey={region}
               stroke={colors[index % colors.length]} 
               dot={false} 

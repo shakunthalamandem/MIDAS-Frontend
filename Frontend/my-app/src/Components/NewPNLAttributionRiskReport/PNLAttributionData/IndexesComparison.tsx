@@ -4,6 +4,8 @@ import type { IndexesComparison as IndexesComparisonData } from "./types";
 
 interface IndexesComparisonProps {
   data: IndexesComparisonData;
+  selectedMetric?: string;
+  onMetricSelect?: (metricKey: string) => void;
 }
 
 interface IndexCardConfig {
@@ -12,29 +14,37 @@ interface IndexCardConfig {
   subKey?: keyof IndexesComparisonData;
   format: "beta" | "vol";
   color: string;
+  metricKey: string;
 }
 
 const INDEX_CARDS_CONFIG: IndexCardConfig[] = [
-  { label: "1m \u03B2 S&P", valueKey: "one_month_beta_sp", format: "beta", color: "blue" },
-  { label: "3m \u03B2 S&P", valueKey: "three_month_beta_sp", format: "beta", color: "blue" },
-  { label: "1m Vol / S&P", valueKey: "one_month_vol", subKey: "one_month_sp_vol", format: "vol", color: "cyan" },
-  { label: "3m Vol / S&P", valueKey: "three_month_vol", subKey: "three_month_sp_vol", format: "vol", color: "orange" },
-  { label: "YTD Vol / S&P", valueKey: "ytd_vol", subKey: "ytd_sp_vol", format: "vol", color: "pink" },
-  { label: "Drawdown / S&P", valueKey: "drawdown", subKey: "sp_drawdown", format: "vol", color: "red" },
+  { label: "1m \u03B2 S&P", valueKey: "one_month_beta_sp", format: "beta", color: "blue", metricKey: "one_month_beta_sp" },
+  { label: "3m \u03B2 S&P", valueKey: "three_month_beta_sp", format: "beta", color: "blue", metricKey: "three_month_beta_sp" },
+  { label: "1m Vol / S&P", valueKey: "one_month_vol", subKey: "one_month_sp_vol", format: "vol", color: "cyan", metricKey: "one_month_vol" },
+  { label: "3m Vol / S&P", valueKey: "three_month_vol", subKey: "three_month_sp_vol", format: "vol", color: "orange", metricKey: "three_month_vol" },
+  { label: "YTD Vol / S&P", valueKey: "ytd_vol", subKey: "ytd_sp_vol", format: "vol", color: "pink", metricKey: "ytd_vol" },
+  { label: "Drawdown / S&P", valueKey: "drawdown", subKey: "sp_drawdown", format: "vol", color: "red", metricKey: "drawdown" },
 ];
 
-const IndexesComparison: React.FC<IndexesComparisonProps> = ({ data }) => {
+const IndexesComparison: React.FC<IndexesComparisonProps> = ({
+  data,
+  selectedMetric,
+  onMetricSelect,
+}) => {
   return (
     <Box className="risk-dashboard-section">
       <Box className="index-cards-grid">
         {INDEX_CARDS_CONFIG.map((cfg) => {
           const value = data[cfg.valueKey];
           const subValue = cfg.subKey ? data[cfg.subKey] : null;
+          const isSelected = selectedMetric === cfg.metricKey;
 
           return (
             <Box
               key={cfg.label}
-              className={`index-card index-card--${cfg.color}`}
+              className={`index-card index-card--${cfg.color}${isSelected ? " index-card--selected" : ""}`}
+              onClick={() => onMetricSelect?.(cfg.metricKey)}
+              sx={{ cursor: onMetricSelect ? "pointer" : "default" }}
             >
               <Box className={`index-card-label index-card-label--${cfg.color}`}>
                 {cfg.label}

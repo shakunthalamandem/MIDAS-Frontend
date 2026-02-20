@@ -171,7 +171,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
           />
           <Legend />
           <Area
-            type="monotone"
+            type="linear"
             dataKey="pnl_percent"
             stroke="#247e00ff"
             fillOpacity={1}
@@ -179,7 +179,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
             name="Daily Net of Hedge P&L (%)"
           />
           <Area
-            type="monotone"
+            type="linear"
             dataKey="pnl_percent_neg"
             stroke="#247e00ff"
             fillOpacity={1}
@@ -187,7 +187,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
             name="Daily Net of Hedge P&L Neg (%)"
           />
           <Area
-            type="monotone"
+            type="linear"
             dataKey="one_year_var_percent_lmv"
             stroke="#999999ff"
             fillOpacity={1}
@@ -195,7 +195,7 @@ const RiskReportDailyPnlvsVarChart: React.FC<RiskReportDailyPnlvsVarChartProps> 
             name="1Yr 1% VaR (% of LMV)"
           />
           <Area
-            type="monotone"
+            type="linear"
             dataKey="one_year_var_percent_lmv_neg"
             stroke="#999999ff"
             fillOpacity={1}

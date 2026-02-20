@@ -659,7 +659,7 @@ const FinancialMetricsChartsContent: React.FC<Props> = ({
                             {/* Line for the selected ticker */}
                             {selectedCompanyKey && (
                               <Line
-                                type="monotone"
+                                type="linear"
                                 dataKey={selectedCompanyKey}
                                 name={`${selectedCompanyKey}`}
                                 stroke={SELECTED_LINE_COLOR}

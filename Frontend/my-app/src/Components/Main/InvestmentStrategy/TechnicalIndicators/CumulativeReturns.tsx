@@ -136,7 +136,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
                 <Tooltip formatter={(value: number) => `${value}%`} />
                 <Legend />
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey="snp_return"
                   stroke="#8884d8"
                   name="S&P Return"
@@ -144,7 +144,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
                   strokeWidth={1}
                 />
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey="dow_jone_return"
                   stroke="#9e0f01"
                   name="Dow Jones Return"
@@ -152,7 +152,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
                   strokeWidth={1}
                 />
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey="russel_return"
                   stroke="#017c53"
                   name="Russell Return"
@@ -160,7 +160,7 @@ const CumulativeReturns: React.FC<CumulativeReturnsProps> = ({ tickerList }) => 
                   strokeWidth={1}
                 />
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey="portfolio"
                   stroke="#ff7300"
                   name="Portfolio"

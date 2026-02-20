@@ -151,7 +151,7 @@ const MacdChart: React.FC<MacdChartProps> = ({ ticker }) => {
             isVisible && (
               <Line
                 key={key}
-                type="monotone"
+                type="linear"
                 dataKey={key}
                 stroke={getLineColor(key)}
                 dot={false}

@@ -259,7 +259,7 @@ const DealTypeSector: React.FC<DealTypeSectorProps> = ({ yAxisType }) => {
                   return (
                     <Line
                       key={sectorKey}
-                      type="monotone"
+                      type="linear"
                       dataKey={sectorKey}
                       stroke={sectorColors[sectorKey]}
                       activeDot={{ r: 8 }}
