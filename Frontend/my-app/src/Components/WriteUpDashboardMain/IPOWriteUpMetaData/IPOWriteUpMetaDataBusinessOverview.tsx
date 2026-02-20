@@ -47,7 +47,7 @@ interface Props {
 type AccordionSection = {
   section: keyof WriteUpData
   title: string
-  icon: ReactElement
+  // icon: ReactElement
 }
 
 /* ===================== CONFIG ===================== */
@@ -56,22 +56,22 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
   {
     section: 'differentiated_summary',
     title: 'Differentiated Summary',
-    icon: <TrendingUpIcon />,
+    // icon: <TrendingUpIcon />,
   },
   {
     section: 'concerns',
     title: 'Concerns',
-    icon: <WarningAmberIcon />,
+    // icon: <WarningAmberIcon />,
   },
   {
     section: 'principal_stockholders_preipo',
-    title: 'Principal Stockholders Pre-IPO',
-    icon: <AccountTreeIcon />,
+    title: 'Principal Stockholders ',
+    // icon: <AccountTreeIcon />,
   },
   {
     section: "key_management_personnel",
     title: "Key Management Personnel",
-    icon: <GroupsIcon />
+    // icon: <GroupsIcon />
   }
 ]
 const quillModules = {
@@ -92,6 +92,10 @@ const quillFormats = [
   "list",
   "bullet",
   "link"
+]
+
+const SINGLE_FIELD_SECTIONS: Array<keyof WriteUpData> = [
+  "key_management_personnel"
 ]
 
 const parseSectionRating = (value?: number | string | null) => {
@@ -274,6 +278,12 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     const copy = { ...updatedData }
     const sectionArray = [...(((copy[section] as string[]) ?? []))]
 
+    if (SINGLE_FIELD_SECTIONS.includes(section)) {
+      copy[section] = [value]
+      setUpdatedData(copy)
+      return
+    }
+
     if (sectionArray[index] === value) {
       return
     }
@@ -285,6 +295,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
   const handleAddPoint = (section: keyof WriteUpData, index?: number) => {
     if (!updatedData) return
+    if (SINGLE_FIELD_SECTIONS.includes(section)) return
     const copy = { ...updatedData }
     const sectionArray = [...(((copy[section] as string[]) ?? []))]
     const insertAt = index === undefined ? sectionArray.length : index + 1
@@ -295,6 +306,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
   const handleDeletePoint = (section: keyof WriteUpData, index: number) => {
     if (!updatedData) return
+    if (SINGLE_FIELD_SECTIONS.includes(section)) return
     const copy = { ...updatedData }
     const sectionArray = [...(((copy[section] as string[]) ?? []))]
     sectionArray.splice(index, 1)
@@ -394,13 +406,37 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
     if (!source) return []
 
-    return [...(((source[section] as string[]) ?? []))]
+    const sectionArray = [...(((source[section] as string[]) ?? []))]
+
+    if (SINGLE_FIELD_SECTIONS.includes(section)) {
+      return [sectionArray.join("")]
+    }
+
+    return sectionArray
   }
 
   /* ===================== RENDER HELPERS ===================== */
 
-  const renderSectionContent = (section: keyof WriteUpData, data: string[]) =>
-    data.map((item, index) =>
+  const renderSectionContent = (section: keyof WriteUpData, data: string[]) => {
+    if (SINGLE_FIELD_SECTIONS.includes(section)) {
+      const value = data[0] ?? ""
+      return editMode === section ? (
+        <ReactQuill
+          theme="snow"
+          value={value}
+          onChange={(val) => handlePointChange(section, 0, val)}
+          modules={quillModules}
+          formats={quillFormats}
+        />
+      ) : (
+        <Box
+          sx={{ color: "#1f2a44" }}
+          dangerouslySetInnerHTML={{ __html: value }}
+        />
+      )
+    }
+
+    return data.map((item, index) =>
       editMode === section ? (
         <Box key={index} mb={2} sx={{ position: "relative" }}>
           <Box
@@ -449,6 +485,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         />
       )
     )
+  }
 
   /* ===================== UI ===================== */
 
@@ -572,7 +609,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           gap: 2
         }}
       >
-        {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
+        {ACCORDION_SECTIONS.map(({ section, title,  }) => (
           <Accordion
             key={section}
             defaultExpanded={pdfMode}
@@ -604,7 +641,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 gap={1.5}
                 width="100%"
               >
-                <Box
+                {/* <Box
                   sx={{
                     color: "#124180",
                     display: "flex",
@@ -612,7 +649,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                   }}
                 >
                   {icon}
-                </Box>
+                </Box> */}
                 <Typography
                   fontWeight={700}
                   color="#124180"

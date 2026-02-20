@@ -75,11 +75,11 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
   const sections = useMemo(
     () => [
       { id: "deal-info", label: "Deal Info" },
-      { id: "ai-indication", label: "Proprietary Model Indication" },
-      { id: "business-overview", label: "Business Overview" },
+      // { id: "ai-indication", label: "Proprietary Model Indication" },
+      { id: "business-overview", label: "Company Overview." },
       { id: "key-risks", label: "Key Risks" },
       { id: "investment-highlights", label: "Investment Highlights" },
-      { id: "valuation-analysis", label: "Valuation Analysis" },
+      { id: "valuation-analysis", label: "Valuation" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comparative Multiples" },
     ],
@@ -251,13 +251,13 @@ const FebFOWriteUpDashboardMain: React.FC<FebFOWriteUpDashboardMainProps> = ({
               </CardContent>
             </Card>
 
-            <Card id="ai-indication" sx={sectionCardSx}>
+            {/* <Card id="ai-indication" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <FOWriteUpMetaDataAIIndication
                   basicDealDetails={basicDealDetails}
                 />
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card id="business-overview" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
