@@ -429,5 +429,4 @@ const MetricsTableMain: React.FC<Props> = ({
     </Box>
   );
 };
-
 export default MetricsTableMain;
