@@ -48,6 +48,20 @@ export interface ChartDataPoint {
   cumulative_pnl: number;
 }
 
+export interface IndexComparisonChartPoint {
+  date: string;
+  one_month_beta_sp: number;
+  three_month_beta_sp: number;
+  one_month_vol: number;
+  one_month_sp_vol: number;
+  three_month_vol: number;
+  three_month_sp_vol: number;
+  ytd_vol: number;
+  ytd_sp_vol: number;
+  drawdown: number;
+  sp_drawdown: number;
+}
+
 export interface PortfolioResponse {
   max_position_date: string | null;
   portfolios: string[];
