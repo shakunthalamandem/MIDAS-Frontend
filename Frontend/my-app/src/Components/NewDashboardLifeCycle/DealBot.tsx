@@ -4,6 +4,7 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  InputAdornment,
   LinearProgress,
   Paper,
   Stack,
@@ -11,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
@@ -198,12 +200,15 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
       const payload = await res.json();
       setBlocks(toBlocks(payload));
-      setQuestion("");
     } catch (error: any) {
       setQueryError(error?.message || "Failed to retrieve answer.");
     } finally {
       setQueryLoading(false);
     }
+  };
+
+  const handleClearQuestion = () => {
+    setQuestion("");
   };
 
   return (
@@ -267,13 +272,16 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           <Box sx={{ flex: 1, width: "100%" }}>
             <TextField
               fullWidth
+              multiline
+              minRows={1}
+              maxRows={4}
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               placeholder="Ask about this deal..."
               disabled={queryLoading || prepLoading}
               size="medium"
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
                   handleAsk();
                 }
@@ -290,7 +298,22 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   "&:hover .MuiOutlinedInput-notchedOutline": {
                     borderColor: "transparent",
                   },
+                  "& textarea": {
+                    padding: "12px 16px",
+                  },
                 },
+                endAdornment: question ? (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={handleClearQuestion}
+                      disabled={queryLoading}
+                      aria-label="Clear question"
+                    >
+                      <CloseRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : undefined,
               }}
             />
           </Box>
