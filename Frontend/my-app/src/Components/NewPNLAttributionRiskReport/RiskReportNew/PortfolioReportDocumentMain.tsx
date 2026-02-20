@@ -281,7 +281,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#0f172a" }}>
-            AI Portfolio Review
+            US Portfolio Review
           </Typography>
           <Typography sx={{ color: "#334155", fontSize: 14, mb: 3 }}>
             Select a report to view the AI-driven portfolio risk analysis
@@ -536,9 +536,23 @@ const PortfolioReportDocumentMain: React.FC = () => {
           </IconButton>
           <Box sx={{ flex: 1, textAlign: "center" }}>
             <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
+              <Box component="span" sx={{ color: "#38bdf8" }}>
+                US PORTFOLIO REVIEW
+              </Box>
+              {" - "}
               {header.report_title}
             </Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+            <Typography
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                fontSize: 12.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0.5,
+                mt: 0.5,
+              }}
+            >
               <Box component="span" sx={{ color: "#60a5fa", fontWeight: 600 }}>{formatDate(header.date)}</Box>
               {header.aum_formatted && (
                 <>
