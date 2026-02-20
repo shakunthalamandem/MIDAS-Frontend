@@ -86,7 +86,7 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
                 }}
               />
               <Area
-                type="monotone"
+                type="linear"
                 dataKey="cumulative_pnl"
                 stroke="#7c3aed"
                 strokeWidth={2.5}
