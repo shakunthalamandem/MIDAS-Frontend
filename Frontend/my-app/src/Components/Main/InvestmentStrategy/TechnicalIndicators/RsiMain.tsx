@@ -107,7 +107,7 @@ const RsiMain: React.FC<RsiMainProps> = ({ ticker }) => {
               <YAxis />
               <Tooltip />
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="value"
                 stroke="#018ba4"
                 strokeWidth={1}

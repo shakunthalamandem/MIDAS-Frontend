@@ -158,7 +158,7 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
               {/* Conditionally render US and International lines based on checkbox states */}
               {showUS && (
                 <Area
-                  type="monotone"
+                  type="linear"
                   dataKey="us"
                   stroke="#166103"
                   fillOpacity={0.3}
@@ -167,7 +167,7 @@ const AreaChartComponent: React.FC<AreaChartComponentProps> = ({ dataCategory })
               )}
               {showInternational && (
                 <Area
-                  type="monotone"
+                  type="linear"
                   dataKey="international"
                   stroke="#1b6ca8"
                   fillOpacity={0.3}

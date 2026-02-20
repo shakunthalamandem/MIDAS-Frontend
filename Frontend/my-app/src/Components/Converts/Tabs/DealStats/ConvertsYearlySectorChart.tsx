@@ -106,7 +106,7 @@ const ConvertsYearlySectorChart: React.FC<LineChartProps> = ({ data, selectedMet
           {visibleSectors.map((sector, index) => (
             <Line
               key={sector}
-              type="monotone"
+              type="linear"
               dataKey={sector}
               stroke={colors[index % colors.length]} // Assign color from the colors array
               dot={false} 

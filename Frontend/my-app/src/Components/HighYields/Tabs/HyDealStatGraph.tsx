@@ -169,9 +169,9 @@ const HyDealStatGraph = ({ selectedFilters }: { selectedFilters: SelectedFilters
             <YAxis tickFormatter={(tick) => formatNumber(tick)} /> {/* Format Y Axis Labels */}
             <Tooltip content={<CustomTooltip />} />
             {/* Render bars based on selected metric */}
-            {selectedMetric === "count" && <Bar type="monotone" dataKey="count" fill="#8884d8" />}
-            {selectedMetric === "deal_value" && <Bar type="monotone" dataKey="deal_value" fill="#82ca9d" />}
-            {selectedMetric === "opp_value" && <Bar type="monotone" dataKey="opp_value" fill="#ffc658" />}
+            {selectedMetric === "count" && <Bar type="linear" dataKey="count" fill="#8884d8" />}
+            {selectedMetric === "deal_value" && <Bar type="linear" dataKey="deal_value" fill="#82ca9d" />}
+            {selectedMetric === "opp_value" && <Bar type="linear" dataKey="opp_value" fill="#ffc658" />}
             {selectedMetric === "opp_value" && (
               <ReferenceLine y={0} stroke="#000" strokeWidth={2} /> // Solid line at $0 for Opportunity Value
             )}

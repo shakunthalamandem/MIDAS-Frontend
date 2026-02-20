@@ -195,25 +195,25 @@ const CumulativeyearlyChart: React.FC = () => {
               {showCount && (
                 <>
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="2022"
                     stroke="#8884d8"
                     name="2022 Deal Count"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="2023"
                     stroke="#214100"
                     name="2023 Deal Count"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="2024"
                     stroke="#ff7300"
                     name="2024 Deal Count"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="CumulativeCount"
                     stroke="#002060"
                     name="Avg Deal Count"
@@ -225,25 +225,25 @@ const CumulativeyearlyChart: React.FC = () => {
               {showSize && (
                 <>
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="cumulative_avg_2022"
                     stroke="#ff6347"
                     name="2022  Deal Size"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="cumulative_avg_2023"
                     stroke="#214100"
                     name="2023  Deal Size"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="cumulative_avg_2024"
                     stroke="#8a009a"
                     name="2024  Deal Size"
                   />
                   <Line
-                    type="monotone"
+                    type="linear"
                     dataKey="cumulativedata_avg_size"
                     stroke="#002060"
                     name="Avg  Deal Size"

@@ -139,7 +139,7 @@ const RegionWiseChart: React.FC<RegionWiseChartProps> = ({
           {visibleRegions.map((region, index) => (
             <Line
               key={region}
-              type="monotone"
+              type="linear"
               dataKey={region}
               stroke={colors[index % colors.length]} // Assign color from the array
               activeDot={{ r: 8 }}

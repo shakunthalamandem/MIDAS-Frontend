@@ -189,7 +189,7 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
                 }}
               />
               <Line
-                type="monotone"
+                type="linear"
                 dataKey={cfg.dataKey}
                 name={cfg.label}
                 stroke={cfg.color}
@@ -204,7 +204,7 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
               />
               {hasDualLines && cfg.subKey && (
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey={cfg.subKey}
                   name={cfg.subLabel}
                   stroke={cfg.subColor}

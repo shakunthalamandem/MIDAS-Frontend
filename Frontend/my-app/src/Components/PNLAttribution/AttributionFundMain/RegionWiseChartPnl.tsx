@@ -230,7 +230,7 @@ const RegionWiseChartPnl: React.FC<Props> = ({ fund }) => {
                 {regions.map((region) => (
                   <Line
                     key={region}
-                    type="monotone"
+                    type="linear"
                     dataKey={region}
                     stroke={REGION_COLORS[region] || "#888888"}
                     strokeWidth={2.5}
