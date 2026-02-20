@@ -120,6 +120,7 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
 
 const SIDEBAR_WIDTH = 240;
 const SIDEBAR_COLLAPSED = 60;
+const LAYOUT_CHROME_HEIGHT = 160; // navbar + footer space (adjust if those heights change)
 
 const PortfolioReportDocumentMain: React.FC = () => {
   const [reportList, setReportList] = useState<ReportListItem[]>([]);
@@ -355,8 +356,15 @@ const PortfolioReportDocumentMain: React.FC = () => {
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
   return (  
-    <Container maxWidth='xl' sx={{mb:4}}>
-    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#eef2ff" }}>
+    <Container maxWidth="xl" sx={{ mb: 4, height: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)` }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "100%",
+        minHeight: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)`,
+        backgroundColor: "#eef2ff",
+      }}
+    >
       {/* ===== Sidebar ===== */}
       <Box
         sx={{
