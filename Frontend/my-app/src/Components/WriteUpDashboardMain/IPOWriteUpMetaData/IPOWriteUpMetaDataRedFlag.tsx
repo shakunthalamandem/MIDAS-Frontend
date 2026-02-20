@@ -857,7 +857,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         ) : (
                           item.impact_risk ?? "--"
                         )}
-                      </Typography> */}
+                      </Typography>
                     </Stack>
                   </Box>
                   <Box
