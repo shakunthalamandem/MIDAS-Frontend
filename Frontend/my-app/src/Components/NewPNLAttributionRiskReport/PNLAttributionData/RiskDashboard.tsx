@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress, Alert, Container, Typography } from "@mui/material";
-import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse } from "./types";
+import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
+import TopBottomPnLTable from "./TopBottomPnLTable";
 import IndexComparisonChart from "./IndexComparisonChart";
 import Attribution from "./Attribution";
 import AttributionAllTabs from "./AttributionAllTabs";
@@ -34,6 +35,9 @@ const RiskDashboard: React.FC = () => {
   const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>(null);
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [indexChartLoading, setIndexChartLoading] = useState(false);
+  const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
+  const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
+  const [topBottomLoading, setTopBottomLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -115,6 +119,32 @@ const RiskDashboard: React.FC = () => {
   useEffect(() => {
     fetchChartData();
   }, [fetchChartData]);
+
+  // Fetch top/bottom PNL tickers
+  const fetchTopBottomPnl = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate) return;
+    setTopBottomLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch top/bottom PNL");
+      const result = await res.json();
+      setTopBottomTop(result.top_10 || []);
+      setTopBottomBottom(result.bottom_10 || []);
+    } catch {
+      setTopBottomTop([]);
+      setTopBottomBottom([]);
+    } finally {
+      setTopBottomLoading(false);
+    }
+  }, [selectedFunds, selectedDate]);
+
+  useEffect(() => {
+    fetchTopBottomPnl();
+  }, [fetchTopBottomPnl]);
 
   // Fetch index comparison chart data
   const fetchIndexChartData = useCallback(async () => {
@@ -234,6 +264,14 @@ const RiskDashboard: React.FC = () => {
               chartData={chartData}
               loading={chartLoading}
               period={metricToPeriod(selectedMetric)}
+            />
+          </Box>
+
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              loading={topBottomLoading}
             />
           </Box>
 

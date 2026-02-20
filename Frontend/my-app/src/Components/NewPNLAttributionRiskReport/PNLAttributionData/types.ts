@@ -81,6 +81,19 @@ export interface AttributionItem {
   beta_adj_net_pct: number;
 }
 
+export interface TopBottomPnlTicker {
+  ticker: string;
+  issuer: string;
+  pnl: number;
+}
+
+export interface TopBottomPnlData {
+  date: string;
+  fund: string[];
+  top_10: TopBottomPnlTicker[];
+  bottom_10: TopBottomPnlTicker[];
+}
+
 export type AttributionGroupBy =
   | "analyst"
   | "sector"
