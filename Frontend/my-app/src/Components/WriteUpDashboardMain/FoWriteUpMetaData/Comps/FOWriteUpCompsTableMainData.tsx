@@ -9,7 +9,11 @@ import {
   TableCell,
   TableBody,
   TableContainer,
+  IconButton,
+  CircularProgress,
+  Tooltip,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { ColumnDef, createColumns } from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/columns";
 import CompetitorSearch from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/CompetitorSearch";
 import DeleteConfirmDialog from "../../../IPODashboardLLM/IPODashboardMain/IPOCompsTableMain/DeleteConfirmDialog";
@@ -23,7 +27,7 @@ import { FOformatValue } from "../../../Main/FOWriteUpMain/FOWriteSections/FOCom
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
 type ApiResponse = {
-  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType };
+  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType; latest_updated_at?: string };
 };
 
 interface Props {
@@ -36,8 +40,9 @@ const FOWriteUpCompsTableMainData: React.FC<Props> = ({ ticker, data, onRefresh,
   const showActions = true;
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const columns: ColumnDef[] = useMemo(() => createColumns(pricingYear), [pricingYear]);
-  
+
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -132,6 +137,29 @@ const confirmDelete = async () => {
 };
 
 
+  const handleRefreshComps = async () => {
+    setRefreshing(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${apiUrl}/api/fo_fs_ticker_competitor_update/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker }),
+      });
+      if (!res.ok) throw new Error("Failed to refresh comps data");
+      setSnackbar({ open: true, message: "Comps data refreshed successfully!", severity: "success" });
+      if (onRefresh) await onRefresh();
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || "Error refreshing comps data", severity: "error" });
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const handleAddCompetitor = async (competitorTicker: string) => {
     const exists = rows.some(
       (row) => row.competitor.toLowerCase() === competitorTicker.toLowerCase()
@@ -175,9 +203,32 @@ const confirmDelete = async () => {
         }}
       >
         <Typography variant="h6" color="#002060" fontWeight={600}>
-          Comparative Trading Multiples & Performance 
+          Comparative Trading Multiples & Performance
         </Typography>
         <CompetitorSearch onSelect={handleAddCompetitor} />
+      </Box>
+
+      {/* Updated + Refresh - Below heading, right aligned */}
+      <Box className="pdf-hidden" sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+        {data[ticker]?.latest_updated_at && (
+          <Typography sx={{ fontSize: 11, color: "#888", whiteSpace: "nowrap", fontStyle: "italic" }}>
+            Last updated: {data[ticker].latest_updated_at}
+          </Typography>
+        )}
+        <Tooltip title="Refresh comps data">
+          <IconButton
+            size="small"
+            onClick={handleRefreshComps}
+            disabled={refreshing}
+            sx={{
+              color: "#002060",
+              p: 0.3,
+              "&:hover": { color: "#001040", backgroundColor: "rgba(0,32,96,0.1)" },
+            }}
+          >
+            {refreshing ? <CircularProgress size={14} /> : <RefreshIcon sx={{ fontSize: 16 }} />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <TableContainer

@@ -9,6 +9,9 @@ import {
   TableCell,
   TableBody,
   TableContainer,
+  IconButton,
+  CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import CompetitorSearch from "./CompetitorSearch";
 import MetricsRow from "./MetricsRow";
@@ -18,6 +21,7 @@ import { createColumns } from "./columns";
 import { formatValue } from "./formatValue";
 import { addCompetitor, deleteCompetitor, updateRow } from "./Services/api";
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const parseRatingValue = (value?: number | string | null) => {
   if (value === undefined || value === null) return null;
@@ -43,7 +47,7 @@ const formatRatingValue = (value: number) => {
 type ComparableMetric = any;
 type AveragesType = { [key: string]: { average?: number; median?: number } };
 type ApiResponse = {
-  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType };
+  [ticker: string]: { data: ComparableMetric[]; Averages?: AveragesType; latest_updated_at?: string };
 };
 
 interface Props {
@@ -64,6 +68,7 @@ const MetricsTableMain: React.FC<Props> = ({
   const [rows, setRows] = useState<ComparableMetric[]>([]);
   const [ratingText, setRatingText] = useState<string | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -265,6 +270,29 @@ const MetricsTableMain: React.FC<Props> = ({
     }
   };
 
+  const handleRefreshComps = async () => {
+    setRefreshing(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${apiUrl}/api/fs_ticker_competitor_update/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ ticker }),
+      });
+      if (!res.ok) throw new Error("Failed to refresh comps data");
+      setSnackbar({ open: true, message: "Comps data refreshed successfully!", severity: "success" });
+      if (onRefresh) await onRefresh();
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || "Error refreshing comps data", severity: "error" });
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const tableColumns = useMemo(() => createColumns(pricingYear), [pricingYear]);
   const headerCellSx = {
     color: "white",
@@ -324,6 +352,29 @@ const MetricsTableMain: React.FC<Props> = ({
         <Box sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
           <CompetitorSearch onSelect={handleAddCompetitor} />
         </Box>
+      </Box>
+
+      {/* Updated + Refresh - Below heading, right aligned */}
+      <Box className="pdf-hidden" sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+        {data[ticker]?.latest_updated_at && (
+          <Typography sx={{ fontSize: 11, color: "#888", whiteSpace: "nowrap", fontStyle: "italic" }}>
+            Last updated: {data[ticker].latest_updated_at}
+          </Typography>
+        )}
+        <Tooltip title="Refresh comps data">
+          <IconButton
+            size="small"
+            onClick={handleRefreshComps}
+            disabled={refreshing}
+            sx={{
+              color: "#124180",
+              p: 0.3,
+              "&:hover": { color: "#002060", backgroundColor: "rgba(18,65,128,0.1)" },
+            }}
+          >
+            {refreshing ? <CircularProgress size={14} /> : <RefreshIcon sx={{ fontSize: 16 }} />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2 }}>
@@ -429,5 +480,4 @@ const MetricsTableMain: React.FC<Props> = ({
     </Box>
   );
 };
-
 export default MetricsTableMain;
