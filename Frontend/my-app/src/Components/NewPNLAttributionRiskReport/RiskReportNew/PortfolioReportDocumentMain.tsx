@@ -207,7 +207,12 @@ const PortfolioReportDocumentMain: React.FC = () => {
       }
       const data: ReportData = await res.json();
       setReportData(data);
-      if (data.sidebar?.length) setActiveSection(data.sidebar[0].key);
+      if (data.sidebar?.length) {
+        const firstVisible = data.sidebar.find(
+          (item) => item.key !== "cio_decision_brief"
+        );
+        if (firstVisible) setActiveSection(firstVisible.key);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -343,6 +348,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
   // ---------- Report loaded: show viewer ----------
   const header = reportData!.header;
   const sidebar = reportData!.sidebar;
+  const visibleSidebar = sidebar.filter(
+    (item) => item.key !== "cio_decision_brief"
+  );
   const sections = reportData!.sections;
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
@@ -417,7 +425,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
         {/* Nav Items */}
         <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
-          {sidebar.map((item) => {
+          {visibleSidebar.map((item) => {
             const isActive = activeSection === item.key;
             return (
               <Box
@@ -574,7 +582,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
           )}
 
-          {sidebar.map((item) => {
+          {visibleSidebar.map((item) => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
             const isNumeric = /^\d+$/.test(item.section_number);
