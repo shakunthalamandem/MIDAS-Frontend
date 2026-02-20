@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import {
   DataGrid,
@@ -29,6 +28,8 @@ interface AttributionTableProps {
   theme: TabTheme;
   selectedFunds?: string[];
   selectedDate?: string;
+  expandedRow?: string | null;
+  onRowClick?: (name: string) => void;
 }
 
 const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
@@ -96,8 +97,9 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
   theme,
   selectedFunds,
   selectedDate,
+  expandedRow,
+  onRowClick,
 }) => {
-  const navigate = useNavigate();
   const rows = useMemo(
     () => data.map((item, idx) => ({ id: idx, ...item })),
     [data]
@@ -208,18 +210,15 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         rowHeight={42}
         disableRowSelectionOnClick
         disableColumnMenu
+        getRowClassName={(params) =>
+          expandedRow && params.row.name === expandedRow ? "attr-row--expanded" : ""
+        }
         slots={{ toolbar: CustomToolbar }}
         onRowClick={(params: GridRowParams) => {
-          if (!selectedFunds || !selectedDate) return;
+          if (!selectedFunds || !selectedDate || !onRowClick) return;
           const name = params.row.name;
           if (name?.toUpperCase() === "OTHER") return;
-          const searchParams = new URLSearchParams({
-            fund: JSON.stringify(selectedFunds),
-            date: selectedDate,
-            groupBy,
-            groupValue: name,
-          });
-          navigate(`/risk_report_pnl_report/ticker-detail?${searchParams.toString()}`);
+          onRowClick(name);
         }}
         initialState={{
           sorting: {
@@ -269,7 +268,11 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             backgroundColor: "#fff",
           },
           "& .MuiDataGrid-row": {
-            cursor: selectedFunds && selectedDate ? "pointer" : "default",
+            cursor: selectedFunds && selectedDate && onRowClick ? "pointer" : "default",
+          },
+          "& .MuiDataGrid-row.attr-row--expanded": {
+            backgroundColor: `${theme.hoverRow} !important`,
+            fontWeight: 700,
           },
           "& .MuiDataGrid-row:hover": {
             backgroundColor: `${theme.hoverRow} !important`,

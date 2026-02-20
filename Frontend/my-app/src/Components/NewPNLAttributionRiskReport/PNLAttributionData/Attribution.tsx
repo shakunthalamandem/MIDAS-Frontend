@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import type { AttributionItem, AttributionGroupBy } from "./types";
 import AttributionTable from "./AttributionTable";
+import AttributionDetail from "./AttributionDetail";
 import "./Attribution.css";
 
 interface AttributionProps {
@@ -101,6 +102,7 @@ const Attribution: React.FC<AttributionProps> = ({
   const [data, setData] = useState<AttributionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const activeTheme = GROUP_BY_TABS.find((t) => t.key === groupBy)!;
 
@@ -137,6 +139,15 @@ const Attribution: React.FC<AttributionProps> = ({
   useEffect(() => {
     fetchAttribution();
   }, [fetchAttribution]);
+
+  /* Close detail when tab changes */
+  useEffect(() => {
+    setExpandedRow(null);
+  }, [groupBy]);
+
+  const handleRowClick = (name: string) => {
+    setExpandedRow((prev) => (prev === name ? null : name));
+  };
 
   return (
     <Box className="risk-dashboard-section">
@@ -186,14 +197,29 @@ const Attribution: React.FC<AttributionProps> = ({
             <CircularProgress size={32} />
           </Box>
         ) : data.length > 0 ? (
-          <AttributionTable
-            data={data}
-            showPct={showPct}
-            groupBy={groupBy}
-            theme={activeTheme}
-            selectedFunds={selectedFunds}
-            selectedDate={selectedDate}
-          />
+          <>
+            <AttributionTable
+              data={data}
+              showPct={showPct}
+              groupBy={groupBy}
+              theme={activeTheme}
+              selectedFunds={selectedFunds}
+              selectedDate={selectedDate}
+              expandedRow={expandedRow}
+              onRowClick={handleRowClick}
+            />
+            {expandedRow && (
+              <AttributionDetail
+                groupBy={groupBy}
+                groupValue={expandedRow}
+                selectedFunds={selectedFunds}
+                selectedDate={selectedDate}
+                showPct={showPct}
+                theme={activeTheme}
+                onClose={() => setExpandedRow(null)}
+              />
+            )}
+          </>
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
             No attribution data available
