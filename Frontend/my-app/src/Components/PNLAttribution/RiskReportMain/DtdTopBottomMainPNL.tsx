@@ -227,9 +227,6 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
                   <TableCell align="right" style={{ color: "#002060" }}>
                     Net of Hedge P&L (%)
                   </TableCell>
-                  <TableCell align="right" style={{ color: "#002060" }}>
-                    Long Exposure/LMV (%)
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -244,9 +241,6 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
                     <TableCell>{row.ticker || "-"}</TableCell>
                     <TableCell align="right">
                       {(row.net_of_hedge_pnl_percent ?? 0).toFixed(2)}%
-                    </TableCell>
-                    <TableCell align="right">
-                      {(row.long_exposure_lmv ?? 0).toFixed(2)}%
                     </TableCell>
                   </TableRow>
                 ))}
@@ -274,9 +268,6 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
                   <TableCell align="right" style={{ color: "#002060" }}>
                     Net of Hedge P&L(%)
                   </TableCell>
-                  <TableCell align="right" style={{ color: "#002060" }}>
-                    Long Exposure/LMV(%)
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -291,9 +282,6 @@ const DtdTopBottomMainPNL: React.FC<DtdTopBottomMainPNLProps> = ({
                     <TableCell>{row.ticker || "-"}</TableCell>
                     <TableCell align="right">
                       {(row.net_of_hedge_pnl_percent ?? 0).toFixed(2)}%
-                    </TableCell>
-                    <TableCell align="right">
-                      {(row.long_exposure_lmv ?? 0).toFixed(2)}%
                     </TableCell>
                   </TableRow>
                 ))}
