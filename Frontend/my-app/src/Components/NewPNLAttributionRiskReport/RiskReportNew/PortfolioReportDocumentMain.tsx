@@ -105,6 +105,7 @@ const sectionGradients: Record<string, string> = {
 
 const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   executive_risk_dashboard: ExecutiveDashboard,
+  final_prioritized_action_matrix: ActionMatrix,
   cio_decision_brief: CIODecisionBrief,
   immediate_decisions: ImmediateDecisions,
   base_model_discipline_scorecard: DisciplineScorecard,
@@ -115,11 +116,11 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   upcoming_week_focus: WeeklyFocus,
   upcoming_month_strategic_outlook: MonthlyOutlook,
   role_specific_action_checklists: ActionChecklists,
-  final_prioritized_action_matrix: ActionMatrix,
 };
 
 const SIDEBAR_WIDTH = 240;
 const SIDEBAR_COLLAPSED = 60;
+const LAYOUT_CHROME_HEIGHT = 160; // navbar + footer space (adjust if those heights change)
 
 const PortfolioReportDocumentMain: React.FC = () => {
   const [reportList, setReportList] = useState<ReportListItem[]>([]);
@@ -207,7 +208,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
       }
       const data: ReportData = await res.json();
       setReportData(data);
-      if (data.sidebar?.length) setActiveSection(data.sidebar[0].key);
+      if (data.sidebar?.length) {
+        setActiveSection(data.sidebar[0].key);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -278,7 +281,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#0f172a" }}>
-            AI Portfolio Review
+            US Portfolio Review
           </Typography>
           <Typography sx={{ color: "#334155", fontSize: 14, mb: 3 }}>
             Select a report to view the AI-driven portfolio risk analysis
@@ -343,12 +346,30 @@ const PortfolioReportDocumentMain: React.FC = () => {
   // ---------- Report loaded: show viewer ----------
   const header = reportData!.header;
   const sidebar = reportData!.sidebar;
+  const orderIndex = new Map(
+    Object.keys(sectionComponents).map((key, idx) => [key, idx])
+  );
+  const orderedSidebar = [...sidebar]
+    .filter((item) => item.key !== "cio_decision_brief")
+    .sort((a, b) => {
+    const aIdx = orderIndex.has(a.key) ? orderIndex.get(a.key)! : 999;
+    const bIdx = orderIndex.has(b.key) ? orderIndex.get(b.key)! : 999;
+    if (aIdx !== bIdx) return aIdx - bIdx;
+    return 0;
+  });
   const sections = reportData!.sections;
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
   return (  
-    <Container maxWidth='xl' sx={{mb:4}}>
-    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#eef2ff" }}>
+    <Container maxWidth="xl" sx={{ mb: 4, height: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)` }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "100%",
+        minHeight: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)`,
+        backgroundColor: "#eef2ff",
+      }}
+    >
       {/* ===== Sidebar ===== */}
       <Box
         sx={{
@@ -417,7 +438,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
         {/* Nav Items */}
         <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
-          {sidebar.map((item) => {
+          {orderedSidebar.map((item) => {
             const isActive = activeSection === item.key;
             return (
               <Box
@@ -515,9 +536,23 @@ const PortfolioReportDocumentMain: React.FC = () => {
           </IconButton>
           <Box sx={{ flex: 1, textAlign: "center" }}>
             <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
+              <Box component="span" sx={{ color: "#38bdf8" }}>
+                US PORTFOLIO REVIEW
+              </Box>
+              {" - "}
               {header.report_title}
             </Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+            <Typography
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                fontSize: 12.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0.5,
+                mt: 0.5,
+              }}
+            >
               <Box component="span" sx={{ color: "#60a5fa", fontWeight: 600 }}>{formatDate(header.date)}</Box>
               {header.aum_formatted && (
                 <>
@@ -574,10 +609,11 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
           )}
 
-          {sidebar.map((item) => {
+          {orderedSidebar.map((item, index) => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
             const isNumeric = /^\d+$/.test(item.section_number);
+            const displayIndex = index + 1;
             const gradient = sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)";
 
             return (
@@ -606,7 +642,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                     {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 18, color: "#fff", flex: 1 }}>
-                    {isNumeric ? `${item.section_number}. ` : ""}
+                    {isNumeric ? `${displayIndex}. ` : ""}
                     {item.label}
                   </Typography>
                   {sectionData?.badge && (
