@@ -105,6 +105,7 @@ const sectionGradients: Record<string, string> = {
 
 const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   executive_risk_dashboard: ExecutiveDashboard,
+  final_prioritized_action_matrix: ActionMatrix,
   cio_decision_brief: CIODecisionBrief,
   immediate_decisions: ImmediateDecisions,
   base_model_discipline_scorecard: DisciplineScorecard,
@@ -115,7 +116,6 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   upcoming_week_focus: WeeklyFocus,
   upcoming_month_strategic_outlook: MonthlyOutlook,
   role_specific_action_checklists: ActionChecklists,
-  final_prioritized_action_matrix: ActionMatrix,
 };
 
 const SIDEBAR_WIDTH = 240;
@@ -209,10 +209,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
       const data: ReportData = await res.json();
       setReportData(data);
       if (data.sidebar?.length) {
-        const firstVisible = data.sidebar.find(
-          (item) => item.key !== "cio_decision_brief"
-        );
-        if (firstVisible) setActiveSection(firstVisible.key);
+        setActiveSection(data.sidebar[0].key);
       }
     } catch (err: any) {
       setError(err.message);
@@ -349,9 +346,17 @@ const PortfolioReportDocumentMain: React.FC = () => {
   // ---------- Report loaded: show viewer ----------
   const header = reportData!.header;
   const sidebar = reportData!.sidebar;
-  const visibleSidebar = sidebar.filter(
-    (item) => item.key !== "cio_decision_brief"
+  const orderIndex = new Map(
+    Object.keys(sectionComponents).map((key, idx) => [key, idx])
   );
+  const orderedSidebar = [...sidebar]
+    .filter((item) => item.key !== "cio_decision_brief")
+    .sort((a, b) => {
+    const aIdx = orderIndex.has(a.key) ? orderIndex.get(a.key)! : 999;
+    const bIdx = orderIndex.has(b.key) ? orderIndex.get(b.key)! : 999;
+    if (aIdx !== bIdx) return aIdx - bIdx;
+    return 0;
+  });
   const sections = reportData!.sections;
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
@@ -433,7 +438,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
         {/* Nav Items */}
         <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
-          {visibleSidebar.map((item) => {
+          {orderedSidebar.map((item) => {
             const isActive = activeSection === item.key;
             return (
               <Box
@@ -590,10 +595,11 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
           )}
 
-          {visibleSidebar.map((item) => {
+          {orderedSidebar.map((item, index) => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
             const isNumeric = /^\d+$/.test(item.section_number);
+            const displayIndex = index + 1;
             const gradient = sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)";
 
             return (
@@ -622,7 +628,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                     {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 18, color: "#fff", flex: 1 }}>
-                    {isNumeric ? `${item.section_number}. ` : ""}
+                    {isNumeric ? `${displayIndex}. ` : ""}
                     {item.label}
                   </Typography>
                   {sectionData?.badge && (
