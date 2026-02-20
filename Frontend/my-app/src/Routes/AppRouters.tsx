@@ -94,6 +94,12 @@ import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDa
 import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
 import TickerChange from "../Components/TickerChange/TickerChange";
 import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
+import PNLAttributionSectionMain from "../Components/NewPNLAttributionRiskReport/PNLAttributionSectionMain";
+import NewPortfolioRiskUpload from "../Components/Uploads/NewPortfolioRiskUpload";
+import RiskDashboard from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard";
+import TickerDetail from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/TickerDetail";
+import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain";
+import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
 
 
 const AppRouters: React.FC = () => {
@@ -294,6 +300,21 @@ const AppRouters: React.FC = () => {
         <Route path='/deals/future_pipeline' element={<AuthGuard><FuturePipelineDealsMain /></AuthGuard>} />
         <Route path="/ticker-change" element={<AuthGuard><TickerChange /></AuthGuard>} />
 
+
+
+
+
+
+        <Route path='/risk_report_pnl_report' element={<AuthGuard><RiskDashboard /></AuthGuard>} />
+        <Route path='/risk_report_pnl_report/ticker-detail' element={<AuthGuard><TickerDetail /></AuthGuard>} />
+        <Route path='/risk_upload' element={<AuthGuard><NewPortfolioRiskUpload /></AuthGuard>} />
+
+
+        <Route path='/risk_document_upload' element={<AuthGuard><RiskAIDocumentUpload /></AuthGuard>} />
+        <Route path='/ai_portfolio_review' element={<AuthGuard><PortfolioReportDocumentMain /></AuthGuard>} />
+
+
+        
 
 
         

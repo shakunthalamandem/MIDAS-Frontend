@@ -30,6 +30,7 @@ import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
@@ -310,6 +311,11 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_results",
                   icon: <InsightsIcon fontSize="small" />,
                 },
+              {
+                  label: "AI Portfolio Review",
+                  path: "/ai_portfolio_review",
+                  icon: <PsychologyIcon fontSize="small" />,
+                },
                 {
                   label: "ABB Model",
                   path: "/equity/abb_model",
@@ -340,6 +346,11 @@ const NavbarMain: React.FC = () => {
                   label: "P&L Attribution",
                   path: "/portfolio-attribution",
                   icon: <TimelineOutlinedIcon fontSize="small" />,
+                },
+                                {
+                  label: "New P&L and Risk Report ",
+                  path: "/risk_report_pnl_report",
+                  icon: <AssessmentOutlinedIcon fontSize="small" />,
                 },
                 {
                   label: "Daily Note to Funds",

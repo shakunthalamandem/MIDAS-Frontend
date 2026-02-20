@@ -687,7 +687,7 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
                         }}
                       />
                     ) : (
-                      <Typography variant="body2" sx={{ color: "#374151" }}>
+                      <Typography variant="body2" sx={{ color: "#000000" }}>
                         {value || "--"}
                       </Typography>
                     )}
