@@ -236,7 +236,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
               Deal Bot
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Ask questions based on the selected deal.
+              Ask questions about {basicDealDetails.ticker }
             </Typography>
           </Box>
           <Box
@@ -293,10 +293,12 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   color: "text.primary",
                   boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+                    borderColor: " rgba(99, 102, 241, 0.85)",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+                    borderColor: " rgba(99, 102, 241, 0.85)",
+                                      boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
+
                   },
                   "& textarea": {
                     padding: "12px 16px",
@@ -343,42 +345,13 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         </Box>
 
         {prepLoading && <LinearProgress />}
-        {prepError && <Alert severity="error">{prepError}</Alert>}
-        {queryError && <Alert severity="error">{queryError}</Alert>}
+        {prepError && <Alert severity="error">{prepError} Try again.</Alert>}
+        {queryError && <Alert severity="error">{queryError} Try again.</Alert>}
 
-        <Box>
-          {blocks.length === 0 ? (
-            <Paper
-              elevation={0}
-              sx={{
-                borderRadius: 3,
-                border: "1px dashed",
-                borderColor: "divider",
-                bgcolor: "rgba(248, 250, 252, 0.8)",
-                p: 3,
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                {prepLoading
-                  ? "Preparing deal data..."
-                  : "Once the deal metadata is ready, ask anything about this transaction."}
-              </Typography>
-            </Paper>
-          ) : (
-            <Paper
-              elevation={0}
-              sx={{
-                borderRadius: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                bgcolor: "rgba(255, 255, 255, 0.95)",
-              }}
-            >
-              <GENAIRenderer blocks={blocks} renderAll disableMotion />
-            </Paper>
-          )}
-        </Box>
+        {blocks.length > 0 && (
+  
+            <GENAIRenderer blocks={blocks} renderAll disableMotion />
+        )}
       </Stack>
     </Paper>
   );
