@@ -247,7 +247,24 @@ const NavbarMain: React.FC = () => {
                   label: "New Dashboard",
                   path: "/deals/new_dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                  onSelect: () => setNewDashboardDefaults("US"),
+                  children: [
+                    {
+                      label: "US",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("US"),
+                    },
+      
+                    {
+                      label: "EMEA",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("EMEA"),
+                    },
+                                  {
+                      label: "APAC",
+                      path: "/deals/new_dashboard",
+                      onSelect: () => setNewDashboardDefaults("APAC"),
+                    },
+                  ],
                 },
                                 {
                   label: "Future Pipeline",
