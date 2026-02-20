@@ -829,7 +829,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                           />
                         )}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: "#1f2937" }}>
+                      <Typography variant="body2" sx={{ color: "#000000" }}>
                         <Box component="span" sx={{ fontWeight: 700 }}>
                           Impact:
                         </Box>{" "}
