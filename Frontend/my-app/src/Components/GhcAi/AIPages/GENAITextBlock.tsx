@@ -6,11 +6,11 @@ const GENAITextBlock: React.FC<{ content: string }> = ({ content }) => {
   return (
     <Card
       sx={{
-        backgroundColor: "rgba(217, 235, 235, 1)", // light transparent white
+        backgroundColor: "#5d5df010", // light transparent white
         // backgroundcolor:"red",
         borderRadius: 3,
         boxShadow: 2,
-        border: "1px solid rgba(255, 255, 255, 0.1)", // subtle white border
+        border: "1px solid #5d5df0a4", // subtle white border
         color: "#0f0e0eff",
         p: 1,
       }}

@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   CircularProgress,
-  Divider,
   IconButton,
   LinearProgress,
   Paper,
@@ -12,6 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
+import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 type DealBotBasicDealDetails = {
   ticker?: string;
@@ -25,33 +26,54 @@ type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
 };
 
-type ChatEntry = {
-  question: string;
-  answer: string;
-};
-
-const formatResponse = (payload: unknown): string => {
-  if (typeof payload === "string") return payload;
+const toBlocks = (payload: unknown): Block[] => {
+  if (!payload) return [];
+  if (Array.isArray(payload)) {
+    return payload as Block[];
+  }
   if (typeof payload === "object" && payload !== null) {
-    const candidate = (payload as Record<string, any>).answer ?? (payload as Record<string, any>).response;
-    if (candidate && typeof candidate === "string") return candidate;
-    const message = (payload as Record<string, any>).message;
-    if (message && typeof message === "string") return message;
-    const data = (payload as Record<string, any>).data;
-    if (data !== undefined) {
-      try {
-        return typeof data === "string" ? data : JSON.stringify(data, null, 2);
-      } catch {
-        return "Received dealbot response.";
+    const candidates = [
+      (payload as Record<string, unknown>).answer,
+      (payload as Record<string, unknown>).blocks,
+      (payload as Record<string, unknown>).data,
+      (payload as Record<string, unknown>).response,
+    ];
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        return candidate as Block[];
       }
     }
+    const textCandidate = candidates.find((c) => typeof c === "string") as string | undefined;
+    if (textCandidate) {
+      return [
+        {
+          type: "text",
+          content: textCandidate,
+        },
+      ];
+    }
     try {
-      return JSON.stringify(payload, null, 2);
+      return [
+        {
+          type: "text",
+          content: JSON.stringify(payload, null, 2),
+        },
+      ];
     } catch {
-      return "Received dealbot response.";
+      return [
+        {
+          type: "text",
+          content: "Received deal bot response.",
+        },
+      ];
     }
   }
-  return "Received dealbot response.";
+  return [
+    {
+      type: "text",
+      content: String(payload),
+    },
+  ];
 };
 
 const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
@@ -59,14 +81,14 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [prepLoading, setPrepLoading] = React.useState(false);
   const [prepError, setPrepError] = React.useState<string | null>(null);
   const [question, setQuestion] = React.useState("");
-  const [entries, setEntries] = React.useState<ChatEntry[]>([]);
+  const [blocks, setBlocks] = React.useState<Block[]>([]);
   const [queryLoading, setQueryLoading] = React.useState(false);
   const [queryError, setQueryError] = React.useState<string | null>(null);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
 
   React.useEffect(() => {
-    setEntries([]);
+    setBlocks([]);
     setQuestion("");
     setQueryError(null);
     setApiData(null);
@@ -149,6 +171,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       return;
     }
 
+    setBlocks([]);
     setQueryLoading(true);
     setQueryError(null);
 
@@ -174,8 +197,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       }
 
       const payload = await res.json();
-      const answer = formatResponse(payload);
-      setEntries((prev) => [...prev, { question: trimmed, answer }]);
+      setBlocks(toBlocks(payload));
       setQuestion("");
     } catch (error: any) {
       setQueryError(error?.message || "Failed to retrieve answer.");
@@ -301,40 +323,39 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         {prepError && <Alert severity="error">{prepError}</Alert>}
         {queryError && <Alert severity="error">{queryError}</Alert>}
 
-        {entries.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" textAlign="center">
-            {/* Once the deal metadata is ready, ask anything about the deal. */}
-          </Typography>
-        ) : (
-          <Stack spacing={2}>
-            {entries.map((entry, index) => (
-              <Paper
-                key={`${entry.question}-${index}`}
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid",
-                  borderColor: "divider",
-                  bgcolor: "rgba(245, 247, 250, 0.8)",
-                }}
-              >
-                <Stack spacing={1} sx={{ p: 2 }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    You asked:
-                  </Typography>
-                  <Typography variant="body1">{entry.question}</Typography>
-                  <Divider />
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Deal Bot replied:
-                  </Typography>
-                  <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
-                    {entry.answer}
-                  </Typography>
-                </Stack>
-              </Paper>
-            ))}
-          </Stack>
-        )}
+        <Box>
+          {blocks.length === 0 ? (
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: 3,
+                border: "1px dashed",
+                borderColor: "divider",
+                bgcolor: "rgba(248, 250, 252, 0.8)",
+                p: 3,
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {prepLoading
+                  ? "Preparing deal data..."
+                  : "Once the deal metadata is ready, ask anything about this transaction."}
+              </Typography>
+            </Paper>
+          ) : (
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "rgba(255, 255, 255, 0.95)",
+              }}
+            >
+              <GENAIRenderer blocks={blocks} renderAll disableMotion />
+            </Paper>
+          )}
+        </Box>
       </Stack>
     </Paper>
   );
