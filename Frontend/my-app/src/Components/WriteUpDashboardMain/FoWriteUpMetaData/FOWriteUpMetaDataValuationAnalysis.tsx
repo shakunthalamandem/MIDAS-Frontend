@@ -129,7 +129,7 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
           ) : (
             <Box
               sx={{
-                color: "#333333",
+                color: "#000000",
                 fontSize: "14px",
                 lineHeight: 1.6,
                 "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
@@ -157,7 +157,7 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
           ) : (
             <Box
               sx={{
-                color: "#000000ff",
+                color: "#000000",
                 fontSize: "14px",
                 lineHeight: 1.6,
                 "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
@@ -185,7 +185,7 @@ const FOWriteUpMetaDataValuationAnalysis: React.FC<FOWriteUpMetaDataValuationAna
           ) : (
             <Box
               sx={{
-                color: "#333333",
+                color: "#000000",
                 fontSize: "14px",
                 lineHeight: 1.6,
                 "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },

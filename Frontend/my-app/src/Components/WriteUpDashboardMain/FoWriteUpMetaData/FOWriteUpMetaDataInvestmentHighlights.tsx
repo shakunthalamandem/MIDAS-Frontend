@@ -117,7 +117,7 @@ const FOWriteUpMetaDataInvestmentHighlights: React.FC<FOWriteUpMetaDataInvestmen
         ) : (
           <Box
             sx={{
-              color: "#333333",
+              color: "#000000",
               fontSize: "14px",
               lineHeight: 1.6,
               "& ul, & ol": { marginLeft: 2, marginTop: 0.5, marginBottom: 0.5 },
