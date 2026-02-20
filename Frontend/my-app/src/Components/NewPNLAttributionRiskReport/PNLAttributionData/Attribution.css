@@ -1,0 +1,199 @@
+/* ── Attribution Card ── */
+.attribution-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Header ── */
+.attribution-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.attribution-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── $ / % AUM Toggle ── */
+.attribution-toggle {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.attribution-toggle-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.attribution-toggle-btn:hover {
+  background: #f8fafc;
+}
+
+.attribution-toggle-btn--active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.attribution-toggle-btn--active:hover {
+  background: #6d28d9;
+}
+
+/* ── Tabs ── */
+.attribution-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.attribution-tab {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.attribution-tab:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.attribution-tab--active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.attribution-tab--active:hover {
+  background: #6d28d9;
+}
+
+/* ── Loading ── */
+.attribution-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* ── Grid ── */
+.attribution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .attribution-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .attribution-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Item Card ── */
+.attribution-item {
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.attribution-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.attribution-item-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 14px;
+}
+
+/* ── P&L Metrics Row ── */
+.attribution-item-metrics {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+}
+
+.attribution-metric {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  margin: 0 2px;
+}
+
+.attribution-metric:first-child {
+  margin-left: 0;
+}
+
+.attribution-metric:last-child {
+  margin-right: 0;
+}
+
+.attribution-metric-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.attribution-metric-value {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ── Exposure Row ── */
+.attribution-item-exposures {
+  display: flex;
+  gap: 12px;
+}
+
+.attribution-exposure {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+}
+
+.attribution-exposure-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.attribution-exposure-value {
+  font-size: 14px;
+  font-weight: 700;
+}

@@ -47,7 +47,7 @@ interface Props {
 type AccordionSection = {
   section: keyof WriteUpData
   title: string
-  icon: ReactElement
+  // icon: ReactElement
 }
 
 /* ===================== CONFIG ===================== */
@@ -56,22 +56,22 @@ const ACCORDION_SECTIONS: AccordionSection[] = [
   {
     section: 'differentiated_summary',
     title: 'Differentiated Summary',
-    icon: <TrendingUpIcon />,
+    // icon: <TrendingUpIcon />,
   },
   {
     section: 'concerns',
     title: 'Concerns',
-    icon: <WarningAmberIcon />,
+    // icon: <WarningAmberIcon />,
   },
   {
     section: 'principal_stockholders_preipo',
-    title: 'Principal Stockholders Pre-IPO',
-    icon: <AccountTreeIcon />,
+    title: 'Principal Stockholders ',
+    // icon: <AccountTreeIcon />,
   },
   {
     section: "key_management_personnel",
     title: "Key Management Personnel",
-    icon: <GroupsIcon />
+    // icon: <GroupsIcon />
   }
 ]
 const quillModules = {
@@ -609,7 +609,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           gap: 2
         }}
       >
-        {ACCORDION_SECTIONS.map(({ section, title, icon }) => (
+        {ACCORDION_SECTIONS.map(({ section, title,  }) => (
           <Accordion
             key={section}
             defaultExpanded={pdfMode}
@@ -641,7 +641,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 gap={1.5}
                 width="100%"
               >
-                <Box
+                {/* <Box
                   sx={{
                     color: "#124180",
                     display: "flex",
@@ -649,7 +649,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                   }}
                 >
                   {icon}
-                </Box>
+                </Box> */}
                 <Typography
                   fontWeight={700}
                   color="#124180"

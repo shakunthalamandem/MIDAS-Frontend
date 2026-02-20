@@ -1,0 +1,857 @@
+.risk-dashboard {
+  width: 100%;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Header Bar ── */
+.risk-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e1e8f;
+  border-radius: 12px;
+  padding: 12px 24px;
+  margin-bottom: 28px;
+}
+
+.risk-dashboard-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.risk-dashboard-logo {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.risk-dashboard-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.risk-dashboard-subtitle {
+  font-size: 12px;
+  color: #a0aec0;
+  margin-top: 2px;
+}
+
+.risk-dashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.risk-dashboard-aum-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 20px;
+  padding: 6px 18px;
+  text-align: center;
+}
+
+.risk-dashboard-aum-badge-label {
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-dashboard-aum-badge-value {
+  font-size: 14px;
+  color: #10b981;
+  font-weight: 700;
+}
+
+.risk-dashboard-date-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 6px 18px;
+  text-align: center;
+}
+
+.risk-dashboard-date-label {
+  font-size: 10px;
+  color: #a0aec0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-dashboard-date-value {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.risk-dashboard-live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  padding: 8px 16px;
+}
+
+.risk-dashboard-live-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+}
+
+.risk-dashboard-live-text {
+  font-size: 13px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* ── Fund Dropdown ── */
+.risk-dashboard-fund-select {
+  min-width: 200px;
+}
+
+/* ── Sections ── */
+.risk-dashboard-section {
+  margin-bottom: 28px;
+}
+
+.risk-dashboard-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 14px;
+}
+
+/* ── Risk Cards Grid ── */
+.risk-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .risk-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .risk-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .risk-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Risk Card ── */
+.risk-card {
+  border-radius: 14px;
+  padding: 22px 24px;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.risk-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.risk-card--green {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+}
+
+.risk-card--blue {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #93c5fd;
+}
+
+.risk-card--cyan {
+  background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+  border: 1px solid #67e8f9;
+}
+
+.risk-card--orange {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1px solid #fdba74;
+}
+
+.risk-card--pink {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+  border: 1px solid #f9a8d4;
+}
+
+/* ── Card top row: icon + label side by side ── */
+.risk-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.risk-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.risk-card-icon--green {
+  background: rgba(16, 185, 129, 0.18);
+  color: #059669;
+}
+
+.risk-card-icon--blue {
+  background: rgba(59, 130, 246, 0.18);
+  color: #2563eb;
+}
+
+.risk-card-icon--cyan {
+  background: rgba(6, 182, 212, 0.18);
+  color: #0891b2;
+}
+
+.risk-card-icon--orange {
+  background: rgba(249, 115, 22, 0.18);
+  color: #ea580c;
+}
+
+.risk-card-icon--pink {
+  background: rgba(236, 72, 153, 0.18);
+  color: #db2777;
+}
+
+.risk-card-label {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ── Card bottom: value + pct centered ── */
+.risk-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.risk-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.risk-card-value--green {
+  color: #059669;
+}
+
+.risk-card-value--blue {
+  color: #2563eb;
+}
+
+.risk-card-value--cyan {
+  color: #0891b2;
+}
+
+.risk-card-value--orange {
+  color: #ea580c;
+}
+
+.risk-card-value--pink {
+  color: #db2777;
+}
+
+.risk-card-pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: #475569;
+}
+
+/* ── Hover overlay with full details ── */
+.risk-card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.risk-card:hover .risk-card-hover-overlay {
+  opacity: 1;
+}
+
+.risk-card-hover-overlay--green {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.92), rgba(5, 150, 105, 0.92));
+}
+
+.risk-card-hover-overlay--blue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.92), rgba(37, 99, 235, 0.92));
+}
+
+.risk-card-hover-overlay--cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.92), rgba(8, 145, 178, 0.92));
+}
+
+.risk-card-hover-overlay--orange {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.92), rgba(234, 88, 12, 0.92));
+}
+
+.risk-card-hover-overlay--pink {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.92), rgba(219, 39, 119, 0.92));
+}
+
+.risk-card-hover-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.risk-card-hover-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.risk-card-hover-pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── P&L Cards Grid ── */
+.pnl-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .pnl-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .pnl-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── P&L Card ── */
+.pnl-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.pnl-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.pnl-card--positive {
+  border-left: 4px solid #10b981;
+}
+
+.pnl-card--negative {
+  border-left: 4px solid #ef4444;
+}
+
+.pnl-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pnl-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.pnl-card-arrow {
+  font-size: 16px;
+}
+
+.pnl-card-arrow--positive {
+  color: #10b981;
+}
+
+.pnl-card-arrow--negative {
+  color: #ef4444;
+}
+
+.pnl-card-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.pnl-card-value--positive {
+  color: #10b981;
+}
+
+.pnl-card-value--negative {
+  color: #ef4444;
+}
+
+.pnl-card-pct {
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.pnl-card-pct--positive {
+  color: #10b981;
+}
+
+.pnl-card-pct--negative {
+  color: #ef4444;
+}
+
+/* ── P&L Card Hover Overlay ── */
+.pnl-card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.pnl-card:hover .pnl-card-hover-overlay {
+  opacity: 1;
+}
+
+.pnl-card-hover-overlay--positive {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.92), rgba(5, 150, 105, 0.92));
+}
+
+.pnl-card-hover-overlay--negative {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.92), rgba(220, 38, 38, 0.92));
+}
+
+.pnl-card-hover-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pnl-card-hover-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.pnl-card-hover-pct {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Index Comparison Cards Grid ── */
+.index-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+}
+
+@media (max-width: 1200px) {
+  .index-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .index-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .index-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Index Card ── */
+.index-card {
+  padding: 16px 20px;
+  cursor: default;
+  transition: transform 0.2s ease;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.index-card:last-child {
+  border-right: none;
+}
+
+.index-card:hover {
+  transform: translateY(-1px);
+}
+
+.index-card--blue {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%);
+}
+
+.index-card--cyan {
+  background: linear-gradient(135deg, #ecfeff 0%, #e0fafe 100%);
+}
+
+.index-card--orange {
+  background: linear-gradient(135deg, #fff9f0 0%, #fff3e0 100%);
+}
+
+.index-card--pink {
+  background: linear-gradient(135deg, #fef5f8 0%, #fdedf2 100%);
+}
+
+.index-card--red {
+  background: linear-gradient(135deg, #fef5f0 0%, #fdeee5 100%);
+}
+
+.index-card-label {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.index-card-label--blue {
+  color: #2563eb;
+}
+
+.index-card-label--cyan {
+  color: #0891b2;
+}
+
+.index-card-label--orange {
+  color: #ea580c;
+}
+
+.index-card-label--pink {
+  color: #db2777;
+}
+
+.index-card-label--red {
+  color: #b91c1c;
+}
+
+.index-card-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.index-card-sub {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* ── P&L Card Selected State ── */
+.pnl-card--selected {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ── Historical P&L Chart ── */
+.pnl-chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.pnl-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pnl-chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pnl-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.pnl-chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  background: #7c3aed;
+  border-radius: 50%;
+}
+
+.pnl-chart-hint {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #d97706;
+  font-weight: 500;
+}
+
+.pnl-chart-hint::before {
+  content: "✦ ";
+}
+
+/* ── Loading & Error ── */
+.risk-dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.risk-dashboard-error {
+  margin: 16px 0;
+}
+
+/* ── Responsive header ── */
+@media (max-width: 900px) {
+  .risk-dashboard-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .risk-dashboard-header-right {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* ── PDF Date Badge (hidden by default) ── */
+.risk-dashboard-pdf-date-badge {
+  display: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 6px 18px;
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════════
+   PDF EXPORT MODE — Clean, print-friendly overrides
+   ══════════════════════════════════════════════════ */
+
+.pdf-export-mode .risk-dashboard-header {
+  background: #002060;
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+}
+
+/* Hide interactive controls, show static date in PDF */
+.pdf-export-mode .risk-dashboard-header-right .MuiTextField-root,
+.pdf-export-mode .risk-dashboard-header-right .MuiIconButton-root,
+.pdf-export-mode .risk-dashboard-date-nav,
+.pdf-export-mode .risk-dashboard-export-btn {
+  display: none !important;
+}
+
+.pdf-export-mode .risk-dashboard-pdf-date-badge {
+  display: block;
+}
+
+/* Remove hover effects in PDF mode */
+.pdf-export-mode .risk-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.pdf-export-mode .risk-card-hover-overlay {
+  display: none !important;
+}
+
+.pdf-export-mode .pnl-card-hover-overlay {
+  display: none !important;
+}
+
+.pdf-export-mode .pnl-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.pdf-export-mode .index-card:hover {
+  transform: none;
+}
+
+/* Ensure grids don't break */
+.pdf-export-mode .risk-cards-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.pdf-export-mode .pnl-cards-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.pdf-export-mode .index-cards-grid {
+  grid-template-columns: repeat(6, 1fr) !important;
+}
+
+/* Clean card rendering for PDF */
+.pdf-export-mode .risk-card {
+  min-height: auto;
+  padding: 16px 18px;
+  border-radius: 10px;
+}
+
+.pdf-export-mode .pnl-card {
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* Chart section */
+.pdf-export-mode .pnl-chart-hint {
+  display: none;
+}
+
+.pdf-export-mode .pnl-chart-card {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Attribution section clean up */
+.pdf-export-mode .attribution-card {
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Hide DataGrid toolbar (export/filter) in PDF */
+.pdf-export-mode .attr-datagrid-toolbar {
+  display: none !important;
+}
+
+/* Ensure DataGrid renders all rows */
+.pdf-export-mode .attr-datagrid-wrapper {
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-root {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.pdf-export-mode .MuiDataGrid-main {
+  overflow: visible !important;
+}
+
+.pdf-export-mode .MuiDataGrid-virtualScroller {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-virtualScrollerContent {
+  height: auto !important;
+}
+
+.pdf-export-mode .MuiDataGrid-virtualScrollerRenderZone {
+  position: relative !important;
+  transform: none !important;
+}
+
+/* Remove DataGrid footer in PDF */
+.pdf-export-mode .MuiDataGrid-footerContainer {
+  display: none !important;
+}
+
+/* Section spacing */
+.pdf-export-mode .pdf-section {
+  margin-bottom: 8px;
+}
+
+.pdf-export-mode .risk-dashboard-section {
+  margin-bottom: 16px;
+}
+
+/* ── Attribution All Tabs (PDF only) ── */
+.attribution-all-tabs-pdf {
+  position: absolute;
+  left: -9999px;
+  width: 100%;
+  visibility: hidden;
+}
+
+.pdf-export-mode .attribution-interactive {
+  display: none !important;
+}
+
+.pdf-export-mode .attribution-all-tabs-pdf {
+  position: static;
+  left: auto;
+  visibility: visible;
+}

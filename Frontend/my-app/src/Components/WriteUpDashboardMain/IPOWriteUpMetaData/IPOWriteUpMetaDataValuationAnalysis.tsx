@@ -361,7 +361,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           {/* Heading - Center aligned */}
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#124180" }}>
-              Valuation Analysis
+              Valuation 
             </Typography>
           </Box>
 
