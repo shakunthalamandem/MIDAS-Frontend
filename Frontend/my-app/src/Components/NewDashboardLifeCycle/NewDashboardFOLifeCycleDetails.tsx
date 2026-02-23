@@ -3,7 +3,6 @@ import {
   Box,
   Chip,
   Container,
-  Grid,
   Paper,
   Tabs,
   Tab,
@@ -21,11 +20,7 @@ import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
-import TrendlyneQVTWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneQVTWidget";
-import TrendlyneWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneWidget";
-import TrendlyneTechnicalWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneTechnicalWidget";
-import TrendlyneChecklistWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneChecklistWidget";
-import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
+import TradingDynamics from "./TradingDynamics";
 
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -33,7 +28,6 @@ import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome"
 import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
 import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
-import DealPricesChart from "../AIMLResults/DealPricesChart";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -245,39 +239,10 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Trading Dynamics" ? (
-            (() => {
-              const widgetTicker = (activePayload.ticker || "").replace(/\s*US\b/i, "").trim() || activePayload.ticker;
-              return (
-                <Box>
-                  <AIMLDealDetails ticker={activePayload.ticker} />
-                  <Box sx={{ mt: 3 }}>
-                    <TradingViewWidget ticker={activePayload.ticker} />
-                  </Box>
-                  <Box sx={{ mt: 4 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
-                        <TrendlyneQVTWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TrendlyneWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TrendlyneTechnicalWidget companyCode={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <TrendlyneChecklistWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                  <Box sx={{ mt: 3 }}>
-                    <DealPricesChart
-                      ticker={activePayload.ticker}
-                      trade_date={activePayload.pricing_date}
-                    />
-                  </Box>
-                </Box>
-              );
-            })()
+            <TradingDynamics
+              ticker={activePayload.ticker}
+              trade_date={activePayload.pricing_date}
+            />
           ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
