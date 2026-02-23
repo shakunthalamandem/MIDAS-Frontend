@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 import { Box, Grid } from "@mui/material";
 import AIMLDealDetails from "./AIMLDealDetails";
-import DealPricesChart from "../AIMLResults/DealPricesChart";
-import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
+import NewDashboardTradingWidget from "../Main/InvestmentStrategy/Tradingview/NewDashboardTradingWidget";
 import TrendlyneQVTWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneQVTWidget";
 import TrendlyneWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneWidget";
 import TrendlyneTechnicalWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneTechnicalWidget";
 import TrendlyneChecklistWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneChecklistWidget";
+import NewDashboardDealPricesChart from "../AIMLResults/NewDashboardDealPricesChart";
 
 interface TradingDynamicsProps {
   ticker: string;
@@ -30,7 +30,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
       <AIMLDealDetails ticker={ticker} />
 
       <Box sx={{ mt: 3 }}>
-        <TradingViewWidget ticker={ticker} />
+        <NewDashboardTradingWidget ticker={ticker} />
       </Box>
 
       <Box sx={{ mt: 4 }}>
@@ -66,7 +66,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
       </Box>
 
       <Box sx={{ mt: 3 }}>
-        <DealPricesChart ticker={ticker} trade_date={trade_date} />
+        <NewDashboardDealPricesChart ticker={ticker} trade_date={trade_date} />
       </Box>
     </Box>
   );
