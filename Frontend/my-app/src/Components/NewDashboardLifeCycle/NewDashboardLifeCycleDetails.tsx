@@ -51,7 +51,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-      ...(!isUpcoming ? [{ label: "Trading Signals" }] : []),
+      ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
       { label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
@@ -203,7 +203,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Trading Signals" ? (
+          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
             (() => {
               const widgetTicker = (activePayload.ticker || "").replace(/\s*US\b/i, "").trim() || activePayload.ticker;
               return (
