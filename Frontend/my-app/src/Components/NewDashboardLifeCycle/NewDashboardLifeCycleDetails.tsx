@@ -50,12 +50,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "AI - Sentiment View" },
       { label: "AI Unsupervised" },
       { label: "ML Model" },
+      {
+        label: "Deal Bot",
+      },
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
-      {
-        label: "Deal Bot",
-      }
+
     ],
     []
   );
