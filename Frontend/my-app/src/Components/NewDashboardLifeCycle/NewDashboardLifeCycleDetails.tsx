@@ -28,6 +28,12 @@ import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
+import DealPricesChart from "../AIMLResults/DealPricesChart";
+import TrendlyneQVTWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneQVTWidget";
+import TrendlyneWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneWidget";
+import TrendlyneTechnicalWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneTechnicalWidget";
+import TrendlyneChecklistWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneChecklistWidget";
+import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -39,8 +45,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
 
+  const activePayload = selectedOption || payload;
+  const status = activePayload?.deal_status ?? "Announced";
+  const isUpcoming = ["Announced", "Price Range"].includes(status);
+
   const tabItems = useMemo(
     () => [
+      ...(!isUpcoming ? [{ label: "Trading Signals" }] : []),
       { label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
@@ -53,9 +64,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
-    []
+    [isUpcoming]
   );
-
 
   React.useEffect(() => {
     if (!targetTabLabel) return;
@@ -90,11 +100,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     );
   }
 
-  const activePayload = selectedOption || payload;
   const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
-  const status = activePayload?.deal_status ?? "Announced";
-  const isUpcoming = ["Announced", "Price Range"].includes(status);
-
 
   return (
     <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
@@ -179,26 +185,59 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             }}
           >
             {tabItems.map((item) => (
-              <Tab
-                key={item.label}
-                // icon={item.icon}
-                iconPosition="start"
-                label={item.label}
-                sx={{
-                  borderRadius: 999,
-                  mr: 1,
-                  "&.Mui-selected": {
-                    color: "#ffff",
-                    backgroundColor: "#262268ff",
-                  },
-                }}
-              />
+                <Tab
+                  key={item.label}
+                  iconPosition="start"
+                  label={item.label}
+                  sx={{
+                    borderRadius: 999,
+                    mr: 1,
+                    "&.Mui-selected": {
+                      color: "#ffff",
+                      backgroundColor: "#262268ff",
+                    },
+                  }}
+                />
             ))}
           </Tabs>
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up New" ? (
+          {tabItems[tabValue]?.label === "Trading Signals" ? (
+            (() => {
+              const widgetTicker = (activePayload.ticker || "").replace(/\s*US\b/i, "").trim() || activePayload.ticker;
+              return (
+                <Box>
+                  <AIMLDealDetails ticker={activePayload.ticker} />
+                  <Box sx={{ mt: 3 }}>
+                    <TradingViewWidget ticker={activePayload.ticker} />
+                  </Box>
+                  <Box sx={{ mt: 4 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <TrendlyneQVTWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <TrendlyneWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <TrendlyneTechnicalWidget companyCode={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <TrendlyneChecklistWidget companyCode={widgetTicker} companyName={widgetTicker} className="flex-1 overflow-x-auto bg-white border border-blue-200 shadow-md rounded-xl p-6 h-[580px]" />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                  <Box sx={{ mt: 3 }}>
+                    <DealPricesChart
+                      ticker={activePayload.ticker}
+                      trade_date={activePayload.pricing_date}
+                    />
+                  </Box>
+                </Box>
+              );
+            })()
+          ) : tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
           <FebWriteUpDashboardMain
             basicDealDetails={{
