@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Tooltip, IconButton } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import GenericDataRenderer from "./GenericDataRenderer";
 
 interface Props {
@@ -23,6 +24,31 @@ const metricCardGradients = [
   { bg: "linear-gradient(135deg, #ecfdf5, #d1fae5)", border: "#6ee7b7" },
   { bg: "linear-gradient(135deg, #fff1f2, #ffe4e6)", border: "#fda4af" },
 ];
+
+const METRIC_INFO: Record<string, string> = {
+  "total long exposure":
+    "Total Long Exposure, expressed as a percentage of the $200M AUM, shows the portion of capital currently deployed.",
+  "wtd avg beta":
+    "Weighted Average Beta, relative to 1.0 (market), measures portfolio market sensitivity based on position size.",
+  "capital at risk":
+    "Capital at Risk, expressed as a percentage of the $200M NAV, shows the total potential loss if all positions decline to their stop levels.",
+  "gain potential":
+    "Gain Potential is the total expected profit to targets, calculated as (Target − Current Price) × Shares, summed across the portfolio and expressed as % of NAV.",
+  "beta-adj exposure":
+    "Calculated as the sum of (Current $ Exposure × Beta) across all positions, expressed as a percentage of AUM to reflect the portfolio's effective market exposure.",
+  "spx -5% impact":
+    "Beta-Adjusted Exposure × (-5%), shown as % of NAV to estimate portfolio loss from a 5% market decline.",
+  "spx -10% impact":
+    "Beta-Adjusted Exposure × (-10%), shown as % of NAV to estimate portfolio loss from a 10% market decline.",
+};
+
+const getMetricTooltip = (label: string): string | null => {
+  const key = (label || "").toLowerCase().trim();
+  for (const [metricKey, description] of Object.entries(METRIC_INFO)) {
+    if (key.includes(metricKey)) return description;
+  }
+  return null;
+};
 
 const metricValueColor = (value: string): string => {
   if (!value) return "#1e293b";
@@ -82,15 +108,46 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
         <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(metricCards.length, 4)}, 1fr)`, gap: 2, mb: 3 }}>
           {metricCards.map((card: any, i: number) => {
             const gradient = metricCardGradients[i % metricCardGradients.length];
+            const cardLabel = card.label || card.title || card.name;
+            const tooltipText = getMetricTooltip(cardLabel);
             return (
               <Box key={i} sx={{
                 background: gradient.bg, border: `1px solid ${gradient.border}40`,
-                borderRadius: 2.5, p: 2, transition: "all 0.2s",
+                borderRadius: 2.5, p: 2, transition: "all 0.2s", position: "relative",
                 "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)", transform: "translateY(-1px)" },
               }}>
-                <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#334155", textTransform: "uppercase", mb: 0.5 }}>
-                  {card.label || card.title || card.name}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
+                  <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#334155", textTransform: "uppercase" }}>
+                    {cardLabel}
+                  </Typography>
+                  {tooltipText && (
+                    <Tooltip
+                      title={tooltipText}
+                      arrow
+                      placement="top"
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            backgroundColor: "#1e293b",
+                            color: "#fff",
+                            fontSize: 12,
+                            lineHeight: 1.5,
+                            maxWidth: 300,
+                            p: 1.5,
+                            borderRadius: 1.5,
+                          },
+                        },
+                        arrow: { sx: { color: "#1e293b" } },
+                      }}
+                    >
+                      <IconButton size="small" sx={{ p: 0.3, color: "#64748b", "&:hover": { color: "#334155" } }}>
+                        <InfoOutlinedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
                 <Typography sx={{ fontSize: 22, fontWeight: 700, color: metricValueColor(String(card.value || "")), fontFamily: "monospace", mb: 0.5 }}>
                   {card.value}
                 </Typography>
