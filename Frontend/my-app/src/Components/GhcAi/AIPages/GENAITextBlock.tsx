@@ -2,7 +2,9 @@ import React from "react";
 import { Card, CardContent, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 
-const GENAITextBlock: React.FC<{ content: string }> = ({ content }) => {
+const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => {
+  const normalizedContent = React.useMemo(() => String(content ?? ""), [content]);
+
   return (
     <Card
       sx={{
@@ -17,7 +19,7 @@ const GENAITextBlock: React.FC<{ content: string }> = ({ content }) => {
     >
       <CardContent sx={{ paddingBottom: "16px !important" }}>
         <Typography variant="body1" component="div">
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <ReactMarkdown>{normalizedContent}</ReactMarkdown>
         </Typography>
       </CardContent>
     </Card>

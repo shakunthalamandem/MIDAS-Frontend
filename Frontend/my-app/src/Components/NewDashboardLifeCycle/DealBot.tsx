@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -88,6 +87,10 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [queryError, setQueryError] = React.useState<string | null>(null);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
+  const friendlyErrorMessage = React.useMemo(
+    () => "Something went wrong. Please rerun to try again.",
+    []
+  );
 
   React.useEffect(() => {
     setBlocks([]);
@@ -134,16 +137,17 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
         if (!res.ok) {
           const json = await res.json().catch(() => null);
-          throw new Error(
-            json?.detail ? `Failed to prepare deal data - ${json.detail}` : `Request failed with ${res.status}`
-          );
+          console.error("Deal data prep failed", json, res.status);
+          setPrepError(friendlyErrorMessage);
+          return;
         }
 
         const data = await res.json();
         setApiData(data);
       } catch (error: any) {
         if (controller.signal.aborted) return;
-        setPrepError(error?.message || "Unable to prepare deal data.");
+        console.error("Deal data prep threw", error);
+        setPrepError(friendlyErrorMessage);
       } finally {
         setPrepLoading(false);
       }
@@ -193,15 +197,16 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
       if (!res.ok) {
         const json = await res.json().catch(() => null);
-        throw new Error(
-          json?.detail ? `Query failed - ${json.detail}` : `Request failed with ${res.status}`
-        );
+        console.error("Deal query failed", json, res.status);
+        setQueryError(friendlyErrorMessage);
+        return;
       }
 
       const payload = await res.json();
       setBlocks(toBlocks(payload));
     } catch (error: any) {
-      setQueryError(error?.message || "Failed to retrieve answer.");
+      console.error("Deal query threw", error);
+      setQueryError(friendlyErrorMessage);
     } finally {
       setQueryLoading(false);
     }
@@ -345,8 +350,16 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         </Box>
 
         {prepLoading && <LinearProgress />}
-        {prepError && <Alert severity="error">{prepError} Try again.</Alert>}
-        {queryError && <Alert severity="error">{queryError} Try again.</Alert>}
+        {prepError && (
+          <Typography variant="body2" color="error">
+            {prepError}
+          </Typography>
+        )}
+        {queryError && (
+          <Typography variant="body2" color="error">
+            {queryError}
+          </Typography>
+        )}
 
         {blocks.length > 0 && (
   
