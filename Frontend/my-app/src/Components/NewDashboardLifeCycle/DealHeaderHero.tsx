@@ -91,7 +91,15 @@ const DealHeaderHero: React.FC<Props> = ({ deal, fmtPlain, fmtMoney }) => {
   const ticker = fmtPlain(deal.ticker);
   const region = fmtPlain(deal.region);
   const sector = fmtPlain(deal.sector);
-  const dealType = "IPO"; // keep as you had; adjust if you have a real field
+  const rawDealType = fmtPlain(deal.deal_type);
+  const normalizedDealType =
+    rawDealType === "-" ? "-" : rawDealType.trim().toUpperCase();
+  const dealType =
+    normalizedDealType === "FO"
+      ? "FO"
+      : normalizedDealType === "IPO"
+        ? "IPO"
+        : rawDealType;
   const issuePrice = fmtMoney(deal.issue_price);
 
   return (
