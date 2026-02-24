@@ -32,7 +32,7 @@ const RiskDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("ytd_pnl");
-  const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>(null);
+  const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>("one_month_beta_sp");
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [indexChartLoading, setIndexChartLoading] = useState(false);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
@@ -239,6 +239,14 @@ const RiskDashboard: React.FC = () => {
             </Box>
           )}
 
+          <Box className="pdf-section" data-pdf-page="1">
+            <CumulativePnLChart
+              chartData={chartData}
+              loading={chartLoading}
+              period={metricToPeriod(selectedMetric)}
+            />
+          </Box>
+
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison
@@ -258,14 +266,6 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
-
-          <Box className="pdf-section" data-pdf-page="1">
-            <CumulativePnLChart
-              chartData={chartData}
-              loading={chartLoading}
-              period={metricToPeriod(selectedMetric)}
-            />
-          </Box>
 
           <Box className="pdf-section" data-pdf-page="1">
             <TopBottomPnLTable

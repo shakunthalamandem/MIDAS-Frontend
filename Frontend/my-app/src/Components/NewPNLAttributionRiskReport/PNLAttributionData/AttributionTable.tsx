@@ -183,9 +183,9 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "beta_adj_net",
-        headerName: "\u03B2 Adj Net",
-        flex: 1,
-        minWidth: 130,
+        headerName: "Beta Adj Net",
+        flex: 1.1,
+        minWidth: 150,
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "right",
         align: "right",

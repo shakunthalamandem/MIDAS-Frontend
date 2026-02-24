@@ -32,37 +32,55 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
           const modifier = isPositive ? "positive" : "negative";
           const isSelected = selectedMetric === cfg.metricKey;
 
+          const selectedBg = isPositive ? "#059669" : "#dc2626";
+
           return (
             <Box
               key={cfg.metricKey}
-              className={`pnl-card pnl-card--${modifier}${isSelected ? " pnl-card--selected" : ""}`}
+              className={`pnl-card${isSelected ? "" : ` pnl-card--${modifier}`}${isSelected ? " pnl-card--selected" : ""}`}
               onClick={() => onMetricSelect(cfg.metricKey)}
-              sx={{ cursor: "pointer" }}
+              sx={{
+                cursor: "pointer",
+                ...(isSelected && {
+                  background: `${selectedBg} !important`,
+                  border: `1px solid ${selectedBg} !important`,
+                  borderLeft: `4px solid ${selectedBg} !important`,
+                }),
+              }}
             >
               <Box className="pnl-card-header">
-                <Box className="pnl-card-title">{cfg.title}</Box>
+                <Box
+                  className={isSelected ? "" : "pnl-card-title"}
+                  sx={isSelected ? { fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)" } : {}}
+                >
+                  {cfg.title}
+                </Box>
               </Box>
               <Box>
                 <Box
                   component="span"
-                  className={`pnl-card-value pnl-card-value--${modifier}`}
+                  className={isSelected ? "" : `pnl-card-value pnl-card-value--${modifier}`}
+                  sx={isSelected ? { fontSize: 20, fontWeight: 700, color: "#fff" } : undefined}
                 >
                   {formatCurrency(value)}
                 </Box>
                 <Box
                   component="span"
-                  className={`pnl-card-pct pnl-card-pct--${modifier}`}
+                  className={isSelected ? "" : `pnl-card-pct pnl-card-pct--${modifier}`}
+                  sx={isSelected ? { fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)", ml: 0.75 } : undefined}
                 >
                   ({pct.toFixed(2)}%)
                 </Box>
               </Box>
 
-              {/* Hover overlay with full details */}
-              <Box className={`pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`}>
-                <Box className="pnl-card-hover-label">{cfg.title}</Box>
-                <Box className="pnl-card-hover-value">{formatFullCurrency(value)}</Box>
-                <Box className="pnl-card-hover-pct">({pct.toFixed(2)}%)</Box>
-              </Box>
+              {/* Hover overlay (hidden when selected) */}
+              {!isSelected && (
+                <Box className={`pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`}>
+                  <Box className="pnl-card-hover-label">{cfg.title}</Box>
+                  <Box className="pnl-card-hover-value">{formatFullCurrency(value)}</Box>
+                  <Box className="pnl-card-hover-pct">({pct.toFixed(2)}%)</Box>
+                </Box>
+              )}
             </Box>
           );
         })}
