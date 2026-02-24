@@ -8,7 +8,7 @@ import {
   ListItemText,
   Typography
 } from "@mui/material"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "./types/DealInformation"
 
 import IPOWriteUpMetaDataBusinessOverview from "./IPOWriteUpMetaData/IPOWriteUpMetaDataBusinessOverview"
@@ -98,7 +98,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
       { id: "deal-info", label: "Deal Info" },
       { id: "market-strategy", label: " Fair Value Estimate and IOI" },
       // { id: "ai-indication", label: "Proprietary Model Indication" },
-      { id: "business-overview", label: "Company Overview." },
+      { id: "business-overview", label: "Company Overview" },
       { id: "key-metrics", label: "Key Metrics" },
       { id: "financial-highlights", label: "Financial Highlights" },
       { id: "comps", label: "Comparative Multiples" },
@@ -112,6 +112,8 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
   const [activeSection, setActiveSection] = useState(sections[0].id)
   const [pdfMode, setPdfMode] = useState(false)
+  const isManualScrollRef = useRef(false)
+  const manualScrollTimeoutRef = useRef<number | null>(null)
   const sectionCardSx = {
     borderRadius: 3,
     border: "1px solid #edf0faff",
@@ -128,10 +130,18 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
   const handleNavClick = (sectionId: string) => {
     setActiveSection(sectionId)
+    isManualScrollRef.current = true
+    if (manualScrollTimeoutRef.current !== null) {
+      window.clearTimeout(manualScrollTimeoutRef.current)
+    }
     const target = document.getElementById(sectionId)
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" })
     }
+    manualScrollTimeoutRef.current = window.setTimeout(() => {
+      isManualScrollRef.current = false
+      manualScrollTimeoutRef.current = null
+    }, 600)
   }
 
   useEffect(() => {
@@ -149,6 +159,10 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
 
+        if (isManualScrollRef.current) {
+          return
+        }
+
         if (activeEntry?.target?.id) {
           setActiveSection(activeEntry.target.id)
         }
@@ -162,7 +176,13 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
     targets.forEach((target) => observer.observe(target))
 
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      if (manualScrollTimeoutRef.current !== null) {
+        window.clearTimeout(manualScrollTimeoutRef.current)
+        manualScrollTimeoutRef.current = null
+      }
+    }
   }, [sections])
 
   return (
