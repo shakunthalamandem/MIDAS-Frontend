@@ -310,10 +310,11 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_results",
                   icon: <InsightsIcon fontSize="small" />,
                 },
-              {
+                {
                   label: "AI Portfolio Review",
                   path: "/ai_portfolio_review",
                   icon: <PsychologyIcon fontSize="small" />,
+                  reload: false,
                 },
                 {
                   label: "ABB Model",

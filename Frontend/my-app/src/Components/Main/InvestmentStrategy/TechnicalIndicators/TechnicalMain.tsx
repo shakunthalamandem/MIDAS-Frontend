@@ -130,6 +130,46 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
                 </Grid>
 
             <TradingViewWidget ticker={selectedTicker} />
+
+            {/* Trendlyne widgets block */}
+            <Box sx={{ mt: 4, pb: 4 }}>
+              {/* <Typography
+                variant="h5"
+                sx={{ fontWeight: "bold", color: "#002060", mb: 2 }}
+              >
+                
+              </Typography> */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TrendlyneQVTWidget
+                    companyCode={widgetTicker ?? undefined}
+                    companyName={widgetTicker ?? ""}
+                    className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TrendlyneWidget
+                    companyCode={widgetTicker ?? undefined}
+                    companyName={widgetTicker ?? ""}
+                    className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TrendlyneTechnicalWidget
+                    companyCode={widgetTicker ?? undefined}
+                    className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TrendlyneChecklistWidget
+                    companyCode={widgetTicker ?? undefined}
+                    companyName={widgetTicker ?? ""}
+                    className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+
             <FundamentalMetricsCard ticker={selectedTicker} />
             <MacdCharts ticker={selectedTicker} />
 
@@ -144,45 +184,6 @@ const TechnicalMain: React.FC<TechnicalMainProps> = ({
             </Grid>
 
                 <VolatilityChart ticker={selectedTicker} />
-
-                {/* Trendlyne widgets block */}
-                <Box sx={{ mt: 4, pb: 4 }}>
-                  {/* <Typography
-                    variant="h5"
-                    sx={{ fontWeight: "bold", color: "#002060", mb: 2 }}
-                  >
-                    
-                  </Typography> */}
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <TrendlyneQVTWidget
-                        companyCode={widgetTicker ?? undefined}
-                        companyName={widgetTicker ?? ""}
-                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TrendlyneWidget
-                        companyCode={widgetTicker ?? undefined}
-                        companyName={widgetTicker ?? ""}
-                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TrendlyneTechnicalWidget
-                        companyCode={widgetTicker ?? undefined}
-                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TrendlyneChecklistWidget
-                        companyCode={widgetTicker ?? undefined}
-                        companyName={widgetTicker ?? ""}
-                        className="flex-1 overflow-x-auto bg-white border border-blue-200 dark:bg-gray-800 shadow-md rounded-xl p-6 h-[580px]"
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
 
                 <CompanyDetails ticker={selectedTicker} />
               </>
