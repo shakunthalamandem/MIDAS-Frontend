@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Box, Grid, Typography, Paper, Chip } from "@mui/material";
 import {
   ShowChart as ShowChartIcon,
@@ -105,112 +105,186 @@ const SectionHeader: React.FC<{
   </Box>
 );
 
+/* ───────── Card color configs ───────── */
+const CARD_THEMES = {
+  green: {
+    accent: "#10b981",
+    gradientBar: "linear-gradient(90deg, #10b981, #34d399, #6ee7b7)",
+    headerBg: "linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)",
+    iconBg: "rgba(16,185,129,0.12)",
+    tagBg: "#d1fae5",
+    tagColor: "#065f46",
+    bodyBg: "#fafffe",
+    borderColor: "rgba(16,185,129,0.15)",
+    hoverShadow: "0 12px 36px rgba(16,185,129,0.18)",
+  },
+  amber: {
+    accent: "#f59e0b",
+    gradientBar: "linear-gradient(90deg, #f59e0b, #fbbf24, #fcd34d)",
+    headerBg: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)",
+    iconBg: "rgba(245,158,11,0.12)",
+    tagBg: "#fef3c7",
+    tagColor: "#92400e",
+    bodyBg: "#fffdf7",
+    borderColor: "rgba(245,158,11,0.15)",
+    hoverShadow: "0 12px 36px rgba(245,158,11,0.18)",
+  },
+  violet: {
+    accent: "#8b5cf6",
+    gradientBar: "linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd)",
+    headerBg: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)",
+    iconBg: "rgba(139,92,246,0.12)",
+    tagBg: "#ede9fe",
+    tagColor: "#5b21b6",
+    bodyBg: "#faf8ff",
+    borderColor: "rgba(139,92,246,0.15)",
+    hoverShadow: "0 12px 36px rgba(139,92,246,0.18)",
+  },
+  red: {
+    accent: "#ef4444",
+    gradientBar: "linear-gradient(90deg, #ef4444, #f87171, #fca5a5)",
+    headerBg: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)",
+    iconBg: "rgba(239,68,68,0.12)",
+    tagBg: "#fee2e2",
+    tagColor: "#991b1b",
+    bodyBg: "#fffafa",
+    borderColor: "rgba(239,68,68,0.15)",
+    hoverShadow: "0 12px 36px rgba(239,68,68,0.18)",
+  },
+} as const;
+
+type CardThemeKey = keyof typeof CARD_THEMES;
+
 /* ───────── Analysis Card Wrapper ───────── */
 const AnalysisCard: React.FC<{
   children: React.ReactNode;
-  accentColor: string;
+  theme: CardThemeKey;
   icon: React.ReactNode;
   title: string;
   tag?: string;
-  tagColor?: string;
   delay?: number;
-}> = ({ children, accentColor, icon, title, tag, tagColor, delay = 0 }) => (
-  <MotionPaper
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.45, delay, ease: "easeOut" }}
-    elevation={0}
-    sx={{
-      borderRadius: "16px",
-      overflow: "hidden",
-      border: "1px solid",
-      borderColor: "rgba(0,0,0,0.06)",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-      transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
-      "&:hover": {
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-        transform: "translateY(-2px)",
-      },
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-    }}
-  >
-    {/* Accent top bar */}
-    <Box
+}> = ({ children, theme, icon, title, tag, delay = 0 }) => {
+  const t = CARD_THEMES[theme];
+  return (
+    <MotionPaper
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      elevation={0}
       sx={{
-        height: 4,
-        background: accentColor,
-        width: "100%",
-      }}
-    />
-    {/* Card header */}
-    <Box
-      sx={{
-        px: 2.5,
-        pt: 2,
-        pb: 1.5,
+        borderRadius: "18px",
+        overflow: "hidden",
+        border: `1.5px solid ${t.borderColor}`,
+        boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+        transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
+        "&:hover": {
+          boxShadow: t.hoverShadow,
+          transform: "translateY(-3px)",
+          borderColor: t.accent,
+        },
+        height: "100%",
         display: "flex",
-        alignItems: "center",
-        gap: 1.2,
-        borderBottom: "1px solid rgba(0,0,0,0.04)",
-        bgcolor: "rgba(249,250,251,0.6)",
+        flexDirection: "column",
+        background: t.bodyBg,
       }}
     >
+      {/* Gradient accent top bar */}
       <Box
         sx={{
-          width: 32,
-          height: 32,
-          borderRadius: "8px",
-          bgcolor: `${accentColor}15`,
+          height: 4,
+          background: t.gradientBar,
+          width: "100%",
+        }}
+      />
+
+      {/* Card header */}
+      <Box
+        sx={{
+          px: 2.5,
+          py: 1.5,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          color: accentColor,
-          flexShrink: 0,
+          gap: 1.2,
+          borderBottom: `1px solid ${t.borderColor}`,
+          background: t.headerBg,
         }}
       >
-        {icon}
-      </Box>
-      <Typography
-        sx={{
-          fontSize: "0.88rem",
-          fontWeight: 700,
-          color: "#1a1a2e",
-          flex: 1,
-        }}
-      >
-        {title}
-      </Typography>
-      {tag && (
-        <Chip
-          label={tag}
-          size="small"
+        <Box
           sx={{
-            height: 20,
-            fontSize: "0.65rem",
-            fontWeight: 700,
-            bgcolor: tagColor || `${accentColor}18`,
-            color: tagColor ? "#fff" : accentColor,
-            borderRadius: "5px",
+            width: 34,
+            height: 34,
+            borderRadius: "10px",
+            bgcolor: t.iconBg,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: t.accent,
+            flexShrink: 0,
+            border: `1px solid ${t.borderColor}`,
+          }}
+        >
+          {icon}
+        </Box>
+        <Typography
+          sx={{
+            fontSize: "0.9rem",
+            fontWeight: 750,
+            color: "#1a1a2e",
+            flex: 1,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {title}
+        </Typography>
+        {tag && (
+          <Chip
+            label={tag}
+            size="small"
+            sx={{
+              height: 24,
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              bgcolor: t.tagBg,
+              color: t.tagColor,
+              borderRadius: "8px",
+              border: `1px solid ${t.borderColor}`,
+              letterSpacing: "0.02em",
+            }}
+          />
+        )}
+      </Box>
+
+      {/* Card body — position relative for branding overlay */}
+      <Box
+        sx={{
+          flex: 1,
+          overflow: "hidden",
+          position: "relative",
+          "& > div": { width: "100%" },
+        }}
+      >
+        {children}
+        {/* Overlay to hide Trendlyne branding logo */}
+        <Box
+          aria-hidden
+          sx={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            width: 80,
+            height: 40,
+            bgcolor: t.bodyBg,
+            pointerEvents: "none",
+            zIndex: 2,
           }}
         />
-      )}
-    </Box>
-    {/* Card body */}
-    <Box
-      sx={{
-        flex: 1,
-        overflow: "hidden",
-      }}
-    >
-      {children}
-    </Box>
-  </MotionPaper>
-);
+      </Box>
+    </MotionPaper>
+  );
+};
 
 const WIDGET_CLASS =
-  "flex-1 overflow-x-auto bg-white rounded-none p-4 h-[560px]";
+  "flex-1 w-full overflow-x-auto bg-transparent rounded-none p-0 h-[560px]";
 
 /* ═══════════════════════════════════════════════════════════
    TRADING DYNAMICS — Main Component
@@ -223,6 +297,34 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
     () => (ticker || "").replace(/\s*US\b/i, "").trim() || ticker,
     [ticker]
   );
+
+  /*
+   * Re-trigger the Trendlyne widget script after all blockquotes are in the DOM.
+   * The script scans for .trendlyne-widgets on load, but in an SPA the blockquotes
+   * may render after the script has already executed. Removing and re-adding the
+   * script forces a fresh scan so all 4 widgets load on the first visit.
+   */
+  useEffect(() => {
+    if (!widgetTicker) return;
+
+    const SCRIPT_ID = "trendlyne-widget-script";
+    const SCRIPT_SRC =
+      "https://cdn-static.trendlyne.com/static/js/webwidgets/tl-widgets.js";
+
+    const timer = setTimeout(() => {
+      const existing = document.getElementById(SCRIPT_ID);
+      if (existing) existing.remove();
+
+      const script = document.createElement("script");
+      script.id = SCRIPT_ID;
+      script.src = SCRIPT_SRC;
+      script.async = true;
+      script.charset = "utf-8";
+      document.body.appendChild(script);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [widgetTicker]);
 
   return (
     <Box
@@ -439,7 +541,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
             {/* QVT Widget */}
             <Grid item xs={12} md={6}>
               <AnalysisCard
-                accentColor="#10b981"
+                theme="green"
                 icon={<TrendingUpIcon sx={{ fontSize: 18 }} />}
                 title="Quality Value Trend"
                 tag="QVT Score"
@@ -456,7 +558,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
             {/* SWOT Widget */}
             <Grid item xs={12} md={6}>
               <AnalysisCard
-                accentColor="#f59e0b"
+                theme="amber"
                 icon={<BarChartIcon sx={{ fontSize: 18 }} />}
                 title="SWOT Analysis"
                 tag="Fundamentals"
@@ -473,7 +575,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
             {/* Technical Widget */}
             <Grid item xs={12} md={6}>
               <AnalysisCard
-                accentColor="#8b5cf6"
+                theme="violet"
                 icon={<AssessmentIcon sx={{ fontSize: 18 }} />}
                 title="Technical Indicators"
                 tag="Signals"
@@ -489,7 +591,7 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
             {/* Checklist Widget */}
             <Grid item xs={12} md={6}>
               <AnalysisCard
-                accentColor="#ef4444"
+                theme="red"
                 icon={<ChecklistIcon sx={{ fontSize: 18 }} />}
                 title="Investment Checklist"
                 tag="Due Diligence"

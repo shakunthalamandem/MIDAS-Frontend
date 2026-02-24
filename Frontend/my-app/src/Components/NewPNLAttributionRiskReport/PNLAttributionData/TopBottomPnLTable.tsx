@@ -37,7 +37,7 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--top">
             <TrendingUpIcon sx={{ fontSize: 20 }} />
-            <span>Top 10 P&L</span>
+            <span>Top 10 P&L (Gross)</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
             <table className="tb-pnl-table">
@@ -78,7 +78,7 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--bottom">
             <TrendingDownIcon sx={{ fontSize: 20 }} />
-            <span>Bottom 10 P&L</span>
+            <span>Bottom 10 P&L (Gross)</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
             <table className="tb-pnl-table">
