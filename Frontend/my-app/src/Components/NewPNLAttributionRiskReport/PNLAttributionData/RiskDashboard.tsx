@@ -184,6 +184,8 @@ const RiskDashboard: React.FC = () => {
       ? selectedFunds[0]
       : `${selectedFunds.length} Funds`;
 
+  const allDataReady = !loading && !chartLoading && !indexChartLoading && !topBottomLoading && !!data;
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
@@ -196,7 +198,7 @@ const RiskDashboard: React.FC = () => {
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
           exportButton={
-            !loading && data ? (
+            allDataReady ? (
               <RiskDashboardPDFExporter
                 exportContainerId="risk-dashboard-pdf-root"
                 fileName={`Risk_PNL_Report_${fundLabel.replace(/\s+/g, "_")}_${selectedDate}.pdf`}
