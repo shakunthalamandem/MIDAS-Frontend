@@ -1069,7 +1069,7 @@
 
 .tb-pnl-th {
   padding: 10px 16px;
-  text-align: left;
+  text-align: center;
   font-size: 11px;
   font-weight: 600;
   color: #64748b;
@@ -1089,7 +1089,7 @@
 }
 
 .tb-pnl-th--pnl {
-  text-align: right;
+  text-align: center;
   width: 140px;
 }
 
@@ -1107,6 +1107,7 @@
 
 .tb-pnl-td {
   padding: 10px 16px;
+  text-align: center;
   color: #1e293b;
   font-weight: 500;
 }
@@ -1131,7 +1132,7 @@
 }
 
 .tb-pnl-td--pnl {
-  text-align: right;
+  text-align: center;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
