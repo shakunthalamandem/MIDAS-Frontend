@@ -9,6 +9,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Divider,
 } from "@mui/material";
 import {
   ResponsiveContainer,
@@ -95,20 +96,23 @@ const CustomTooltip: React.FC<any> = ({ active, payload }) => {
   const point = payload[0].payload as DealPoint;
 
   return (
-    <Paper elevation={6} sx={{ p: 1.25, minWidth: 220, borderRadius: 2 }}>
-      <Typography variant="subtitle2" sx={{ mb: 0.75, fontWeight: 700 }}>
+    <Paper
+      elevation={4}
+      sx={{ p: 1.25, minWidth: 200, borderRadius: 1.5, border: "1px solid #E2E8F0" }}
+    >
+      <Typography sx={{ mb: 0.5, fontWeight: 700, fontSize: 12.5, color: "#0F172A" }}>
         {formatFullDate(point.date)}
       </Typography>
-      <Table size="small" sx={{ "& td": { borderBottom: "none", py: 0.35 } }}>
+      <Table size="small" sx={{ "& td": { borderBottom: "none", py: 0.25 } }}>
         <TableBody>
           {(["open", "high", "low", "close"] as const).map((key) => (
             <TableRow key={key}>
               <TableCell
-                sx={{ color: "#000000", pr: 1, width: 70, textTransform: "capitalize" }}
+                sx={{ color: "#64748B", pr: 1, width: 50, textTransform: "capitalize", fontSize: 11.5, fontWeight: 600 }}
               >
                 {key}
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, textAlign: "right" }}>
+              <TableCell sx={{ fontWeight: 700, textAlign: "right", fontSize: 12, color: "#0F172A" }}>
                 {formatPrice(point[key])}
               </TableCell>
             </TableRow>
@@ -138,7 +142,7 @@ const Candles: React.FC<any> = (props) => {
       {(data as DealPoint[]).map((entry, index) => {
         const { label, open, close, high, low } = entry;
         const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
-        const color = close >= open ? "#008000" : "#CC0000";
+        const color = close >= open ? "#10B981" : "#EF4444";
         const highY = yScale(high);
         const lowY = yScale(low);
         const openY = yScale(open);
@@ -187,7 +191,7 @@ const OutsideLeftLabel: React.FC<any> = (props) => {
       y={y - 4 + labelYOffset}
       textAnchor="end"
       fill={color}
-      fontSize={11}
+      fontSize={10.5}
       fontWeight={700}
       pointerEvents="none"
     >
@@ -205,9 +209,9 @@ const YAxisTopLabel: React.FC<any> = (props) => {
       x={Math.max(6, offset.left - 10)}
       y={Math.max(12, offset.top - 6)}
       textAnchor="end"
-      fill="rgba(0,0,0,0.75)"
-      fontSize={12}
-      fontWeight={800}
+      fill="#64748B"
+      fontSize={11}
+      fontWeight={700}
       pointerEvents="none"
     >
       Price
@@ -332,8 +336,7 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
     return spread ? spread * 0.01 : 0.05;
   }, [issuePrice, stopLoss, yMin, yMax]);
 
-  const issueLineValue =
-    issuePrice != null ? issuePrice : undefined;
+  const issueLineValue = issuePrice != null ? issuePrice : undefined;
   const stopLossLineValue =
     stopLoss != null ? stopLoss - stopLossOffset : undefined;
 
@@ -342,17 +345,28 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
       {/* ── FactSet Candlestick Chart ── */}
       <Box
         sx={{
-          borderRadius: 4,
+          borderRadius: 2,
           bgcolor: "#FFFFFF",
-          border: "1px solid #EEF2F7",
-          boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-          p: 2.5,
-          mb: 3,
+          border: "1px solid #E2E8F0",
+          p: 2,
+          mb: 2.5,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-          <ShowChartIcon sx={{ color: "#2563EB", fontSize: 24 }} />
-          <Typography variant="h6" sx={{ fontWeight: 900, fontSize: 16 }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 3,
+            height: "100%",
+            bgcolor: "#3B82F6",
+          }}
+        />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+          <ShowChartIcon sx={{ color: "#3B82F6", fontSize: 20 }} />
+          <Typography sx={{ fontWeight: 800, fontSize: 13, color: "#0F172A" }}>
             {ticker} - Deal Price Timeseries
           </Typography>
         </Box>
@@ -366,30 +380,37 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
               height: 300,
             }}
           >
-            <CircularProgress />
+            <CircularProgress size={28} sx={{ color: "#64748B" }} />
           </Box>
         )}
 
         {!loading && error && (
-          <Alert sx={{ mt: 2 }} severity="info">
+          <Alert sx={{ mt: 1, borderRadius: 1.5, fontSize: 12.5 }} severity="info">
             {error}
           </Alert>
         )}
 
         {!loading && !error && chartData.length > 0 && (
           <>
-            <Box sx={{ height: 420 }}>
+            <Box sx={{ height: 400 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={chartData}
                   margin={{ top: 18, right: 30, bottom: 20, left: 50 }}
                   style={{ overflow: "visible" }}
                 >
-                  <XAxis dataKey="label" />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 11, fill: "#64748B" }}
+                    tickLine={false}
+                    axisLine={{ stroke: "#E2E8F0" }}
+                  />
                   <YAxis
                     yAxisId="price"
                     domain={[yMin, yMax]}
                     tickLine={false}
+                    tick={{ fontSize: 11, fill: "#64748B" }}
+                    axisLine={{ stroke: "#E2E8F0" }}
                   />
 
                   <Customized component={<YAxisTopLabel />} />
@@ -410,18 +431,18 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
                     <ReferenceLine
                       y={issueLineValue}
                       yAxisId="price"
-                      stroke="rgba(0,0,0,0.35)"
-                      strokeWidth={1.25}
-                      strokeDasharray="3 4"
+                      stroke="#475569"
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
                     />
                   )}
                   {stopLoss != null && (
                     <ReferenceLine
                       y={stopLossLineValue}
                       yAxisId="price"
-                      stroke="rgba(176,0,32,0.40)"
-                      strokeWidth={1.25}
-                      strokeDasharray="3 4"
+                      stroke="#DC2626"
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
                     />
                   )}
 
@@ -432,7 +453,7 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
                         <OutsideLeftLabel
                           yValue={issueLineValue}
                           text={`Issue = ${issuePrice.toFixed(2)}`}
-                          color="rgba(0,0,0,0.70)"
+                          color="#475569"
                           labelYOffset={-2}
                         />
                       }
@@ -444,7 +465,7 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
                         <OutsideLeftLabel
                           yValue={stopLossLineValue}
                           text={`Stop = ${stopLoss.toFixed(2)}`}
-                          color="rgba(176,0,32,0.75)"
+                          color="#DC2626"
                           labelYOffset={12}
                         />
                       }
@@ -457,47 +478,42 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
             {/* Legend */}
             <Box
               sx={{
-                mt: 2,
+                mt: 1.5,
                 display: "flex",
                 flexWrap: "wrap",
                 justifyContent: "center",
-                gap: 2,
+                gap: 2.5,
                 alignItems: "center",
               }}
             >
-              <Typography variant="caption">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <Box
-                  component="span"
                   sx={{
-                    display: "inline-block",
-                    width: 18,
+                    width: 16,
                     height: 0,
-                    borderTop: "2px dashed rgba(0,0,0,0.55)",
-                    mr: 0.5,
+                    borderTop: "2px dashed #475569",
                   }}
                 />
-                Issue Price
-              </Typography>
-              <Typography variant="caption">
+                <Typography sx={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>
+                  Issue Price
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <Box
-                  component="span"
                   sx={{
-                    display: "inline-block",
-                    width: 18,
+                    width: 16,
                     height: 0,
-                    borderTop: "2px dashed rgba(176,0,32,0.55)",
-                    mr: 0.5,
+                    borderTop: "2px dashed #DC2626",
                   }}
                 />
-                Stop Loss
-              </Typography>
-              <Box display="flex" alignItems="center" mt={0.5}>
-                <InfoOutlinedIcon
-                  fontSize="small"
-                  sx={{ color: "grey.500", mr: 0.5 }}
-                />
-                <Typography variant="caption" color="#000000">
-                  Data from Trade date to 30 trading days
+                <Typography sx={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>
+                  Stop Loss
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <InfoOutlinedIcon sx={{ fontSize: 13, color: "#94A3B8" }} />
+                <Typography sx={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}>
+                  Trade date to 30 trading days
                 </Typography>
               </Box>
             </Box>
@@ -505,7 +521,7 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
         )}
 
         {!loading && !error && chartData.length === 0 && (
-          <Alert sx={{ mt: 2 }} severity="info">
+          <Alert sx={{ mt: 1, borderRadius: 1.5, fontSize: 12.5 }} severity="info">
             No price data available.
           </Alert>
         )}
@@ -515,18 +531,30 @@ const PriceChartsSection: React.FC<Props> = ({ ticker, trade_date }) => {
       {ticker && (
         <Box
           sx={{
-            borderRadius: 4,
+            borderRadius: 2,
             bgcolor: "#FFFFFF",
-            border: "1px solid #EEF2F7",
-            boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
+            border: "1px solid #E2E8F0",
             overflow: "hidden",
+            position: "relative",
           }}
         >
-          <Box sx={{ px: 2.5, pt: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 900, fontSize: 16 }}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 3,
+              height: "100%",
+              bgcolor: "#6366F1",
+              zIndex: 1,
+            }}
+          />
+          <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 13, color: "#0F172A" }}>
               {ticker} - TradingView Chart
             </Typography>
           </Box>
+          <Divider sx={{ borderColor: "#F1F5F9" }} />
           <TradingViewWidget ticker={ticker} />
         </Box>
       )}
