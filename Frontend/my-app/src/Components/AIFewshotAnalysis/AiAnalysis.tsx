@@ -479,6 +479,9 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate, uniqueDeal
       setLoading(false);
       return;
     }
+    if (pricingDate && !uniqueDealId) {
+    return; // Just wait — do NOT reset anything
+  }
 
     if (!API_URL) {
       setStatus({ kind: "error", text: "REACT_APP_API_URL is not set." });

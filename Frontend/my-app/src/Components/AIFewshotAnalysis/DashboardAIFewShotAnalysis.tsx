@@ -26,6 +26,7 @@ type TickerItem = {
   id: string;
   ticker: string;
   pricing_date?: string | null;
+  unique_deal_id?: string | null;   // ✅ ADD THIS
 };
 
 const normalizePricingDate = (value?: string | null): string => {
@@ -188,12 +189,17 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
 
       const items = Array.isArray(data?.tickers)
         ? (
-            data.tickers as { ticker: string; pricing_date?: string | null }[]
-          ).map((t, idx) => ({
-            ticker: t.ticker,
-            pricing_date: t.pricing_date ?? null,
-            id: `${t.ticker}-${t.pricing_date ?? idx}`,
-          }))
+          data.tickers as {
+            ticker: string;
+            pricing_date?: string | null;
+            unique_deal_id?: string | null;
+          }[]
+        ).map((t, idx) => ({
+          ticker: t.ticker,
+          pricing_date: t.pricing_date ?? null,
+          unique_deal_id: t.unique_deal_id ?? null,   // ✅ ADD THIS
+          id: `${t.ticker}-${t.pricing_date ?? idx}`,
+        }))
         : [];
       setTickers(items);
       setSelectedTicker((prev) => {
@@ -541,7 +547,11 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
             <AiAnalysis
               ticker={selectedTicker?.ticker ?? null}
               pricingDate={selectedTicker?.pricing_date ?? null}
-              uniqueDealId={basicDealDetails?.unique_deal_id ?? null}
+              uniqueDealId={
+                selectedTicker?.unique_deal_id ??
+                basicDealDetails?.unique_deal_id ??
+                null
+              }
             />
           </Box>
         </CardContent>

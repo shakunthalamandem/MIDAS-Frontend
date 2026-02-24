@@ -609,11 +609,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
             <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
           )}
 
-          {orderedSidebar.map((item, index) => {
+          {orderedSidebar.map((item) => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
-            const isNumeric = /^\d+$/.test(item.section_number);
-            const displayIndex = index + 1;
             const gradient = sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)";
 
             return (
@@ -642,7 +640,6 @@ const PortfolioReportDocumentMain: React.FC = () => {
                     {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 18, color: "#fff", flex: 1 }}>
-                    {isNumeric ? `${displayIndex}. ` : ""}
                     {item.label}
                   </Typography>
                   {sectionData?.badge && (
