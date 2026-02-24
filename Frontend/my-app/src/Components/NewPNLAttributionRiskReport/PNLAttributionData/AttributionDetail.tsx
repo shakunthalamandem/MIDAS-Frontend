@@ -244,7 +244,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       },
       {
         field: "beta_adj_net",
-        headerName: "\u03B2 Adj Net",
+        headerName: "Beta Adj Net",
         flex: 1,
         minWidth: 120,
         headerAlign: "right",

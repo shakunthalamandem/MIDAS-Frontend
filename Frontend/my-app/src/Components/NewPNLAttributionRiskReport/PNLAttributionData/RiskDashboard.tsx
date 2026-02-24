@@ -32,7 +32,7 @@ const RiskDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("ytd_pnl");
-  const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>(null);
+  const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>("one_month_beta_sp");
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [indexChartLoading, setIndexChartLoading] = useState(false);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
@@ -184,6 +184,8 @@ const RiskDashboard: React.FC = () => {
       ? selectedFunds[0]
       : `${selectedFunds.length} Funds`;
 
+  const allDataReady = !loading && !chartLoading && !indexChartLoading && !topBottomLoading && !!data;
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
@@ -196,7 +198,7 @@ const RiskDashboard: React.FC = () => {
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
           exportButton={
-            !loading && data ? (
+            allDataReady ? (
               <RiskDashboardPDFExporter
                 exportContainerId="risk-dashboard-pdf-root"
                 fileName={`Risk_PNL_Report_${fundLabel.replace(/\s+/g, "_")}_${selectedDate}.pdf`}
@@ -239,6 +241,14 @@ const RiskDashboard: React.FC = () => {
             </Box>
           )}
 
+          <Box className="pdf-section" data-pdf-page="1">
+            <CumulativePnLChart
+              chartData={chartData}
+              loading={chartLoading}
+              period={metricToPeriod(selectedMetric)}
+            />
+          </Box>
+
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison
@@ -258,14 +268,6 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
-
-          <Box className="pdf-section" data-pdf-page="1">
-            <CumulativePnLChart
-              chartData={chartData}
-              loading={chartLoading}
-              period={metricToPeriod(selectedMetric)}
-            />
-          </Box>
 
           <Box className="pdf-section" data-pdf-page="1">
             <TopBottomPnLTable

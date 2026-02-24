@@ -29,10 +29,8 @@ import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlin
 import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import SummarizeOutlinedIcon from "@mui/icons-material/SummarizeOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
@@ -42,6 +40,7 @@ import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -344,12 +343,7 @@ const NavbarMain: React.FC = () => {
               label="Profit & Loss"
               menuItems={[
                 {
-                  label: "P&L Attribution",
-                  path: "/portfolio-attribution",
-                  icon: <TimelineOutlinedIcon fontSize="small" />,
-                },
-                                {
-                  label: "New P&L and Risk Report ",
+                  label: "Risk and P&L Attribution ",
                   path: "/risk_report_pnl_report",
                   icon: <AssessmentOutlinedIcon fontSize="small" />,
                 },
@@ -359,14 +353,24 @@ const NavbarMain: React.FC = () => {
                   icon: <DescriptionOutlinedIcon fontSize="small" />,
                 },
                 {
-                  label: "Risk Report to Funds",
-                  path: "/portfolio-attribution/pnl_risk_report",
-                  icon: <SecurityOutlinedIcon fontSize="small" />,
-                },
-                {
                   label: "Monashee Daily Report",
                   path: "/opportunity/monashee_daily_report",
                   icon: <SummarizeOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Previous Report",
+                  path: "/portfolio-attribution/pnl_risk_report",
+                  icon: <HistoryOutlinedIcon fontSize="small" />,
+                  children: [
+                    {
+                      label: "Risk Report to Funds",
+                      path: "/portfolio-attribution/pnl_risk_report",
+                    },
+                    {
+                      label: "P&L Attribution",
+                      path: "/portfolio-attribution",
+                    },
+                  ],
                 },
               ]}
               selectedTab={selectedTab}

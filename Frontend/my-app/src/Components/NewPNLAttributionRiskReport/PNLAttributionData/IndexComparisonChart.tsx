@@ -25,13 +25,13 @@ interface MetricConfig {
 
 const METRIC_MAP: Record<string, MetricConfig> = {
   one_month_beta_sp: {
-    label: "1m β S&P",
+    label: "1m Beta S&P",
     dataKey: "one_month_beta_sp",
     format: "beta",
     color: "#2563eb",
   },
   three_month_beta_sp: {
-    label: "3m β S&P",
+    label: "3m Beta S&P",
     dataKey: "three_month_beta_sp",
     format: "beta",
     color: "#2563eb",

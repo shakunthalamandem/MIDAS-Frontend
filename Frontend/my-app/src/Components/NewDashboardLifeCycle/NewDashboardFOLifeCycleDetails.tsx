@@ -3,7 +3,6 @@ import {
   Box,
   Chip,
   Container,
-  Grid,
   Paper,
   Tabs,
   Tab,
@@ -21,7 +20,8 @@ import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
-
+// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
+import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -40,8 +40,16 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
 
+  const activePayload = selectedOption || payload;
+  const writeupEnabled =
+    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
+    (activePayload?.writeup_available || "").toUpperCase() === "YES";
+  const status = activePayload?.deal_status ?? "Announced";
+  const isUpcoming = ["Announced", "Price Range"].includes(status);
+
   const tabItems = useMemo(
     () => [
+      ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
       { label: "Write Up New", requiresWriteup: true },
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
@@ -54,45 +62,35 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
-    []
+    [isUpcoming]
   );
-
-  const activePayload = selectedOption || payload;
-  const writeupEnabled =
-    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
-    (activePayload?.writeup_available || "").toUpperCase() === "YES";
 
   React.useEffect(() => {
-  const currentTab = tabItems[tabValue];
-  if (!currentTab) return;
+    const currentTab = tabItems[tabValue];
+    if (!currentTab) return;
 
-  const writeUpNewIndex = tabItems.findIndex(
-    (item) => item.label === "Write Up New"
-  );
+    const writeUpNewIndex = tabItems.findIndex(
+      (item) => item.label === "Write Up New"
+    );
 
-  const firstNonWriteupIndex = tabItems.findIndex(
-    (item) => !item.requiresWriteup
-  );
+    const firstNonWriteupIndex = tabItems.findIndex(
+      (item) => !item.requiresWriteup
+    );
 
-  // CASE 1: Writeup NOT available
-  if (!writeupEnabled) {
-    if (currentTab.requiresWriteup && firstNonWriteupIndex !== -1) {
-      setTabValue(firstNonWriteupIndex);
+    // CASE 1: Writeup NOT available
+    if (!writeupEnabled) {
+      if (currentTab.requiresWriteup && firstNonWriteupIndex !== -1) {
+        setTabValue(firstNonWriteupIndex);
+      }
     }
-  }
 
-  // CASE 2: Writeup becomes available again
-  if (writeupEnabled) {
-    if (writeUpNewIndex !== -1 && tabValue !== writeUpNewIndex) {
-      setTabValue(writeUpNewIndex);
+    // CASE 2: Writeup becomes available again
+    if (writeupEnabled) {
+      if (writeUpNewIndex !== -1 && tabValue !== writeUpNewIndex) {
+        setTabValue(writeUpNewIndex);
+      }
     }
-  }
-
-}, [writeupEnabled]);
-
-
-
-
+  }, [writeupEnabled, tabItems, tabValue]);
 
   React.useEffect(() => {
     if (!targetTabLabel) return;
@@ -128,9 +126,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   }
 
   const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
-  const status = activePayload?.deal_status ?? "Announced";
-  const isUpcoming = ["Announced", "Price Range"].includes(status);
-
 
   return (
     <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
@@ -244,7 +239,12 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up Old" ? (
+          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+            <TradingSignalsMain
+              ticker={activePayload.ticker}
+              trade_date={activePayload.pricing_date}
+            />
+          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (

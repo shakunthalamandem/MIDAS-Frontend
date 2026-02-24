@@ -176,12 +176,12 @@ const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTa
               <Box className="risk-dashboard-section">
                 <Box
                   sx={{
-                    fontSize: "13px",
-                    fontWeight: 700,
+                    fontSize: "16px",
+                    fontWeight: 800,
                     textTransform: "uppercase",
                     letterSpacing: "1px",
                     color: tab.activeTab,
-                    mb: 1.5,
+                    mb: 2,
                   }}
                 >
                   Attribution by {tab.label}

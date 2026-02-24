@@ -191,7 +191,7 @@ const TickerDetail: React.FC = () => {
       },
       {
         field: "beta_adj_net",
-        headerName: "\u03B2 Adj Net",
+        headerName: "Beta Adj Net",
         flex: 1,
         minWidth: 130,
         headerAlign: "right",
