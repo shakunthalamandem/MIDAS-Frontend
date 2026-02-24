@@ -236,11 +236,6 @@ const NavbarMain: React.FC = () => {
                   path: "/deals/dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
                 },
-                {
-                  label: "New Deal Form",
-                  path: "/deals/new_deal_form",
-                  icon: <PostAddOutlinedIcon fontSize="small" />,
-                },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
                   label: "New Dashboard",
@@ -464,6 +459,11 @@ const NavbarMain: React.FC = () => {
             {isLoggedIn && (
               <>
                 {/* 🔔 Notifications */}
+                <ChatBoxButton
+                  label="New Deal Form"
+                  icon={<PostAddOutlinedIcon fontSize="small" />}
+                  onClick={() => navigate("/deals/new_deal_form")}
+                />
                 <ChatBoxButton />
                 <ChatBoxButton
                   label="Meeting Notes"
