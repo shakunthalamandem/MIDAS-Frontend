@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import aibotImage from '../../../../Assets/images/ChatGPT Image Feb 23, 2026, 03_57_26 PM.png';
 
 const ARROW_RIGHT_OFFSET = '20px'; // must match arrow's right
 const ARROW_BOTTOM_OFFSET = '10px'; // must match arrow's bottom
@@ -22,101 +23,28 @@ const containerStyle: React.CSSProperties = {
   transform: `translateX(${HORIZONTAL_NUDGE_PX}px)`,
 };
 
-const bubbleStyle: React.CSSProperties = {
-  position: 'relative',
-  backgroundColor: '#0b284f',
-  color: '#ffffff',
-  padding: '10px 12px',
-  borderRadius: '14px',
-  fontWeight: 600,
-  fontSize: '14px',
-  lineHeight: 1.3,
-  boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
-  minHeight: '32px',
-  minWidth: '170px',
-  textAlign: 'center',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-};
-
-const bubbleTailStyle: React.CSSProperties = {
-  position: 'absolute',
-  bottom: '-6px',
-  right: '10px', // ✅ tail near right edge like your crop
-  width: '12px',
-  height: '12px',
-  backgroundColor: '#0b284f',
-  transform: 'rotate(45deg)',
-};
 
 const avatarStyle: React.CSSProperties = {
-  width: '64px',
-  height: '64px',
+  width: '80px',
+  height: '80px',
   borderRadius: '50%',
   overflow: 'hidden',
-  border: '3px solid #0b284f',
+  border: '3px solid #c7b8b8',
   boxShadow: '0 10px 22px rgba(0, 0, 0, 0.28)',
   backgroundColor: '#ffffff',
 };
 
-const videoStyle: React.CSSProperties = {
+const imageStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
   display: 'block',
+  transform: 'scale(1.35)',
+  transformOrigin: 'center',
 };
 
 const Aibot: React.FC = () => {
   const navigate = useNavigate();
-  const videoSrc = `${process.env.PUBLIC_URL || ''}/images/aibot.mp4`;
-
-  const tooltipFullText = 'Hi, I am Midas AI Assistant';
-  const [typedTooltip, setTypedTooltip] = useState<string>('');
-  const [isHovering, setIsHovering] = useState(false);
-
-  const intervalRef = useRef<number | null>(null);
-  const timeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const clearTimers = () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current);
-      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-      intervalRef.current = null;
-      timeoutRef.current = null;
-    };
-
-    if (!isHovering) {
-      clearTimers();
-      setTypedTooltip('');
-      return;
-    }
-
-    let idx = 0;
-    const startTyping = () => {
-      clearTimers();
-      setTypedTooltip('');
-      idx = 0;
-
-      intervalRef.current = window.setInterval(() => {
-        idx += 1;
-        setTypedTooltip(tooltipFullText.slice(0, idx));
-
-        if (idx >= tooltipFullText.length) {
-          if (intervalRef.current) window.clearInterval(intervalRef.current);
-          intervalRef.current = null;
-          timeoutRef.current = window.setTimeout(startTyping, 1200);
-        }
-      }, 50);
-    };
-
-    startTyping();
-
-    return () => {
-      clearTimers();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHovering]);
-
   return (
     <div
       style={containerStyle}
@@ -131,23 +59,11 @@ const Aibot: React.FC = () => {
         }
       }}
     >
-      {isHovering && (
-        <div style={bubbleStyle}>
-          {typedTooltip}
-          <span aria-hidden="true" style={bubbleTailStyle} />
-        </div>
-      )}
-
       <div
         style={avatarStyle}
         aria-label="Gen AI assistant"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-        onFocus={() => setIsHovering(true)}
-        onBlur={() => setIsHovering(false)}
-        tabIndex={0}
       >
-        <video src={videoSrc} style={videoStyle} autoPlay loop muted playsInline />
+        <img src={aibotImage} alt="Midas AI assistant" style={imageStyle} />
       </div>
     </div>
   );
