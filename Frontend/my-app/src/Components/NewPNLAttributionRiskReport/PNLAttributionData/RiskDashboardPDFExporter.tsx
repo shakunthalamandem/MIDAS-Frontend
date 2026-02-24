@@ -322,6 +322,15 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
         open={loading}
         maxWidth="sm"
         fullWidth
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: "rgba(0, 10, 40, 0.85)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            },
+          },
+        }}
         PaperProps={{
           sx: {
             borderRadius: "16px",
