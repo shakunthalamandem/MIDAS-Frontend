@@ -725,19 +725,19 @@
 /* ── Dashboard Header ── */
 .pdf-export-mode .risk-dashboard-header {
   background: linear-gradient(135deg, #002060 0%, #001545 100%);
-  border-radius: 6px;
-  padding: 8px 16px;
-  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 12px;
 }
 
 .pdf-export-mode .risk-dashboard-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: 0.3px;
 }
 
 .pdf-export-mode .risk-dashboard-subtitle {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* Hide interactive controls, show static date in PDF */
@@ -750,6 +750,27 @@
 
 .pdf-export-mode .risk-dashboard-pdf-date-badge {
   display: block;
+}
+
+/* Ensure header badges are readable in PDF */
+.pdf-export-mode .risk-dashboard-aum-badge-label {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pdf-export-mode .risk-dashboard-aum-badge-value {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.pdf-export-mode .risk-dashboard-date-label {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pdf-export-mode .risk-dashboard-date-value {
+  font-size: 16px;
+  font-weight: 700;
 }
 
 /* ── Remove ALL hover effects ── */
@@ -768,32 +789,33 @@
 /* ── Force grid layouts ── */
 .pdf-export-mode .risk-cards-grid {
   grid-template-columns: repeat(5, 1fr) !important;
-  gap: 6px !important;
+  gap: 10px !important;
 }
 
 .pdf-export-mode .pnl-cards-grid {
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 6px !important;
+  gap: 10px !important;
 }
 
 .pdf-export-mode .index-cards-grid {
   grid-template-columns: repeat(6, 1fr) !important;
-  gap: 4px !important;
+  gap: 6px !important;
 }
 
 /* ── Compact Risk Cards ── */
 .pdf-export-mode .risk-card {
   min-height: auto;
-  padding: 8px 10px;
-  border-radius: 6px;
-  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  gap: 8px;
+  border-width: 2px;
 }
 
 .pdf-export-mode .risk-card-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  font-size: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .pdf-export-mode .risk-card-top {
@@ -801,26 +823,38 @@
 }
 
 .pdf-export-mode .risk-card-label {
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .pdf-export-mode .risk-card-value {
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .pdf-export-mode .risk-card-pct {
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .pdf-export-mode .risk-card-body {
-  gap: 1px;
+  gap: 2px;
 }
 
 /* ── Compact P&L Cards ── */
 .pdf-export-mode .pnl-card {
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-width: 2px;
+}
+
+.pdf-export-mode .pnl-card--positive {
+  border-left-width: 5px;
+}
+
+.pdf-export-mode .pnl-card--negative {
+  border-left-width: 5px;
 }
 
 .pdf-export-mode .pnl-card--selected {
@@ -828,25 +862,30 @@
 }
 
 .pdf-export-mode .pnl-card-header {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .pdf-export-mode .pnl-card-title {
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .pdf-export-mode .pnl-card-value {
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .pdf-export-mode .pnl-card-pct {
-  font-size: 10px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* ── Compact Index Cards ── */
 .pdf-export-mode .index-card {
-  border-radius: 5px;
-  padding: 6px 8px;
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-width: 2px;
 }
 
 .pdf-export-mode .index-card--selected {
@@ -854,16 +893,21 @@
 }
 
 .pdf-export-mode .index-card-label {
-  font-size: 9px;
-  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 3px;
 }
 
 .pdf-export-mode .index-card-value {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
 }
 
 .pdf-export-mode .index-card-sub {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
 }
 
 /* ── Chart sections ── */
@@ -872,18 +916,23 @@
 }
 
 .pdf-export-mode .pnl-chart-card {
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 8px;
+  padding: 12px 14px;
 }
 
 .pdf-export-mode .pnl-chart-header {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .pdf-export-mode .pnl-chart-title {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   color: #002060;
+}
+
+.pdf-export-mode .pnl-chart-legend {
+  font-size: 12px;
+  font-weight: 700;
 }
 
 /* Reduce chart height for portrait A4 */
@@ -894,8 +943,8 @@
 
 /* ── Attribution section ── */
 .pdf-export-mode .attribution-card {
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 /* Hide DataGrid toolbar (export/filter) in PDF */
@@ -926,8 +975,8 @@
 }
 
 .pdf-export-mode .MuiDataGrid-row {
-  max-height: 32px !important;
-  min-height: 32px !important;
+  max-height: 36px !important;
+  min-height: 36px !important;
 }
 
 .pdf-export-mode .MuiDataGrid-main {
@@ -961,18 +1010,21 @@
   overflow: visible !important;
   text-overflow: clip !important;
   white-space: nowrap !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.4px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  color: #0f172a !important;
 }
 
 .pdf-export-mode .MuiDataGrid-cell {
   overflow: visible !important;
   text-overflow: clip !important;
   white-space: nowrap !important;
-  font-size: 10px !important;
-  padding-top: 3px !important;
-  padding-bottom: 3px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }
 
 /* Remove DataGrid footer in PDF */
@@ -982,22 +1034,22 @@
 
 /* ── Compact spacing for PDF ── */
 .pdf-export-mode .pdf-section {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .pdf-export-mode .risk-dashboard-section {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 /* PDF section titles */
 .pdf-export-mode .risk-dashboard-section-title {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   color: #002060;
-  letter-spacing: 0.8px;
-  margin-bottom: 5px;
-  padding-bottom: 2px;
-  border-bottom: 1.5px solid #002060;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  padding-bottom: 3px;
+  border-bottom: 2px solid #002060;
   display: inline-block;
 }
 
@@ -1180,40 +1232,54 @@
 
 /* ── PDF mode for top/bottom tables ── */
 .pdf-export-mode .tb-pnl-container {
-  gap: 8px;
+  gap: 12px;
 }
 
 .pdf-export-mode .tb-pnl-card {
-  border-radius: 5px;
+  border-radius: 8px;
+  border-width: 2px;
 }
 
 .pdf-export-mode .tb-pnl-header {
-  padding: 6px 10px;
-  font-size: 10px;
-  gap: 5px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 6px;
 }
 
 .pdf-export-mode .tb-pnl-table {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .pdf-export-mode .tb-pnl-th {
-  padding: 4px 8px;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #334155;
 }
 
 .pdf-export-mode .tb-pnl-td {
-  padding: 3px 8px;
-  font-size: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.pdf-export-mode .tb-pnl-td--ticker {
+  font-weight: 800;
+}
+
+.pdf-export-mode .tb-pnl-td--pnl {
+  font-weight: 800;
 }
 
 .pdf-export-mode .tb-pnl-rank-badge {
-  width: 18px;
-  height: 18px;
-  font-size: 9px;
-  border-radius: 5px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 6px;
 }
 
 .pdf-export-mode .tb-pnl-row:hover {
