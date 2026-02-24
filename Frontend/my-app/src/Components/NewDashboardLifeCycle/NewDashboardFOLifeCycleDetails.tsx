@@ -21,6 +21,7 @@ import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 import TradingDynamics from "./TradingDynamics";
+import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -49,6 +50,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const tabItems = useMemo(
     () => [
       ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
+      ...(!isUpcoming ? [{ label: "Trading Signals" }] : []),
       { label: "Write Up New", requiresWriteup: true },
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
@@ -240,6 +242,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Trading Dynamics" ? (
             <TradingDynamics
+              ticker={activePayload.ticker}
+              trade_date={activePayload.pricing_date}
+            />
+          ) : tabItems[tabValue]?.label === "Trading Signals" ? (
+            <TradingSignalsMain
               ticker={activePayload.ticker}
               trade_date={activePayload.pricing_date}
             />
