@@ -57,16 +57,8 @@ const DealsTable: React.FC<DealsTableProps> = ({
   const handleRowClick = (params: any) => {
     setSelectedId(params.id);
 
-    const { ticker, deal_type, region, fo_type, sector } = params.row;
-
     onRowSelect(
-      {
-      ticker,
-      deal_type,
-      region,
-      fo_type,
-      sector,
-    },
+      params.row,
       params.id
     );
 

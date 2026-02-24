@@ -10,6 +10,7 @@ export interface DropdownMenuItem {
   icon?: React.ReactNode;
   children?: DropdownMenuItem[];
   onSelect?: () => void;
+  reload?: boolean;
 }
 
 interface DropdownTabProps {
@@ -60,7 +61,11 @@ const DropdownTab: React.FC<DropdownTabProps> = ({
     setAnchorEl(null);
     setSubAnchorEl(null);
     setSubSubAnchorEl(null);
-    navigateAndRefresh(item.path);
+    if (item.reload === false) {
+      navigate(item.path);
+    } else {
+      navigateAndRefresh(item.path);
+    }
   };
 
   const handleClose = () => {
