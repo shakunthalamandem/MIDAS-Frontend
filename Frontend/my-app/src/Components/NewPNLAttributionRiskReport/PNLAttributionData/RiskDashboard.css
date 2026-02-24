@@ -717,6 +717,11 @@
    PDF EXPORT MODE — Compact, print-friendly overrides
    ══════════════════════════════════════════════════ */
 
+/* Constrain container to lg (1200px) width during PDF export */
+.MuiContainer-root:has(.pdf-export-mode) {
+  max-width: 1200px !important;
+}
+
 /* ── Dashboard Header ── */
 .pdf-export-mode .risk-dashboard-header {
   background: linear-gradient(135deg, #002060 0%, #001545 100%);
