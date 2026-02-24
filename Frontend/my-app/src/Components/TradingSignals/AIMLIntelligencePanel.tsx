@@ -5,9 +5,10 @@ import {
   Grid,
   Divider,
   Chip,
+  Card,
+  CardContent,
   CircularProgress,
   Alert,
-  Tooltip,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
@@ -15,11 +16,14 @@ import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import SentimentSatisfiedIcon from "@mui/icons-material/SentimentSatisfied";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 import PredictionCard from "../NewDashboardLifeCycle/PredictionCard";
 import type { TradingSignalIntelligence } from "./types";
 
-/* ---------- helpers (same as AIMLDealInsightsPanel) ---------- */
+/* ════════════════════════════════════════════
+   Helpers
+   ════════════════════════════════════════════ */
 
 function toNumber(v: number | string | null | undefined): number | null {
   if (v === null || v === undefined) return null;
@@ -39,178 +43,204 @@ function fmtPlain(v: any): string {
   return String(v);
 }
 
-/* ---------- sub-components ---------- */
+/* ════════════════════════════════════════════
+   Sentiment color helper
+   ════════════════════════════════════════════ */
 
-function SectionHeader({
-  icon,
-  title,
-}: {
-  icon: React.ReactNode;
-  title: string;
-}) {
+function getSentimentStyle(value: string): { bg: string; color: string } {
+  const v = (value || "").toLowerCase();
+  if (v.includes("bullish"))
+    return { bg: "#DCFCE7", color: "#166534" };
+  if (v.includes("bearish"))
+    return { bg: "#FEE2E2", color: "#991B1B" };
+  if (v.includes("neutral"))
+    return { bg: "#FEF3C7", color: "#92400E" };
+  return { bg: "#F1F5F9", color: "#334155" };
+}
+
+function getVolatilityStyle(value: string): { bg: string; color: string } {
+  const v = (value || "").toLowerCase();
+  if (v.includes("high"))
+    return { bg: "#FEE2E2", color: "#991B1B" };
+  if (v.includes("medium") || v.includes("moderate"))
+    return { bg: "#FEF3C7", color: "#92400E" };
+  if (v.includes("low"))
+    return { bg: "#DCFCE7", color: "#166534" };
+  return { bg: "#E0F2FE", color: "#075985" };
+}
+
+function getConfidenceStyle(value: string): { bg: string; color: string } {
+  const v = (value || "").toLowerCase();
+  if (v.includes("high"))
+    return { bg: "#DCFCE7", color: "#166534" };
+  if (v.includes("medium") || v.includes("moderate"))
+    return { bg: "#FEF9C3", color: "#854D0E" };
+  if (v.includes("low"))
+    return { bg: "#FEE2E2", color: "#991B1B" };
+  return { bg: "#FEF9C3", color: "#854D0E" };
+}
+
+/* ════════════════════════════════════════════
+   Sub-components
+   ════════════════════════════════════════════ */
+
+/** Section header with icon + title */
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
       {icon}
-      <Typography variant="h6" sx={{ fontWeight: 900, fontSize: 16 }}>
+      <Typography sx={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
         {title}
       </Typography>
     </Box>
   );
 }
 
-function FancyCard({
-  title,
-  children,
-  tone = "cool",
-}: {
-  title: string;
-  children: React.ReactNode;
-  tone?: "cool" | "neutral" | "warm";
-}) {
-  const bg =
-    tone === "cool"
-      ? "linear-gradient(180deg, rgba(33,150,243,0.10), rgba(33,150,243,0.02))"
-      : tone === "warm"
-      ? "linear-gradient(180deg, rgba(251,146,60,0.10), rgba(251,146,60,0.02))"
-      : "linear-gradient(180deg, rgba(148,163,184,0.10), rgba(148,163,184,0.02))";
-
-  return (
-    <Box
-      sx={{
-        borderRadius: 4,
-        height: "100%",
-        bgcolor: "#FFFFFF",
-        border: "1px solid #EEF2F7",
-        backgroundImage: bg,
-        boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-        p: 2.25,
-        transition: "transform 180ms ease, box-shadow 180ms ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 14px 30px rgba(16, 24, 40, 0.12)",
-        },
-      }}
-    >
-      <Typography
-        variant="subtitle2"
-        sx={{ fontWeight: 1000, letterSpacing: 0.4, mb: 1.25 }}
-      >
-        {title.toUpperCase()}
-      </Typography>
-      <Divider sx={{ mb: 1.25, borderColor: "#EEF2F7" }} />
-      {children}
-    </Box>
-  );
-}
-
-function StatRow({
+/** Individual Outlook Card matching the reference design */
+function OutlookCard({
   label,
   value,
-  hint,
-}: {
-  label: string;
-  value: React.ReactNode;
-  hint?: string;
-}) {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 2,
-        py: 1,
-      }}
-    >
-      <Box
-        sx={{ display: "flex", alignItems: "center", gap: 0.75, minWidth: 0 }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ color: "#000000", fontWeight: 700, whiteSpace: "nowrap" }}
-        >
-          {label}
-        </Typography>
-        {hint ? (
-          <Tooltip title={hint} arrow>
-            <Typography
-              variant="caption"
-              color="text.disabled"
-              sx={{ cursor: "help" }}
-            >
-              i
-            </Typography>
-          </Tooltip>
-        ) : null}
-      </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          fontWeight: 900,
-          color: "text.primary",
-          textAlign: "right",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          maxWidth: "65%",
-        }}
-      >
-        {value}
-      </Typography>
-    </Box>
-  );
-}
-
-function SentimentChip({
-  label,
-  value,
+  chipBg,
+  chipColor,
+  accentColor = "#F1F5F9",
 }: {
   label: string;
   value: string;
+  chipBg: string;
+  chipColor: string;
+  accentColor?: string;
 }) {
-  const v = (value || "").toLowerCase();
-  const color =
-    v === "bullish"
-      ? "#166534"
-      : v === "bearish"
-      ? "#991B1B"
-      : "#374151";
-  const bg =
-    v === "bullish"
-      ? "#DCFCE7"
-      : v === "bearish"
-      ? "#FEE2E2"
-      : "#F3F4F6";
-  const Icon =
-    v === "bullish"
-      ? TrendingUpIcon
-      : v === "bearish"
-      ? TrendingDownIcon
-      : TrendingFlatIcon;
-
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      <Typography variant="body2" sx={{ fontWeight: 700, color: "#374151", minWidth: 100 }}>
-        {label}
-      </Typography>
-      <Chip
-        icon={<Icon sx={{ fontSize: 16, color }} />}
-        label={value || "-"}
-        size="small"
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid",
+        borderColor: "grey.200",
+        background: "#FFFFFF",
+        boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+        overflow: "hidden",
+        height: "100%",
+        minHeight: 120,
+      }}
+    >
+      <Box sx={{ height: 6, bgcolor: accentColor }} />
+      <CardContent
         sx={{
-          bgcolor: bg,
-          color,
-          fontWeight: 800,
-          textTransform: "capitalize",
-          borderRadius: 999,
-          height: 28,
+          p: 2.25,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
         }}
-      />
-    </Box>
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#002060",
+            textAlign: "center",
+            fontSize: 14,
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </Typography>
+
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 32,
+            px: 1.75,
+            borderRadius: 2,
+            bgcolor: chipBg,
+            color: chipColor,
+            fontWeight: 800,
+            fontSize: 13,
+            minWidth: "fit-content",
+            border: "1px solid rgba(0,0,0,0.04)",
+          }}
+        >
+          {value || "-"}
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 
-/* ---------- main component ---------- */
+/** Sentiment card with icon + colored chip */
+function SentimentCard({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}) {
+  const style = getSentimentStyle(value);
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid",
+        borderColor: "grey.200",
+        background: "#FFFFFF",
+        boxShadow: "0 10px 26px rgba(0,0,0,0.05)",
+        overflow: "hidden",
+        height: "100%",
+        minHeight: 120,
+      }}
+    >
+      <Box sx={{ height: 6, bgcolor: style.bg }} />
+      <CardContent
+        sx={{
+          p: 2.25,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#002060",
+            textAlign: "center",
+            fontSize: 14,
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </Typography>
+        <Chip
+          icon={<>{icon}</>}
+          label={value || "-"}
+          size="small"
+          sx={{
+            height: 32,
+            px: 1.75,
+            bgcolor: style.bg,
+            color: style.color,
+            borderRadius: 2,
+            border: "1px solid rgba(0,0,0,0.04)",
+            fontWeight: 800,
+            fontSize: 13,
+            textTransform: "capitalize",
+          }}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ════════════════════════════════════════════
+   Main Component
+   ════════════════════════════════════════════ */
 
 interface Props {
   ticker: string;
@@ -232,23 +262,18 @@ const AIMLIntelligencePanel: React.FC<Props> = ({ ticker }) => {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(
-          `${apiUrl}/api/trading_signal_intelligence/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token ? `Bearer ${token}` : "",
-            },
-            body: JSON.stringify({ ticker }),
-          }
-        );
+        const res = await fetch(`${apiUrl}/api/trading_signal_intelligence/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker }),
+        });
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => null);
-          throw new Error(
-            errJson?.error || `Request failed with status ${res.status}`
-          );
+          throw new Error(errJson?.error || `Request failed with status ${res.status}`);
         }
 
         const json: TradingSignalIntelligence = await res.json();
@@ -270,17 +295,17 @@ const AIMLIntelligencePanel: React.FC<Props> = ({ ticker }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          py: 8,
+          py: 6,
         }}
       >
-        <CircularProgress />
+        <CircularProgress size={28} sx={{ color: "#64748B" }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Alert severity="info" sx={{ mt: 2 }}>
+      <Alert severity="info" sx={{ mt: 1, borderRadius: 2, fontSize: 13 }}>
         {error}
       </Alert>
     );
@@ -288,7 +313,37 @@ const AIMLIntelligencePanel: React.FC<Props> = ({ ticker }) => {
 
   if (!data) return null;
 
-  // Parse sentiment summary bullets
+  const outlook = data.few_shot_final_outlook;
+
+  // Sentiment chip colors
+  const weekSentiment = getSentimentStyle(outlook?.one_week_sentiment || "");
+  const monthSentiment = getSentimentStyle(outlook?.one_month_sentiment || "");
+  const volStyle = getVolatilityStyle(outlook?.expected_volatility || "");
+  const confStyle = getConfidenceStyle(outlook?.confidence_level || "");
+
+  // Classified sentiment
+  const classWeek = getSentimentStyle(data.one_week_sentiment || "");
+  const classMonth = getSentimentStyle(data.one_month_sentiment || "");
+
+  const classWeekIcon =
+    (data.one_week_sentiment || "").toLowerCase().includes("bullish") ? (
+      <TrendingUpIcon sx={{ fontSize: 16, color: classWeek.color }} />
+    ) : (data.one_week_sentiment || "").toLowerCase().includes("bearish") ? (
+      <TrendingDownIcon sx={{ fontSize: 16, color: classWeek.color }} />
+    ) : (
+      <TrendingFlatIcon sx={{ fontSize: 16, color: classWeek.color }} />
+    );
+
+  const classMonthIcon =
+    (data.one_month_sentiment || "").toLowerCase().includes("bullish") ? (
+      <TrendingUpIcon sx={{ fontSize: 16, color: classMonth.color }} />
+    ) : (data.one_month_sentiment || "").toLowerCase().includes("bearish") ? (
+      <TrendingDownIcon sx={{ fontSize: 16, color: classMonth.color }} />
+    ) : (
+      <TrendingFlatIcon sx={{ fontSize: 16, color: classMonth.color }} />
+    );
+
+  // Sentiment summary bullets
   const sentimentSummaryData = data.sentiment_summary?.sentiment_summary;
   const weekBullets = (sentimentSummaryData?.one_week || "")
     .split("\\n")
@@ -297,29 +352,37 @@ const AIMLIntelligencePanel: React.FC<Props> = ({ ticker }) => {
     .split("\\n")
     .filter(Boolean);
 
-  const outlook = data.few_shot_final_outlook;
-
   return (
     <Box>
-      {/* ── ML Predictions ── */}
+      {/* ═══════════════════════════════════════════
+          Section 1: ML Predictions
+          ═══════════════════════════════════════════ */}
       <Box
         sx={{
+          borderRadius: 2,
+          bgcolor: "#FFFFFF",
+          border: "1px solid #E2E8F0",
           p: 2.5,
-          borderRadius: 4,
-          bgcolor: "#FBF8E7",
-          border: "1px solid #F3EFD8",
-          boxShadow: "0 10px 24px rgba(16, 24, 40, 0.06)",
-          mb: 3,
+          mb: 2.5,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 3,
+            height: "100%",
+            bgcolor: "#F59E0B",
+          }}
+        />
         <SectionHeader
-          icon={<PsychologyIcon sx={{ color: "#D97706", fontSize: 24 }} />}
+          icon={<PsychologyIcon sx={{ color: "#D97706", fontSize: 22 }} />}
           title="ML Model Predictions & Outcomes"
         />
-        <Typography
-          variant="body2"
-          sx={{ color: "#111827", opacity: 0.75, fontWeight: 600, mb: 2 }}
-        >
+        <Typography sx={{ color: "#64748B", fontWeight: 500, fontSize: 12.5, mb: 2 }}>
           AI-powered forecasts compared to actual market performance
         </Typography>
 
@@ -367,206 +430,272 @@ const AIMLIntelligencePanel: React.FC<Props> = ({ ticker }) => {
         </Grid>
       </Box>
 
-      {/* ── Few-shot Analysis + Sentiment ── */}
-      <Grid container spacing={3}>
+      {/* ═══════════════════════════════════════════
+          Section 2: AI Unsupervised Outlook
+          Executive Summary + 4 Outlook Cards
+          ═══════════════════════════════════════════ */}
+      <Box
+        sx={{
+          borderRadius: 2,
+          bgcolor: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          p: 2.5,
+          mb: 2.5,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 3,
+            height: "100%",
+            bgcolor: "#6366F1",
+          }}
+        />
+
+        <SectionHeader
+          icon={<AutoAwesomeIcon sx={{ color: "#6366F1", fontSize: 22 }} />}
+          title="AI Unsupervised Analysis"
+        />
+
         {/* Executive Summary */}
-        <Grid item xs={12} md={6}>
-          <FancyCard title="AI Executive Summary" tone="cool">
-            <SectionHeader
-              icon={<SummarizeIcon sx={{ color: "#2563EB", fontSize: 20 }} />}
-              title=""
-            />
-            {data.few_shot_executive_summary ? (
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#374151",
-                  fontWeight: 500,
-                  lineHeight: 1.7,
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {data.few_shot_executive_summary}
+        {data.few_shot_executive_summary ? (
+          <Box
+            sx={{
+              bgcolor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: 2,
+              p: 2,
+              mb: 2.5,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 1 }}>
+              <SummarizeIcon sx={{ color: "#6366F1", fontSize: 18 }} />
+              <Typography sx={{ fontWeight: 800, fontSize: 12.5, color: "#334155" }}>
+                Executive Summary
               </Typography>
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ color: "#9CA3AF", fontWeight: 600 }}
-              >
-                No executive summary available
-              </Typography>
-            )}
-          </FancyCard>
-        </Grid>
-
-        {/* Final Outlook + Sentiment */}
-        <Grid item xs={12} md={6}>
-          <FancyCard title="Sentiment & Volatility Outlook" tone="warm">
-            {/* Few-shot final outlook */}
+            </Box>
             <Typography
-              variant="caption"
               sx={{
-                fontWeight: 800,
-                color: "#92400E",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-                mb: 1.5,
-                display: "block",
+                color: "#475569",
+                fontWeight: 500,
+                fontSize: 13,
+                lineHeight: 1.7,
+                whiteSpace: "pre-line",
               }}
             >
-              Unsupervised Model Outlook
+              {data.few_shot_executive_summary}
             </Typography>
-
-            <Box sx={{ mb: 2 }}>
-              <StatRow
-                label="1-Week Sentiment"
-                value={
-                  <Chip
-                    label={outlook?.one_week_sentiment || "-"}
-                    size="small"
-                    sx={{
-                      bgcolor:
-                        (outlook?.one_week_sentiment || "").toLowerCase() ===
-                        "bullish"
-                          ? "#DCFCE7"
-                          : (outlook?.one_week_sentiment || "").toLowerCase() ===
-                            "bearish"
-                          ? "#FEE2E2"
-                          : "#F3F4F6",
-                      fontWeight: 800,
-                      textTransform: "capitalize",
-                      height: 24,
-                      fontSize: 12,
-                    }}
-                  />
-                }
-              />
-              <StatRow
-                label="1-Month Sentiment"
-                value={
-                  <Chip
-                    label={outlook?.one_month_sentiment || "-"}
-                    size="small"
-                    sx={{
-                      bgcolor:
-                        (outlook?.one_month_sentiment || "").toLowerCase() ===
-                        "bullish"
-                          ? "#DCFCE7"
-                          : (outlook?.one_month_sentiment || "").toLowerCase() ===
-                            "bearish"
-                          ? "#FEE2E2"
-                          : "#F3F4F6",
-                      fontWeight: 800,
-                      textTransform: "capitalize",
-                      height: 24,
-                      fontSize: 12,
-                    }}
-                  />
-                }
-              />
-              <StatRow
-                label="Expected Volatility"
-                value={fmtPlain(outlook?.expected_volatility)}
-                hint="Low / Medium / High"
-              />
-              <StatRow
-                label="Confidence Level"
-                value={fmtPlain(outlook?.confidence_level)}
-              />
-            </Box>
-
-            <Divider sx={{ my: 1.5, borderColor: "#EEF2F7" }} />
-
-            {/* Classified sentiment */}
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 800,
-                color: "#1E40AF",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-                mb: 1.5,
-                display: "block",
-              }}
-            >
-              Classified Sentiment
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              bgcolor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: 2,
+              p: 2,
+              mb: 2.5,
+            }}
+          >
+            <Typography sx={{ color: "#94A3B8", fontWeight: 600, fontSize: 13 }}>
+              No executive summary available
             </Typography>
-
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-              <SentimentChip
-                label="1-Week"
-                value={data.one_week_sentiment}
-              />
-              <SentimentChip
-                label="1-Month"
-                value={data.one_month_sentiment}
-              />
-            </Box>
-          </FancyCard>
-        </Grid>
-
-        {/* Sentiment Summary */}
-        {(weekBullets.length > 0 || monthBullets.length > 0) && (
-          <Grid item xs={12}>
-            <FancyCard title="Sentiment Summary" tone="neutral">
-              <SectionHeader
-                icon={
-                  <SentimentSatisfiedIcon
-                    sx={{ color: "#6366F1", fontSize: 20 }}
-                  />
-                }
-                title=""
-              />
-              <Grid container spacing={3}>
-                {weekBullets.length > 0 && (
-                  <Grid item xs={12} md={6}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 900, mb: 1, color: "#1E40AF" }}
-                    >
-                      1-Week Outlook
-                    </Typography>
-                    <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
-                      {weekBullets.map((b, i) => (
-                        <Typography
-                          component="li"
-                          variant="body2"
-                          key={i}
-                          sx={{ mb: 0.5, color: "#374151", lineHeight: 1.6 }}
-                        >
-                          {b}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Grid>
-                )}
-                {monthBullets.length > 0 && (
-                  <Grid item xs={12} md={6}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 900, mb: 1, color: "#92400E" }}
-                    >
-                      1-Month Outlook
-                    </Typography>
-                    <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
-                      {monthBullets.map((b, i) => (
-                        <Typography
-                          component="li"
-                          variant="body2"
-                          key={i}
-                          sx={{ mb: 0.5, color: "#374151", lineHeight: 1.6 }}
-                        >
-                          {b}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Grid>
-                )}
-              </Grid>
-            </FancyCard>
-          </Grid>
+          </Box>
         )}
-      </Grid>
+
+        {/* Outlook Summary heading */}
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: 14,
+            color: "#5D0163",
+            textAlign: "center",
+            mb: 1.5,
+          }}
+        >
+          Outlook Summary
+        </Typography>
+
+        {/* 4 Outlook Cards in a row */}
+        <Box
+          sx={{
+            display: "grid",
+            gap: 2,
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+          }}
+        >
+          <OutlookCard
+            label="1-Week Sentiment"
+            value={fmtPlain(outlook?.one_week_sentiment)}
+            chipBg={weekSentiment.bg}
+            chipColor={weekSentiment.color}
+            accentColor={weekSentiment.bg}
+          />
+          <OutlookCard
+            label="1-Month Sentiment"
+            value={fmtPlain(outlook?.one_month_sentiment)}
+            chipBg={monthSentiment.bg}
+            chipColor={monthSentiment.color}
+            accentColor={monthSentiment.bg}
+          />
+          <OutlookCard
+            label="Expected Volatility"
+            value={fmtPlain(outlook?.expected_volatility)}
+            chipBg={volStyle.bg}
+            chipColor={volStyle.color}
+            accentColor="#E0F2FE"
+          />
+          <OutlookCard
+            label="Confidence Level"
+            value={fmtPlain(outlook?.confidence_level)}
+            chipBg={confStyle.bg}
+            chipColor={confStyle.color}
+            accentColor="#FEF9C3"
+          />
+        </Box>
+      </Box>
+
+      {/* ═══════════════════════════════════════════
+          Section 3: Classified Sentiment
+          Sentiment Summary + 2 Sentiment Cards
+          ═══════════════════════════════════════════ */}
+      <Box
+        sx={{
+          borderRadius: 2,
+          bgcolor: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          p: 2.5,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 3,
+            height: "100%",
+            bgcolor: "#3B82F6",
+          }}
+        />
+
+        <SectionHeader
+          icon={<SentimentSatisfiedIcon sx={{ color: "#3B82F6", fontSize: 22 }} />}
+          title="Classified Sentiment Analysis"
+        />
+
+        {/* Sentiment Summary bullets (if available) */}
+        {(weekBullets.length > 0 || monthBullets.length > 0) && (
+          <Box
+            sx={{
+              bgcolor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: 2,
+              p: 2,
+              mb: 2.5,
+            }}
+          >
+            <Grid container spacing={3}>
+              {weekBullets.length > 0 && (
+                <Grid item xs={12} md={6}>
+                  <Typography
+                    sx={{ fontWeight: 800, fontSize: 13, mb: 1, color: "#1E40AF" }}
+                  >
+                    1-Week Outlook
+                  </Typography>
+                  <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+                    {weekBullets.map((b, i) => (
+                      <Typography
+                        component="li"
+                        key={i}
+                        sx={{
+                          mb: 0.5,
+                          color: "#475569",
+                          fontSize: 13,
+                          lineHeight: 1.6,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {b}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Grid>
+              )}
+              {monthBullets.length > 0 && (
+                <Grid item xs={12} md={6}>
+                  <Typography
+                    sx={{ fontWeight: 800, fontSize: 13, mb: 1, color: "#92400E" }}
+                  >
+                    1-Month Outlook
+                  </Typography>
+                  <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+                    {monthBullets.map((b, i) => (
+                      <Typography
+                        component="li"
+                        key={i}
+                        sx={{
+                          mb: 0.5,
+                          color: "#475569",
+                          fontSize: 13,
+                          lineHeight: 1.6,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {b}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Grid>
+              )}
+            </Grid>
+          </Box>
+        )}
+
+        {/* Sentiment heading */}
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: 14,
+            color: "#5D0163",
+            textAlign: "center",
+            mb: 1.5,
+          }}
+        >
+          Sentiment Overview
+        </Typography>
+
+        {/* 2 Sentiment Cards */}
+        <Box
+          sx={{
+            display: "grid",
+            gap: 2,
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+            },
+          }}
+        >
+          <SentimentCard
+            label="1-Week Sentiment"
+            value={data.one_week_sentiment}
+            icon={classWeekIcon}
+          />
+          <SentimentCard
+            label="1-Month Sentiment"
+            value={data.one_month_sentiment}
+            icon={classMonthIcon}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 };

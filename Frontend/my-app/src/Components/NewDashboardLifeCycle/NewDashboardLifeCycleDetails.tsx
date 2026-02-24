@@ -27,7 +27,7 @@ import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
-import TradingDynamics from "./TradingDynamics";
+// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
 import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
@@ -47,7 +47,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const tabItems = useMemo(
     () => [
       ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
-      ...(!isUpcoming ? [{ label: "Trading Signals" }] : []),
       { label: "Write Up New" },
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
@@ -200,11 +199,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Trading Dynamics" ? (
-            <TradingDynamics
-              ticker={activePayload.ticker}
-              trade_date={activePayload.pricing_date}
-            />
-          ) : tabItems[tabValue]?.label === "Trading Signals" ? (
             <TradingSignalsMain
               ticker={activePayload.ticker}
               trade_date={activePayload.pricing_date}

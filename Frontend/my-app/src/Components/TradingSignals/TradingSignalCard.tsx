@@ -10,6 +10,10 @@ import {
   Tooltip,
   Button,
   Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -19,6 +23,7 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 import type { TradingSignalData } from "./types";
 
@@ -28,31 +33,31 @@ function getSignalColors(signal: string) {
   switch (signal) {
     case "BUY":
       return {
-        bg: "#DCFCE7",
-        text: "#166534",
-        border: "#22C55E",
-        bar: "#22C55E",
-        gradient: "linear-gradient(135deg, #22C55E, #16A34A, #15803D)",
-        accent: "linear-gradient(90deg, #22C55E, #4ADE80, #86EFAC)",
+        bg: "#ECFDF5",
+        text: "#065F46",
+        border: "#10B981",
+        bar: "#10B981",
+        chipBg: "#D1FAE5",
+        badgeBg: "#059669",
       };
     case "SELL":
       return {
-        bg: "#FEE2E2",
+        bg: "#FEF2F2",
         text: "#991B1B",
         border: "#EF4444",
         bar: "#EF4444",
-        gradient: "linear-gradient(135deg, #EF4444, #DC2626, #B91C1C)",
-        accent: "linear-gradient(90deg, #EF4444, #F87171, #FCA5A5)",
+        chipBg: "#FEE2E2",
+        badgeBg: "#DC2626",
       };
     case "HOLD":
     default:
       return {
-        bg: "#FEF3C7",
+        bg: "#FFFBEB",
         text: "#92400E",
         border: "#F59E0B",
         bar: "#F59E0B",
-        gradient: "linear-gradient(135deg, #F59E0B, #D97706, #B45309)",
-        accent: "linear-gradient(90deg, #F59E0B, #FBBF24, #FCD34D)",
+        chipBg: "#FEF3C7",
+        badgeBg: "#D97706",
       };
   }
 }
@@ -60,11 +65,11 @@ function getSignalColors(signal: string) {
 function getSignalIcon(signal: string) {
   switch (signal) {
     case "BUY":
-      return <TrendingUpIcon sx={{ fontSize: 32, color: "#FFFFFF" }} />;
+      return <TrendingUpIcon sx={{ fontSize: 22, color: "#FFFFFF" }} />;
     case "SELL":
-      return <TrendingDownIcon sx={{ fontSize: 32, color: "#FFFFFF" }} />;
+      return <TrendingDownIcon sx={{ fontSize: 22, color: "#FFFFFF" }} />;
     default:
-      return <RemoveIcon sx={{ fontSize: 32, color: "#FFFFFF" }} />;
+      return <RemoveIcon sx={{ fontSize: 22, color: "#FFFFFF" }} />;
   }
 }
 
@@ -95,6 +100,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -118,7 +124,6 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
       });
 
       if (res.status === 404) {
-        // No signal yet — that's fine
         setSignal(null);
         return;
       }
@@ -167,399 +172,457 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
     }
   };
 
+  // Confirmation dialog handlers
+  const handleRefreshClick = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmRefresh = () => {
+    setConfirmOpen(false);
+    generateSignal();
+  };
+
+  const handleCancelRefresh = () => {
+    setConfirmOpen(false);
+  };
+
   const colors = signal ? getSignalColors(signal.signal) : getSignalColors("HOLD");
+
+  /* ─── Shared card wrapper ─── */
+  const CardShell: React.FC<{ children: React.ReactNode; accentColor?: string }> = ({
+    children,
+    accentColor,
+  }) => (
+    <Box
+      sx={{
+        borderRadius: 2,
+        bgcolor: "#FFFFFF",
+        border: "1px solid #E2E8F0",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {accentColor && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 3,
+            height: "100%",
+            bgcolor: accentColor,
+          }}
+        />
+      )}
+      {children}
+    </Box>
+  );
 
   // ── Loading state ──
   if (loading) {
     return (
-      <Box
-        sx={{
-          borderRadius: 4,
-          bgcolor: "#FFFFFF",
-          border: "1px solid #EEF2F7",
-          boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-          p: 4,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: 200,
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <CardShell>
+        <Box
+          sx={{
+            p: 4,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: 160,
+          }}
+        >
+          <CircularProgress size={32} sx={{ color: "#64748B" }} />
+        </Box>
+      </CardShell>
     );
   }
 
   // ── No signal yet — show generate button ──
   if (!signal && !generating) {
     return (
-      <Box
-        sx={{
-          borderRadius: 4,
-          bgcolor: "#FFFFFF",
-          border: "1px solid #EEF2F7",
-          backgroundImage:
-            "linear-gradient(180deg, rgba(99,102,241,0.06), rgba(255,255,255,0))",
-          boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-          p: 3,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 4,
-            background: "linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA)",
-          }}
-        />
+      <CardShell accentColor="#6366F1">
+        <Box sx={{ p: 2.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+            <AutoGraphIcon sx={{ fontSize: 20, color: "#6366F1" }} />
+            <Typography sx={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
+              AI Trading Signal
+            </Typography>
+          </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-          <AutoGraphIcon sx={{ fontSize: 28, color: "#6366F1" }} />
-          <Typography variant="h6" sx={{ fontWeight: 900, color: "#1E1B4B" }}>
-            AI Trading Signal
-          </Typography>
-        </Box>
+          <Divider sx={{ mb: 2.5, borderColor: "#F1F5F9" }} />
 
-        <Divider sx={{ mb: 3, borderColor: "#EEF2F7" }} />
-
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            py: 3,
-            gap: 2,
-          }}
-        >
-          <Typography
-            variant="body1"
-            sx={{ color: "#6B7280", fontWeight: 600, textAlign: "center" }}
-          >
-            No trading signal has been generated for {ticker} yet.
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AutoGraphIcon />}
-            onClick={generateSignal}
+          <Box
             sx={{
-              bgcolor: "#6366F1",
-              fontWeight: 800,
-              borderRadius: 999,
-              px: 4,
-              py: 1.2,
-              textTransform: "none",
-              "&:hover": { bgcolor: "#4F46E5" },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              py: 3,
+              gap: 1.5,
             }}
           >
-            Generate Trading Signal
-          </Button>
-          {error && (
-            <Typography variant="caption" sx={{ color: "#EF4444", fontWeight: 600 }}>
-              {error}
+            <Typography
+              sx={{ color: "#64748B", fontWeight: 600, fontSize: 13, textAlign: "center" }}
+            >
+              No trading signal generated for {ticker} yet.
             </Typography>
-          )}
+            <Button
+              variant="contained"
+              startIcon={<AutoGraphIcon sx={{ fontSize: 16 }} />}
+              onClick={generateSignal}
+              sx={{
+                bgcolor: "#1E293B",
+                fontWeight: 700,
+                borderRadius: 1.5,
+                px: 3,
+                py: 0.8,
+                fontSize: 13,
+                textTransform: "none",
+                boxShadow: "none",
+                "&:hover": { bgcolor: "#334155", boxShadow: "none" },
+              }}
+            >
+              Generate Signal
+            </Button>
+            {error && (
+              <Typography sx={{ color: "#EF4444", fontWeight: 600, fontSize: 12, mt: 0.5 }}>
+                {error}
+              </Typography>
+            )}
+          </Box>
         </Box>
-      </Box>
+      </CardShell>
     );
   }
 
   // ── Generating state ──
   if (generating) {
     return (
-      <Box
-        sx={{
-          borderRadius: 4,
-          bgcolor: "#FFFFFF",
-          border: "1px solid #EEF2F7",
-          backgroundImage:
-            "linear-gradient(180deg, rgba(99,102,241,0.06), rgba(255,255,255,0))",
-          boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-          p: 3,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 4,
-            background: "linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA)",
-          }}
-        />
+      <CardShell accentColor="#6366F1">
+        <Box sx={{ p: 2.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+            <AutoGraphIcon sx={{ fontSize: 20, color: "#6366F1" }} />
+            <Typography sx={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
+              AI Trading Signal
+            </Typography>
+          </Box>
+          <Divider sx={{ mb: 2.5, borderColor: "#F1F5F9" }} />
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            py: 5,
-            gap: 2,
-          }}
-        >
-          <CircularProgress size={48} sx={{ color: "#6366F1" }} />
-          <Typography
-            variant="body1"
-            sx={{ color: "#374151", fontWeight: 700, textAlign: "center" }}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              py: 4,
+              gap: 1.5,
+            }}
           >
-            Analyzing market signals, sentiment, news & price action...
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ color: "#9CA3AF", fontWeight: 500 }}
-          >
-            Claude is generating your trading signal
-          </Typography>
+            <CircularProgress size={36} sx={{ color: "#1E293B" }} />
+            <Typography sx={{ color: "#334155", fontWeight: 700, fontSize: 13 }}>
+              Analyzing market data, sentiment & price action...
+            </Typography>
+            <Typography sx={{ color: "#94A3B8", fontWeight: 500, fontSize: 12 }}>
+              Generating trading signal via Claude AI
+            </Typography>
+          </Box>
         </Box>
-      </Box>
+      </CardShell>
     );
   }
 
   // ── Signal display ──
   return (
-    <Box
-      sx={{
-        borderRadius: 4,
-        bgcolor: "#FFFFFF",
-        border: "1px solid #EEF2F7",
-        boxShadow: "0 10px 24px rgba(16, 24, 40, 0.08)",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Top accent bar */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: colors.accent,
-        }}
-      />
-
-      <Box sx={{ p: 3 }}>
-        {/* Header row */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <AutoGraphIcon sx={{ fontSize: 28, color: colors.border }} />
-            <Typography variant="h6" sx={{ fontWeight: 900, color: "#1E1B4B" }}>
-              AI Trading Signal
-            </Typography>
-          </Box>
-
-          {/* Date + Refresh together on the right */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <ScheduleIcon sx={{ fontSize: 15, color: "#9CA3AF" }} />
-              <Typography
-                variant="caption"
-                sx={{ color: "#9CA3AF", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
-                {formatDate(signal!.generated_at)}
-              </Typography>
-            </Box>
-            <Tooltip title="Regenerate signal">
-              <IconButton
-                onClick={generateSignal}
-                disabled={generating}
-                size="small"
-                sx={{
-                  bgcolor: "#F3F4F6",
-                  "&:hover": { bgcolor: "#E5E7EB" },
-                }}
-              >
-                <RefreshIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-
-        <Divider sx={{ mb: 2.5, borderColor: "#EEF2F7" }} />
-
-        {/* Signal badge + confidence */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 3,
-            mb: 2.5,
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Large signal badge */}
+    <>
+      <CardShell accentColor={colors.border}>
+        <Box sx={{ p: 2.5 }}>
+          {/* Header row */}
           <Box
             sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              background: colors.gradient,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              boxShadow: `0 8px 20px ${colors.border}40`,
-              flexShrink: 0,
+              justifyContent: "space-between",
+              mb: 1.5,
             }}
           >
-            {getSignalIcon(signal!.signal)}
-            <Typography
-              sx={{
-                color: "#FFFFFF",
-                fontWeight: 900,
-                fontSize: 13,
-                letterSpacing: 1,
-                mt: -0.25,
-              }}
-            >
-              {signal!.signal}
-            </Typography>
-          </Box>
-
-          {/* Confidence + insight */}
-          <Box sx={{ flex: 1, minWidth: 200 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 800, color: "#374151" }}
-              >
-                Confidence
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 900,
-                  fontSize: 20,
-                  color: colors.text,
-                }}
-              >
-                {signal!.confidence}%
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <AutoGraphIcon sx={{ fontSize: 20, color: colors.border }} />
+              <Typography sx={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
+                AI Trading Signal
               </Typography>
             </Box>
 
-            <LinearProgress
-              variant="determinate"
-              value={signal!.confidence}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <ScheduleIcon sx={{ fontSize: 13, color: "#94A3B8" }} />
+                <Typography sx={{ color: "#94A3B8", fontWeight: 600, fontSize: 11, whiteSpace: "nowrap" }}>
+                  {formatDate(signal!.generated_at)}
+                </Typography>
+              </Box>
+              <Tooltip title="Regenerate signal">
+                <IconButton
+                  onClick={handleRefreshClick}
+                  disabled={generating}
+                  size="small"
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    bgcolor: "#F8FAFC",
+                    border: "1px solid #E2E8F0",
+                    "&:hover": { bgcolor: "#F1F5F9" },
+                  }}
+                >
+                  <RefreshIcon sx={{ fontSize: 15, color: "#64748B" }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          <Divider sx={{ mb: 2, borderColor: "#F1F5F9" }} />
+
+          {/* Signal badge + confidence row */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 2.5,
+              mb: 2,
+            }}
+          >
+            {/* Signal badge */}
+            <Box
               sx={{
-                height: 10,
-                borderRadius: 999,
-                bgcolor: "#E5E7EB",
+                width: 56,
+                height: 56,
+                borderRadius: 2,
+                bgcolor: colors.badgeBg,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {getSignalIcon(signal!.signal)}
+              <Typography
+                sx={{
+                  color: "#FFFFFF",
+                  fontWeight: 800,
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                  mt: -0.25,
+                }}
+              >
+                {signal!.signal}
+              </Typography>
+            </Box>
+
+            {/* Confidence + insight */}
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, mb: 0.75 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 12, color: "#64748B" }}>
+                  Confidence
+                </Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: 18, color: colors.text }}>
+                  {signal!.confidence}%
+                </Typography>
+              </Box>
+
+              <LinearProgress
+                variant="determinate"
+                value={signal!.confidence}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  bgcolor: "#F1F5F9",
+                  mb: 1.5,
+                  "& .MuiLinearProgress-bar": {
+                    borderRadius: 3,
+                    backgroundColor: colors.bar,
+                  },
+                }}
+              />
+
+              <Typography
+                sx={{
+                  color: "#475569",
+                  fontWeight: 500,
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  fontStyle: "italic",
+                }}
+              >
+                {signal!.insight}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Reasoning bullets — 2-column layout */}
+          {signal!.reasoning && signal!.reasoning.length > 0 && (
+            <Box
+              sx={{
+                bgcolor: "#F8FAFC",
+                borderRadius: 1.5,
+                p: 2,
                 mb: 1.5,
-                "& .MuiLinearProgress-bar": {
-                  borderRadius: 999,
-                  backgroundColor: colors.bar,
-                },
+                border: "1px solid #F1F5F9",
+              }}
+            >
+              <Typography
+                sx={{ fontWeight: 800, fontSize: 12, mb: 1.5, color: "#0F172A", letterSpacing: 0.3 }}
+              >
+                Key Reasoning
+              </Typography>
+              <Grid container spacing={1}>
+                {signal!.reasoning.map((bullet, idx) => (
+                  <Grid item xs={12} md={6} key={idx}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 0.75,
+                      }}
+                    >
+                      <FiberManualRecordIcon
+                        sx={{
+                          fontSize: 6,
+                          mt: 0.8,
+                          color: colors.border,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography
+                        sx={{ color: "#475569", fontWeight: 500, fontSize: 12.5, lineHeight: 1.55 }}
+                      >
+                        {bullet}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+
+          {/* Footer: signal date chip */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Chip
+              icon={<CheckCircleOutlineIcon sx={{ fontSize: 12 }} />}
+              label={`Signal for ${signal!.signal_date}`}
+              size="small"
+              sx={{
+                bgcolor: colors.chipBg,
+                color: colors.text,
+                fontWeight: 700,
+                fontSize: 11,
+                height: 22,
+                borderRadius: 1,
+                "& .MuiChip-icon": { color: colors.text },
               }}
             />
-
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#374151",
-                fontWeight: 600,
-                lineHeight: 1.5,
-                fontStyle: "italic",
-              }}
-            >
-              {signal!.insight}
-            </Typography>
           </Box>
+
+          {/* Error display */}
+          {error && (
+            <Typography
+              sx={{ color: "#EF4444", fontWeight: 600, fontSize: 12, mt: 1, display: "block" }}
+            >
+              {error}
+            </Typography>
+          )}
         </Box>
+      </CardShell>
 
-        {/* Reasoning bullets — 2 per row */}
-        {signal!.reasoning && signal!.reasoning.length > 0 && (
-          <Box
-            sx={{
-              bgcolor: "#F9FAFB",
-              borderRadius: 3,
-              p: 2,
-              mb: 2,
-              border: "1px solid #F3F4F6",
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 900, mb: 1.5, color: "#111827" }}
-            >
-              Key Reasoning
-            </Typography>
-            <Grid container spacing={1.5}>
-              {signal!.reasoning.map((bullet, idx) => (
-                <Grid item xs={12} md={6} key={idx}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 1,
-                    }}
-                  >
-                    <FiberManualRecordIcon
-                      sx={{
-                        fontSize: 8,
-                        mt: 0.75,
-                        color: colors.border,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#374151", fontWeight: 500, lineHeight: 1.55 }}
-                    >
-                      {bullet}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        )}
-
-        {/* Footer: signal date chip */}
-        <Box
+      {/* ── Confirmation Dialog ── */}
+      <Dialog
+        open={confirmOpen}
+        onClose={handleCancelRefresh}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            minWidth: 380,
+            maxWidth: 440,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          },
+        }}
+      >
+        <DialogTitle
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            gap: 1.5,
+            pb: 1,
+            pt: 2.5,
+            px: 3,
           }}
         >
-          <Chip
-            icon={<CheckCircleOutlineIcon sx={{ fontSize: 14 }} />}
-            label={`Signal for ${signal!.signal_date}`}
-            size="small"
-            sx={{
-              bgcolor: colors.bg,
-              color: colors.text,
-              fontWeight: 700,
-              fontSize: 11,
-              height: 24,
-            }}
-          />
-        </Box>
-
-        {/* Error display */}
-        {error && (
-          <Typography
-            variant="caption"
-            sx={{ color: "#EF4444", fontWeight: 600, mt: 1, display: "block" }}
-          >
-            {error}
+          <WarningAmberIcon sx={{ fontSize: 22, color: "#F59E0B" }} />
+          <Typography sx={{ fontWeight: 800, fontSize: 16, color: "#0F172A" }}>
+            Regenerate Signal?
           </Typography>
-        )}
-      </Box>
-    </Box>
+        </DialogTitle>
+        <DialogContent sx={{ px: 3, pt: 0.5, pb: 1 }}>
+          <Typography sx={{ color: "#475569", fontSize: 13, fontWeight: 500, lineHeight: 1.6 }}>
+            This will generate a new AI trading signal for <strong>{ticker}</strong>, replacing the
+            current one.
+          </Typography>
+          {signal?.generated_at && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.75,
+                mt: 1.5,
+                p: 1.25,
+                bgcolor: "#F8FAFC",
+                borderRadius: 1.5,
+                border: "1px solid #E2E8F0",
+              }}
+            >
+              <ScheduleIcon sx={{ fontSize: 15, color: "#64748B" }} />
+              <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#64748B" }}>
+                Last generated: {formatDate(signal.generated_at)}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, pt: 1, gap: 1 }}>
+          <Button
+            onClick={handleCancelRefresh}
+            sx={{
+              color: "#64748B",
+              fontWeight: 700,
+              fontSize: 13,
+              textTransform: "none",
+              borderRadius: 1.5,
+              px: 2.5,
+              "&:hover": { bgcolor: "#F1F5F9" },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRefresh}
+            variant="contained"
+            sx={{
+              bgcolor: "#1E293B",
+              fontWeight: 700,
+              fontSize: 13,
+              textTransform: "none",
+              borderRadius: 1.5,
+              px: 2.5,
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#334155", boxShadow: "none" },
+            }}
+          >
+            Regenerate
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
