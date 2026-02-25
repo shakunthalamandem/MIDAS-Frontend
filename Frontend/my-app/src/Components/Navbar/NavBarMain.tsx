@@ -231,11 +231,11 @@ const NavbarMain: React.FC = () => {
             <DropdownTab
               label="New Issue Deals "
               menuItems={[
-                {
-                  label: "Dashboard",
-                  path: "/deals/dashboard",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Dashboard",
+                //   path: "/deals/dashboard",
+                //   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
+                // },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
                   label: "New Dashboard",
