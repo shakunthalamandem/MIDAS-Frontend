@@ -65,8 +65,12 @@ const AIPortfolioReview: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
-          const data = await res.json();
-          setCioReports(data);
+          const data: CIOReportItem[] = await res.json();
+          const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
+          setCioReports(sorted);
+          if (sorted.length > 0) {
+            setSelectedCioReport(sorted[0]);
+          }
         }
       } catch {
         // silent
@@ -93,7 +97,12 @@ const AIPortfolioReview: React.FC = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          setRankingReports(data.results || []);
+          const results: RankingReportItem[] = data.results || [];
+          const sorted = [...results].sort((a, b) => b.date.localeCompare(a.date));
+          setRankingReports(sorted);
+          if (sorted.length > 0) {
+            setSelectedRankingReport(sorted[0]);
+          }
         }
       } catch {
         // silent
@@ -160,16 +169,16 @@ const AIPortfolioReview: React.FC = () => {
                   py: 0.8,
                   color: isActive ? "#fff" : "#475569",
                   background: isActive
-                    ? "linear-gradient(135deg, #2563eb, #3b82f6)"
+                    ? "#002060"
                     : "transparent",
-                  border: isActive ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                  border: isActive ? "1px solid #002060" : "1px solid #e2e8f0",
                   boxShadow: isActive
-                    ? "0 2px 8px rgba(37, 99, 235, 0.25)"
+                    ? "0 2px 8px rgba(0, 32, 96, 0.3)"
                     : "none",
                   whiteSpace: "nowrap",
                   "&:hover": {
                     background: isActive
-                      ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
+                      ? "#001a50"
                       : "#f1f5f9",
                   },
                 }}
