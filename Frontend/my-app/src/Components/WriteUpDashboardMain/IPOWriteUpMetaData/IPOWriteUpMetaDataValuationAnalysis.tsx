@@ -15,7 +15,6 @@ import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
-import ValuationImagePanel from "../../IPODashboardLLM/ValuationImagePanel"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
@@ -84,9 +83,6 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const [editMode, setEditMode] = useState(false)
   const [valuationText, setValuationText] = useState("")
   const [valuationImageUrl, setValuationImageUrl] = useState<string>("")
-  const [valuationImageId, setValuationImageId] = useState<string | null>(null)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [uploadError, setUploadError] = useState<string | null>(null)
   const [draftValuationText, setDraftValuationText] = useState("")
   const [draftImageUrl, setDraftImageUrl] = useState("")
   const [isExpanded, setIsExpanded] = useState(false)
@@ -139,11 +135,8 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
           const normalized = normalizeValuation(data?.valuation)
           setValuationText(normalized)
           setValuationImageUrl(data?.valuation_image_url ?? "")
-          setValuationImageId(data?.valuation_image_url ?? null)
           setDraftValuationText(normalized)
           setDraftImageUrl(data?.valuation_image_url ?? "")
-          setImageFile(null)
-          setUploadError(null)
           setFetchError(null)
           setIsExpanded(false)
           const incomingRating:
@@ -207,54 +200,27 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const handleSave = async () => {
     try {
       if (!apiUrl) throw new Error("API URL not defined")
-      const hasNewImage = Boolean(imageFile)
-      const requestBody = hasNewImage
-        ? (() => {
-            const formData = new FormData()
-            formData.append("ticker_name", basicDealDetails.ticker)
-            formData.append("valuation", draftValuationText)
-            formData.append("valuation_image", imageFile as File)
-            return formData
-          })()
-        : JSON.stringify({
-            ticker_name: basicDealDetails.ticker,
-            valuation: draftValuationText,
-            valuation_image_url: draftImageUrl || null
-          })
+      const payload = {
+        ticker_name: basicDealDetails.ticker,
+        valuation: draftValuationText,
+        valuation_image_url: draftImageUrl || null
+      }
 
       const res = await fetch(`${apiUrl}/api/writeup_data/`, {
         method: "PATCH",
-        headers: hasNewImage
-          ? {
-              Authorization: token ? `Bearer ${token}` : ""
-            }
-          : getAuthHeaders,
-        body: requestBody
+        headers: getAuthHeaders,
+        body: JSON.stringify(payload)
       })
 
       if (!res.ok) {
         const errData = await res.json()
         throw new Error(errData.message || "Failed to save valuation data")
       }
-      const resData = await res.json()
-      const newImageId =
-        resData?.valuation_image_url ??
-        resData?.valuation_image ??
-        resData?.valuation_image_id ??
-        null
 
       setValuationText(draftValuationText)
-      if (newImageId !== null) {
-        setValuationImageUrl(newImageId)
-        setDraftImageUrl(newImageId)
-        setValuationImageId(newImageId)
-      }
-      if (hasNewImage) {
-        setImageFile(null)
-      }
+      setValuationImageUrl(draftImageUrl)
       setEditMode(false)
       setSaveError(null)
-      setUploadError(null)
     } catch (err: any) {
       setSaveError(err.message || "Save failed")
     }
@@ -263,9 +229,6 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const handleCancel = () => {
     setDraftValuationText(valuationText)
     setDraftImageUrl(valuationImageUrl)
-    setValuationImageId(valuationImageUrl || null)
-    setImageFile(null)
-    setUploadError(null)
     setEditMode(false)
   }
 
@@ -287,118 +250,80 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
       )
     }
 
-    const showImageColumn =
-      editMode || Boolean(valuationImageId) || Boolean(imageFile)
-
     return (
       <Stack spacing={2}>
         <Box
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 2
+            borderRadius: 2,
+            border: "1px solid #e0e6f5",
+            background: "#f8faff",
+            p: 2
           }}
         >
-          <Box sx={{ flex: showImageColumn ? 7 : 1 }}>
+          {editMode ? (
             <Box
               sx={{
-                borderRadius: 2,
-                border: "1px solid #e0e6f5",
-                background: "#f8faff",
-                p: 2
+                mt: 1,
+                background: "#ffffff",
+                borderRadius: 1,
+                px: 0.5,
+                py: 0.5
               }}
             >
-              {editMode ? (
-                <Box
-                  sx={{
-                    mt: 1,
-                    background: "#ffffff",
-                    borderRadius: 1,
-                    px: 0.5,
-                    py: 0.5
-                  }}
-                >
-                  <ReactQuill
-                    theme="snow"
-                    value={draftValuationText}
-                    onChange={setDraftValuationText}
-                    modules={quillModules}
-                    formats={quillFormats}
-                  />
-                </Box>
-              ) : valuationText ? (
-                <Box
-                  ref={valuationRef}
-                  sx={{
-                    mt: 1,
-                    minHeight: 120,
-                    color: "#000000",
-                    lineHeight: 1.7,
-                    overflow: pdfMode || isExpanded ? "visible" : "hidden",
-                    display: pdfMode || isExpanded ? "block" : "-webkit-box",
-                    WebkitBoxOrient: "vertical",
-                    WebkitLineClamp: pdfMode || isExpanded ? "unset" : 8
-                  }}
-                  dangerouslySetInnerHTML={{ __html: valuationText }}
-                />
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    mt: 1,
-                    fontStyle: "italic",
-                    color: "#6b7280"
-                  }}
-                >
-                  --
-                </Typography>
-              )}
-              {!editMode && !pdfMode && valuationText && showToggle ? (
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-                  <Button
-                    size="small"
-                    onClick={() => setIsExpanded((prev) => !prev)}
-                    sx={{
-                      textTransform: "none",
-                      color: "#005512ff",
-                      fontWeight: 600,
-                      px: 0,
-                      minWidth: "auto"
-                    }}
-                  >
-                    {isExpanded ? "...Read less" : "...Read more"}
-                  </Button>
-                </Box>
-              ) : null}
-            </Box>
-          </Box>
-
-          {showImageColumn && (
-            <Box sx={{ flex: 3, mt: { xs: 2, md: 0 } }}>
-              <ValuationImagePanel
-                editMode={editMode && !pdfMode}
-                valuationImageId={valuationImageId}
-                apiUrl={apiUrl}
-                token={token}
-                imageFile={imageFile}
-                onImageFileChange={setImageFile}
-                setUploadError={setUploadError}
-                tickerName={basicDealDetails.ticker}
-                deleteApiPath="/api/delete_valuation_image/"
-                onImageDeleted={() => {
-                  setValuationImageId(null)
-                  setValuationImageUrl("")
-                  setDraftImageUrl("")
-                }}
+              <ReactQuill
+                theme="snow"
+                value={draftValuationText}
+                onChange={setDraftValuationText}
+                modules={quillModules}
+                formats={quillFormats}
               />
-              {uploadError ? (
-                <Typography color="error" variant="caption" sx={{ mt: 1 }}>
-                  {uploadError}
-                </Typography>
-              ) : null}
             </Box>
+          ) : valuationText ? (
+            <Box
+              ref={valuationRef}
+              sx={{
+                mt: 1,
+                minHeight: 120,
+                color: "#000000",
+                lineHeight: 1.7,
+                overflow: pdfMode || isExpanded ? "visible" : "hidden",
+                display: pdfMode || isExpanded ? "block" : "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: pdfMode || isExpanded ? "unset" : 8
+              }}
+              dangerouslySetInnerHTML={{ __html: valuationText }}
+            />
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 1,
+                fontStyle: "italic",
+                color: "#6b7280"
+              }}
+            >
+              --
+            </Typography>
           )}
+          {!editMode && !pdfMode && valuationText && showToggle ? (
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+              <Button
+                size="small"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                sx={{
+                  textTransform: "none",
+                  color: "#005512ff",
+                  fontWeight: 600,
+                  px: 0,
+                  minWidth: "auto"
+                }}
+              >
+                {isExpanded ? "...Read less" : "...Read more"}
+              </Button>
+            </Box>
+          ) : null}
         </Box>
+
       </Stack>
     )
   }
