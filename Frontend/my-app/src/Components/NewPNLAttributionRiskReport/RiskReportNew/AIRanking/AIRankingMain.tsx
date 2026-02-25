@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Autocomplete,
   Box,
   CircularProgress,
-  Paper,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { ExecutiveSummary } from "./ExecutiveSummary";
@@ -14,7 +11,7 @@ import { StockDetail, StockData } from "./StockDetail";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-interface ReportOption {
+interface RankingReportItem {
   id: number;
   date: string;
   report_name: string;
@@ -53,15 +50,15 @@ const emptyPortfolioData: PortfolioMetadata = {
   ranking_table: [],
 };
 
-const AIRankingMain: React.FC = () => {
+interface AIRankingMainProps {
+  selectedReport?: RankingReportItem | null;
+}
+
+const AIRankingMain: React.FC<AIRankingMainProps> = ({ selectedReport: externalReport }) => {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
-  const [reports, setReports] = useState<ReportOption[]>([]);
-  const [selectedReport, setSelectedReport] = useState<ReportOption | undefined>(undefined);
   const [portfolioData, setPortfolioData] = useState<PortfolioMetadata>(emptyPortfolioData);
-  const [loadingReports, setLoadingReports] = useState(false);
   const [loadingMetadata, setLoadingMetadata] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [metadataLoaded, setMetadataLoaded] = useState(false);
 
   const selectedStock = useMemo(
     () =>
@@ -71,7 +68,7 @@ const AIRankingMain: React.FC = () => {
     [selectedTicker, portfolioData]
   );
 
-  const fetchMetadata = async (report: ReportOption) => {
+  const fetchMetadata = async (report: RankingReportItem) => {
     if (!report) return;
     setLoadingMetadata(true);
     setError(null);
@@ -109,7 +106,6 @@ const AIRankingMain: React.FC = () => {
           stocks: (metadata.stocks as StockData[]) ?? prev.stocks,
           ranking_table: (metadata.ranking_table as RankingRow[]) ?? prev.ranking_table,
         }));
-        setMetadataLoaded(true);
       }
     } catch (err: any) {
       setError(err.message);
@@ -118,131 +114,87 @@ const AIRankingMain: React.FC = () => {
     }
   };
 
-  const handleReportChange = (report?: ReportOption) => {
-    setSelectedReport(report);
-    setMetadataLoaded(false);
-    setSelectedTicker(null);
-    if (report) {
-      fetchMetadata(report);
-    }
-  };
-
-  const fetchReports = async () => {
-    setLoadingReports(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/api/ai_agents_dataset/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ report_type: "Portfolio AI Stock Ranking" }),
-      });
-      if (!response.ok) throw new Error("Failed to load report list");
-      const data = await response.json();
-      const results = data.results || [];
-      setReports(results);
-      setMetadataLoaded(false);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoadingReports(false);
-    }
-  };
-
   useEffect(() => {
-    fetchReports();
-  }, []);
+    if (externalReport) {
+      setSelectedTicker(null);
+      fetchMetadata(externalReport);
+    } else {
+      setPortfolioData(emptyPortfolioData);
+    }
+  }, [externalReport]);
 
-  const dropdownCard = (
-    <Paper
-      elevation={0}
-      sx={{
-        borderRadius: 3,
-        p: 4,
-        mb: 3,
-        backgroundColor: "#fff",
-        border: "1px solid #e2e8f0",
-        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
-        textAlign: "center",
-      }}
-    >
-      <Box
-        sx={{
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          mx: "auto",
-          mb: 2,
-        }}
-      >
+  // ---------- No report selected ----------
+  if (!externalReport && !loadingMetadata) {
+    return (
+      <Box sx={{ width: "100%" }}>
         <Box
-          component="span"
           sx={{
-            width: 20,
-            height: 20,
-            background:
-              "radial-gradient(circle at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 70%)",
-            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "45vh",
+            px: 3,
           }}
-        />
-      </Box>
-      <Typography variant="h5" fontWeight={700} mb={1} color="#1e293b">
-        US Portfolio Review
-      </Typography>
-      <Typography variant="body2" color="#64748b" mb={2}>
-        Select a report to view the AI-driven portfolio risk analysis
-      </Typography>
-        <Autocomplete
-          options={reports}
-          getOptionLabel={(option) => option.report_name}
-          value={selectedReport ?? undefined}
-          onChange={(_event, value) => handleReportChange(value)}
-          loading={loadingReports}
-          disableClearable
-          sx={{
-            bgcolor: "#fff",
-            borderRadius: 2,
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="Search Reports"
-              size="small"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {(loadingReports || loadingMetadata) && (
-                      <CircularProgress size={20} />
-                    )}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
+        >
+          <Box sx={{ textAlign: "center" }}>
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+                mb: 2.5,
+                boxShadow: "0 4px 14px rgba(99, 102, 241, 0.3)",
               }}
-            />
-          )}
-        />
-      </Paper>
-  );
+            >
+              <Box
+                component="span"
+                sx={{
+                  width: 22,
+                  height: 22,
+                  background:
+                    "radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.3) 70%)",
+                  borderRadius: "50%",
+                }}
+              />
+            </Box>
+            <Typography variant="h5" fontWeight={700} mb={0.5} color="#1e293b">
+              Portfolio AI Stock Ranking
+            </Typography>
+            <Typography variant="body2" color="#64748b">
+              Select a report from the search bar above to view AI-driven stock analysis and rankings
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
+  // ---------- Loading ----------
+  if (loadingMetadata) {
+    return (
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "40vh" }}>
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress sx={{ color: "#6366f1", mb: 2 }} />
+          <Typography sx={{ color: "#64748b" }}>Loading report data...</Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  // ---------- Report loaded ----------
   return (
     <Box sx={{ width: "100%" }}>
-    {dropdownCard}
+      {error && (
+        <Typography color="error" variant="body2" mb={2}>
+          {error}
+        </Typography>
+      )}
 
-    {error && (
-      <Typography color="error" variant="body2" mb={2}>
-        {error}
-      </Typography>
-    )}
-
-    {metadataLoaded && (
       <Stack spacing={3}>
         <ExecutiveSummary
           summary={portfolioData.executive_summary}
@@ -265,7 +217,6 @@ const AIRankingMain: React.FC = () => {
           />
         )}
       </Stack>
-    )}
     </Box>
   );
 };

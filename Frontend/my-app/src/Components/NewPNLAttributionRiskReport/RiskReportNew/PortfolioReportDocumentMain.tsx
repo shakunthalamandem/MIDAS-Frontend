@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Typography,
-  Autocomplete,
-  TextField,
   CircularProgress,
   IconButton,
   Chip,
@@ -122,13 +120,14 @@ const SIDEBAR_WIDTH = 240;
 const SIDEBAR_COLLAPSED = 60;
 const LAYOUT_CHROME_HEIGHT = 160; // navbar + footer space (adjust if those heights change)
 
-const PortfolioReportDocumentMain: React.FC = () => {
-  const [reportList, setReportList] = useState<ReportListItem[]>([]);
-  const [selectedReport, setSelectedReport] = useState<ReportListItem | null>(null);
+interface PortfolioReportDocumentMainProps {
+  selectedReport?: ReportListItem | null;
+}
+
+const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = ({ selectedReport: externalReport }) => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [activeSection, setActiveSection] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [listLoading, setListLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,15 +135,14 @@ const PortfolioReportDocumentMain: React.FC = () => {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // React to external report selection from parent
   useEffect(() => {
-    fetchReportList();
-  }, []);
-
-  useEffect(() => {
-    if (selectedReport) {
-      fetchReportData(selectedReport);
+    if (externalReport) {
+      fetchReportData(externalReport);
+    } else {
+      setReportData(null);
     }
-  }, [selectedReport]);
+  }, [externalReport]);
 
   // Intersection observer for active section tracking
   useEffect(() => {
@@ -171,23 +169,6 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
     return () => observerRef.current?.disconnect();
   }, [reportData]);
-
-  const fetchReportList = async () => {
-    setListLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(`${apiUrl}/api/cio_report_list/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to load reports");
-      const data = await res.json();
-      setReportList(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setListLoading(false);
-    }
-  };
 
   const fetchReportData = async (report: ReportListItem) => {
     setLoading(true);
@@ -225,7 +206,6 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
   const handleBack = () => {
     setReportData(null);
-    setSelectedReport(null);
     setActiveSection("");
     setError(null);
   };
@@ -239,86 +219,44 @@ const PortfolioReportDocumentMain: React.FC = () => {
     }
   };
 
-  // ---------- No report selected: show selector ----------
+  // ---------- No report selected: show prompt ----------
   if (!reportData && !loading) {
     return (
       <Box
         sx={{
-          minHeight: "60vh",
+          minHeight: "40vh",
           display: "flex",
-          alignItems: "flex-start",
+          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
-          pt: 6,
+          textAlign: "center",
           px: 3,
-          pb: 3,
         }}
       >
         <Box
           sx={{
-            maxWidth: 520,
-            width: "100%",
-            backgroundColor: "#fff",
-            borderRadius: 3,
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
-            border: "1px solid #e2e8f0",
-            p: 4,
-            textAlign: "center",
+            width: 64,
+            height: 64,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 2.5,
+            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.25)",
           }}
         >
-          <Box
-            sx={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mx: "auto",
-              mb: 2,
-            }}
-          >
-            <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
-          </Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#1e293b" }}>
-            US Portfolio Review
-          </Typography>
-          <Typography sx={{ color: "#64748b", fontSize: 14, mb: 3 }}>
-            Select a report to view the AI-driven portfolio risk analysis
-          </Typography>
-
-          {error && (
-            <Typography sx={{ color: "#ef4444", fontSize: 13, mb: 2 }}>{error}</Typography>
-          )}
-
-          <Autocomplete
-            options={reportList}
-            getOptionLabel={(opt) => `${opt.report_title} — ${opt.date}`}
-            onChange={(_, val) => setSelectedReport(val)}
-            loading={listLoading}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} key={option.id}>
-                <Box>
-                  <Typography sx={{ fontSize: 14, fontWeight: 600, color: "#1e293b" }}>
-                    {option.report_title}
-                  </Typography>
-                  <Typography sx={{ fontSize: 12, color: "#64748b" }}>
-                    {formatDate(option.date)}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Reports"
-                placeholder="Type to search..."
-                size="small"
-              />
-            )}
-            sx={{ width: "100%" }}
-          />
+          <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
         </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#1e293b" }}>
+          US Portfolio CIO AI Review
+        </Typography>
+        <Typography sx={{ color: "#64748b", fontSize: 14 }}>
+          Select a report from the search bar above to begin
+        </Typography>
+        {error && (
+          <Typography sx={{ color: "#ef4444", fontSize: 13, mt: 2 }}>{error}</Typography>
+        )}
       </Box>
     );
   }

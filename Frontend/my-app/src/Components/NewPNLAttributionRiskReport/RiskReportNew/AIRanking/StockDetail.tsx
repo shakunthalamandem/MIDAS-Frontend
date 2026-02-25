@@ -164,41 +164,38 @@ export const StockDetail = ({ stock, onClose }: Props) => {
     stock;
 
   return (
-    <Card elevation={6} sx={{ borderRadius: 3, overflow: "hidden" }}>
+    <Card elevation={0} sx={{ borderRadius: 3, overflow: "hidden", border: "1px solid #e2e8f0", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
       <Box
         sx={{
-          background: "#511977",
+          background: "linear-gradient(135deg, #eff6ff, #eef2ff)",
+          borderBottom: "2px solid #bfdbfe",
           px: 4,
           py: 3,
-          color: "#fff",
         }}
       >
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="h4" fontWeight={700}>
+            <Typography variant="h4" fontWeight={700} color="#1e293b">
               {stock.ticker}
-
             </Typography>
             <Box display="flex" alignItems="center" gap={2} mt={0.5}>
-            <ActionBadge action={decision.action} />
-
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+              <ActionBadge action={decision.action} />
+              <Typography variant="body2" color="#64748b">
                 {decision.confidence_level} Confidence
               </Typography>
-              
             </Box>
           </Box>
           <Box display="flex" alignItems="center" gap={1}>
             <ConvictionStars rating={decision.conviction_rating} />
-            <IconButton onClick={onClose} sx={{ color: "#fff" }}>
+            <IconButton onClick={onClose} sx={{ color: "#64748b", "&:hover": { backgroundColor: "#e2e8f0" } }}>
               <X />
             </IconButton>
           </Box>
         </Box>
-        <Typography variant="subtitle2" mt={2} sx={{ letterSpacing: 3, textTransform: "uppercase" }}>
+        <Typography variant="subtitle2" mt={2} sx={{ letterSpacing: 2, textTransform: "uppercase", color: "#2563eb", fontWeight: 700 }}>
           CIO Commentary
         </Typography>
-        <Typography variant="body2" mt={1} color="rgba(255,255,255,0.85)">
+        <Typography variant="body2" mt={1} color="#334155" sx={{ lineHeight: 1.7 }}>
           {stock.cio_commentary}
         </Typography>
       </Box>
