@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Typography,
-  Autocomplete,
-  TextField,
   CircularProgress,
   IconButton,
   Chip,
@@ -88,19 +86,19 @@ const sectionIconMap: Record<string, React.ReactNode> = {
   final_prioritized_action_matrix: <ViewListOutlinedIcon fontSize="small" />,
 };
 
-const sectionGradients: Record<string, string> = {
-  executive_risk_dashboard: "linear-gradient(135deg, #1e3a5f, #2563eb)",
-  cio_decision_brief: "linear-gradient(135deg, #92400e, #d97706)",
-  immediate_decisions: "linear-gradient(135deg, #991b1b, #dc2626)",
-  base_model_discipline_scorecard: "linear-gradient(135deg, #4c1d95, #7c3aed)",
-  sector_peer_news_map: "linear-gradient(135deg, #0c4a6e, #0284c7)",
-  macro_event_risk_calendar: "linear-gradient(135deg, #1e3a5f, #2563eb)",
-  technical_risk_overlay: "linear-gradient(135deg, #164e63, #0891b2)",
-  opportunity_engine: "linear-gradient(135deg, #064e3b, #059669)",
-  upcoming_week_focus: "linear-gradient(135deg, #7c2d12, #ea580c)",
-  upcoming_month_strategic_outlook: "linear-gradient(135deg, #4c1d95, #7c3aed)",
-  role_specific_action_checklists: "linear-gradient(135deg, #064e3b, #059669)",
-  final_prioritized_action_matrix: "linear-gradient(135deg, #1e3a5f, #4f46e5)",
+const sectionColors: Record<string, { bg: string; border: string; iconColor: string; textColor: string }> = {
+  executive_risk_dashboard: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
+  cio_decision_brief: { bg: "#fffbeb", border: "#fde68a", iconColor: "#d97706", textColor: "#92400e" },
+  immediate_decisions: { bg: "#fef2f2", border: "#fecaca", iconColor: "#dc2626", textColor: "#991b1b" },
+  base_model_discipline_scorecard: { bg: "#faf5ff", border: "#e9d5ff", iconColor: "#7c3aed", textColor: "#5b21b6" },
+  sector_peer_news_map: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#0284c7", textColor: "#075985" },
+  macro_event_risk_calendar: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
+  technical_risk_overlay: { bg: "#ecfeff", border: "#a5f3fc", iconColor: "#0891b2", textColor: "#155e75" },
+  opportunity_engine: { bg: "#ecfdf5", border: "#a7f3d0", iconColor: "#059669", textColor: "#065f46" },
+  upcoming_week_focus: { bg: "#fff7ed", border: "#fed7aa", iconColor: "#ea580c", textColor: "#9a3412" },
+  upcoming_month_strategic_outlook: { bg: "#faf5ff", border: "#e9d5ff", iconColor: "#7c3aed", textColor: "#5b21b6" },
+  role_specific_action_checklists: { bg: "#ecfdf5", border: "#a7f3d0", iconColor: "#059669", textColor: "#065f46" },
+  final_prioritized_action_matrix: { bg: "#eef2ff", border: "#c7d2fe", iconColor: "#4f46e5", textColor: "#3730a3" },
 };
 
 const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
@@ -122,13 +120,14 @@ const SIDEBAR_WIDTH = 240;
 const SIDEBAR_COLLAPSED = 60;
 const LAYOUT_CHROME_HEIGHT = 160; // navbar + footer space (adjust if those heights change)
 
-const PortfolioReportDocumentMain: React.FC = () => {
-  const [reportList, setReportList] = useState<ReportListItem[]>([]);
-  const [selectedReport, setSelectedReport] = useState<ReportListItem | null>(null);
+interface PortfolioReportDocumentMainProps {
+  selectedReport?: ReportListItem | null;
+}
+
+const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = ({ selectedReport: externalReport }) => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [activeSection, setActiveSection] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [listLoading, setListLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,15 +135,14 @@ const PortfolioReportDocumentMain: React.FC = () => {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // React to external report selection from parent
   useEffect(() => {
-    fetchReportList();
-  }, []);
-
-  useEffect(() => {
-    if (selectedReport) {
-      fetchReportData(selectedReport);
+    if (externalReport) {
+      fetchReportData(externalReport);
+    } else {
+      setReportData(null);
     }
-  }, [selectedReport]);
+  }, [externalReport]);
 
   // Intersection observer for active section tracking
   useEffect(() => {
@@ -171,23 +169,6 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
     return () => observerRef.current?.disconnect();
   }, [reportData]);
-
-  const fetchReportList = async () => {
-    setListLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(`${apiUrl}/api/cio_report_list/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to load reports");
-      const data = await res.json();
-      setReportList(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setListLoading(false);
-    }
-  };
 
   const fetchReportData = async (report: ReportListItem) => {
     setLoading(true);
@@ -225,7 +206,6 @@ const PortfolioReportDocumentMain: React.FC = () => {
 
   const handleBack = () => {
     setReportData(null);
-    setSelectedReport(null);
     setActiveSection("");
     setError(null);
   };
@@ -239,86 +219,44 @@ const PortfolioReportDocumentMain: React.FC = () => {
     }
   };
 
-  // ---------- No report selected: show selector ----------
+  // ---------- No report selected: show prompt ----------
   if (!reportData && !loading) {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
+          minHeight: "40vh",
           display: "flex",
-          alignItems: "flex-start",
+          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
-          pt: 6,
+          textAlign: "center",
           px: 3,
-          pb: 3,
         }}
       >
         <Box
           sx={{
-            maxWidth: 520,
-            width: "100%",
-            backgroundColor: "#fff",
-            borderRadius: 3,
-            boxShadow: "0 12px 48px rgba(0,0,0,0.25)",
-            p: 4,
-            textAlign: "center",
+            width: 64,
+            height: 64,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 2.5,
+            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.25)",
           }}
         >
-          <Box
-            sx={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mx: "auto",
-              mb: 2,
-            }}
-          >
-            <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
-          </Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#0f172a" }}>
-            US Portfolio Review
-          </Typography>
-          <Typography sx={{ color: "#334155", fontSize: 14, mb: 3 }}>
-            Select a report to view the AI-driven portfolio risk analysis
-          </Typography>
-
-          {error && (
-            <Typography sx={{ color: "#ef4444", fontSize: 13, mb: 2 }}>{error}</Typography>
-          )}
-
-          <Autocomplete
-            options={reportList}
-            getOptionLabel={(opt) => `${opt.report_title} — ${opt.date}`}
-            onChange={(_, val) => setSelectedReport(val)}
-            loading={listLoading}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} key={option.id}>
-                <Box>
-                  <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
-                    {option.report_title}
-                  </Typography>
-                  <Typography sx={{ fontSize: 12, color: "#64748b" }}>
-                    {formatDate(option.date)}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Reports"
-                placeholder="Type to search..."
-                size="small"
-              />
-            )}
-            sx={{ width: "100%" }}
-          />
+          <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
         </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#1e293b" }}>
+          US  Equity Portfolio AI Review
+        </Typography>
+        <Typography sx={{ color: "#64748b", fontSize: 14 }}>
+          Select a report from the search bar above to begin
+        </Typography>
+        {error && (
+          <Typography sx={{ color: "#ef4444", fontSize: 13, mt: 2 }}>{error}</Typography>
+        )}
       </Box>
     );
   }
@@ -328,16 +266,15 @@ const PortfolioReportDocumentMain: React.FC = () => {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
+          minHeight: "60vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0f172a, #1e3a5f)",
         }}
       >
         <Box sx={{ textAlign: "center" }}>
           <CircularProgress sx={{ color: "#2563eb", mb: 2 }} />
-          <Typography sx={{ color: "#94a3b8" }}>Loading report...</Typography>
+          <Typography sx={{ color: "#64748b" }}>Loading report...</Typography>
         </Box>
       </Box>
     );
@@ -367,7 +304,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
         display: "flex",
         height: "100%",
         minHeight: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)`,
-        backgroundColor: "#eef2ff",
+        backgroundColor: "#f8fafc",
+        borderRadius: 2,
+        overflow: "hidden",
+        border: "1px solid #e2e8f0",
       }}
     >
       {/* ===== Sidebar ===== */}
@@ -378,9 +318,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
           transition: "width 0.3s ease, min-width 0.3s ease",
           display: "flex",
           flexDirection: "column",
-          background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+          backgroundColor: "#eef2ff",
           overflow: "hidden",
-          boxShadow: "4px 0 24px rgba(0,0,0,0.15)",
+          borderRight: "1px solid #c7d2fe",
         }}
       >
         {/* Logo */}
@@ -391,7 +331,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 1.5,
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            borderBottom: "1px solid #c7d2fe",
             minHeight: 52,
           }}
         >
@@ -417,7 +357,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 letterSpacing: 1.5,
                 whiteSpace: "nowrap",
                 flex: 1,
-                color: "#fff",
+                color: "#002060",
               }}
             >
               AI REVIEW
@@ -426,7 +366,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
           <IconButton
             size="small"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto", color: "#94a3b8", "&:hover": { color: "#fff" } }}
+            sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto", color: "#94a3b8", "&:hover": { color: "#475569" } }}
           >
             {sidebarOpen ? (
               <ChevronLeftIcon fontSize="small" />
@@ -452,19 +392,19 @@ const PortfolioReportDocumentMain: React.FC = () => {
                   py: 1.1,
                   cursor: "pointer",
                   borderLeft: isActive
-                    ? "3px solid #3b82f6"
+                    ? "3px solid #2563eb"
                     : "3px solid transparent",
                   backgroundColor: isActive
-                    ? "rgba(37, 99, 235, 0.15)"
+                    ? "#dbeafe"
                     : "transparent",
-                  color: isActive ? "#60a5fa" : "#94a3b8",
+                  color: isActive ? "#002060" : "#002060",
                   transition: "all 0.2s",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   "&:hover": {
                     backgroundColor: isActive
-                      ? "rgba(37, 99, 235, 0.15)"
-                      : "rgba(255, 255, 255, 0.05)",
-                    color: isActive ? "#60a5fa" : "#cbd5e1",
+                      ? "#dbeafe"
+                      : "#e0e7ff",
+                    color: "#002060",
                   },
                 }}
               >
@@ -497,9 +437,9 @@ const PortfolioReportDocumentMain: React.FC = () => {
               px: 2,
               py: 1.5,
               fontSize: 10,
-              color: "#64748b",
+              color: "#94a3b8",
               letterSpacing: 0.5,
-              borderTop: "1px solid rgba(255,255,255,0.06)",
+              borderTop: "1px solid #c7d2fe",
               textTransform: "uppercase",
             }}
           >
@@ -515,28 +455,28 @@ const PortfolioReportDocumentMain: React.FC = () => {
           sx={{
             px: 3,
             py: 2,
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+            borderBottom: "1px solid #c7d2fe",
+            backgroundColor: "#eef2ff",
             display: "flex",
             alignItems: "center",
             minHeight: 72,
           }}
         >
-          <IconButton
+          {/* <IconButton
             size="small"
             onClick={handleBack}
             sx={{
               mr: 2,
-              backgroundColor: "rgba(255,255,255,0.1)",
-              color: "#fff",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+              backgroundColor: "#f1f5f9",
+              color: "#475569",
+              "&:hover": { backgroundColor: "#e2e8f0" },
             }}
           >
             <ArrowBackIcon fontSize="small" />
-          </IconButton>
+          </IconButton> */}
           <Box sx={{ flex: 1, textAlign: "center" }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
-              <Box component="span" sx={{ color: "#38bdf8" }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#1e293b" }}>
+              <Box component="span" sx={{ color: "#2563eb" }}>
                 US PORTFOLIO REVIEW
               </Box>
               {" - "}
@@ -544,7 +484,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
             </Typography>
             <Typography
               sx={{
-                color: "rgba(255,255,255,0.5)",
+                color: "#94a3b8",
                 fontSize: 12.5,
                 display: "flex",
                 alignItems: "center",
@@ -553,11 +493,11 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 mt: 0.5,
               }}
             >
-              <Box component="span" sx={{ color: "#60a5fa", fontWeight: 600 }}>{formatDate(header.date)}</Box>
+              <Box component="span" sx={{ color: "#2563eb", fontWeight: 600 }}>{formatDate(header.date)}</Box>
               {header.aum_formatted && (
                 <>
                   <Box component="span"> · </Box>
-                  <Box component="span" sx={{ color: "#34d399", fontWeight: 600 }}>AUM: {header.aum_formatted}</Box>
+                  <Box component="span" sx={{ color: "#059669", fontWeight: 600 }}>AUM: {header.aum_formatted}</Box>
                 </>
               )}
               {header.classification && ` · ${header.classification}`}
@@ -570,12 +510,12 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
                 size="small"
                 sx={{
-                  background: "linear-gradient(135deg, #1e3a5f, #2563eb)",
-                  color: "#fff",
+                  backgroundColor: "#eff6ff",
+                  color: "#2563eb",
                   fontWeight: 700,
                   fontSize: 12,
                   height: 30,
-                  boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
+                  border: "1px solid #bfdbfe",
                 }}
               />
             )}
@@ -584,11 +524,12 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 label={`DTD: ${header.dtd}`}
                 size="small"
                 sx={{
-                  backgroundColor: "rgba(255,255,255,0.15)",
-                  color: "#fff",
+                  backgroundColor: "#f1f5f9",
+                  color: "#475569",
                   fontWeight: 700,
                   fontSize: 12,
                   height: 30,
+                  border: "1px solid #e2e8f0",
                 }}
               />
             )}
@@ -612,7 +553,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
           {orderedSidebar.map((item) => {
             const SectionComponent = sectionComponents[item.key];
             const sectionData = sections[item.key];
-            const gradient = sectionGradients[item.key] || "linear-gradient(90deg, #94a3b8, #cbd5e1)";
+            const colors = sectionColors[item.key] || { bg: "#f8fafc", border: "#e2e8f0", iconColor: "#64748b", textColor: "#475569" };
 
             return (
               <Box
@@ -621,13 +562,15 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 ref={(el: HTMLDivElement | null) => {
                   sectionRefs.current[item.key] = el;
                 }}
-                sx={{ mb: 5 }}
+                sx={{ mb: 4 }}
               >
-                {/* Section Header with Gradient */}
+                {/* Section Header */}
                 <Box
                   sx={{
-                    background: gradient,
+                    backgroundColor: colors.bg,
                     borderRadius: "12px 12px 0 0",
+                    border: `1px solid ${colors.border}`,
+                    borderBottom: `2px solid ${colors.border}`,
                     px: 3,
                     py: 1.5,
                     display: "flex",
@@ -636,10 +579,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
                     mb: 0,
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", minWidth: 28, justifyContent: "center", color: "#fff" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", minWidth: 28, justifyContent: "center", color: colors.iconColor }}>
                     {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 18, color: "#fff", flex: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16, color: colors.textColor, flex: 1 }}>
                     {item.label}
                   </Typography>
                   {sectionData?.badge && (
@@ -649,10 +592,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
                       sx={{
                         fontSize: 11,
                         height: 24,
-                        backgroundColor: "rgba(255,255,255,0.25)",
-                        color: "#fff",
+                        backgroundColor: "#fff",
+                        color: colors.textColor,
                         fontWeight: 600,
-                        backdropFilter: "blur(4px)",
+                        border: `1px solid ${colors.border}`,
                       }}
                     />
                   )}
@@ -663,10 +606,10 @@ const PortfolioReportDocumentMain: React.FC = () => {
                       sx={{
                         fontSize: 11,
                         height: 24,
-                        backgroundColor: "rgba(255,255,255,0.25)",
-                        color: "#fff",
+                        backgroundColor: "#fff",
+                        color: colors.textColor,
                         fontWeight: 600,
-                        backdropFilter: "blur(4px)",
+                        border: `1px solid ${colors.border}`,
                       }}
                     />
                   )}
@@ -676,7 +619,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
                 <Box
                   sx={{
                     backgroundColor: "#fff",
-                    border: "1px solid #c7d2fe",
+                    border: `1px solid ${colors.border}`,
                     borderTop: "none",
                     borderRadius: "0 0 12px 12px",
                     p: 3,
