@@ -73,19 +73,19 @@ interface Props {
 
 const SectionHeading = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
   <Box display="flex" alignItems="center" gap={1} mb={1}>
-    <Icon size={16} color="#0f172a" />
-    <Typography variant="button" sx={{ letterSpacing: 2, textTransform: "uppercase", color: "text.secondary" }}>
+    <Icon size={16} color="#0a2870" />
+    <Typography variant="button" sx={{   color: "#0a2870" }}>
       {title}
     </Typography>
   </Box>
 );
 
 const DataRow = ({ label, value, valueColor }: { label: string; value: React.ReactNode; valueColor?: string }) => (
-  <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 0.4 }}>
-    <Typography variant="caption" color="text.secondary">
+  <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
+    <Typography variant="body1"  color="#580a70">
       {label}
     </Typography>
-    <Typography variant="body2" color={valueColor ?? "text.primary"} fontWeight={600}>
+    <Typography variant="body1" color={valueColor ?? "text.primary"} fontWeight={700}>
       {value}
     </Typography>
   </Grid>
@@ -205,29 +205,47 @@ export const StockDetail = ({ stock, onClose }: Props) => {
 
       <CardContent>
         <Grid container spacing={2} mb={3}>
-          {getDetailSections(pa, pc, fsp).map((section) => (
+          {getDetailSections(pa, pc, fsp).map((section, idx) => (
             <Grid item xs={12} md={4} key={section.title}>
-              <Box
+              <Card
+                elevation={0}
                 sx={{
                   border: "1px solid rgba(15,23,42,0.08)",
                   borderRadius: 2,
-                  p: 2,
                   height: "100%",
                 }}
               >
-                <SectionHeading icon={section.icon} title={section.title} />
-                {section.rows.map(({ label, value, color }, idx) => (
-                  <DataRow key={idx} label={label} value={value} valueColor={color} />
-                ))}
-                <Typography variant="caption" color="text.secondary">
-                  {section.footer}
-                </Typography>
-              </Box>
+                <Stack direction="row" sx={{ height: "100%" }}>
+                  <Box
+                    sx={{
+                      width: 6,
+                      bgcolor: ["#22c55e", "#2563eb", "#f97316"][idx % 3],
+                      borderRadius: "0 0 0 10px",
+                    }}
+                  />
+                  <CardContent
+                    sx={{
+                      flex: 1,
+                      bgcolor: "rgba(255,255,255,0.95)",
+                      borderLeft: "2px solid transparent",
+                      minHeight: 220,
+                    }}
+                  >
+                    <SectionHeading icon={section.icon} title={section.title} />
+                    {section.rows.map(({ label, value, color }, rowIdx) => (
+                      <DataRow key={rowIdx} label={label} value={value} valueColor={color} />
+                    ))}
+                    <Typography variant="caption" color="text.secondary">
+                      {section.footer}
+                    </Typography>
+                  </CardContent>
+                </Stack>
+              </Card>
             </Grid>
           ))}
         </Grid>
 
-        <Grid container spacing={2} mb={3}>
+        <Grid container spacing={2} mb={3} mt={3}>
           {[
             {
               title: "Catalysts",
@@ -245,90 +263,74 @@ export const StockDetail = ({ stock, onClose }: Props) => {
             },
           ].map((section) => (
             <Grid item xs={12} md={6} key={section.title}>
-              <Box
+              <Card
+                elevation={0}
                 sx={{
-                  border: "1px solid rgba(15,23,42,0.08)",
                   borderRadius: 2,
-                  p: 2,
+                  border: "1px solid rgba(15,23,42,0.08)",
+                  minHeight: 200,
                 }}
               >
-                <SectionHeading icon={section.icon} title={section.title} />
-                <Stack spacing={1}>
-                  {section.items.map((item, idx) => (
-                    <Box display="flex" gap={1} key={`${section.title}-${idx}`}>
-                      <Typography variant="body2" color={section.color} fontWeight={600}>
-                        {section.prefix}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {item}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Stack>
-              </Box>
+                <CardContent sx={{ py: 2, px: 3 }}>
+                  <SectionHeading icon={section.icon} title={section.title} />
+                  <Stack spacing={1}>
+                    {section.items.map((item, idx) => (
+                      <Box display="flex" gap={1} key={`${section.title}-${idx}`}>
+                        <Typography variant="body2" color={section.color} fontWeight={700}>
+                          {section.prefix}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {item}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </CardContent>
+              </Card>
             </Grid>
           ))}
         </Grid>
 
         <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} lg={6}>
-            <Box
-              sx={{
-                border: "1px solid rgba(15,23,42,0.08)",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <SectionHeading icon={TrendingUp} title="Sentiment Analysis" />
-              <Grid container spacing={1}>
-                {Object.entries(sa).map(([key, val]) => (
-                  <Grid item xs={12} key={key}>
-                    <Typography variant="caption" color="text.secondary">
-                      {key.replace(/_/g, " ")}
-                    </Typography>
-                    <Typography variant="body2" color="text.primary">
-                      {val}
-                    </Typography>
+          {[
+            { title: "Sentiment Analysis", icon: TrendingUp, data: sa },
+            { title: "Fundamentals", icon: TrendingDown, data: fa },
+          ].map((section) => (
+            <Grid item xs={12} lg={6} key={section.title}>
+              <Card
+                elevation={0}
+                sx={{
+                  borderRadius: 2,
+                  border: "1px solid rgba(15,23,42,0.08)",
+                }}
+              >
+                <CardContent sx={{ py: 2, px: 3 }}>
+                  <SectionHeading icon={section.icon} title={section.title} />
+                  <Grid container spacing={1}>
+                    {Object.entries(section.data).map(([key, val]) => (
+                      <Grid item xs={12} key={key}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: "#580a70" }}>
+                          {key.replace(/_/g, " ")}
+                        </Typography>
+                        <Typography variant="body2" color="text.primary">
+                          {val}
+                        </Typography>
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <Box
-              sx={{
-                border: "1px solid rgba(15,23,42,0.08)",
-                borderRadius: 2,
-                p: 2,
-              }}
-            >
-              <SectionHeading icon={TrendingDown} title="Fundamentals" />
-              <Grid container spacing={1}>
-                {Object.entries(fa).map(([key, val]) => (
-                  <Grid item xs={12} key={key}>
-                    <Typography variant="caption" color="text.secondary">
-                      {key.replace(/_/g, " ")}
-                    </Typography>
-                    <Typography variant="body2" color="text.primary">
-                      {val}
-                    </Typography>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
 
         {/* <Divider sx={{ mb: 3 }} /> */}
         <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
           <Box>
             <SectionHeading icon={Target} title="Suggested Positioning" />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body1" color="#410b7e">
               {stock.suggested_positioning}
             </Typography>
-          </Box>
-          <Box sx={{ width: 200 }}>
-            <SentimentBar score={(decision.conviction_rating - 3) / 2} label="Conviction" />
           </Box>
         </Box>
       </CardContent>
