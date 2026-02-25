@@ -5,8 +5,6 @@ import {
   Container,
   Grid,
   Stack,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -24,7 +22,6 @@ import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import NewDashboardLifeCycleCard, { NewDashboardLifeCycleCardMeta } from "./NewDashboardLifeCycleCard";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
-import RegionTabs from "./NewDashboardLifeCycleRegionTabs";
 import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
 import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
 import {
@@ -564,122 +561,95 @@ const NewDealsLifecycleCards: React.FC = () => {
       <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1, md: 1.5 } }}>
         <Box
           sx={{
-            backgroundColor: "#f3faff",
-            borderRadius: 4,
+            backgroundColor: "#ffffff",
+            borderRadius: 3,
             px: { xs: 1.5, md: 2 },
             py: { xs: 1.5, md: 2 },
-            border: "1px solid #cbd7ff",
-            boxShadow: "0 12px 26px rgba(15,23,42,0.08)",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 10px 24px rgba(15,23,42,0.06)",
           }}
         >
-          <Container
-            maxWidth="xl"
-            sx={{
-              display: "grid",
-              alignItems: "center",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "minmax(360px, 1.6fr) minmax(220px, 0.6fr)",
-              },
-              columnGap: 2,
-              rowGap: 1.5,
-              mb: 0.5,
-              px: 1,
-            }}
-          >
-            <Box sx={{ minWidth: 0 }}>
-              <Stack spacing={1} sx={{ minWidth: 0 }}>
-                <FiltersBar
-                  tabs={tabs}
-                  selectedOp={selectedOp}
-                  onSelectOp={setSelectedOp}
-                  selectedDealType={selectedDealType}
-                  onSelectDealType={setSelectedDealType}
-                  isPipelineView={isPipelineView}
-                  liveStartDate={liveStartDate}
-                  liveEndDate={liveEndDate}
-                  setLiveStartDate={setLiveStartDate}
-                  setLiveEndDate={setLiveEndDate}
-                  dealSearch={dealSearch}
-                  setDealSearch={setDealSearch}
-                  pipelineSearch={pipelineSearch}
-                  setPipelineSearch={setPipelineSearch}
-                  inline
-                />
-                <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                  <RegionTabs
-                    tabs={regionTabs}
-                    selectedRegion={selectedRegion}
-                    onSelect={(value) =>
-                      setSelectedRegion(value as "US" | "EMEA" | "APAC" )
-                    }
-                    compact
-                  />
+          <Stack spacing={1.5}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: 1,
+                flexWrap: "wrap",
+              }}
+            >
+              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#6b7280" }}>
+                Tracking:
+              </Typography>
+              <Stack direction="row" spacing={0.75} alignItems="center">
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 0.4,
+                    borderRadius: 1,
+                    backgroundColor: "#e8edff",
+                    color: "#334155",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {selectedOp === "live" ? "Recent" : "Upcoming"}
+                </Box>
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 0.4,
+                    borderRadius: 1,
+                    backgroundColor: "#e8edff",
+                    color: "#334155",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {selectedDealType}
+                </Box>
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 0.4,
+                    borderRadius: 1,
+                    backgroundColor: "#e8edff",
+                    color: "#334155",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {selectedRegion}
                 </Box>
               </Stack>
             </Box>
 
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{
-                ml: "auto",
-                minWidth: 200,
-                justifyContent: "flex-end",
-              }}
-            >
-              <ToggleButtonGroup
-                size="small"
-                value={viewMode || "card"}
-                exclusive
-                onChange={(_e, value) =>
-                  setViewMode((prev) => (value ?? prev ?? "card"))
-                }
-                sx={{
-                  backgroundColor: "transparent",
-                  borderRadius: 999,
-                  border: "1px solid transparent",
-                  "& .MuiToggleButton-root": {
-                    border: "1px solid #d7ddea",
-                    px: 2,
-                    py: 0.4,
-                    minWidth: 80,
-                    color: "#1f2a44",
-                    textTransform: "none",
-                    fontWeight: 600,
-                    borderRadius: 999,
-                    backgroundColor: "#ffffff",
-                  },
-                  "& .MuiToggleButton-root:hover": {
-                    backgroundColor: "#8f75ddff",
-                    color: "#ffffff",
-                  },
-                  "& .MuiToggleButton-root.Mui-selected": {
-                    color: "#ffffff",
-                    backgroundColor: "#2b146f",
-                    borderColor: "#2b146f",
-                    boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
-                  },
-                  "& .MuiToggleButton-root.Mui-selected:hover": {
-                    backgroundColor: "#2b146f",
-                    color: "#ffffff",
-                  },
-                  "& .MuiToggleButton-root.Mui-selected:leave": {
-                    backgroundColor: "#2b146f",
-                    color: "#ffffff",
-                  },
-                }}
-              >
-                <ToggleButton value="card" aria-label="Card view">
-                  Card View
-                </ToggleButton>
-                <ToggleButton value="table" aria-label="Table view">
-                  Table View
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Stack>
-          </Container>
+            <FiltersBar
+              tabs={tabs}
+              selectedOp={selectedOp}
+              onSelectOp={setSelectedOp}
+              selectedDealType={selectedDealType}
+              onSelectDealType={setSelectedDealType}
+              isPipelineView={isPipelineView}
+              liveStartDate={liveStartDate}
+              liveEndDate={liveEndDate}
+              setLiveStartDate={setLiveStartDate}
+              setLiveEndDate={setLiveEndDate}
+              regionTabs={regionTabs}
+              selectedRegion={selectedRegion}
+              onSelectRegion={(value) =>
+                setSelectedRegion(value as "US" | "EMEA" | "APAC")
+              }
+              dealSearch={dealSearch}
+              setDealSearch={setDealSearch}
+              pipelineSearch={pipelineSearch}
+              setPipelineSearch={setPipelineSearch}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              inline
+            />
+          </Stack>
         </Box>
       </Container>
 
