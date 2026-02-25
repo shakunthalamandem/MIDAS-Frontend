@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import PortfolioReportDocumentMain from "./PortfolioReportDocumentMain";
+import AIRankingMain from "./AIRanking/AIRankingMain";
 
 const tabConfig = [
   { key: "portfolioReview", label: "US Portfolio CIO AI Review" },
   { key: "stockRanking", label: "Portfolio AI Stock Ranking" },
-  { key: "individualReview", label: "Inidividual Stock CIO AI REview" },
+  { key: "individualReview", label: "Inidividual Stock CIO AI Review" },
 ];
 
 const AIPortfolioReview: React.FC = () => {
   const [activeTab, setActiveTab] = useState(tabConfig[0].key);
+
+  const handleTabChange = (newValue: string) => {
+    setActiveTab(newValue);
+  };
 
   const renderPlaceholder = (label: string) => (
     <Box
@@ -25,7 +30,7 @@ const AIPortfolioReview: React.FC = () => {
       }}
     >
       <Typography variant="h5" sx={{ fontWeight: 600, textAlign: "center" }}>
-        {label} — coming soon
+        {label} - coming soon
       </Typography>
       <Typography variant="body2" sx={{ color: "text.secondary", textAlign: "center" }}>
         We will add this view shortly.
@@ -33,37 +38,50 @@ const AIPortfolioReview: React.FC = () => {
     </Box>
   );
 
-  const handleTabChange = (newValue: string) => {
-    setActiveTab(newValue);
+  const renderContent = () => {
+    if (activeTab === "portfolioReview") {
+      return <PortfolioReportDocumentMain />;
+    }
+
+    if (activeTab === "stockRanking") {
+      return (
+        <Box sx={{ mt: 2 }}>
+          <AIRankingMain />
+        </Box>
+      );
+    }
+
+    const tabLabel = tabConfig.find((tab) => tab.key === activeTab)?.label ?? "";
+    return renderPlaceholder(tabLabel);
   };
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        // background: "linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #111827 100%)",
         px: { xs: 1, sm: 3, md: 4 },
         py: 3,
+        background: "linear-gradient(135deg, #0b1223 0%, #0f172a 40%, #1f2937 100%)",
       }}
     >
       <Box
         sx={{
           maxWidth: 1280,
           mx: "auto",
-          backgroundColor: "#fff",
           borderRadius: 3,
           boxShadow: "0 24px 60px rgba(15, 23, 42, 0.35)",
+          backgroundColor: "#e2e8f0",
           overflow: "hidden",
         }}
       >
         <Box
           sx={{
-            backgroundColor: "#e2e8f0",
             borderRadius: 999,
             p: 1,
             display: "flex",
             gap: 1,
             flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
           {tabConfig.map((tab) => {
@@ -79,15 +97,11 @@ const AIPortfolioReview: React.FC = () => {
                   fontSize: 13,
                   px: 3.5,
                   py: 1,
-                  color: isActive ? "#fff" : "#0f172a",
-                  background: isActive
-                    ? "linear-gradient(135deg, #0b1b3b, #1e3a8a)"
-                    : "#fff",
-                  border: isActive ? "1px solid #0b1b3b" : "1px solid #cbd5f5",
-                  boxShadow: isActive
-                    ? "0 8px 20px rgba(15, 23, 42, 0.35)"
-                    : "none",
-                  minWidth: 160,
+                  color: isActive ? "#fff" : "#0b1223",
+                  background: isActive ? "linear-gradient(135deg, #111e3a, #1d4ed8)" : "#fff",
+                  border: isActive ? "1px solid #0b1223" : "1px solid #cbd5f5",
+                  boxShadow: isActive ? "0 8px 20px rgba(15, 23, 42, 0.35)" : "none",
+                  minWidth: 180,
                 }}
               >
                 {tab.label}
@@ -97,13 +111,20 @@ const AIPortfolioReview: React.FC = () => {
         </Box>
       </Box>
 
-      {activeTab === tabConfig[0].key ? (
-        <Box sx={{ mt: 2 }}>
-          <PortfolioReportDocumentMain />
-        </Box>
-      ) : (
-        renderPlaceholder(tabConfig.find((tab) => tab.key === activeTab)?.label ?? "")
-      )}
+      <Box
+        sx={{
+          mt: 3,
+          maxWidth: 1260,
+          mx: "auto",
+          bgcolor: "#fff",
+          borderRadius: 3,
+          boxShadow: "0 24px 60px rgba(15, 23, 42, 0.25)",
+          px: { xs: 2, md: 4 },
+          py: { xs: 3, md: 4 },
+        }}
+      >
+        {renderContent()}
+      </Box>
     </Box>
   );
 };
