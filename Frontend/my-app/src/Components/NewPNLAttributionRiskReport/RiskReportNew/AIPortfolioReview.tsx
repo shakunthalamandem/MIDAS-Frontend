@@ -29,7 +29,7 @@ interface RankingReportItem {
 }
 
 const tabConfig = [
-  { key: "portfolioReview", label: "US Portfolio CIO AI Review" },
+  { key: "portfolioReview", label: "US  Equity Portfolio AI Review" },
   { key: "stockRanking", label: "Portfolio AI Stock Ranking" },
 ];
 

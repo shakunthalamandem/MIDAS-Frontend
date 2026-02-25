@@ -160,7 +160,7 @@ const PortfolioDocumentUpload: React.FC = () => {
             size="small"
             sx={{ mb: 2 }}
           >
-            <MenuItem value="US Portfolio CIO AI Review">US Portfolio CIO AI Review</MenuItem>
+            <MenuItem value="US  Equity Portfolio AI Review">US  Equity Portfolio AI Review</MenuItem>
             <MenuItem value="Portfolio AI Stock Ranking">Portfolio AI Stock Ranking</MenuItem>
             <MenuItem value="Inidividual Stock CIO AI REview">Inidividual Stock CIO AI REview</MenuItem>
           </TextField>
