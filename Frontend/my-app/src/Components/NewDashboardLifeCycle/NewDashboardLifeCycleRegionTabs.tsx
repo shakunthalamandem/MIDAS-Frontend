@@ -39,7 +39,7 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
           onClick={() => onSelect(item.value)}
           sx={{
             px: compact ? 1.4 : 2,
-            py: compact ? 0.35 : 0.6,
+            py: compact ? 0.5 : 0.7,
             borderRadius: 999,
             cursor: "pointer",
             fontWeight: 600,

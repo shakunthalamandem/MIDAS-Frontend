@@ -160,6 +160,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                   backgroundColor: "#6d28d9",
                   color: "#ffffff",
                 },
+                "& .Mui-selected:hover": {
+                  backgroundColor: "#6d28d9",
+                  color: "#ffffff",
+                },
               }}
             >
               {tabs.map((option) => (
@@ -184,6 +188,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                     color: "#ffffff",
                   },
                   "& .Mui-selected": {
+                    backgroundColor: "#ec4899",
+                    color: "#ffffff",
+                  },
+                  "& .Mui-selected:hover": {
                     backgroundColor: "#ec4899",
                     color: "#ffffff",
                   },
@@ -265,8 +273,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             sx={{
               backgroundColor: "transparent",
               borderRadius: 999,
+              border: "1px solid #d7ddea",
+              p: 0.35,
               "& .MuiToggleButton-root": {
-                border: "1px solid #d7ddea",
+                border: "none",
                 px: 2,
                 py: 0.35,
                 minWidth: 70,
@@ -277,17 +287,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 backgroundColor: "#ffffff",
               },
               "& .MuiToggleButton-root:hover": {
-                backgroundColor: "#8f75ddff",
+                backgroundColor: "#000000",
                 color: "#ffffff",
               },
               "& .MuiToggleButton-root.Mui-selected": {
                 color: "#ffffff",
-                backgroundColor: "#2b146f",
-                borderColor: "#2b146f",
-                boxShadow: "0 8px 18px rgba(43,20,111,0.18)",
+                backgroundColor: "#000000",
+                boxShadow: "0 8px 18px rgba(0,0,0,0.2)",
               },
               "& .MuiToggleButton-root.Mui-selected:hover": {
-                backgroundColor: "#2b146f",
+                backgroundColor: "#000000",
                 color: "#ffffff",
               },
             }}
