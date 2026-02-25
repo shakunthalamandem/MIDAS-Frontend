@@ -45,202 +45,44 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const DocumentUploadTabs: React.FC = () => {
-  const [tabValue, setTabValue] = useState(0);
+interface UploadFormProps {
+  file: File | null;
+  date: string;
+  setDate: (date: string) => void;
+  name: string;
+  setName: (name: string) => void;
+  type?: string;
+  setType?: (type: string) => void;
+  uploading: boolean;
+  alert: { type: "success" | "error"; message: string } | null;
+  onFileSelect: (file: File) => void;
+  onUpload: () => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  isRisk?: boolean;
+}
 
-  // Portfolio Upload State
-  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
-  const [portfolioDate, setPortfolioDate] = useState<string>("");
-  const [portfolioName, setPortfolioName] = useState<string>("");
-  const [portfolioType, setPortfolioType] = useState<string>("US Portfolio CIO AI Review");
-  const [portfolioUploading, setPortfolioUploading] = useState(false);
-  const [portfolioAlert, setPortfolioAlert] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  // Risk Upload State
-  const [riskFile, setRiskFile] = useState<File | null>(null);
-  const [riskDate, setRiskDate] = useState<string>("");
-  const [riskName, setRiskName] = useState<string>("");
-  const [riskUploading, setRiskUploading] = useState(false);
-  const [riskAlert, setRiskAlert] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  const portfolioFileInputRef = useRef<HTMLInputElement>(null);
-  const riskFileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
-
-  // Portfolio Upload Handlers
-  const handlePortfolioFileSelect = (selectedFile: File) => {
-    if (!selectedFile.name.endsWith(".json")) {
-      setPortfolioAlert({ type: "error", message: "Only JSON files are accepted." });
-      return;
-    }
-    setPortfolioFile(selectedFile);
-    setPortfolioAlert(null);
-  };
-
-  const handlePortfolioUpload = async () => {
-    if (!portfolioFile) {
-      setPortfolioAlert({ type: "error", message: "Please select a JSON file." });
-      return;
-    }
-    if (!portfolioDate) {
-      setPortfolioAlert({ type: "error", message: "Please select a report date." });
-      return;
-    }
-    if (!portfolioName.trim()) {
-      setPortfolioAlert({ type: "error", message: "Please enter a report name." });
-      return;
-    }
-
-    setPortfolioUploading(true);
-    setPortfolioAlert(null);
-
-    const token = localStorage.getItem("access_token");
-    const formData = new FormData();
-    formData.append("metadata_file", portfolioFile);
-    formData.append("date", portfolioDate);
-    formData.append("report_name", portfolioName.trim());
-    formData.append("report_type", portfolioType);
-
-    try {
-      const res = await fetch(`${apiUrl}/api/ai_agents_data_uploads/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setPortfolioAlert({
-          type: "success",
-          message: data.message || "Portfolio report uploaded successfully!",
-        });
-        setPortfolioFile(null);
-        setPortfolioDate("");
-        setPortfolioName("");
-        if (portfolioFileInputRef.current) {
-          portfolioFileInputRef.current.value = "";
-        }
-      } else {
-        setPortfolioAlert({
-          type: "error",
-          message: data.error || "Upload failed. Please try again.",
-        });
-      }
-    } catch (err: any) {
-      setPortfolioAlert({
-        type: "error",
-        message: err.message || "Network error. Please try again.",
-      });
-    } finally {
-      setPortfolioUploading(false);
-    }
-  };
-
-  // Risk Upload Handlers
-  const handleRiskFileSelect = (selectedFile: File) => {
-    if (!selectedFile.name.endsWith(".json")) {
-      setRiskAlert({ type: "error", message: "Only JSON files are accepted." });
-      return;
-    }
-    setRiskFile(selectedFile);
-    setRiskAlert(null);
-  };
-
-  const handleRiskUpload = async () => {
-    if (!riskFile) {
-      setRiskAlert({ type: "error", message: "Please select a JSON file." });
-      return;
-    }
-    if (!riskDate) {
-      setRiskAlert({ type: "error", message: "Please select a report date." });
-      return;
-    }
-    if (!riskName.trim()) {
-      setRiskAlert({ type: "error", message: "Please enter a report name." });
-      return;
-    }
-
-    setRiskUploading(true);
-    setRiskAlert(null);
-
-    const token = localStorage.getItem("access_token");
-    const formData = new FormData();
-    formData.append("metadata_file", riskFile);
-    formData.append("date", riskDate);
-    formData.append("report_name", riskName.trim());
-    formData.append("report_type", "Risk Report");
-
-    try {
-      const res = await fetch(`${apiUrl}/api/risk_ai_data_uploads/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setRiskAlert({
-          type: "success",
-          message: data.message || "Risk report uploaded successfully!",
-        });
-        setRiskFile(null);
-        setRiskDate("");
-        setRiskName("");
-        if (riskFileInputRef.current) {
-          riskFileInputRef.current.value = "";
-        }
-      } else {
-        setRiskAlert({
-          type: "error",
-          message: data.error || "Upload failed. Please try again.",
-        });
-      }
-    } catch (err: any) {
-      setRiskAlert({
-        type: "error",
-        message: err.message || "Network error. Please try again.",
-      });
-    } finally {
-      setRiskUploading(false);
-    }
-  };
-
+const UploadFormComponent: React.FC<UploadFormProps> = ({
+  file,
+  date,
+  setDate,
+  name,
+  setName,
+  type = "",
+  setType = () => {},
+  uploading,
+  alert,
+  onFileSelect,
+  onUpload,
+  fileInputRef,
+  isRisk = false,
+}) => {
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const UploadForm = ({
-    file,
-    date,
-    setDate,
-    name,
-    setName,
-    type,
-    setType,
-    uploading,
-    alert,
-    onFileSelect,
-    onUpload,
-    fileInputRef,
-    isRisk = false,
-  }: any) => (
+  return (
     <Box>
       {alert && (
         <Alert
@@ -444,6 +286,182 @@ const DocumentUploadTabs: React.FC = () => {
       </Button>
     </Box>
   );
+};
+
+const DocumentUploadTabs: React.FC = () => {
+  const [tabValue, setTabValue] = useState(0);
+
+  // Portfolio Upload State
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
+  const [portfolioDate, setPortfolioDate] = useState<string>("");
+  const [portfolioName, setPortfolioName] = useState<string>("");
+  const [portfolioType, setPortfolioType] = useState<string>("US Portfolio CIO AI Review");
+  const [portfolioUploading, setPortfolioUploading] = useState(false);
+  const [portfolioAlert, setPortfolioAlert] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  // Risk Upload State
+  const [riskFile, setRiskFile] = useState<File | null>(null);
+  const [riskDate, setRiskDate] = useState<string>("");
+  const [riskName, setRiskName] = useState<string>("");
+  const [riskUploading, setRiskUploading] = useState(false);
+  const [riskAlert, setRiskAlert] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  const portfolioFileInputRef = useRef<HTMLInputElement>(null);
+  const riskFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  // Portfolio Upload Handlers
+  const handlePortfolioFileSelect = (selectedFile: File) => {
+    if (!selectedFile.name.endsWith(".json")) {
+      setPortfolioAlert({ type: "error", message: "Only JSON files are accepted." });
+      return;
+    }
+    setPortfolioFile(selectedFile);
+    setPortfolioAlert(null);
+  };
+
+  const handlePortfolioUpload = async () => {
+    if (!portfolioFile) {
+      setPortfolioAlert({ type: "error", message: "Please select a JSON file." });
+      return;
+    }
+    if (!portfolioDate) {
+      setPortfolioAlert({ type: "error", message: "Please select a report date." });
+      return;
+    }
+    if (!portfolioName.trim()) {
+      setPortfolioAlert({ type: "error", message: "Please enter a report name." });
+      return;
+    }
+
+    setPortfolioUploading(true);
+    setPortfolioAlert(null);
+
+    const token = localStorage.getItem("access_token");
+    const formData = new FormData();
+    formData.append("metadata_file", portfolioFile);
+    formData.append("date", portfolioDate);
+    formData.append("report_name", portfolioName.trim());
+    formData.append("report_type", portfolioType);
+
+    try {
+      const res = await fetch(`${apiUrl}/api/ai_agents_data_uploads/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setPortfolioAlert({
+          type: "success",
+          message: data.message || "Portfolio report uploaded successfully!",
+        });
+        setPortfolioFile(null);
+        setPortfolioDate("");
+        setPortfolioName("");
+        if (portfolioFileInputRef.current) {
+          portfolioFileInputRef.current.value = "";
+        }
+      } else {
+        setPortfolioAlert({
+          type: "error",
+          message: data.error || "Upload failed. Please try again.",
+        });
+      }
+    } catch (err: any) {
+      setPortfolioAlert({
+        type: "error",
+        message: err.message || "Network error. Please try again.",
+      });
+    } finally {
+      setPortfolioUploading(false);
+    }
+  };
+
+  // Risk Upload Handlers
+  const handleRiskFileSelect = (selectedFile: File) => {
+    if (!selectedFile.name.endsWith(".json")) {
+      setRiskAlert({ type: "error", message: "Only JSON files are accepted." });
+      return;
+    }
+    setRiskFile(selectedFile);
+    setRiskAlert(null);
+  };
+
+  const handleRiskUpload = async () => {
+    if (!riskFile) {
+      setRiskAlert({ type: "error", message: "Please select a JSON file." });
+      return;
+    }
+    if (!riskDate) {
+      setRiskAlert({ type: "error", message: "Please select a report date." });
+      return;
+    }
+    if (!riskName.trim()) {
+      setRiskAlert({ type: "error", message: "Please enter a report name." });
+      return;
+    }
+
+    setRiskUploading(true);
+    setRiskAlert(null);
+
+    const token = localStorage.getItem("access_token");
+    const formData = new FormData();
+    formData.append("metadata_file", riskFile);
+    formData.append("date", riskDate);
+    formData.append("report_name", riskName.trim());
+    formData.append("report_type", "Risk Report");
+
+    try {
+      const res = await fetch(`${apiUrl}/api/risk_ai_data_uploads/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setRiskAlert({
+          type: "success",
+          message: data.message || "Risk report uploaded successfully!",
+        });
+        setRiskFile(null);
+        setRiskDate("");
+        setRiskName("");
+        if (riskFileInputRef.current) {
+          riskFileInputRef.current.value = "";
+        }
+      } else {
+        setRiskAlert({
+          type: "error",
+          message: data.error || "Upload failed. Please try again.",
+        });
+      }
+    } catch (err: any) {
+      setRiskAlert({
+        type: "error",
+        message: err.message || "Network error. Please try again.",
+      });
+    } finally {
+      setRiskUploading(false);
+    }
+  };
 
   return (
     <Box
@@ -523,7 +541,7 @@ const DocumentUploadTabs: React.FC = () => {
           {/* Tab Content */}
           <CardContent sx={{ p: 4 }}>
             <TabPanel value={tabValue} index={0}>
-              <UploadForm
+              <UploadFormComponent
                 file={portfolioFile}
                 date={portfolioDate}
                 setDate={setPortfolioDate}
@@ -540,7 +558,7 @@ const DocumentUploadTabs: React.FC = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
-              <UploadForm
+              <UploadFormComponent
                 file={riskFile}
                 date={riskDate}
                 setDate={setRiskDate}
