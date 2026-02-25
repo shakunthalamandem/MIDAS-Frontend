@@ -44,9 +44,9 @@ const getRandomPalette = () =>
   COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
 
 interface GENAICardBlockProps {
-  title: string;
-  subtitle: string;
-  description: string; // supports markdown
+  title: string | number;
+  subtitle?: string | number;
+  description: string | number; // supports markdown
   icon?: string; // Optional: emoji or icon name
 }
 
@@ -56,6 +56,15 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
   description,
   icon,
 }) => {
+  const normalizedTitle = React.useMemo(() => String(title ?? ""), [title]);
+  const normalizedSubtitle = React.useMemo(
+    () => (subtitle !== undefined && subtitle !== null ? String(subtitle) : ""),
+    [subtitle]
+  );
+  const normalizedDescription = React.useMemo(
+    () => String(description ?? ""),
+    [description]
+  );
   const palette = React.useMemo(() => getRandomPalette(), []);
 
   return (
@@ -90,8 +99,10 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
           subheaderTypographyProps={{
             sx: { color: palette.subtitleColor, display: "flex", alignItems: "center", gap: 0.5 },
           }}
-          title={<ReactMarkdown>{title || ""}</ReactMarkdown>}
-          subheader={subtitle ? <ReactMarkdown>{subtitle}</ReactMarkdown> : undefined}
+          title={<ReactMarkdown>{normalizedTitle}</ReactMarkdown>}
+          subheader={
+            subtitle ? <ReactMarkdown>{normalizedSubtitle}</ReactMarkdown> : undefined
+          }
           sx={{ pb: 0 }}
         />
 
@@ -101,7 +112,7 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
             component="div"
             sx={{ color: palette.textColor }}
           >
-            <ReactMarkdown>{description}</ReactMarkdown>
+            <ReactMarkdown>{normalizedDescription}</ReactMarkdown>
           </Typography>
         </CardContent>
       </Card>

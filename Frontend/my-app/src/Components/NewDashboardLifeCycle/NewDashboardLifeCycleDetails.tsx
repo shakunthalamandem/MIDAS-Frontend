@@ -27,6 +27,7 @@ import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
+import DealBot from "./DealBot";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -52,9 +53,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "AI - Sentiment View" },
       { label: "AI based on previous 30 deals" },
       { label: "ML Model" },
+      {
+        label: "Deal Bot",
+      },
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
+
     ],
     []
   );
@@ -271,7 +276,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               dealType={activePayload.deal_type}
             />
           ) : (
-            <PageUnderDevelopment />
+            tabItems[tabValue]?.label === "Deal Bot" ? (
+              <DealBot
+                basicDealDetails={{
+                  deal_id: activePayload.deal_id,
+                  unique_deal_id: activePayload.unique_deal_id,
+                  ticker: activePayload.ticker,
+                  pricing_date: activePayload.pricing_date,
+                  deal_type: activePayload.deal_type,
+                }}
+              />
+            ) : (
+              <PageUnderDevelopment />
+            )
           )}
         </Box>
       </Paper>
