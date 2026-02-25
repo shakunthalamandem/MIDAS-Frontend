@@ -101,8 +101,8 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
         sx={{
           display: "grid",
           gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-          background: "linear-gradient(135deg, #1e293b, #334155)",
-          borderBottom: "2px solid #a855f7",
+          backgroundColor: "#f8fafc",
+          borderBottom: "2px solid #e9d5ff",
         }}
       >
         {dynamicKeys.map((k) => (
@@ -114,7 +114,7 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: 0.8,
-              color: "#fff",
+              color: "#475569",
               textTransform: "uppercase",
             }}
           >

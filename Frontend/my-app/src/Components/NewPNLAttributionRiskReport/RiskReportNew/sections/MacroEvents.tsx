@@ -70,12 +70,12 @@ const MacroEvents: React.FC<Props> = ({ data }) => {
               sx={{
                 display: "grid",
                 gridTemplateColumns: `repeat(${eventKeys.length}, 1fr)`,
-                background: "linear-gradient(135deg, #1e293b, #334155)",
-                borderBottom: "2px solid #3b82f6",
+                backgroundColor: "#f8fafc",
+                borderBottom: "2px solid #bfdbfe",
               }}
             >
               {eventKeys.map((k) => (
-                <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#fff", textTransform: "uppercase" }}>
+                <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase" }}>
                   {formatHeader(k)}
                 </Typography>
               ))}

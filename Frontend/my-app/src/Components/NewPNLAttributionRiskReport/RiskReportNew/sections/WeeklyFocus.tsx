@@ -32,9 +32,9 @@ const renderDynamicTable = (items: any[], accentColor: string, hoverBg: string) 
   return (
     <Box sx={{ border: `1px solid ${accentColor}40`, borderRadius: 2.5, overflow: "hidden" }}>
       <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-        background: "linear-gradient(135deg, #1e293b, #334155)", borderBottom: `2px solid ${accentColor}` }}>
+        backgroundColor: "#f8fafc", borderBottom: `2px solid ${accentColor}` }}>
         {keys.map((k) => (
-          <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#fff", textTransform: "uppercase" }}>
+          <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase" }}>
             {formatHeader(k)}
           </Typography>
         ))}

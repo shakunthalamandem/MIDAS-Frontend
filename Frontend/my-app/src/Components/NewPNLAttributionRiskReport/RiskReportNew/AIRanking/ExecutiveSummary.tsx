@@ -35,14 +35,15 @@ const SummaryStat = ({ label, value }: { label: string; value: number }) => (
       minWidth: 80,
       textAlign: "center",
       borderRadius: 2,
-      backgroundColor: "#0f172a",
-      color: "#fff",
+      backgroundColor: "#f8fafc",
+      border: "1px solid #e2e8f0",
+      color: "#1e293b",
     }}
   >
-    <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
+    <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1, color: "#2563eb" }}>
       {value}
     </Typography>
-    <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: "uppercase" }}>
+    <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: "uppercase", color: "#64748b" }}>
       {label}
     </Typography>
   </Paper>

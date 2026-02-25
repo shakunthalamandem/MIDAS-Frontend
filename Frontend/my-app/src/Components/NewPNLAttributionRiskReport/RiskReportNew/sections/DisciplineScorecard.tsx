@@ -82,9 +82,9 @@ const DisciplineScorecard: React.FC<Props> = ({ data }) => {
       {rules.length > 0 && dynamicKeys.length > 0 && (
         <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden", mb: 3 }}>
           <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-            background: "linear-gradient(135deg, #1e293b, #334155)", borderBottom: "2px solid #1e293b" }}>
+            backgroundColor: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
             {dynamicKeys.map((h) => (
-              <Typography key={h} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#fff" }}>{formatHeader(h)}</Typography>
+              <Typography key={h} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#475569" }}>{formatHeader(h)}</Typography>
             ))}
           </Box>
           {rules.map((row: any, i: number) => {
