@@ -159,7 +159,10 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             formatDate={formatDate}
             onBack={() =>
               navigate("/deals/new_dashboard", {
-                state: { viewMode: viewMode === "table" ? "table" : "card" },
+                state: {
+                  viewMode: viewMode === "table" ? "table" : "card",
+                  dashboardState: (location.state as any)?.dashboardState,
+                },
               })
             }
             SearchComponent={
@@ -189,15 +192,15 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               "& .MuiTabs-indicator": {
                 display: "none",
               },
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  fontWeight: 600,
-                  color: "#0f0f0fff",
-                  fontSize: "0.725rem",
-                  minHeight: 40,
-                  px: 2,
-                  borderRadius: 999,
-                  border: "1px solid #e2e8f0",
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                color: "#0f0f0fff",
+                fontSize: "0.725rem",
+                minHeight: 40,
+                px: 2,
+                borderRadius: 999,
+                border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
                 boxShadow: "none",
                 transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
@@ -251,7 +254,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             )
 
 
-          )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
+          ) : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
 
               <DealRecommendationHome ticker={activePayload.ticker} />
