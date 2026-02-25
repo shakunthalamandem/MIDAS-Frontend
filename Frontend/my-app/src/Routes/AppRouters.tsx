@@ -101,6 +101,7 @@ import TickerDetail from "../Components/NewPNLAttributionRiskReport/PNLAttributi
 import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain";
 import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
 import PortfolioDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/portfolioDocumentUpload";
+import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
 
 
 const AppRouters: React.FC = () => {
@@ -314,7 +315,7 @@ const AppRouters: React.FC = () => {
         <Route path='/risk_document_upload' element={<AuthGuard><RiskAIDocumentUpload /></AuthGuard>} />
         <Route path='/portfolio_document_upload' element={<AuthGuard><PortfolioDocumentUpload /></AuthGuard>} />
 
-        <Route path='/ai_portfolio_review' element={<AuthGuard><PortfolioReportDocumentMain /></AuthGuard>} />
+        <Route path='/ai_portfolio_review' element={<AuthGuard><AIPortfolioReview /></AuthGuard>} />
 
 
         
