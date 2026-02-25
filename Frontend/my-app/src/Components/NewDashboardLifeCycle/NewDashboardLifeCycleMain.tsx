@@ -561,7 +561,7 @@ const NewDealsLifecycleCards: React.FC = () => {
       <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1, md: 1.5 } }}>
         <Box
           sx={{
-            backgroundColor: "#ffffff",
+            backgroundColor: "#bfddc3",
             borderRadius: 3,
             px: { xs: 2, md: 2.5 },
             py: { xs: 2, md: 2.5 },
