@@ -37,13 +37,13 @@ const ipoTextColor: Record<string, "success" | "info" | "warning"> = {
 };
 
 const headerSx = {
-  color: "#475569",
+  color: "#fff",
   fontWeight: 700,
   fontSize: 11,
   letterSpacing: 0.5,
   textTransform: "uppercase" as const,
-  backgroundColor: "#f8fafc",
-  borderBottom: "2px solid #e2e8f0",
+  backgroundColor: "#071852",
+  borderBottom: "none",
   py: 1.5,
 };
 
@@ -54,7 +54,7 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
       borderRadius: 3,
       overflow: "hidden",
       border: "1px solid #e2e8f0",
-      boxShadow: "0 2px 12px rgba(0, 0, 0, 0.04)",
+      boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
     }}
   >
     <TableContainer sx={{ maxHeight: 420 }}>
@@ -71,7 +71,7 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => {
+          {rows.map((row, idx) => {
             const isActive = selectedTicker === row.ticker;
             return (
               <TableRow
@@ -81,23 +81,37 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
                 onClick={() => onSelectTicker(row.ticker)}
                 sx={{
                   cursor: "pointer",
-                  backgroundColor: isActive ? "#eff6ff" : "transparent",
-                  "&:hover": { backgroundColor: isActive ? "#eff6ff" : "#f8fafc" },
+                  backgroundColor: isActive
+                    ? "#eff6ff"
+                    : idx % 2 === 0
+                    ? "#fff"
+                    : "#f8fafc",
+                  "&:hover": {
+                    backgroundColor: isActive ? "#dbeafe" : "#eef2ff",
+                  },
                   borderLeft: isActive ? "3px solid #2563eb" : "3px solid transparent",
+                  transition: "background-color 0.15s",
                 }}
               >
-                <TableCell sx={{ fontWeight: 700, color: "#1e293b" }}>{row.ticker}</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "#002060", fontSize: 13 }}>
+                  {row.ticker}
+                </TableCell>
                 <TableCell>
                   <ActionBadge action={row.action} />
                 </TableCell>
                 <TableCell sx={{ color: "#475569", fontSize: 13 }}>{row.sector}</TableCell>
                 <TableCell>
-                  <Chip label={row.current_vs_ipo} color={ipoTextColor[row.current_vs_ipo] ?? "default"} size="small" variant="outlined" />
+                  <Chip
+                    label={row.current_vs_ipo}
+                    color={ipoTextColor[row.current_vs_ipo] ?? "default"}
+                    size="small"
+                    variant="outlined"
+                  />
                 </TableCell>
                 <TableCell>
                   <ConvictionStars rating={row.conviction_rating} />
                 </TableCell>
-                <TableCell sx={{ width: 100, fontWeight: 600, color: "#475569" }}>
+                <TableCell sx={{ width: 100, fontWeight: 700, color: "#002060", fontSize: 14 }}>
                   {row.forward_sentiment_score}
                 </TableCell>
                 <TableCell align="center">
