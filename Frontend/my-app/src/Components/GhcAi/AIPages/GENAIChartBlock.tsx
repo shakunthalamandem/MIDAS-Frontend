@@ -36,7 +36,7 @@ ChartJS.register(
 type GENAIChartBlockProps = {
   chartType: string;
   data: any;
-  title: string;
+  title: string | number;
   fixedHeight?: number; // height in pixels
 };
 
@@ -47,6 +47,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
   fixedHeight = 380,
 }) => {
   const type = chartType.toLowerCase();
+  const normalizedTitle = React.useMemo(() => String(title ?? ""), [title]);
 
   const chartMap: Record<string, any> = {
     pie: Pie,
@@ -85,7 +86,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
     formattedData = {
       datasets: [
         {
-          label: title,
+          label: normalizedTitle,
           data,
           backgroundColor: "#60a5fa",
         },
@@ -147,7 +148,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         fontWeight={600}
         sx={{ color: "#2c387e", mb: 1 }}
       >
-        <ReactMarkdown>{title}</ReactMarkdown>
+        <ReactMarkdown>{normalizedTitle}</ReactMarkdown>
       </Typography>
 
       <Divider sx={{ mb: 1 }} />

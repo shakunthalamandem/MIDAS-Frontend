@@ -37,11 +37,21 @@ const getRandomTheme = () =>
   COLOR_THEMES[Math.floor(Math.random() * COLOR_THEMES.length)];
 
 const GENATableBlock: React.FC<{
-  headers: string[];
-  rows: string[][];
+  headers: (string | number)[];
+  rows: (string | number)[][];
   title?: string;
 }> = ({ headers, rows, title }) => {
   const theme = React.useMemo(() => getRandomTheme(), []);
+
+  const normalizedHeaders = React.useMemo(
+    () => headers.map((h) => String(h)),
+    [headers]
+  );
+
+  const normalizedRows = React.useMemo(
+    () => rows.map((row) => row.map((cell) => String(cell))),
+    [rows]
+  );
 
   return (
     <motion.div
@@ -55,7 +65,7 @@ const GENATableBlock: React.FC<{
         sx={{
           borderRadius: 3,
           bgcolor: "#f9fafa",
-          width: "100%",        // ✅ Responsive width
+          width: "100%",
           boxSizing: "border-box",
         }}
       >
@@ -69,6 +79,7 @@ const GENATableBlock: React.FC<{
             sx={{ pb: 0 }}
           />
         )}
+
         <CardContent sx={{ pt: title ? 1 : 2 }}>
           <Box sx={{ width: "100%", overflowX: "auto" }}>
             <Table
@@ -81,23 +92,16 @@ const GENATableBlock: React.FC<{
             >
               <TableHead>
                 <TableRow sx={{ backgroundColor: `${theme.headerColor}20` }}>
-                  {headers.map((h, i) => (
-                    <TableCell
-                      key={i}
-                      sx={{
-                        fontWeight: "bold",
-                        color: theme.headerColor,
-                        fontSize: "0.95rem",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                  {normalizedHeaders.map((h, i) => (
+                    <TableCell key={i}>
                       <ReactMarkdown>{h}</ReactMarkdown>
                     </TableCell>
                   ))}
                 </TableRow>
               </TableHead>
+
               <TableBody>
-                {rows.map((row, i) => (
+                {normalizedRows.map((row, i) => (
                   <TableRow
                     key={i}
                     sx={{
@@ -108,14 +112,7 @@ const GENATableBlock: React.FC<{
                     }}
                   >
                     {row.map((cell, j) => (
-                      <TableCell
-                        key={j}
-                        sx={{
-                          fontSize: "0.875rem",
-                          verticalAlign: "top",
-                          wordBreak: "break-word",
-                        }}
-                      >
+                      <TableCell key={j}>
                         <ReactMarkdown>{cell}</ReactMarkdown>
                       </TableCell>
                     ))}
