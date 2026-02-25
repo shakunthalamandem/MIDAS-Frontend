@@ -357,7 +357,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                 letterSpacing: 1.5,
                 whiteSpace: "nowrap",
                 flex: 1,
-                color: "#1e293b",
+                color: "#002060",
               }}
             >
               AI REVIEW
@@ -397,14 +397,14 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                   backgroundColor: isActive
                     ? "#dbeafe"
                     : "transparent",
-                  color: isActive ? "#2563eb" : "#64748b",
+                  color: isActive ? "#002060" : "#002060",
                   transition: "all 0.2s",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   "&:hover": {
                     backgroundColor: isActive
                       ? "#dbeafe"
                       : "#e0e7ff",
-                    color: isActive ? "#2563eb" : "#475569",
+                    color: "#002060",
                   },
                 }}
               >
