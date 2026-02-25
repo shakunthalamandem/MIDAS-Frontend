@@ -158,7 +158,6 @@ const UploadFormComponent: React.FC<UploadFormProps> = ({
             >
               <MenuItem value="US  Equity Portfolio AI Review">US  Equity Portfolio AI Review</MenuItem>
               <MenuItem value="Portfolio AI Stock Ranking">Portfolio AI Stock Ranking</MenuItem>
-              <MenuItem value="Individual Stock CIO AI Review">Individual Stock CIO AI Review</MenuItem>
             </TextField>
           </Grid>
         )}

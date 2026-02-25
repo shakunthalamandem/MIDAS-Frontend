@@ -142,7 +142,7 @@ const AIPortfolioReview: React.FC = () => {
           // maxWidth: 1280,
           mx: "auto",
           borderRadius: 2,
-          backgroundColor: "#eef2ff",
+          backgroundColor: "#071852",
           border: "1px solid #c7d2fe",
           px: 2,
           py: 1.2,
