@@ -158,14 +158,15 @@ const AIRankingMain: React.FC = () => {
 
   const dropdownCard = (
     <Paper
-      elevation={10}
+      elevation={0}
       sx={{
-        borderRadius: 4,
+        borderRadius: 3,
         p: 4,
         mb: 3,
-        background:
-          "linear-gradient(135deg, rgba(12,20,46,0.95) 0%, rgba(15,23,42,0.9) 100%)",
-        color: "#fff",
+        backgroundColor: "#fff",
+        border: "1px solid #e2e8f0",
+        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
+        textAlign: "center",
       }}
     >
       <Box
@@ -173,8 +174,7 @@ const AIRankingMain: React.FC = () => {
           width: 56,
           height: 56,
           borderRadius: "50%",
-          background:
-            "linear-gradient(180deg, rgba(59,130,246,1) 0%, rgba(37,99,235,1) 100%)",
+          background: "linear-gradient(135deg, #2563eb, #3b82f6)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -188,15 +188,15 @@ const AIRankingMain: React.FC = () => {
             width: 20,
             height: 20,
             background:
-              "radial-gradient(circle at center, rgba(248,250,252,0.9) 0%, rgba(248,250,252,0.4) 70%)",
+              "radial-gradient(circle at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 70%)",
             borderRadius: "50%",
           }}
         />
       </Box>
-      <Typography variant="h5" fontWeight={700} mb={1}>
+      <Typography variant="h5" fontWeight={700} mb={1} color="#1e293b">
         US Portfolio Review
       </Typography>
-      <Typography variant="body2" color="rgba(255,255,255,0.7)" mb={2}>
+      <Typography variant="body2" color="#64748b" mb={2}>
         Select a report to view the AI-driven portfolio risk analysis
       </Typography>
         <Autocomplete

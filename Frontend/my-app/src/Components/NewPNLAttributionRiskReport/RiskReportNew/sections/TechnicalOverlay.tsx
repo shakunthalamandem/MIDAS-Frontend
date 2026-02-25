@@ -47,9 +47,9 @@ const renderTable = (title: string, items: any) => {
       <Typography sx={{ fontWeight: 700, fontSize: 15, color: colors.title, mb: 1.5 }}>{title}</Typography>
       <Box sx={{ border: `1px solid ${colors.border}`, borderRadius: 2.5, overflow: "hidden" }}>
         <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-          background: "linear-gradient(135deg, #1e293b, #334155)", borderBottom: `2px solid ${colors.border}` }}>
+          backgroundColor: "#f8fafc", borderBottom: `2px solid ${colors.border}` }}>
           {keys.map((k) => (
-            <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#fff", textTransform: "uppercase" }}>
+            <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase" }}>
               {k.replace(/_/g, " ")}
             </Typography>
           ))}

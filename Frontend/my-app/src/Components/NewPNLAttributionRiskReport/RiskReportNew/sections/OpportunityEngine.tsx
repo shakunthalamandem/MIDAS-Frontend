@@ -114,12 +114,12 @@ const OpportunityEngine: React.FC<Props> = ({ data }) => {
               sx={{
                 display: "grid",
                 gridTemplateColumns: `repeat(${upsideKeys.length}, 1fr)`,
-                background: "linear-gradient(135deg, #1e293b, #334155)",
-                borderBottom: "2px solid #10b981",
+                backgroundColor: "#f8fafc",
+                borderBottom: "2px solid #a7f3d0",
               }}
             >
               {upsideKeys.map((k) => (
-                <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#fff", textTransform: "uppercase" }}>
+                <Typography key={k} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: "#475569", textTransform: "uppercase" }}>
                   {formatHeader(k)}
                 </Typography>
               ))}
