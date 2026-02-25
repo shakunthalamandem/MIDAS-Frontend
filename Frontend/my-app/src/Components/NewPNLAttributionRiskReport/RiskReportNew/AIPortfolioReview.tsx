@@ -193,13 +193,13 @@ const AIPortfolioReview: React.FC = () => {
             loading={cioListLoading}
             size="small"
             sx={{
-              width: { xs: "100%", sm: 340 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc" },
+              width: { xs: "100%", sm: 380 },
+              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
             }}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
                     {option.report_title}
                   </Typography>
                   <Typography sx={{ fontSize: 11, color: "#64748b" }}>
@@ -230,15 +230,27 @@ const AIPortfolioReview: React.FC = () => {
         {activeTab === "stockRanking" && (
           <Autocomplete
             options={rankingReports}
-            getOptionLabel={(opt) => opt.report_name}
+            getOptionLabel={(opt) => `${opt.report_name} — ${opt.date}`}
             value={selectedRankingReport}
             onChange={(_, val) => setSelectedRankingReport(val)}
             loading={rankingListLoading}
             size="small"
             sx={{
-              width: { xs: "100%", sm: 340 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc" },
+              width: { xs: "100%", sm: 380 },
+              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
             }}
+            renderOption={(props, option) => (
+              <Box component="li" {...props} key={option.id}>
+                <Box>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
+                    {option.report_name}
+                  </Typography>
+                  <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+                    {formatDate(option.date)}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -263,7 +275,6 @@ const AIPortfolioReview: React.FC = () => {
       <Box
         sx={{
           mt: 2,
-          // maxWidth: 1280,
           mx: "auto",
         }}
       >
