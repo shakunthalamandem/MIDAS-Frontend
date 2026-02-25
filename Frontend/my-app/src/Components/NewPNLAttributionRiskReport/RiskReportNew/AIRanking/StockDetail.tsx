@@ -1,5 +1,16 @@
 import React from "react";
-import { Box, Card, CardContent, Divider, Grid, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { ActionBadge } from "./ActionBadge";
 import { ConvictionStars } from "./ConvictionStars";
 import {
@@ -80,10 +91,72 @@ const DataRow = ({ label, value, valueColor }: { label: string; value: React.Rea
   </Grid>
 );
 
+type SectionRow = { label: string; value: React.ReactNode; color?: string };
+
 const pnlColor = (status: string) => {
   if (status.toLowerCase().includes("winner")) return "success.main";
   if (status.toLowerCase().includes("loser")) return "error.main";
   return "text.secondary";
+};
+
+const getDetailSections = (
+  pa: StockData["price_analysis"],
+  pc: StockData["portfolio_context"],
+  fsp: StockData["forward_sentiment_prediction"]
+) => {
+  const sections: {
+    title: string;
+    icon: React.ElementType;
+    rows: SectionRow[];
+    footer: string;
+  }[] = [
+    {
+      title: "Price Analysis",
+      icon: DollarSign,
+      rows: [
+        { label: "Current", value: `$${pa.current_price.toFixed(2)}` },
+        { label: "IPO Price", value: `$${pa.ipo_price.toFixed(2)}` },
+        { label: "Avg Entry", value: `$${pa.avg_entry_price.toFixed(2)}` },
+        { label: "Risk to Stop", value: pa.risk_to_stop, color: "error.main" },
+        { label: "To Target", value: pa.distance_to_target },
+      ],
+      footer: pa.trend_since_ipo,
+    },
+    {
+      title: "Portfolio Context",
+      icon: BarChart3,
+      rows: [
+        { label: "Days Held", value: pc.days_held },
+        { label: "Exposure", value: pc.portfolio_exposure },
+        {
+          label: "Status",
+          value: pc.performance_status.split("(")[0].trim(),
+          color: pnlColor(pc.performance_status),
+        },
+      ],
+      footer: pc.performance_status,
+    },
+    {
+      title: "Forward Outlook",
+      icon: Eye,
+      rows: [
+        { label: "Driver", value: fsp.sentiment_driver },
+        {
+          label: "Volatility",
+          value: fsp.expected_volatility,
+          color:
+            fsp.expected_volatility === "High"
+              ? "error.main"
+              : fsp.expected_volatility === "Medium"
+              ? "text.secondary"
+              : "success.main",
+        },
+      ],
+      footer: fsp.next_1_2_month_outlook,
+    },
+  ];
+
+  return sections;
 };
 
 export const StockDetail = ({ stock, onClose }: Props) => {
@@ -91,99 +164,121 @@ export const StockDetail = ({ stock, onClose }: Props) => {
     stock;
 
   return (
-    <Card elevation={4} sx={{ borderRadius: 3 }}>
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Box display="flex" alignItems="center" gap={2}>
+    <Card elevation={6} sx={{ borderRadius: 3, overflow: "hidden" }}>
+      <Box
+        sx={{
+          background: "#511977",
+          px: 4,
+          py: 3,
+          color: "#fff",
+        }}
+      >
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
             <Typography variant="h4" fontWeight={700}>
               {stock.ticker}
+
             </Typography>
+            <Box display="flex" alignItems="center" gap={2} mt={0.5}>
             <ActionBadge action={decision.action} />
-            <ConvictionStars rating={decision.conviction_rating} />
-            <Typography variant="caption" color="text.secondary">
-              {decision.confidence_level} Confidence
-            </Typography>
+
+              <Typography variant="body2" color="rgba(255, 255, 255, 0.7)">
+                {decision.confidence_level} Confidence
+              </Typography>
+              
+            </Box>
           </Box>
-          <IconButton onClick={onClose}>
-            <X />
-          </IconButton>
+          <Box display="flex" alignItems="center" gap={1}>
+            <ConvictionStars rating={decision.conviction_rating} />
+            <IconButton onClick={onClose} sx={{ color: "#fff" }}>
+              <X />
+            </IconButton>
+          </Box>
         </Box>
-        <Box mb={3}>
-          <SectionHeading icon={MessageSquare} title="CIO Commentary" />
-          <Typography variant="body2" color="text.secondary">
-            {stock.cio_commentary}
-          </Typography>
-        </Box>
+        <Typography variant="subtitle2" mt={2} sx={{ letterSpacing: 3, textTransform: "uppercase" }}>
+          CIO Commentary
+        </Typography>
+        <Typography variant="body2" mt={1} color="rgba(255,255,255,0.85)">
+          {stock.cio_commentary}
+        </Typography>
+      </Box>
 
+      <CardContent>
         <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <SectionHeading icon={DollarSign} title="Price Analysis" />
-                <DataRow label="Current" value={`$${pa.current_price.toFixed(2)}`} />
-                <DataRow label="IPO Price" value={`$${pa.ipo_price.toFixed(2)}`} />
-                <DataRow label="Avg Entry" value={`$${pa.avg_entry_price.toFixed(2)}`} />
-                <DataRow label="Risk to Stop" value={pa.risk_to_stop} valueColor="error.main" />
-                <DataRow
-                  label="To Target"
-                  value={pa.distance_to_target}
-                  valueColor={pa.distance_to_target.includes("+") ? "success.main" : "text.secondary"}
-                />
+          {getDetailSections(pa, pc, fsp).map((section) => (
+            <Grid item xs={12} md={4} key={section.title}>
+              <Box
+                sx={{
+                  border: "1px solid rgba(15,23,42,0.08)",
+                  borderRadius: 2,
+                  p: 2,
+                  height: "100%",
+                }}
+              >
+                <SectionHeading icon={section.icon} title={section.title} />
+                {section.rows.map(({ label, value, color }, idx) => (
+                  <DataRow key={idx} label={label} value={value} valueColor={color} />
+                ))}
                 <Typography variant="caption" color="text.secondary">
-                  {pa.trend_since_ipo}
+                  {section.footer}
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <SectionHeading icon={BarChart3} title="Portfolio Context" />
-                <DataRow label="Days Held" value={pc.days_held} />
-                <DataRow label="Exposure" value={pc.portfolio_exposure} />
-                <DataRow label="Status" value={pc.performance_status.split("(")[0].trim()} valueColor={pnlColor(pc.performance_status)} />
-                <Typography variant="caption" color="text.secondary">
-                  {pc.performance_status}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <SectionHeading icon={Eye} title="Forward Outlook" />
-                <DataRow label="Driver" value={fsp.sentiment_driver} />
-                <DataRow label="Volatility" value={fsp.expected_volatility} valueColor={fsp.expected_volatility === "High" ? "error.main" : fsp.expected_volatility === "Medium" ? "text.secondary" : "success.main"} />
-                <Typography variant="caption" color="text.secondary">
-                  {fsp.next_1_2_month_outlook}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
 
         <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} md={6}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <SectionHeading icon={Zap} title="Catalysts" />
-                <StackSection items={stock.catalysts} prefix="+" />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card variant="outlined" sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <SectionHeading icon={Shield} title="Risks" />
-                <StackSection items={stock.risks} prefix="!" color="error.main" />
-              </CardContent>
-            </Card>
-          </Grid>
+          {[
+            {
+              title: "Catalysts",
+              icon: Zap,
+              items: stock.catalysts,
+              prefix: "+",
+              color: "success.main",
+            },
+            {
+              title: "Risks",
+              icon: Shield,
+              items: stock.risks,
+              prefix: "!",
+              color: "error.main",
+            },
+          ].map((section) => (
+            <Grid item xs={12} md={6} key={section.title}>
+              <Box
+                sx={{
+                  border: "1px solid rgba(15,23,42,0.08)",
+                  borderRadius: 2,
+                  p: 2,
+                }}
+              >
+                <SectionHeading icon={section.icon} title={section.title} />
+                <Stack spacing={1}>
+                  {section.items.map((item, idx) => (
+                    <Box display="flex" gap={1} key={`${section.title}-${idx}`}>
+                      <Typography variant="body2" color={section.color} fontWeight={600}>
+                        {section.prefix}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {item}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
 
         <Grid container spacing={2} mb={3}>
-          <Grid item xs={12} md={6}>
-            <Box>
+          <Grid item xs={12} lg={6}>
+            <Box
+              sx={{
+                border: "1px solid rgba(15,23,42,0.08)",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
               <SectionHeading icon={TrendingUp} title="Sentiment Analysis" />
               <Grid container spacing={1}>
                 {Object.entries(sa).map(([key, val]) => (
@@ -199,8 +294,14 @@ export const StockDetail = ({ stock, onClose }: Props) => {
               </Grid>
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box>
+          <Grid item xs={12} lg={6}>
+            <Box
+              sx={{
+                border: "1px solid rgba(15,23,42,0.08)",
+                borderRadius: 2,
+                p: 2,
+              }}
+            >
               <SectionHeading icon={TrendingDown} title="Fundamentals" />
               <Grid container spacing={1}>
                 {Object.entries(fa).map(([key, val]) => (
@@ -218,15 +319,15 @@ export const StockDetail = ({ stock, onClose }: Props) => {
           </Grid>
         </Grid>
 
-        <Divider sx={{ mb: 3 }} />
-        <Box display="flex" justifyContent="space-between" alignItems="center">
+        {/* <Divider sx={{ mb: 3 }} /> */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
           <Box>
             <SectionHeading icon={Target} title="Suggested Positioning" />
             <Typography variant="body2" color="text.secondary">
               {stock.suggested_positioning}
             </Typography>
           </Box>
-          <Box sx={{ width: 180 }}>
+          <Box sx={{ width: 200 }}>
             <SentimentBar score={(decision.conviction_rating - 3) / 2} label="Conviction" />
           </Box>
         </Box>
@@ -234,26 +335,3 @@ export const StockDetail = ({ stock, onClose }: Props) => {
     </Card>
   );
 };
-
-const StackSection = ({
-  items,
-  prefix,
-  color,
-}: {
-  items: string[];
-  prefix: string;
-  color?: string;
-}) => (
-  <Stack spacing={1}>
-    {items.map((item, idx) => (
-      <Box key={idx} display="flex" gap={1}>
-        <Typography variant="body2" color={color ?? "text.primary"} fontWeight={600}>
-          {prefix}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {item}
-        </Typography>
-      </Box>
-    ))}
-  </Stack>
-);

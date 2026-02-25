@@ -69,14 +69,14 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
     >
       <Box display="flex" flexDirection={{ xs: "column", sm: "row" }} justifyContent="space-between" gap={3} mb={3}>
         <Box>
-          <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: 2 }}>
+          <Typography variant="h4" sx={{ color: "#530478", fontWeight: 600, letterSpacing: 1 }}>
             {metadata.fund_style}
           </Typography>
-          <Typography variant="h3" fontWeight={700} color="text.primary">
+          {/* <Typography variant="h3" fontWeight={700} color="text.primary">
             AI Portfolio <Box component="span" color="primary.main">Sentinel</Box>
-          </Typography>
+          </Typography> */}
           <Typography variant="body2" color="text.secondary">
-            {metadata.analysis_focus} · {metadata.investment_horizon} horizon · {metadata.report_date}
+            {metadata.analysis_focus} | {metadata.investment_horizon} horizon | {metadata.report_date}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="flex-end">
@@ -90,21 +90,21 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
         <Grid item xs={12} md={7}>
           <Box display="flex" alignItems="center" gap={1} mb={1}>
             <Activity size={18} color="#0f172a" />
-            <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: "uppercase", color: "text.secondary" }}>
+            <Typography variant="h6" sx={{ letterSpacing: 2, textTransform: "uppercase", color: "#184dc9" }}>
               Market View
             </Typography>
           </Box>
-          <Typography variant="body1" color="text.primary" paragraph>
+          <Typography variant="body1" color="#000000" paragraph>
             {summary.market_view}
           </Typography>
           <Box borderTop="1px solid rgba(15,23,42,0.08)" pt={2} mt={2}>
             <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-              <BarChart3 size={16} color="#0f172a" />
-              <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: "uppercase", color: "text.secondary" }}>
+              {/* <BarChart3 size={16} color="#0f172a" /> */}
+            <Typography variant="h6" sx={{ fontWeight: 2, textTransform: "uppercase", color: "#184dc9" }}>
                 Forward Outlook
               </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary">
+          <Typography variant="body1" color="#000000" paragraph>
               {summary.forward_sentiment_outlook}
             </Typography>
           </Box>
@@ -115,7 +115,7 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
               <TrendingUp size={18} color="#047857" />
               <Typography
                 variant="caption"
-                sx={{ letterSpacing: 2, textTransform: "uppercase", color: "text.secondary" }}
+                sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#5618c9" }}
               >
                 Top Picks
               </Typography>
@@ -144,7 +144,7 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
               <AlertTriangle size={18} color="#dc2626" />
               <Typography
                 variant="caption"
-                sx={{ letterSpacing: 2, textTransform: "uppercase", color: "text.secondary" }}
+                sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#dc2626" }}
               >
                 Key Risks
               </Typography>
@@ -155,7 +155,7 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
                   <Typography variant="body2" sx={{ fontWeight: 600, color: "text.secondary" }}>
                     •
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="#dc2626">
                     {risk}
                   </Typography>
                 </Box>
