@@ -294,6 +294,11 @@ const NavbarMain: React.FC = () => {
                   icon: <PsychologyIcon fontSize="small" />,
                   reload: false,
                 },
+                      {
+                  label: "Last 30 Days IPO AI Ranking",
+                  path: "/last_30_days_ai_ranking",
+                  icon: <AutoAwesomeIcon fontSize="small" />,
+                },
                 {
                   label: "ABB Model",
                   path: "/equity/abb_model",
