@@ -55,13 +55,14 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
+       {
+        label: "Deal Bot",
+      },
       { label: "Peer Deals Performance", requiresWriteup: true },
       { label: "AI - Sentiment View" },
       { label: "Previous FO deals" },
       { label: "ML Model" },
-      {
-        label: "Deal Bot",
-      },
+     
       { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },

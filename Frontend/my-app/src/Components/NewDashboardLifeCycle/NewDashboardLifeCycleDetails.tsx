@@ -52,13 +52,14 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "Write Up Old" },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
+       {
+        label: "Deal Bot",
+      },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
       { label: "AI based on previous 30 deals" },
       { label: "ML Model" },
-      {
-        label: "Deal Bot",
-      },
+     
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
