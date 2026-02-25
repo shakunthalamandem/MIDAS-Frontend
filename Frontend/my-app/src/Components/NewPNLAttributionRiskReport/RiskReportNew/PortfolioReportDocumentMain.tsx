@@ -318,9 +318,9 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           transition: "width 0.3s ease, min-width 0.3s ease",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#fff",
+          backgroundColor: "#eef2ff",
           overflow: "hidden",
-          borderRight: "1px solid #e2e8f0",
+          borderRight: "1px solid #c7d2fe",
         }}
       >
         {/* Logo */}
@@ -331,7 +331,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
             display: "flex",
             alignItems: "center",
             gap: 1.5,
-            borderBottom: "1px solid #e2e8f0",
+            borderBottom: "1px solid #c7d2fe",
             minHeight: 52,
           }}
         >
@@ -395,15 +395,15 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                     ? "3px solid #2563eb"
                     : "3px solid transparent",
                   backgroundColor: isActive
-                    ? "#eff6ff"
+                    ? "#dbeafe"
                     : "transparent",
                   color: isActive ? "#2563eb" : "#64748b",
                   transition: "all 0.2s",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   "&:hover": {
                     backgroundColor: isActive
-                      ? "#eff6ff"
-                      : "#f8fafc",
+                      ? "#dbeafe"
+                      : "#e0e7ff",
                     color: isActive ? "#2563eb" : "#475569",
                   },
                 }}
@@ -439,7 +439,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
               fontSize: 10,
               color: "#94a3b8",
               letterSpacing: 0.5,
-              borderTop: "1px solid #e2e8f0",
+              borderTop: "1px solid #c7d2fe",
               textTransform: "uppercase",
             }}
           >
@@ -455,14 +455,14 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           sx={{
             px: 3,
             py: 2,
-            borderBottom: "1px solid #e2e8f0",
-            backgroundColor: "#fff",
+            borderBottom: "1px solid #c7d2fe",
+            backgroundColor: "#eef2ff",
             display: "flex",
             alignItems: "center",
             minHeight: 72,
           }}
         >
-          <IconButton
+          {/* <IconButton
             size="small"
             onClick={handleBack}
             sx={{
@@ -473,7 +473,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
             }}
           >
             <ArrowBackIcon fontSize="small" />
-          </IconButton>
+          </IconButton> */}
           <Box sx={{ flex: 1, textAlign: "center" }}>
             <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#1e293b" }}>
               <Box component="span" sx={{ color: "#2563eb" }}>

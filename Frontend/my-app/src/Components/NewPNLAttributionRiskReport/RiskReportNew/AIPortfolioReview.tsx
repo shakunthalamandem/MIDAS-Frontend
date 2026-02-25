@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Container,
   TextField,
   Typography,
 } from "@mui/material";
@@ -124,23 +125,16 @@ const AIPortfolioReview: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        px: { xs: 1, sm: 3, md: 4 },
-        py: 3,
-        background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)",
-      }}
-    >
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+
       {/* Tab bar with inline search */}
       <Box
         sx={{
-          maxWidth: 1280,
+          // maxWidth: 1280,
           mx: "auto",
-          borderRadius: 3,
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
-          backgroundColor: "#fff",
-          border: "1px solid #e2e8f0",
+          borderRadius: 2,
+          backgroundColor: "#eef2ff",
+          border: "1px solid #c7d2fe",
           px: 2,
           py: 1.2,
           display: "flex",
@@ -268,20 +262,14 @@ const AIPortfolioReview: React.FC = () => {
       {/* Content area */}
       <Box
         sx={{
-          mt: 3,
-          maxWidth: 1260,
+          mt: 2,
+          // maxWidth: 1280,
           mx: "auto",
-          bgcolor: "#fff",
-          borderRadius: 3,
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
-          border: "1px solid #e2e8f0",
-          px: { xs: 2, md: 4 },
-          py: { xs: 3, md: 4 },
         }}
       >
         {renderContent()}
       </Box>
-    </Box>
+    </Container> 
   );
 };
 
