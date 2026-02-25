@@ -27,6 +27,7 @@ import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome"
 import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
 import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
+import DealBot from "./DealBot";
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -55,6 +56,9 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "AI - Sentiment View" },
       { label: "Previous FO deals" },
       { label: "ML Model" },
+      {
+        label: "Deal Bot",
+      },
       { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
@@ -294,7 +298,19 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               dealType={activePayload.deal_type}
             />
           ) : (
-            <PageUnderDevelopment />
+            tabItems[tabValue]?.label === "Deal Bot" ? (
+              <DealBot
+                basicDealDetails={{
+                  deal_id: activePayload.deal_id,
+                  unique_deal_id: activePayload.unique_deal_id,
+                  ticker: activePayload.ticker,
+                  pricing_date: activePayload.pricing_date,
+                  deal_type: activePayload.deal_type,
+                }}
+              />
+            ) : (
+              <PageUnderDevelopment />
+            )
           )}
         </Box>
       </Paper>
