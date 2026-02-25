@@ -72,7 +72,7 @@ const PortfolioDocumentUpload: React.FC = () => {
     formData.append("report_type", reportType);   // ✅ added
 
     try {
-      const res = await fetch(`${apiUrl}/api/ai_output/upload/`, {
+      const res = await fetch(`${apiUrl}/api/ai_agents_data_uploads/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
