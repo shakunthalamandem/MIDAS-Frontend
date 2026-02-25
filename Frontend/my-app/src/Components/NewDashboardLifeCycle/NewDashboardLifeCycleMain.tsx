@@ -561,12 +561,12 @@ const NewDealsLifecycleCards: React.FC = () => {
       <Container maxWidth="xl" sx={{ mt: 2, mb: 0, px: { xs: 1, md: 1.5 } }}>
         <Box
           sx={{
-            backgroundColor: "#bfc0dd",
+            background: "linear-gradient(135deg, #002060 0%, #003494 100%)",
             borderRadius: 3,
             px: { xs: 2, md: 2.5 },
             py: { xs: 2, md: 2.5 },
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 10px 24px rgba(15,23,42,0.06)",
+            border: "1px solid #001845",
+            boxShadow: "0 10px 24px rgba(0,32,96,0.25)",
           }}
         >
           <Stack spacing={1.5}>
@@ -579,7 +579,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                 flexWrap: "wrap",
               }}
             >
-              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#6b7280" }}>
+              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#ffffff" }}>
                 Tracking:
               </Typography>
               <Stack direction="row" spacing={0.75} alignItems="center">
@@ -588,10 +588,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                     px: 1.25,
                     py: 0.4,
                     borderRadius: 1,
-                    backgroundColor: "#e8edff",
-                    color: "#334155",
+                    backgroundColor: "rgba(255,255,255,0.15)",
+                    color: "#ffffff",
                     fontSize: "0.75rem",
                     fontWeight: 700,
+                    border: "1px solid rgba(255,255,255,0.25)",
                   }}
                 >
                   {selectedOp === "live" ? "Recent" : "Upcoming"}
@@ -601,10 +602,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                     px: 1.25,
                     py: 0.4,
                     borderRadius: 1,
-                    backgroundColor: "#e8edff",
-                    color: "#334155",
+                    backgroundColor: "rgba(255,255,255,0.15)",
+                    color: "#ffffff",
                     fontSize: "0.75rem",
                     fontWeight: 700,
+                    border: "1px solid rgba(255,255,255,0.25)",
                   }}
                 >
                   {selectedDealType}
@@ -614,10 +616,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                     px: 1.25,
                     py: 0.4,
                     borderRadius: 1,
-                    backgroundColor: "#e8edff",
-                    color: "#334155",
+                    backgroundColor: "rgba(255,255,255,0.15)",
+                    color: "#ffffff",
                     fontSize: "0.75rem",
                     fontWeight: 700,
+                    border: "1px solid rgba(255,255,255,0.25)",
                   }}
                 >
                   {selectedRegion}

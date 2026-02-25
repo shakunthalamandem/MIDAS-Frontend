@@ -145,7 +145,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
           }}
         >
           <Box sx={sectionSx}>
-            <Typography sx={sectionLabelSx}>Timing:</Typography>
+            {/* <Typography sx={sectionLabelSx}>Timing:</Typography> */}
             <ToggleButtonGroup
               value={selectedOp || tabs[0]?.value}
               exclusive
@@ -153,15 +153,15 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               sx={{
                 ...pillGroupSx,
                 "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                  backgroundColor: "#6d28d9",
+                  backgroundColor: "#002060",
                   color: "#ffffff",
                 },
                 "& .Mui-selected": {
-                  backgroundColor: "#6d28d9",
+                  backgroundColor: "#002060",
                   color: "#ffffff",
                 },
                 "& .Mui-selected:hover": {
-                  backgroundColor: "#6d28d9",
+                  backgroundColor: "#002060",
                   color: "#ffffff",
                 },
               }}
@@ -184,15 +184,15 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 sx={{
                   ...pillGroupSx,
                   "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                    backgroundColor: "#ec4899",
+                    backgroundColor: "#002060",
                     color: "#ffffff",
                   },
                   "& .Mui-selected": {
-                    backgroundColor: "#ec4899",
+                    backgroundColor: "#002060",
                     color: "#ffffff",
                   },
                   "& .Mui-selected:hover": {
-                    backgroundColor: "#ec4899",
+                    backgroundColor: "#002060",
                     color: "#ffffff",
                   },
                 }}
@@ -211,7 +211,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 selectedRegion={selectedRegion}
                 onSelect={onSelectRegion}
                 compact
-                hoverColor="#16a34a"
+                hoverColor="#002060"
               />
             </Box>
           </Box>
@@ -287,16 +287,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 backgroundColor: "#ffffff",
               },
               "& .MuiToggleButton-root:hover": {
-                backgroundColor: "#000000",
+                backgroundColor: "#002060",
                 color: "#ffffff",
               },
               "& .MuiToggleButton-root.Mui-selected": {
                 color: "#ffffff",
-                backgroundColor: "#000000",
-                boxShadow: "0 8px 18px rgba(0,0,0,0.2)",
+                backgroundColor: "#002060",
+                boxShadow: "0 8px 18px rgba(0,32,96,0.3)",
               },
               "& .MuiToggleButton-root.Mui-selected:hover": {
-                backgroundColor: "#000000",
+                backgroundColor: "#002060",
                 color: "#ffffff",
               },
             }}
