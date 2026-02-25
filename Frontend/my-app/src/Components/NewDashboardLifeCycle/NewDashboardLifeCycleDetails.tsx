@@ -130,7 +130,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             formatDate={formatDate}
             onBack={() =>
               navigate("/deals/new_dashboard", {
-                state: { viewMode: viewMode === "table" ? "table" : "card" },
+                state: {
+                  viewMode: viewMode === "table" ? "table" : "card",
+                  dashboardState: (location.state as any)?.dashboardState,
+                },
               })
             }
             SearchComponent={
@@ -160,15 +163,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               "& .MuiTabs-indicator": {
                 display: "none",
               },
-                "& .MuiTab-root": {
-                  textTransform: "none",
-                  fontWeight: 600,
-                  color: "#0f0f0fff",
-                  fontSize: "0.725rem",
-                  minHeight: 40,
-                  px: 2,
-                  borderRadius: 999,
-                  border: "1px solid #e2e8f0",
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                color: "#0f0f0fff",
+                fontSize: "0.725rem",
+                minHeight: 40,
+                px: 2,
+                borderRadius: 999,
+                border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
                 boxShadow: "none",
                 transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
@@ -182,19 +185,19 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             }}
           >
             {tabItems.map((item) => (
-                <Tab
-                  key={item.label}
-                  iconPosition="start"
-                  label={item.label}
-                  sx={{
-                    borderRadius: 999,
-                    mr: 1,
-                    "&.Mui-selected": {
-                      color: "#ffff",
-                      backgroundColor: "#262268ff",
-                    },
-                  }}
-                />
+              <Tab
+                key={item.label}
+                iconPosition="start"
+                label={item.label}
+                sx={{
+                  borderRadius: 999,
+                  mr: 1,
+                  "&.Mui-selected": {
+                    color: "#ffff",
+                    backgroundColor: "#262268ff",
+                  },
+                }}
+              />
             ))}
           </Tabs>
         </Paper>
@@ -202,20 +205,20 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           {tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
-          <FebWriteUpDashboardMain
-            basicDealDetails={{
-              deal_id: activePayload.deal_id,
-              unique_deal_id: activePayload.unique_deal_id,
-              ticker: activePayload.ticker,
-              pricing_date: activePayload.pricing_date,
-              region: activePayload.region,
-              deal_type: activePayload.deal_type,
-              issuer_name: activePayload.issuer_name,
-              exchange: activePayload.exchange,
-            }}
-          />
+              <FebWriteUpDashboardMain
+                basicDealDetails={{
+                  deal_id: activePayload.deal_id,
+                  unique_deal_id: activePayload.unique_deal_id,
+                  ticker: activePayload.ticker,
+                  pricing_date: activePayload.pricing_date,
+                  region: activePayload.region,
+                  deal_type: activePayload.deal_type,
+                  issuer_name: activePayload.issuer_name,
+                  exchange: activePayload.exchange,
+                }}
+              />
 
-              
+
             ) : (
               <NewDashboardLifeCycleOverviewFO
                 ticker={activePayload.ticker}
@@ -233,7 +236,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             )
 
 
-          )  : tabItems[tabValue]?.label === "Deal Recommendation" ? (
+          ) : tabItems[tabValue]?.label === "Deal Recommendation" ? (
             isUpcoming ? (
               // <UpcomingDealRecomendation ticker={activePayload.ticker}
               // />
@@ -247,16 +250,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
-            
+
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "ML Model" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "AI based on previous 30 deals" ? (
             <DashboardAIFewShotAnalysis
-                basicDealDetails={{
-                  unique_deal_id: activePayload.unique_deal_id,
-                }}
+              basicDealDetails={{
+                unique_deal_id: activePayload.unique_deal_id,
+              }}
               prefillTicker={{
                 ticker: activePayload.ticker,
                 pricing_date: activePayload.pricing_date ?? null,

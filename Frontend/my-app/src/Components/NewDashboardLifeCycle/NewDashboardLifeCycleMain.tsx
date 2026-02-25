@@ -246,6 +246,22 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [selectedOp, selectedRegion, selectedDealType]);
 
   useEffect(() => {
+  const state = location.state as any;
+
+  if (state?.dashboardState) {
+    const {
+      liveStartDate,
+      liveEndDate,
+    } = state.dashboardState;
+
+    if (liveStartDate) setLiveStartDate(dayjs(liveStartDate));
+    if (liveEndDate) setLiveEndDate(dayjs(liveEndDate));
+    // 🔥 Clear state after restoring
+    navigate(location.pathname, { replace: true, state: null });
+  }
+}, []);
+
+  useEffect(() => {
     localStorage.setItem("newDashboardSelectedRegion", selectedRegion);
   }, [selectedRegion]);
 
@@ -263,12 +279,12 @@ const NewDealsLifecycleCards: React.FC = () => {
     }
   }, [locationViewMode]);
 
-  useEffect(() => {
-    if (selectedOp === "live") {
-      setLiveStartDate(dayjs().subtract(30, "day"));
-      setLiveEndDate(dayjs());
-    }
-  }, [selectedOp]);
+  // useEffect(() => {
+  //   if (selectedOp === "live") {
+  //     setLiveStartDate(dayjs().subtract(30, "day"));
+  //     setLiveEndDate(dayjs());
+  //   }
+  // }, [selectedOp]);
 
   const isPipelineView = selectedOp === "pipeline";
 
@@ -369,8 +385,17 @@ const NewDealsLifecycleCards: React.FC = () => {
       : "/deals/new_dashboard/details";
 
   navigate(targetPath, {
-    state: { payload: row, viewMode, ...(extraState || {}) },
-  });
+  state: {
+    payload: row,
+    viewMode,
+    dashboardState: {
+      liveStartDate: liveStartDate?.toISOString() ?? null,
+      liveEndDate: liveEndDate?.toISOString() ?? null,
+     
+    },
+    ...(extraState || {}),
+  },
+});
 };
 
 
