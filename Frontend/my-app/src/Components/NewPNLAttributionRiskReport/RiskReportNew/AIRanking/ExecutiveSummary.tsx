@@ -92,10 +92,11 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
         boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
       }}
     >
-      {/* Dark header band */}
+      {/* Header band */}
       <Box
         sx={{
-          background: "linear-gradient(135deg, #071852 0%, #0f2a7a 100%)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)",
+          borderBottom: "2px solid #e2e8f0",
           px: { xs: 3, md: 4 },
           py: 2.5,
           display: "flex",
@@ -106,10 +107,10 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
         }}
       >
         <Box>
-          <Typography variant="h5" sx={{ color: "#fff", fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ color: "#002060", fontWeight: 700 }}>
             {metadata.fund_style}
           </Typography>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)", mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
             {metadata.analysis_focus} · {metadata.investment_horizon} horizon · {metadata.report_date}
           </Typography>
         </Box>
