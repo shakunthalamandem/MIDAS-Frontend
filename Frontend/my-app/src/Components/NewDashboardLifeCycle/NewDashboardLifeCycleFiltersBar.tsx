@@ -152,9 +152,6 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                         format="DD-MM-YYYY"
                         onChange={(value) => {
                           setLiveStartDate(value);
-                          if (value && liveEndDate && value.isAfter(liveEndDate)) {
-                            setLiveEndDate(value);
-                          }
                         }}
                         slotProps={{
                           textField: {
@@ -181,9 +178,6 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                         format="DD-MM-YYYY"
                         onChange={(value) => {
                           setLiveEndDate(value);
-                          if (value && liveStartDate && value.isBefore(liveStartDate)) {
-                            setLiveStartDate(value);
-                          }
                         }}
                         slotProps={{
                           textField: {

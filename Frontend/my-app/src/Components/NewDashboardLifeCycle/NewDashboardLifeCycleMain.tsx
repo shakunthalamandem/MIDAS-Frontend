@@ -39,6 +39,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const location = useLocation();
   const storedRegion = localStorage.getItem("newDashboardSelectedRegion");
   const storedDealType = localStorage.getItem("newDashboardSelectedDealType");
+  const storedSelectedOp = localStorage.getItem("newDashboardSelectedOp");
   const initialRegion: "US" | "EMEA" | "APAC" | "Non-US America" =
     storedRegion === "US" || storedRegion === "APAC" || storedRegion === "EMEA"
       ? storedRegion
@@ -47,7 +48,9 @@ const NewDealsLifecycleCards: React.FC = () => {
     storedDealType === "FO" ? "FO" : "IPO";
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedOp, setSelectedOp] = useState<string>("upcoming");
+  const [selectedOp, setSelectedOp] = useState<string>(
+    storedSelectedOp ?? "upcoming"
+  );
   const [dealSearch, setDealSearch] = useState("");
   const [pipelineSearch, setPipelineSearch] = useState("");
   const [selectedDealType, setSelectedDealType] =
@@ -249,6 +252,10 @@ const NewDealsLifecycleCards: React.FC = () => {
   useEffect(() => {
     localStorage.setItem("newDashboardSelectedDealType", selectedDealType);
   }, [selectedDealType]);
+
+  useEffect(() => {
+    localStorage.setItem("newDashboardSelectedOp", selectedOp);
+  }, [selectedOp]);
 
   useEffect(() => {
     if (locationViewMode === "card" || locationViewMode === "table") {
