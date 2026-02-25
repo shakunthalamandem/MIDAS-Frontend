@@ -16,7 +16,7 @@ import { ActionBadge } from "./ActionBadge";
 import { ConvictionStars } from "./ConvictionStars";
 import { SentimentBar } from "./SentimentBar";
 
-interface RankingRow {
+export interface RankingRow {
   rank: number;
   ticker: string;
   action: string;

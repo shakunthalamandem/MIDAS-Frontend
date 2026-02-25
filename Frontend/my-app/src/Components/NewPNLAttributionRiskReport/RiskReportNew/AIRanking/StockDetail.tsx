@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { SentimentBar } from "./SentimentBar";
 
-interface StockData {
+export interface StockData {
   ticker: string;
   decision: { action: string; confidence_level: string; conviction_rating: number };
   cio_commentary: string;
