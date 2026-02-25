@@ -392,7 +392,17 @@ const NewDealsLifecycleCards: React.FC = () => {
         hideFoTypeColumn={selectedDealType === "IPO"}
       />
     ) : (
-      renderCards(list)
+      renderCards(
+        selectedOp === "live"
+          ? [...list].sort((a, b) => {
+              const dateA = dayjs(a?.pricing_date);
+              const dateB = dayjs(b?.pricing_date);
+              const valueA = dateA.isValid() ? dateA.valueOf() : -Infinity;
+              const valueB = dateB.isValid() ? dateB.valueOf() : -Infinity;
+              return valueB - valueA;
+            })
+          : list
+      )
     );
 
   const renderPipelineList = (list: any[]) =>
