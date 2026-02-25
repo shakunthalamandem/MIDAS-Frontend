@@ -563,8 +563,8 @@ const NewDealsLifecycleCards: React.FC = () => {
           sx={{
             backgroundColor: "#ffffff",
             borderRadius: 3,
-            px: { xs: 1.5, md: 2 },
-            py: { xs: 1.5, md: 2 },
+            px: { xs: 2, md: 2.5 },
+            py: { xs: 2, md: 2.5 },
             border: "1px solid #e2e8f0",
             boxShadow: "0 10px 24px rgba(15,23,42,0.06)",
           }}
@@ -573,7 +573,7 @@ const NewDealsLifecycleCards: React.FC = () => {
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "center",
                 alignItems: "center",
                 gap: 1,
                 flexWrap: "wrap",

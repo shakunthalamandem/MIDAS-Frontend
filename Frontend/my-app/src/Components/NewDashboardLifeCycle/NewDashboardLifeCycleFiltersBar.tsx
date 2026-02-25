@@ -82,16 +82,20 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
     display: "flex",
     alignItems: "center",
     gap: 1,
-    pr: { xs: 0, md: 1.5 },
-    mr: { xs: 0, md: 1.5 },
-    borderRight: { xs: "none", md: "1px solid #e2e8f0" },
+    pr: 1,
+    pl: 1.1,
+    py: 0.35,
+    borderRadius: 999,
+    border: "1px solid #d7ddea",
+    backgroundColor: "#ffffff",
+    mr: 0.5,
   };
 
   const pillGroupSx = {
-    backgroundColor: "#f4f6fb",
+    backgroundColor: "transparent",
     p: 0.35,
     borderRadius: 9999,
-    border: "1px solid #d7ddea",
+    border: "none",
     display: "inline-flex",
     gap: 0.35,
     flexShrink: 0,
@@ -101,20 +105,15 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
     "& .MuiToggleButton-root": {
       textTransform: "none",
       borderRadius: 9999,
-      border: 0,
-      px: inline ? 1.2 : 1.6,
-      py: 0.25,
-      minHeight: inline ? 28 : 30,
+      border: "none",
+      px: inline ? 1.3 : 1.7,
+      py: 0.3,
+      minHeight: inline ? 28 : 32,
       fontWeight: 700,
       fontSize: inline ? "0.72rem" : "0.78rem",
       color: "#5c6680",
       backgroundColor: "transparent",
       transition: "all 0.2s ease",
-    },
-    "& .Mui-selected": {
-      backgroundColor: "#2b146f",
-      color: "#ffffff",
-      boxShadow: "0 6px 14px rgba(43,20,111,0.2)",
     },
   };
 
@@ -127,8 +126,8 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
           justifyContent: "space-between",
           gap: 1.5,
           flexWrap: { xs: "wrap", lg: "nowrap" },
-          px: { xs: 1, md: 1.5 },
-          py: 1,
+          px: { xs: 1.5, md: 2 },
+          py: 1.25,
           borderRadius: 2.5,
           border: "1px solid #e2e8f0",
           backgroundColor: "#ffffff",
@@ -151,7 +150,17 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               value={selectedOp || tabs[0]?.value}
               exclusive
               onChange={(_e, value) => onSelectOp(value ?? selectedOp)}
-              sx={pillGroupSx}
+              sx={{
+                ...pillGroupSx,
+                "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
+                  backgroundColor: "#6d28d9",
+                  color: "#ffffff",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#6d28d9",
+                  color: "#ffffff",
+                },
+              }}
             >
               {tabs.map((option) => (
                 <ToggleButton key={option.value} value={option.value}>
@@ -168,7 +177,17 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 value={selectedDealType}
                 exclusive
                 onChange={(_e, value) => value && onSelectDealType(value)}
-                sx={pillGroupSx}
+                sx={{
+                  ...pillGroupSx,
+                  "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
+                    backgroundColor: "#ec4899",
+                    color: "#ffffff",
+                  },
+                  "& .Mui-selected": {
+                    backgroundColor: "#ec4899",
+                    color: "#ffffff",
+                  },
+                }}
               >
                 <ToggleButton value="IPO">IPO</ToggleButton>
                 <ToggleButton value="FO">FO</ToggleButton>
@@ -184,11 +203,12 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 selectedRegion={selectedRegion}
                 onSelect={onSelectRegion}
                 compact
+                hoverColor="#16a34a"
               />
             </Box>
           </Box>
 
-          <Box sx={{ ...sectionSx, borderRight: "none", mr: 0, pr: 0 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 0 }}>
             {/* <Typography sx={sectionLabelSx}>Search:</Typography> */}
             <TextField
               size="small"

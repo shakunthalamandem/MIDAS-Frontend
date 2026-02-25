@@ -12,6 +12,8 @@ type RegionTabsProps = {
   selectedRegion: string;
   onSelect: (value: string) => void;
   compact?: boolean;
+  hoverColor?: string;
+  selectedColor?: string;
 };
 
 const RegionTabs: React.FC<RegionTabsProps> = ({
@@ -19,6 +21,8 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
   selectedRegion,
   onSelect,
   compact = false,
+  hoverColor = "#22c55e",
+  selectedColor,
 }) => (
   <Stack
     direction="row"
@@ -28,6 +32,7 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
   >
     {tabs.map((item) => {
       const isSelected = selectedRegion === item.value;
+      const activeColor = selectedColor ?? hoverColor;
       return (
         <Paper
           key={item.value}
@@ -39,15 +44,16 @@ const RegionTabs: React.FC<RegionTabsProps> = ({
             cursor: "pointer",
             fontWeight: 600,
             fontSize: compact ? "0.7rem" : "0.8rem",
-            border: isSelected ? "1px solid #2b146f" : "1px solid #d7ddea",
-            backgroundColor: isSelected ? "#2b146f" : "#ffffff",
+            border: "none",
+            backgroundColor: isSelected ? activeColor : "transparent",
             color: isSelected ? "#ffffff" : "#1f2a44",
-            boxShadow: isSelected ? "0 8px 18px rgba(43,20,111,0.18)" : "none",
+            boxShadow: "none",
             transition: "all 0.2s ease",
             display: "inline-flex",
             alignItems: "center",
             "&:hover": {
-              backgroundColor: isSelected ? "#24105f" : "#f6f8fc",
+              backgroundColor: activeColor,
+              color: "#ffffff",
             },
           }}
         >
