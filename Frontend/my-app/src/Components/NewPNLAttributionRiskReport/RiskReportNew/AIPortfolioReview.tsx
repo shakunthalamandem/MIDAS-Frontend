@@ -143,7 +143,7 @@ const AIPortfolioReview: React.FC = () => {
           mx: "auto",
           borderRadius: 2,
           backgroundColor: "#071852",
-          border: "1px solid #c7d2fe",
+          border: "1px solid #1e3a6e",
           px: 2,
           py: 1.2,
           display: "flex",
@@ -167,19 +167,20 @@ const AIPortfolioReview: React.FC = () => {
                   fontSize: 13,
                   px: 3,
                   py: 0.8,
-                  color: isActive ? "#fff" : "#475569",
+                  color: isActive ? "#fff" : "#94a3b8",
                   background: isActive
-                    ? "#002060"
-                    : "transparent",
-                  border: isActive ? "1px solid #002060" : "1px solid #e2e8f0",
+                    ? "#1e40af"
+                    : "rgba(255, 255, 255, 0.05)",
+                  border: isActive ? "1px solid #3b82f6" : "1px solid rgba(255, 255, 255, 0.15)",
                   boxShadow: isActive
-                    ? "0 2px 8px rgba(0, 32, 96, 0.3)"
+                    ? "0 2px 10px rgba(59, 130, 246, 0.4)"
                     : "none",
                   whiteSpace: "nowrap",
                   "&:hover": {
                     background: isActive
-                      ? "#001a50"
-                      : "#f1f5f9",
+                      ? "#1d4ed8"
+                      : "rgba(255, 255, 255, 0.12)",
+                    color: "#fff",
                   },
                 }}
               >
