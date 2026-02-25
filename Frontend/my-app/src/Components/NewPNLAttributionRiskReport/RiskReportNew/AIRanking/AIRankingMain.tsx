@@ -163,7 +163,7 @@ const AIRankingMain: React.FC<AIRankingMainProps> = ({ selectedReport: externalR
               />
             </Box>
             <Typography variant="h5" fontWeight={700} mb={0.5} color="#1e293b">
-              Portfolio AI Stock Ranking
+              Last 30 Days IPO AI Ranking
             </Typography>
             <Typography variant="body2" color="#64748b">
               Select a report from the search bar above to view AI-driven stock analysis and rankings

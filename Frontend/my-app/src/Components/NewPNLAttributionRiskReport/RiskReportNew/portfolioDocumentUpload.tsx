@@ -161,7 +161,7 @@ const PortfolioDocumentUpload: React.FC = () => {
             sx={{ mb: 2 }}
           >
             <MenuItem value="US  Equity Portfolio AI Review">US  Equity Portfolio AI Review</MenuItem>
-            <MenuItem value="Portfolio AI Stock Ranking">Portfolio AI Stock Ranking</MenuItem>
+            <MenuItem value="Last 30 Days IPO AI Ranking">Last 30 Days IPO AI Ranking</MenuItem>
             <MenuItem value="Inidividual Stock CIO AI REview">Inidividual Stock CIO AI REview</MenuItem>
           </TextField>
 

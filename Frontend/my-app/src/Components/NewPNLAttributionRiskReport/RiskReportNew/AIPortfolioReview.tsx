@@ -30,7 +30,7 @@ interface RankingReportItem {
 
 const tabConfig = [
   { key: "portfolioReview", label: "US  Equity Portfolio AI Review" },
-  { key: "stockRanking", label: "Portfolio AI Stock Ranking" },
+  { key: "stockRanking", label: "Last 30 Days IPO AI Ranking" },
 ];
 
 const AIPortfolioReview: React.FC = () => {
@@ -93,7 +93,7 @@ const AIPortfolioReview: React.FC = () => {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ report_type: "Portfolio AI Stock Ranking" }),
+          body: JSON.stringify({ report_type: "Last 30 Days IPO AI Ranking" }),
         });
         if (res.ok) {
           const data = await res.json();
