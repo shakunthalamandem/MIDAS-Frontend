@@ -36,6 +36,7 @@ import MonthlyOutlook from "./sections/MonthlyOutlook";
 import ActionChecklists from "./sections/ActionChecklists";
 import ActionMatrix from "./sections/ActionMatrix";
 import GenericDataRenderer from "./sections/GenericDataRenderer";
+import AIPortfolioReviewPDFExporter from "./AIPortfolioReviewPDFExporter";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -504,7 +505,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
             {header.pnl && (
               <Chip
                 label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
@@ -533,12 +534,20 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                 }}
               />
             )}
+            <AIPortfolioReviewPDFExporter
+              exportContainerId="ai-portfolio-review-content"
+              fileName={`AI_Portfolio_Review_${header.date || "report"}.pdf`}
+              reportTitle={`US PORTFOLIO REVIEW - ${header.report_title || ""}`}
+              reportDate={formatDate(header.date)}
+              aum={header.aum_formatted || ""}
+            />
           </Box>
         </Box>
 
         {/* Scrollable Content */}
         <Box
           ref={contentRef}
+          id="ai-portfolio-review-content"
           sx={{
             flex: 1,
             overflowY: "auto",
@@ -559,6 +568,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
               <Box
                 key={item.key}
                 data-section-key={item.key}
+                className="pdf-section"
                 ref={(el: HTMLDivElement | null) => {
                   sectionRefs.current[item.key] = el;
                 }}
