@@ -63,28 +63,28 @@ const AIPortfolioReviewPDFExporter: React.FC<
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const marginX = 10;
+      const marginX = 4;
       const contentWidth = pdfWidth - marginX * 2;
-      const bottomMargin = 18;
-      const headerHeight = 28;
+      const bottomMargin = 10;
+      const headerHeight = 20;
 
       const drawPageHeader = () => {
         pdf.setFillColor(0, 32, 96);
         pdf.rect(0, 0, pdfWidth, headerHeight, "F");
 
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(14);
+        pdf.setFontSize(11);
         pdf.setTextColor(255, 255, 255);
-        pdf.text(reportTitle, marginX, 12);
+        pdf.text(reportTitle, marginX, 8);
 
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setTextColor(180, 200, 230);
         const subtitle = [reportDate, aum ? `AUM: ${aum}` : ""]
           .filter(Boolean)
           .join("  |  ");
         if (subtitle) {
-          pdf.text(subtitle, marginX, 19);
+          pdf.text(subtitle, marginX, 14);
         }
 
         pdf.setFontSize(7);
@@ -97,7 +97,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
           hour: "2-digit",
           minute: "2-digit",
         });
-        pdf.text(`Generated: ${timestamp}`, pdfWidth - marginX, 19, {
+        pdf.text(`Generated: ${timestamp}`, pdfWidth - marginX, 14, {
           align: "right",
         });
 
@@ -106,14 +106,14 @@ const AIPortfolioReviewPDFExporter: React.FC<
         pdf.line(0, headerHeight, pdfWidth, headerHeight);
 
         pdf.setTextColor(0, 0, 0);
-        return headerHeight + 6;
+        return headerHeight + 3;
       };
 
       // Capture a section to canvas
       const captureSection = async (section: HTMLElement) => {
-        const captureWidth = Math.max(section.scrollWidth, 1200);
+        const captureWidth = Math.max(section.scrollWidth, 1100);
         const canvas = await html2canvas(section, {
-          scale: 2,
+          scale: 2.5,
           backgroundColor: "#ffffff",
           useCORS: true,
           logging: false,
@@ -134,7 +134,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
 
         // If it fits on the current page, just place it
         if (startY + imgHeight <= pdfHeight - bottomMargin) {
-          const imgData = canvas.toDataURL("image/jpeg", 0.92);
+          const imgData = canvas.toDataURL("image/jpeg", 0.95);
           pdf.addImage(
             imgData,
             "JPEG",
@@ -143,7 +143,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
             imgWidth,
             imgHeight
           );
-          return startY + imgHeight + 4;
+          return startY + imgHeight + 2;
         }
 
         // Otherwise, slice into page-height chunks
@@ -180,7 +180,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
             );
           }
 
-          const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.92);
+          const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
           pdf.addImage(
             sliceData,
             "JPEG",
@@ -201,7 +201,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
             pdf.addPage();
             currentY = drawPageHeader();
           } else {
-            currentY = currentY + sliceMm + 4;
+            currentY = currentY + sliceMm + 2;
           }
         }
 
@@ -233,11 +233,11 @@ const AIPortfolioReviewPDFExporter: React.FC<
         const remainingSpace = pdfHeight - bottomMargin - currentY;
 
         // Start a new page if:
-        // - Less than 60mm left (not enough for a meaningful section start)
+        // - Less than 40mm left (not enough for a meaningful section start)
         // - OR section is small enough to fit on a fresh page but not on remaining space
         if (
-          (remainingSpace < 60 && imgHeight > remainingSpace) ||
-          (remainingSpace < 80 && imgHeight > remainingSpace && imgHeight <= pdfHeight - bottomMargin - (headerHeight + 6))
+          (remainingSpace < 40 && imgHeight > remainingSpace) ||
+          (remainingSpace < 50 && imgHeight > remainingSpace && imgHeight <= pdfHeight - bottomMargin - (headerHeight + 3))
         ) {
           pdf.addPage();
           currentY = drawPageHeader();
@@ -265,7 +265,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
         pdf.text(
           `Page ${p} of ${pageCount}`,
           pdfWidth - marginX,
-          pdfHeight - 8,
+          pdfHeight - 4,
           { align: "right" }
         );
 
@@ -273,14 +273,14 @@ const AIPortfolioReviewPDFExporter: React.FC<
         pdf.setLineWidth(0.2);
         pdf.line(
           marginX,
-          pdfHeight - 14,
+          pdfHeight - 8,
           pdfWidth - marginX,
-          pdfHeight - 14
+          pdfHeight - 8
         );
 
         pdf.setFontSize(7);
         pdf.setTextColor(160, 160, 160);
-        pdf.text("MIDAS - AI Portfolio Review", marginX, pdfHeight - 8);
+        pdf.text("MIDAS - AI Portfolio Review", marginX, pdfHeight - 4);
       }
 
       setStatusText("Downloading PDF...");
