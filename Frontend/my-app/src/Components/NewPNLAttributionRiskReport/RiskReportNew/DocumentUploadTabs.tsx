@@ -156,9 +156,8 @@ const UploadFormComponent: React.FC<UploadFormProps> = ({
                 },
               }}
             >
-              <MenuItem value="US Portfolio CIO AI Review">US Portfolio CIO AI Review</MenuItem>
+              <MenuItem value="US  Equity Portfolio AI Review">US  Equity Portfolio AI Review</MenuItem>
               <MenuItem value="Portfolio AI Stock Ranking">Portfolio AI Stock Ranking</MenuItem>
-              <MenuItem value="Individual Stock CIO AI Review">Individual Stock CIO AI Review</MenuItem>
             </TextField>
           </Grid>
         )}
@@ -295,7 +294,7 @@ const DocumentUploadTabs: React.FC = () => {
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
   const [portfolioDate, setPortfolioDate] = useState<string>("");
   const [portfolioName, setPortfolioName] = useState<string>("");
-  const [portfolioType, setPortfolioType] = useState<string>("US Portfolio CIO AI Review");
+  const [portfolioType, setPortfolioType] = useState<string>("US  Equity Portfolio AI Review");
   const [portfolioUploading, setPortfolioUploading] = useState(false);
   const [portfolioAlert, setPortfolioAlert] = useState<{
     type: "success" | "error";

@@ -29,7 +29,7 @@ interface RankingReportItem {
 }
 
 const tabConfig = [
-  { key: "portfolioReview", label: "US Portfolio CIO AI Review" },
+  { key: "portfolioReview", label: "US  Equity Portfolio AI Review" },
   { key: "stockRanking", label: "Portfolio AI Stock Ranking" },
 ];
 
@@ -65,8 +65,12 @@ const AIPortfolioReview: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
-          const data = await res.json();
-          setCioReports(data);
+          const data: CIOReportItem[] = await res.json();
+          const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
+          setCioReports(sorted);
+          if (sorted.length > 0) {
+            setSelectedCioReport(sorted[0]);
+          }
         }
       } catch {
         // silent
@@ -93,7 +97,12 @@ const AIPortfolioReview: React.FC = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          setRankingReports(data.results || []);
+          const results: RankingReportItem[] = data.results || [];
+          const sorted = [...results].sort((a, b) => b.date.localeCompare(a.date));
+          setRankingReports(sorted);
+          if (sorted.length > 0) {
+            setSelectedRankingReport(sorted[0]);
+          }
         }
       } catch {
         // silent
@@ -133,8 +142,8 @@ const AIPortfolioReview: React.FC = () => {
           // maxWidth: 1280,
           mx: "auto",
           borderRadius: 2,
-          backgroundColor: "#eef2ff",
-          border: "1px solid #c7d2fe",
+          backgroundColor: "#071852",
+          border: "1px solid #1e3a6e",
           px: 2,
           py: 1.2,
           display: "flex",
@@ -158,19 +167,20 @@ const AIPortfolioReview: React.FC = () => {
                   fontSize: 13,
                   px: 3,
                   py: 0.8,
-                  color: isActive ? "#fff" : "#475569",
+                  color: isActive ? "#fff" : "#94a3b8",
                   background: isActive
-                    ? "linear-gradient(135deg, #2563eb, #3b82f6)"
-                    : "transparent",
-                  border: isActive ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    ? "#1e40af"
+                    : "rgba(255, 255, 255, 0.05)",
+                  border: isActive ? "1px solid #3b82f6" : "1px solid rgba(255, 255, 255, 0.15)",
                   boxShadow: isActive
-                    ? "0 2px 8px rgba(37, 99, 235, 0.25)"
+                    ? "0 2px 10px rgba(59, 130, 246, 0.4)"
                     : "none",
                   whiteSpace: "nowrap",
                   "&:hover": {
                     background: isActive
-                      ? "linear-gradient(135deg, #1d4ed8, #2563eb)"
-                      : "#f1f5f9",
+                      ? "#1d4ed8"
+                      : "rgba(255, 255, 255, 0.12)",
+                    color: "#fff",
                   },
                 }}
               >
@@ -193,13 +203,13 @@ const AIPortfolioReview: React.FC = () => {
             loading={cioListLoading}
             size="small"
             sx={{
-              width: { xs: "100%", sm: 340 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc" },
+              width: { xs: "100%", sm: 380 },
+              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
             }}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
                     {option.report_title}
                   </Typography>
                   <Typography sx={{ fontSize: 11, color: "#64748b" }}>
@@ -230,15 +240,27 @@ const AIPortfolioReview: React.FC = () => {
         {activeTab === "stockRanking" && (
           <Autocomplete
             options={rankingReports}
-            getOptionLabel={(opt) => opt.report_name}
+            getOptionLabel={(opt) => `${opt.report_name} — ${opt.date}`}
             value={selectedRankingReport}
             onChange={(_, val) => setSelectedRankingReport(val)}
             loading={rankingListLoading}
             size="small"
             sx={{
-              width: { xs: "100%", sm: 340 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc" },
+              width: { xs: "100%", sm: 380 },
+              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
             }}
+            renderOption={(props, option) => (
+              <Box component="li" {...props} key={option.id}>
+                <Box>
+                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
+                    {option.report_name}
+                  </Typography>
+                  <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+                    {formatDate(option.date)}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -263,7 +285,6 @@ const AIPortfolioReview: React.FC = () => {
       <Box
         sx={{
           mt: 2,
-          // maxWidth: 1280,
           mx: "auto",
         }}
       >

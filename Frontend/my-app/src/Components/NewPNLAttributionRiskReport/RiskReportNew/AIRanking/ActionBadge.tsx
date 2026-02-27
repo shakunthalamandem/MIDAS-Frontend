@@ -2,15 +2,15 @@ import React from "react";
 import { Box } from "@mui/material";
 
 const actionColors: Record<string, { bg: string; color: string; border: string }> = {
-  buy: { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
-  "buy more": { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
-  hold: { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
-  reduce: { bg: "#fff7ed", color: "#ea580c", border: "#fed7aa" },
-  sell: { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
-  "sell down": { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+  buy: { bg: "#059669", color: "#fff", border: "#059669" },
+  "buy more": { bg: "#059669", color: "#fff", border: "#059669" },
+  hold: { bg: "#2563eb", color: "#fff", border: "#2563eb" },
+  reduce: { bg: "#ea580c", color: "#fff", border: "#ea580c" },
+  sell: { bg: "#dc2626", color: "#fff", border: "#dc2626" },
+  "sell down": { bg: "#dc2626", color: "#fff", border: "#dc2626" },
 };
 
-const defaultColor = { bg: "#f8fafc", color: "#475569", border: "#e2e8f0" };
+const defaultColor = { bg: "#64748b", color: "#fff", border: "#64748b" };
 
 interface ActionBadgeProps {
   action: string;

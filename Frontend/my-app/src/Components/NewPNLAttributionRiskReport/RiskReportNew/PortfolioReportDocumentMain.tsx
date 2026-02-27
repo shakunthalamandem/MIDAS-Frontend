@@ -249,7 +249,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
         </Box>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: "#1e293b" }}>
-          US Portfolio CIO AI Review
+          US  Equity Portfolio AI Review
         </Typography>
         <Typography sx={{ color: "#64748b", fontSize: 14 }}>
           Select a report from the search bar above to begin
@@ -357,7 +357,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                 letterSpacing: 1.5,
                 whiteSpace: "nowrap",
                 flex: 1,
-                color: "#1e293b",
+                color: "#002060",
               }}
             >
               AI REVIEW
@@ -397,14 +397,14 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                   backgroundColor: isActive
                     ? "#dbeafe"
                     : "transparent",
-                  color: isActive ? "#2563eb" : "#64748b",
+                  color: isActive ? "#002060" : "#002060",
                   transition: "all 0.2s",
                   justifyContent: sidebarOpen ? "flex-start" : "center",
                   "&:hover": {
                     backgroundColor: isActive
                       ? "#dbeafe"
                       : "#e0e7ff",
-                    color: isActive ? "#2563eb" : "#475569",
+                    color: "#002060",
                   },
                 }}
               >
