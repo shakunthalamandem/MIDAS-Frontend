@@ -537,7 +537,7 @@ const PortfolioReportDocumentMain: React.FC = () => {
           <Box sx={{ flex: 1, textAlign: "center" }}>
             <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#fff" }}>
               <Box component="span" sx={{ color: "#38bdf8" }}>
-                US PORTFOLIO REVIEW
+                US EQUITIES PORTFOLIO REVIEW
               </Box>
               {" - "}
               {header.report_title}
