@@ -232,39 +232,17 @@ const NavbarMain: React.FC = () => {
             <DropdownTab
               label="New Issue Deals "
               menuItems={[
-                {
-                  label: "Dashboard",
-                  path: "/deals/dashboard",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                },
-                {
-                  label: "New Deal Form",
-                  path: "/deals/new_deal_form",
-                  icon: <PostAddOutlinedIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Dashboard",
+                //   path: "/deals/dashboard",
+                //   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
+                // },
                 // { label: "DealTracking", path: "/deals/deal_Tracking" },
                 {
                   label: "New Dashboard",
                   path: "/deals/new_dashboard",
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                  children: [
-                    {
-                      label: "US",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("US"),
-                    },
-      
-                    {
-                      label: "EMEA",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("EMEA"),
-                    },
-                                  {
-                      label: "APAC",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("APAC"),
-                    },
-                  ],
+                  onSelect: () => setNewDashboardDefaults("US"),
                 },
                                 {
                   label: "Future Pipeline",
@@ -316,6 +294,11 @@ const NavbarMain: React.FC = () => {
                   path: "/ai_portfolio_review",
                   icon: <PsychologyIcon fontSize="small" />,
                   reload: false,
+                },
+                      {
+                  label: "Last 30 Days IPO AI Ranking",
+                  path: "/last_30_days_ai_ranking",
+                  icon: <AutoAwesomeIcon fontSize="small" />,
                 },
                 {
                   label: "ABB Model",
@@ -482,6 +465,11 @@ const NavbarMain: React.FC = () => {
             {isLoggedIn && (
               <>
                 {/* 🔔 Notifications */}
+                <ChatBoxButton
+                  label="New Deal Form"
+                  icon={<PostAddOutlinedIcon fontSize="small" />}
+                  onClick={() => navigate("/deals/new_deal_form")}
+                />
                 <ChatBoxButton />
                 <ChatBoxButton
                   label="Meeting Notes"

@@ -8,6 +8,7 @@ import {
 import { ExecutiveSummary } from "./ExecutiveSummary";
 import { RankingTable, RankingRow } from "./RankingTable";
 import { StockDetail, StockData } from "./StockDetail";
+import AIPortfolioReviewPDFExporter from "../AIPortfolioReviewPDFExporter";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -163,7 +164,7 @@ const AIRankingMain: React.FC<AIRankingMainProps> = ({ selectedReport: externalR
               />
             </Box>
             <Typography variant="h5" fontWeight={700} mb={0.5} color="#1e293b">
-              Portfolio AI Stock Ranking
+              Last 30 Days IPO AI Ranking
             </Typography>
             <Typography variant="body2" color="#64748b">
               Select a report from the search bar above to view AI-driven stock analysis and rankings
@@ -187,36 +188,56 @@ const AIRankingMain: React.FC<AIRankingMainProps> = ({ selectedReport: externalR
   }
 
   // ---------- Report loaded ----------
+  const reportDate = portfolioData.report_metadata?.report_date || externalReport?.date || "";
+  const reportName = externalReport?.report_name || "Last 30 Days IPO AI Ranking";
+
   return (
     <Box sx={{ width: "100%" }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1.5 }}>
+        <AIPortfolioReviewPDFExporter
+          exportContainerId="ai-ranking-report-content"
+          fileName={`AI_Stock_Ranking_${reportDate || "report"}.pdf`}
+          reportTitle={`LAST 30 DAYS IPO AI RANKING - ${reportName}`}
+          reportDate={reportDate}
+        />
+      </Box>
+
       {error && (
         <Typography color="error" variant="body2" mb={2}>
           {error}
         </Typography>
       )}
 
-      <Stack spacing={3}>
-        <ExecutiveSummary
-          summary={portfolioData.executive_summary}
-          actionSummary={portfolioData.portfolio_action_summary}
-          metadata={portfolioData.report_metadata}
-        />
+      <Box id="ai-ranking-report-content">
+        <Stack spacing={3}>
+          <Box className="pdf-section" data-section-key="executive_summary">
+            <ExecutiveSummary
+              summary={portfolioData.executive_summary}
+              actionSummary={portfolioData.portfolio_action_summary}
+              metadata={portfolioData.report_metadata}
+            />
+          </Box>
 
-        <RankingTable
-          rows={portfolioData.ranking_table}
-          selectedTicker={selectedTicker}
-          onSelectTicker={(ticker) =>
-            setSelectedTicker(selectedTicker === ticker ? null : ticker)
-          }
-        />
+          <Box className="pdf-section" data-section-key="ranking_table">
+            <RankingTable
+              rows={portfolioData.ranking_table}
+              selectedTicker={selectedTicker}
+              onSelectTicker={(ticker) =>
+                setSelectedTicker(selectedTicker === ticker ? null : ticker)
+              }
+            />
+          </Box>
 
-        {selectedStock && (
-          <StockDetail
-            stock={selectedStock}
-            onClose={() => setSelectedTicker(null)}
-          />
-        )}
-      </Stack>
+          {selectedStock && (
+            <Box className="pdf-section" data-section-key="stock_detail">
+              <StockDetail
+                stock={selectedStock}
+                onClose={() => setSelectedTicker(null)}
+              />
+            </Box>
+          )}
+        </Stack>
+      </Box>
     </Box>
   );
 };

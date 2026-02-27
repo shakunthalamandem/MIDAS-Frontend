@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Autocomplete,
   Box,
-  Button,
   CircularProgress,
   Container,
   TextField,
@@ -28,14 +27,11 @@ interface RankingReportItem {
   updated_at: string;
 }
 
-const tabConfig = [
-  { key: "portfolioReview", label: "US  Equity Portfolio AI Review" },
-  { key: "stockRanking", label: "Portfolio AI Stock Ranking" },
-];
+interface AIPortfolioReviewProps {
+  mode: "portfolioReview" | "stockRanking";
+}
 
-const AIPortfolioReview: React.FC = () => {
-  const [activeTab, setActiveTab] = useState(tabConfig[0].key);
-
+const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode }) => {
   // Tab 1 (CIO Review) search state
   const [cioReports, setCioReports] = useState<CIOReportItem[]>([]);
   const [selectedCioReport, setSelectedCioReport] = useState<CIOReportItem | null>(null);
@@ -57,6 +53,7 @@ const AIPortfolioReview: React.FC = () => {
 
   // Fetch CIO report list
   useEffect(() => {
+    if (mode !== "portfolioReview") return;
     const fetchCioReports = async () => {
       setCioListLoading(true);
       try {
@@ -79,10 +76,11 @@ const AIPortfolioReview: React.FC = () => {
       }
     };
     fetchCioReports();
-  }, []);
+  }, [mode]);
 
   // Fetch Ranking report list
   useEffect(() => {
+    if (mode !== "stockRanking") return;
     const fetchRankingReports = async () => {
       setRankingListLoading(true);
       try {
@@ -93,7 +91,7 @@ const AIPortfolioReview: React.FC = () => {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ report_type: "Portfolio AI Stock Ranking" }),
+          body: JSON.stringify({ report_type: "Last 30 Days IPO AI Ranking" }),
         });
         if (res.ok) {
           const data = await res.json();
@@ -111,35 +109,18 @@ const AIPortfolioReview: React.FC = () => {
       }
     };
     fetchRankingReports();
-  }, []);
+  }, [mode]);
 
-  const handleTabChange = (newValue: string) => {
-    setActiveTab(newValue);
-  };
-
-  const renderContent = () => {
-    if (activeTab === "portfolioReview") {
-      return <PortfolioReportDocumentMain selectedReport={selectedCioReport} />;
-    }
-
-    if (activeTab === "stockRanking") {
-      return (
-        <Box sx={{ mt: 1 }}>
-          <AIRankingMain selectedReport={selectedRankingReport} />
-        </Box>
-      );
-    }
-
-    return null;
-  };
+  const title = mode === "portfolioReview"
+    ? "US Equity Portfolio AI Review"
+    : "Last 30 Days IPO AI Ranking";
 
   return (
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
 
-      {/* Tab bar with inline search */}
+      {/* Header bar with title and search */}
       <Box
         sx={{
-          // maxWidth: 1280,
           mx: "auto",
           borderRadius: 2,
           backgroundColor: "#071852",
@@ -152,49 +133,23 @@ const AIPortfolioReview: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        {/* Tabs - left side */}
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {tabConfig.map((tab) => {
-            const isActive = tab.key === activeTab;
-            return (
-              <Button
-                key={tab.key}
-                onClick={() => handleTabChange(tab.key)}
-                sx={{
-                  borderRadius: "999px",
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: 13,
-                  px: 3,
-                  py: 0.8,
-                  color: isActive ? "#fff" : "#94a3b8",
-                  background: isActive
-                    ? "#1e40af"
-                    : "rgba(255, 255, 255, 0.05)",
-                  border: isActive ? "1px solid #3b82f6" : "1px solid rgba(255, 255, 255, 0.15)",
-                  boxShadow: isActive
-                    ? "0 2px 10px rgba(59, 130, 246, 0.4)"
-                    : "none",
-                  whiteSpace: "nowrap",
-                  "&:hover": {
-                    background: isActive
-                      ? "#1d4ed8"
-                      : "rgba(255, 255, 255, 0.12)",
-                    color: "#fff",
-                  },
-                }}
-              >
-                {tab.label}
-              </Button>
-            );
-          })}
-        </Box>
+        {/* Title - left side */}
+        <Typography
+          sx={{
+            color: "#fff",
+            fontWeight: 600,
+            fontSize: 14,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {title}
+        </Typography>
 
         {/* Spacer */}
         <Box sx={{ flex: 1 }} />
 
-        {/* Search - right side (shows respective search per tab) */}
-        {activeTab === "portfolioReview" && (
+        {/* Search - right side */}
+        {mode === "portfolioReview" && (
           <Autocomplete
             options={cioReports}
             getOptionLabel={(opt) => `${opt.report_title} — ${opt.date}`}
@@ -237,7 +192,7 @@ const AIPortfolioReview: React.FC = () => {
           />
         )}
 
-        {activeTab === "stockRanking" && (
+        {mode === "stockRanking" && (
           <Autocomplete
             options={rankingReports}
             getOptionLabel={(opt) => `${opt.report_name} — ${opt.date}`}
@@ -288,9 +243,16 @@ const AIPortfolioReview: React.FC = () => {
           mx: "auto",
         }}
       >
-        {renderContent()}
+        {mode === "portfolioReview" && (
+          <PortfolioReportDocumentMain selectedReport={selectedCioReport} />
+        )}
+        {mode === "stockRanking" && (
+          <Box sx={{ mt: 1 }}>
+            <AIRankingMain selectedReport={selectedRankingReport} />
+          </Box>
+        )}
       </Box>
-    </Container> 
+    </Container>
   );
 };
 
