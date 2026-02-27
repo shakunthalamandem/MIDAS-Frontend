@@ -150,6 +150,7 @@ const NavbarMain: React.FC = () => {
   const setNewDashboardDefaults = (region: "US" | "APAC" | "EMEA") => {
     localStorage.setItem("newDashboardSelectedRegion", region);
     localStorage.setItem("newDashboardSelectedDealType", "IPO");
+    localStorage.setItem("newDashboardSelectedOp", "upcoming");
   };
 
   return (
