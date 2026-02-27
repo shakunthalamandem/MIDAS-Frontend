@@ -155,16 +155,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               sx={{
                 ...pillGroupSx,
                 "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected:hover": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
               }}
             >
@@ -185,16 +185,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               sx={{
                 ...pillGroupSx,
                 "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected:hover": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
               }}
             >
