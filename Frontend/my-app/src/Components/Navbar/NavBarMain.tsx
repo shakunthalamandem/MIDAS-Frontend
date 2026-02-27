@@ -101,6 +101,13 @@ const NavbarMain: React.FC = () => {
     }
   };
 
+  const handleNewDashboardClick = () => {
+    setSelectedTab("New Dashboard");
+    localStorage.setItem("selectedTab", "New Dashboard");
+    setNewDashboardDefaults("US");
+    navigateAndRefresh("/deals/new_dashboard");
+  };
+
   const handleLogoutClick = () => {
     setShowLogout(true);
   };
@@ -229,43 +236,26 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-            <DropdownTab
-              label="New Issue Deals "
-              menuItems={[
-                // {
-                //   label: "Dashboard",
-                //   path: "/deals/dashboard",
-                //   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                // },
-                // { label: "DealTracking", path: "/deals/deal_Tracking" },
-                {
-                  label: "New Dashboard",
-                  path: "/deals/new_dashboard",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                  onSelect: () => setNewDashboardDefaults("US"),
+            <Button
+              onClick={handleNewDashboardClick}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "New Dashboard"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
                 },
-                // {
-                //   label: "IPO Write-Up",
-                //   path: "/equity/ipo_dashboard",
-                //   icon: <TrendingUpOutlinedIcon fontSize="small" />,
-                // },
-                // {
-                //   label: "FO Write-Up",
-                //   path: "/equity/fo_dashboard",
-                //   icon: <ArticleOutlinedIcon fontSize="small" />,
-                // },
-
-                // {
-                //   label: "Meeting Notes",
-                //   path: "/deal_meeting_notes",
-                //   icon: <ArticleOutlinedIcon fontSize="small" />,
-                // },
-                // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
-              ]}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              rich
-            />
+              }}
+            >
+              New Dashboard
+            </Button>
             <DropdownTab
               label="AI-ML"
               menuItems={[
