@@ -29,6 +29,7 @@ type FiltersBarProps = {
   onSelectOp: (value: string) => void;
   selectedDealType: "IPO" | "FO";
   onSelectDealType: (value: "IPO" | "FO") => void;
+  disableFo?: boolean;
   isPipelineView: boolean;
   liveStartDate: Dayjs | null;
   liveEndDate: Dayjs | null;
@@ -52,6 +53,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
   onSelectOp,
   selectedDealType,
   onSelectDealType,
+  disableFo = false,
   isPipelineView,
   liveStartDate,
   liveEndDate,
@@ -174,34 +176,34 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             </ToggleButtonGroup>
           </Box>
 
-          {!isPipelineView && (
-            <Box sx={sectionSx}>
-              <Typography sx={sectionLabelSx}>Type:</Typography>
-              <ToggleButtonGroup
-                value={selectedDealType}
-                exclusive
-                onChange={(_e, value) => value && onSelectDealType(value)}
-                sx={{
-                  ...pillGroupSx,
-                  "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                  "& .Mui-selected:hover": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                }}
-              >
-                <ToggleButton value="IPO">IPO</ToggleButton>
-                <ToggleButton value="FO">FO</ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-          )}
+          <Box sx={sectionSx}>
+            <Typography sx={sectionLabelSx}>Type:</Typography>
+            <ToggleButtonGroup
+              value={selectedDealType}
+              exclusive
+              onChange={(_e, value) => value && onSelectDealType(value)}
+              sx={{
+                ...pillGroupSx,
+                "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
+                  backgroundColor: "#002060",
+                  color: "#ffffff",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#002060",
+                  color: "#ffffff",
+                },
+                "& .Mui-selected:hover": {
+                  backgroundColor: "#002060",
+                  color: "#ffffff",
+                },
+              }}
+            >
+              <ToggleButton value="IPO">IPO</ToggleButton>
+              <ToggleButton value="FO" disabled={disableFo}>
+                FO
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
           <Box sx={sectionSx}>
             <Typography sx={sectionLabelSx}>Region:</Typography>

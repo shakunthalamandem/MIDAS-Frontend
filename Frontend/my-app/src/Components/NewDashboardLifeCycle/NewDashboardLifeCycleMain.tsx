@@ -16,14 +16,11 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import TableRowsIcon from "@mui/icons-material/TableRows";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import dayjs, { Dayjs } from "dayjs";
 import NewDashboardLifeCycleCard, { NewDashboardLifeCycleCardMeta } from "./NewDashboardLifeCycleCard";
 import FiltersBar from "./NewDashboardLifeCycleFiltersBar";
-import NewDashboardLifeCycleTableView from "./NewDashboardLifeCycleTableView";
 import DealsTable from "../Main/NewDealsLifeCycle/DealsTable";
+import ExpectedPipelineDealsTable from "../UpcomingPipelineDeals/ExpectedPipelineDealsTable";
 import {
   buildCardTags,
   formatDate,
@@ -64,14 +61,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<
     "US" | "EMEA" | "APAC" | "Non-US America"
   >(initialRegion);
-
-  const [pipelineData, setPipelineData] = useState<Record<string, any[]>>({
-    fo: [],
-    ipo_international: [],
-    ipo_us: [],
-    ipo_europe: [],
-  });
-  const [pipelineLoading, setPipelineLoading] = useState(false);
+   
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -93,12 +83,12 @@ const NewDealsLifecycleCards: React.FC = () => {
       helper: "Issued Deals",
       icon: <FlashOnIcon fontSize="small" sx={{ color: "inherit" }} />,
     },
-    // {
-    //   value: "pipeline",
-    //   label: "Future Pipeline",
-    //   helper: "Not filed",
-    //   icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
-    // },
+    {
+      value: "pipeline",
+      label: "Future Pipeline",
+      helper: "Not filed",
+      icon: <RocketLaunchIcon fontSize="small" sx={{ color: "inherit" }} />,
+    },
   ];
 
   const fetchData = async (operation: string, region: string, dealType: string) => {
@@ -207,35 +197,8 @@ const NewDealsLifecycleCards: React.FC = () => {
     }
   };
 
-  const fetchPipeline = async () => {
-    if (!apiUrl) return;
-    setPipelineLoading(true);
-    try {
-      const response = await fetch(`${apiUrl}/api/pipeline_expected_deals/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({}),
-      });
-      const json = await response.json();
-      setPipelineData({
-        fo: json?.fo ?? [],
-        ipo_international: json?.ipo_international ?? [],
-        ipo_us: json?.ipo_us ?? [],
-        ipo_europe: json?.ipo_europe ?? [],
-      });
-    } catch (error) {
-      console.error("Pipeline fetch failed", error);
-    } finally {
-      setPipelineLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (selectedOp === "pipeline") {
-      fetchPipeline();
       return;
     }
     const apiOperation = opMap[selectedOp] || selectedOp;
@@ -271,10 +234,10 @@ const NewDealsLifecycleCards: React.FC = () => {
   }, [selectedOp]);
 
   useEffect(() => {
-    if (locationViewMode === "card" || locationViewMode === "table") {
-      setViewMode(locationViewMode);
+    if (selectedOp === "pipeline" && viewMode !== "table") {
+      setViewMode("table");
     }
-  }, [locationViewMode]);
+  }, [selectedOp, viewMode]);
 
   // useEffect(() => {
   //   if (selectedOp === "live") {
@@ -284,6 +247,19 @@ const NewDealsLifecycleCards: React.FC = () => {
   // }, [selectedOp]);
 
   const isPipelineView = selectedOp === "pipeline";
+  const disablePipelineFo = isPipelineView && selectedRegion !== "US";
+
+  useEffect(() => {
+    if (locationViewMode === "card" || locationViewMode === "table") {
+      setViewMode(locationViewMode);
+    }
+  }, [locationViewMode]);
+
+  useEffect(() => {
+    if (disablePipelineFo && selectedDealType === "FO") {
+      setSelectedDealType("IPO");
+    }
+  }, [disablePipelineFo, selectedDealType]);
 
 
 
@@ -355,25 +331,6 @@ const NewDealsLifecycleCards: React.FC = () => {
     return [withPricing, tba];
   }, [filteredRows, selectedOp]);
 
-  const pipelineCategory = useMemo(() => {
-    if (selectedRegion === "APAC" || selectedRegion === "Non-US America") {
-      return "ipo_international";
-    }
-    if (selectedRegion === "EMEA") return "ipo_europe";
-    return selectedDealType === "FO" ? "fo" : "ipo_us";
-  }, [selectedRegion, selectedDealType]);
-
-  const pipelineRows = useMemo(() => {
-    const list = pipelineData[pipelineCategory] || [];
-    const term = pipelineSearch.trim().toLowerCase();
-    if (!term) return list;
-    return list.filter((item: any) =>
-      Object.values(item || {}).some((value) =>
-        value?.toString().toLowerCase().includes(term)
-      )
-    );
-  }, [pipelineData, pipelineCategory, pipelineSearch]);
-
   const handleRowNavigate = (row: any, extraState?: Record<string, any>) => {
   const dealType = (row?.deal_type || "").toLowerCase();
   const targetPath =
@@ -425,18 +382,6 @@ const NewDealsLifecycleCards: React.FC = () => {
             })
           : list
       )
-    );
-
-  const renderPipelineList = (list: any[]) =>
-    viewMode === "table" ? (
-      <NewDashboardLifeCycleTableView
-        rows={list}
-        mode="pipeline"
-        selectedRegion={selectedRegion}
-        onRowClick={(row) => handleRowNavigate(row, { pipelineCategory })}
-      />
-    ) : (
-      renderPipelineCards(list)
     );
 
   const renderCards = (list: any[]) => (
@@ -514,79 +459,6 @@ const NewDealsLifecycleCards: React.FC = () => {
     </Box>
   );
 
-  const renderPipelineCards = (list: any[]) => (
-    <Box
-      sx={{
-        maxHeight: list.length > 9 ? 500 : "none",
-        overflowY: list.length > 9 ? "auto" : "visible",
-        pr: list.length > 9 ? 0.5 : 0,
-      }}
-    >
-      <Grid container spacing={2}>
-        {list.map((row: any, index: number) => {
-          const title = row.ticker || row.company || "Pipeline Deal";
-          const subtitle =
-            row.company ||
-            row.country ||
-            row.region ||
-            row.sectors ||
-            row.sector ||
-            "Pipeline Deal";
-          const meta: NewDashboardLifeCycleCardMeta[] = [
-            {
-              label: "Expected Date",
-              value: formatDate(row.expected_date || row.last_placement_date || row.lockup_date),
-              icon: <CalendarMonthOutlinedIcon fontSize="small" />,
-            },
-            {
-              label: "Size / Valuation",
-              value: formatDealSize(
-                row.size_m ||
-                  row.valuation_m ||
-                  row.sell_down_size_m ||
-                  row.implied_secondary_mkt_valuation_m
-              ),
-              icon: <PaidOutlinedIcon fontSize="small" />,
-            },
-            {
-              label: "Sector",
-              value: row.sectors || row.sector || "TBA",
-              icon: <CategoryOutlinedIcon fontSize="small" />,
-            },
-            {
-              label: "Region",
-              value: row.country || row.region || selectedRegion,
-              icon: <BusinessOutlinedIcon fontSize="small" />,
-            },
-          ];
-          return (
-            <Grid item xs={12} md={4} lg={3} key={row.id ?? `${title}-${index}`}>
-              <NewDashboardLifeCycleCard
-                title={title}
-                subtitle={subtitle}
-                meta={meta}
-                tags={[
-                  {
-                    label: pipelineCategory.replace("_", " ").toUpperCase(),
-                    bg: "#eef2ff",
-                    color: "#1d4ed8",
-                  },
-                ]}
-                onActionClick={(label) =>
-                  handleRowNavigate(row, {
-                    pipelineCategory,
-                    targetTabLabel: actionTabMap[label] ?? label,
-                  })
-                }
-                onViewDetails={() => handleRowNavigate(row, { pipelineCategory })}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
-    </Box>
-  );
-
   const regionTabs = [
     { label: "US", value: "US", icon: <BusinessOutlinedIcon fontSize="small" /> },
     { label: "EMEA", value: "EMEA", icon: <Diversity3Icon fontSize="small" /> },
@@ -637,7 +509,11 @@ const NewDealsLifecycleCards: React.FC = () => {
                     border: "1px solid rgba(255,255,255,0.25)",
                   }}
                 >
-                  {selectedOp === "live" ? "Recent" : "Upcoming"}
+                  {selectedOp === "live"
+                    ? "Recent"
+                    : selectedOp === "pipeline"
+                    ? "Pipeline"
+                    : "Upcoming"}
                 </Box>
                 <Box
                   sx={{
@@ -676,6 +552,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               onSelectOp={setSelectedOp}
               selectedDealType={selectedDealType}
               onSelectDealType={setSelectedDealType}
+              disableFo={disablePipelineFo}
               isPipelineView={isPipelineView}
               liveStartDate={liveStartDate}
               liveEndDate={liveEndDate}
@@ -690,8 +567,8 @@ const NewDealsLifecycleCards: React.FC = () => {
               setDealSearch={setDealSearch}
               pipelineSearch={pipelineSearch}
               setPipelineSearch={setPipelineSearch}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
+              viewMode={isPipelineView ? undefined : viewMode}
+              setViewMode={isPipelineView ? undefined : setViewMode}
               inline
             />
           </Stack>
@@ -712,29 +589,16 @@ const NewDealsLifecycleCards: React.FC = () => {
       >
         <Container maxWidth="xl" sx={{ mt: 1, px: 0 }}>
           {isPipelineView ? (
-            pipelineLoading ? (
-              <CircularProgress sx={{ display: "block", mx: "auto" }} />
-            ) : pipelineRows.length === 0 ? (
-              <Container
-                sx={{
-                  px: 2,
-                  py: 4,
-                  borderRadius: 2,
-                  border: "1px dashed #cbd5e1",
-                  backgroundColor: "#ffffff",
-                  textAlign: "center",
-                }}
-              >
-                <Typography sx={{ fontWeight: 600, color: "#002060" }}>
-                  No pipeline deals available
-                </Typography>
-                <Typography variant="body2" color="#000000">
-                  There are no pipeline deals for this filter selection.
-                </Typography>
-              </Container>
-            ) : (
-              renderPipelineList(pipelineRows)
-            )
+            <ExpectedPipelineDealsTable
+              searchQuery={pipelineSearch}
+              onSearchQueryChange={setPipelineSearch}
+              showSearch={false}
+              showDealTypeToggle={false}
+              showTitle={false}
+              selectedDealType={selectedDealType}
+              onSelectedDealTypeChange={setSelectedDealType}
+              selectedRegion={selectedRegion}
+            />
           ) : loading ? (
             <CircularProgress sx={{ display: "block", mx: "auto" }} />
           ) : selectedOp === "upcoming" ? (
