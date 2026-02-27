@@ -1,5 +1,5 @@
 // src/components/MidasChat.tsx
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   TextField,
@@ -12,49 +12,23 @@ import SendIcon from "@mui/icons-material/Send";
 import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 
-const MidasChat: React.FC = () => {
-  const [question, setQuestion] = useState<string>("");
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+type MidasChatProps = {
+  question: string;
+  setQuestion: React.Dispatch<React.SetStateAction<string>>;
+  data: any[];
+  loading: boolean;
+  error: string | null;
+  onAsk: (e?: React.FormEvent | Event, customQuestion?: string) => Promise<void>;
+};
 
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("access_token");
-
-  const handleAsk = async (e?: React.FormEvent | Event, customQuestion?: string) => {
-    if (e?.preventDefault) e.preventDefault();
-    const query = (customQuestion ?? question).trim();
-    if (!query) return;
-
-    setLoading(true);
-    setData([]);
-    setError(null);
-
-    try {
-      const response = await fetch(`${apiUrl}/api/midas_universal_rag_query/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          question: query, // payload as requested
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Something went wrong");
-
-      // Same response shape as existing API: result.answer is array
-      if (Array.isArray(result.answer)) setData(result.answer);
-      else throw new Error("Invalid response format");
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch answer");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const MidasChat: React.FC<MidasChatProps> = ({
+  question,
+  setQuestion,
+  data,
+  loading,
+  error,
+  onAsk,
+}) => {
   return (
     <Box>
       <Paper
@@ -84,7 +58,7 @@ const MidasChat: React.FC = () => {
 
         <Box
           component="form"
-          onSubmit={handleAsk}
+          onSubmit={onAsk}
           display="flex"
           gap={2}
           flexDirection={{ xs: "column", sm: "row" }}
@@ -125,19 +99,18 @@ const MidasChat: React.FC = () => {
         </Box>
       </Paper>
 
-      {/* Reuse existing UI blocks exactly like Global */}
       <GHCAIMain data={data} loading={loading} error={error} />
 
-      {/* <SuggestedQuestions
+      <SuggestedQuestions
         questions={
           data.find((block) => block.type === "suggested_questions")?.questions || []
         }
         onSelect={(selected) => {
           setQuestion(selected);
-          handleAsk(undefined, selected);
+          onAsk(undefined, selected);
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
-      /> */}
+      />
     </Box>
   );
 };
