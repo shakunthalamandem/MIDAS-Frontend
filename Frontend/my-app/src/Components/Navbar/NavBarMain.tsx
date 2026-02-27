@@ -244,11 +244,6 @@ const NavbarMain: React.FC = () => {
                   icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
                   onSelect: () => setNewDashboardDefaults("US"),
                 },
-                                {
-                  label: "Future Pipeline",
-                  path: "/deals/future_pipeline",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                },
                 // {
                 //   label: "IPO Write-Up",
                 //   path: "/equity/ipo_dashboard",
