@@ -282,9 +282,9 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
                     fontSize: 14,
                     fontWeight: 500,
                     color:
-                      sensitivityColor(displayVal) !== "#1e293b"
+                      sensitivityColor(displayVal) !== "#000000"
                         ? sensitivityColor(displayVal)
-                        : "#334155",
+                        : "#000000",
                     lineHeight: 1.6,
                     fontFamily:
                       k.toLowerCase().includes("capital") ||

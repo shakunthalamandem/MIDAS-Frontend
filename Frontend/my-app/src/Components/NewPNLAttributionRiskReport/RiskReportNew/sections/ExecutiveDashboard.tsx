@@ -112,29 +112,67 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
   return (
     <Box>
       {qualitativeCards.length > 0 && (
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2, mb: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 2,
+            mb: 3,
+          }}
+        >
           {qualitativeCards.map((card: any, i: number) => {
             const colors = cardColors[card.type] || cardColors.neutral;
+
             return (
               <Box
                 key={i}
                 sx={{
-                  background: colors.gradient,
+                  // background: colors.gradient,
+                  background: "#eff1fc",
                   border: `1px solid ${colors.border}`,
                   borderRadius: 2.5,
                   p: 2.5,
                   transition: "all 0.2s",
-                  "&:hover": { boxShadow: `0 4px 16px ${colors.dot}20`, transform: "translateY(-1px)" },
+                  "&:hover": {
+                    boxShadow: `0 4px 16px ${colors.dot}20`,
+                    transform: "translateY(-1px)",
+                  },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                  <Box sx={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: colors.dot, boxShadow: `0 0 8px ${colors.dot}60` }} />
-                  <Typography sx={{ fontWeight: 700, fontSize: 15, color: colors.title }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
+                >
+                  <Box
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      backgroundColor: colors.dot,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 16,
+                      letterSpacing: 0.3,
+                      color: colors.title,
+                    }}
+                  >
                     {card.title || card.label || card.name}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.6 }}>
-                  {card.content || card.description || card.text || card.value}
+
+                <Typography
+                  sx={{
+                    fontSize: 14,
+                    lineHeight: 1.7,
+                    color: "#0f172a",
+                  }}
+                >
+                  {card.content ||
+                    card.description ||
+                    card.text ||
+                    card.value}
                 </Typography>
               </Box>
             );
@@ -142,20 +180,55 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
         </Box>
       )}
 
+      {/* METRIC CARDS — WITH INFO ICON RESTORED */}
       {metricCards.length > 0 && (
-        <Box sx={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(metricCards.length, 4)}, 1fr)`, gap: 2, mb: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${Math.min(
+              metricCards.length,
+              4
+            )}, 1fr)`,
+            gap: 2,
+            mb: 3,
+          }}
+        >
           {metricCards.map((card: any, i: number) => {
             const gradient = metricCardGradients[i % metricCardGradients.length];
             const cardLabel = card.label || card.title || card.name;
             const tooltipText = getMetricTooltip(cardLabel);
             return (
-              <Box key={i} sx={{
-                background: gradient.bg, border: `1px solid ${gradient.border}40`,
-                borderRadius: 2.5, p: 2, transition: "all 0.2s", position: "relative",
-                "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)", transform: "translateY(-1px)" },
-              }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
-                  <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#334155", textTransform: "uppercase" }}>
+              <Box
+                key={i}
+                sx={{
+                  background: gradient.bg,
+                  border: `1px solid ${gradient.border}40`,
+                  borderRadius: 2.5,
+                  p: 2,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                {/* Header Row with Info Icon */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 0.8,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#332ba3",
+                      textTransform: "uppercase",
+                    }}
+                  >
                     {cardLabel}
                   </Typography>
                   {tooltipText && (
@@ -186,7 +259,15 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
                     </Tooltip>
                   )}
                 </Box>
-                <Typography sx={{ fontSize: 22, fontWeight: 700, color: metricValueColor(String(card.value || "")), fontFamily: "monospace", mb: 0.5 }}>
+
+                <Typography
+                  sx={{
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontFamily: "monospace",
+                  }}
+                >
                   {card.value}
                 </Typography>
                 <Typography sx={{ fontSize: 12, color: "#334155", lineHeight: 1.5 }}>
@@ -198,37 +279,95 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
         </Box>
       )}
 
+      {/* PORTFOLIO BIAS */}
       {portfolioBias && (
-        <Box sx={{
-          background: "linear-gradient(135deg, #faf5ff, #ede9fe)", border: "1px solid #c4b5fd",
-          borderRadius: 2.5, p: 2.5, mb: 3, display: "inline-block", minWidth: 220,
-        }}>
-          <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: "#7c3aed", textTransform: "uppercase", mb: 0.5 }}>
-            {portfolioBias.label || "PORTFOLIO BIAS"}
+        <Box
+          sx={{
+            background: "linear-gradient(135deg, #faf5ff, #ede9fe)",
+            border: "1px solid #c4b5fd",
+            borderRadius: 2.5,
+            p: 2.5,
+            mb: 3,
+            display: "inline-block",
+            minWidth: 220,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 1.3,
+              color: "#6d28d9",
+              textTransform: "uppercase",
+              mb: 0.5,
+            }}
+          >
+            {portfolioBias.label || "Portfolio Bias"}
           </Typography>
           <Typography sx={{ fontSize: 24, fontWeight: 700, color: "#7c3aed", mb: 0.5 }}>
             {portfolioBias.value || (typeof portfolioBias === "string" ? portfolioBias : "")}
           </Typography>
-          <Typography sx={{ fontSize: 12, color: "#334155", lineHeight: 1.5 }}>
+          <Typography sx={{ fontSize: 14, color: "#000000", lineHeight: 1.5 }}>
             {portfolioBias.text || portfolioBias.description || portfolioBias.interpretation}
           </Typography>
         </Box>
       )}
 
+      {/* RISK TABLE */}
       {riskTable.length > 0 && (
-        <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-            background: "linear-gradient(135deg, #f0f7ff, #e0e7ff)", borderBottom: "2px solid #ec4899" }}>
-            {["METRIC", "VALUE", "INTERPRETATION"].map((h) => (
-              <Typography key={h} sx={{ px: 2, py: 1.2, fontSize: 11, fontWeight: 700, letterSpacing: 1, color: "#be185d" }}>{h}</Typography>
+        <Box
+          sx={{
+            border: "1px solid #c7d2fe",
+            borderRadius: 2.5,
+            overflow: "hidden",
+          }}
+        >
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              background: "linear-gradient(135deg, #f0f7ff, #e0e7ff)",
+            }}
+          >
+            {["Metric", "Value", "Interpretation"].map((h) => (
+              <Typography
+                key={h}
+                sx={{
+                  px: 2,
+                  py: 1.3,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  color: "#1e3a8a",
+                }}
+              >
+                {h}
+              </Typography>
             ))}
           </Box>
+
           {riskTable.map((row: any, i: number) => (
-            <Box key={i} sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-              borderBottom: i < riskTable.length - 1 ? "1px solid #e0e7ff" : "none", "&:hover": { backgroundColor: "#fdf2f8" } }}>
-              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{row.metric || row.label || row.name}</Typography>
-              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#1e293b", fontFamily: "monospace" }}>{row.value}</Typography>
-              <Typography sx={{ px: 2, py: 1.5, fontSize: 13, color: "#334155" }}>{row.interpretation || row.description || row.text}</Typography>
+            <Box
+              key={i}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <Typography sx={{ px: 2, py: 1.5, fontWeight: 600 }}>
+                {row.metric || row.label || row.name}
+              </Typography>
+              <Typography
+                sx={{ px: 2, py: 1.5, fontFamily: "monospace" }}
+              >
+                {row.value}
+              </Typography>
+              <Typography sx={{ px: 2, py: 1.5, color: "#334155" }}>
+                {row.interpretation ||
+                  row.description ||
+                  row.text}
+              </Typography>
             </Box>
           ))}
         </Box>
