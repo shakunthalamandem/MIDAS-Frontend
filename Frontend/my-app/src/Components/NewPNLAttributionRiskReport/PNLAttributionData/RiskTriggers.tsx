@@ -184,7 +184,11 @@ const RiskTriggers: React.FC = () => {
   const [error, setError] = useState("");
 
   const [guidelines, setGuidelines] = useState<Record<string, number>>({ ...DEFAULT_GUIDELINES });
-  const [editGuidelines, setEditGuidelines] = useState<Record<string, number>>({ ...DEFAULT_GUIDELINES });
+  const [editGuidelines, setEditGuidelines] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const [k, v] of Object.entries(DEFAULT_GUIDELINES)) init[k] = String(v);
+    return init;
+  });
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
@@ -230,14 +234,26 @@ const RiskTriggers: React.FC = () => {
 
   useEffect(() => { fetchTriggers(); }, [fetchTriggers]);
 
-  const handleOpenEdit = () => { setEditGuidelines({ ...guidelines }); setEditMode(true); };
+  const toStringMap = (obj: Record<string, number>): Record<string, string> => {
+    const m: Record<string, string> = {};
+    for (const [k, v] of Object.entries(obj)) m[k] = String(v);
+    return m;
+  };
+
+  const handleOpenEdit = () => { setEditGuidelines(toStringMap(guidelines)); setEditMode(true); };
   const handleCancelEdit = () => { setEditMode(false); };
-  const handleApplyEdit = () => { setGuidelines({ ...editGuidelines }); setEditMode(false); };
-  const handleResetDefaults = () => { setEditGuidelines({ ...DEFAULT_GUIDELINES }); };
+  const handleApplyEdit = () => {
+    const nums: Record<string, number> = {};
+    for (const [k, v] of Object.entries(editGuidelines)) {
+      const n = parseFloat(v);
+      nums[k] = isNaN(n) ? 0 : n;
+    }
+    setGuidelines(nums);
+    setEditMode(false);
+  };
+  const handleResetDefaults = () => { setEditGuidelines(toStringMap(DEFAULT_GUIDELINES)); };
   const handleGuidelineChange = (key: string, value: string) => {
-    const num = parseFloat(value);
-    if (!isNaN(num)) setEditGuidelines((prev) => ({ ...prev, [key]: num }));
-    else if (value === "" || value === "-") setEditGuidelines((prev) => ({ ...prev, [key]: 0 }));
+    setEditGuidelines((prev) => ({ ...prev, [key]: value }));
   };
 
   const formatDisplayDate = (dateStr: string): string => {
