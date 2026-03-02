@@ -100,7 +100,11 @@ const DealHeaderHero: React.FC<Props> = ({ deal, fmtPlain, fmtMoney }) => {
       : normalizedDealType === "IPO"
         ? "IPO"
         : rawDealType;
-  const issuePrice = fmtMoney(deal.issue_price);
+  const issuePriceNum = Number(deal.issue_price);
+  const hasIssuePrice = Number.isFinite(issuePriceNum) && issuePriceNum > 0;
+  const priceChipLabel = hasIssuePrice
+    ? `Priced at ${fmtMoney(deal.issue_price)}`
+    : "Price NA";
 
   return (
     <Box
@@ -166,7 +170,7 @@ const DealHeaderHero: React.FC<Props> = ({ deal, fmtPlain, fmtMoney }) => {
           </Typography>
 
           <Chip
-            label={`Priced at ${issuePrice}`}
+            label={priceChipLabel}
             sx={{
               flex: "0 0 auto",
               height: 30,
