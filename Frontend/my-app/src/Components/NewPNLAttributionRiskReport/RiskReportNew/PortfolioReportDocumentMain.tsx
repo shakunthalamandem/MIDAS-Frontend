@@ -25,7 +25,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import ExecutiveDashboard from "./sections/ExecutiveDashboard";
 import CIODecisionBrief from "./sections/CIODecisionBrief";
-import ImmediateDecisions, { extractImmediateDecisionItems } from "./sections/ImmediateDecisions";
+import { extractImmediateDecisionItems } from "./sections/ImmediateDecisions";
 import DisciplineScorecard from "./sections/DisciplineScorecard";
 import SectorNewsMap from "./sections/SectorNewsMap";
 import MacroEvents from "./sections/MacroEvents";
@@ -106,7 +106,6 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   executive_risk_dashboard: ExecutiveDashboard,
   final_prioritized_action_matrix: ActionMatrix,
   cio_decision_brief: CIODecisionBrief,
-  immediate_decisions: ImmediateDecisions,
   base_model_discipline_scorecard: DisciplineScorecard,
   sector_peer_news_map: SectorNewsMap,
   macro_event_risk_calendar: MacroEvents,
@@ -288,7 +287,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
     Object.keys(sectionComponents).map((key, idx) => [key, idx])
   );
   const orderedSidebar = [...sidebar]
-    .filter((item) => item.key !== "cio_decision_brief")
+    .filter((item) => item.key !== "cio_decision_brief" && item.key !== "immediate_decisions")
     .sort((a, b) => {
       const aIdx = orderIndex.has(a.key) ? orderIndex.get(a.key)! : 999;
       const bIdx = orderIndex.has(b.key) ? orderIndex.get(b.key)! : 999;
