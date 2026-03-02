@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import GenericDataRenderer from "./GenericDataRenderer";
 import ImmediateDecisionCard from "./ImmediateDecisionCard";
 
@@ -123,25 +124,33 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
   return (
     <>
-      <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
+      <Box
+        sx={{
+          borderRadius: 4,
+          overflow: "hidden",
+          background: "linear-gradient(145deg,#ffffff,#f8fafc)",
+          border: "1px solid rgba(99,102,241,0.15)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
+        }}
+      >
         <Box
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-            backgroundColor: "#f8fafc",
-            borderBottom: "2px solid #e9d5ff",
+            background: "linear-gradient(90deg,#f8fafc,#f1f5f9)",
+            borderBottom: "1px solid rgba(148,163,184,0.25)",
           }}
         >
           {dynamicKeys.map((k) => (
             <Typography
               key={k}
               sx={{
-                px: 2,
-                py: 1.2,
-                fontSize: 11,
+                px: 3,
+                py: 2,
+                fontSize: 12,
                 fontWeight: 700,
-                letterSpacing: 0.8,
-                color: "#475569",
+                letterSpacing: 1,
+                color: "#053b89",
                 textTransform: "uppercase",
               }}
             >
@@ -157,10 +166,17 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
             sx={{
               display: "grid",
               gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-              borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none",
               alignItems: "center",
               cursor: "pointer",
-              "&:hover": { backgroundColor: "#f0f7ff" },
+              transition: "all 0.2s ease",
+              borderBottom:
+                i < items.length - 1
+                  ? "1px solid rgba(148,163,184,0.15)"
+                  : "none",
+              "&:hover": {
+                backgroundColor: "rgba(99,102,241,0.04)",
+                transform: "translateX(2px)",
+              },
             }}
           >
             {dynamicKeys.map((k) => {
@@ -173,19 +189,36 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
               if (isPriority) {
                 return (
-                  <Box key={k} sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
+                    key={k}
+                    sx={{
+                      px: 3,
+                      py: 2,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     <Box
                       sx={{
-                        width: 24,
-                        height: 24,
+                        width: 28,
+                        height: 28,
                         borderRadius: "50%",
-                        backgroundColor: priorityColor(val),
+                        background: `linear-gradient(135deg, ${priorityColor(val)}, ${priorityColor(val)}cc)`,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                     >
-                      <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{val}</Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#fff",
+                        }}
+                      >
+                        {val}
+                      </Typography>
                     </Box>
                   </Box>
                 );
@@ -193,7 +226,17 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
               if (isTicker) {
                 return (
-                  <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                  <Typography
+                    key={k}
+                    sx={{
+                      px: 3,
+                      py: 2,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: "#0f172a",
+                    }}
+                  >
                     {displayVal}
                   </Typography>
                 );
@@ -214,7 +257,17 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
               if (isSeverity) {
                 return (
-                  <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b", textAlign: "center" }}>
+                  <Typography
+                    key={k}
+                    sx={{
+                      px: 3,
+                      py: 2,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: "#0f172a",
+                      textAlign: "center",
+                    }}
+                  >
                     {displayVal}
                   </Typography>
                 );
@@ -224,12 +277,20 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
                 <Typography
                   key={k}
                   sx={{
-                    px: 2,
-                    py: 1.5,
-                    fontSize: 13,
-                    color: sensitivityColor(displayVal) !== "#1e293b" ? sensitivityColor(displayVal) : "#1e293b",
-                    fontWeight: displayVal.toLowerCase().includes("exit") ? 600 : 400,
-                    fontFamily: k.toLowerCase().includes("capital") || k.toLowerCase().includes("impact") ? "monospace" : "inherit",
+                    px: 3,
+                    py: 2,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color:
+                      sensitivityColor(displayVal) !== "#1e293b"
+                        ? sensitivityColor(displayVal)
+                        : "#334155",
+                    lineHeight: 1.6,
+                    fontFamily:
+                      k.toLowerCase().includes("capital") ||
+                        k.toLowerCase().includes("impact")
+                        ? "monospace"
+                        : "inherit",
                   }}
                 >
                   {displayVal}
@@ -240,20 +301,41 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
         ))}
       </Box>
 
-      <Dialog open={Boolean(selectedRow)} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
-        <DialogTitle sx={{ pt: 3, pb: 1 }}>
-          {selectedRow
-            ? `${selectedRow.ticker || selectedRow.title || selectedRow.name || "Decision"} Details`
-            : "Decision Details"}
-        </DialogTitle>
-        <DialogContent dividers sx={{ pt: 0 }}>
+      <Dialog
+        open={Boolean(selectedRow)}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="md"
+        scroll="paper"
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            overflow: "hidden",
+            position: "relative",
+          },
+        }}
+      >
+        {/* Floating X Button */}
+        <IconButton
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            backgroundColor: "rgba(0,0,0,0.04)",
+            backdropFilter: "blur(6px)",
+            "&:hover": {
+              backgroundColor: "rgba(0,0,0,0.08)",
+            },
+            zIndex: 10,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+
+        <DialogContent dividers sx={{ pt: 4 }}>
           {selectedRow && <ImmediateDecisionCard item={selectedRow} />}
         </DialogContent>
-        <DialogActions sx={{ pr: 3, pb: 2 }}>
-          <Button onClick={handleClose} variant="text">
-            Close
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );
