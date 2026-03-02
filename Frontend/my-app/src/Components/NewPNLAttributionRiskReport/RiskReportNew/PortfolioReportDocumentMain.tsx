@@ -477,9 +477,17 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           </IconButton> */}
             <Box sx={{ flex: 1, textAlign: "center" }}>
               <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.1, color: "#1e293b" }}>
-                <Box component="span" sx={{ color: "#2563eb" }}>
+                <Box component="span" sx={{ color: "#7236a9",fontSize:20 }}>
                   US Equity Portfolio AI Review              </Box>
-                {" - "}
+                {/* {" - "}
+                {header.report_title} */}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: 12,
+
+                }}
+              >
                 {header.report_title}
               </Typography>
               <Typography
