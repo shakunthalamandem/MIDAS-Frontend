@@ -146,7 +146,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <TextField
             type="date"
             size="small"
-            label="Date"
+            label="As of Date"
             value={selectedDate}
             onChange={(e) => onDateChange(e.target.value)}
             InputLabelProps={{ shrink: true }}

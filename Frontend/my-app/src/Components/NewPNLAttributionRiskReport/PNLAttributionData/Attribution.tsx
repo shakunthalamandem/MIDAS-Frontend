@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import type { AttributionItem, AttributionGroupBy } from "./types";
 import AttributionTable from "./AttributionTable";
 import AttributionDetail from "./AttributionDetail";
+import AttributionRowCards from "./AttributionRowCards";
+import AttributionChart from "./AttributionChart";
 import "./Attribution.css";
+import "./AttributionRowCards.css";
 
 interface AttributionProps {
   selectedFunds: string[];
@@ -103,8 +106,14 @@ const Attribution: React.FC<AttributionProps> = ({
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
   const activeTheme = GROUP_BY_TABS.find((t) => t.key === groupBy)!;
+
+  const expandedRowData = useMemo(
+    () => (expandedRow ? data.find((d) => d.name === expandedRow) ?? null : null),
+    [data, expandedRow]
+  );
 
   const fetchAttribution = useCallback(async () => {
     if (selectedFunds.length === 0 || !selectedDate) return;
@@ -143,10 +152,22 @@ const Attribution: React.FC<AttributionProps> = ({
   /* Close detail when tab changes */
   useEffect(() => {
     setExpandedRow(null);
+    setSelectedCard(null);
   }, [groupBy]);
 
   const handleRowClick = (name: string) => {
-    setExpandedRow((prev) => (prev === name ? null : name));
+    setExpandedRow((prev) => {
+      if (prev === name) {
+        setSelectedCard(null);
+        return null;
+      }
+      setSelectedCard("ytd_pnl");
+      return name;
+    });
+  };
+
+  const handleCardClick = (metricKey: string) => {
+    setSelectedCard((prev) => (prev === metricKey ? null : metricKey));
   };
 
   return (
@@ -208,6 +229,33 @@ const Attribution: React.FC<AttributionProps> = ({
               expandedRow={expandedRow}
               onRowClick={handleRowClick}
             />
+
+            {/* Metric cards for expanded row */}
+            {expandedRow && expandedRowData && (
+              <AttributionRowCards
+                rowData={expandedRowData}
+                selectedCard={selectedCard}
+                accentColor={activeTheme.activeTab}
+                onCardClick={handleCardClick}
+                onClose={() => {
+                  setExpandedRow(null);
+                  setSelectedCard(null);
+                }}
+              />
+            )}
+
+            {/* Chart for selected card */}
+            {expandedRow && selectedCard && (
+              <AttributionChart
+                selectedFunds={selectedFunds}
+                selectedDate={selectedDate}
+                groupBy={groupBy}
+                groupValue={expandedRow}
+                metric={selectedCard}
+                accentColor={activeTheme.activeTab}
+              />
+            )}
+
             {expandedRow && (
               <AttributionDetail
                 groupBy={groupBy}
@@ -216,7 +264,10 @@ const Attribution: React.FC<AttributionProps> = ({
                 selectedDate={selectedDate}
                 showPct={showPct}
                 theme={activeTheme}
-                onClose={() => setExpandedRow(null)}
+                onClose={() => {
+                  setExpandedRow(null);
+                  setSelectedCard(null);
+                }}
               />
             )}
           </>
