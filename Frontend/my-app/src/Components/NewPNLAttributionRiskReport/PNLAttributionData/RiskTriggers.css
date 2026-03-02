@@ -1,0 +1,620 @@
+/* ══ Risk Triggers – Limits & Alerts ══ */
+
+/* ── Header Bar ── */
+.trig-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #002060 0%, #001440 100%);
+  border-radius: 12px;
+  padding: 14px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 32, 96, 0.25);
+}
+
+.trig-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trig-header-title {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.trig-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Fund dropdown in header */
+.trig-header-select {
+  min-width: 170px;
+}
+
+.trig-header-select .MuiOutlinedInput-root {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.trig-header-select .MuiOutlinedInput-root fieldset {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.trig-header-select .MuiOutlinedInput-root:hover fieldset {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.trig-header-select .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #4db8ff;
+}
+
+.trig-header-select .MuiSelect-select {
+  color: #fff !important;
+}
+
+.trig-header-select .MuiSvgIcon-root {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Date nav group */
+.trig-header-date-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Date input in header */
+.trig-header-date {
+  width: 155px;
+}
+
+.trig-header-date .MuiOutlinedInput-root {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.trig-header-date .MuiOutlinedInput-root fieldset {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.trig-header-date .MuiOutlinedInput-root:hover fieldset {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.trig-header-date .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #4db8ff;
+}
+
+.trig-header-date input {
+  color: #fff !important;
+}
+
+.trig-header-date input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Edit button in header */
+.trig-header-edit-btn {
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  padding: 5px 18px !important;
+  white-space: nowrap;
+}
+
+.trig-header-edit-btn.MuiButton-outlined {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.trig-header-edit-btn.MuiButton-outlined:hover {
+  border-color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.trig-header-edit-btn.MuiButton-contained {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+
+.trig-header-edit-btn.MuiButton-contained:hover {
+  background: #c0392b !important;
+}
+
+/* ── Edit Guidelines Panel ── */
+.trig-edit-panel {
+  background: #fff;
+  border: 1px solid #e0e4ea;
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 12px rgba(0, 32, 96, 0.06);
+}
+
+.trig-edit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.trig-edit-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.trig-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trig-edit-reset {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+}
+
+.trig-edit-reset:hover {
+  background: #f1f5f9 !important;
+}
+
+.trig-edit-apply {
+  background: #002060 !important;
+  color: #fff !important;
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+  padding: 5px 20px !important;
+}
+
+.trig-edit-apply:hover {
+  background: #001440 !important;
+}
+
+.trig-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 22px;
+}
+
+@media (max-width: 900px) {
+  .trig-edit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .trig-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trig-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trig-edit-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  letter-spacing: 0.2px;
+}
+
+.trig-edit-input {
+  width: 100%;
+}
+
+.trig-edit-input .MuiOutlinedInput-root {
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f8fafc;
+}
+
+.trig-edit-input .MuiOutlinedInput-root.Mui-focused {
+  background: #fff;
+}
+
+.trig-edit-input .MuiOutlinedInput-root fieldset {
+  border-color: #e2e8f0;
+}
+
+.trig-edit-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #002060;
+}
+
+.trig-edit-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #002060;
+}
+
+/* ── Summary Cards ── */
+.trig-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .trig-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .trig-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trig-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trig-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 32, 96, 0.1);
+}
+
+.trig-card--breach {
+  border-left: 4px solid #e74c3c;
+}
+
+.trig-card--warning {
+  border-left: 4px solid #f39c12;
+}
+
+.trig-card--safe {
+  border-left: 4px solid #10b981;
+}
+
+.trig-card-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  letter-spacing: 0.8px;
+}
+
+.trig-card-value {
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.trig-card-limit {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #94a3b8 !important;
+}
+
+/* Progress bar */
+.trig-card-bar {
+  height: 5px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.trig-card-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ── Section Card ── */
+.trig-section {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+}
+
+.trig-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.trig-section-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trig-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.trig-icon--warn {
+  background: rgba(234, 179, 8, 0.12);
+  color: #ca8a04;
+}
+
+.trig-icon--blue {
+  background: rgba(0, 32, 96, 0.1);
+  color: #002060;
+}
+
+.trig-section-title {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+}
+
+/* Badges */
+.trig-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+
+.trig-badge--green {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.trig-badge--blue {
+  color: #002060;
+  background: rgba(0, 32, 96, 0.08);
+  border: 1px solid rgba(0, 32, 96, 0.2);
+}
+
+/* ── Metric Block ── */
+.trig-metric {
+  margin-bottom: 24px;
+}
+
+.trig-metric:last-child {
+  margin-bottom: 0;
+}
+
+.trig-metric-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.trig-metric-name {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.trig-metric-name-standalone {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin-bottom: 10px !important;
+}
+
+.trig-guideline-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 3px 12px;
+}
+
+/* ── Table Styles ── */
+.trig-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.trig-table thead tr {
+  background: #002060;
+}
+
+.trig-table th {
+  padding: 12px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: none;
+}
+
+.trig-th-l {
+  text-align: left !important;
+}
+
+.trig-th-r {
+  text-align: right !important;
+}
+
+.trig-table td {
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  border: none;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trig-td-l {
+  text-align: left !important;
+  font-weight: 600 !important;
+}
+
+.trig-td-r {
+  text-align: right !important;
+}
+
+.trig-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ── Value Cell with trend icon + pill ── */
+.trig-val-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.trig-trend {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.trig-trend--up {
+  color: #e74c3c;
+}
+
+.trig-trend--flat {
+  color: #94a3b8;
+}
+
+/* Value pills */
+.trig-pill {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 14px;
+  border-radius: 16px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.trig-pill--breach {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.trig-pill--warning {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.trig-pill--safe {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ── Total row ── */
+.trig-total-row {
+  border-top: 2px solid #cbd5e1 !important;
+}
+
+.trig-total-row td {
+  border-top: 2px solid #cbd5e1 !important;
+}
+
+.trig-total-cell {
+  font-weight: 800 !important;
+  color: #0f172a !important;
+}
+
+.trig-total-val {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty row ── */
+.trig-empty {
+  text-align: center !important;
+  color: #94a3b8 !important;
+  font-style: italic;
+  padding: 20px 16px !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .trig-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+    padding: 14px 16px;
+  }
+
+  .trig-header-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .trig-section {
+    padding: 16px;
+  }
+
+  .trig-table th,
+  .trig-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .trig-card-value {
+    font-size: 22px !important;
+  }
+
+  .trig-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .trig-cards {
+    grid-template-columns: 1fr;
+  }
+}
