@@ -203,18 +203,64 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             </Box>
           )}
 
-          <Box sx={sectionSx}>
-            <Typography sx={sectionLabelSx}>Region:</Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <RegionTabs
-                tabs={regionTabs}
-                selectedRegion={selectedRegion}
-                onSelect={onSelectRegion}
-                compact
-                hoverColor="#002060"
-              />
-            </Box>
-          </Box>
+                {selectedOp === "live" && (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
+                      <DatePicker
+                        label="Start date"
+                        value={liveStartDate}
+                        format="DD-MM-YYYY"
+                        onChange={(value) => {
+                          setLiveStartDate(value);
+                        }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            placeholder: "dd-mm-yyyy",
+                            sx: {
+                              minWidth: 108,
+                              maxWidth: 150,
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: 999,
+                                height: 36,
+                                backgroundColor: "#ffffff",
+                              },
+                              "& .MuiInputBase-input": {
+                                px: 1,
+                              },
+                            },
+                          },
+                        }}
+                      />
+                      <DatePicker
+                        label="End date"
+                        value={liveEndDate}
+                        format="DD-MM-YYYY"
+                        onChange={(value) => {
+                          setLiveEndDate(value);
+                        }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            placeholder: "dd-mm-yyyy",
+                            sx: {
+                              minWidth: 108,
+                              maxWidth: 150,
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: 999,
+                                height: 36,
+                                backgroundColor: "#ffffff",
+                              },
+                              "& .MuiInputBase-input": {
+                                px: 1,
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </Stack>
+                  </LocalizationProvider>
+                )}
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 0 }}>
             {/* <Typography sx={sectionLabelSx}>Search:</Typography> */}

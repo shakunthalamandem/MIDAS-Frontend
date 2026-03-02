@@ -31,7 +31,9 @@ export const formatDate = (dateStr: string): string => {
   });
 };
 
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export const formatChartXAxis = (dateStr: string): string => {
   const d = new Date(dateStr + "T00:00:00");
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+  return `${SHORT_MONTHS[d.getMonth()]}-${d.getDate()}`;
 };
