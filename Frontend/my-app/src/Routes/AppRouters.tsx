@@ -87,6 +87,7 @@ import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
 import SentimentAnalysisTabs from "../Components/AIML/SentimentAnalysisTabs";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
+import ShowUSSentimentAnalysis from "../Components/AIML/ShowUSSentimentAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
@@ -289,6 +290,7 @@ const AppRouters: React.FC = () => {
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysisTabs /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+        <Route path="/ai_sentiment_view" element={<AuthGuard><ShowUSSentimentAnalysis /></AuthGuard>} />
 
 
 
