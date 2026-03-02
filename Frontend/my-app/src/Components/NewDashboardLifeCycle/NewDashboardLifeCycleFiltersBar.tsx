@@ -29,6 +29,7 @@ type FiltersBarProps = {
   onSelectOp: (value: string) => void;
   selectedDealType: "IPO" | "FO";
   onSelectDealType: (value: "IPO" | "FO") => void;
+  disableFo?: boolean;
   isPipelineView: boolean;
   liveStartDate: Dayjs | null;
   liveEndDate: Dayjs | null;
@@ -52,6 +53,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
   onSelectOp,
   selectedDealType,
   onSelectDealType,
+  disableFo = false,
   isPipelineView,
   liveStartDate,
   liveEndDate,
@@ -153,16 +155,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               sx={{
                 ...pillGroupSx,
                 "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
                 "& .Mui-selected:hover": {
-                  backgroundColor: "#002060",
-                  color: "#ffffff",
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
                 },
               }}
             >
@@ -174,93 +176,47 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             </ToggleButtonGroup>
           </Box>
 
-          {!isPipelineView && (
-            <Box sx={sectionSx}>
-              <Typography sx={sectionLabelSx}>Type:</Typography>
-              <ToggleButtonGroup
-                value={selectedDealType}
-                exclusive
-                onChange={(_e, value) => value && onSelectDealType(value)}
-                sx={{
-                  ...pillGroupSx,
-                  "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                  "& .Mui-selected:hover": {
-                    backgroundColor: "#002060",
-                    color: "#ffffff",
-                  },
-                }}
-              >
-                <ToggleButton value="IPO">IPO</ToggleButton>
-                <ToggleButton value="FO">FO</ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-          )}
+          <Box sx={sectionSx}>
+            <Typography sx={sectionLabelSx}>Type:</Typography>
+            <ToggleButtonGroup
+              value={selectedDealType}
+              exclusive
+              onChange={(_e, value) => value && onSelectDealType(value)}
+              sx={{
+                ...pillGroupSx,
+                "& .MuiToggleButton-root:hover:not(.Mui-selected)": {
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
+                },
+                "& .Mui-selected:hover": {
+                  backgroundColor: "#002060 !important",
+                  color: "#ffffff !important",
+                },
+              }}
+            >
+              <ToggleButton value="IPO">IPO</ToggleButton>
+              <ToggleButton value="FO" disabled={disableFo}>
+                FO
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
-                {selectedOp === "live" && (
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
-                      <DatePicker
-                        label="Start date"
-                        value={liveStartDate}
-                        format="DD-MM-YYYY"
-                        onChange={(value) => {
-                          setLiveStartDate(value);
-                        }}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            placeholder: "dd-mm-yyyy",
-                            sx: {
-                              minWidth: 108,
-                              maxWidth: 150,
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 999,
-                                height: 36,
-                                backgroundColor: "#ffffff",
-                              },
-                              "& .MuiInputBase-input": {
-                                px: 1,
-                              },
-                            },
-                          },
-                        }}
-                      />
-                      <DatePicker
-                        label="End date"
-                        value={liveEndDate}
-                        format="DD-MM-YYYY"
-                        onChange={(value) => {
-                          setLiveEndDate(value);
-                        }}
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            placeholder: "dd-mm-yyyy",
-                            sx: {
-                              minWidth: 108,
-                              maxWidth: 150,
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 999,
-                                height: 36,
-                                backgroundColor: "#ffffff",
-                              },
-                              "& .MuiInputBase-input": {
-                                px: 1,
-                              },
-                            },
-                          },
-                        }}
-                      />
-                    </Stack>
-                  </LocalizationProvider>
-                )}
+          <Box sx={sectionSx}>
+            <Typography sx={sectionLabelSx}>Region:</Typography>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <RegionTabs
+                tabs={regionTabs}
+                selectedRegion={selectedRegion}
+                onSelect={onSelectRegion}
+                compact
+                hoverColor="#002060"
+              />
+            </Box>
+          </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 0 }}>
             {/* <Typography sx={sectionLabelSx}>Search:</Typography> */}
@@ -372,8 +328,8 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             flexWrap: "wrap",
           }}
         >
-          <CalendarMonthOutlinedIcon sx={{ color: "#d97706" }} />
-          <Typography sx={{ fontWeight: 700, color: "#9a5b00" }}>
+          <CalendarMonthOutlinedIcon sx={{ color: "#d97706", fontSize: "1rem" }} />
+          <Typography sx={{ fontWeight: 500, color: "#9a5b00" }} variant="caption">
             Date Range:
           </Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -402,12 +358,16 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                       },
                       "& .MuiInputBase-input": {
                         px: 1,
+                        fontSize: "0.75rem",
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "0.75rem",
                       },
                     },
                   },
                 }}
               />
-              <Typography sx={{ fontWeight: 700, color: "#9a5b00" }}>
+              <Typography sx={{ fontWeight: 500, color: "#9a5b00" }} variant="caption">
                 to
               </Typography>
               <DatePicker
@@ -434,6 +394,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                       },
                       "& .MuiInputBase-input": {
                         px: 1,
+                        fontSize: "0.75rem",
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "0.75rem",
                       },
                     },
                   },

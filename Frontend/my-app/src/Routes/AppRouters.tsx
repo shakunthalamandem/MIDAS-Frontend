@@ -99,6 +99,7 @@ import PNLAttributionSectionMain from "../Components/NewPNLAttributionRiskReport
 import NewPortfolioRiskUpload from "../Components/Uploads/NewPortfolioRiskUpload";
 import RiskDashboard from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard";
 import TickerDetail from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/TickerDetail";
+import RiskTriggers from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskTriggers";
 import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain";
 import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
 import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs";
@@ -310,6 +311,7 @@ const AppRouters: React.FC = () => {
 
         <Route path='/risk_report_pnl_report' element={<AuthGuard><RiskDashboard /></AuthGuard>} />
         <Route path='/risk_report_pnl_report/ticker-detail' element={<AuthGuard><TickerDetail /></AuthGuard>} />
+        <Route path='/risk_triggers' element={<AuthGuard><RiskTriggers /></AuthGuard>} />
         <Route path='/risk_upload' element={<AuthGuard><NewPortfolioRiskUpload /></AuthGuard>} />
 
 
