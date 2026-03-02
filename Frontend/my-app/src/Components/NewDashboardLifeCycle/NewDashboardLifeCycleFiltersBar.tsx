@@ -329,7 +329,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
           }}
         >
           <CalendarMonthOutlinedIcon sx={{ color: "#d97706" }} />
-          <Typography sx={{ fontWeight: 700, color: "#9a5b00" }}>
+          <Typography sx={{ fontWeight: 500, color: "#9a5b00" }} variant="caption">
             Date Range:
           </Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -363,7 +363,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                   },
                 }}
               />
-              <Typography sx={{ fontWeight: 700, color: "#9a5b00" }}>
+              <Typography sx={{ fontWeight: 500, color: "#9a5b00" }} variant="caption">
                 to
               </Typography>
               <DatePicker

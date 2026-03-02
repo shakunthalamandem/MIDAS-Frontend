@@ -484,67 +484,7 @@ const NewDealsLifecycleCards: React.FC = () => {
           }}
         >
           <Stack spacing={1.5}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 1,
-                flexWrap: "wrap",
-              }}
-            >
-              <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#ffffff" }}>
-                Tracking:
-              </Typography>
-              <Stack direction="row" spacing={0.75} alignItems="center">
-                <Box
-                  sx={{
-                    px: 1.25,
-                    py: 0.4,
-                    borderRadius: 1,
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    border: "1px solid rgba(255,255,255,0.25)",
-                  }}
-                >
-                  {selectedOp === "live"
-                    ? "Recent"
-                    : selectedOp === "pipeline"
-                    ? "Pipeline"
-                    : "Upcoming"}
-                </Box>
-                <Box
-                  sx={{
-                    px: 1.25,
-                    py: 0.4,
-                    borderRadius: 1,
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    border: "1px solid rgba(255,255,255,0.25)",
-                  }}
-                >
-                  {selectedDealType}
-                </Box>
-                <Box
-                  sx={{
-                    px: 1.25,
-                    py: 0.4,
-                    borderRadius: 1,
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    border: "1px solid rgba(255,255,255,0.25)",
-                  }}
-                >
-                  {selectedRegion}
-                </Box>
-              </Stack>
-            </Box>
+
 
             <FiltersBar
               tabs={tabs}
