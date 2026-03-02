@@ -242,7 +242,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
             <CardContent sx={{ pb: 0 }}>
               <Box display="flex" justifyContent="space-between">
                 <Typography fontWeight={600}>
-                  About AI Unsupervised Analysis
+                  About AI based on previous 30 deals analysis
                 </Typography>
 
                 <IconButton
