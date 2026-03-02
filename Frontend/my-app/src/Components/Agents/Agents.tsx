@@ -14,7 +14,6 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import RadarIcon from "@mui/icons-material/Radar";
 
 interface AgentConfig {
   title: string;
@@ -23,24 +22,45 @@ interface AgentConfig {
 }
 
 const activeAgents: AgentConfig[] = [
+
   {
-    title: "AI Daily Briefing",
+    title: "AI Portfolio Review",
     description:
-      "AI-generated executive briefing tailored to your sectors and risk profile.",
-    schedule: "Run daily at 8:00 AM UTC",
+      "Comprehensive review of your portfolio performance and recommendations.",
+    schedule: "Run daily at 8:00 AM EST",
   },
-  {
-    title: "Portfolio Signals",
+    {
+    title: "Last 30 Days IPO AI Ranking",
     description:
-      "Buy/Sell/Hold signals generated for your watchlist stocks every trading day.",
-    schedule: "Run every day at 8:00 AM UTC",
+      "AI-generated ranking of the most promising IPOs from the last 30 days.",
+    schedule: "Run daily at 8:00 AM EST",
   },
+    {
+    title: "AI Unsupervised Market Insights",
+    description:
+      "AI-generated insights on market trends and opportunities without explicit supervision.",
+    schedule: "Run daily at 8:00 AM EST",
+  },
+    {
+    title: "Portfolio Analysis",
+    description:
+      "AI-generated portfolio analysis reports through the email",
+    schedule: "Run daily at 8:00 AM EST",
+  },
+    {
+    title: "AI Sentiment Analysis",
+    description:
+      "AI-generated sentiment analysis for your watchlist stocks.",
+    schedule: "Run daily at 8:00 AM EST",
+  },
+
 ];
 
 const comingSoonAgents = [
   {
     title: "IPO Calendar Alerts",
-    description: "Get notified when IPOs matching your interests are scheduled.",
+    description:
+      "Get notified when IPOs matching your interests are scheduled.",
     icon: CalendarTodayIcon,
   },
   {
@@ -50,10 +70,10 @@ const comingSoonAgents = [
   },
   {
     title: "Earnings Whisper Agent",
-    description: "Pre-earnings analysis and whisper numbers for your watchlist.",
+    description:
+      "Pre-earnings analysis and whisper numbers for your watchlist.",
     icon: RocketLaunchIcon,
   },
-
 ];
 
 const Agents: React.FC = () => {
@@ -61,15 +81,12 @@ const Agents: React.FC = () => {
     activeAgents.reduce(
       (acc, agent) => ({
         ...acc,
-        [agent.title]: { enabled: agent.title !== "AI Daily Briefing", email: true },
+        [agent.title]: {
+          enabled: agent.title !== "AI Daily Briefing",
+          email: true,
+        },
       }),
-      {} as Record<
-        string,
-        {
-          enabled: boolean;
-          email: boolean;
-        }
-      >
+      {} as Record<string, { enabled: boolean; email: boolean }>
     )
   );
 
@@ -93,6 +110,7 @@ const Agents: React.FC = () => {
       }}
     >
       <Box sx={{ maxWidth: 1200, width: "100%", mx: "auto" }}>
+        {/* Header */}
         <Paper
           elevation={0}
           sx={{
@@ -109,10 +127,12 @@ const Agents: React.FC = () => {
                 bgcolor: "#efd4ff",
                 width: 64,
                 height: 64,
-                boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.12)",
               }}
             >
-              <AutoAwesomeIcon fontSize="large" sx={{ color: "#5b2fff" }} />
+              <AutoAwesomeIcon
+                fontSize="large"
+                sx={{ color: "#5b2fff" }}
+              />
             </Avatar>
 
             <Box flex="1" minWidth={240}>
@@ -123,21 +143,26 @@ const Agents: React.FC = () => {
                 Your AI Workforce
               </Typography>
               <Typography variant="body1" color="#4f5973">
-                Autonomous AI agents that monitor markets, generate insights, and
-                deliver personalized intelligence — working around the clock for
-                you.
+                Autonomous AI agents that monitor markets, generate insights,
+                and deliver personalized intelligence — working around the
+                clock for you.
               </Typography>
             </Box>
           </Stack>
 
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label="2 Agents" color="default" />
+            <Chip label="3 Agents" />
             <Chip label="0 Active" color="success" variant="outlined" />
-            <Chip label="Email Not Verified" color="warning" variant="outlined" />
+            <Chip
+              label="Email Not Verified"
+              color="warning"
+              variant="outlined"
+            />
             <Chip label="3 Coming Soon" color="info" />
           </Stack>
         </Paper>
 
+        {/* Active Agents */}
         <Typography
           variant="h6"
           sx={{ color: "#0b1e4c", fontWeight: 700, mb: 2 }}
@@ -145,32 +170,33 @@ const Agents: React.FC = () => {
           Active Agents
         </Typography>
 
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={3}
-          mb={5}
-          alignItems="stretch"
-          justifyContent="center"
+        <Box
+          component="section"
+          sx={{
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+            gap: 3,
+            justifyContent: "center",
+            mb: 5,
+          }}
         >
           {activeAgents.map((agent) => {
             const state = activations[agent.title];
             const isActive = state?.enabled ?? false;
             const emailOn = state?.email ?? false;
+
             return (
               <Paper
                 key={agent.title}
                 elevation={2}
                 sx={{
                   borderRadius: 4,
-                  p: { xs: 3, md: 4 },
-                  flex: 1,
-                  maxWidth: 520,
-                  minWidth: 280,
+                  p: 4,
                   backgroundColor: "#ffffff",
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
-                  mx: "auto",
                 }}
               >
                 <Stack
@@ -183,8 +209,9 @@ const Agents: React.FC = () => {
                   </Typography>
                   <Switch
                     checked={isActive}
-                    onChange={() => handleToggle(agent.title, "enabled")}
-                    color="primary"
+                    onChange={() =>
+                      handleToggle(agent.title, "enabled")
+                    }
                   />
                 </Stack>
 
@@ -194,16 +221,10 @@ const Agents: React.FC = () => {
 
                 <Divider />
 
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  flexWrap="wrap"
-                  spacing={2}
-                >
+                <Stack direction="row" flexWrap="wrap" spacing={2}>
                   <Chip
                     icon={<CalendarTodayIcon />}
                     label={agent.schedule}
-                    color="primary"
                     variant="outlined"
                   />
                   <Chip
@@ -215,34 +236,14 @@ const Agents: React.FC = () => {
                   <Chip
                     icon={<EmailOutlinedIcon />}
                     label={
-                      emailOn ? "Email results after run" : "Email disabled"
+                      emailOn
+                        ? "Email results after run"
+                        : "Email disabled"
                     }
-                    variant="outlined"
                     color={emailOn ? "success" : "default"}
+                    variant="outlined"
                   />
                 </Stack>
-
-                <Box
-                  sx={{
-                    width: "fit-content",
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    border: "1px solid",
-                    borderColor: isActive ? "#2cae5c" : "rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      color: isActive ? "#2cae5c" : "#999",
-                    }}
-                  >
-                    {isActive ? "Active" : "Paused"}
-                  </Typography>
-                </Box>
 
                 <Paper
                   elevation={0}
@@ -262,14 +263,17 @@ const Agents: React.FC = () => {
                   </Typography>
                   <Switch
                     checked={emailOn}
-                    onChange={() => handleToggle(agent.title, "email")}
+                    onChange={() =>
+                      handleToggle(agent.title, "email")
+                    }
                   />
                 </Paper>
               </Paper>
             );
           })}
-        </Stack>
+        </Box>
 
+        {/* Coming Soon */}
         <Typography
           variant="h6"
           sx={{ color: "#0b1e4c", fontWeight: 700, mb: 2 }}
@@ -278,20 +282,22 @@ const Agents: React.FC = () => {
         </Typography>
 
         <Stack
-          direction={{ xs: "column", md: "row" }}
+          direction="row"
           spacing={3}
-          flexWrap="wrap"
-          justifyContent="center"
+          sx={{
+            overflowX: "auto",
+            pb: 1,
+          }}
         >
           {comingSoonAgents.map((agent) => {
             const Icon = agent.icon;
+
             return (
               <Paper
                 key={agent.title}
                 elevation={0}
                 sx={{
-                  flex: "1",
-                  minWidth: 250,
+                  flex: "0 0 300px",
                   borderRadius: 4,
                   p: 3,
                   background:
@@ -299,16 +305,31 @@ const Agents: React.FC = () => {
                   border: "1px solid rgba(94, 112, 148, 0.15)",
                 }}
               >
-                <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-                  <Avatar sx={{ bgcolor: "#eef3ff", color: "#5b2fff" }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={2}
+                  mb={2}
+                >
+                  <Avatar
+                    sx={{ bgcolor: "#eef3ff", color: "#5b2fff" }}
+                  >
                     <Icon />
                   </Avatar>
                   <Chip label="Soon" color="warning" size="small" />
                 </Stack>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700 }}
+                >
                   {agent.title}
                 </Typography>
-                <Typography variant="body2" color="#555f77" mt={1}>
+                <Typography
+                  variant="body2"
+                  color="#555f77"
+                  mt={1}
+                >
                   {agent.description}
                 </Typography>
               </Paper>
