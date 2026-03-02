@@ -25,7 +25,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import ExecutiveDashboard from "./sections/ExecutiveDashboard";
 import CIODecisionBrief from "./sections/CIODecisionBrief";
-import ImmediateDecisions from "./sections/ImmediateDecisions";
+import ImmediateDecisions, { extractImmediateDecisionItems } from "./sections/ImmediateDecisions";
 import DisciplineScorecard from "./sections/DisciplineScorecard";
 import SectorNewsMap from "./sections/SectorNewsMap";
 import MacroEvents from "./sections/MacroEvents";
@@ -296,6 +296,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
       return 0;
     });
   const sections = reportData!.sections;
+  const immediateDecisionItems = extractImmediateDecisionItems(sections.immediate_decisions);
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
   return (
@@ -562,6 +563,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
               const SectionComponent = sectionComponents[item.key];
               const sectionData = sections[item.key];
               const colors = sectionColors[item.key] || { bg: "#f8fafc", border: "#e2e8f0", iconColor: "#64748b", textColor: "#475569" };
+              const isActionMatrixSection = item.key === "final_prioritized_action_matrix";
 
               return (
                 <Box
@@ -634,15 +636,22 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                       p: 3,
                     }}
                   >
-                    {SectionComponent && sectionData != null ? (
-                      <SectionComponent data={sectionData} />
-                    ) : sectionData ? (
-                      <GenericDataRenderer data={sectionData} />
-                    ) : (
-                      <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
-                        No data available for this section.
-                      </Typography>
-                    )}
+                    {(() => {
+                      if (sectionData == null) {
+                        return (
+                          <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
+                            No data available for this section.
+                          </Typography>
+                        );
+                      }
+                      if (isActionMatrixSection) {
+                        return <ActionMatrix data={sectionData} detailItems={immediateDecisionItems} />;
+                      }
+                      if (SectionComponent) {
+                        return <SectionComponent data={sectionData} />;
+                      }
+                      return <GenericDataRenderer data={sectionData} />;
+                    })()}
                   </Box>
                 </Box>
               );

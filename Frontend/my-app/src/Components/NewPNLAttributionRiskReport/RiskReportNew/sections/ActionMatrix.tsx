@@ -1,9 +1,11 @@
-import React from "react";
-import { Box, Typography, Chip } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import GenericDataRenderer from "./GenericDataRenderer";
+import ImmediateDecisionCard from "./ImmediateDecisionCard";
 
 interface Props {
   data: any;
+  detailItems?: any[];
 }
 
 const SKIP_KEYS = ["badge", "overall", "section_number", "label", "key", "urgency_emoji"];
@@ -20,6 +22,11 @@ const extractColumns = (val: any, rows: any[]): string[] => {
   if (val && Array.isArray(val.columns) && val.columns.length > 0) return val.columns;
   if (rows.length > 0) return Object.keys(rows[0]);
   return [];
+};
+
+const normalizeTickerKey = (item: any): string => {
+  const candidate = item?.ticker || item?.symbol || item?.name || "";
+  return String(candidate).trim().toLowerCase();
 };
 
 const priorityColor = (priority: number | string): string => {
@@ -41,7 +48,7 @@ const sensitivityColor = (val: string): string => {
 
 const formatHeader = (k: string) => k.replace(/_/g, " ").toUpperCase();
 
-/** Enforce column order: Priority → Ticker → Action → Capital Impact → Severity → Time → Urgency → rest */
+/** Enforce column order: Priority -> Ticker -> Action -> Capital Impact -> Severity -> Time -> Urgency -> rest */
 const PREFERRED_ORDER: { keywords: string[]; index: number }[] = [
   { keywords: ["priority"], index: 0 },
   { keywords: ["ticker", "symbol", "stock", "name"], index: 1 },
@@ -57,14 +64,27 @@ const getColumnOrder = (key: string): number => {
   for (const entry of PREFERRED_ORDER) {
     if (entry.keywords.some((kw) => lower === kw || lower.includes(kw))) return entry.index;
   }
-  return 100; // unknown columns go to the end
+  return 100;
 };
 
 const sortColumns = (keys: string[]): string[] => {
   return [...keys].sort((a, b) => getColumnOrder(a) - getColumnOrder(b));
 };
 
-const ActionMatrix: React.FC<Props> = ({ data }) => {
+const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
+  const [selectedRow, setSelectedRow] = useState<any | null>(null);
+
+  const detailLookup = useMemo(() => {
+    const map = new Map<string, any>();
+    (detailItems || []).forEach((detail) => {
+      const key = normalizeTickerKey(detail);
+      if (key) {
+        map.set(key, detail);
+      }
+    });
+    return map;
+  }, [detailItems]);
+
   if (!data) return null;
 
   if (typeof data === "string") {
@@ -82,7 +102,6 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
     return <GenericDataRenderer data={data} accentColor="#7c3aed" />;
   }
 
-  // Get columns, filter skipped keys, then enforce preferred order
   const dynamicKeys = sortColumns(extractColumns(rawSource, items).filter((k) => !SKIP_KEYS.includes(k)));
 
   if (dynamicKeys.length === 0) {
@@ -94,123 +113,149 @@ const ActionMatrix: React.FC<Props> = ({ data }) => {
   const urgencyKey = dynamicKeys.find((k) => ["urgency", "time_sensitivity", "time", "window", "timeline"].includes(k.toLowerCase()));
   const severityKey = dynamicKeys.find((k) => ["severity", "severity_score", "score", "risk_level"].includes(k.toLowerCase()));
 
-  return (
-    <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
-      {/* Table Header */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-          backgroundColor: "#f8fafc",
-          borderBottom: "2px solid #e9d5ff",
-        }}
-      >
-        {dynamicKeys.map((k) => (
-          <Typography
-            key={k}
-            sx={{
-              px: 2,
-              py: 1.2,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: 0.8,
-              color: "#475569",
-              textTransform: "uppercase",
-            }}
-          >
-            {formatHeader(k)}
-          </Typography>
-        ))}
-      </Box>
+  const handleRowClick = (row: any) => {
+    const lookupKey = normalizeTickerKey(row);
+    const detailMatch = lookupKey ? detailLookup.get(lookupKey) : null;
+    setSelectedRow(detailMatch || row);
+  };
 
-      {/* Table Rows */}
-      {items.map((row: any, i: number) => (
+  const handleClose = () => setSelectedRow(null);
+
+  return (
+    <>
+      <Box sx={{ border: "1px solid #c7d2fe", borderRadius: 2.5, overflow: "hidden" }}>
         <Box
-          key={i}
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
-            borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none",
-            alignItems: "center",
-            "&:hover": { backgroundColor: "#f0f7ff" },
+            backgroundColor: "#f8fafc",
+            borderBottom: "2px solid #e9d5ff",
           }}
         >
-          {dynamicKeys.map((k) => {
-            const val = row[k];
-            const displayVal = val === null || val === undefined ? "—" : typeof val === "object" ? JSON.stringify(val) : String(val);
-            const isPriority = k === priorityKey;
-            const isTicker = k === tickerKey;
-            const isUrgency = k === urgencyKey;
-            const isSeverity = k === severityKey;
+          {dynamicKeys.map((k) => (
+            <Typography
+              key={k}
+              sx={{
+                px: 2,
+                py: 1.2,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: 0.8,
+                color: "#475569",
+                textTransform: "uppercase",
+              }}
+            >
+              {formatHeader(k)}
+            </Typography>
+          ))}
+        </Box>
 
-            if (isPriority) {
-              return (
-                <Box key={k} sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
-                  <Box
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: "50%",
-                      backgroundColor: priorityColor(val),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{val}</Typography>
+        {items.map((row: any, i: number) => (
+          <Box
+            key={i}
+            onClick={() => handleRowClick(row)}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${dynamicKeys.length}, 1fr)`,
+              borderBottom: i < items.length - 1 ? "1px solid #e0e7ff" : "none",
+              alignItems: "center",
+              cursor: "pointer",
+              "&:hover": { backgroundColor: "#f0f7ff" },
+            }}
+          >
+            {dynamicKeys.map((k) => {
+              const val = row[k];
+              const displayVal = val === null || val === undefined ? "-" : typeof val === "object" ? JSON.stringify(val) : String(val);
+              const isPriority = k === priorityKey;
+              const isTicker = k === tickerKey;
+              const isUrgency = k === urgencyKey;
+              const isSeverity = k === severityKey;
+
+              if (isPriority) {
+                return (
+                  <Box key={k} sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        backgroundColor: priorityColor(val),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{val}</Typography>
+                    </Box>
                   </Box>
-                </Box>
-              );
-            }
+                );
+              }
 
-            if (isTicker) {
-              return (
-                <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
-                  {displayVal}
-                </Typography>
-              );
-            }
-
-            if (isUrgency) {
-              return (
-                <Box key={k} sx={{ px: 2, py: 1.5 }}>
-                  {row.urgency_emoji && (
-                    <Box component="span" sx={{ mr: 0.5 }}>{row.urgency_emoji}</Box>
-                  )}
-                  <Typography component="span" sx={{ fontSize: 13, fontWeight: 600, color: sensitivityColor(displayVal) }}>
+              if (isTicker) {
+                return (
+                  <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
                     {displayVal}
                   </Typography>
-                </Box>
-              );
-            }
+                );
+              }
 
-            if (isSeverity) {
+              if (isUrgency) {
+                return (
+                  <Box key={k} sx={{ px: 2, py: 1.5 }}>
+                    {row.urgency_emoji && (
+                      <Box component="span" sx={{ mr: 0.5 }}>{row.urgency_emoji}</Box>
+                    )}
+                    <Typography component="span" sx={{ fontSize: 13, fontWeight: 600, color: sensitivityColor(displayVal) }}>
+                      {displayVal}
+                    </Typography>
+                  </Box>
+                );
+              }
+
+              if (isSeverity) {
+                return (
+                  <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b", textAlign: "center" }}>
+                    {displayVal}
+                  </Typography>
+                );
+              }
+
               return (
-                <Typography key={k} sx={{ px: 2, py: 1.5, fontSize: 13, fontWeight: 600, color: "#1e293b", textAlign: "center" }}>
+                <Typography
+                  key={k}
+                  sx={{
+                    px: 2,
+                    py: 1.5,
+                    fontSize: 13,
+                    color: sensitivityColor(displayVal) !== "#1e293b" ? sensitivityColor(displayVal) : "#1e293b",
+                    fontWeight: displayVal.toLowerCase().includes("exit") ? 600 : 400,
+                    fontFamily: k.toLowerCase().includes("capital") || k.toLowerCase().includes("impact") ? "monospace" : "inherit",
+                  }}
+                >
                   {displayVal}
                 </Typography>
               );
-            }
+            })}
+          </Box>
+        ))}
+      </Box>
 
-            return (
-              <Typography
-                key={k}
-                sx={{
-                  px: 2,
-                  py: 1.5,
-                  fontSize: 13,
-                  color: sensitivityColor(displayVal) !== "#1e293b" ? sensitivityColor(displayVal) : "#1e293b",
-                  fontWeight: displayVal.toLowerCase().includes("exit") ? 600 : 400,
-                  fontFamily: k.toLowerCase().includes("capital") || k.toLowerCase().includes("impact") ? "monospace" : "inherit",
-                }}
-              >
-                {displayVal}
-              </Typography>
-            );
-          })}
-        </Box>
-      ))}
-    </Box>
+      <Dialog open={Boolean(selectedRow)} onClose={handleClose} fullWidth maxWidth="md" scroll="paper">
+        <DialogTitle sx={{ pt: 3, pb: 1 }}>
+          {selectedRow
+            ? `${selectedRow.ticker || selectedRow.title || selectedRow.name || "Decision"} Details`
+            : "Decision Details"}
+        </DialogTitle>
+        <DialogContent dividers sx={{ pt: 0 }}>
+          {selectedRow && <ImmediateDecisionCard item={selectedRow} />}
+        </DialogContent>
+        <DialogActions sx={{ pr: 3, pb: 2 }}>
+          <Button onClick={handleClose} variant="text">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
