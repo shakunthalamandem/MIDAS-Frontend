@@ -9,11 +9,11 @@ import {
   Container,
   Grid,
   CircularProgress,
-  // Snackbar,
+  Snackbar,
   Alert,
   Paper,
 } from "@mui/material";
-import { AutorenewRounded } from "@mui/icons-material";
+import { Refresh } from "@mui/icons-material";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -28,14 +28,7 @@ interface LoginResponse {
   message?: string;
 }
 
-interface SendOtpResponse {
-  message?: string;
-  expires_in_seconds?: number;
-}
-
-// const CAPTCHA_LEN = 4;
-const OTP_LEN = 6;
-const OTP_EXPIRY_SECONDS = 5 * 60;
+const CAPTCHA_LEN = 4;
 const REQUEST_TIMEOUT_MS = 60000;
 
 const Login: React.FC = () => {
@@ -49,18 +42,11 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation() as { state?: { from?: string } };
 
-  // Captcha is intentionally disabled on UI; kept as comments only as requested.
-  // const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // const [captchaText, setCaptchaText] = useState("");
-  // const [userInput, setUserInput] = useState("");
-  // const [snackbarOpen, setSnackbarOpen] = useState(false);
-
-  const otpInputRef = useRef<HTMLInputElement | null>(null);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpInput, setOtpInput] = useState("");
-  const [otpExpiresIn, setOtpExpiresIn] = useState(0);
-  const [otpMessage, setOtpMessage] = useState<string | null>(null);
-  const [sendingOtp, setSendingOtp] = useState(false);
+  // ---- Captcha state ----
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [captchaText, setCaptchaText] = useState("");
+  const [userInput, setUserInput] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
 
@@ -69,7 +55,6 @@ const Login: React.FC = () => {
     return axios.create({ baseURL: apiUrl, timeout: REQUEST_TIMEOUT_MS });
   }, [apiUrl]);
 
-  /*
   const generateCaptchaText = () => {
     const chars = "0123456789";
     let text = "";
@@ -125,94 +110,27 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     refreshCaptcha();
-    const id = setInterval(refreshCaptcha, 60000);
+    const id = setInterval(refreshCaptcha, 60000); // refresh every 60s
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  */
-
-  useEffect(() => {
-    if (!otpSent) return;
-    const id = window.setInterval(() => {
-      setOtpExpiresIn((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [otpSent]);
-
-  useEffect(() => {
-    if (otpSent && otpExpiresIn <= 0) {
-      setOtpMessage(null);
-    }
-  }, [otpExpiresIn, otpSent]);
-
-  const formatOtpTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const handleSendOtp = async () => {
-    if (!username.trim()) {
-      setErrorMsg("Please enter your username before sending OTP.");
-      return;
-    }
-
-    setSendingOtp(true);
-    setErrorMsg(null);
-    setOtpMessage(null);
-
-    try {
-      const res = await http.post<SendOtpResponse>("/api/login/send-otp/", {
-        username: username.trim(),
-      });
-
-      setOtpSent(true);
-      setOtpInput("");
-      setOtpExpiresIn(res.data?.expires_in_seconds ?? OTP_EXPIRY_SECONDS);
-      setOtpMessage(
-        res.data?.message ||
-          "OTP sent to your registered email. It will expire in 5 minutes."
-      );
-      setTimeout(() => otpInputRef.current?.focus(), 0);
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.error ||
-        err?.response?.data?.detail ||
-        err?.response?.data?.message ||
-        err?.message ||
-        "Unable to send OTP. Please try again.";
-      setErrorMsg(message);
-    } finally {
-      setSendingOtp(false);
-    }
-  };
 
   const togglePasswordVisibility = () => setPasswordVisible((v) => !v);
 
   const canSubmit =
     username.trim().length > 0 &&
     password.length > 0 &&
-    // userInput.trim().length === CAPTCHA_LEN &&
-    // userInput === captchaText &&
-    otpSent &&
-    otpInput.trim().length === OTP_LEN &&
-    otpExpiresIn > 0 &&
-    !loading &&
-    !sendingOtp;
+    userInput.trim().length === CAPTCHA_LEN &&
+    userInput === captchaText &&
+    !loading;
 
   // Submit
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!canSubmit) {
-      // if (userInput !== captchaText) setSnackbarOpen(true);
+      if (userInput !== captchaText) setSnackbarOpen(true);
       return;
     }
-    if (otpExpiresIn <= 0) {
-      setErrorMsg("OTP is expired. Please click Resend.");
-      setOtpMessage(null);
-      return;
-    }
-
     setLoading(true);
     setErrorMsg(null);
 
@@ -220,7 +138,6 @@ const Login: React.FC = () => {
       const res = await http.post<LoginResponse>("/api/login/", {
         username,
         password,
-        otp: otpInput,
       });
 
       // Store only the access token + a tiny user snapshot
@@ -236,35 +153,13 @@ const Login: React.FC = () => {
       // Reload the app after login so every page starts with fresh data
       setTimeout(() => window.location.reload(), 0);
     } catch (err: any) {
-      const errorCode = String(err?.response?.data?.code || "").toUpperCase();
-      const rawMessage =
+      const message =
         err?.response?.data?.error ||
         err?.response?.data?.detail ||
-        err?.response?.data?.message ||
         err?.message ||
         "Something went wrong. Please try again.";
-
-      const normalized = String(rawMessage).toLowerCase();
-      if (
-        errorCode === "OTP_EXPIRED" ||
-        (normalized.includes("otp") && normalized.includes("expired"))
-      ) {
-        setErrorMsg("OTP is expired. Please click Resend.");
-        setOtpExpiresIn(0);
-        setOtpInput("");
-        setOtpMessage(null);
-      } else if (
-        errorCode === "OTP_INVALID" ||
-        (normalized.includes("otp") && normalized.includes("invalid"))
-      ) {
-        setErrorMsg("Invalid OTP. Please enter the correct OTP.");
-        setOtpInput("");
-        setTimeout(() => otpInputRef.current?.focus(), 0);
-      } else {
-        setErrorMsg(rawMessage);
-      }
-
-      // refreshCaptcha();
+      setErrorMsg(message);
+      refreshCaptcha();
     } finally {
       setLoading(false);
     }
@@ -317,13 +212,7 @@ const Login: React.FC = () => {
               autoComplete="username"
               autoFocus
               value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setOtpSent(false);
-                setOtpInput("");
-                setOtpExpiresIn(0);
-                setOtpMessage(null);
-              }}
+              onChange={(e) => setUsername(e.target.value)}
               sx={{ mb: 2 }}
               InputLabelProps={{ shrink: true }}
             />
@@ -348,7 +237,7 @@ const Login: React.FC = () => {
               </IconButton>
             </Box>
 
-            {/*
+            {/* CAPTCHA */}
             <Box
               display="flex"
               alignItems="center"
@@ -394,151 +283,23 @@ const Login: React.FC = () => {
                 InputLabelProps={{ shrink: true }}
               />
             </Box>
-            */}
 
-            {!otpSent ? (
-              <Box sx={{ mb: 2, display: "flex", justifyContent: "center" }}>
-                <Button
-                  type="button"
-                  variant="contained"
-                  onClick={handleSendOtp}
-                  disabled={sendingOtp || !username.trim()}
-                  sx={{
-                    minWidth: 118,
-                    height: 44,
-                    px: 2.2,
-                    borderRadius: "14px",
-                    textTransform: "none",
-                    fontSize: "0.98rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.01em",
-                    color: "#ffffff",
-                    background:
-                      "linear-gradient(135deg, #17bfae 0%, #2fb3d6 45%, #4f83ff 100%)",
-                    boxShadow: "0 8px 20px rgba(30, 126, 199, 0.3)",
-                    transition:
-                      "transform 0.2s ease, box-shadow 0.2s ease, background 0.28s ease",
-                    "&:hover": {
-                      transform: "translateY(-1px)",
-                      boxShadow: "0 11px 24px rgba(30, 126, 199, 0.38)",
-                      background:
-                        "linear-gradient(135deg, #12b7a7 0%, #28abd1 45%, #4478f7 100%)",
-                    },
-                    "&:active": {
-                      transform: "translateY(0) scale(0.99)",
-                    },
-                    "&.Mui-disabled": {
-                      color: "#f4f4f4",
-                      background:
-                        "linear-gradient(135deg, #8db1cb 0%, #94a7c6 100%)",
-                      boxShadow: "none",
-                    },
-                  }}
-                >
-                  {sendingOtp ? "Sending..." : "Send OTP"}
-                </Button>
-              </Box>
-            ) : (
-              <Box display="flex" alignItems="flex-start" gap={1.2} sx={{ mb: 2 }}>
-                <TextField
-                  inputRef={otpInputRef}
-                  fullWidth
-                  label={`Enter ${OTP_LEN}-digit OTP`}
-                  inputMode="numeric"
-                  value={otpInput}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D+/g, "").slice(0, OTP_LEN);
-                    setOtpInput(v);
-                  }}
-                  helperText={
-                    otpExpiresIn > 0
-                      ? `OTP expires in ${formatOtpTime(otpExpiresIn)}`
-                      : "OTP expired. Click Resend."
-                  }
-                  InputLabelProps={{ shrink: true }}
-                />
-
-                <Button
-                  type="button"
-                  variant="contained"
-                  onClick={handleSendOtp}
-                  disabled={sendingOtp || !username.trim()}
-                  startIcon={
-                    <AutorenewRounded
-                      sx={{
-                        "@keyframes resendIconSpin": {
-                          "0%": { transform: "rotate(0deg)" },
-                          "100%": { transform: "rotate(360deg)" },
-                        },
-                        animation: sendingOtp
-                          ? "resendIconSpin 0.9s linear infinite"
-                          : "none",
-                      }}
-                    />
-                  }
-                  sx={{
-                    minWidth: 116,
-                    height: 44,
-                    px: 1.8,
-                    borderRadius: "14px",
-                    textTransform: "none",
-                    fontSize: "0.95rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.01em",
-                    color: "#0d4f7b",
-                    border: "1px solid rgba(19, 96, 145, 0.28)",
-                    background: "linear-gradient(180deg, #ffffff 0%, #f4fbff 100%)",
-                    boxShadow: "0 8px 20px rgba(16, 91, 139, 0.15)",
-                    transition:
-                      "transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease",
-                    "&:hover": {
-                      transform: "translateY(-1px)",
-                      boxShadow: "0 11px 24px rgba(16, 91, 139, 0.2)",
-                      background: "linear-gradient(180deg, #ffffff 0%, #ebf8ff 100%)",
-                    },
-                    "&:active": {
-                      transform: "translateY(0) scale(0.99)",
-                    },
-                    "&.Mui-disabled": {
-                      color: "#8fa7bb",
-                      background: "#eef5fb",
-                      boxShadow: "none",
-                    },
-                    "& .MuiButton-startIcon": {
-                      mr: 0.6,
-                      ml: -0.1,
-                    },
-                  }}
-                >
-                  {sendingOtp ? "Sending..." : "Resend"}
-                </Button>
-              </Box>
-            )}
-
-            {otpMessage && otpExpiresIn > 0 && (
-              <Alert severity="success" sx={{ mb: 2 }}>
-                {otpMessage}
-              </Alert>
-            )}
-
-            {otpSent && (
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                disabled={!canSubmit}
-                sx={{
-                  py: 1.25,
-                  borderRadius: 2,
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={22} color="inherit" />
-                ) : (
-                  "Log In"
-                )}
-              </Button>
-            )}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={!canSubmit}
+              sx={{
+                py: 1.25,
+                borderRadius: 2,
+              }}
+            >
+              {loading ? (
+                <CircularProgress size={22} color="inherit" />
+              ) : (
+                "Log In"
+              )}
+            </Button>
           </Box>
 
           <Grid
@@ -578,7 +339,7 @@ const Login: React.FC = () => {
           </Grid>
         </Paper>
 
-        {/*
+        {/* Wrong captcha snackbar */}
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={2400}
@@ -593,7 +354,6 @@ const Login: React.FC = () => {
             Incorrect CAPTCHA. Please try again.
           </Alert>
         </Snackbar>
-        */}
       </Container>
     </Box>
   );
