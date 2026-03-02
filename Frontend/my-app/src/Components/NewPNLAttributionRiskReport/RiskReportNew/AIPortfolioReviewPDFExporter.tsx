@@ -28,7 +28,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
 > = ({
   exportContainerId,
   fileName = "AI_Portfolio_Review.pdf",
-  reportTitle = "US Portfolio Review",
+  reportTitle = "US Equity Portfolio AI Review",
   reportDate = "",
   aum = "",
 }) => {

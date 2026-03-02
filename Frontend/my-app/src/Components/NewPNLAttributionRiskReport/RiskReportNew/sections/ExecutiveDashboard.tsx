@@ -25,27 +25,65 @@ const metricCardGradients = [
   { bg: "linear-gradient(135deg, #fff1f2, #ffe4e6)", border: "#fda4af" },
 ];
 
-const METRIC_INFO: Record<string, string> = {
-  "total long exposure":
-    "Total Long Exposure, expressed as a percentage of the $200M AUM, shows the portion of capital currently deployed.",
-  "wtd avg beta":
-    "Weighted Average Beta, relative to 1.0 (market), measures portfolio market sensitivity based on position size.",
-  "capital at risk":
-    "Capital at Risk, expressed as a percentage of the $200M NAV, shows the total potential loss if all positions decline to their stop levels.",
-  "gain potential":
-    "Gain Potential is the total expected profit to targets, calculated as (Target − Current Price) × Shares, summed across the portfolio and expressed as % of NAV.",
-  "beta-adj exposure":
-    "Calculated as the sum of (Current $ Exposure × Beta) across all positions, expressed as a percentage of AUM to reflect the portfolio's effective market exposure.",
-  "spx -5% impact":
-    "Beta-Adjusted Exposure × (-5%), shown as % of NAV to estimate portfolio loss from a 5% market decline.",
-  "spx -10% impact":
-    "Beta-Adjusted Exposure × (-10%), shown as % of NAV to estimate portfolio loss from a 10% market decline.",
-};
+const METRIC_INFO: Array<{ keywords: string[]; description: string }> = [
+  {
+    keywords: ['total long exposure'],
+    description:
+      'Total Long Exposure, expressed as a percentage of the $200M AUM, shows the portion of capital currently deployed.',
+  },
+  {
+    keywords: ['weighted average beta', 'wtd avg beta'],
+    description:
+      'Weighted Average Beta, relative to 1.0 (market), measures the position-weighted market sensitivity.',
+  },
+  {
+    keywords: ['capital at risk to stops', 'capital at risk'],
+    description:
+      'Capital at Risk, expressed as a percentage of the $200M NAV, shows the total potential loss if all positions decline to their stop levels.',
+  },
+  {
+    keywords: ['capital gain potential to targets', 'gain potential'],
+    description:
+      'Gain Potential is the total expected profit to targets, calculated as (Target - Current Price) x Shares, summed across the portfolio and expressed as % of NAV.',
+  },
+  {
+    keywords: ['beta-adj exposure', 'beta-adjusted exposure'],
+    description:
+      'Calculated as the sum of (Current $ Exposure x Beta) across all positions, expressed as a percentage of AUM to reflect the portfolios effective market exposure.',
+  },
+  {
+    keywords: ['beta-adj impact spx -5%', 'spx -5% impact'],
+    description:
+      'Beta-Adjusted Exposure x (-5%), shown as % of NAV to estimate portfolio loss from a 5% market decline.',
+  },
+  {
+    keywords: ['beta-adj impact spx -10%', 'spx -10% impact'],
+    description:
+      'Beta-Adjusted Exposure x (-10%), shown as % of NAV to estimate portfolio loss from a 10% market decline.',
+  },
+  {
+    keywords: ['sector concentration risk'],
+    description:
+      'Sector Concentration Risk highlights the dominant sector exposure and its share of the portfolio, flagging diversification gaps.',
+  },
+  {
+    keywords: ['dtd p&l'],
+    description:
+      'Day-to-date P&L shows how the portfolio has behaved so far during the current trading day.',
+  },
+  {
+    keywords: ['cumulative gross p&l'],
+    description:
+      'Cumulative Gross P&L tallies realized and unrealized gains since the reporting start, before fees or adjustments.',
+  },
+];
 
 const getMetricTooltip = (label: string): string | null => {
-  const key = (label || "").toLowerCase().trim();
-  for (const [metricKey, description] of Object.entries(METRIC_INFO)) {
-    if (key.includes(metricKey)) return description;
+  const normalizedLabel = (label || '').toLowerCase().trim();
+  for (const entry of METRIC_INFO) {
+    if (entry.keywords.some((keyword) => normalizedLabel.includes(keyword))) {
+      return entry.description;
+    }
   }
   return null;
 };
