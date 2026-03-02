@@ -455,7 +455,7 @@ const NavbarMain: React.FC = () => {
                   icon={<PostAddOutlinedIcon fontSize="small" />}
                   onClick={() => navigate("/deals/new_deal_form")}
                 />
-                <ChatBoxButton />
+                {/* <ChatBoxButton /> */}
                 <ChatBoxButton
                   label="Meeting Notes"
                   icon={<HistoryEduOutlinedIcon fontSize="small" />}

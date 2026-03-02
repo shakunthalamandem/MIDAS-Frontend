@@ -328,7 +328,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
             flexWrap: "wrap",
           }}
         >
-          <CalendarMonthOutlinedIcon sx={{ color: "#d97706" }} />
+          <CalendarMonthOutlinedIcon sx={{ color: "#d97706", fontSize: "1rem" }} />
           <Typography sx={{ fontWeight: 500, color: "#9a5b00" }} variant="caption">
             Date Range:
           </Typography>
@@ -358,6 +358,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                       },
                       "& .MuiInputBase-input": {
                         px: 1,
+                        fontSize: "0.75rem",
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "0.75rem",
                       },
                     },
                   },
@@ -390,6 +394,10 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                       },
                       "& .MuiInputBase-input": {
                         px: 1,
+                        fontSize: "0.75rem",
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "0.75rem",
                       },
                     },
                   },
