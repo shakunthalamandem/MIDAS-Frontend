@@ -6,6 +6,8 @@ interface Props {
   data: any;
 }
 
+const modernFont = `'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+
 const extractRows = (val: any): any[] => {
   if (!val) return [];
   if (Array.isArray(val)) return val;
@@ -15,16 +17,36 @@ const extractRows = (val: any): any[] => {
 };
 
 const extractColumns = (val: any, rows: any[]): string[] => {
-  if (val && Array.isArray(val.columns) && val.columns.length > 0) return val.columns;
+  if (val && Array.isArray(val.columns) && val.columns.length > 0)
+    return val.columns;
   if (rows.length > 0) return Object.keys(rows[0]);
   return [];
 };
 
-const sectionColors: Record<string, { title: string; border: string; headerBg: string; hoverBg: string }> = {
-  overbought: { title: "#dc2626", border: "#fecaca", headerBg: "linear-gradient(135deg, #fef2f2, #fff1f2)", hoverBg: "#fef2f2" },
-  oversold: { title: "#059669", border: "#a7f3d0", headerBg: "linear-gradient(135deg, #ecfdf5, #f0fdf4)", hoverBg: "#ecfdf5" },
-  resistance: { title: "#d97706", border: "#fde68a", headerBg: "linear-gradient(135deg, #fffbeb, #fef3c7)", hoverBg: "#fffbeb" },
-  support: { title: "#2563eb", border: "#93c5fd", headerBg: "linear-gradient(135deg, #eff6ff, #dbeafe)", hoverBg: "#eff6ff" },
+const sectionColors: Record<
+  string,
+  { border: string; headerBg: string; hoverBg: string }
+> = {
+  overbought: {
+    border: "#fecaca",
+    headerBg: "#fef2f2",
+    hoverBg: "#fff5f5",
+  },
+  oversold: {
+    border: "#bbf7d0",
+    headerBg: "#ecfdf5",
+    hoverBg: "#f0fdf4",
+  },
+  resistance: {
+    border: "#fde68a",
+    headerBg: "#fffbeb",
+    hoverBg: "#fefce8",
+  },
+  support: {
+    border: "#bfdbfe",
+    headerBg: "#eff6ff",
+    hoverBg: "#f8fbff",
+  },
 };
 
 const getSectionColor = (title: string) => {
@@ -33,48 +55,65 @@ const getSectionColor = (title: string) => {
     if (lower.includes(key)) return val;
   }
   return {
-    title: "#1e293b",
-    border: "#c7d2fe",
-    headerBg: "linear-gradient(135deg, #f0f7ff, #e0e7ff)",
-    hoverBg: "#f0f7ff",
+    border: "#e5e7eb",
+    headerBg: "#f9fafb",
+    hoverBg: "#f3f4f6",
   };
 };
 
 const renderTable = (title: string, items: any) => {
   const rows = extractRows(items);
   if (rows.length === 0) return null;
+
   const keys = extractColumns(items, rows);
   if (keys.length === 0) return null;
+
   const colors = getSectionColor(title);
 
   return (
-    <Box sx={{ mb: 3 }} key={title}>
-      {/* Section Title - TEXT ONLY CHANGED */}
-      <Typography sx={{ fontWeight: 700, fontSize: 15, color: "#0f172a", mb: 1.5 }}>
+    <Box sx={{ mb: 4 }} key={title}>
+      {/* Section Title - Modern */}
+      <Typography
+        sx={{
+          fontSize: 16,
+          fontWeight: 600,
+          color: "#111827",
+          mb: 2,
+          fontFamily: modernFont,
+          letterSpacing: 0.2,
+        }}
+      >
         {title}
       </Typography>
 
-      <Box sx={{ border: `1px solid ${colors.border}`, borderRadius: 2.5, overflow: "hidden" }}>
-        {/* Header Row */}
+      <Box
+        sx={{
+          border: `1px solid ${colors.border}`,
+          borderRadius: 3,
+          overflow: "hidden",
+          fontFamily: modernFont,
+        }}
+      >
+        {/* Header */}
         <Box
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-            backgroundColor: "#f8fafc",
-            borderBottom: `2px solid ${colors.border}`,
+            backgroundColor: colors.headerBg,
+            borderBottom: `1px solid ${colors.border}`,
           }}
         >
           {keys.map((k) => (
             <Typography
               key={k}
               sx={{
-                px: 2,
-                py: 1.2,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0.8,
-                color: "#0f172a", // TEXT DARKER
+                px: 2.5,
+                py: 1.8,
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#374151",
                 textTransform: "uppercase",
+                letterSpacing: 0.5,
               }}
             >
               {k.replace(/_/g, " ")}
@@ -82,15 +121,19 @@ const renderTable = (title: string, items: any) => {
           ))}
         </Box>
 
-        {/* Table Rows */}
+        {/* Rows */}
         {rows.map((row: any, i: number) => (
           <Box
             key={i}
             sx={{
               display: "grid",
               gridTemplateColumns: `repeat(${keys.length}, 1fr)`,
-              borderBottom: i < rows.length - 1 ? "1px solid #e0e7ff" : "none",
-              "&:hover": { backgroundColor: colors.hoverBg },
+              borderBottom:
+                i < rows.length - 1 ? "1px solid #f1f5f9" : "none",
+              transition: "background 0.2s ease",
+              "&:hover": {
+                backgroundColor: colors.hoverBg,
+              },
             }}
           >
             {keys.map((k) => {
@@ -107,18 +150,20 @@ const renderTable = (title: string, items: any) => {
                 k.toLowerCase() === "name" ||
                 k.toLowerCase() === "symbol";
 
+              const isNumeric = ["rsi", "price", "value"].some((s) =>
+                k.toLowerCase().includes(s)
+              );
+
               return (
                 <Typography
                   key={k}
                   sx={{
-                    px: 2,
-                    py: 1.5,
-                    fontSize: 13,
-                    color: "#0f172a", // TEXT DARKER
-                    fontWeight: isTicker ? 700 : 400,
-                    fontFamily: ["rsi", "price", "value"].some((s) => k.includes(s))
-                      ? "monospace"
-                      : "inherit",
+                    px: 2.5,
+                    py: 1.8,
+                    fontSize: 14,
+                    color: "#111827",
+                    fontWeight: isTicker ? 600 : 400,
+                    fontFamily: isNumeric ? "monospace" : modernFont,
                   }}
                 >
                   {displayVal}
@@ -134,7 +179,12 @@ const renderTable = (title: string, items: any) => {
 
 const hasTableData = (val: any): boolean => {
   if (Array.isArray(val) && val.length > 0) return true;
-  if (val && typeof val === "object" && Array.isArray(val.rows) && val.rows.length > 0)
+  if (
+    val &&
+    typeof val === "object" &&
+    Array.isArray(val.rows) &&
+    val.rows.length > 0
+  )
     return true;
   return false;
 };
@@ -144,12 +194,20 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
 
   if (typeof data === "string") {
     return (
-      <Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
+      <Box
+        sx={{
+          backgroundColor: "#f9fafb",
+          border: "1px solid #e5e7eb",
+          borderRadius: 3,
+          p: 3,
+          fontFamily: modernFont,
+        }}
+      >
         <Typography
           sx={{
-            fontSize: 13,
-            color: "#0f172a", // TEXT DARKER
-            lineHeight: 1.7,
+            fontSize: 14,
+            color: "#111827",
+            lineHeight: 1.8,
             whiteSpace: "pre-wrap",
           }}
         >
@@ -159,7 +217,8 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
     );
   }
 
-  if (Array.isArray(data)) return renderTable("Technical Positions", data);
+  if (Array.isArray(data))
+    return renderTable("Technical Positions", data);
 
   const overbought = data.overbought;
   const oversold = data.oversold;
@@ -194,7 +253,7 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
     return <GenericDataRenderer data={data} accentColor="#06b6d4" />;
 
   return (
-    <Box>
+    <Box sx={{ fontFamily: modernFont }}>
       {renderTable("Overbought (RSI > 70)", overbought)}
       {renderTable("Oversold (RSI < 30)", oversold)}
       {renderTable("Near Resistance", nearResistance)}
@@ -215,16 +274,23 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
           return (
             <Box
               key={key}
-              sx={{ backgroundColor: "#f0f7ff", borderRadius: 2, p: 2, mb: 2 }}
+              sx={{
+                backgroundColor: "#f9fafb",
+                border: "1px solid #e5e7eb",
+                borderRadius: 3,
+                p: 3,
+                mb: 3,
+                fontFamily: modernFont,
+              }}
             >
               <Typography
                 sx={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#0f172a", // TEXT DARKER
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#6b7280",
                   textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                  mb: 0.5,
+                  letterSpacing: 0.5,
+                  mb: 1,
                 }}
               >
                 {key.replace(/_/g, " ")}
@@ -232,9 +298,9 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
 
               <Typography
                 sx={{
-                  fontSize: 13,
-                  color: "#0f172a", // TEXT DARKER
-                  lineHeight: 1.7,
+                  fontSize: 14,
+                  color: "#111827",
+                  lineHeight: 1.8,
                   whiteSpace: "pre-wrap",
                 }}
               >
