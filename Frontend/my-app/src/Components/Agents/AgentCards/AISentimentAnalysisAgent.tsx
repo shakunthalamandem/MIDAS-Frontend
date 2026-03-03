@@ -169,7 +169,21 @@ const postSentimentPdf = async (
   if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
   return data;
 };
+const triggerSentimentEmail = async (tickers: string[]) => {
+  const res = await fetch(`${apiUrl}/api/sentiment_analysis_email_trigger/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      tickers, // list of successfully processed tickers
+    }),
+  });
 
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to trigger email");
+  return data;
+};
 const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const { state } = props;
 
@@ -308,37 +322,80 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
     })();
   }, [enabled, sentimentTickers.length]);
 
-  const runSentiment = async () => {
-    if (!selectedSentimentDeals.length) return;
+const runSentiment = async () => {
+  if (!selectedSentimentDeals.length) return;
 
-    setRunning(true);
-    setError(null);
-    setMessage(null);
+  setRunning(true);
+  setError(null);
+  setMessage(null);
 
-    try {
-      const success: string[] = [];
-      const failures: string[] = [];
+  try {
+    const success: string[] = [];
+    const failures: string[] = [];
 
-      for (const deal of selectedSentimentDeals) {
-        try {
-          const prompt = buildPrompt(deal.ticker, deal.deal_type);
-          const blocks = await askPerplexity(prompt, deal.unique_deal_id, deal.source);
-          await postSentiment(deal.ticker, deal.unique_deal_id, deal.region, blocks);
-          const sentimentPdf = await renderBlocksToPdf(blocks, deal.ticker);
-          await postSentimentPdf(deal.ticker, deal.unique_deal_id, sentimentPdf);
-          success.push(deal.ticker);
-        } catch (err: any) {
-          failures.push(`${deal.ticker}: ${err?.message || "run failed"}`);
-        }
+    for (const deal of selectedSentimentDeals) {
+      try {
+        const prompt = buildPrompt(deal.ticker, deal.deal_type);
+
+        const blocks = await askPerplexity(
+          prompt,
+          deal.unique_deal_id,
+          deal.source
+        );
+
+        await postSentiment(
+          deal.ticker,
+          deal.unique_deal_id,
+          deal.region,
+          blocks
+        );
+
+        const sentimentPdf = await renderBlocksToPdf(
+          blocks,
+          deal.ticker
+        );
+
+        await postSentimentPdf(
+          deal.ticker,
+          deal.unique_deal_id,
+          sentimentPdf
+        );
+
+        success.push(deal.ticker);
+      } catch (err: any) {
+        failures.push(
+          `${deal.ticker}: ${err?.message || "run failed"}`
+        );
       }
-
-      if (success.length) setMessage(`Sentiment saved for ${success.join(", ")}`);
-      if (failures.length) setError(failures.join("; "));
-    } finally {
-      setRunning(false);
     }
-  };
 
+    // ✅ Trigger email AFTER loop completes
+    if (success.length) {
+      try {
+        await triggerSentimentEmail(success);
+        setMessage(
+          `Sentiment saved & email triggered for ${success.join(", ")}`
+        );
+      } catch (emailErr: any) {
+        setError(
+          `Sentiment saved but email failed: ${
+            emailErr?.message || "Unknown error"
+          }`
+        );
+      }
+    }
+
+    if (failures.length) {
+      setError((prev) =>
+        prev
+          ? `${prev}; ${failures.join("; ")}`
+          : failures.join("; ")
+      );
+    }
+  } finally {
+    setRunning(false);
+  }
+};
   // If you want to allow close:
   const handleClose = () => setDialogOpen(false);
 

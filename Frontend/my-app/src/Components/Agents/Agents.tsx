@@ -45,7 +45,7 @@ const activeAgents: AgentConfig[] = [
     schedule: "Run daily at 8:00 AM EST",
   },
   {
-    title: "Portfolio Analysis",
+    title: "Individual Stock Analysis",
     description: "AI-generated portfolio analysis reports through the email",
     schedule: "Run daily at 8:00 AM EST",
   },
