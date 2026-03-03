@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Autocomplete,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -13,6 +14,9 @@ import {
 } from "@mui/material";
 import ActiveAgentCard, { ActiveAgentCardProps } from "./ActiveAgentCard";
 import { Block } from "../../GhcAi/Utils/ComponentsUtils";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -26,6 +30,11 @@ type Deal = {
 
 type SentimentDeal = Deal & {
   source: "IPO" | "FO";
+};
+
+type RenderedPdf = {
+  blob: Blob;
+  filename: string;
 };
 
 const buildPrompt = (ticker: string, dealType?: string) => {
@@ -105,7 +114,10 @@ const askPerplexity = async (
 
   const res = await fetch(endpoint, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+  headers: { 
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`, // 🔥 ADD THIS
+  },
     body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId ,email_trigger:true}),
   });
   const data = await res.json();
@@ -139,6 +151,25 @@ const postSentiment = async (
   return data;
 };
 
+const postSentimentPdf = async (
+  ticker: string,
+  unique_deal_id: string,
+  sentimentPdf: RenderedPdf
+) => {
+  const formData = new FormData();
+  formData.append("ticker", ticker);
+  formData.append("unique_deal_id", unique_deal_id);
+  formData.append("sentiment_pdf", sentimentPdf.blob, sentimentPdf.filename);
+
+  const res = await fetch(`${apiUrl}/api/deal_sentiment_pdf/`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
+  return data;
+};
+
 const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const { state } = props;
 
@@ -153,6 +184,99 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  const pdfContainerRef = useRef<HTMLDivElement | null>(null);
+  const [pdfBlocks, setPdfBlocks] = useState<Block[]>([]);
+
+  const wait = (ms = 200) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  const waitForPaint = () =>
+    new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+  const renderBlocksToPdf = useCallback(
+    async (blocks: Block[], filename?: string): Promise<RenderedPdf> => {
+      setPdfBlocks(blocks);
+      await waitForPaint();
+      await wait(500);
+
+      const container = pdfContainerRef.current;
+      if (!container) throw new Error("PDF container not available");
+      if (container.clientHeight < 10) {
+        await waitForPaint();
+        await wait(300);
+      }
+
+      let tries = 0;
+      while (container.clientHeight < 20 && tries < 4) {
+        await waitForPaint();
+        await wait(250);
+        tries += 1;
+      }
+
+      const capture = async (): Promise<HTMLCanvasElement> => {
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scrollY: -window.scrollY,
+          windowWidth: container.scrollWidth || undefined,
+          windowHeight: container.scrollHeight || undefined,
+        });
+        if (!canvas || canvas.height < 5 || canvas.width < 5) {
+          throw new Error("Failed to render PDF canvas");
+        }
+        return canvas;
+      };
+
+      let canvas: HTMLCanvasElement | null = null;
+      try {
+        canvas = await capture();
+      } catch (_err) {
+        await wait(500);
+        canvas = await capture();
+      }
+
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const mmPerPx = pdfWidth / canvas.width;
+      const pageHeightPx = pdfHeight / mmPerPx;
+
+      let offset = 0;
+      while (offset < canvas.height) {
+        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - offset);
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeightPx;
+
+        const ctx = sliceCanvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0,
+            offset,
+            canvas.width,
+            sliceHeightPx,
+            0,
+            0,
+            canvas.width,
+            sliceHeightPx
+          );
+        }
+
+        const imgData = sliceCanvas.toDataURL("image/jpeg", 0.78);
+        const sliceHeightMm = sliceHeightPx * mmPerPx;
+
+        if (offset > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, sliceHeightMm, undefined, "FAST");
+        offset += sliceHeightPx;
+      }
+
+      const pdfBlob = pdf.output("blob") as Blob;
+      const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
+      return { blob: pdfBlob, filename: safeName };
+    },
+    []
+  );
 
   // Open popup ONLY on transition disabled -> enabled (not on every re-render)
   const prevEnabled = useRef<boolean>(false);
@@ -200,6 +324,8 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
           const prompt = buildPrompt(deal.ticker, deal.deal_type);
           const blocks = await askPerplexity(prompt, deal.unique_deal_id, deal.source);
           await postSentiment(deal.ticker, deal.unique_deal_id, deal.region, blocks);
+          const sentimentPdf = await renderBlocksToPdf(blocks, deal.ticker);
+          await postSentimentPdf(deal.ticker, deal.unique_deal_id, sentimentPdf);
           success.push(deal.ticker);
         } catch (err: any) {
           failures.push(`${deal.ticker}: ${err?.message || "run failed"}`);
@@ -291,6 +417,22 @@ console.log("email sent to backend:", localStorage.getItem("email"));
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Box
+        ref={pdfContainerRef}
+        sx={{
+          position: "fixed",
+          left: -2000,
+          top: 0,
+          width: 1100,
+          bgcolor: "#ffffff",
+          p: 2,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <GENAIRenderer blocks={pdfBlocks} renderAll disableMotion />
+      </Box>
     </ActiveAgentCard>
   );
 };
