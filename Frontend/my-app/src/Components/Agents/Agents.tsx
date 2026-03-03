@@ -9,9 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ActiveAgentCard, {
@@ -45,7 +45,7 @@ const activeAgents: AgentConfig[] = [
     title: "AI Unsupervised Market Insights",
     description:
       "AI-generated insights on market trends and opportunities without explicit supervision.",
-    schedule: "RunS After completing the WriteUp",
+    schedule: "Run daily at 8:00 AM EST",
     route: "/ai_fewshot_analysis",
   },
   {
@@ -128,9 +128,9 @@ const Agents: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#f5f6fb",
+        backgroundColor: "#edf0f7",
         minHeight: "100vh",
-        px: { xs: 2, md: 6 },
+        px: { xs: 2, md: 8 },
         py: { xs: 4, md: 6 },
       }}
     >
@@ -139,10 +139,11 @@ const Agents: React.FC = () => {
           elevation={0}
           sx={{
             borderRadius: 4,
-            px: { xs: 3, md: 5 },
-            py: { xs: 3, md: 5 },
-            background: "linear-gradient(135deg, #eef3ff, #ffffff)",
+            px: { xs: 3, md: 4 },
+            py: { xs: 3, md: 4 },
             mb: 4,
+            border: "1px solid rgba(15, 76, 129, 0.08)",
+            background: "#ffffff",
           }}
         >
           <Stack direction="row" alignItems="center" gap={2} flexWrap="wrap">
@@ -183,13 +184,6 @@ const Agents: React.FC = () => {
           </Stack>
         </Paper>
 
-        <Typography
-          variant="h6"
-          sx={{ color: "#0b1e4c", fontWeight: 700, mb: 2 }}
-        >
-          Active Agents
-        </Typography>
-
         <Box
           component="section"
           sx={{
@@ -197,7 +191,7 @@ const Agents: React.FC = () => {
             display: "grid",
             gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
             gap: 3,
-            mb: 5,
+            mb: 4,
           }}
         >
           {activeAgents.map((agent) => {
@@ -211,6 +205,7 @@ const Agents: React.FC = () => {
                   const url = `${window.location.origin}${agent.route}`;
                   window.open(url, "_blank", "noopener");
                 }}
+                sx={{ textTransform: "none" }}
               >
                 View details
               </Button>
@@ -244,7 +239,7 @@ const Agents: React.FC = () => {
                 elevation={0}
                 sx={{
                   flex: "0 0 300px",
-                  borderRadius: 4,
+                  borderRadius: 3,
                   p: 3,
                   background:
                     "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(237,236,255,0.9))",
