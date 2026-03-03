@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Avatar,
   Box,
   Chip,
-  Divider,
   Paper,
   Stack,
   Switch,
@@ -14,12 +13,15 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-
-interface AgentConfig {
-  title: string;
-  description: string;
-  schedule: string;
-}
+import ActiveAgentCard, {
+  AgentConfig,
+  ActiveAgentCardProps,
+} from "./AgentCards/ActiveAgentCard";
+import AIPortfolioReviewAgent from "./AgentCards/AIPortfolioReviewAgent";
+import Last30DaysIPORankingAgent from "./AgentCards/Last30DaysIPORankingAgent";
+import AIUnsupervisedMarketInsightsAgent from "./AgentCards/AIUnsupervisedMarketInsightsAgent";
+import PortfolioAnalysisAgent from "./AgentCards/PortfolioAnalysisAgent";
+import AISentimentAnalysisAgent from "./AgentCards/AISentimentAnalysisAgent";
 
 const EMAIL_VERIFIED_KEY = "email_verified";
 
@@ -44,15 +46,14 @@ const activeAgents: AgentConfig[] = [
   },
   {
     title: "Portfolio Analysis",
-    description:
-      "AI-generated portfolio analysis reports through the email",
+    description: "AI-generated portfolio analysis reports through the email",
     schedule: "Run daily at 8:00 AM EST",
   },
   {
     title: "AI Sentiment Analysis",
     description:
-      "AI-generated sentiment analysis for your watchlist stocks.",
-    schedule: "Run daily at 8:00 AM EST",
+      "The sentiment analysis runs daily on selected stocks. To view the latest updated sentiment report and receive it via email, please enable the email option.",
+    schedule: "Run daily",
   },
 ];
 
@@ -75,6 +76,14 @@ const comingSoonAgents = [
     icon: RocketLaunchIcon,
   },
 ];
+
+const agentComponentMap: Record<string, React.ComponentType<ActiveAgentCardProps>> = {
+  "AI Portfolio Review": AIPortfolioReviewAgent,
+  "Last 30 Days IPO AI Ranking": Last30DaysIPORankingAgent,
+  "AI Unsupervised Market Insights": AIUnsupervisedMarketInsightsAgent,
+  "Portfolio Analysis": PortfolioAnalysisAgent,
+  "AI Sentiment Analysis": AISentimentAnalysisAgent,
+};
 
 const Agents: React.FC = () => {
   const [emailVerified] = useState(
@@ -103,15 +112,11 @@ const Agents: React.FC = () => {
     }));
   };
 
-  // ✅ Derived counts
   const totalAgents = activeAgents.length;
-
   const activeCount = useMemo(
-    () =>
-      Object.values(activations).filter((agent) => agent.enabled).length,
+    () => Object.values(activations).filter((agent) => agent.enabled).length,
     [activations]
   );
-
   const comingSoonCount = comingSoonAgents.length;
 
   return (
@@ -124,7 +129,6 @@ const Agents: React.FC = () => {
       }}
     >
       <Box sx={{ maxWidth: 1200, width: "100%", mx: "auto" }}>
-        {/* Header */}
         <Paper
           elevation={0}
           sx={{
@@ -155,32 +159,24 @@ const Agents: React.FC = () => {
               </Typography>
               <Typography variant="body1" color="#4f5973">
                 Autonomous AI agents that monitor markets, generate insights,
-                and deliver personalized intelligence — working around the
-                clock for you.
+                and deliver personalized intelligence — working around the clock
+                for you.
               </Typography>
             </Box>
           </Stack>
 
-          {/* ✅ Dynamic Chips */}
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
             <Chip label={`${totalAgents} Agents`} />
-
             <Chip
               label={`${activeCount} Active`}
               color={activeCount > 0 ? "success" : "default"}
               variant="outlined"
             />
-
             <Chip label="Email Verified" color="success" variant="outlined" />
-
-            <Chip
-              label={`${comingSoonCount} Coming Soon`}
-              color="info"
-            />
+            <Chip label={`${comingSoonCount} Coming Soon`} color="info" />
           </Stack>
         </Paper>
 
-        {/* Active Agents */}
         <Typography
           variant="h6"
           sx={{ color: "#0b1e4c", fontWeight: 700, mb: 2 }}
@@ -200,95 +196,19 @@ const Agents: React.FC = () => {
         >
           {activeAgents.map((agent) => {
             const state = activations[agent.title];
-            const isActive = state?.enabled ?? false;
-            const emailOn = state?.email ?? false;
+            const Component = agentComponentMap[agent.title] ?? ActiveAgentCard;
 
             return (
-              <Paper
+              <Component
                 key={agent.title}
-                elevation={2}
-                sx={{
-                  borderRadius: 4,
-                  p: 4,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    {agent.title}
-                  </Typography>
-                  <Switch
-                    checked={isActive}
-                    onChange={() => handleToggle(agent.title, "enabled")}
-                  />
-                </Stack>
-
-                <Typography variant="body2" color="#555f77">
-                  {agent.description}
-                </Typography>
-
-                <Divider />
-
-                <Stack direction="row" flexWrap="wrap" spacing={2}>
-                  <Chip
-                    icon={<CalendarTodayIcon />}
-                    label={agent.schedule}
-                    variant="outlined"
-                  />
-
-                  <Chip
-                    label={isActive ? "Active" : "Paused"}
-                    color={isActive ? "success" : "default"}
-                    variant="outlined"
-                    size="small"
-                  />
-
-                  <Chip
-                    icon={<EmailOutlinedIcon />}
-                    label={
-                      emailOn
-                        ? "Email results after run"
-                        : "Email disabled"
-                    }
-                    color={emailOn ? "success" : "default"}
-                    variant="outlined"
-                  />
-                </Stack>
-
-                <Paper
-                  elevation={0}
-                  sx={{
-                    mt: "auto",
-                    px: 2,
-                    py: 1,
-                    borderRadius: 3,
-                    backgroundColor: "#f8f8fb",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography variant="caption" color="#7a8097">
-                    Email results after run
-                  </Typography>
-                  <Switch
-                    checked={emailOn}
-                    disabled={!emailVerified}
-                    onChange={() => handleToggle(agent.title, "email")}
-                  />
-                </Paper>
-              </Paper>
+                agent={agent}
+                state={state}
+                onToggle={handleToggle}
+              />
             );
           })}
         </Box>
 
-        {/* Coming Soon */}
         <Typography
           variant="h6"
           sx={{ color: "#0b1e4c", fontWeight: 700, mb: 2 }}
@@ -299,7 +219,6 @@ const Agents: React.FC = () => {
         <Stack direction="row" spacing={3} sx={{ overflowX: "auto", pb: 1 }}>
           {comingSoonAgents.map((agent) => {
             const Icon = agent.icon;
-
             return (
               <Paper
                 key={agent.title}
