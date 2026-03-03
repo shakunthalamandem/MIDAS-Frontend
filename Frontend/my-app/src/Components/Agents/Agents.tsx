@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   Divider,
   Paper,
@@ -14,6 +15,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import { jwtDecode } from "jwt-decode";
 
 interface AgentConfig {
   title: string;
@@ -21,39 +23,41 @@ interface AgentConfig {
   schedule: string;
 }
 
-const activeAgents: AgentConfig[] = [
+const ACCESS_TOKEN_KEY = "access_token";
 
+type JWTPayload = { email?: string; name?: string; [k: string]: any };
+
+const activeAgents: AgentConfig[] = [
   {
     title: "AI Portfolio Review",
     description:
       "Comprehensive review of your portfolio performance and recommendations.",
     schedule: "Run daily at 8:00 AM EST",
   },
-    {
+  {
     title: "Last 30 Days IPO AI Ranking",
     description:
       "AI-generated ranking of the most promising IPOs from the last 30 days.",
     schedule: "Run daily at 8:00 AM EST",
   },
-    {
+  {
     title: "AI Unsupervised Market Insights",
     description:
       "AI-generated insights on market trends and opportunities without explicit supervision.",
     schedule: "Run daily at 8:00 AM EST",
   },
-    {
+  {
     title: "Portfolio Analysis",
     description:
       "AI-generated portfolio analysis reports through the email",
     schedule: "Run daily at 8:00 AM EST",
   },
-    {
+  {
     title: "AI Sentiment Analysis",
     description:
       "AI-generated sentiment analysis for your watchlist stocks.",
     schedule: "Run daily at 8:00 AM EST",
   },
-
 ];
 
 const comingSoonAgents = [
@@ -77,12 +81,14 @@ const comingSoonAgents = [
 ];
 
 const Agents: React.FC = () => {
+  // Email verification state (replace with API later)
+  const [emailVerified, setEmailVerified] = useState(false);
   const [activations, setActivations] = useState(
     activeAgents.reduce(
       (acc, agent) => ({
         ...acc,
         [agent.title]: {
-          enabled: agent.title !== "AI Daily Briefing",
+          enabled: false,
           email: true,
         },
       }),
@@ -99,6 +105,17 @@ const Agents: React.FC = () => {
       },
     }));
   };
+
+  // ✅ Derived counts
+  const totalAgents = activeAgents.length;
+
+  const activeCount = useMemo(
+    () =>
+      Object.values(activations).filter((agent) => agent.enabled).length,
+    [activations]
+  );
+
+  const comingSoonCount = comingSoonAgents.length;
 
   return (
     <Box
@@ -129,10 +146,7 @@ const Agents: React.FC = () => {
                 height: 64,
               }}
             >
-              <AutoAwesomeIcon
-                fontSize="large"
-                sx={{ color: "#5b2fff" }}
-              />
+              <AutoAwesomeIcon fontSize="large" sx={{ color: "#5b2fff" }} />
             </Avatar>
 
             <Box flex="1" minWidth={240}>
@@ -150,15 +164,37 @@ const Agents: React.FC = () => {
             </Box>
           </Stack>
 
+          {/* ✅ Dynamic Chips */}
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label="3 Agents" />
-            <Chip label="0 Active" color="success" variant="outlined" />
+            <Chip label={`${totalAgents} Agents`} />
+
             <Chip
-              label="Email Not Verified"
-              color="warning"
+              label={`${activeCount} Active`}
+              color={activeCount > 0 ? "success" : "default"}
               variant="outlined"
             />
-            <Chip label="3 Coming Soon" color="info" />
+
+            <Chip
+              label={emailVerified ? "Email Verified" : "Email Not Verified"}
+              color={emailVerified ? "success" : "warning"}
+              variant="outlined"
+            />
+
+            {!emailVerified && (
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                onClick={() => setEmailVerified(true)}
+              >
+                Verify Email
+              </Button>
+            )}
+
+            <Chip
+              label={`${comingSoonCount} Coming Soon`}
+              color="info"
+            />
           </Stack>
         </Paper>
 
@@ -177,7 +213,6 @@ const Agents: React.FC = () => {
             display: "grid",
             gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
             gap: 3,
-            justifyContent: "center",
             mb: 5,
           }}
         >
@@ -193,7 +228,6 @@ const Agents: React.FC = () => {
                 sx={{
                   borderRadius: 4,
                   p: 4,
-                  backgroundColor: "#ffffff",
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
@@ -209,9 +243,7 @@ const Agents: React.FC = () => {
                   </Typography>
                   <Switch
                     checked={isActive}
-                    onChange={() =>
-                      handleToggle(agent.title, "enabled")
-                    }
+                    onChange={() => handleToggle(agent.title, "enabled")}
                   />
                 </Stack>
 
@@ -227,12 +259,14 @@ const Agents: React.FC = () => {
                     label={agent.schedule}
                     variant="outlined"
                   />
+
                   <Chip
                     label={isActive ? "Active" : "Paused"}
                     color={isActive ? "success" : "default"}
                     variant="outlined"
                     size="small"
                   />
+
                   <Chip
                     icon={<EmailOutlinedIcon />}
                     label={
@@ -263,9 +297,8 @@ const Agents: React.FC = () => {
                   </Typography>
                   <Switch
                     checked={emailOn}
-                    onChange={() =>
-                      handleToggle(agent.title, "email")
-                    }
+                    disabled={!emailVerified}
+                    onChange={() => handleToggle(agent.title, "email")}
                   />
                 </Paper>
               </Paper>
@@ -281,14 +314,7 @@ const Agents: React.FC = () => {
           Coming Soon
         </Typography>
 
-        <Stack
-          direction="row"
-          spacing={3}
-          sx={{
-            overflowX: "auto",
-            pb: 1,
-          }}
-        >
+        <Stack direction="row" spacing={3} sx={{ overflowX: "auto", pb: 1 }}>
           {comingSoonAgents.map((agent) => {
             const Icon = agent.icon;
 
@@ -305,31 +331,17 @@ const Agents: React.FC = () => {
                   border: "1px solid rgba(94, 112, 148, 0.15)",
                 }}
               >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={2}
-                  mb={2}
-                >
-                  <Avatar
-                    sx={{ bgcolor: "#eef3ff", color: "#5b2fff" }}
-                  >
+                <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+                  <Avatar sx={{ bgcolor: "#eef3ff", color: "#5b2fff" }}>
                     <Icon />
                   </Avatar>
                   <Chip label="Soon" color="warning" size="small" />
                 </Stack>
 
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 700 }}
-                >
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                   {agent.title}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="#555f77"
-                  mt={1}
-                >
+                <Typography variant="body2" color="#555f77" mt={1}>
                   {agent.description}
                 </Typography>
               </Paper>

@@ -425,7 +425,7 @@ const DocumentUploadTabs: React.FC = () => {
     formData.append("report_type", "Risk Report");
 
     try {
-      const res = await fetch(`${apiUrl}/api/risk_ai_data_uploads/`, {
+      const res = await fetch(`${apiUrl}/api/cio_report_upload/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
