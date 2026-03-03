@@ -22,10 +22,11 @@ import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
 
 import ExecutiveDashboard from "./sections/ExecutiveDashboard";
 import CIODecisionBrief from "./sections/CIODecisionBrief";
-import ImmediateDecisions from "./sections/ImmediateDecisions";
+import { extractImmediateDecisionItems } from "./sections/ImmediateDecisions";
 import DisciplineScorecard from "./sections/DisciplineScorecard";
 import SectorNewsMap from "./sections/SectorNewsMap";
 import MacroEvents from "./sections/MacroEvents";
@@ -36,6 +37,7 @@ import MonthlyOutlook from "./sections/MonthlyOutlook";
 import ActionChecklists from "./sections/ActionChecklists";
 import ActionMatrix from "./sections/ActionMatrix";
 import GenericDataRenderer from "./sections/GenericDataRenderer";
+import MacroRegimeSectorRotation from "./sections/MacroRegimeSectorRotation";
 import AIPortfolioReviewPDFExporter from "./AIPortfolioReviewPDFExporter";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -80,6 +82,7 @@ const sectionIconMap: Record<string, React.ReactNode> = {
   sector_peer_news_map: <PublicOutlinedIcon fontSize="small" />,
   macro_event_risk_calendar: <CalendarMonthOutlinedIcon fontSize="small" />,
   technical_risk_overlay: <ShowChartOutlinedIcon fontSize="small" />,
+  macro_regime_sector_rotation_model: <AutoGraphOutlinedIcon fontSize="small" />,
   opportunity_engine: <TrackChangesOutlinedIcon fontSize="small" />,
   upcoming_week_focus: <ScheduleOutlinedIcon fontSize="small" />,
   upcoming_month_strategic_outlook: <EventNoteOutlinedIcon fontSize="small" />,
@@ -95,6 +98,7 @@ const sectionColors: Record<string, { bg: string; border: string; iconColor: str
   sector_peer_news_map: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#0284c7", textColor: "#075985" },
   macro_event_risk_calendar: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
   technical_risk_overlay: { bg: "#ecfeff", border: "#a5f3fc", iconColor: "#0891b2", textColor: "#155e75" },
+  macro_regime_sector_rotation_model: { bg: "#fdf2f8", border: "#fecdd3", iconColor: "#be185d", textColor: "#831843" },
   opportunity_engine: { bg: "#ecfdf5", border: "#a7f3d0", iconColor: "#059669", textColor: "#065f46" },
   upcoming_week_focus: { bg: "#fff7ed", border: "#fed7aa", iconColor: "#ea580c", textColor: "#9a3412" },
   upcoming_month_strategic_outlook: { bg: "#faf5ff", border: "#e9d5ff", iconColor: "#7c3aed", textColor: "#5b21b6" },
@@ -106,11 +110,11 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   executive_risk_dashboard: ExecutiveDashboard,
   final_prioritized_action_matrix: ActionMatrix,
   cio_decision_brief: CIODecisionBrief,
-  immediate_decisions: ImmediateDecisions,
   base_model_discipline_scorecard: DisciplineScorecard,
   sector_peer_news_map: SectorNewsMap,
   macro_event_risk_calendar: MacroEvents,
   technical_risk_overlay: TechnicalOverlay,
+  macro_regime_sector_rotation_model: MacroRegimeSectorRotation,
   opportunity_engine: OpportunityEngine,
   upcoming_week_focus: WeeklyFocus,
   upcoming_month_strategic_outlook: MonthlyOutlook,
@@ -288,182 +292,183 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
     Object.keys(sectionComponents).map((key, idx) => [key, idx])
   );
   const orderedSidebar = [...sidebar]
-    .filter((item) => item.key !== "cio_decision_brief")
+    .filter((item) => item.key !== "cio_decision_brief" && item.key !== "immediate_decisions")
     .sort((a, b) => {
-    const aIdx = orderIndex.has(a.key) ? orderIndex.get(a.key)! : 999;
-    const bIdx = orderIndex.has(b.key) ? orderIndex.get(b.key)! : 999;
-    if (aIdx !== bIdx) return aIdx - bIdx;
-    return 0;
-  });
+      const aIdx = orderIndex.has(a.key) ? orderIndex.get(a.key)! : 999;
+      const bIdx = orderIndex.has(b.key) ? orderIndex.get(b.key)! : 999;
+      if (aIdx !== bIdx) return aIdx - bIdx;
+      return 0;
+    });
   const sections = reportData!.sections;
+  const immediateDecisionItems = extractImmediateDecisionItems(sections.immediate_decisions);
   const sw = sidebarOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED;
 
-  return (  
+  return (
     <Container maxWidth="xl" sx={{ mb: 4, height: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)` }}>
-    <Box
-      sx={{
-        display: "flex",
-        height: "100%",
-        minHeight: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)`,
-        backgroundColor: "#f8fafc",
-        borderRadius: 2,
-        overflow: "hidden",
-        border: "1px solid #e2e8f0",
-      }}
-    >
-      {/* ===== Sidebar ===== */}
       <Box
         sx={{
-          width: sw,
-          minWidth: sw,
-          transition: "width 0.3s ease, min-width 0.3s ease",
           display: "flex",
-          flexDirection: "column",
-          backgroundColor: "#eef2ff",
+          height: "100%",
+          minHeight: `calc(100vh - ${LAYOUT_CHROME_HEIGHT}px)`,
+          backgroundColor: "#f8fafc",
+          borderRadius: 2,
           overflow: "hidden",
-          borderRight: "1px solid #c7d2fe",
+          border: "1px solid #e2e8f0",
         }}
       >
-        {/* Logo */}
+        {/* ===== Sidebar ===== */}
         <Box
           sx={{
-            px: sidebarOpen ? 2 : 1,
-            py: 1.5,
+            width: sw,
+            minWidth: sw,
+            transition: "width 0.3s ease, min-width 0.3s ease",
             display: "flex",
-            alignItems: "center",
-            gap: 1.5,
-            borderBottom: "1px solid #c7d2fe",
-            minHeight: 52,
+            flexDirection: "column",
+            backgroundColor: "#eef2ff",
+            overflow: "hidden",
+            borderRight: "1px solid #c7d2fe",
           }}
         >
+          {/* Logo */}
           <Box
             sx={{
-              width: 32,
-              height: 32,
-              minWidth: 32,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+              px: sidebarOpen ? 2 : 1,
+              py: 1.5,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              gap: 1.5,
+              borderBottom: "1px solid #c7d2fe",
+              minHeight: 52,
             }}
           >
-            <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 18 }} />
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                minWidth: 32,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <BarChartOutlinedIcon sx={{ color: "#fff", fontSize: 18 }} />
+            </Box>
+            {sidebarOpen && (
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: 1.5,
+                  whiteSpace: "nowrap",
+                  flex: 1,
+                  color: "#002060",
+                }}
+              >
+                AI REVIEW
+              </Typography>
+            )}
+            <IconButton
+              size="small"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto", color: "#94a3b8", "&:hover": { color: "#475569" } }}
+            >
+              {sidebarOpen ? (
+                <ChevronLeftIcon fontSize="small" />
+              ) : (
+                <ChevronRightIcon fontSize="small" />
+              )}
+            </IconButton>
           </Box>
+
+          {/* Nav Items */}
+          <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
+            {orderedSidebar.map((item) => {
+              const isActive = activeSection === item.key;
+              return (
+                <Box
+                  key={item.key}
+                  onClick={() => scrollToSection(item.key)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    px: sidebarOpen ? 2 : 0,
+                    py: 1.1,
+                    cursor: "pointer",
+                    borderLeft: isActive
+                      ? "3px solid #2563eb"
+                      : "3px solid transparent",
+                    backgroundColor: isActive
+                      ? "#dbeafe"
+                      : "transparent",
+                    color: isActive ? "#002060" : "#002060",
+                    transition: "all 0.2s",
+                    justifyContent: sidebarOpen ? "flex-start" : "center",
+                    "&:hover": {
+                      backgroundColor: isActive
+                        ? "#dbeafe"
+                        : "#e0e7ff",
+                      color: "#002060",
+                    },
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", minWidth: 24, justifyContent: "center" }}>
+                    {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
+                  </Box>
+                  {sidebarOpen && (
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        fontWeight: isActive ? 600 : 400,
+                        color: "inherit",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            })}
+          </Box>
+
+          {/* Footer */}
           {sidebarOpen && (
             <Typography
               sx={{
-                fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: 1.5,
-                whiteSpace: "nowrap",
-                flex: 1,
-                color: "#002060",
+                px: 2,
+                py: 1.5,
+                fontSize: 10,
+                color: "#94a3b8",
+                letterSpacing: 0.5,
+                borderTop: "1px solid #c7d2fe",
+                textTransform: "uppercase",
               }}
             >
-              AI REVIEW
+              Confidential · {formatDate(header.date)}
             </Typography>
           )}
-          <IconButton
-            size="small"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            sx={{ ml: sidebarOpen ? 0 : "auto", mr: sidebarOpen ? 0 : "auto", color: "#94a3b8", "&:hover": { color: "#475569" } }}
-          >
-            {sidebarOpen ? (
-              <ChevronLeftIcon fontSize="small" />
-            ) : (
-              <ChevronRightIcon fontSize="small" />
-            )}
-          </IconButton>
         </Box>
 
-        {/* Nav Items */}
-        <Box sx={{ flex: 1, overflowY: "auto", py: 0.5 }}>
-          {orderedSidebar.map((item) => {
-            const isActive = activeSection === item.key;
-            return (
-              <Box
-                key={item.key}
-                onClick={() => scrollToSection(item.key)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                  px: sidebarOpen ? 2 : 0,
-                  py: 1.1,
-                  cursor: "pointer",
-                  borderLeft: isActive
-                    ? "3px solid #2563eb"
-                    : "3px solid transparent",
-                  backgroundColor: isActive
-                    ? "#dbeafe"
-                    : "transparent",
-                  color: isActive ? "#002060" : "#002060",
-                  transition: "all 0.2s",
-                  justifyContent: sidebarOpen ? "flex-start" : "center",
-                  "&:hover": {
-                    backgroundColor: isActive
-                      ? "#dbeafe"
-                      : "#e0e7ff",
-                    color: "#002060",
-                  },
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", minWidth: 24, justifyContent: "center" }}>
-                  {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
-                </Box>
-                {sidebarOpen && (
-                  <Typography
-                    sx={{
-                      fontSize: 13,
-                      fontWeight: isActive ? 600 : 400,
-                      color: "inherit",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {item.label}
-                  </Typography>
-                )}
-              </Box>
-            );
-          })}
-        </Box>
-
-        {/* Footer */}
-        {sidebarOpen && (
-          <Typography
+        {/* ===== Main Content ===== */}
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {/* Header */}
+          <Box
             sx={{
-              px: 2,
-              py: 1.5,
-              fontSize: 10,
-              color: "#94a3b8",
-              letterSpacing: 0.5,
-              borderTop: "1px solid #c7d2fe",
-              textTransform: "uppercase",
+              px: 3,
+              py: 2,
+              borderBottom: "1px solid #c7d2fe",
+              backgroundColor: "#eef2ff",
+              display: "flex",
+              alignItems: "center",
+              minHeight: 72,
             }}
           >
-            Confidential · {formatDate(header.date)}
-          </Typography>
-        )}
-      </Box>
-
-      {/* ===== Main Content ===== */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Header */}
-        <Box
-          sx={{
-            px: 3,
-            py: 2,
-            borderBottom: "1px solid #c7d2fe",
-            backgroundColor: "#eef2ff",
-            display: "flex",
-            alignItems: "center",
-            minHeight: 72,
-          }}
-        >
-          {/* <IconButton
+            {/* <IconButton
             size="small"
             onClick={handleBack}
             sx={{
@@ -475,182 +480,197 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           >
             <ArrowBackIcon fontSize="small" />
           </IconButton> */}
-          <Box sx={{ flex: 1, textAlign: "center" }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5, color: "#1e293b" }}>
-              <Box component="span" sx={{ color: "#2563eb" }}>
-                US EQUITIES PORTFOLIO REVIEW
-              </Box>
-              {" - "}
-              {header.report_title}
-            </Typography>
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: 12.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 0.5,
-                mt: 0.5,
-              }}
-            >
-              <Box component="span" sx={{ color: "#2563eb", fontWeight: 600 }}>{formatDate(header.date)}</Box>
-              {header.aum_formatted && (
-                <>
-                  <Box component="span"> · </Box>
-                  <Box component="span" sx={{ color: "#059669", fontWeight: 600 }}>AUM: {header.aum_formatted}</Box>
-                </>
-              )}
-              {header.classification && ` · ${header.classification}`}
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-            {header.pnl && (
-              <Chip
-                label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
-                size="small"
+            <Box sx={{ flex: 1, textAlign: "center" }}>
+              <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.1, color: "#1e293b" }}>
+                <Box component="span" sx={{ color: "#7236a9", fontSize: 20 }}>
+                  US Equity Portfolio AI Review              </Box>
+                {/* {" - "}
+                {header.report_title} */}
+              </Typography>
+              <Typography
                 sx={{
-                  backgroundColor: "#eff6ff",
-                  color: "#2563eb",
-                  fontWeight: 700,
                   fontSize: 12,
-                  height: 30,
-                  border: "1px solid #bfdbfe",
-                }}
-              />
-            )}
-            {header.dtd && (
-              <Chip
-                label={`DTD: ${header.dtd}`}
-                size="small"
-                sx={{
-                  backgroundColor: "#f1f5f9",
-                  color: "#475569",
-                  fontWeight: 700,
-                  fontSize: 12,
-                  height: 30,
-                  border: "1px solid #e2e8f0",
-                }}
-              />
-            )}
-            <AIPortfolioReviewPDFExporter
-              exportContainerId="ai-portfolio-review-content"
-              fileName={`AI_Portfolio_Review_${header.date || "report"}.pdf`}
-              reportTitle={`US PORTFOLIO REVIEW - ${header.report_title || ""}`}
-              reportDate={formatDate(header.date)}
-              aum={header.aum_formatted || ""}
-            />
-          </Box>
-        </Box>
 
-        {/* Scrollable Content */}
-        <Box
-          ref={contentRef}
-          id="ai-portfolio-review-content"
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            px: 3,
-            py: 3,
-          }}
-        >
-          {error && (
-            <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
-          )}
-
-          {orderedSidebar.map((item) => {
-            const SectionComponent = sectionComponents[item.key];
-            const sectionData = sections[item.key];
-            const colors = sectionColors[item.key] || { bg: "#f8fafc", border: "#e2e8f0", iconColor: "#64748b", textColor: "#475569" };
-
-            return (
-              <Box
-                key={item.key}
-                data-section-key={item.key}
-                className="pdf-section"
-                ref={(el: HTMLDivElement | null) => {
-                  sectionRefs.current[item.key] = el;
                 }}
-                sx={{ mb: 4 }}
               >
-                {/* Section Header */}
-                <Box
-                  sx={{
-                    backgroundColor: colors.bg,
-                    borderRadius: "12px 12px 0 0",
-                    border: `1px solid ${colors.border}`,
-                    borderBottom: `2px solid ${colors.border}`,
-                    px: 3,
-                    py: 1.5,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.5,
-                    mb: 0,
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", minWidth: 28, justifyContent: "center", color: colors.iconColor }}>
-                    {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
-                  </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16, color: colors.textColor, flex: 1 }}>
-                    {item.label}
-                  </Typography>
-                  {sectionData?.badge && (
-                    <Chip
-                      label={sectionData.badge}
-                      size="small"
-                      sx={{
-                        fontSize: 11,
-                        height: 24,
-                        backgroundColor: "#fff",
-                        color: colors.textColor,
-                        fontWeight: 600,
-                        border: `1px solid ${colors.border}`,
-                      }}
-                    />
-                  )}
-                  {sectionData?.overall && (
-                    <Chip
-                      label={`Overall: ${sectionData.overall}`}
-                      size="small"
-                      sx={{
-                        fontSize: 11,
-                        height: 24,
-                        backgroundColor: "#fff",
-                        color: colors.textColor,
-                        fontWeight: 600,
-                        border: `1px solid ${colors.border}`,
-                      }}
-                    />
-                  )}
-                </Box>
+                {header.report_title}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#94a3b8",
+                  fontSize: 12.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 0.5,
+                  mt: 0.5,
+                }}
+              >
+                <Box component="span" sx={{ color: "#2563eb", fontWeight: 600 }}>{formatDate(header.date)}</Box>
+                {header.aum_formatted && (
+                  <>
+                    <Box component="span"> · </Box>
+                    <Box component="span" sx={{ color: "#059669", fontWeight: 600 }}>AUM: {header.aum_formatted}</Box>
+                  </>
+                )}
+                {header.classification && ` · ${header.classification}`}
+              </Typography>
+            </Box>
 
-                {/* Section Content */}
-                <Box
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              {header.pnl && (
+                <Chip
+                  label={`P&L: ${header.pnl}${header.pnl_pct ? ` (${header.pnl_pct})` : ""}`}
+                  size="small"
                   sx={{
-                    backgroundColor: "#fff",
-                    border: `1px solid ${colors.border}`,
-                    borderTop: "none",
-                    borderRadius: "0 0 12px 12px",
-                    p: 3,
+                    backgroundColor: "#eff6ff",
+                    color: "#2563eb",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    height: 30,
+                    border: "1px solid #bfdbfe",
                   }}
+                />
+              )}
+              {header.dtd && (
+                <Chip
+                  label={`DTD: ${header.dtd}`}
+                  size="small"
+                  sx={{
+                    backgroundColor: "#f1f5f9",
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    height: 30,
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+              )}
+              <AIPortfolioReviewPDFExporter
+                exportContainerId="ai-portfolio-review-content"
+                fileName={`AI_Portfolio_Review_${header.date || "report"}.pdf`}
+                reportTitle={`US Equity Portfolio AI Review - ${header.report_title || ""}`}
+                reportDate={formatDate(header.date)}
+                aum={header.aum_formatted || ""}
+              />
+            </Box>
+          </Box>
+
+          {/* Scrollable Content */}
+          <Box
+            ref={contentRef}
+            id="ai-portfolio-review-content"
+            sx={{
+              flex: 1,
+              overflowY: "auto",
+              px: 3,
+              py: 3,
+            }}
+          >
+            {error && (
+              <Typography sx={{ color: "#ef4444", mb: 2 }}>{error}</Typography>
+            )}
+
+            {orderedSidebar.map((item) => {
+              const SectionComponent = sectionComponents[item.key];
+              const sectionData = sections[item.key];
+              const colors = sectionColors[item.key] || { bg: "#f8fafc", border: "#e2e8f0", iconColor: "#64748b", textColor: "#475569" };
+              const isActionMatrixSection = item.key === "final_prioritized_action_matrix";
+
+              return (
+                <Box
+                  key={item.key}
+                  data-section-key={item.key}
+                  className="pdf-section"
+                  ref={(el: HTMLDivElement | null) => {
+                    sectionRefs.current[item.key] = el;
+                  }}
+                  sx={{ mb: 4 }}
                 >
-                  {SectionComponent && sectionData != null ? (
-                    <SectionComponent data={sectionData} />
-                  ) : sectionData ? (
-                    <GenericDataRenderer data={sectionData} />
-                  ) : (
-                    <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
-                      No data available for this section.
+                  {/* Section Header */}
+                  <Box
+                    sx={{
+                      backgroundColor: colors.bg,
+                      borderRadius: "12px 12px 0 0",
+                      border: `1px solid ${colors.border}`,
+                      borderBottom: `2px solid ${colors.border}`,
+                      px: 3,
+                      py: 1.5,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.5,
+                      mb: 0,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", minWidth: 28, justifyContent: "center", color: colors.iconColor }}>
+                      {sectionIconMap[item.key] || <ViewListOutlinedIcon fontSize="small" />}
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16, color: colors.textColor, flex: 1 }}>
+                      {item.label}
                     </Typography>
-                  )}
+                    {sectionData?.badge && (
+                      <Chip
+                        label={sectionData.badge}
+                        size="small"
+                        sx={{
+                          fontSize: 11,
+                          height: 24,
+                          backgroundColor: "#fff",
+                          color: colors.textColor,
+                          fontWeight: 600,
+                          border: `1px solid ${colors.border}`,
+                        }}
+                      />
+                    )}
+                    {sectionData?.overall && (
+                      <Chip
+                        label={`Overall: ${sectionData.overall}`}
+                        size="small"
+                        sx={{
+                          fontSize: 11,
+                          height: 24,
+                          backgroundColor: "#fff",
+                          color: colors.textColor,
+                          fontWeight: 600,
+                          border: `1px solid ${colors.border}`,
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  {/* Section Content */}
+                  <Box
+                    sx={{
+                      backgroundColor: "#fff",
+                      border: `1px solid ${colors.border}`,
+                      borderTop: "none",
+                      borderRadius: "0 0 12px 12px",
+                      p: 3,
+                    }}
+                  >
+                    {(() => {
+                      if (sectionData == null) {
+                        return (
+                          <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
+                            No data available for this section.
+                          </Typography>
+                        );
+                      }
+                      if (isActionMatrixSection) {
+                        return <ActionMatrix data={sectionData} detailItems={immediateDecisionItems} />;
+                      }
+                      if (SectionComponent) {
+                        return <SectionComponent data={sectionData} />;
+                      }
+                      return <GenericDataRenderer data={sectionData} />;
+                    })()}
+                  </Box>
                 </Box>
-              </Box>
-            );
-          })}
+              );
+            })}
+          </Box>
         </Box>
       </Box>
-    </Box>
     </Container>
   );
 };

@@ -24,12 +24,17 @@ interface LoginResponse {
   user: {
     is_superuser: boolean;
     username?: string;
+    email?: string;
+    email_verified?: boolean;
   };
   message?: string;
 }
 
 const CAPTCHA_LEN = 4;
 const REQUEST_TIMEOUT_MS = 60000;
+const EMAIL_VERIFIED_KEY = "email_verified";
+const USER_EMAIL_KEY = "user_email";
+const DEFAULT_EMAIL_VERIFY_ENDPOINT = "/api/mark-email-verified/";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -49,6 +54,10 @@ const Login: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const apiUrl = useMemo(() => process.env.REACT_APP_API_URL, []);
+  const emailVerifyEndpoint = useMemo(
+    () => process.env.REACT_APP_EMAIL_VERIFY_ENDPOINT || DEFAULT_EMAIL_VERIFY_ENDPOINT,
+    []
+  );
 
   // Axios instance with timeout
   const http = useMemo(() => {
@@ -124,6 +133,29 @@ const Login: React.FC = () => {
     userInput === captchaText &&
     !loading;
 
+  const markEmailVerifiedOnLogin = async (
+    accessToken: string,
+    usernameValue: string
+  ) => {
+    try {
+      await http.patch(
+        emailVerifyEndpoint,
+        { email_verified: true },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      return true;
+    } catch (error: any) {
+      // Keep login flow resilient even if auto-verify API is unavailable.
+      console.warn(
+        `[Login] Auto email verification API failed for ${usernameValue}:`,
+        error?.response?.status || error?.message || error
+      );
+      return false;
+    }
+  };
+
   // Submit
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -140,13 +172,37 @@ const Login: React.FC = () => {
         password,
       });
 
+      const userData = res.data.user || { is_superuser: false };
+      const finalUsername = userData.username || username;
+      const email = userData.email || "";
+      let emailVerified = Boolean(userData.email_verified);
+
+      if (!emailVerified) {
+        const autoVerified = await markEmailVerifiedOnLogin(
+          res.data.access_token,
+          finalUsername
+        );
+        if (!autoVerified) {
+          console.warn(
+            `[Login] Email verification DB update could not be confirmed for ${finalUsername}.`
+          );
+        }
+        emailVerified = true;
+      }
+
       // Store only the access token + a tiny user snapshot
       localStorage.setItem("access_token", res.data.access_token);
       localStorage.setItem(
         "is_superuser",
-        res.data.user?.is_superuser ? "true" : "false"
+        userData?.is_superuser ? "true" : "false"
       );
-      localStorage.setItem("user", res.data.user?.username || username);
+      localStorage.setItem("user", finalUsername);
+      localStorage.setItem(USER_EMAIL_KEY, email);
+      localStorage.setItem(EMAIL_VERIFIED_KEY, emailVerified ? "true" : "false");
+
+      console.log(`[Login] Username: ${finalUsername}`);
+      console.log(`[Login] Email: ${email || "N/A"}`);
+      console.log(`[Login] Email Verified: ${emailVerified}`);
 
       const to = location.state?.from || "/";
       navigate(to, { replace: true });

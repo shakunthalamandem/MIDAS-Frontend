@@ -57,6 +57,7 @@ import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
+import Agents from "../Components/Agents/Agents";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
@@ -321,6 +322,8 @@ const AppRouters: React.FC = () => {
 
         <Route path='/ai_portfolio_review' element={<AuthGuard><AIPortfolioReview mode="portfolioReview" /></AuthGuard>} />
         <Route path='/last_30_days_ai_ranking' element={<AuthGuard><AIPortfolioReview mode="stockRanking" /></AuthGuard>} />
+
+        <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} />
 
 
 
