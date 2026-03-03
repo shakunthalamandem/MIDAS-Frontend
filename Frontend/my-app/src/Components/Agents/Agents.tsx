@@ -5,9 +5,9 @@ import {
   Chip,
   Paper,
   Stack,
-  Switch,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -31,18 +31,21 @@ const activeAgents: AgentConfig[] = [
     description:
       "Comprehensive review of your portfolio performance and recommendations.",
     schedule: "Run daily at 8:00 AM EST",
+    route: "/ai_portfolio_review",
   },
   {
     title: "Last 30 Days IPO AI Ranking",
     description:
       "AI-generated ranking of the most promising IPOs from the last 30 days.",
     schedule: "Run daily at 8:00 AM EST",
+    route: "/last_30_days_ai_ranking",
   },
   {
     title: "AI Unsupervised Market Insights",
     description:
       "AI-generated insights on market trends and opportunities without explicit supervision.",
     schedule: "Run daily at 8:00 AM EST",
+    route: "/ai_fewshot_analysis",
   },
   {
     title: "Portfolio Analysis",
@@ -54,6 +57,7 @@ const activeAgents: AgentConfig[] = [
     description:
       "The sentiment analysis runs daily on selected stocks. To view the latest updated sentiment report and receive it via email, please enable the email option.",
     schedule: "Run daily",
+    route: "/ai_sentiment_view",
   },
 ];
 
@@ -86,6 +90,7 @@ const agentComponentMap: Record<string, React.ComponentType<ActiveAgentCardProps
 };
 
 const Agents: React.FC = () => {
+  const navigate = useNavigate();
   const [emailVerified] = useState(
     () => localStorage.getItem(EMAIL_VERIFIED_KEY) === "true"
   );
@@ -110,6 +115,17 @@ const Agents: React.FC = () => {
         [key]: !prev[title][key],
       },
     }));
+  };
+
+  const handleCardClick = (agent: AgentConfig) => {
+    if (agent.route) {
+      navigate(agent.route);
+      return;
+    }
+
+    if (agent.title === "Portfolio Analysis") {
+      console.log("Portfolio Analysis card clicked");
+    }
   };
 
   const totalAgents = activeAgents.length;
@@ -204,6 +220,7 @@ const Agents: React.FC = () => {
                 agent={agent}
                 state={state}
                 onToggle={handleToggle}
+                onCardClick={handleCardClick}
               />
             );
           })}
