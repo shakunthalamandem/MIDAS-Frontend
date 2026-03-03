@@ -323,7 +323,8 @@ const AppRouters: React.FC = () => {
         <Route path='/ai_portfolio_review' element={<AuthGuard><AIPortfolioReview mode="portfolioReview" /></AuthGuard>} />
         <Route path='/last_30_days_ai_ranking' element={<AuthGuard><AIPortfolioReview mode="stockRanking" /></AuthGuard>} />
 
-        <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} />
+        {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
+        <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
 
 
 

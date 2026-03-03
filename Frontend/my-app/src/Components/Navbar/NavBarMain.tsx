@@ -93,9 +93,6 @@ const NavbarMain: React.FC = () => {
       case "Data & Analytics":
         navigateAndRefresh("/data-analytics/writeups");
         break;
-      case "Agents":
-        navigateAndRefresh("/agents");
-        break;
       // case "New Deal Form":
       //   navigate("/deals/new_deal_form");
       //   break;
@@ -262,6 +259,12 @@ const NavbarMain: React.FC = () => {
             <DropdownTab
               label="AI-Agents"
               menuItems={[
+
+               {
+                  label: "AI-Agent Dashboard",
+                  path: "/agents/dashboard",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
                
                 {
                   label: "AI Portfolio Review",
@@ -455,26 +458,6 @@ const NavbarMain: React.FC = () => {
               rich
             />
 
-            <Button
-              onClick={() => handleTabSelect("Agents")}
-              sx={{
-                color: "#005166",
-                fontWeight: "bold",
-                fontSize: "0.725rem",
-                mx: 1,
-                borderBottom:
-                  selectedTab === "Agents"
-                    ? "3px solid #005166"
-                    : "3px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  borderBottom: "3px solid #005166",
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              Agents
-            </Button>
 
             {/* <Button
               onClick={() => handleTabSelect("Data & Analytics")}
