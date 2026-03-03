@@ -22,6 +22,7 @@ import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
 
 import ExecutiveDashboard from "./sections/ExecutiveDashboard";
 import CIODecisionBrief from "./sections/CIODecisionBrief";
@@ -36,6 +37,7 @@ import MonthlyOutlook from "./sections/MonthlyOutlook";
 import ActionChecklists from "./sections/ActionChecklists";
 import ActionMatrix from "./sections/ActionMatrix";
 import GenericDataRenderer from "./sections/GenericDataRenderer";
+import MacroRegimeSectorRotation from "./sections/MacroRegimeSectorRotation";
 import AIPortfolioReviewPDFExporter from "./AIPortfolioReviewPDFExporter";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -80,6 +82,7 @@ const sectionIconMap: Record<string, React.ReactNode> = {
   sector_peer_news_map: <PublicOutlinedIcon fontSize="small" />,
   macro_event_risk_calendar: <CalendarMonthOutlinedIcon fontSize="small" />,
   technical_risk_overlay: <ShowChartOutlinedIcon fontSize="small" />,
+  macro_regime_sector_rotation_model: <AutoGraphOutlinedIcon fontSize="small" />,
   opportunity_engine: <TrackChangesOutlinedIcon fontSize="small" />,
   upcoming_week_focus: <ScheduleOutlinedIcon fontSize="small" />,
   upcoming_month_strategic_outlook: <EventNoteOutlinedIcon fontSize="small" />,
@@ -95,6 +98,7 @@ const sectionColors: Record<string, { bg: string; border: string; iconColor: str
   sector_peer_news_map: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#0284c7", textColor: "#075985" },
   macro_event_risk_calendar: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
   technical_risk_overlay: { bg: "#ecfeff", border: "#a5f3fc", iconColor: "#0891b2", textColor: "#155e75" },
+  macro_regime_sector_rotation_model: { bg: "#fdf2f8", border: "#fecdd3", iconColor: "#be185d", textColor: "#831843" },
   opportunity_engine: { bg: "#ecfdf5", border: "#a7f3d0", iconColor: "#059669", textColor: "#065f46" },
   upcoming_week_focus: { bg: "#fff7ed", border: "#fed7aa", iconColor: "#ea580c", textColor: "#9a3412" },
   upcoming_month_strategic_outlook: { bg: "#faf5ff", border: "#e9d5ff", iconColor: "#7c3aed", textColor: "#5b21b6" },
@@ -110,6 +114,7 @@ const sectionComponents: Partial<Record<string, React.FC<{ data: any }>>> = {
   sector_peer_news_map: SectorNewsMap,
   macro_event_risk_calendar: MacroEvents,
   technical_risk_overlay: TechnicalOverlay,
+  macro_regime_sector_rotation_model: MacroRegimeSectorRotation,
   opportunity_engine: OpportunityEngine,
   upcoming_week_focus: WeeklyFocus,
   upcoming_month_strategic_outlook: MonthlyOutlook,
@@ -477,7 +482,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
           </IconButton> */}
             <Box sx={{ flex: 1, textAlign: "center" }}>
               <Typography sx={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.1, color: "#1e293b" }}>
-                <Box component="span" sx={{ color: "#7236a9",fontSize:20 }}>
+                <Box component="span" sx={{ color: "#7236a9", fontSize: 20 }}>
                   US Equity Portfolio AI Review              </Box>
                 {/* {" - "}
                 {header.report_title} */}

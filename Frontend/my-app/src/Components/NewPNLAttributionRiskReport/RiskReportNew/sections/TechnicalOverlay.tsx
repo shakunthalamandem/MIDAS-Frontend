@@ -1,12 +1,217 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import GenericDataRenderer from "./GenericDataRenderer";
+import GenericDataRenderer, { renderArrayTable } from "./GenericDataRenderer";
 
 interface Props {
   data: any;
 }
 
 const modernFont = `'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+
+const formatColumnLabel = (column: string): string =>
+  column
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+const normalizeRowObject = (row: any, columns: string[]): Record<string, any> | null => {
+  if (!row) return null;
+  if (Array.isArray(row)) {
+    return columns.reduce<Record<string, any>>((acc, col, idx) => {
+      acc[col] = row[idx];
+      return acc;
+    }, {});
+  }
+  if (typeof row === "object") {
+    return row;
+  }
+  return { value: row };
+};
+
+const getRowCellValue = (row: Record<string, any>, column: string): any => {
+  if (column in row) return row[column];
+  const normalizedColumn = column.replace(/_/g, "").toLowerCase();
+  const matchingKey = Object.keys(row).find(
+    (key) => key.replace(/_/g, "").toLowerCase() === normalizedColumn
+  );
+  if (matchingKey) return row[matchingKey];
+  return row[column];
+};
+
+const formatStructuredValue = (value: any): string => {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value.toString();
+  return String(value);
+};
+
+const isTickerColumn = (column: string): boolean => {
+  const normalized = column.replace(/_/g, "").toLowerCase();
+  return ["ticker", "symbol", "name"].includes(normalized);
+};
+
+const isNumericColumn = (column: string): boolean => {
+  const lower = column.toLowerCase();
+  return (
+    lower.includes("score") ||
+    lower.includes("value") ||
+    lower.includes("pct") ||
+    lower.includes("return") ||
+    lower.includes("impact")
+  );
+};
+
+const renderStructuredTable = (
+  title: string,
+  columns: string[] = [],
+  rows: any[] = [],
+  accentColor: string = "#0ea5e9"
+) => {
+  if (!rows || rows.length === 0) return null;
+  const headers = columns.length > 0 ? columns : Object.keys(rows[0] || {});
+  if (headers.length === 0) return null;
+
+  const normalizedRows = rows
+    .map((row) => normalizeRowObject(row, headers))
+    .filter((row): row is Record<string, any> => row !== null);
+  if (normalizedRows.length === 0) return null;
+
+  const borderColor = accentColor;
+  const headerBg = `${accentColor}11`;
+  const hoverBg = "#f0f9ff";
+
+  return (
+    <Box sx={{ mb: 4 }}>
+      <Typography
+        sx={{
+          fontSize: 15,
+          fontWeight: 700,
+          color: "#0f172a",
+          mb: 2,
+        }}
+      >
+        {title}
+      </Typography>
+      <Box
+        sx={{
+          border: `1px solid ${borderColor}`,
+          borderRadius: 3,
+          overflow: "hidden",
+          fontFamily: modernFont,
+        }}
+      >
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${headers.length}, 1fr)`,
+            backgroundColor: headerBg,
+            borderBottom: `1px solid ${borderColor}`,
+          }}
+        >
+          {headers.map((col) => (
+            <Typography
+              key={col}
+              sx={{
+                px: 2.5,
+                py: 1.6,
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#0f172a",
+                letterSpacing: 0.5,
+                textTransform: "uppercase",
+              }}
+            >
+              {formatColumnLabel(col)}
+            </Typography>
+          ))}
+        </Box>
+
+        {normalizedRows.map((row, rowIndex) => (
+          <Box
+            key={`${title}-${rowIndex}`}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${headers.length}, 1fr)`,
+              borderBottom:
+                rowIndex < normalizedRows.length - 1 ? "1px solid #e2e8f0" : "none",
+              backgroundColor: rowIndex % 2 === 0 ? "#fff" : "#f8fafc",
+              "&:hover": {
+                backgroundColor: hoverBg,
+              },
+            }}
+          >
+            {headers.map((col, colIndex) => {
+              const val = getRowCellValue(row, col);
+              const displayVal = formatStructuredValue(val);
+              const isTicker = isTickerColumn(col);
+              const isNumeric = isNumericColumn(col);
+
+              return (
+                <Typography
+                  key={`${title}-${rowIndex}-${col}`}
+                  sx={{
+                    px: 2.5,
+                    py: 1.6,
+                    fontSize: 14,
+                    fontWeight: isTicker ? 600 : 400,
+                    color: isTicker ? "#111827" : "#1e293b",
+                    fontFamily: isNumeric ? "monospace" : modernFont,
+                  }}
+                >
+                  {displayVal}
+                </Typography>
+              );
+            })}
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+};
+
+const renderMethodologyBlock = (methodology: any) => {
+  if (!methodology) return null;
+  return (
+    <Box sx={{ mb: 4 }}>
+      <Typography
+        sx={{
+          fontSize: 16,
+          fontWeight: 700,
+          color: "#0f172a",
+          mb: 1.5,
+          fontFamily: modernFont,
+        }}
+      >
+        Technical Methodology
+      </Typography>
+      {methodology.description && (
+        <Typography
+          sx={{
+            fontSize: 14,
+            color: "#1e293b",
+            mb: 0.4,
+          }}
+        >
+          {methodology.description}
+        </Typography>
+      )}
+      {methodology.scoring_scale && (
+        <Typography sx={{ fontSize: 13, color: "#475569", mb: 1 }}>
+          Scale: {methodology.scoring_scale}
+        </Typography>
+      )}
+      {Array.isArray(methodology.factors) && methodology.factors.length > 0 && (
+        <Box sx={{ mt: 3 }}>
+          {renderArrayTable(methodology.factors, "#06b6d4")}
+        </Box>
+      )}
+      {methodology.note && (
+        <Typography sx={{ fontSize: 13, color: "#475569", mt: 2, fontStyle: "italic" }}>
+          Note: {methodology.note}
+        </Typography>
+      )}
+    </Box>
+  );
+};
 
 const extractRows = (val: any): any[] => {
   if (!val) return [];
@@ -217,8 +422,46 @@ const TechnicalOverlay: React.FC<Props> = ({ data }) => {
     );
   }
 
-  if (Array.isArray(data))
+  if (Array.isArray(data)) {
     return renderTable("Technical Positions", data);
+  }
+
+  const isModernTechnicalPayload =
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    (data.stock_scores || data.methodology || data.portfolio_summary);
+
+  if (isModernTechnicalPayload) {
+    const stockScores = data.stock_scores || { columns: [], rows: [] };
+    const portfolioSummary = data.portfolio_summary;
+
+    return (
+      <Box sx={{ fontFamily: modernFont }}>
+        {renderMethodologyBlock(data.methodology)}
+        {renderStructuredTable(
+          "Technical Stock Scores",
+          stockScores.columns || [],
+          stockScores.rows || [],
+          "#0891b2"
+        )}
+        {portfolioSummary && (
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              sx={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: "#0f172a",
+                mb: 1,
+              }}
+            >
+              Portfolio Technical Summary
+            </Typography>
+            <GenericDataRenderer data={portfolioSummary} accentColor="#0891b2" />
+          </Box>
+        )}
+      </Box>
+    );
+  }
 
   const overbought = data.overbought;
   const oversold = data.oversold;
