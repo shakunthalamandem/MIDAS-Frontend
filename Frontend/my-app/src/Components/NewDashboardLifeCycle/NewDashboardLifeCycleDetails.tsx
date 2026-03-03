@@ -40,13 +40,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const appliedTabRef = React.useRef<string | null>(null);
 
   const activePayload = selectedOption || payload;
+  const writeupEnabled =
+    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
+    (activePayload?.writeup_available || "").toUpperCase() === "YES";
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
   const tabItems = useMemo(
     () => [
-      { label: "Write Up New" },
-      { label: "Write Up Old" },
+      { label: "Write Up New", requiresWriteup: true },
+      { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
@@ -65,14 +68,28 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   );
 
   React.useEffect(() => {
+    const currentTab = tabItems[tabValue];
+    if (!currentTab) return;
+
+    const dealRecommendationIndex = tabItems.findIndex(
+      (item) => item.label === "Deal Recommendation"
+    );
+
+    if (!writeupEnabled && currentTab.requiresWriteup && dealRecommendationIndex !== -1) {
+      setTabValue(dealRecommendationIndex);
+    }
+  }, [tabItems, tabValue, writeupEnabled]);
+
+  React.useEffect(() => {
     if (!targetTabLabel) return;
     if (appliedTabRef.current === targetTabLabel) return;
     const nextIndex = tabItems.findIndex((item) => item.label === targetTabLabel);
-    if (nextIndex >= 0) {
+    const isWriteupTab = tabItems[nextIndex]?.requiresWriteup;
+    if (nextIndex >= 0 && !(isWriteupTab && !writeupEnabled)) {
       appliedTabRef.current = targetTabLabel;
       setTabValue(nextIndex);
     }
-  }, [targetTabLabel, tabItems]);
+  }, [targetTabLabel, tabItems, writeupEnabled]);
 
   if (!payload) {
     return (
@@ -184,21 +201,32 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               },
             }}
           >
-            {tabItems.map((item) => (
-              <Tab
-                key={item.label}
-                iconPosition="start"
-                label={item.label}
-                sx={{
-                  borderRadius: 999,
-                  mr: 1,
-                  "&.Mui-selected": {
-                    color: "#ffff",
-                    backgroundColor: "#262268ff",
-                  },
-                }}
-              />
-            ))}
+            {tabItems.map((item) => {
+              const isDisabled = item.requiresWriteup && !writeupEnabled;
+              return (
+                <Tab
+                  key={item.label}
+                  iconPosition="start"
+                  label={item.label}
+                  disabled={isDisabled}
+                  sx={{
+                    borderRadius: 999,
+                    mr: 1,
+                    "&.Mui-selected": {
+                      color: "#ffff",
+                      backgroundColor: "#262268ff",
+                    },
+                    "&.Mui-disabled": {
+                      color: "#a0a0a0",
+                      backgroundColor: "#e0e0e0",
+                      borderColor: "#d0d0d0",
+                      cursor: "not-allowed",
+                      pointerEvents: "auto",
+                    },
+                  }}
+                />
+              );
+            })}
           </Tabs>
         </Paper>
 
