@@ -48,8 +48,7 @@ const normalizeDealRows = (payload: any): Deal[] => {
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
-      unique_deal_id:
-        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      unique_deal_id: item.unique_deal_id ?? "",
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
@@ -161,6 +160,7 @@ const postSentimentPdf = async (
   formData.append("ticker", ticker);
   formData.append("unique_deal_id", unique_deal_id);
   formData.append("sentiment_pdf", sentimentPdf.blob, sentimentPdf.filename);
+  console.log(unique_deal_id); // Debug log for unique_deal_id
 
   const res = await fetch(`${apiUrl}/api/deal_sentiment_pdf/`, {
     method: "POST",
@@ -170,12 +170,13 @@ const postSentimentPdf = async (
   if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
   return data;
 };
-
 const triggerSentimentEmail = async (tickers: string[]) => {
   const res = await fetch(`${apiUrl}/api/sentiment_analysis_email_trigger/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Added Authorization header
+
     },
     body: JSON.stringify({
       tickers, // list of successfully processed tickers
@@ -371,8 +372,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
           );
         } catch (emailErr: any) {
           setError(
-            `Sentiment saved but email failed: ${
-              emailErr?.message || "Unknown error"
+            `Sentiment saved but email failed: ${emailErr?.message || "Unknown error"
             }`
           );
         }
@@ -393,13 +393,12 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   // Dialog close handler
   const handleClose = () => setDialogOpen(false);
 
-  console.log("email sent to backend:", localStorage.getItem("email"));
 
   return (
-<ActiveAgentCard
-  {...props}
-  onRunSentimentClick={() => setDialogOpen(true)}
->      {/* Show Run Sentiment button only if enabled */}
+    <ActiveAgentCard
+      {...props}
+      onRunSentimentClick={() => setDialogOpen(true)}
+    >      {/* Show Run Sentiment button only if enabled */}
 
 
       <Dialog
