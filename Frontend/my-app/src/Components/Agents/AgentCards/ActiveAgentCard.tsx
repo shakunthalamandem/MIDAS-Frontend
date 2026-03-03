@@ -1,5 +1,5 @@
 import React from "react";
-import { Chip, Divider, Paper, Stack, Switch, Typography } from "@mui/material";
+import { Box, Chip, Divider, Paper, Stack, Switch, Typography } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
@@ -19,36 +19,25 @@ export interface ActiveAgentCardProps {
   agent: AgentConfig;
   state: ActiveAgentState;
   onToggle: (title: string, key: "enabled" | "email") => void;
-  onCardClick?: (agent: AgentConfig) => void;
   children?: React.ReactNode;
+  footerAction?: React.ReactNode;
 }
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,
   state,
   onToggle,
-  onCardClick,
   children,
+  footerAction,
 }) => (
   <Paper
     elevation={2}
-    onClick={() => onCardClick?.(agent)}
-    onKeyDown={(event) => {
-      if (!onCardClick) return;
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        onCardClick(agent);
-      }
-    }}
-    role={onCardClick ? "button" : undefined}
-    tabIndex={onCardClick ? 0 : -1}
     sx={{
       borderRadius: 4,
       p: 4,
       display: "flex",
       flexDirection: "column",
       gap: 2,
-      cursor: onCardClick ? "pointer" : "default",
     }}
   >
     <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -94,6 +83,12 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
     </Stack>
 
     {children}
+
+    {footerAction && (
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        {footerAction}
+      </Box>
+    )}
   </Paper>
 );
 

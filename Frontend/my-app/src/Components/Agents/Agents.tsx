@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   Paper,
   Stack,
@@ -44,7 +45,7 @@ const activeAgents: AgentConfig[] = [
     title: "AI Unsupervised Market Insights",
     description:
       "AI-generated insights on market trends and opportunities without explicit supervision.",
-    schedule: "Run daily at 8:00 AM EST",
+    schedule: "RunS After completing the WriteUp",
     route: "/ai_fewshot_analysis",
   },
   {
@@ -115,17 +116,6 @@ const Agents: React.FC = () => {
         [key]: !prev[title][key],
       },
     }));
-  };
-
-  const handleCardClick = (agent: AgentConfig) => {
-    if (agent.route) {
-      navigate(agent.route);
-      return;
-    }
-
-    if (agent.title === "Portfolio Analysis") {
-      console.log("Portfolio Analysis card clicked");
-    }
   };
 
   const totalAgents = activeAgents.length;
@@ -213,6 +203,18 @@ const Agents: React.FC = () => {
           {activeAgents.map((agent) => {
             const state = activations[agent.title];
             const Component = agentComponentMap[agent.title] ?? ActiveAgentCard;
+            const viewDetailsAction = agent.route ? (
+              <Button
+                variant="text"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  const url = `${window.location.origin}${agent.route}`;
+                  window.open(url, "_blank", "noopener");
+                }}
+              >
+                View details
+              </Button>
+            ) : null;
 
             return (
               <Component
@@ -220,7 +222,7 @@ const Agents: React.FC = () => {
                 agent={agent}
                 state={state}
                 onToggle={handleToggle}
-                onCardClick={handleCardClick}
+                footerAction={viewDetailsAction}
               />
             );
           })}
