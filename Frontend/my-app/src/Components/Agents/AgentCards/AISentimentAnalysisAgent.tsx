@@ -106,7 +106,7 @@ const askPerplexity = async (
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId ,email: localStorage.getItem("email") ?? undefined }),
+    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId ,email_trigger:true}),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Perplexity chat failed");
