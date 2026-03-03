@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Divider,
   Paper,
@@ -15,7 +14,6 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import { jwtDecode } from "jwt-decode";
 
 interface AgentConfig {
   title: string;
@@ -23,9 +21,7 @@ interface AgentConfig {
   schedule: string;
 }
 
-const ACCESS_TOKEN_KEY = "access_token";
-
-type JWTPayload = { email?: string; name?: string; [k: string]: any };
+const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
@@ -81,8 +77,9 @@ const comingSoonAgents = [
 ];
 
 const Agents: React.FC = () => {
-  // Email verification state (replace with API later)
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [emailVerified] = useState(
+    () => localStorage.getItem(EMAIL_VERIFIED_KEY) === "true"
+  );
   const [activations, setActivations] = useState(
     activeAgents.reduce(
       (acc, agent) => ({
@@ -174,22 +171,7 @@ const Agents: React.FC = () => {
               variant="outlined"
             />
 
-            <Chip
-              label={emailVerified ? "Email Verified" : "Email Not Verified"}
-              color={emailVerified ? "success" : "warning"}
-              variant="outlined"
-            />
-
-            {!emailVerified && (
-              <Button
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={() => setEmailVerified(true)}
-              >
-                Verify Email
-              </Button>
-            )}
+            <Chip label="Email Verified" color="success" variant="outlined" />
 
             <Chip
               label={`${comingSoonCount} Coming Soon`}
