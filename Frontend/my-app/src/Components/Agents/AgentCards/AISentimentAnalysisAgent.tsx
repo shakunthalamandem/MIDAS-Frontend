@@ -48,7 +48,8 @@ const normalizeDealRows = (payload: any): Deal[] => {
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
-      unique_deal_id: item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      unique_deal_id:
+        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
@@ -114,11 +115,11 @@ const askPerplexity = async (
 
   const res = await fetch(endpoint, {
     method: "POST",
-  headers: { 
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("access_token")}`, // 🔥 ADD THIS
-  },
-    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId ,email_trigger:true}),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Added Authorization header
+    },
+    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId, email_trigger: true }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Perplexity chat failed");
@@ -169,6 +170,7 @@ const postSentimentPdf = async (
   if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
   return data;
 };
+
 const triggerSentimentEmail = async (tickers: string[]) => {
   const res = await fetch(`${apiUrl}/api/sentiment_analysis_email_trigger/`, {
     method: "POST",
@@ -184,6 +186,7 @@ const triggerSentimentEmail = async (tickers: string[]) => {
   if (!res.ok) throw new Error(data.error || "Failed to trigger email");
   return data;
 };
+
 const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const { state } = props;
 
@@ -292,16 +295,6 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
     []
   );
 
-  // Open popup ONLY on transition disabled -> enabled (not on every re-render)
-  const prevEnabled = useRef<boolean>(false);
-  useEffect(() => {
-    const wasEnabled = prevEnabled.current;
-    prevEnabled.current = enabled;
-
-    if (!wasEnabled && enabled) setDialogOpen(true);
-    if (wasEnabled && !enabled) setDialogOpen(false);
-  }, [enabled]);
-
   // Load tickers when enabled (once)
   useEffect(() => {
     if (!enabled || sentimentTickers.length) return;
@@ -322,100 +315,97 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
     })();
   }, [enabled, sentimentTickers.length]);
 
-const runSentiment = async () => {
-  if (!selectedSentimentDeals.length) return;
+  const runSentiment = async () => {
+    if (!selectedSentimentDeals.length) return;
 
-  setRunning(true);
-  setError(null);
-  setMessage(null);
+    setRunning(true);
+    setError(null);
+    setMessage(null);
 
-  try {
-    const success: string[] = [];
-    const failures: string[] = [];
+    try {
+      const success: string[] = [];
+      const failures: string[] = [];
 
-    for (const deal of selectedSentimentDeals) {
-      try {
-        const prompt = buildPrompt(deal.ticker, deal.deal_type);
+      for (const deal of selectedSentimentDeals) {
+        try {
+          const prompt = buildPrompt(deal.ticker, deal.deal_type);
 
-        const blocks = await askPerplexity(
-          prompt,
-          deal.unique_deal_id,
-          deal.source
-        );
+          const blocks = await askPerplexity(
+            prompt,
+            deal.unique_deal_id,
+            deal.source
+          );
 
-        await postSentiment(
-          deal.ticker,
-          deal.unique_deal_id,
-          deal.region,
-          blocks
-        );
+          await postSentiment(
+            deal.ticker,
+            deal.unique_deal_id,
+            deal.region,
+            blocks
+          );
 
-        const sentimentPdf = await renderBlocksToPdf(
-          blocks,
-          deal.ticker
-        );
+          const sentimentPdf = await renderBlocksToPdf(
+            blocks,
+            deal.ticker
+          );
 
-        await postSentimentPdf(
-          deal.ticker,
-          deal.unique_deal_id,
-          sentimentPdf
-        );
+          await postSentimentPdf(
+            deal.ticker,
+            deal.unique_deal_id,
+            sentimentPdf
+          );
 
-        success.push(deal.ticker);
-      } catch (err: any) {
-        failures.push(
-          `${deal.ticker}: ${err?.message || "run failed"}`
+          success.push(deal.ticker);
+        } catch (err: any) {
+          failures.push(
+            `${deal.ticker}: ${err?.message || "run failed"}`
+          );
+        }
+      }
+
+      // Trigger email AFTER loop completes
+      if (success.length) {
+        try {
+          await triggerSentimentEmail(success);
+          setMessage(
+            `Sentiment saved & email triggered for ${success.join(", ")}`
+          );
+        } catch (emailErr: any) {
+          setError(
+            `Sentiment saved but email failed: ${
+              emailErr?.message || "Unknown error"
+            }`
+          );
+        }
+      }
+
+      if (failures.length) {
+        setError((prev) =>
+          prev
+            ? `${prev}; ${failures.join("; ")}`
+            : failures.join("; ")
         );
       }
+    } finally {
+      setRunning(false);
     }
+  };
 
-    // ✅ Trigger email AFTER loop completes
-    if (success.length) {
-      try {
-        await triggerSentimentEmail(success);
-        setMessage(
-          `Sentiment saved & email triggered for ${success.join(", ")}`
-        );
-      } catch (emailErr: any) {
-        setError(
-          `Sentiment saved but email failed: ${
-            emailErr?.message || "Unknown error"
-          }`
-        );
-      }
-    }
-
-    if (failures.length) {
-      setError((prev) =>
-        prev
-          ? `${prev}; ${failures.join("; ")}`
-          : failures.join("; ")
-      );
-    }
-  } finally {
-    setRunning(false);
-  }
-};
-  // If you want to allow close:
+  // Dialog close handler
   const handleClose = () => setDialogOpen(false);
 
-  // If you want to FORCE the popup when enabled (cannot dismiss), use this instead:
-  // const handleClose = () => {};  // no-op
-  // and add: disableEscapeKeyDown
-  // and in onClose ignore backdrop clicks
-console.log("email sent to backend:", localStorage.getItem("email"));
+  console.log("email sent to backend:", localStorage.getItem("email"));
 
   return (
-    <ActiveAgentCard {...props}>
-      {/* Nothing inside card (popup-only UX) */}
+<ActiveAgentCard
+  {...props}
+  onRunSentimentClick={() => setDialogOpen(true)}
+>      {/* Show Run Sentiment button only if enabled */}
+
 
       <Dialog
         open={dialogOpen}
         onClose={(_, reason) => {
-          // Optional: prevent closing by backdrop click while running
-          if (running) return;
-          // Optional: block backdrop click entirely:
-          // if (reason === "backdropClick") return;
+          if (running) return; // prevent closing when running
           handleClose();
         }}
         fullWidth

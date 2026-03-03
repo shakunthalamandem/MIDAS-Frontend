@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   Chip,
   Divider,
   Paper,
@@ -26,12 +27,9 @@ export interface ActiveAgentState {
 export interface ActiveAgentCardProps {
   agent: AgentConfig;
   state: ActiveAgentState;
-  onToggle: (
-    agent: AgentConfig,
-    key: "enabled" | "email",
-    currentValue: boolean
-  ) => void;
+  onToggle: (agent: AgentConfig, key: "enabled" | "email", currentValue: boolean) => void;
   agentIndex?: number;
+  onRunSentimentClick?: () => void;
   children?: React.ReactNode;
   footerAction?: React.ReactNode;
 }
@@ -41,6 +39,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   state,
   onToggle,
   agentIndex,
+  onRunSentimentClick,
   children,
   footerAction,
 }) => {
@@ -101,6 +100,23 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         {agent.description}
       </Typography>
 
+      {onRunSentimentClick && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={(event) => {
+              event.stopPropagation();
+              onRunSentimentClick();
+            }}
+          >
+            Run Sentiment
+          </Button>
+        </Box>
+      )}
+
+      {children && <Box sx={{ mt: 1, mb: 1 }}>{children}</Box>}
+
       <Divider />
 
       <Stack direction="row" flexWrap="wrap" spacing={1}>
@@ -136,10 +152,8 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         />
       </Stack>
 
-      {children}
-
       {footerAction && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
           {footerAction}
         </Box>
       )}
