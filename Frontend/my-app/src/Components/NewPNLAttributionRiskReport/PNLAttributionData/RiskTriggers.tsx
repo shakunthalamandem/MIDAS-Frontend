@@ -318,13 +318,13 @@ const RiskTriggers: React.FC = () => {
     const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
 
     return (
-      <Box key={sectionKey} className="trig-metric">
-        <Box className="trig-metric-head">
+      <Box key={sectionKey} className={`trig-metric ${isLiquidity ? "trig-metric--liquidity-sticky" : ""}`}>
+        <Box className={`trig-metric-head ${isLiquidity ? "trig-metric-head--sticky" : ""}`}>
           <Typography className="trig-metric-name">{titleName}</Typography>
           {guidelineDisplay && <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>}
         </Box>
         <Box className={isLiquidity ? "trig-table-scroll-500" : ""}>
-          <table className="trig-table">
+          <table className={`trig-table ${isLiquidity ? "trig-table--scroll-body" : ""}`}>
             <thead>
               <tr>
                 <th className="trig-th-l">{firstColLabel.toUpperCase()}</th>
