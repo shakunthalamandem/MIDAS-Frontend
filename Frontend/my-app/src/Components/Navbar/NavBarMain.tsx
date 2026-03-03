@@ -257,6 +257,42 @@ const NavbarMain: React.FC = () => {
               New Dashboard
             </Button>
             <DropdownTab
+              label="AI-Agents"
+              menuItems={[
+               
+                {
+                  label: "AI Portfolio Review",
+                  path: "/ai_portfolio_review",
+                  icon: <PsychologyIcon fontSize="small" />,
+                  reload: false,
+                },
+                {
+                  label: "AI based on previous 30 deals",
+                  path: "/ai_fewshot_analysis",
+                  icon: <DescriptionOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "AI View (Outside Sentiment)",
+                  path: "/ai_sentiment_view",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
+                //  {
+                //   label: "AI-ML Result Dashboard",
+                //   path: "/equity/ai_ml_results",
+                //   icon: <InsightsIcon fontSize="small" />,
+                // },
+                {
+                  label: "Last 30 Days IPO AI Ranking",
+                  path: "/last_30_days_ai_ranking",
+                  icon: <AutoAwesomeIcon fontSize="small" />,
+                },
+                
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              rich
+            />
+            <DropdownTab
               label="AI-ML"
               menuItems={[
                 {
@@ -264,32 +300,32 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_models",
                   icon: <AutoAwesomeIcon fontSize="small" />,
                 },
-                {
-                  label: "APAC IPO & FO AI-ML Model",
-                  path: "/equity/apac_ai_ml_models",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
+                // {
+                //   label: "APAC IPO & FO AI-ML Model",
+                //   path: "/equity/apac_ai_ml_models",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
                 {
                   label: "AI-ML Result Dashboard",
                   path: "/equity/ai_ml_results",
                   icon: <InsightsIcon fontSize="small" />,
                 },
-                {
-                  label: "AI Portfolio Review",
-                  path: "/ai_portfolio_review",
-                  icon: <PsychologyIcon fontSize="small" />,
-                  reload: false,
-                },
-                      {
-                  label: "Last 30 Days IPO AI Ranking",
-                  path: "/last_30_days_ai_ranking",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
-                {
-                  label: "ABB Model",
-                  path: "/equity/abb_model",
-                  icon: <HubIcon fontSize="small" />,
-                },
+                // {
+                //   label: "AI Portfolio Review",
+                //   path: "/ai_portfolio_review",
+                //   icon: <PsychologyIcon fontSize="small" />,
+                //   reload: false,
+                // },
+                //       {
+                //   label: "Last 30 Days IPO AI Ranking",
+                //   path: "/last_30_days_ai_ranking",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "ABB Model",
+                //   path: "/equity/abb_model",
+                //   icon: <HubIcon fontSize="small" />,
+                // },
                 // {
                 //   label: "Gen AI Tool",
                 //   path: "/gen_ai_tool",
