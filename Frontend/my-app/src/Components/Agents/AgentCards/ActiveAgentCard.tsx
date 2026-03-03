@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import BoltIcon from "@mui/icons-material/Bolt";
 
 export interface AgentConfig {
   title: string;
@@ -27,7 +26,11 @@ export interface ActiveAgentState {
 export interface ActiveAgentCardProps {
   agent: AgentConfig;
   state: ActiveAgentState;
-  onToggle: (title: string, key: "enabled" | "email") => void;
+  onToggle: (
+    agent: AgentConfig,
+    key: "enabled" | "email",
+    currentValue: boolean
+  ) => void;
   agentIndex?: number;
   children?: React.ReactNode;
   footerAction?: React.ReactNode;
@@ -43,6 +46,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
 }) => {
   const statusLabel = state.enabled ? "Active" : "Paused";
   const statusColor = state.enabled ? "success" : "warning";
+  const displayIndex = agentIndex ?? "-";
 
   return (
     <Paper
@@ -62,51 +66,33 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
       }}
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Stack direction="row" alignItems="center" spacing={1.25}>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
             sx={{
               width: 40,
               height: 40,
               borderRadius: "50%",
-              bgcolor: "primary.light",
-              color: "primary.main",
+              bgcolor: "primary.main",
+              color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              fontWeight: 700,
+              fontSize: 18,
             }}
           >
-            <BoltIcon />
+            {displayIndex}
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {agentIndex && (
-              <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  bgcolor: "primary.main",
-                  color: "#fff",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {agentIndex}
-              </Box>
-            )}
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {agent.title}
-            </Typography>
-          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            {agent.title}
+          </Typography>
         </Stack>
         <Switch
           checked={state.enabled}
           onClick={(event) => event.stopPropagation()}
           onChange={(event) => {
             event.stopPropagation();
-            onToggle(agent.title, "enabled");
+            onToggle(agent, "enabled", state.enabled);
           }}
         />
       </Stack>
@@ -127,7 +113,15 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
 
         <Chip
           label={statusLabel}
-          color={statusColor as "default" | "primary" | "info" | "success" | "error" | "warning"}
+          color={
+            statusColor as
+              | "default"
+              | "primary"
+              | "info"
+              | "success"
+              | "error"
+              | "warning"
+          }
           variant="outlined"
           size="small"
           sx={{ borderRadius: 3, textTransform: "none" }}

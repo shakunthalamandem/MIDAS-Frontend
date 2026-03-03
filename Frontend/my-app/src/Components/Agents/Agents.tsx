@@ -1,9 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Paper,
   Stack,
   Typography,
@@ -24,42 +30,47 @@ import AIUnsupervisedMarketInsightsAgent from "./AgentCards/AIUnsupervisedMarket
 import PortfolioAnalysisAgent from "./AgentCards/PortfolioAnalysisAgent";
 import AISentimentAnalysisAgent from "./AgentCards/AISentimentAnalysisAgent";
 
+const apiUrl = process.env.REACT_APP_API_URL;
 const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
+    title: "AI Unsupervised (IPO)",
+    description:
+      "AI-generated insights on market trends and opportunities without explicit supervision.",
+    schedule: "Daily · 8:00 AM EST",
+    route: "/ai_fewshot_analysis",
+  },
+  {
+    title: "AI Sentiment Analysis",
+    description:
+      "Runs daily on selected stocks. Enable email to receive the latest updated sentiment report.",
+    schedule: "Daily · 8:00 AM EST",
+    route: "/ai_sentiment_view",
+  },
+  {
+    title: "Individual Stock Analysis",
+    description:
+      "AI-generated portfolio analysis reports delivered through email with actionable insights.",
+    schedule: "Daily · 8:00 AM EST",
+  },
+  {
     title: "AI Portfolio Review",
     description:
       "Comprehensive review of your portfolio performance and recommendations.",
-    schedule: "Run daily at 8:00 AM EST",
+    schedule: "Daily · 8:00 AM EST",
     route: "/ai_portfolio_review",
   },
   {
     title: "Last 30 Days IPO AI Ranking",
     description:
       "AI-generated ranking of the most promising IPOs from the last 30 days.",
-    schedule: "Run daily at 8:00 AM EST",
+    schedule: "Daily · 8:00 AM EST",
     route: "/last_30_days_ai_ranking",
   },
-  {
-    title: "AI Unsupervised Market Insights",
-    description:
-      "AI-generated insights on market trends and opportunities without explicit supervision.",
-    schedule: "Run daily at 8:00 AM EST",
-    route: "/ai_fewshot_analysis",
-  },
-  {
-    title: "Individual Stock Analysis",
-    description: "AI-generated portfolio analysis reports through the email",
-    schedule: "Run daily at 8:00 AM EST",
-  },
-  {
-    title: "AI Sentiment Analysis",
-    description:
-      "The sentiment analysis runs daily on selected stocks. To view the latest updated sentiment report and receive it via email, please enable the email option.",
-    schedule: "Run daily",
-    route: "/ai_sentiment_view",
-  },
+
+
+
 ];
 
 const comingSoonAgents = [
@@ -107,23 +118,158 @@ const Agents: React.FC = () => {
       {} as Record<string, { enabled: boolean; email: boolean }>
     )
   );
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingAgent, setPendingAgent] = useState<
+    { agent: AgentConfig; index: number } | null
+  >(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleToggle = (title: string, key: "enabled" | "email") => {
+  const updateActivation = (
+    title: string,
+    key: "enabled" | "email",
+    value: boolean
+  ) => {
     setActivations((prev) => ({
       ...prev,
       [title]: {
         ...prev[title],
-        [key]: !prev[title][key],
+        [key]: value,
       },
     }));
   };
 
+  const handleToggle = (
+    agent: AgentConfig,
+    key: "enabled" | "email",
+    currentValue: boolean
+  ) => {
+    if (key === "enabled") {
+      updateActivation(agent.title, key, !currentValue);
+      return;
+    }
+    updateActivation(agent.title, key, !currentValue);
+  };
+
+  const handleEnableRequest = (agent: AgentConfig, index: number) => {
+    setPendingAgent({ agent, index });
+    setSaveError(null);
+    setDialogOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!pendingAgent) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${apiUrl}/api/update_agent_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          agentnumber: `agent${String(pendingAgent.index).padStart(2, "0")}`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save agent");
+      updateActivation(pendingAgent.agent.title, "enabled", true);
+      setDialogOpen(false);
+      setPendingAgent(null);
+    } catch (err: any) {
+      setSaveError(err.message || "Unable to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setPendingAgent(null);
+    setSaveError(null);
+  };
+  const handleAgentToggle = async (
+    agent: AgentConfig,
+    key: "enabled" | "email",
+    currentValue: boolean,
+    index: number
+  ) => {
+    if (key !== "enabled") {
+      // Email toggle (if you have separate email opt-in)
+      setActivations((prev) => ({
+        ...prev,
+        [agent.title]: { ...prev[agent.title], [key]: !currentValue },
+      }));
+      return;
+    }
+
+    const token = localStorage.getItem("access_token");
+
+    try {
+      const res = await fetch(`${apiUrl}/api/update_agent_data/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          agentnumber: `agent${String(index).padStart(2, "0")}`,
+          action: currentValue ? "remove" : "add", // 🔥 key change here
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update agent");
+
+      // Update frontend state
+      setActivations((prev) => ({
+        ...prev,
+        [agent.title]: { ...prev[agent.title], enabled: !currentValue },
+      }));
+    } catch (err: any) {
+      console.error("Agent toggle failed:", err.message);
+    }
+  };
   const totalAgents = activeAgents.length;
   const activeCount = useMemo(
     () => Object.values(activations).filter((agent) => agent.enabled).length,
     [activations]
   );
   const comingSoonCount = comingSoonAgents.length;
+
+  useEffect(() => {
+    const loadMembership = async () => {
+      const token = localStorage.getItem("access_token");
+      try {
+        const res = await fetch(`${apiUrl}/api/agent_membership/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to fetch membership");
+        const agentSet = new Set<string>(data?.agentnumbers ?? []);
+        setActivations((prev) => {
+          const next = { ...prev };
+          activeAgents.forEach((agent, index) => {
+            const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
+            if (agentSet.has(agentNumber)) {
+              next[agent.title] = { ...next[agent.title], enabled: true };
+            }
+          });
+          return next;
+        });
+      } catch (err) {
+        console.error("Failed to load agent membership", err);
+      }
+    };
+
+    loadMembership();
+  }, []);
 
   return (
     <Box
@@ -194,7 +340,7 @@ const Agents: React.FC = () => {
             mb: 4,
           }}
         >
-          {activeAgents.map((agent) => {
+          {activeAgents.map((agent, index) => {
             const state = activations[agent.title];
             const Component = agentComponentMap[agent.title] ?? ActiveAgentCard;
             const viewDetailsAction = agent.route ? (
@@ -216,7 +362,10 @@ const Agents: React.FC = () => {
                 key={agent.title}
                 agent={agent}
                 state={state}
-                onToggle={handleToggle}
+                agentIndex={index + 1}
+                onToggle={(ag, key, currentValue) =>
+                  handleAgentToggle(ag, key, currentValue, index + 1)
+                }
                 footerAction={viewDetailsAction}
               />
             );
@@ -264,6 +413,35 @@ const Agents: React.FC = () => {
           })}
         </Stack>
       </Box>
+
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Save agent settings?</DialogTitle>
+        <DialogContent>
+          {saveError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {saveError}
+            </Alert>
+          )}
+          <DialogContentText>
+            Do you want to save the agent configuration and notify via email?
+            Enabling agent{" "}
+            <strong>{pendingAgent ? pendingAgent.agent.title : "selected"}</strong>{" "}
+            will hit the backend to persist the request.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} disabled={saving}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleConfirmSave}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Confirm"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
