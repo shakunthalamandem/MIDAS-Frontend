@@ -454,6 +454,18 @@
   border: 1px solid #e2e8f0;
 }
 
+.trig-table-scroll-500 {
+  height: 500px;
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+.trig-table-scroll-500 .trig-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 .trig-table thead tr {
   background: #002060;
 }

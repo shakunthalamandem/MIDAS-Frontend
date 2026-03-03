@@ -323,34 +323,36 @@ const RiskTriggers: React.FC = () => {
           <Typography className="trig-metric-name">{titleName}</Typography>
           {guidelineDisplay && <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>}
         </Box>
-        <table className="trig-table">
-          <thead>
-            <tr>
-              <th className="trig-th-l">{firstColLabel.toUpperCase()}</th>
-              <th className="trig-th-r">{valueLabel.toUpperCase()}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {section.data.length === 0 ? (
-              <tr><td colSpan={2} className="trig-empty">No data</td></tr>
-            ) : (
-              section.data.map((row: any, i: number) => {
-                const rawVal = row[valueKey];
-                const isTotalRow = row[firstColKey] === "Total";
-                return (
-                  <tr key={i} className={isTotalRow ? "trig-total-row" : ""}>
-                    <td className={`trig-td-l ${isTotalRow ? "trig-total-cell" : ""}`}>{row[firstColKey]}</td>
-                    <td className={`trig-td-r ${isTotalRow ? "trig-total-cell" : ""}`}>
-                      {isTotalRow
-                        ? <span className="trig-total-val">{rawVal}</span>
-                        : renderValuePill(rawVal, section.guideline, isLiquidity)}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+        <Box className={isLiquidity ? "trig-table-scroll-500" : ""}>
+          <table className="trig-table">
+            <thead>
+              <tr>
+                <th className="trig-th-l">{firstColLabel.toUpperCase()}</th>
+                <th className="trig-th-r">{valueLabel.toUpperCase()}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section.data.length === 0 ? (
+                <tr><td colSpan={2} className="trig-empty">No data</td></tr>
+              ) : (
+                section.data.map((row: any, i: number) => {
+                  const rawVal = row[valueKey];
+                  const isTotalRow = row[firstColKey] === "Total";
+                  return (
+                    <tr key={i} className={isTotalRow ? "trig-total-row" : ""}>
+                      <td className={`trig-td-l ${isTotalRow ? "trig-total-cell" : ""}`}>{row[firstColKey]}</td>
+                      <td className={`trig-td-r ${isTotalRow ? "trig-total-cell" : ""}`}>
+                        {isTotalRow
+                          ? <span className="trig-total-val">{rawVal}</span>
+                          : renderValuePill(rawVal, section.guideline, isLiquidity)}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </Box>
       </Box>
     );
   };
