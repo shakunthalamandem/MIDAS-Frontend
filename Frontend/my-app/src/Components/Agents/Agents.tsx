@@ -35,14 +35,14 @@ const activeAgents: AgentConfig[] = [
   {
     title: "AI Unsupervised (IPO)",
     description:
-      "AI-generated insights on market trends and opportunities without explicit supervision.",
-    schedule: "Daily · 8:00 AM EST",
+      "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
+    schedule: "ONE TIME FOR EACH IPO",
     route: "/ai_fewshot_analysis",
   },
   {
     title: "AI Sentiment Analysis",
     description:
-      "Runs daily on selected stocks. Enable email to receive the latest updated sentiment report.",
+      "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
     schedule: "Daily · 8:00 AM EST",
     route: "/ai_sentiment_view",
   },
@@ -55,7 +55,7 @@ const activeAgents: AgentConfig[] = [
   {
     title: "AI Portfolio Review",
     description:
-      "Comprehensive review of your portfolio performance and recommendations.",
+      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
     schedule: "Daily · 8:00 AM EST",
     route: "/ai_portfolio_review",
   },

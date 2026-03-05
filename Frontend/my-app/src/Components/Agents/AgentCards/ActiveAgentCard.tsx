@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 export interface AgentConfig {
   title: string;
@@ -49,19 +50,20 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
 
   return (
     <Paper
-      elevation={3}
+      elevation={0}
       sx={{
         borderRadius: 4,
         p: { xs: 3, md: 4 },
-        background: state.enabled
-          ? "linear-gradient(135deg, #e8f4ff, #ffffff)"
-          : "#ffffff",
-        border: "1px solid rgba(15, 76, 129, 0.08)",
+        border: state.enabled
+          ? "2px solid rgba(118, 114, 255, 0.35)"
+          : "1px solid rgba(88, 79, 255, 0.15)",
         minHeight: 220,
         display: "flex",
         flexDirection: "column",
         gap: 2.5,
-        boxShadow: "0 20px 45px rgba(15, 76, 129, 0.08)",
+        boxShadow: state.enabled
+          ? "0 20px 40px rgba(79, 101, 182, 0.08)"
+          : "0 20px 40px rgba(79, 101, 182, 0.03)",
       }}
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -96,60 +98,96 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         />
       </Stack>
 
-      <Typography variant="body2" color="#555f77" sx={{ minHeight: 60 }}>
-        {agent.description}
-      </Typography>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="body2" color="#555f77">
+          {agent.description}
+        </Typography>
 
-      {onRunSentimentClick && (
-        <Box sx={{ mt: 1 }}>
-          <Button
+        {children && <Box sx={{ mt: 0, mb: 0 }}>{children}</Box>}
+
+        <Divider sx={{ borderColor: "rgba(79, 101, 182, 0.2)", my: 0 }} />
+      </Box>
+
+      <Stack spacing={1} sx={{ mt: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
+          >
+            Active:
+          </Typography>
+          <Chip
+            label={statusLabel}
+            color={
+              statusColor as
+                | "default"
+                | "primary"
+                | "info"
+                | "success"
+                | "error"
+                | "warning"
+            }
             variant="outlined"
             size="small"
-            onClick={(event) => {
-              event.stopPropagation();
-              onRunSentimentClick();
-            }}
+            sx={{ borderRadius: 3, textTransform: "none" }}
+          />
+        </Stack>
+
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
           >
-            Run Sentiment
-          </Button>
-        </Box>
-      )}
+            Run:
+          </Typography>
+          <Chip
+            icon={<CalendarTodayIcon />}
+            label={agent.schedule}
+            variant="filled"
+            sx={{
+              borderRadius: 3,
+              textTransform: "none",
+              bgcolor: "#f6f6ff",
+              color: "#3f467a",
+            }}
+            size="small"
+          />
+          {onRunSentimentClick && (
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<PlayArrowIcon />}
+              sx={{
+                borderRadius: 3,
+                textTransform: "none",
+                fontWeight: 600,
+                letterSpacing: 0.5,
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+                onRunSentimentClick();
+              }}
+            >
+              Run Sentiment
+            </Button>
+          )}
+        </Stack>
 
-      {children && <Box sx={{ mt: 1, mb: 1 }}>{children}</Box>}
-
-      <Divider />
-
-      <Stack direction="row" flexWrap="wrap" spacing={1}>
-        <Chip
-          icon={<CalendarTodayIcon />}
-          label={agent.schedule}
-          variant="outlined"
-          sx={{ borderRadius: 3, textTransform: "none" }}
-        />
-
-        <Chip
-          label={statusLabel}
-          color={
-            statusColor as
-              | "default"
-              | "primary"
-              | "info"
-              | "success"
-              | "error"
-              | "warning"
-          }
-          variant="outlined"
-          size="small"
-          sx={{ borderRadius: 3, textTransform: "none" }}
-        />
-
-        <Chip
-          icon={<EmailOutlinedIcon />}
-          label={state.email ? "Email on run" : "Email disabled"}
-          color={state.email ? "success" : "default"}
-          variant="outlined"
-          sx={{ borderRadius: 3, textTransform: "none" }}
-        />
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
+          >
+            Output:
+          </Typography>
+          <Chip
+            icon={<EmailOutlinedIcon />}
+            label={state.email ? "Email on run" : "Email disabled"}
+            color={state.email ? "success" : "default"}
+            variant="outlined"
+            sx={{ borderRadius: 3, textTransform: "none" }}
+          />
+        </Stack>
       </Stack>
 
       {footerAction && (
