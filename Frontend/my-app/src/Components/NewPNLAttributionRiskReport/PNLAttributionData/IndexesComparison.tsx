@@ -34,6 +34,13 @@ const INDEX_CARDS_CONFIG: IndexCardConfig[] = [
   { label: "Drawdown / S&P", valueKey: "drawdown", subKey: "sp_drawdown", format: "vol", color: "red", metricKey: "drawdown" },
 ];
 
+const toNumber = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  return null;
+};
+
 const IndexesComparison: React.FC<IndexesComparisonProps> = ({
   data,
   selectedMetric,
@@ -43,8 +50,8 @@ const IndexesComparison: React.FC<IndexesComparisonProps> = ({
     <Box className="risk-dashboard-section">
       <Box className="index-cards-grid">
         {INDEX_CARDS_CONFIG.map((cfg) => {
-          const value = data[cfg.valueKey];
-          const subValue = cfg.subKey ? data[cfg.subKey] : null;
+          const value = toNumber(data[cfg.valueKey]);
+          const subValue = cfg.subKey ? toNumber(data[cfg.subKey]) : null;
           const isSelected = selectedMetric === cfg.metricKey;
 
           const selectedBg = SELECTED_BG[cfg.color] || "#1e293b";
@@ -72,10 +79,12 @@ const IndexesComparison: React.FC<IndexesComparisonProps> = ({
                 className={isSelected ? "" : "index-card-value"}
                 sx={isSelected ? { fontSize: 16, fontWeight: 700, color: "#fff" } : {}}
               >
-                {cfg.format === "beta"
+                {value === null
+                  ? "--"
+                  : cfg.format === "beta"
                   ? value.toFixed(2)
                   : `${value.toFixed(2)}%`}
-                {subValue !== null && (
+                {subValue !== null && value !== null && (
                   <Box
                     component="span"
                     className={isSelected ? "" : "index-card-sub"}
