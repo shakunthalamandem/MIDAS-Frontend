@@ -168,10 +168,10 @@ const NavbarMain: React.FC = () => {
       >
         {(location.pathname === "/macro/prime" ||
           location.pathname.startsWith("/equity/technical/")) && (
-          <Box sx={{ marginBottom: "50px" }}>
-            <TradingViewTickerTape />
-          </Box>
-        )}
+            <Box sx={{ marginBottom: "50px" }}>
+              <TradingViewTickerTape />
+            </Box>
+          )}
 
         <Box
           sx={{
@@ -256,7 +256,7 @@ const NavbarMain: React.FC = () => {
             >
               New Dashboard
             </Button>
-                        <DropdownTab
+            <DropdownTab
               label="AI-ML"
               menuItems={[
                 {
@@ -330,8 +330,20 @@ const NavbarMain: React.FC = () => {
               }}
             >
               AI-Agents
+              <span
+                style={{
+                  fontSize: "0.55rem",
+                  marginLeft: "4px",
+                  verticalAlign: "super",
+                  color: "#ff1e00",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Beta
+              </span>
             </Button>
-{/* 
+            {/* 
             <DropdownTab
               label="AI-Agents"
               menuItems={[

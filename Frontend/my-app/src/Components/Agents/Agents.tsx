@@ -258,20 +258,38 @@ const Agents: React.FC = () => {
             </Avatar>
 
             <Box flex="1" minWidth={240}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                MIDAS AI Agents              </Typography>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  MIDAS AI Agents
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#8222af",
+                    fontWeight: 600,
+                    border: "1px solid rgba(130, 34, 175, 0.4)",
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 1,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Beta 
+                </Typography>
+              </Box>
               <Typography variant="body1" color="#113591">
-Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
+                Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
               </Typography>
-                            <Typography variant="body1" color="#8222af">
-Enable the Agents for automated market analysis and insights.
+              <Typography variant="body1" color="#8222af">
+                Enable the agents for automated market analysis and insights.
               </Typography>
             </Box>
           </Stack>
 
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label={`${totalAgents} Agents`}color="info"
-             />
+            <Chip label={`${totalAgents} Agents`} color="info"
+            />
             <Chip
               label={`${activeCount} Active`}
               color={activeCount > 0 ? "success" : "default"}
@@ -334,7 +352,7 @@ Enable the Agents for automated market analysis and insights.
             );
           })}
         </Box>
-{/* 
+        {/* 
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
           Coming Soon
         </Typography>
