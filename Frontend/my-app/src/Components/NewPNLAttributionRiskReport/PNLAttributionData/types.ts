@@ -35,6 +35,8 @@ export interface IndexesComparison {
 }
 
 export interface DashboardData {
+  message?: string;
+  data_available?: boolean;
   date: string;
   fund: string;
   headline_risks: HeadlineRisks;

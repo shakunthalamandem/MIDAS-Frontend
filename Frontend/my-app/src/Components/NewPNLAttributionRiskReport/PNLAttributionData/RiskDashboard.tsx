@@ -187,6 +187,7 @@ const RiskDashboard: React.FC = () => {
       : `${selectedFunds.length} Funds`;
 
   const allDataReady = !loading && !chartLoading && !indexChartLoading && !topBottomLoading && !!data;
+  const isDataAvailable = data?.data_available !== false;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -250,7 +251,13 @@ const RiskDashboard: React.FC = () => {
         </Box>
       )}
 
-      {!loading && data && (
+      {!loading && data && !isDataAvailable && (
+        <Alert severity="info" className="risk-dashboard-error">
+          {data.message || "Data is not available for selected date."}
+        </Alert>
+      )}
+
+      {!loading && data && isDataAvailable && (
         <>
           {data.headline_risks && (
             <Box className="pdf-section" data-pdf-page="1">
