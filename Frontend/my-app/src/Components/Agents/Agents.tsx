@@ -265,9 +265,9 @@ const Agents: React.FC = () => {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: "#8222af",
+                    color: "#ff1e00",
                     fontWeight: 600,
-                    border: "1px solid rgba(130, 34, 175, 0.4)",
+                    border: "1px solid #ff1e00",
                     px: 1,
                     py: 0.25,
                     borderRadius: 1,
