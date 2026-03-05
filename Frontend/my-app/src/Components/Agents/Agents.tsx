@@ -50,7 +50,7 @@ const activeAgents: AgentConfig[] = [
     title: "Individual Stock Analysis",
     description:
       "AI-generated portfolio analysis reports delivered through email with actionable insights.",
-    schedule: "Daily 12:00 PM IST",
+    schedule: "Daily 1:30 AM EST",
   },
   {
     title: "AI Portfolio Review",
