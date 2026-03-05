@@ -137,12 +137,26 @@ const SUMMARY_KEYS = [
   "var_99",
 ];
 
+const SECTION_CARD_THEME: Record<string, { accent: string; soft: string; icon: string }> = {
+  delta_gross_exposure: { accent: "#b91c1c", soft: "#fff5f5", icon: "DG" },
+  equity_delta_net_exposure: { accent: "#0f766e", soft: "#f0fdfa", icon: "EN" },
+  equity_beta_net_exposure: { accent: "#1d4ed8", soft: "#eff6ff", icon: "BN" },
+  drawdown: { accent: "#b45309", soft: "#fff7ed", icon: "DD" },
+  var_99: { accent: "#14532d", soft: "#f0fdf4", icon: "VR" },
+};
+
 /* ── Helpers ── */
 
 const parseNumericValue = (val: string | number | undefined): number => {
   if (val == null) return 0;
   if (typeof val === "number") return val;
   return parseFloat(val.replace("%", "")) || 0;
+};
+
+const parseSignedNumericValue = (val: string | number | undefined): number => {
+  if (val == null) return 0;
+  if (typeof val === "number") return val;
+  return parseFloat(String(val).replace("%", "").replace(/,/g, "")) || 0;
 };
 
 type Status = "breach" | "warning" | "safe";
@@ -156,9 +170,9 @@ const getStatus = (value: number, guideline: number | undefined): Status => {
 };
 
 const STATUS_COLORS: Record<Status, string> = {
-  breach: "#e74c3c",
+  breach: "#dc2626",
   warning: "#f39c12",
-  safe: "#10b981",
+  safe: "#14532d",
 };
 
 const shiftDate = (dateStr: string, days: number): string => {
@@ -317,6 +331,40 @@ const RiskTriggers: React.FC = () => {
     const titleName = titleParts[0];
     const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
 
+    if (isLiquidity) {
+      return (
+        <Box key={sectionKey} className="trig-metric">
+          <Box className="trig-metric-head">
+            <Typography className="trig-metric-name">{titleName}</Typography>
+            {guidelineDisplay && <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>}
+          </Box>
+          <Box className="trig-liq-scroll">
+            <Box className="trig-liq-grid">
+              {section.data.length === 0 ? (
+                <Typography className="trig-empty">No data</Typography>
+              ) : (
+                section.data.map((row: any, i: number) => {
+                  const rawVal = row[valueKey];
+                  const isTotalRow = row[firstColKey] === "Total";
+                  return (
+                    <Box
+                      key={i}
+                      className={`trig-liq-card ${isTotalRow ? "trig-liq-card--total" : ""}`}
+                    >
+                      <Typography className="trig-liq-fund">{row[firstColKey]}</Typography>
+                      <Box className="trig-liq-value-wrap">
+                        <span className="trig-liq-value">{rawVal}</span>
+                      </Box>
+                    </Box>
+                  );
+                })
+              )}
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+
     return (
       <Box key={sectionKey} className={`trig-metric ${isLiquidity ? "trig-metric--liquidity-sticky" : ""}`}>
         <Box className={`trig-metric-head ${isLiquidity ? "trig-metric-head--sticky" : ""}`}>
@@ -357,9 +405,132 @@ const RiskTriggers: React.FC = () => {
     );
   };
 
+  const renderCurrentLevelCard = (sectionKey: string, section: SectionData) => {
+    const cfg = SECTION_CONFIG[sectionKey];
+    if (!cfg || !section.data?.length) return null;
+    const row = section.data[0];
+    const rawVal = row[cfg.valueKey];
+    const numVal = parseNumericValue(rawVal);
+    const status = getStatus(numVal, section.guideline);
+    const titleParts = section.title.split(": Guideline ");
+    const titleName = titleParts[0];
+    const subtitle = cfg.valueLabel;
+    const displayValue = typeof rawVal === "string" ? rawVal : `${rawVal}`;
+    const fundName = row[cfg.firstColKey] || selectedFund || "Fund";
+    const theme = SECTION_CARD_THEME[sectionKey] || SECTION_CARD_THEME.var_99;
+
+    return (
+      <Box
+        key={sectionKey}
+        className={`trig-mini-card trig-mini-card--${status}`}
+        style={
+          {
+            "--card-accent": theme.accent,
+            "--card-soft": theme.soft,
+          } as React.CSSProperties
+        }
+      >
+        <Box className="trig-mini-card-head">
+          <Box className="trig-mini-card-title-wrap">
+            <span className="trig-mini-card-icon">{theme.icon}</span>
+            <Typography className="trig-mini-card-title">{titleName}</Typography>
+          </Box>
+          {section.guideline != null && (
+            <span className="trig-mini-guideline">{section.guideline.toFixed(1)}%</span>
+          )}
+        </Box>
+        <Typography className="trig-mini-card-subtitle">{subtitle}</Typography>
+        <Typography className="trig-mini-card-fund">{fundName}</Typography>
+        <Box className="trig-mini-card-value-row">
+          <Typography className={`trig-mini-card-value trig-mini-card-value--${status}`}>
+            {displayValue}
+          </Typography>
+          {renderTrendIcon(status)}
+        </Box>
+      </Box>
+    );
+  };
+
+  const renderExposureBars = (sectionKey: string, section: SectionData) => {
+    const cfg = SECTION_CONFIG[sectionKey];
+    if (!cfg) return null;
+    const titleParts = section.title.split(": Guideline ");
+    const titleName = titleParts[0];
+    const dataRows = section.data || [];
+    const nonTotalRows = dataRows.filter((row) => row[cfg.firstColKey] !== "Total");
+    const totalRow = dataRows.find((row) => row[cfg.firstColKey] === "Total");
+    const maxAbs = Math.max(
+      ...nonTotalRows.map((row) => Math.abs(parseSignedNumericValue(row[cfg.valueKey]))),
+      1
+    );
+
+    return (
+      <Box key={sectionKey} className={`trig-bar-section trig-bar-section--${sectionKey}`}>
+        <Box className="trig-bar-section-head">
+          <Box className="trig-bar-section-title-wrap">
+            <span className="trig-bar-section-dot" />
+            <Typography className="trig-bar-section-title">{titleName}</Typography>
+          </Box>
+          {section.guideline != null && (
+            <span className="trig-guideline-tag">Guideline {section.guideline.toFixed(1)}%</span>
+          )}
+        </Box>
+
+        <Box className="trig-bar-list">
+          {nonTotalRows.length === 0 ? (
+            <Typography className="trig-empty">No data</Typography>
+          ) : (
+            nonTotalRows.map((row, idx) => {
+              const rawVal = row[cfg.valueKey];
+              const numVal = parseSignedNumericValue(rawVal);
+              const widthPct = Math.max((Math.abs(numVal) / maxAbs) * 100, 6);
+              const isNegative = numVal < 0;
+              const label = row[cfg.firstColKey];
+              return (
+                <Box
+                  key={`${sectionKey}-${idx}-${label}`}
+                  className={`trig-exp-item ${isNegative ? "trig-exp-item--neg" : "trig-exp-item--pos"}`}
+                >
+                  <Box
+                    className={`trig-exp-item-fill ${isNegative ? "trig-exp-item-fill--neg" : "trig-exp-item-fill--pos"}`}
+                    style={{ width: `${Math.min(widthPct, 100)}%` }}
+                  />
+                  <Box className="trig-exp-item-content">
+                    <Box className="trig-exp-item-left">
+                      <Typography className="trig-exp-label">{label}</Typography>
+                    </Box>
+                    <Typography className={`trig-exp-value ${isNegative ? "trig-exp-value--neg" : "trig-exp-value--pos"}`}>
+                      {rawVal}
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })
+          )}
+        </Box>
+
+        {totalRow && (
+          <Box className="trig-bar-total">
+            <Typography className="trig-bar-total-label">Total</Typography>
+            <Typography className="trig-bar-total-value">{totalRow[cfg.valueKey]}</Typography>
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
   const summaryCards = data ? getSummaryCards() : [];
   const currentLevelEntries = data ? Object.entries(data.current_levels) : [];
-  const metricsCount = currentLevelEntries.length;
+  const liquidityEntry = currentLevelEntries.find(([k]) => k === "liquidity");
+  const exposureEntries = currentLevelEntries.filter(([k]) =>
+    k === "top_10_issuer_delta_net_exposure" || k === "issuer_delta_net_exposure"
+  );
+  const cardEntries = currentLevelEntries.filter(([k]) =>
+    k !== "liquidity" &&
+    k !== "top_10_issuer_delta_net_exposure" &&
+    k !== "issuer_delta_net_exposure"
+  );
+  const metricsCount = cardEntries.length;
 
   return (
     <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
@@ -477,22 +648,27 @@ const RiskTriggers: React.FC = () => {
             <Box className="trig-cards">
               {summaryCards.map((card) => (
                 <Box key={card.key} className={`trig-card trig-card--${card.status}`}>
-                  <Typography className="trig-card-label">{card.label.toUpperCase()}</Typography>
+                  <Box className="trig-card-top">
+                    <Typography className="trig-card-label">{card.label.toUpperCase()}</Typography>
+                    <Box
+                      className="trig-card-gauge"
+                      style={{
+                        background: `conic-gradient(${STATUS_COLORS[card.status]} ${Math.round(
+                          card.ratio * 100
+                        )}%, #e2e8f0 0)`,
+                      }}
+                    >
+                      <Box className="trig-card-gauge-inner">
+                        {Math.round(card.ratio * 100)}%
+                      </Box>
+                    </Box>
+                  </Box>
                   <Typography className="trig-card-value" style={{ color: STATUS_COLORS[card.status] }}>
                     {card.value}
                   </Typography>
                   {card.limit && (
                     <Typography className="trig-card-limit">Limit: {card.limit}</Typography>
                   )}
-                  <Box className="trig-card-bar">
-                    <Box
-                      className="trig-card-bar-fill"
-                      style={{
-                        width: `${Math.min(card.ratio * 100, 100)}%`,
-                        background: STATUS_COLORS[card.status],
-                      }}
-                    />
-                  </Box>
                 </Box>
               ))}
             </Box>
@@ -553,8 +729,18 @@ const RiskTriggers: React.FC = () => {
               </Box>
               <span className="trig-badge trig-badge--blue">{metricsCount} Metrics</span>
             </Box>
-            {currentLevelEntries.map(([k, s]) => renderCurrentLevelTable(k, s))}
+            <Box className="trig-mini-grid">
+              {cardEntries.map(([k, s]) => renderCurrentLevelCard(k, s))}
+            </Box>
           </Box>
+
+          {exposureEntries.map(([k, s]) => renderExposureBars(k, s))}
+
+          {liquidityEntry && (
+            <Box className="trig-section">
+              {renderCurrentLevelTable(liquidityEntry[0], liquidityEntry[1])}
+            </Box>
+          )}
         </>
       )}
     </Container>

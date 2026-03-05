@@ -347,10 +347,9 @@ const DocumentUploadTabs: React.FC = () => {
 
     const token = localStorage.getItem("access_token");
     const formData = new FormData();
-    formData.append("metadata_file", portfolioFile);
+    formData.append("file", portfolioFile);
     formData.append("date", portfolioDate);
-    formData.append("report_name", portfolioName.trim());
-    formData.append("report_type", portfolioType);
+    formData.append("title", portfolioName.trim());
 
     try {
       const res = await fetch(`${apiUrl}/api/ai_agents_data_uploads/`, {
@@ -419,10 +418,9 @@ const DocumentUploadTabs: React.FC = () => {
 
     const token = localStorage.getItem("access_token");
     const formData = new FormData();
-    formData.append("metadata_file", riskFile);
+    formData.append("file", riskFile);
     formData.append("date", riskDate);
-    formData.append("report_name", riskName.trim());
-    formData.append("report_type", "Risk Report");
+    formData.append("title", riskName.trim());
 
     try {
       const res = await fetch(`${apiUrl}/api/cio_report_upload/`, {

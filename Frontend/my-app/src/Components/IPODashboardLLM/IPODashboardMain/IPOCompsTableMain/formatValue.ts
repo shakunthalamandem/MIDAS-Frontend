@@ -14,6 +14,22 @@ const toNumberIfNumeric = (input: number | string) => {
 export const formatValue = (key: string, value: number | string) => {
   if (value === null || value === undefined || value === "") return "nm";
 
+   if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase();
+
+    // ✅ Handle nm / na-like inputs safely
+    if (
+      trimmed === "" ||
+      trimmed === "nm" ||
+      trimmed === "na" ||
+      trimmed === "n/a" ||
+      trimmed === "--" ||
+      trimmed === "-"
+    ) {
+      return "nm";
+    }
+  }
+
   const negativeColumns = [
     "present_year_ev_sales",
     "one_year_later_ev_sales",
