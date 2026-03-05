@@ -55,7 +55,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         borderRadius: 4,
         p: { xs: 3, md: 4 },
         border: state.enabled
-          ? "2px solid rgba(118, 114, 255, 0.35)"
+          ? "2px solid rgba(88, 82, 243, 0.35)"
           : "1px solid rgba(88, 79, 255, 0.15)",
         minHeight: 220,
         display: "flex",

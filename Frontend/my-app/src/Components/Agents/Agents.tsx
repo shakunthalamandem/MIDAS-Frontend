@@ -319,7 +319,8 @@ const Agents: React.FC = () => {
 
             const viewDetailsAction = agent.route ? (
               <Button
-                variant="text"
+                variant="contained"
+                disableElevation
                 onClick={(e) => {
                   e.stopPropagation();
                   window.open(
@@ -327,8 +328,18 @@ const Agents: React.FC = () => {
                     "_blank"
                   );
                 }}
+                sx={{
+                  backgroundColor: "#481f93",
+                  color: "#ffffff",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  px: 3,
+                  py: 0.5,
+                  "&:hover": { backgroundColor: "#4a24d9" },
+                }}
               >
-                View details
+                View Details
               </Button>
             ) : null;
 
