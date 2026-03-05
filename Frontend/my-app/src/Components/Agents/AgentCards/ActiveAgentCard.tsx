@@ -84,7 +84,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           >
             {displayIndex}
           </Box>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          <Typography variant="h6" sx={{color: "#481f93", fontWeight: 700 }}>
             {agent.title}
           </Typography>
         </Stack>
@@ -99,7 +99,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
       </Stack>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2" color="#555f77">
+        <Typography variant="body2" color="#2f323a">
           {agent.description}
         </Typography>
 
@@ -136,7 +136,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
           <Typography
             variant="body2"
-            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
+            sx={{ fontWeight: 600, color: "#715579", minWidth: 60 }}
           >
             Run:
           </Typography>

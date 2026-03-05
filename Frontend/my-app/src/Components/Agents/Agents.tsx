@@ -43,7 +43,7 @@ const activeAgents: AgentConfig[] = [
     title: "AI Sentiment Analysis",
     description:
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
-    schedule: "Run daily",
+    schedule: "Runs Daily",
     route: "/ai_sentiment_view",
   },
   {
