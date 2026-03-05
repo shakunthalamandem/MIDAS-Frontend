@@ -256,49 +256,7 @@ const NavbarMain: React.FC = () => {
             >
               New Dashboard
             </Button>
-            <DropdownTab
-              label="AI-Agents"
-              menuItems={[
-
-               {
-                  label: "AI-Agent Dashboard",
-                  path: "/agents/dashboard",
-                  icon: <InsightsIcon fontSize="small" />,
-                },
-               
-                {
-                  label: "AI Portfolio Review",
-                  path: "/ai_portfolio_review",
-                  icon: <PsychologyIcon fontSize="small" />,
-                  reload: false,
-                },
-                {
-                  label: "AI based on previous 30 deals",
-                  path: "/ai_fewshot_analysis",
-                  icon: <DescriptionOutlinedIcon fontSize="small" />,
-                },
-                {
-                  label: "AI View (Outside Sentiment)",
-                  path: "/ai_sentiment_view",
-                  icon: <InsightsIcon fontSize="small" />,
-                },
-                //  {
-                //   label: "AI-ML Result Dashboard",
-                //   path: "/equity/ai_ml_results",
-                //   icon: <InsightsIcon fontSize="small" />,
-                // },
-                {
-                  label: "Last 30 Days IPO AI Ranking",
-                  path: "/last_30_days_ai_ranking",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
-                
-              ]}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              rich
-            />
-            <DropdownTab
+                        <DropdownTab
               label="AI-ML"
               menuItems={[
                 {
@@ -349,7 +307,73 @@ const NavbarMain: React.FC = () => {
               setSelectedTab={setSelectedTab}
               rich
             />
+            <Button
+              onClick={() => {
+                setSelectedTab("AI-Agent Dashboard");
+                localStorage.setItem("selectedTab", "AI-Agent Dashboard");
+                navigate("/agents/dashboard");
+              }}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "AI-Agent Dashboard"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              AI-Agents
+            </Button>
+{/* 
+            <DropdownTab
+              label="AI-Agents"
+              menuItems={[
 
+               {
+                  label: "AI-Agent Dashboard",
+                  path: "/agents/dashboard",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
+               
+                // {
+                //   label: "AI Portfolio Review",
+                //   path: "/ai_portfolio_review",
+                //   icon: <PsychologyIcon fontSize="small" />,
+                //   reload: false,
+                // },
+                // {
+                //   label: "AI based on previous 30 deals",
+                //   path: "/ai_fewshot_analysis",
+                //   icon: <DescriptionOutlinedIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "AI View (Outside Sentiment)",
+                //   path: "/ai_sentiment_view",
+                //   icon: <InsightsIcon fontSize="small" />,
+                // },
+                //  {
+                //   label: "AI-ML Result Dashboard",
+                //   path: "/equity/ai_ml_results",
+                //   icon: <InsightsIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "Last 30 Days IPO AI Ranking",
+                //   path: "/last_30_days_ai_ranking",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
+                
+              ]}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              rich
+            /> */}
             <DropdownTab
               label="Profit & Loss"
               menuItems={[
