@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Tabs, Tab } from "@mui/material";
 import SentimentAnalysis from "./SentimentAnalysis";
 import FOSentimentAnalysisDumpDaily from "./FOSentimentAnalysisDumpDaily";
+import CombinedSentimentControl from "./CombinedSentimentControl";
 
 const SentimentAnalysisTabs: React.FC = () => {
   const [tab, setTab] = useState(0);
@@ -44,12 +45,14 @@ const SentimentAnalysisTabs: React.FC = () => {
         >
           <Tab label="IPO Sentiment" />
           <Tab label="FO Sentiment" />
+          <Tab label="Combined Sentiment" />
         </Tabs>
       </Box>
 
       <Box sx={{ maxWidth: 1200, mx: "auto" }}>
         {tab === 0 && <SentimentAnalysis />}
         {tab === 1 && <FOSentimentAnalysisDumpDaily />}
+        {tab === 2 && <CombinedSentimentControl />}
       </Box>
     </Box>
   );

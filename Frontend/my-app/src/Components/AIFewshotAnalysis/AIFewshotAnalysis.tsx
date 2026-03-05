@@ -181,7 +181,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               align="center"
               sx={{ fontWeight: 900, color: "#5D0163" }}
             >
-              AI Unsupervised Analysis for {companyName}
+              AI based on previous 30 deals for {companyName}
             </Typography>
 
             <Autocomplete
@@ -242,7 +242,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
             <CardContent sx={{ pb: 0 }}>
               <Box display="flex" justifyContent="space-between">
                 <Typography fontWeight={600}>
-                  About AI Unsupervised Analysis
+                  About AI based on previous 30 deals analysis
                 </Typography>
 
                 <IconButton
