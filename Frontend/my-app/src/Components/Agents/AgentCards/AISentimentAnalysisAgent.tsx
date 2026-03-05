@@ -170,7 +170,9 @@ const postSentimentPdf = async (
   if (!res.ok) throw new Error(data.error || "Failed to save sentiment PDF");
   return data;
 };
-const triggerSentimentEmail = async (tickers: string[]) => {
+type SentimentEmailPayloadItem = { ticker: string; unique_deal_id: string };
+
+const triggerSentimentEmail = async (items: SentimentEmailPayloadItem[]) => {
   const res = await fetch(`${apiUrl}/api/sentiment_analysis_email_trigger/`, {
     method: "POST",
     headers: {
@@ -179,7 +181,7 @@ const triggerSentimentEmail = async (tickers: string[]) => {
 
     },
     body: JSON.stringify({
-      tickers, // list of successfully processed tickers
+      payload: items,
     }),
   });
 
@@ -324,7 +326,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
     setMessage(null);
 
     try {
-      const success: string[] = [];
+      const success: SentimentEmailPayloadItem[] = [];
       const failures: string[] = [];
 
       for (const deal of selectedSentimentDeals) {
@@ -355,7 +357,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
             sentimentPdf
           );
 
-          success.push(deal.ticker);
+          success.push({ ticker: deal.ticker, unique_deal_id: deal.unique_deal_id });
         } catch (err: any) {
           failures.push(
             `${deal.ticker}: ${err?.message || "run failed"}`
@@ -368,11 +370,14 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
         try {
           await triggerSentimentEmail(success);
           setMessage(
-            `Sentiment saved & email triggered for ${success.join(", ")}`
+            `Sentiment saved & email triggered for ${success
+              .map((item) => item.ticker)
+              .join(", ")}`
           );
         } catch (emailErr: any) {
           setError(
-            `Sentiment saved but email failed: ${emailErr?.message || "Unknown error"
+            `Sentiment saved but email failed: ${
+              emailErr?.message || "Unknown error"
             }`
           );
         }
