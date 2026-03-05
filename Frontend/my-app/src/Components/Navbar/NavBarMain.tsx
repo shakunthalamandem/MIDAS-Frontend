@@ -101,6 +101,13 @@ const NavbarMain: React.FC = () => {
     }
   };
 
+  const handleNewDashboardClick = () => {
+    setSelectedTab("New Dashboard");
+    localStorage.setItem("selectedTab", "New Dashboard");
+    setNewDashboardDefaults("US");
+    navigateAndRefresh("/deals/new_dashboard");
+  };
+
   const handleLogoutClick = () => {
     setShowLogout(true);
   };
@@ -229,65 +236,63 @@ const NavbarMain: React.FC = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, textAlign: "center" }}>
+            <Button
+              onClick={handleNewDashboardClick}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "New Dashboard"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              New Dashboard
+            </Button>
             <DropdownTab
-              label="New Issue Deals "
+              label="AI-Agents"
               menuItems={[
-                {
-                  label: "Dashboard",
-                  path: "/deals/dashboard",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                },
-                {
-                  label: "New Deal Form",
-                  path: "/deals/new_deal_form",
-                  icon: <PostAddOutlinedIcon fontSize="small" />,
-                },
-                // { label: "DealTracking", path: "/deals/deal_Tracking" },
-                {
-                  label: "New Dashboard",
-                  path: "/deals/new_dashboard",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                  children: [
-                    {
-                      label: "US",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("US"),
-                    },
-      
-                    {
-                      label: "EMEA",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("EMEA"),
-                    },
-                                  {
-                      label: "APAC",
-                      path: "/deals/new_dashboard",
-                      onSelect: () => setNewDashboardDefaults("APAC"),
-                    },
-                  ],
-                },
-                                {
-                  label: "Future Pipeline",
-                  path: "/deals/future_pipeline",
-                  icon: <SpaceDashboardOutlinedIcon fontSize="small" />,
-                },
-                // {
-                //   label: "IPO Write-Up",
-                //   path: "/equity/ipo_dashboard",
-                //   icon: <TrendingUpOutlinedIcon fontSize="small" />,
-                // },
-                // {
-                //   label: "FO Write-Up",
-                //   path: "/equity/fo_dashboard",
-                //   icon: <ArticleOutlinedIcon fontSize="small" />,
-                // },
 
-                // {
-                //   label: "Meeting Notes",
-                //   path: "/deal_meeting_notes",
-                //   icon: <ArticleOutlinedIcon fontSize="small" />,
+               {
+                  label: "AI-Agent Dashboard",
+                  path: "/agents/dashboard",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
+               
+                {
+                  label: "AI Portfolio Review",
+                  path: "/ai_portfolio_review",
+                  icon: <PsychologyIcon fontSize="small" />,
+                  reload: false,
+                },
+                {
+                  label: "AI based on previous 30 deals",
+                  path: "/ai_fewshot_analysis",
+                  icon: <DescriptionOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "AI View (Outside Sentiment)",
+                  path: "/ai_sentiment_view",
+                  icon: <InsightsIcon fontSize="small" />,
+                },
+                //  {
+                //   label: "AI-ML Result Dashboard",
+                //   path: "/equity/ai_ml_results",
+                //   icon: <InsightsIcon fontSize="small" />,
                 // },
-                // { label: "AI-ML Model", path: "/equity/ai_ml_models" },
+                {
+                  label: "Last 30 Days IPO AI Ranking",
+                  path: "/last_30_days_ai_ranking",
+                  icon: <AutoAwesomeIcon fontSize="small" />,
+                },
+                
               ]}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -301,27 +306,32 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_models",
                   icon: <AutoAwesomeIcon fontSize="small" />,
                 },
-                {
-                  label: "APAC IPO & FO AI-ML Model",
-                  path: "/equity/apac_ai_ml_models",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
+                // {
+                //   label: "APAC IPO & FO AI-ML Model",
+                //   path: "/equity/apac_ai_ml_models",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
                 {
                   label: "AI-ML Result Dashboard",
                   path: "/equity/ai_ml_results",
                   icon: <InsightsIcon fontSize="small" />,
                 },
-                {
-                  label: "AI Portfolio Review",
-                  path: "/ai_portfolio_review",
-                  icon: <PsychologyIcon fontSize="small" />,
-                  reload: false,
-                },
-                {
-                  label: "ABB Model",
-                  path: "/equity/abb_model",
-                  icon: <HubIcon fontSize="small" />,
-                },
+                // {
+                //   label: "AI Portfolio Review",
+                //   path: "/ai_portfolio_review",
+                //   icon: <PsychologyIcon fontSize="small" />,
+                //   reload: false,
+                // },
+                //       {
+                //   label: "Last 30 Days IPO AI Ranking",
+                //   path: "/last_30_days_ai_ranking",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
+                // {
+                //   label: "ABB Model",
+                //   path: "/equity/abb_model",
+                //   icon: <HubIcon fontSize="small" />,
+                // },
                 // {
                 //   label: "Gen AI Tool",
                 //   path: "/gen_ai_tool",
@@ -448,6 +458,7 @@ const NavbarMain: React.FC = () => {
               rich
             />
 
+
             {/* <Button
               onClick={() => handleTabSelect("Data & Analytics")}
               sx={{
@@ -482,7 +493,12 @@ const NavbarMain: React.FC = () => {
             {isLoggedIn && (
               <>
                 {/* 🔔 Notifications */}
-                <ChatBoxButton />
+                <ChatBoxButton
+                  label="New Deal Form"
+                  icon={<PostAddOutlinedIcon fontSize="small" />}
+                  onClick={() => navigate("/deals/new_deal_form")}
+                />
+                {/* <ChatBoxButton /> */}
                 <ChatBoxButton
                   label="Meeting Notes"
                   icon={<HistoryEduOutlinedIcon fontSize="small" />}

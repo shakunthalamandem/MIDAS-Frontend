@@ -116,13 +116,14 @@ const NewDashboardLifeCycleTableView: React.FC<NewDashboardLifeCycleTableViewPro
     id: row.id ?? `${row.ticker ?? row.company ?? "row"}-${idx}`,
     ...row,
   }));
+  const isPipelineView = mode === "pipeline";
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", height: isPipelineView ? 480 : "auto" }}>
       <DataGrid
         rows={normalizedRows}
         columns={columns}
-        autoHeight
+        autoHeight={!isPipelineView}
         disableRowSelectionOnClick
         onRowClick={(params) => onRowClick?.(params.row)}
         rowHeight={36}
@@ -136,6 +137,7 @@ const NewDashboardLifeCycleTableView: React.FC<NewDashboardLifeCycleTableViewPro
           },
           border: "1px solid #e2e8f0",
           borderRadius: 2,
+          height: "100%",
         }}
       />
     </Box>

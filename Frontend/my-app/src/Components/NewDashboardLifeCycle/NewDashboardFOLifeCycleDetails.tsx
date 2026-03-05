@@ -20,6 +20,8 @@ import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
+// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
+import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -48,22 +50,24 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
+      ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
       { label: "Write Up New", requiresWriteup: true },
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
+       {
+        label: "Deal Bot",
+      },
       { label: "Peer Deals Performance", requiresWriteup: true },
       { label: "AI - Sentiment View" },
       { label: "Previous FO deals" },
       { label: "ML Model" },
-      {
-        label: "Deal Bot",
-      },
+     
       { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
-    []
+    [isUpcoming]
   );
 
   React.useEffect(() => {
@@ -243,7 +247,12 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up Old" ? (
+          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+            <TradingSignalsMain
+              ticker={activePayload.ticker}
+              trade_date={activePayload.pricing_date}
+            />
+          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (

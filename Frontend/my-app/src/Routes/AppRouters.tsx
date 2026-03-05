@@ -57,6 +57,7 @@ import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
 import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
+import Agents from "../Components/Agents/Agents";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
@@ -87,6 +88,7 @@ import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
 import SentimentAnalysisTabs from "../Components/AIML/SentimentAnalysisTabs";
 import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
 import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
+import ShowUSSentimentAnalysis from "../Components/AIML/ShowUSSentimentAnalysis";
 import NotesUI from "../Components/mattermostupload/NotesUI";
 import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
 import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
@@ -98,8 +100,11 @@ import PNLAttributionSectionMain from "../Components/NewPNLAttributionRiskReport
 import NewPortfolioRiskUpload from "../Components/Uploads/NewPortfolioRiskUpload";
 import RiskDashboard from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard";
 import TickerDetail from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/TickerDetail";
+import RiskTriggers from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskTriggers";
 import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain";
 import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
+import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs";
+import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
 
 
 const AppRouters: React.FC = () => {
@@ -287,6 +292,7 @@ const AppRouters: React.FC = () => {
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysisTabs /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+        <Route path="/ai_sentiment_view" element={<AuthGuard><ShowUSSentimentAnalysis /></AuthGuard>} />
 
 
 
@@ -307,11 +313,19 @@ const AppRouters: React.FC = () => {
 
         <Route path='/risk_report_pnl_report' element={<AuthGuard><RiskDashboard /></AuthGuard>} />
         <Route path='/risk_report_pnl_report/ticker-detail' element={<AuthGuard><TickerDetail /></AuthGuard>} />
+        <Route path='/risk_triggers' element={<AuthGuard><RiskTriggers /></AuthGuard>} />
         <Route path='/risk_upload' element={<AuthGuard><NewPortfolioRiskUpload /></AuthGuard>} />
 
 
         <Route path='/risk_document_upload' element={<AuthGuard><RiskAIDocumentUpload /></AuthGuard>} />
-        <Route path='/ai_portfolio_review' element={<AuthGuard><PortfolioReportDocumentMain /></AuthGuard>} />
+        <Route path='/portfolio_document_upload' element={<AuthGuard><DocumentUploadTabs /></AuthGuard>} />
+
+        <Route path='/ai_portfolio_review' element={<AuthGuard><AIPortfolioReview mode="portfolioReview" /></AuthGuard>} />
+        <Route path='/last_30_days_ai_ranking' element={<AuthGuard><AIPortfolioReview mode="stockRanking" /></AuthGuard>} />
+
+        {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
+        <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
+
 
 
         

@@ -28,6 +28,8 @@ import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNot
 import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
 import DealBot from "./DealBot";
+// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
+import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -51,20 +53,21 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "Write Up New", requiresWriteup: true },
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
-      { label: "Deal Recommendation" },
+      // { label: "Deal Recommendation" },
+       {
+        label: "Deal Bot",
+      },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
       { label: "AI based on previous 30 deals" },
       { label: "ML Model" },
-      {
-        label: "Deal Bot",
-      },
+     
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
 
     ],
-    []
+    [isUpcoming]
   );
 
   React.useEffect(() => {
@@ -231,7 +234,12 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up New" ? (
+          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+            <TradingSignalsMain
+              ticker={activePayload.ticker}
+              trade_date={activePayload.pricing_date}
+            />
+          ) : tabItems[tabValue]?.label === "Write Up New" ? (
             isIpo ? (
               <FebWriteUpDashboardMain
                 basicDealDetails={{

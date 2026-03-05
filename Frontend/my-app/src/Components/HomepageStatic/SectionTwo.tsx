@@ -1,10 +1,18 @@
 import React from "react";
 import { Typography, Grid, Container, Button, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import "./SectionTwo.css";
 import Imagecard from "../../Assets/images/sec2image.jpg";
 import logo from '../../Assets/images/MIDAS_logo.png' // Corrected import
 
-const SectionTwo: React.FC = () => (
+const SectionTwo: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLearnMore = () => {
+    navigate('/portfolio_document_upload');
+  };
+
+  return (
   <Container maxWidth="lg" className="section-container">
     <Grid
       container
@@ -60,7 +68,7 @@ const SectionTwo: React.FC = () => (
         </Typography>
         <br/>
         <Typography className="section-text" variant="body1" style={{fontWeight:'bold',color:'#002060'}}>
-        Stay tuned for our risk management tools. 
+        Stay tuned for our <span style={{cursor:'pointer'}} onClick={handleLearnMore}>risk</span> management tools.
         </Typography>
         <Box
           sx={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}
@@ -85,6 +93,7 @@ const SectionTwo: React.FC = () => (
       </Grid>
     </Grid>
   </Container>
-);
+  );
+};
 
 export default SectionTwo;

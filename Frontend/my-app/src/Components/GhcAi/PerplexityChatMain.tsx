@@ -31,6 +31,11 @@ const PerplexityChatMain: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [midasQuestion, setMidasQuestion] = useState<string>("");
+  const [midasData, setMidasData] = useState<any[]>([]);
+  const [midasLoading, setMidasLoading] = useState(false);
+  const [midasError, setMidasError] = useState<string | null>(null);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -67,6 +72,41 @@ const PerplexityChatMain: React.FC = () => {
       setError(err.message || "Failed to fetch answer");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMidasAsk = async (
+    e?: React.FormEvent | Event,
+    customQuestion?: string
+  ) => {
+    if (e?.preventDefault) e.preventDefault();
+    const query = (customQuestion ?? midasQuestion).trim();
+    if (!query) return;
+
+    setMidasLoading(true);
+    setMidasData([]);
+    setMidasError(null);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/midas_universal_rag_query/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          question: query,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      if (Array.isArray(result.answer)) setMidasData(result.answer);
+      else throw new Error("Invalid response format");
+    } catch (err: any) {
+      setMidasError(err.message || "Failed to fetch answer");
+    } finally {
+      setMidasLoading(false);
     }
   };
 
@@ -160,8 +200,14 @@ const PerplexityChatMain: React.FC = () => {
 
         {/* MIDAS TAB */}
         {activeTab === 0 && (
-  
- <MidasChat />
+          <MidasChat
+            question={midasQuestion}
+            data={midasData}
+            loading={midasLoading}
+            error={midasError}
+            setQuestion={setMidasQuestion}
+            onAsk={handleMidasAsk}
+          />
         )}
 
         {/* GLOBAL TAB (your existing UI + functionality) */}
@@ -260,7 +306,7 @@ const PerplexityChatMain: React.FC = () => {
             {/* AI Response and Suggestions */}
             <GHCAIMain data={data} loading={loading} error={error} />
 
-            <SuggestedQuestions
+            {/* <SuggestedQuestions
               questions={
                 data.find((block) => block.type === "suggested_questions")
                   ?.questions || []
@@ -270,7 +316,7 @@ const PerplexityChatMain: React.FC = () => {
                 handleSubmit(undefined, selected);
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-            />
+            /> */}
           </>
         )}
       </Container>

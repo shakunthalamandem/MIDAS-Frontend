@@ -6,14 +6,54 @@ interface Props {
   data: any;
 }
 
-const roleColors: Record<string, { border: string; title: string; bg: string; headerBg: string }> = {
-  cio: { border: "#93c5fd", title: "#1e40af", bg: "#eff6ff", headerBg: "linear-gradient(135deg, #eff6ff, #dbeafe)" },
-  traders: { border: "#f9a8d4", title: "#be185d", bg: "#fdf2f8", headerBg: "linear-gradient(135deg, #fdf2f8, #fce7f3)" },
-  risk_team: { border: "#6ee7b7", title: "#065f46", bg: "#ecfdf5", headerBg: "linear-gradient(135deg, #ecfdf5, #d1fae5)" },
-  risk: { border: "#6ee7b7", title: "#065f46", bg: "#ecfdf5", headerBg: "linear-gradient(135deg, #ecfdf5, #d1fae5)" },
-  stock_pickers: { border: "#a5b4fc", title: "#3730a3", bg: "#eef2ff", headerBg: "linear-gradient(135deg, #eef2ff, #e0e7ff)" },
-  pm: { border: "#fcd34d", title: "#92400e", bg: "#fffbeb", headerBg: "linear-gradient(135deg, #fffbeb, #fef3c7)" },
-  analyst: { border: "#c4b5fd", title: "#5b21b6", bg: "#faf5ff", headerBg: "linear-gradient(135deg, #faf5ff, #ede9fe)" },
+const modernFont = `'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+
+const roleColors: Record<
+  string,
+  { border: string; title: string; bg: string; headerBg: string }
+> = {
+  cio: {
+    border: "#bfdbfe",
+    title: "#1e3a8a",
+    bg: "#eff6ff",
+    headerBg: "#eff6ff",
+  },
+  traders: {
+    border: "#fbcfe8",
+    title: "#9d174d",
+    bg: "#fdf2f8",
+    headerBg: "#fdf2f8",
+  },
+  risk_team: {
+    border: "#bbf7d0",
+    title: "#065f46",
+    bg: "#ecfdf5",
+    headerBg: "#ecfdf5",
+  },
+  risk: {
+    border: "#bbf7d0",
+    title: "#065f46",
+    bg: "#ecfdf5",
+    headerBg: "#ecfdf5",
+  },
+  stock_pickers: {
+    border: "#c7d2fe",
+    title: "#3730a3",
+    bg: "#eef2ff",
+    headerBg: "#eef2ff",
+  },
+  pm: {
+    border: "#fde68a",
+    title: "#92400e",
+    bg: "#fffbeb",
+    headerBg: "#fffbeb",
+  },
+  analyst: {
+    border: "#ddd6fe",
+    title: "#5b21b6",
+    bg: "#faf5ff",
+    headerBg: "#faf5ff",
+  },
 };
 
 const getRoleColor = (key: string) => {
@@ -21,58 +61,183 @@ const getRoleColor = (key: string) => {
   for (const [k, v] of Object.entries(roleColors)) {
     if (lower.includes(k)) return v;
   }
-  return { border: "#c7d2fe", title: "#1e293b", bg: "#f0f7ff", headerBg: "linear-gradient(135deg, #f0f7ff, #e0e7ff)" };
+  return {
+    border: "#e5e7eb",
+    title: "#111827",
+    bg: "#f9fafb",
+    headerBg: "#f9fafb",
+  };
 };
 
 const ActionChecklists: React.FC<Props> = ({ data }) => {
   if (!data) return null;
+
   if (typeof data === "string") {
-    return (<Box sx={{ backgroundColor: "#f0f7ff", borderRadius: 2.5, p: 2.5 }}>
-      <Typography sx={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{data}</Typography>
-    </Box>);
+    return (
+      <Box
+        sx={{
+          backgroundColor: "#f9fafb",
+          border: "1px solid #e5e7eb",
+          borderRadius: 3,
+          p: 3,
+          fontFamily: modernFont,
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 14,
+            color: "#111827",
+            lineHeight: 1.8,
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {data}
+        </Typography>
+      </Box>
+    );
   }
 
   let roles: Array<{ title: string; items: string[] }> = [];
+
   if (Array.isArray(data)) {
     roles = data.map((r: any) => ({
       title: r.role || r.title || r.name || "",
-      items: Array.isArray(r.items || r.actions || r.checklist || r.tasks)
-        ? (r.items || r.actions || r.checklist || r.tasks).map((v: any) => typeof v === "string" ? v : v.text || v.action || v.description || JSON.stringify(v))
+      items: Array.isArray(
+        r.items || r.actions || r.checklist || r.tasks
+      )
+        ? (r.items || r.actions || r.checklist || r.tasks).map(
+            (v: any) =>
+              typeof v === "string"
+                ? v
+                : v.text || v.action || v.description || JSON.stringify(v)
+          )
         : [],
     }));
   } else if (typeof data === "object") {
     roles = Object.entries(data)
-      .filter(([key]) => !["badge", "overall", "section_number", "label", "key"].includes(key))
+      .filter(
+        ([key]) =>
+          ![
+            "badge",
+            "overall",
+            "section_number",
+            "label",
+            "key",
+          ].includes(key)
+      )
       .map(([key, val]: [string, any]) => ({
-        title: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        title: key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase()),
         items: Array.isArray(val)
-          ? val.map((v: any) => typeof v === "string" ? v : v.text || v.action || v.description || JSON.stringify(v))
+          ? val.map((v: any) =>
+              typeof v === "string"
+                ? v
+                : v.text ||
+                  v.action ||
+                  v.description ||
+                  JSON.stringify(v)
+            )
           : typeof val === "object" && val !== null
-            ? (val.items || val.actions || val.checklist || val.tasks || []).map((v: any) => typeof v === "string" ? v : v.text || v.action || v.description || JSON.stringify(v))
-            : typeof val === "string" ? [val] : [],
+          ? (
+              val.items ||
+              val.actions ||
+              val.checklist ||
+              val.tasks ||
+              []
+            ).map((v: any) =>
+              typeof v === "string"
+                ? v
+                : v.text ||
+                  v.action ||
+                  v.description ||
+                  JSON.stringify(v)
+            )
+          : typeof val === "string"
+          ? [val]
+          : [],
       }));
   }
 
-  if (roles.length === 0 || roles.every((r) => r.items.length === 0)) {
-    return <GenericDataRenderer data={data} accentColor="#10b981" />;
+  if (
+    roles.length === 0 ||
+    roles.every((r) => r.items.length === 0)
+  ) {
+    return (
+      <GenericDataRenderer data={data} accentColor="#10b981" />
+    );
   }
 
   return (
-    <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2 }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, 1fr)",
+        gap: 3,
+        fontFamily: modernFont,
+      }}
+    >
       {roles.map((role, i) => {
         const colors = getRoleColor(role.title);
+
         return (
-          <Box key={i} sx={{ backgroundColor: "#fff", border: `1px solid ${colors.border}`, borderRadius: 2.5, overflow: "hidden",
-            transition: "all 0.2s", "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)" } }}>
-            <Box sx={{ background: colors.headerBg, px: 2.5, py: 1.5 }}>
-              <Typography sx={{ fontWeight: 700, fontSize: 15, color: colors.title }}>
-                {role.title.startsWith("For ") ? role.title : `For ${role.title}`}
+          <Box
+            key={i}
+            sx={{
+              backgroundColor: "#ffffff",
+              border: `1px solid ${colors.border}`,
+              borderRadius: 3,
+              overflow: "hidden",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+              },
+            }}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                backgroundColor: colors.headerBg,
+                px: 3,
+                py: 2,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 600,
+                  fontSize: 16,
+                  color: colors.title,
+                  letterSpacing: 0.2,
+                }}
+              >
+                {role.title.startsWith("For ")
+                  ? role.title
+                  : `For ${role.title}`}
               </Typography>
             </Box>
-            <Box sx={{ p: 2.5 }}>
-              <Box component="ol" sx={{ m: 0, pl: 2.5 }}>
+
+            {/* Checklist */}
+            <Box sx={{ p: 3 }}>
+              <Box
+                component="ol"
+                sx={{
+                  m: 0,
+                  pl: 2.5,
+                }}
+              >
                 {role.items.map((item: string, j: number) => (
-                  <Typography component="li" key={j} sx={{ fontSize: 13, color: "#1e293b", mb: 0.8, lineHeight: 1.5 }}>{item}</Typography>
+                  <Typography
+                    component="li"
+                    key={j}
+                    sx={{
+                      fontSize: 14,
+                      color: "#111827",
+                      mb: 1.2,
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {item}
+                  </Typography>
                 ))}
               </Box>
             </Box>
