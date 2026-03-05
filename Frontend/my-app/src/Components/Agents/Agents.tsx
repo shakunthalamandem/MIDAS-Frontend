@@ -259,8 +259,7 @@ const Agents: React.FC = () => {
 
             <Box flex="1" minWidth={240}>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                Your AI Workforce
-              </Typography>
+                MIDAS AI Agents              </Typography>
               <Typography variant="body1" color="#4f5973">
                 Autonomous AI agents that monitor markets and generate insights
                 for you.
