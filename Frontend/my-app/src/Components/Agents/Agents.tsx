@@ -36,34 +36,34 @@ const activeAgents: AgentConfig[] = [
     title: "AI Unsupervised (IPO)",
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
-    schedule: "ONE TIME FOR EACH IPO",
+    schedule: "One Time for each IPO",
     route: "/ai_fewshot_analysis",
   },
   {
     title: "AI Sentiment Analysis",
     description:
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
-    schedule: "Daily · 8:00 AM EST",
+    schedule: "Run daily",
     route: "/ai_sentiment_view",
   },
   {
     title: "Individual Stock Analysis",
     description:
       "AI-generated portfolio analysis reports delivered through email with actionable insights.",
-    schedule: "Daily · 8:00 AM EST",
+    schedule: "Daily 12:00 PM IST",
   },
   {
     title: "AI Portfolio Review",
     description:
       "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
-    schedule: "Daily · 8:00 AM EST",
+    schedule: "Once a Week on Monday",
     route: "/ai_portfolio_review",
   },
   {
     title: "Last 30 Days IPO AI Ranking",
     description:
       "AI-generated ranking of the most promising IPOs from the last 30 days.",
-    schedule: "Daily · 8:00 AM EST",
+    schedule: "Weekly Once",
     route: "/last_30_days_ai_ranking",
   },
 ];
