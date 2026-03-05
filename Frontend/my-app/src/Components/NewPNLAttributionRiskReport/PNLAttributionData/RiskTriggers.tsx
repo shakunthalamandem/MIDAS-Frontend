@@ -181,6 +181,10 @@ const shiftDate = (dateStr: string, days: number): string => {
   return d.toISOString().split("T")[0];
 };
 
+const isTotalLabel = (value: unknown): boolean => {
+  return typeof value === "string" && value.trim().toLowerCase() === "total";
+};
+
 /* ── Component ── */
 
 const RiskTriggers: React.FC = () => {
@@ -345,7 +349,7 @@ const RiskTriggers: React.FC = () => {
               ) : (
                 section.data.map((row: any, i: number) => {
                   const rawVal = row[valueKey];
-                  const isTotalRow = row[firstColKey] === "Total";
+                  const isTotalRow = isTotalLabel(row[firstColKey]);
                   return (
                     <Box
                       key={i}
@@ -385,7 +389,7 @@ const RiskTriggers: React.FC = () => {
               ) : (
                 section.data.map((row: any, i: number) => {
                   const rawVal = row[valueKey];
-                  const isTotalRow = row[firstColKey] === "Total";
+                  const isTotalRow = isTotalLabel(row[firstColKey]);
                   return (
                     <tr key={i} className={isTotalRow ? "trig-total-row" : ""}>
                       <td className={`trig-td-l ${isTotalRow ? "trig-total-cell" : ""}`}>{row[firstColKey]}</td>
@@ -457,8 +461,8 @@ const RiskTriggers: React.FC = () => {
     const titleParts = section.title.split(": Guideline ");
     const titleName = titleParts[0];
     const dataRows = section.data || [];
-    const nonTotalRows = dataRows.filter((row) => row[cfg.firstColKey] !== "Total");
-    const totalRow = dataRows.find((row) => row[cfg.firstColKey] === "Total");
+    const nonTotalRows = dataRows.filter((row) => !isTotalLabel(row[cfg.firstColKey]));
+    const totalRow = dataRows.find((row) => isTotalLabel(row[cfg.firstColKey]));
     const maxAbs = Math.max(
       ...nonTotalRows.map((row) => Math.abs(parseSignedNumericValue(row[cfg.valueKey]))),
       1
