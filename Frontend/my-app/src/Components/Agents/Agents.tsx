@@ -260,15 +260,18 @@ const Agents: React.FC = () => {
             <Box flex="1" minWidth={240}>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 MIDAS AI Agents              </Typography>
-              <Typography variant="body1" color="#4f5973">
-                Autonomous AI agents that monitor markets and generate insights
-                for you.
+              <Typography variant="body1" color="#113591">
+Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
+              </Typography>
+                            <Typography variant="body1" color="#8222af">
+Enable the Agents for automated market analysis and insights.
               </Typography>
             </Box>
           </Stack>
 
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label={`${totalAgents} Agents`} />
+            <Chip label={`${totalAgents} Agents`}color="info"
+             />
             <Chip
               label={`${activeCount} Active`}
               color={activeCount > 0 ? "success" : "default"}
@@ -279,7 +282,7 @@ const Agents: React.FC = () => {
               color={emailVerified ? "success" : "warning"}
               variant="outlined"
             />
-            <Chip label={`${comingSoonCount} Coming Soon`} color="info" />
+            {/* <Chip label={`${comingSoonCount} Coming Soon`} color="info" /> */}
           </Stack>
         </Paper>
 
@@ -331,7 +334,7 @@ const Agents: React.FC = () => {
             );
           })}
         </Box>
-
+{/* 
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
           Coming Soon
         </Typography>
@@ -367,7 +370,7 @@ const Agents: React.FC = () => {
               </Paper>
             );
           })}
-        </Stack>
+        </Stack> */}
       </Box>
 
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
