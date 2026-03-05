@@ -43,7 +43,7 @@ const activeAgents: AgentConfig[] = [
     title: "AI Sentiment Analysis",
     description:
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
-    schedule: "Run daily",
+    schedule: "Runs Daily",
     route: "/ai_sentiment_view",
   },
   {
@@ -258,20 +258,38 @@ const Agents: React.FC = () => {
             </Avatar>
 
             <Box flex="1" minWidth={240}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                MIDAS AI Agents              </Typography>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  MIDAS AI Agents
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#ff1e00",
+                    fontWeight: 600,
+                    border: "1px solid #ff1e00",
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 1,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Beta 
+                </Typography>
+              </Box>
               <Typography variant="body1" color="#113591">
-Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
+                Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
               </Typography>
-                            <Typography variant="body1" color="#8222af">
-Enable the Agents for automated market analysis and insights.
+              <Typography variant="body1" color="#8222af">
+                Enable the agents for automated market analysis and insights.
               </Typography>
             </Box>
           </Stack>
 
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label={`${totalAgents} Agents`}color="info"
-             />
+            <Chip label={`${totalAgents} Agents`} color="info"
+            />
             <Chip
               label={`${activeCount} Active`}
               color={activeCount > 0 ? "success" : "default"}
@@ -301,7 +319,8 @@ Enable the Agents for automated market analysis and insights.
 
             const viewDetailsAction = agent.route ? (
               <Button
-                variant="text"
+                variant="contained"
+                disableElevation
                 onClick={(e) => {
                   e.stopPropagation();
                   window.open(
@@ -309,8 +328,18 @@ Enable the Agents for automated market analysis and insights.
                     "_blank"
                   );
                 }}
+                sx={{
+                  backgroundColor: "#481f93",
+                  color: "#ffffff",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  px: 3,
+                  py: 0.5,
+                  "&:hover": { backgroundColor: "#4a24d9" },
+                }}
               >
-                View details
+                View Details
               </Button>
             ) : null;
 
@@ -334,7 +363,7 @@ Enable the Agents for automated market analysis and insights.
             );
           })}
         </Box>
-{/* 
+        {/* 
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
           Coming Soon
         </Typography>
