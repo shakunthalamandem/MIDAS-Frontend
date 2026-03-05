@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  AlertColor,
   Autocomplete,
   Box,
   Button,
@@ -9,8 +10,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Snackbar,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import ActiveAgentCard, { ActiveAgentCardProps } from "./ActiveAgentCard";
 import { Block } from "../../GhcAi/Utils/ComponentsUtils";
@@ -200,10 +203,36 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const [sentimentTickers, setSentimentTickers] = useState<SentimentDeal[]>([]);
   const [selectedSentimentDeals, setSelectedSentimentDeals] = useState<SentimentDeal[]>([]);
   const [loadingTickers, setLoadingTickers] = useState(false);
+  const [tickerSearchValue, setTickerSearchValue] = useState("");
 
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success");
+  const showSnackbar = (message: string, severity: AlertColor = "success") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setSnackbarOpen(false);
+  };
+
+  const filterTickerOptions = (options: SentimentDeal[], state: { inputValue: string }) => {
+    if (!state.inputValue.trim()) return options;
+    const normalizedInput = state.inputValue.toLowerCase();
+    return options.filter((option) => {
+      const ticker = option.ticker.toLowerCase();
+      const source = option.source.toLowerCase();
+      return ticker.includes(normalizedInput) || source.includes(normalizedInput);
+    });
+  };
 
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [pdfBlocks, setPdfBlocks] = useState<Block[]>([]);
@@ -309,7 +338,6 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
       try {
         const deals = await fetchSentimentDeals();
         setSentimentTickers(deals);
-        setSelectedSentimentDeals((prev) => (prev.length ? prev : deals[0] ? [deals[0]] : []));
       } catch (e: any) {
         setError(e?.message || "Unable to load tickers");
       } finally {
@@ -321,9 +349,12 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const runSentiment = async () => {
     if (!selectedSentimentDeals.length) return;
 
+    setDialogOpen(false);
+
     setRunning(true);
     setError(null);
-    setMessage(null);
+    setSnackbarOpen(false);
+    let emailFailureMessage: string | null = null;
 
     try {
       const success: SentimentEmailPayloadItem[] = [];
@@ -369,26 +400,38 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
       if (success.length) {
         try {
           await triggerSentimentEmail(success);
-          setMessage(
-            `Sentiment saved & email triggered for ${success
-              .map((item) => item.ticker)
-              .join(", ")}`
-          );
         } catch (emailErr: any) {
-          setError(
-            `Sentiment saved but email failed: ${
-              emailErr?.message || "Unknown error"
-            }`
-          );
+          emailFailureMessage = `Sentiment saved but email failed: ${
+            emailErr?.message || "Unknown error"
+          }`;
+          setError(emailFailureMessage);
         }
       }
 
-      if (failures.length) {
-        setError((prev) =>
-          prev
-            ? `${prev}; ${failures.join("; ")}`
-            : failures.join("; ")
+      const failureMessage =
+        failures.length > 0 ? `Run failed for ${failures.join("; ")}` : null;
+
+      if (success.length) {
+        const successMessage = `Sentiment Updated & check Email for ${success
+          .map((item) => item.ticker)
+          .join(", ")}`;
+        const snackbarParts = [successMessage];
+
+        if (emailFailureMessage) snackbarParts.push(emailFailureMessage);
+        if (failureMessage) snackbarParts.push(failureMessage);
+
+        showSnackbar(
+          snackbarParts.join(". "),
+          emailFailureMessage || failureMessage ? "warning" : "success"
         );
+
+        setError(null);
+        setDialogOpen(false);
+        setSelectedSentimentDeals([]);
+        setTickerSearchValue("");
+      } else if (failureMessage) {
+        setError(failureMessage);
+        showSnackbar(failureMessage, "error");
       }
     } finally {
       setRunning(false);
@@ -396,7 +439,11 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   };
 
   // Dialog close handler
-  const handleClose = () => setDialogOpen(false);
+  const handleClose = () => {
+    setDialogOpen(false);
+    setError(null);
+    setTickerSearchValue("");
+  };
 
 
   return (
@@ -415,18 +462,22 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Run AI Sentiment</DialogTitle>
+        <DialogTitle color="primary">Run AI Sentiment-Select the tickers to run the sentiment analysis</DialogTitle>
+        {/* <Typography>Select the tickers to run the sentiment analysis</Typography> */}
 
-        <DialogContent dividers>
+        <DialogContent >
           <Stack spacing={2}>
             {error && <Alert severity="error">{error}</Alert>}
-            {message && <Alert severity="success">{message}</Alert>}
 
             <Autocomplete
               multiple
               filterSelectedOptions
+              openOnFocus
               options={sentimentTickers}
               loading={loadingTickers}
+              inputValue={tickerSearchValue}
+              onInputChange={(_, value) => setTickerSearchValue(value || "")}
+              filterOptions={filterTickerOptions}
               getOptionLabel={(o) => `${o.ticker} (${o.source})`}
               value={selectedSentimentDeals}
               onChange={(_, value) => setSelectedSentimentDeals(value)}
@@ -468,6 +519,21 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       <Box
         ref={pdfContainerRef}
