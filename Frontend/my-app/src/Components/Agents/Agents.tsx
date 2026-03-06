@@ -33,7 +33,21 @@ const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
-    title: "AI Unsupervised (IPO)",
+    title: "Portfolio Agent",
+    description:
+      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
+    schedule: "Once a Week on Monday",
+    route: "/ai_portfolio_review",
+  },
+  {
+    title: "IPO Market Agent",
+    description:
+      "AI-generated ranking of the most promising IPOs from the last 30 days based on data and market signals.",
+    schedule: "Weekly Once",
+    route: "/last_30_days_ai_ranking",
+  },
+  {
+    title: "AI Model",
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
     schedule: "One Time for each IPO",
@@ -45,26 +59,6 @@ const activeAgents: AgentConfig[] = [
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
     schedule: "Runs Daily",
     route: "/ai_sentiment_view",
-  },
-  {
-    title: "Individual Stock Analysis",
-    description:
-      "AI-generated portfolio analysis reports delivered through email with actionable insights.",
-    schedule: "Daily 1:30 AM EST",
-  },
-  {
-    title: "AI Portfolio Review",
-    description:
-      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
-    schedule: "Once a Week on Monday",
-    route: "/ai_portfolio_review",
-  },
-  {
-    title: "Last 30 Days IPO AI Ranking",
-    description:
-      "AI-generated ranking of the most promising IPOs from the last 30 days.",
-    schedule: "Weekly Once",
-    route: "/last_30_days_ai_ranking",
   },
 ];
 
@@ -98,6 +92,15 @@ const agentComponentMap: Record<
   "AI Sentiment Analysis": AISentimentAnalysisAgent,
 };
 
+type AgentLatestUpdatedDates = Record<
+  string,
+  {
+    id?: number;
+    updated_at?: string;
+    [key: string]: any;
+  }
+>;
+
 const Agents: React.FC = () => {
   const [emailVerified] = useState(
     () => localStorage.getItem(EMAIL_VERIFIED_KEY) === "true"
@@ -112,6 +115,9 @@ const Agents: React.FC = () => {
       {} as Record<string, { enabled: boolean; email: boolean }>
     )
   );
+
+  const [latestUpdatedDates, setLatestUpdatedDates] =
+    useState<AgentLatestUpdatedDates>({});
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingAgent, setPendingAgent] = useState<{
@@ -231,6 +237,35 @@ const Agents: React.FC = () => {
     loadMembership();
   }, []);
 
+  useEffect(() => {
+    const loadLatestUpdatedDates = async () => {
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const res = await fetch(`${apiUrl}/api/agents_latest_updated_dates/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            data.error || "Failed to fetch latest updated dates"
+          );
+        }
+
+        setLatestUpdatedDates(data || {});
+      } catch (err) {
+        console.error("Failed to load latest agent updated dates", err);
+      }
+    };
+
+    loadLatestUpdatedDates();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -275,11 +310,12 @@ const Agents: React.FC = () => {
                     letterSpacing: 0.5,
                   }}
                 >
-                  Beta 
+                  Beta
                 </Typography>
               </Box>
               <Typography variant="body1" color="#113591">
-                Autonomous financial AI agents that continuously analyze markets and deliver actionable insights for your investment decisions.
+                Autonomous financial AI agents that continuously analyze markets
+                and deliver actionable insights for your investment decisions.
               </Typography>
               <Typography variant="body1" color="#8222af">
                 Enable the agents for automated market analysis and insights.
@@ -288,8 +324,7 @@ const Agents: React.FC = () => {
           </Stack>
 
           <Stack direction="row" spacing={1} mt={3} flexWrap="wrap">
-            <Chip label={`${totalAgents} Agents`} color="info"
-            />
+            <Chip label={`${totalAgents} Agents`} color="info" />
             <Chip
               label={`${activeCount} Active`}
               color={activeCount > 0 ? "success" : "default"}
@@ -300,7 +335,6 @@ const Agents: React.FC = () => {
               color={emailVerified ? "success" : "warning"}
               variant="outlined"
             />
-            {/* <Chip label={`${comingSoonCount} Coming Soon`} color="info" /> */}
           </Stack>
         </Paper>
 
@@ -316,6 +350,10 @@ const Agents: React.FC = () => {
             const state = activations[agent.title];
             const Component =
               agentComponentMap[agent.title] ?? ActiveAgentCard;
+
+            const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
+            const lastUpdatedAt =
+              latestUpdatedDates?.[agentNumber]?.updated_at ?? null;
 
             const viewDetailsAction = agent.route ? (
               <Button
@@ -339,7 +377,7 @@ const Agents: React.FC = () => {
                   "&:hover": { backgroundColor: "#4a24d9" },
                 }}
               >
-                View Details
+                Explore Insights
               </Button>
             ) : null;
 
@@ -349,6 +387,7 @@ const Agents: React.FC = () => {
                 agent={agent}
                 state={state}
                 agentIndex={index + 1}
+                lastUpdatedAt={lastUpdatedAt}
                 onToggle={(ag, key, currentValue) => {
                   if (key === "enabled") {
                     handleAgentRequest(
@@ -363,43 +402,6 @@ const Agents: React.FC = () => {
             );
           })}
         </Box>
-        {/* 
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-          Coming Soon
-        </Typography>
-
-        <Stack direction="row" spacing={3} sx={{ overflowX: "auto", pb: 1 }}>
-          {comingSoonAgents.map((agent) => {
-            const Icon = agent.icon;
-
-            return (
-              <Paper
-                key={agent.title}
-                sx={{
-                  flex: "0 0 300px",
-                  borderRadius: 3,
-                  p: 3,
-                  border: "1px solid rgba(94,112,148,0.15)",
-                }}
-              >
-                <Stack direction="row" spacing={2} mb={2}>
-                  <Avatar sx={{ bgcolor: "#eef3ff", color: "#5b2fff" }}>
-                    <Icon />
-                  </Avatar>
-                  <Chip label="Soon" color="warning" size="small" />
-                </Stack>
-
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                  {agent.title}
-                </Typography>
-
-                <Typography variant="body2" color="#555f77" mt={1}>
-                  {agent.description}
-                </Typography>
-              </Paper>
-            );
-          })}
-        </Stack> */}
       </Box>
 
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
