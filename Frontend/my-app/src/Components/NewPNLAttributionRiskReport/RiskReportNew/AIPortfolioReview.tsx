@@ -111,14 +111,23 @@ const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode }) => {
     fetchRankingReports();
   }, [mode]);
 
-  const title = mode === "portfolioReview"
-    ? "US Equity Portfolio AI Review"
-    : "Last 30 Days IPO AI Ranking";
+  // ── Portfolio Review mode: no blue bar, search is inside the report viewer ──
+  if (mode === "portfolioReview") {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 1, mb: 4 }}>
+        <PortfolioReportDocumentMain
+          selectedReport={selectedCioReport}
+          reportList={cioReports}
+          reportListLoading={cioListLoading}
+          onSelectReport={setSelectedCioReport}
+        />
+      </Container>
+    );
+  }
 
+  // ── Stock Ranking mode: keep the header bar ──
   return (
     <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-
-      {/* Header bar with title and search */}
       <Box
         sx={{
           mx: "auto",
@@ -133,124 +142,53 @@ const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode }) => {
           flexWrap: "wrap",
         }}
       >
-        {/* Title - left side */}
-        <Typography
-          sx={{
-            color: "#fff",
-            fontWeight: 600,
-            fontSize: 14,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {title}
+        <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: 14, whiteSpace: "nowrap" }}>
+          Last 30 Days IPO AI Ranking
         </Typography>
-
-        {/* Spacer */}
         <Box sx={{ flex: 1 }} />
-
-        {/* Search - right side */}
-        {mode === "portfolioReview" && (
-          <Autocomplete
-            options={cioReports}
-            getOptionLabel={(opt) => `${opt.report_title} — ${opt.date}`}
-            value={selectedCioReport}
-            onChange={(_, val) => setSelectedCioReport(val)}
-            loading={cioListLoading}
-            size="small"
-            sx={{
-              width: { xs: "100%", sm: 380 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
-            }}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} key={option.id}>
-                <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
-                    {option.report_title}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: "#64748b" }}>
-                    {formatDate(option.date)}
-                  </Typography>
-                </Box>
+        <Autocomplete
+          options={rankingReports}
+          getOptionLabel={(opt) => `${opt.report_name} — ${opt.date}`}
+          value={selectedRankingReport}
+          onChange={(_, val) => setSelectedRankingReport(val)}
+          loading={rankingListLoading}
+          size="small"
+          sx={{
+            width: { xs: "100%", sm: 380 },
+            "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
+          }}
+          renderOption={(props, option) => (
+            <Box component="li" {...props} key={option.id}>
+              <Box>
+                <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
+                  {option.report_name}
+                </Typography>
+                <Typography sx={{ fontSize: 11, color: "#64748b" }}>
+                  {formatDate(option.date)}
+                </Typography>
               </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Search CIO reports..."
-                size="small"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {cioListLoading && <CircularProgress size={18} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-        )}
-
-        {mode === "stockRanking" && (
-          <Autocomplete
-            options={rankingReports}
-            getOptionLabel={(opt) => `${opt.report_name} — ${opt.date}`}
-            value={selectedRankingReport}
-            onChange={(_, val) => setSelectedRankingReport(val)}
-            loading={rankingListLoading}
-            size="small"
-            sx={{
-              width: { xs: "100%", sm: 380 },
-              "& .MuiOutlinedInput-root": { borderRadius: 2, backgroundColor: "#f8fafc", fontSize: 12, py: "2px" },
-            }}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} key={option.id}>
-                <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
-                    {option.report_name}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: "#64748b" }}>
-                    {formatDate(option.date)}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Search stock ranking reports..."
-                size="small"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {rankingListLoading && <CircularProgress size={18} />}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-        )}
+            </Box>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Search stock ranking reports..."
+              size="small"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {rankingListLoading && <CircularProgress size={18} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+        />
       </Box>
-
-      {/* Content area */}
-      <Box
-        sx={{
-          mt: 2,
-          mx: "auto",
-        }}
-      >
-        {mode === "portfolioReview" && (
-          <PortfolioReportDocumentMain selectedReport={selectedCioReport} />
-        )}
-        {mode === "stockRanking" && (
-          <Box sx={{ mt: 1 }}>
-            <AIRankingMain selectedReport={selectedRankingReport} />
-          </Box>
-        )}
+      <Box sx={{ mt: 2, mx: "auto" }}>
+        <AIRankingMain selectedReport={selectedRankingReport} />
       </Box>
     </Container>
   );
