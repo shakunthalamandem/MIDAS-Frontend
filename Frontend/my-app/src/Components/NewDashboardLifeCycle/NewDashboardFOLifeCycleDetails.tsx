@@ -70,10 +70,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     const currentTab = tabItems[tabValue];
     if (!currentTab) return;
 
-    const writeUpNewIndex = tabItems.findIndex(
-      (item) => item.label === "Write Up New"
-    );
-
     const firstNonWriteupIndex = tabItems.findIndex(
       (item) => !item.requiresWriteup
     );
@@ -85,12 +81,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       }
     }
 
-    // CASE 2: Writeup becomes available again
-    if (writeupEnabled) {
-      if (writeUpNewIndex !== -1 && tabValue !== writeUpNewIndex) {
-        setTabValue(writeUpNewIndex);
-      }
-    }
+    // When writeup is available, do not auto-switch tabs.
   }, [writeupEnabled, tabItems, tabValue]);
 
   React.useEffect(() => {
