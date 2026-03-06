@@ -8,7 +8,9 @@ import {
   Box,
   Paper,
   CircularProgress,
-  Button
+  Button,
+  Snackbar,
+  Alert
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import EditIcon from "@mui/icons-material/Edit"
@@ -25,6 +27,11 @@ import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import 'react-quill/dist/quill.snow.css'
 import { BasicDealDetails, WriteupRatings } from "../types/DealInformation"
+import {
+  clampHtmlToWordLimit,
+  countWordsFromHtml,
+  getWordLimitStats
+} from "../utils/wordLimit"
 
 /* ===================== TYPES ===================== */
 
@@ -97,6 +104,17 @@ const quillFormats = [
 const SINGLE_FIELD_SECTIONS: Array<keyof WriteUpData> = [
   "key_management_personnel"
 ]
+
+const SECTION_WORD_LIMITS: Partial<Record<keyof WriteUpData, number>> = {
+  business_overview: 250,
+  differentiated_summary: 400,
+  concerns: 250,
+  principal_stockholders_preipo: 150,
+  key_management_personnel: 150
+}
+
+const getWordCountForSection = (values: string[]) =>
+  values.reduce((total, item) => total + countWordsFromHtml(item), 0)
 
 const parseSectionRating = (value?: number | string | null) => {
   if (value === undefined || value === null) return null
@@ -212,6 +230,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
   )
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [wordLimitToastOpen, setWordLimitToastOpen] = useState(false)
 
   /* ===================== FETCH ===================== */
 
@@ -277,8 +296,18 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
     const copy = { ...updatedData }
     const sectionArray = [...(((copy[section] as string[]) ?? []))]
+    const sectionLimit = SECTION_WORD_LIMITS[section]
 
     if (SINGLE_FIELD_SECTIONS.includes(section)) {
+      if (sectionLimit) {
+        const clampedValue = clampHtmlToWordLimit(value, sectionLimit)
+        if (clampedValue !== value) {
+          setWordLimitToastOpen(true)
+        }
+        copy[section] = [clampedValue]
+        setUpdatedData(copy)
+        return
+      }
       copy[section] = [value]
       setUpdatedData(copy)
       return
@@ -288,8 +317,25 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
       return
     }
 
-    sectionArray[index] = value
-    copy[section] = sectionArray
+    if (sectionLimit) {
+      const currentItemWords = countWordsFromHtml(sectionArray[index] ?? "")
+      const totalSectionWords = getWordCountForSection(sectionArray)
+      const otherItemsWords = Math.max(totalSectionWords - currentItemWords, 0)
+      const availableWordsForItem = Math.max(sectionLimit - otherItemsWords, 0)
+      const clampedValue = clampHtmlToWordLimit(value, availableWordsForItem)
+      if (clampedValue !== value) {
+        setWordLimitToastOpen(true)
+      }
+      const nextSectionArray = [...sectionArray]
+      nextSectionArray[index] = clampedValue
+      copy[section] = nextSectionArray
+      setUpdatedData(copy)
+      return
+    }
+
+    const nextSectionArray = [...sectionArray]
+    nextSectionArray[index] = value
+    copy[section] = nextSectionArray
     setUpdatedData(copy)
   }
 
@@ -415,9 +461,29 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     return sectionArray
   }
 
+  const getSectionWordStats = (section: keyof WriteUpData) => {
+    const sectionLimit = SECTION_WORD_LIMITS[section]
+    if (!sectionLimit) return null
+
+    const sectionValues = getSectionData(section)
+    return getWordLimitStats(getWordCountForSection(sectionValues), sectionLimit)
+  }
+
+  const handleBusinessOverviewChange = (value: string) => {
+    const sectionLimit = SECTION_WORD_LIMITS.business_overview ?? 250
+    const clampedValue = clampHtmlToWordLimit(value, sectionLimit)
+    if (clampedValue !== value) {
+      setWordLimitToastOpen(true)
+    }
+    setBusinessOverviewDraft(clampedValue)
+  }
+
   /* ===================== RENDER HELPERS ===================== */
 
   const renderSectionContent = (section: keyof WriteUpData, data: string[]) => {
+    const sectionWordStats = getSectionWordStats(section)
+    const disableAddPoint = Boolean(sectionWordStats?.isAtLimit)
+
     if (SINGLE_FIELD_SECTIONS.includes(section)) {
       const value = data[0] ?? ""
       return editMode === section ? (
@@ -456,6 +522,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               size="small"
               onClick={() => handleAddPoint(section, index)}
               aria-label="add-item"
+              disabled={disableAddPoint}
             >
               <AddIcon fontSize="small" />
             </IconButton>
@@ -514,6 +581,11 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
   const businessOverviewRatingText =
     businessOverviewRating !== null ? formatRating(businessOverviewRating) : null
+
+  const businessOverviewWordStats = getWordLimitStats(
+    countWordsFromHtml(businessOverviewDraft),
+    SECTION_WORD_LIMITS.business_overview ?? 250
+  )
 
   return (
     <Paper
@@ -587,10 +659,24 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         </Box>
 
         {businessOverviewEditing ? (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: businessOverviewWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+              }}
+            >
+              Words left: {businessOverviewWordStats.remaining}/{businessOverviewWordStats.limit}
+            </Typography>
+          </Box>
+        ) : null}
+
+        {businessOverviewEditing ? (
           <ReactQuill
             theme="snow"
             value={businessOverviewDraft}
-            onChange={setBusinessOverviewDraft}
+            onChange={handleBusinessOverviewChange}
             modules={quillModules}
             formats={quillFormats}
           />
@@ -609,7 +695,10 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           gap: 2
         }}
       >
-        {ACCORDION_SECTIONS.map(({ section, title,  }) => (
+        {ACCORDION_SECTIONS.map(({ section, title }) => {
+          const sectionWordStats = getSectionWordStats(section)
+
+          return (
           <Accordion
             key={section}
             defaultExpanded={pdfMode}
@@ -637,19 +726,11 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               <Box
                 display="flex"
                 alignItems="center"
-                justifyContent="center"
-                gap={1.5}
+                justifyContent="space-between"
+                gap={1}
                 width="100%"
+                pr={!pdfMode ? 1 : 0}
               >
-                {/* <Box
-                  sx={{
-                    color: "#124180",
-                    display: "flex",
-                    alignItems: "center"
-                  }}
-                >
-                  {icon}
-                </Box> */}
                 <Typography
                   fontWeight={700}
                   color="#124180"
@@ -657,6 +738,17 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 >
                   {title}
                 </Typography>
+                {sectionWordStats && editMode === section ? (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 600,
+                      color: sectionWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+                    }}
+                  >
+                    Words left: {sectionWordStats.remaining}/{sectionWordStats.limit}
+                  </Typography>
+                ) : null}
               </Box>
 
               {!pdfMode && (
@@ -700,8 +792,24 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               )}
             </AccordionDetails>
           </Accordion>
-        ))}
+          )
+        })}
       </Box>
+      <Snackbar
+        open={wordLimitToastOpen}
+        autoHideDuration={1800}
+        onClose={() => setWordLimitToastOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="warning"
+          variant="filled"
+          onClose={() => setWordLimitToastOpen(false)}
+          sx={{ fontSize: 12, py: 0 }}
+        >
+          You have reached your word limit.
+        </Alert>
+      </Snackbar>
     </Paper>
   )
 }

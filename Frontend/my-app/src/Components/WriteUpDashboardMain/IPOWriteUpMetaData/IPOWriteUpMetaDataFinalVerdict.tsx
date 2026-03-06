@@ -7,7 +7,9 @@ import {
   IconButton,
   Slider,
   Stack,
-  Typography
+  Typography,
+  Snackbar,
+  Alert
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
@@ -16,6 +18,11 @@ import { BasicDealDetails } from "../types/DealInformation"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
+import {
+  clampHtmlToWordLimit,
+  countWordsFromHtml,
+  getWordLimitStats
+} from "../utils/wordLimit"
 
 const quillModules = {
   toolbar: [
@@ -36,6 +43,8 @@ const quillFormats = [
   "bullet",
   "link"
 ]
+
+const INVESTMENT_SUMMARY_WORD_LIMIT = 200
 
 interface IPOWriteUpMetaDataFinalVerdictProps {
   basicDealDetails: BasicDealDetails
@@ -60,6 +69,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
 
   const [draftFinalVerdictText, setDraftFinalVerdictText] = useState("")
   const [draftSectionScores, setDraftSectionScores] = useState<Record<string, number>>({})
+  const [wordLimitToastOpen, setWordLimitToastOpen] = useState(false)
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -274,6 +284,15 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
     setSaveError(null)
   }
 
+  const handleDraftFinalVerdictChange = (value: string) => {
+    const clampedValue = clampHtmlToWordLimit(value, INVESTMENT_SUMMARY_WORD_LIMIT)
+    if (clampedValue !== value) {
+      setWordLimitToastOpen(true)
+    }
+
+    setDraftFinalVerdictText(clampedValue)
+  }
+
   if (!loading && fetchError) {
     return (
       <NoDataNotice
@@ -282,6 +301,11 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
       />
     )
   }
+
+  const finalVerdictWordStats = getWordLimitStats(
+    countWordsFromHtml(editMode ? draftFinalVerdictText : finalVerdictText),
+    INVESTMENT_SUMMARY_WORD_LIMIT
+  )
 
   return (
     <Box
@@ -383,6 +407,19 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
           <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ width: "100%" }}>
             <Box flex={1}>
               {editMode ? (
+                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0.75 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 600,
+                      color: finalVerdictWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+                    }}
+                  >
+                    Words left: {finalVerdictWordStats.remaining}/{finalVerdictWordStats.limit}
+                  </Typography>
+                </Box>
+              ) : null}
+              {editMode ? (
                 <Box
                   sx={{
                     background: "#ffffff",
@@ -394,7 +431,7 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                   <ReactQuill
                     theme="snow"
                     value={draftFinalVerdictText}
-                    onChange={setDraftFinalVerdictText}
+                    onChange={handleDraftFinalVerdictChange}
                     modules={quillModules}
                     formats={quillFormats}
                   />
@@ -523,6 +560,21 @@ const IPOWriteUpMetaDataFinalVerdict: React.FC<IPOWriteUpMetaDataFinalVerdictPro
                 {metadata.final_verdict_note}
               </Typography>
             )}
+            <Snackbar
+              open={wordLimitToastOpen}
+              autoHideDuration={1800}
+              onClose={() => setWordLimitToastOpen(false)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <Alert
+                severity="warning"
+                variant="filled"
+                onClose={() => setWordLimitToastOpen(false)}
+                sx={{ fontSize: 12, py: 0 }}
+              >
+                You have reached your word limit.
+              </Alert>
+            </Snackbar>
           </Stack>
         </Grid>
       </Grid>

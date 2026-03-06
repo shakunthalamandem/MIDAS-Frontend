@@ -12,7 +12,9 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Snackbar,
+  Alert
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
@@ -25,6 +27,11 @@ import { motion } from "framer-motion"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import AddIcon from "@mui/icons-material/Add"
+import {
+  clampHtmlToWordLimit,
+  countWordsFromHtml,
+  getWordLimitStats
+} from "../utils/wordLimit"
 
 /* -------------------- TYPES -------------------- */
 
@@ -58,6 +65,8 @@ const criteriaList = [
   { label: "ESG Focus", key: "esg_focus" },
   { label: "M&A Opportunities", key: "ma_opportunities" }
 ]
+
+const KEY_METRIC_NOTES_WORD_LIMIT = 100
 
 interface CriteriaItem {
   label: string
@@ -129,6 +138,7 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
   const [editedMetrics, setEditedMetrics] = useState<KeyMetricsResponse>({})
   const [dynamicCriteria, setDynamicCriteria] = useState<CriteriaItem[]>([])
   const [removedKeys, setRemovedKeys] = useState<Set<string>>(new Set())
+  const [wordLimitToastOpen, setWordLimitToastOpen] = useState(false)
 
   const apiUrl = process.env.REACT_APP_API_URL
   const token = localStorage.getItem("access_token")
@@ -276,6 +286,33 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
         category: prev[key]?.category ?? metrics[key]?.category ?? ""
       }
     }))
+  }
+
+  const handleMetricNotesChange = (
+    key: string,
+    value: string,
+    color: string | null | undefined
+  ) => {
+    setEditedMetrics((prev) => {
+      const clampedValue = clampHtmlToWordLimit(value, KEY_METRIC_NOTES_WORD_LIMIT)
+      if (clampedValue !== value) {
+        setWordLimitToastOpen(true)
+      }
+
+      return {
+        ...prev,
+        [key]: {
+          ...prev[key],
+          label:
+            prev[key]?.label ??
+            metrics[key]?.label ??
+            criteriaList.find((c) => c.key === key)?.label ??
+            key,
+          category: clampedValue,
+          color
+        }
+      }
+    })
   }
 
   const handleAddRow = () => {
@@ -583,6 +620,10 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
                 original.label ??
                 item.label ??
                 item.key
+              const notesWordStats = getWordLimitStats(
+                countWordsFromHtml(value),
+                KEY_METRIC_NOTES_WORD_LIMIT
+              )
 
               return (
                 <TableRow
@@ -662,30 +703,36 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
 
                   <TableCell>
                     {editMode ? (
-                      <TextField
-                        fullWidth
-                        size="small"
-                        value={value}
-                        onChange={(e) =>
-                          setEditedMetrics((prev) => ({
-                            ...prev,
-                            [item.key]: {
-                              ...prev[item.key],
-                              category: e.target.value,
-                              color
-                            }
-                          }))
-                        }
-                        placeholder="Enter notes..."
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
-                            background: "#ffffff",
-                            "&:hover fieldset": {
-                              borderColor: "#124180"
-                            }
+                      <Box>
+                        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontWeight: 600,
+                              color: notesWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+                            }}
+                          >
+                            Words left: {notesWordStats.remaining}/{notesWordStats.limit}
+                          </Typography>
+                        </Box>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={value}
+                          onChange={(e) =>
+                            handleMetricNotesChange(item.key, e.target.value, color)
                           }
-                        }}
-                      />
+                          placeholder="Enter notes..."
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              background: "#ffffff",
+                              "&:hover fieldset": {
+                                borderColor: "#124180"
+                              }
+                            }
+                          }}
+                        />
+                      </Box>
                     ) : (
                       <Typography variant="body2" sx={{ color: "#000000" }}>
                         {value || "--"}
@@ -735,6 +782,21 @@ const IPOWriteUpMetaDataKeyMetricsNew: React.FC<
             </Typography>
           </Box>
         )}
+        <Snackbar
+          open={wordLimitToastOpen}
+          autoHideDuration={1800}
+          onClose={() => setWordLimitToastOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            severity="warning"
+            variant="filled"
+            onClose={() => setWordLimitToastOpen(false)}
+            sx={{ fontSize: 12, py: 0 }}
+          >
+            You have reached your word limit.
+          </Alert>
+        </Snackbar>
       </Box>
     </motion.div>
   )
