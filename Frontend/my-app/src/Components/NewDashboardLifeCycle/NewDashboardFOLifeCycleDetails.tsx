@@ -38,6 +38,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
   const appliedTabRef = React.useRef<string | null>(null);
+  const lastSelectedTickerRef = React.useRef<string | null>(null);
 
   const activePayload = selectedOption || payload;
   const writeupEnabled =
@@ -70,10 +71,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     const currentTab = tabItems[tabValue];
     if (!currentTab) return;
 
-    const writeUpNewIndex = tabItems.findIndex(
-      (item) => item.label === "Write Up New"
-    );
-
     const firstNonWriteupIndex = tabItems.findIndex(
       (item) => !item.requiresWriteup
     );
@@ -85,12 +82,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       }
     }
 
-    // CASE 2: Writeup becomes available again
-    if (writeupEnabled) {
-      if (writeUpNewIndex !== -1 && tabValue !== writeUpNewIndex) {
-        setTabValue(writeUpNewIndex);
-      }
-    }
+    // When writeup is available, do not auto-switch tabs.
   }, [writeupEnabled, tabItems, tabValue]);
 
   React.useEffect(() => {
@@ -102,6 +94,30 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       setTabValue(nextIndex);
     }
   }, [targetTabLabel, tabItems]);
+
+  React.useEffect(() => {
+    const nextTicker = activePayload?.ticker ?? null;
+    if (!nextTicker) return;
+    if (lastSelectedTickerRef.current === nextTicker) return;
+
+    lastSelectedTickerRef.current = nextTicker;
+
+    const writeUpNewIndex = tabItems.findIndex(
+      (item) => item.label === "Write Up New"
+    );
+    const firstNonWriteupIndex = tabItems.findIndex(
+      (item) => !item.requiresWriteup
+    );
+
+    if (writeupEnabled && writeUpNewIndex !== -1) {
+      setTabValue(writeUpNewIndex);
+      return;
+    }
+
+    if (!writeupEnabled && firstNonWriteupIndex !== -1) {
+      setTabValue(firstNonWriteupIndex);
+    }
+  }, [activePayload?.ticker, tabItems, writeupEnabled]);
 
   if (!payload) {
     return (
