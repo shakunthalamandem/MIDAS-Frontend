@@ -113,7 +113,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
       minHeight: inline ? 28 : 32,
       fontWeight: 700,
       fontSize: inline ? "0.72rem" : "0.78rem",
-      color: "#5c6680",
+      color: "#000000",
       backgroundColor: "transparent",
       transition: "all 0.2s ease",
     },

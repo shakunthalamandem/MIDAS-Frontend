@@ -41,6 +41,7 @@ import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -393,6 +394,11 @@ const NavbarMain: React.FC = () => {
                   label: "Risk and P&L Attribution ",
                   path: "/risk_report_pnl_report",
                   icon: <AssessmentOutlinedIcon fontSize="small" />,
+                },
+                {
+                  label: "Risk Triggers",
+                  path: "/risk_triggers",
+                  icon: <WarningAmberOutlinedIcon fontSize="small" />,
                 },
                 {
                   label: "Daily Note to Funds",

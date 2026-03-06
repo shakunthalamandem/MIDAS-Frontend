@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import type { HeadlinePnl } from "./types";
-import { formatCurrency, formatFullCurrency } from "./utils";
+import { formatCurrencyAsK, formatFullCurrency } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
@@ -69,7 +69,7 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
                   className={isSelected ? "" : `pnl-card-value pnl-card-value--${modifier}`}
                   sx={isSelected ? { fontSize: 20, fontWeight: 700, color: "#fff" } : undefined}
                 >
-                  {value === null ? "--" : formatCurrency(value)}
+                  {value === null ? "--" : formatCurrencyAsK(value)}
                 </Box>
                 <Box
                   component="span"

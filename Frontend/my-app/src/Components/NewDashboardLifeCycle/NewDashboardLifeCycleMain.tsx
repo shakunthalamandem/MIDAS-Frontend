@@ -581,7 +581,7 @@ const NewDealsLifecycleCards: React.FC = () => {
                                     Upcoming{" "}
                     <Box component="span" sx={{ color: "#dc2626" }}>
                       {selectedRegion} {selectedDealType}
-                    </Box>{" "} Deals Pricing Date Not Available (Not Yet Listed)
+                    </Box>{" "} Deals Pricing Date Not Available
                   </Typography>
                 </Container>
                 {upcomingTbaRows.length > 0 ? (
