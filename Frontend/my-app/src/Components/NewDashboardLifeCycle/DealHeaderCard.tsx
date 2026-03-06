@@ -65,7 +65,6 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
           </Button>
         </Box>
 
-        {/* Center */}
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Box
             sx={{
