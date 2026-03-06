@@ -68,7 +68,7 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
     {
       actionLabel: "ML Model",
       label: "ML",
-      value: mlPredAvailable === true ? "Complete" : "Pending",
+      value: mlPredAvailable === true ? "Completed": "Pending",
       positive: mlPredAvailable === true,
       actionEnabled: true,
     },
