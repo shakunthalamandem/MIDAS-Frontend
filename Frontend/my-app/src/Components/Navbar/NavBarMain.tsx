@@ -541,7 +541,7 @@ const NavbarMain: React.FC = () => {
                   onClick={() => navigate("/deal_meeting_notes")}
                 />
 
-                <NotificationMenu />
+                {/* <NotificationMenu /> */}
               </>
             )}
 
