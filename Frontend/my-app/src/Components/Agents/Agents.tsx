@@ -33,7 +33,21 @@ const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
-    title: "AI Unsupervised (IPO)",
+    title: "Portfolio Agent",
+    description:
+      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
+    schedule: "Once a Week on Monday",
+    route: "/ai_portfolio_review",
+  },
+  {
+    title: "IPO Market Agent",
+    description:
+      "AI-generated ranking of the most promising IPOs from the last 30 days based on data and market signals.",
+    schedule: "Weekly Once",
+    route: "/last_30_days_ai_ranking",
+  },
+  {
+    title: "AI Model",
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
     schedule: "One Time for each IPO",
@@ -46,26 +60,13 @@ const activeAgents: AgentConfig[] = [
     schedule: "Runs Daily",
     route: "/ai_sentiment_view",
   },
-  {
-    title: "Individual Stock Analysis",
-    description:
-      "AI-generated portfolio analysis reports delivered through email with actionable insights.",
-    schedule: "Daily 1:30 AM EST",
-  },
-  {
-    title: "AI Portfolio Review",
-    description:
-      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
-    schedule: "Once a Week on Monday",
-    route: "/ai_portfolio_review",
-  },
-  {
-    title: "Last 30 Days IPO AI Ranking",
-    description:
-      "AI-generated ranking of the most promising IPOs from the last 30 days.",
-    schedule: "Weekly Once",
-    route: "/last_30_days_ai_ranking",
-  },
+  // {
+  //   title: "Individual Stock Analysis",
+  //   description:
+  //     "AI-generated portfolio analysis reports delivered through email with actionable insights.",
+  //   schedule: "Daily 1:30 AM EST",
+  // },
+
 ];
 
 const comingSoonAgents = [
@@ -275,7 +276,7 @@ const Agents: React.FC = () => {
                     letterSpacing: 0.5,
                   }}
                 >
-                  Beta 
+                  Beta
                 </Typography>
               </Box>
               <Typography variant="body1" color="#113591">
@@ -339,7 +340,8 @@ const Agents: React.FC = () => {
                   "&:hover": { backgroundColor: "#4a24d9" },
                 }}
               >
-                View Details
+                Explore Insights
+
               </Button>
             ) : null;
 

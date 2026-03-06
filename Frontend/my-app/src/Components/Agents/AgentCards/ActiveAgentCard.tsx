@@ -182,7 +182,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           </Typography>
           <Chip
             icon={<EmailOutlinedIcon />}
-            label={state.email ? "Email on run" : "Email disabled"}
+            label={state.email ? "Send Email" : "Email disabled"}
             color={state.email ? "success" : "default"}
             variant="outlined"
             sx={{ borderRadius: 3, textTransform: "none" }}
