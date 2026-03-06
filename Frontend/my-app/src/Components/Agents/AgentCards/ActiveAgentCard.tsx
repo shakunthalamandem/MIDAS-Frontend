@@ -12,6 +12,7 @@ import {
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import dayjs from "dayjs";
 
 export interface AgentConfig {
   title: string;
@@ -33,6 +34,7 @@ export interface ActiveAgentCardProps {
   onRunSentimentClick?: () => void;
   children?: React.ReactNode;
   footerAction?: React.ReactNode;
+  lastUpdatedAt?: string | null;
 }
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
@@ -43,10 +45,21 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   onRunSentimentClick,
   children,
   footerAction,
+  lastUpdatedAt,
 }) => {
   const statusLabel = state.enabled ? "Active" : "Paused";
   const statusColor = state.enabled ? "success" : "warning";
   const displayIndex = agentIndex ?? "-";
+
+  const formattedUpdatedAt = lastUpdatedAt
+    ? new Date(lastUpdatedAt).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        // hour: "2-digit",
+        // minute: "2-digit",
+      })
+    : dayjs().format("DD MMM YYYY");
 
   return (
     <Paper
@@ -84,7 +97,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           >
             {displayIndex}
           </Box>
-          <Typography variant="h6" sx={{color: "#481f93", fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ color: "#481f93", fontWeight: 700 }}>
             {agent.title}
           </Typography>
         </Stack>
@@ -188,10 +201,22 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
             sx={{ borderRadius: 3, textTransform: "none" }}
           />
         </Stack>
+
+        <Stack direction="row" alignItems="flex-start" spacing={1} flexWrap="wrap">
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
+          >
+            Last Updated:
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#2e3035" }}>
+            {formattedUpdatedAt}
+          </Typography>
+        </Stack>
       </Stack>
 
       {footerAction && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end"}}>
           {footerAction}
         </Box>
       )}
