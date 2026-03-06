@@ -164,7 +164,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               })
             }
             SearchComponent={
-              <Box sx={{ width: { xs: "100%", md: 320 } }}>
+              <Box sx={{ width: { xs: "100%", md: 215 } }}>
                 <NewDashbaordIPOTickerList
                   selectedTicker={activePayload.ticker}
                   onSelect={setSelectedOption}
