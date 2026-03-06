@@ -27,6 +27,42 @@ type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
 };
 
+type DealBotCache = {
+  question: string;
+  blocks: Block[];
+};
+
+const getDealBotStorageKey = (details: DealBotBasicDealDetails) => {
+  const parts = [
+    details.deal_id ?? "",
+    details.unique_deal_id ?? "",
+    details.ticker ?? "",
+    details.pricing_date ?? "",
+    details.deal_type ?? "",
+  ];
+  return `dealbot:${parts.join("|")}`;
+};
+
+const readDealBotCache = (key: string): DealBotCache | null => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DealBotCache;
+    if (!parsed || !Array.isArray(parsed.blocks)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const writeDealBotCache = (key: string, cache: DealBotCache) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(cache));
+  } catch {
+    // Ignore storage write failures (e.g., private mode or quota).
+  }
+};
+
 const toBlocks = (payload: unknown): Block[] => {
   if (!payload) return [];
   if (Array.isArray(payload)) {
@@ -87,14 +123,30 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [queryError, setQueryError] = React.useState<string | null>(null);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
+  const storageKey = React.useMemo(
+    () => getDealBotStorageKey(basicDealDetails ?? {}),
+    [
+      basicDealDetails.deal_id,
+      basicDealDetails.unique_deal_id,
+      basicDealDetails.ticker,
+      basicDealDetails.pricing_date,
+      basicDealDetails.deal_type,
+    ]
+  );
   const friendlyErrorMessage = React.useMemo(
     () => "Something went wrong. Please rerun to try again.",
     []
   );
 
   React.useEffect(() => {
-    setBlocks([]);
-    setQuestion("");
+    const cached = readDealBotCache(storageKey);
+    if (cached) {
+      setQuestion(cached.question ?? "");
+      setBlocks(cached.blocks ?? []);
+    } else {
+      setQuestion("");
+      setBlocks([]);
+    }
     setQueryError(null);
     setApiData(null);
 
@@ -158,6 +210,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     return () => controller.abort();
   }, [
     apiUrl,
+    storageKey,
     basicDealDetails.deal_id,
     basicDealDetails.deal_type,
     basicDealDetails.pricing_date,
@@ -203,7 +256,9 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       }
 
       const payload = await res.json();
-      setBlocks(toBlocks(payload));
+      const nextBlocks = toBlocks(payload);
+      setBlocks(nextBlocks);
+      writeDealBotCache(storageKey, { question: trimmed, blocks: nextBlocks });
     } catch (error: any) {
       console.error("Deal query threw", error);
       setQueryError(friendlyErrorMessage);
