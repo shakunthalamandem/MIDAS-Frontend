@@ -39,6 +39,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const targetTabLabel = (location.state as { targetTabLabel?: string } | null)?.targetTabLabel;
   const [selectedOption, setSelectedOption] = React.useState<any | null>(null);
   const [tabValue, setTabValue] = React.useState(0);
+  const [showDealBot, setShowDealBot] = React.useState(false);
   const appliedTabRef = React.useRef<string | null>(null);
 
   const activePayload = selectedOption || payload;
@@ -55,9 +56,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
-       {
-        label: "Deal Bot",
-      },
       { label: "Peer Deals Performance" },
       { label: "AI - Sentiment View" },
       { label: "AI based on previous 30 deals" },
@@ -87,10 +85,16 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   React.useEffect(() => {
     if (!targetTabLabel) return;
     if (appliedTabRef.current === targetTabLabel) return;
+    if (targetTabLabel === "Deal Bot") {
+      appliedTabRef.current = targetTabLabel;
+      setShowDealBot(true);
+      return;
+    }
     const nextIndex = tabItems.findIndex((item) => item.label === targetTabLabel);
     const isWriteupTab = tabItems[nextIndex]?.requiresWriteup;
     if (nextIndex >= 0 && !(isWriteupTab && !writeupEnabled)) {
       appliedTabRef.current = targetTabLabel;
+      setShowDealBot(false);
       setTabValue(nextIndex);
     }
   }, [targetTabLabel, tabItems, writeupEnabled]);
@@ -149,6 +153,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <DealHeaderCard
             activePayload={activePayload}
             formatDate={formatDate}
+            onDealBotClick={() => setShowDealBot((prev) => !prev)}
+            isDealBotActive={showDealBot}
             onBack={() =>
               navigate("/deals/new_dashboard", {
                 state: {
@@ -170,6 +176,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Tabs
             value={tabValue}
             onChange={(_: React.SyntheticEvent, newValue: number) => {
+              setShowDealBot(false);
               setTabValue(newValue);
             }}
             variant="scrollable"
@@ -235,7 +242,17 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+          {showDealBot ? (
+            <DealBot
+              basicDealDetails={{
+                deal_id: activePayload.deal_id,
+                unique_deal_id: activePayload.unique_deal_id,
+                ticker: activePayload.ticker,
+                pricing_date: activePayload.pricing_date,
+                deal_type: activePayload.deal_type,
+              }}
+            />
+          ) : tabItems[tabValue]?.label === "Trading Dynamics" ? (
             <TradingSignalsMain
               ticker={activePayload.ticker}
               trade_date={activePayload.pricing_date}
@@ -316,19 +333,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               dealType={activePayload.deal_type}
             />
           ) : (
-            tabItems[tabValue]?.label === "Deal Bot" ? (
-              <DealBot
-                basicDealDetails={{
-                  deal_id: activePayload.deal_id,
-                  unique_deal_id: activePayload.unique_deal_id,
-                  ticker: activePayload.ticker,
-                  pricing_date: activePayload.pricing_date,
-                  deal_type: activePayload.deal_type,
-                }}
-              />
-            ) : (
-              <PageUnderDevelopment />
-            )
+            <PageUnderDevelopment />
           )}
         </Box>
       </Paper>

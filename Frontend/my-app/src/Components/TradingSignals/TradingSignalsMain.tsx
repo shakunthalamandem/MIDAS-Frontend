@@ -52,7 +52,7 @@ const TradingSignalsMain: React.FC<Props> = ({ ticker, trade_date }) => {
             <Typography sx={{ fontWeight: 800, fontSize: 15, color: "#0F172A", lineHeight: 1.2 }}>
               Trading Dynamics
             </Typography>
-            <Typography sx={{ fontSize: 12, color: "#64748B", fontWeight: 500 }}>
+            <Typography sx={{ fontSize: 13.5, color: "#64748B", fontWeight: 600 }}>
               AI signals, ML predictions, sentiment & price charts
             </Typography>
           </Box>
