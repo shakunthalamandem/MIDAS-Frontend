@@ -106,7 +106,7 @@ const NewDashbaordIPOTickerList: React.FC<
   }, [options]);
 
   return (
-    <Box sx={{ minWidth: { xs: "100%", sm: 320 } }}>
+    <Box sx={{ width: "100%", minWidth: 0 }}>
       <Autocomplete
         size="small"
         options={sortedOptions}
