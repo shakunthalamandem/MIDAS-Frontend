@@ -200,31 +200,31 @@ const RiskDashboard: React.FC = () => {
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
-          triggersButton={
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => {
-                const fund = selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds[0] || "";
-                navigate(`/risk_triggers?fund=${encodeURIComponent(fund)}&date=${encodeURIComponent(selectedDate)}`);
-              }}
-              sx={{
-                borderRadius: "20px",
-                background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: "12px",
-                textTransform: "none",
-                px: 2.5,
-                py: 0.8,
-                "&:hover": {
-                  background: "linear-gradient(135deg, #c0392b 0%, #96281b 100%)",
-                },
-              }}
-            >
-              Triggers
-            </Button>
-          }
+          // triggersButton={
+          //   <Button
+          //     variant="contained"
+          //     size="small"
+          //     onClick={() => {
+          //       const fund = selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds[0] || "";
+          //       navigate(`/risk_triggers?fund=${encodeURIComponent(fund)}&date=${encodeURIComponent(selectedDate)}`);
+          //     }}
+          //     sx={{
+          //       borderRadius: "20px",
+          //       background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
+          //       color: "#fff",
+          //       fontWeight: 700,
+          //       fontSize: "12px",
+          //       textTransform: "none",
+          //       px: 2.5,
+          //       py: 0.8,
+          //       "&:hover": {
+          //         background: "linear-gradient(135deg, #c0392b 0%, #96281b 100%)",
+          //       },
+          //     }}
+          //   >
+          //     Triggers
+          //   </Button>
+          // }
           exportButton={
             allDataReady ? (
               <RiskDashboardPDFExporter

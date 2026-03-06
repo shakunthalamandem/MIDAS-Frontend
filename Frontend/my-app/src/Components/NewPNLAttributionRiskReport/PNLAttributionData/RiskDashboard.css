@@ -263,7 +263,7 @@
 }
 
 .risk-card-label {
-  font-size: 14px;
+  font-size: 16px;
   color: #000000;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -350,7 +350,7 @@
 }
 
 .risk-card-hover-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
@@ -421,7 +421,7 @@
 }
 
 .pnl-card-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #000000;
 }
@@ -573,7 +573,7 @@
 }
 
 .index-card-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   margin-bottom: 6px;
 }
@@ -1127,7 +1127,7 @@
 .tb-pnl-th {
   padding: 10px 16px;
   text-align: center;
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
@@ -1167,6 +1167,7 @@
   text-align: center;
   color: #1e293b;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .tb-pnl-td--rank {
@@ -1180,7 +1181,7 @@
 }
 
 .tb-pnl-td--issuer {
-  color: #475569;
+  color: #030506;
   font-weight: 400;
   max-width: 200px;
   overflow: hidden;

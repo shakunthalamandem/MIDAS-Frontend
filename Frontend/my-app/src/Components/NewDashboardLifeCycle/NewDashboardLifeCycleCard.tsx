@@ -3,16 +3,12 @@ import {
   Box,
   Card,
   CardContent,
-  Chip,
-  Grid,
-  IconButton,
-  Stack,
+  Divider,
   Typography,
 } from "@mui/material";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import RadioButtonUncheckedOutlinedIcon from "@mui/icons-material/RadioButtonUncheckedOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { NewDashboardLifeCycleCardTag } from "./NewDashboardLifeCycleUtils";
 
 export type NewDashboardLifeCycleCardMeta = {
@@ -42,61 +38,102 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
   onViewDetails,
   onActionClick,
 }) => {
-  const barMeta = meta.filter((item) =>
-    /size|price range|valuation/i.test(item.label)
-  );
-  const dateMeta = meta.filter(
-    (item) => /date/i.test(item.label) && !barMeta.includes(item)
-  );
-  const tileMeta = meta.filter(
-    (item) => !barMeta.includes(item) && !dateMeta.includes(item)
-  );
-  const writeupStatus =
-    writeupAvailable === true
-      ? "Write Up Ready"
-      : writeupAvailable === false
-      ? "Write Up Not Ready"
-      : null;
+  const pickMeta = (pattern: RegExp, fallbackLabel: string) =>
+    meta.find((item) => pattern.test(item.label)) ?? {
+      label: fallbackLabel,
+      value: "TBA",
+      icon: null,
+    };
 
-  const actionCards = [
-    {
-      label: "Write Up",
-      icon: <DescriptionOutlinedIcon sx={{ fontSize: 16 }} />,
-      bg: "#eeeffcff",
-      tone: "#4b5bff",
-      status: writeupStatus,
-    },
-    {
-      label: "ML Model",
-      icon: <PsychologyOutlinedIcon sx={{ fontSize: 16 }} />,
-      tone: "#2e7fb0",
-            bg: "#eeeffcff",
-
-      showTick: mlPredAvailable === true,
-    },
-    // { label: "AI Unsupervised", icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eaf5faff", tone: "#2e7fb0", },
-    // { label: "AI Sentiment View", icon: <MemoryOutlinedIcon sx={{ fontSize: 16 }} />, bg: "#eeeffcff", tone: "#4b5bff",  },
+  const displayMeta: NewDashboardLifeCycleCardMeta[] = [
+    pickMeta(/deal size/i, "Deal Size"),
+    pickMeta(/price range/i, "Price Range"),
+    pickMeta(/pricing date/i, "Pricing Date"),
+    pickMeta(/first trade date|trade date/i, "First Trade Date"),
   ];
+
+  const statusItems = [
+    {
+      actionLabel: "Write Up",
+      label: "Write Up",
+      value:
+        writeupAvailable === true
+          ? "Ready"
+          : writeupAvailable === false
+          ? "Not Ready"
+          : "Pending",
+      positive: writeupAvailable === true,
+      actionEnabled: writeupAvailable === true,
+    },
+    {
+      actionLabel: "ML Model",
+      label: "ML",
+      value: mlPredAvailable === true ? "Complete" : "Pending",
+      positive: mlPredAvailable === true,
+      actionEnabled: true,
+    },
+  ];
+  const sectorText = tags?.[0]?.label?.trim();
+  const onActionItemClick = (
+    actionLabel: string,
+    actionEnabled: boolean,
+    event: React.MouseEvent
+  ) => {
+    event.stopPropagation();
+    if (actionEnabled) {
+      onActionClick?.(actionLabel);
+    }
+  };
+
+  const onActionItemKeyDown = (
+    actionLabel: string,
+    actionEnabled: boolean,
+    event: React.KeyboardEvent
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (actionEnabled) {
+        onActionClick?.(actionLabel);
+      }
+    }
+  };
+
+  const handleViewClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onViewDetails?.();
+  };
+
+  const handleViewKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      onViewDetails?.();
+    }
+  };
 
   return (
     <Card
       elevation={0}
       onClick={onViewDetails}
       sx={{
-        borderRadius: 4,
-        border: "1px solid #e5f0ff",
-        backgroundColor: "#c2dbf0",
-        boxShadow: "0 16px 34px rgba(27, 44, 90, 0.08)",
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: 3,
+        border: "1px solid #d9e4f3",
+        backgroundColor: "#ffffff",
+        boxShadow: "0 10px 20px rgba(15, 33, 72, 0.1)",
         height: "100%",
-        minHeight: { xs: 400, sm: 300 },
-        fontSize: "0.92rem",
+        minHeight: { xs: 365, sm: 380 },
         cursor: onViewDetails ? "pointer" : "default",
-        transition: "transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease",
+        transition:
+          "transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease",
         willChange: "transform, box-shadow",
         "&:hover": onViewDetails
           ? {
-              transform: "translateY(-4px)",
-              boxShadow: "0 22px 40px rgba(27, 44, 90, 0.16)",
+              transform: "translateY(-3px)",
+              borderColor: "#bfd2f0",
+              boxShadow: "0 14px 26px rgba(15, 33, 72, 0.15)",
             }
           : undefined,
         "&:focus-visible": onViewDetails
@@ -108,320 +145,228 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
     >
       <CardContent
         sx={{
+          position: "relative",
+          zIndex: 1,
           display: "flex",
           flexDirection: "column",
-          gap: 1.6,
-          p: { xs: 2.2, sm: 2.6 },
+          gap:3.5,
+          p: { xs: 2, sm: 2.2 },
         }}
       >
-        <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="flex-start">
-          <Box sx={{ minWidth: 0 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                color: "#162048",
-                letterSpacing: 0.2,
-                wordBreak: "break-word",
-                fontSize: "1.05rem",
-              }}
-            >
-              {title}
-            </Typography>
-          </Box>
-          {tags?.length ? (
-            <Stack direction="row" spacing={0.8} flexWrap="wrap" justifyContent="flex-end">
-              {tags.map((tag) => (
-                <Chip
-                  key={tag.label}
-                  label={tag.label}
-                  size="small"
-                  sx={{
-                    bgcolor: tag.bg ?? "#e9edff",
-                    color: tag.color ?? "#3348d0",
-                    fontWeight: 700,
-                    borderRadius: 999,
-                    fontSize: "0.7rem",
-                  }}
-                />
-              ))}
-            </Stack>
-          ) : null}
-        </Stack>
-
-        {subtitle ? (
-          <Box sx={{ width: "100%" }}>
+        <Box sx={{ minWidth: 0, pt: 0.8 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 800,
+              color: "#15284d",
+              letterSpacing: 0.25,
+              wordBreak: "break-word",
+              fontSize: "clamp(1.08rem, 1.55vw, 1.35rem)",
+              lineHeight: 1.15,
+            }}
+          >
+            {title}
+          </Typography>
+          {subtitle ? (
             <Typography
               variant="body2"
               sx={{
-                color: "#000000ff",
-                fontWeight: 300,
-                fontSize: "0.78rem",
+                mt: 0.5,
+                color: "#334f77",
+                fontWeight: 500,
+                fontSize: "0.83rem",
                 wordBreak: "break-word",
+                lineHeight: 1.3,
               }}
             >
               {subtitle}
             </Typography>
-          </Box>
-        ) : null}
+          ) : null}
+          {sectorText ? (
+            <Box
+              sx={{
+                mt: 0.9,
+                display: "inline-flex",
+                alignItems: "center",
+                px: 1.1,
+                py: 0.38,
+                borderRadius: 999,
+                border: "1px solid #d4def0",
+                backgroundColor: "#eef4ff",
+                color: "#2f4f84",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                lineHeight: 1,
+                maxWidth: "100%",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+            >
+              {sectorText}
+            </Box>
+          ) : null}
+        </Box>
 
-        <Grid container spacing={1.2}>
-          {actionCards.map((item) => (
-            <Grid item xs={6} key={item.label}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 0.8,
+          }}
+        >
+          {statusItems.map((item) => {
+            const interactive = Boolean(onActionClick) && item.actionEnabled;
+            return (
               <Box
-                data-label={item.label}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  const isWriteUpAction =
-                    item.label === "Write Up" && writeupAvailable !== true;
-                  if (!isWriteUpAction) {
-                    onActionClick?.(item.label);
-                  }
-                }}
-                onKeyDown={(event) => {
-                  if (!onActionClick) return;
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const isWriteUpAction =
-                      item.label === "Write Up" && writeupAvailable !== true;
-                    if (!isWriteUpAction) {
-                      onActionClick(item.label);
-                    }
-                  }
-                }}
-                role={
-                  onActionClick &&
-                  !(item.label === "Write Up" && writeupAvailable !== true)
-                    ? "button"
-                    : undefined
+                key={item.actionLabel}
+                onClick={(event) =>
+                  onActionItemClick(item.actionLabel, item.actionEnabled, event)
                 }
-                tabIndex={
-                  onActionClick &&
-                  !(item.label === "Write Up" && writeupAvailable !== true)
-                    ? 0
-                    : -1
+                onKeyDown={(event) =>
+                  onActionItemKeyDown(item.actionLabel, item.actionEnabled, event)
                 }
+                role={interactive ? "button" : undefined}
+                tabIndex={interactive ? 0 : -1}
                 sx={{
-                  borderRadius: 2.5,
-                  backgroundColor: item.bg,
-                  // border: `1px solid ${item.border}`,
-                  boxShadow: "0 6px 12px rgba(30, 41, 59, 0.06)",
-                  color: "#0f172a",
-                  p: 0.8,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0.3,
+                  display: "inline-flex",
                   alignItems: "center",
-                  textAlign: "center",
-                  minHeight: 72,
                   justifyContent: "center",
-                  cursor:
-                    item.label === "Write Up" && writeupAvailable !== true
-                      ? "not-allowed"
-                      : onActionClick
-                      ? "pointer"
-                      : "default",
-                  opacity:
-                    item.label === "Write Up" && writeupAvailable !== true
-                      ? 0.65
-                      : 1,
-                  "&:hover":
-                    onActionClick &&
-                    !(item.label === "Write Up" && writeupAvailable !== true)
-                      ? {
-                          boxShadow: "0 10px 18px rgba(30, 41, 59, 0.12)",
-                          bgcolor: "#ceccf3ff",
-                        }
-                      : undefined,
-                    mt:2,
-                    mb:2
+                  gap: 0.4,
+                  px: 0.7,
+                  py: 0.48,
+                  borderRadius: 999,
+                  border: "1px solid #d9e5f4",
+                  backgroundColor: item.positive ? "#eefbf3" : "#f4f7fb",
+                  color: item.positive ? "#0f8a55" : "#5f6f87",
+                  cursor: interactive ? "pointer" : "default",
+                  transition: "all 180ms ease",
+                  "&:hover": interactive
+                    ? {
+                        transform: "translateY(-1px)",
+                        borderColor: "#b5cced",
+                        boxShadow: "0 6px 12px rgba(14, 57, 117, 0.12)",
+                        backgroundColor: "#e8f7ef",
+                      }
+                    : undefined,
                 }}
               >
-                <Box
+                {item.positive ? (
+                  <CheckCircleOutlinedIcon sx={{ fontSize: 17 }} />
+                ) : (
+                  <RadioButtonUncheckedOutlinedIcon sx={{ fontSize: 16 }} />
+                )}
+                <Typography
+                  component="span"
                   sx={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: "50%",
-                    backgroundColor: "#ffffff",
-                    display: "grid",
-                    placeItems: "center",
-                    color: item.tone,
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "#3b4b66",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  {item.icon}
-                </Box>
-                <Typography sx={{ fontWeight: 600, fontSize: "0.82rem" }}>
-                  {item.label}
-                </Typography>
-                {item.status ? (
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: "0.7rem",
-                      color: item.status === "Write Up Ready" ? "#0d883c" : "#991b1b",
-                    }}
-                  >
-                    {item.status}
-                  </Typography>
-                ) : null}
-                {item.showTick ? (
-                  <CheckCircleIcon
-                    sx={{
-                      fontSize: 18,
-                      color: "#03722fff",
-                      mt: 0.3,
-                    }}
-                  />
-                ) : null}
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-
-        {tileMeta.length > 0 ? (
-          <Grid container spacing={1.2}>
-            {tileMeta.map((item) => (
-              <Grid item xs={6} key={item.label}>
-                <Box
-                  sx={{
-                    borderRadius: 2.5,
-                    backgroundColor: "#f2f5ff",
-                    color: "#2f3a62",
-                    p: 1.4,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 0.6,
-                    alignItems: "center",
-                    textAlign: "center",
-                    minHeight: 86,
-                    justifyContent: "center",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: "50%",
-                      backgroundColor: "#e4e9ff",
-                      display: "grid",
-                      placeItems: "center",
-                      color: "#3b52e5",
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                    {item.label}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: "#17203d", fontSize: "0.95rem" }}
-                  >
-                    {item.value}
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        ) : null}
-
-        {barMeta.length > 0 ? (
-          <Box
-            sx={{
-              borderRadius: 3,
-              backgroundColor: "transparent",
-              border: "1px solid #c7d2fe",
-              p: 1.2,
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-              gap: 1,
-            }}
-          >
-            {barMeta.map((item) => (
-              <Box key={item.label}>
-                <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
-                  {item.label}
+                  {item.label}:
                 </Typography>
                 <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.95rem" }}
+                  component="span"
+                  sx={{
+                    fontSize: "0.79rem",
+                    fontWeight: 800,
+                    color: item.positive ? "#156f49" : "#4f607a",
+                    whiteSpace: "nowrap",
+                  }}
                 >
                   {item.value}
                 </Typography>
               </Box>
-            ))}
-          </Box>
-        ) : null}
+            );
+          })}
+        </Box>
 
-        {dateMeta.length > 0 ? (
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-            flexWrap="wrap"
-          >
-            {dateMeta.map((item) => (
-              <Stack key={item.label} direction="row" spacing={1} alignItems="center">
-                <Box
-                  sx={{
-                    width: 26,
-                    height: 26,
-                    borderRadius: "50%",
-                    backgroundColor: "rgb(53, 15, 114)",
-                    display: "grid",
-                    placeItems: "center",
-                    color: "#ffffff",
-                    flexShrink: 0,
-                  }}
-                >
-                  {item.icon}
-                </Box>
-                <Box>
-                  <Typography variant="caption" sx={{ color: "#505050ff", fontWeight: 700 }}>
-                    {item.label}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: "#1a2b5c", fontSize: "0.92rem" }}
-                  >
-                    {item.value}
-                  </Typography>
-                </Box>
-              </Stack>
-            ))}
-          </Stack>
-        ) : null}
+        <Divider sx={{ borderColor: "#d7e3f4" }} />
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            columnGap: 1.6,
+            rowGap: 1.15,
+          }}
+        >
+          {displayMeta.map((item) => (
+            <Box key={item.label}>
+              <Typography
+                sx={{
+                  color: "#4b5e7b",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {item.label}
+              </Typography>
+              <Typography
+                sx={{
+                  mt: 0.15,
+                  color: "#15284d",
+                  fontWeight: 700,
+                  fontSize: "clamp(1.02rem, 1.35vw, 1.12rem)",
+                  lineHeight: 1.25,
+                  wordBreak: "break-word",
+                }}
+              >
+                {item.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
 
         {onViewDetails && (
-<Box
-  sx={{
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: 0.5,
-    pt: 0.5,
-  }}
->
-  <Typography variant="body2" color="#002060" fontWeight={600}>View</Typography>
-
-  <IconButton
-    onClick={onViewDetails}
-    aria-label="View details"
-    sx={{
-      backgroundColor: "#002060",
-      color: "#ffffff",
-      width: 20,
-      height: 20,
-      "&:hover": {
-        backgroundColor: "#002060",
-      },
-    }}
-  >
-    <ArrowForwardIcon sx={{ fontSize: 14 }} />
-  </IconButton>
-</Box>
-
+          <Box
+            onClick={handleViewClick}
+            onKeyDown={handleViewKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label="View details"
+            sx={{
+              mt: "auto",
+              alignSelf: "flex-end",
+              minHeight: 30,
+              borderRadius: 1.4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 0.45,
+              px: 0.4,
+              color: "#0d2f6d",
+              background: "transparent",
+              boxShadow: "none",
+              transition:
+                "transform 180ms ease, box-shadow 180ms ease, filter 180ms ease",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                color: "#0a285c",
+              },
+            }}
+          >
+            <Typography sx={{ fontSize: "1.02rem", fontWeight: 700 }}>
+              View
+            </Typography>
+            <Box
+              sx={{
+                width: 24,
+                height: 24,
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                backgroundColor: "#123b82",
+                color: "#ffffff",
+                boxShadow: "0 4px 10px rgba(18, 59, 130, 0.22)",
+              }}
+            >
+              <ArrowForwardIcon sx={{ fontSize: 15 }} />
+            </Box>
+          </Box>
         )}
       </CardContent>
     </Card>
