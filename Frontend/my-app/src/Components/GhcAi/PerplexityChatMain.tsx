@@ -96,16 +96,17 @@ const PerplexityChatMain: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ bot_type: botType });
-      const response = await fetch(
-        `${apiUrl}/api/bot_responses/?${params.toString()}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/bot_responses/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          action: "list",
+          bot_type: botType,
+        }),
+      });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Something went wrong");
       setItems(Array.isArray(result?.results) ? result.results : []);
@@ -131,6 +132,7 @@ const PerplexityChatMain: React.FC = () => {
           Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
+          action: "save",
           bot_type: botType,
           question: askedQuestion,
           answer: answerPayload,
