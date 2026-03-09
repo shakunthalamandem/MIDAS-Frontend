@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  Button,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
@@ -28,11 +28,6 @@ type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
 };
 
-type DealBotCache = {
-  question: string;
-  blocks: Block[];
-};
-
 type BotResponseItem = {
   id: number;
   ticker?: string | null;
@@ -41,37 +36,6 @@ type BotResponseItem = {
   question: string;
   answer: unknown;
   created_at?: string;
-};
-
-const getDealBotStorageKey = (details: DealBotBasicDealDetails) => {
-  const parts = [
-    details.deal_id ?? "",
-    details.unique_deal_id ?? "",
-    details.ticker ?? "",
-    details.pricing_date ?? "",
-    details.deal_type ?? "",
-  ];
-  return `dealbot:${parts.join("|")}`;
-};
-
-const readDealBotCache = (key: string): DealBotCache | null => {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as DealBotCache;
-    if (!parsed || !Array.isArray(parsed.blocks)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-};
-
-const writeDealBotCache = (key: string, cache: DealBotCache) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(cache));
-  } catch {
-    // Ignore storage write failures.
-  }
 };
 
 const toBlocks = (payload: unknown): Block[] => {
@@ -96,6 +60,7 @@ const toBlocks = (payload: unknown): Block[] => {
     }
 
     const textCandidate = candidates.find((c) => typeof c === "string") as string | undefined;
+
     if (textCandidate) {
       return [
         {
@@ -141,38 +106,17 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [recentResponses, setRecentResponses] = React.useState<BotResponseItem[]>([]);
   const [recentLoading, setRecentLoading] = React.useState(false);
   const [recentError, setRecentError] = React.useState<string | null>(null);
-  const [showRecent, setShowRecent] = React.useState(false);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
   const botType = React.useMemo(() => "deal_bot", []);
-
-  const storageKey = React.useMemo(
-    () => getDealBotStorageKey(basicDealDetails ?? {}),
-    [
-      basicDealDetails.deal_id,
-      basicDealDetails.unique_deal_id,
-      basicDealDetails.ticker,
-      basicDealDetails.pricing_date,
-      basicDealDetails.deal_type,
-    ]
-  );
-
   const friendlyErrorMessage = React.useMemo(
     () => "Something went wrong. Please rerun to try again.",
     []
   );
 
   React.useEffect(() => {
-    const cached = readDealBotCache(storageKey);
-
-    if (cached) {
-      setQuestion(cached.question ?? "");
-      setBlocks(cached.blocks ?? []);
-    } else {
-      setQuestion("");
-      setBlocks([]);
-    }
-
+    setQuestion("");
+    setBlocks([]);
     setQueryError(null);
     setApiData(null);
 
@@ -237,7 +181,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     return () => controller.abort();
   }, [
     apiUrl,
-    storageKey,
     basicDealDetails.deal_id,
     basicDealDetails.deal_type,
     basicDealDetails.pricing_date,
@@ -393,7 +336,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       const nextBlocks = toBlocks(payload);
 
       setBlocks(nextBlocks);
-      writeDealBotCache(storageKey, { question: trimmed, blocks: nextBlocks });
       saveBotResponse(nextBlocks, trimmed);
     } catch (error: any) {
       console.error("Deal query threw", error);
@@ -405,6 +347,8 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
   const handleClearQuestion = () => {
     setQuestion("");
+    setBlocks([]);
+    setQueryError(null);
   };
 
   const handleSelectRecent = (item: BotResponseItem) => {
@@ -412,8 +356,9 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     setQuestion(item.question ?? "");
     setBlocks(nextBlocks);
     setQueryError(null);
-    writeDealBotCache(storageKey, { question: item.question ?? "", blocks: nextBlocks });
   };
+
+  const shouldShowRecentCards = !prepLoading && recentResponses.length > 0;
 
   return (
     <Paper
@@ -423,7 +368,8 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         borderRadius: 3,
         border: "1px solid",
         borderColor: "divider",
-        backgroundColor: "rgba(255,255,255,0.95)",
+        background:
+          "radial-gradient(circle at top, rgba(233, 244, 255, 0.9), rgba(255,255,255,0.96) 55%)",
         boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
       }}
     >
@@ -498,11 +444,10 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   color: "text.primary",
                   boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(99, 102, 241, 0.85)",
+                    borderColor: "rgba(99, 102, 241, 0.3)",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(99, 102, 241, 0.85)",
-                    boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
+                    borderColor: "rgba(99, 102, 241, 0.65)",
                   },
                   "& textarea": {
                     padding: "12px 16px",
@@ -535,65 +480,35 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
               color: "white",
               borderRadius: "50%",
               boxShadow: "0 10px 25px rgba(99, 102, 241, 0.65)",
-              transition: "box-shadow 0.2s ease",
+              transition: "box-shadow 0.2s ease, transform 0.2s ease",
               "&:hover": {
                 boxShadow: "0 12px 28px rgba(99, 102, 241, 0.85)",
+                transform: "translateY(-1px)",
               },
             }}
           >
-            {queryLoading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              <SendRoundedIcon />
-            )}
+            {queryLoading ? <CircularProgress size={20} color="inherit" /> : <SendRoundedIcon />}
           </IconButton>
         </Box>
 
-        <Box>
-          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => setShowRecent((prev) => !prev)}
-              sx={{
-                textTransform: "none",
-                borderRadius: 999,
-                px: 2,
-                background: "linear-gradient(135deg, #6b6bff, #8f5bff)",
-                boxShadow: "0 8px 18px rgba(99, 102, 241, 0.35)",
-                "&:hover": {
-                  boxShadow: "0 10px 22px rgba(99, 102, 241, 0.45)",
-                },
-              }}
-            >
-              {showRecent ? "Hide recent questions" : "Show recent questions"}
-            </Button>
+        {shouldShowRecentCards && (
+          <Box>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+              <BoltOutlinedIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+              <Typography variant="body2" sx={{ color: "#2563eb", fontWeight: 600 }}>
+                Recently asked questions
+              </Typography>
+              {recentLoading && <CircularProgress size={14} />}
+            </Stack>
 
-            {recentLoading && <CircularProgress size={16} />}
-          </Stack>
-
-          {recentError && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {recentError}
-            </Typography>
-          )}
-
-          {showRecent && recentResponses.length === 0 && !recentLoading && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              No previous questions for this deal yet.
-            </Typography>
-          )}
-
-          {showRecent && recentResponses.length > 0 && (
             <Box
               sx={{
-                mt: 2,
                 display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                gap: 1.5,
+                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                gap: 2,
               }}
             >
-              {recentResponses.map((item) => (
+              {recentResponses.slice(0, 4).map((item) => (
                 <Paper
                   key={item.id}
                   variant="outlined"
@@ -607,29 +522,55 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                     }
                   }}
                   sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    borderColor: "rgba(99, 102, 241, 0.35)",
-                    background:
-                      "linear-gradient(180deg, rgba(248, 249, 255, 0.95), rgba(255,255,255,1))",
+                    p: 2,
+                    minHeight: 50,
+                    borderRadius: 3,
+                    border: "1px solid rgba(37, 99, 235, 0.14)",
+                    backgroundColor: "rgba(255,255,255,0.82)",
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 1,
-                    boxShadow: "0 12px 22px rgba(99, 102, 241, 0.08)",
+                    alignItems: "center",
+                    gap: 2,
                     cursor: "pointer",
-                    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                    transition:
+                      "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
+                    boxShadow: "0 8px 20px rgba(15, 23, 42, 0.05)",
                     "&:hover": {
-                      transform: "translateY(-1px)",
-                      boxShadow: "0 14px 24px rgba(99, 102, 241, 0.16)",
+                      transform: "translateY(-2px)",
+                      borderColor: "rgba(37, 99, 235, 0.28)",
+                      boxShadow: "0 14px 26px rgba(37, 99, 235, 0.12)",
                     },
                   }}
                 >
-                  <Typography variant="subtitle2">{item.question}</Typography>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: 600,
+                      color: "text.primary",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {item.question}
+                  </Typography>
                 </Paper>
               ))}
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
+
+        {recentLoading && !shouldShowRecentCards && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <CircularProgress size={16} />
+            <Typography variant="body2" color="text.secondary">
+              Loading recent questions...
+            </Typography>
+          </Box>
+        )}
+
+        {recentError && (
+          <Typography variant="body2" color="error">
+            {recentError}
+          </Typography>
+        )}
 
         {prepLoading && <LinearProgress />}
 
@@ -645,9 +586,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           </Typography>
         )}
 
-        {blocks.length > 0 && (
-          <GENAIRenderer blocks={blocks} renderAll disableMotion />
-        )}
+        {blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll disableMotion />}
       </Stack>
     </Paper>
   );
