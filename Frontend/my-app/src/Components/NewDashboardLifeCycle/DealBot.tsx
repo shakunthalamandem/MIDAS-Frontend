@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Box,
   CircularProgress,
   IconButton,
@@ -13,10 +12,9 @@ import {
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import PictureAsPdfRoundedIcon from "@mui/icons-material/PictureAsPdfRounded";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
-import { exportDealBotPdf, type DealBotBasicDealDetails } from "./DealBotPdfExport";
+import { type DealBotBasicDealDetails } from "./DealBotPdfExport";
 
 type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
@@ -116,8 +114,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [blocks, setBlocks] = React.useState<Block[]>([]);
   const [queryLoading, setQueryLoading] = React.useState(false);
   const [queryError, setQueryError] = React.useState<string | null>(null);
-  const [exportLoading, setExportLoading] = React.useState(false);
-  const [exportError, setExportError] = React.useState<string | null>(null);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
   const storageKey = React.useMemo(
@@ -268,25 +264,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     setQuestion("");
   };
 
-  const handleExportPdf = async () => {
-    if (exportLoading) return;
-    setExportLoading(true);
-    setExportError(null);
-    try {
-      exportDealBotPdf({
-        basicDealDetails,
-        apiData,
-        question,
-        blocks,
-      });
-    } catch (error) {
-      console.error("Deal Bot PDF export failed", error);
-      setExportError("Unable to export PDF. Please try again.");
-    } finally {
-      setExportLoading(false);
-    }
-  };
-
   return (
     <Paper
       elevation={0}
@@ -324,30 +301,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             }}
           >
             {prepLoading && <CircularProgress size={18} />}
-            {!prepLoading && apiData && (
-              <Button
-                size="small"
-                variant="contained"
-                onClick={handleExportPdf}
-                disabled={exportLoading}
-                startIcon={
-                  exportLoading ? (
-                    <CircularProgress size={14} color="inherit" />
-                  ) : (
-                    <PictureAsPdfRoundedIcon fontSize="small" />
-                  )
-                }
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 999,
-                  fontWeight: 700,
-                  px: 1.8,
-                  background: "linear-gradient(135deg, #153a7a, #1c5fb6)",
-                }}
-              >
-                {exportLoading ? "Exporting..." : "Export PDF"}
-              </Button>
-            )}
             {!prepLoading && !apiData && !prepError && (
               <Typography variant="body2" color="text.secondary">
                 Waiting for deal data
@@ -452,12 +405,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             {queryError}
           </Typography>
         )}
-        {exportError && (
-          <Typography variant="body2" color="error">
-            {exportError}
-          </Typography>
-        )}
-
         {blocks.length > 0 && (
   
             <GENAIRenderer blocks={blocks} renderAll disableMotion />
