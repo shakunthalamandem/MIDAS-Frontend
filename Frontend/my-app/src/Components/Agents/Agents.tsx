@@ -33,28 +33,35 @@ const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
-    title: "Portfolio Agent",
+    title: "Portfolio CIO Agent",
     description:
-      "AI Decision Engine for Portfolio Risk and Capital Allocation Identify risks early, prioritize actions, and support faster investment decisions.",
+      "AI-powered decision engine for portfolio oversight. Identifies emerging risks, prioritizes actions, and supports faster capital allocation and investment decisions.",
     schedule: "Once a Week on Monday",
     route: "/ai_portfolio_review",
   },
   {
-    title: "IPO Market Agent",
+    title: "Risk Agent",
+    description:
+      "Continuously analyzes portfolio exposures to detect potential risks early. Highlights vulnerabilities, volatility signals, and areas requiring immediate attention.",
+    schedule: "Once a Week on Monday",
+    route: "/ai_portfolio_review",
+  },
+  {
+    title: "Recent IPO Agent",
     description:
       "AI-generated ranking of the most promising IPOs from the last 30 days based on data and market signals.",
     schedule: "Weekly Once",
     route: "/last_30_days_ai_ranking",
   },
   {
-    title: "AI Model",
+    title: "Peer Analysis Agent",
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
     schedule: "One Time for each IPO",
     route: "/ai_fewshot_analysis",
   },
   {
-    title: "AI Sentiment Analysis",
+    title: "Sentiment Agent",
     description:
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
     schedule: "Runs Daily",
@@ -89,7 +96,7 @@ const agentComponentMap: Record<
   "Last 30 Days IPO AI Ranking": Last30DaysIPORankingAgent,
   "AI Unsupervised Market Insights": AIUnsupervisedMarketInsightsAgent,
   "Portfolio Analysis": PortfolioAnalysisAgent,
-  "AI Sentiment Analysis": AISentimentAnalysisAgent,
+  "Sentiment Agent": AISentimentAnalysisAgent,
 };
 
 type AgentLatestUpdatedDates = Record<
