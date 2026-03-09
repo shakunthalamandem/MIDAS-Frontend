@@ -70,15 +70,17 @@ const writeDealBotCache = (key: string, cache: DealBotCache) => {
   try {
     localStorage.setItem(key, JSON.stringify(cache));
   } catch {
-    // Ignore storage write failures (e.g., private mode or quota).
+    // Ignore storage write failures.
   }
 };
 
 const toBlocks = (payload: unknown): Block[] => {
   if (!payload) return [];
+
   if (Array.isArray(payload)) {
     return payload as Block[];
   }
+
   if (typeof payload === "object" && payload !== null) {
     const candidates = [
       (payload as Record<string, unknown>).answer,
@@ -86,11 +88,13 @@ const toBlocks = (payload: unknown): Block[] => {
       (payload as Record<string, unknown>).data,
       (payload as Record<string, unknown>).response,
     ];
+
     for (const candidate of candidates) {
       if (Array.isArray(candidate)) {
         return candidate as Block[];
       }
     }
+
     const textCandidate = candidates.find((c) => typeof c === "string") as string | undefined;
     if (textCandidate) {
       return [
@@ -100,6 +104,7 @@ const toBlocks = (payload: unknown): Block[] => {
         },
       ];
     }
+
     try {
       return [
         {
@@ -116,6 +121,7 @@ const toBlocks = (payload: unknown): Block[] => {
       ];
     }
   }
+
   return [
     {
       type: "text",
@@ -139,11 +145,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
   const botType = React.useMemo(() => "deal_bot", []);
-  const normalizedTicker = React.useMemo(() => {
-    const raw = (basicDealDetails?.ticker ?? "").toString();
-    if (!raw) return "";
-    return raw.split("(")[0].split(" ")[0].trim();
-  }, [basicDealDetails?.ticker]);
+
   const storageKey = React.useMemo(
     () => getDealBotStorageKey(basicDealDetails ?? {}),
     [
@@ -154,20 +156,15 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       basicDealDetails.deal_type,
     ]
   );
+
   const friendlyErrorMessage = React.useMemo(
     () => "Something went wrong. Please rerun to try again.",
     []
   );
 
-  const recentQueryParams = React.useMemo(() => {
-    const params = new URLSearchParams();
-    params.set("bot_type", botType);
-    if (normalizedTicker) params.set("ticker", normalizedTicker);
-    return params;
-  }, [botType, normalizedTicker]);
-
   React.useEffect(() => {
     const cached = readDealBotCache(storageKey);
+
     if (cached) {
       setQuestion(cached.question ?? "");
       setBlocks(cached.blocks ?? []);
@@ -175,6 +172,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       setQuestion("");
       setBlocks([]);
     }
+
     setQueryError(null);
     setApiData(null);
 
@@ -185,6 +183,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     }
 
     const { ticker, pricing_date, deal_type, unique_deal_id, deal_id } = basicDealDetails ?? {};
+
     if (!ticker && !deal_id && !unique_deal_id) {
       setPrepError("Missing deal identifiers.");
       setPrepLoading(false);
@@ -244,37 +243,47 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     basicDealDetails.pricing_date,
     basicDealDetails.ticker,
     basicDealDetails.unique_deal_id,
+    friendlyErrorMessage,
   ]);
 
   React.useEffect(() => {
     if (!apiUrl) return;
-    if (!normalizedTicker && !basicDealDetails?.unique_deal_id) {
+
+    if (!basicDealDetails?.ticker && !basicDealDetails?.unique_deal_id) {
       setRecentResponses([]);
       return;
     }
 
     const controller = new AbortController();
+
     const loadRecent = async () => {
       setRecentLoading(true);
       setRecentError(null);
+
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch(
-          `${apiUrl}/api/bot_responses/?${recentQueryParams.toString()}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            signal: controller.signal,
-          }
-        );
+        const res = await fetch(`${apiUrl}/api/bot_responses/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            action: "list",
+            bot_type: botType,
+            ticker: basicDealDetails?.ticker || null,
+            unique_deal_id: basicDealDetails?.unique_deal_id || null,
+          }),
+        });
+
         if (!res.ok) {
           const json = await res.json().catch(() => null);
           console.error("Deal bot recent fetch failed", json, res.status);
           setRecentError(friendlyErrorMessage);
           return;
         }
+
         const data = await res.json();
         setRecentResponses(Array.isArray(data?.results) ? data.results : []);
       } catch (error: any) {
@@ -290,14 +299,15 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     return () => controller.abort();
   }, [
     apiUrl,
+    botType,
     basicDealDetails?.ticker,
     basicDealDetails?.unique_deal_id,
     friendlyErrorMessage,
-    recentQueryParams,
   ]);
 
   const saveBotResponse = async (nextBlocks: Block[], askedQuestion: string) => {
     if (!apiUrl) return;
+
     try {
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${apiUrl}/api/bot_responses/`, {
@@ -307,10 +317,12 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
+          action: "save",
           bot_type: botType,
           question: askedQuestion,
           answer: nextBlocks,
-          ticker: normalizedTicker || null,
+          ticker: basicDealDetails?.ticker || null,
+          unique_deal_id: basicDealDetails?.unique_deal_id || null,
         }),
       });
 
@@ -330,6 +342,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         answer: saved.answer,
         created_at: saved.created_at,
       };
+
       setRecentResponses((prev) => [newItem, ...prev]);
     } catch (error: any) {
       console.error("Deal bot response save threw", error);
@@ -338,11 +351,14 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
   const handleAsk = async () => {
     const trimmed = question.trim();
+
     if (!trimmed || queryLoading) return;
+
     if (!apiUrl) {
       setQueryError("API URL is not configured.");
       return;
     }
+
     if (!apiData) {
       setQueryError("Deal data is still being prepared.");
       return;
@@ -375,6 +391,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
       const payload = await res.json();
       const nextBlocks = toBlocks(payload);
+
       setBlocks(nextBlocks);
       writeDealBotCache(storageKey, { question: trimmed, blocks: nextBlocks });
       saveBotResponse(nextBlocks, trimmed);
@@ -423,9 +440,10 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
               Deal Bot
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Ask questions about {basicDealDetails.ticker }
+              Ask questions about {basicDealDetails.ticker}
             </Typography>
           </Box>
+
           <Box
             sx={{
               display: "flex",
@@ -480,12 +498,11 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   color: "text.primary",
                   boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: " rgba(99, 102, 241, 0.85)",
+                    borderColor: "rgba(99, 102, 241, 0.85)",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: " rgba(99, 102, 241, 0.85)",
-                                      boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
-
+                    borderColor: "rgba(99, 102, 241, 0.85)",
+                    boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   },
                   "& textarea": {
                     padding: "12px 16px",
@@ -506,6 +523,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
               }}
             />
           </Box>
+
           <IconButton
             onClick={handleAsk}
             disabled={queryLoading || prepLoading}
@@ -550,18 +568,22 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             >
               {showRecent ? "Hide recent questions" : "Show recent questions"}
             </Button>
+
             {recentLoading && <CircularProgress size={16} />}
           </Stack>
+
           {recentError && (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
               {recentError}
             </Typography>
           )}
+
           {showRecent && recentResponses.length === 0 && !recentLoading && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               No previous questions for this deal yet.
             </Typography>
           )}
+
           {showRecent && recentResponses.length > 0 && (
             <Box
               sx={{
@@ -610,11 +632,13 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         </Box>
 
         {prepLoading && <LinearProgress />}
+
         {prepError && (
           <Typography variant="body2" color="error">
             {prepError}
           </Typography>
         )}
+
         {queryError && (
           <Typography variant="body2" color="error">
             {queryError}
@@ -624,7 +648,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         {blocks.length > 0 && (
           <GENAIRenderer blocks={blocks} renderAll disableMotion />
         )}
-
       </Stack>
     </Paper>
   );
