@@ -717,93 +717,93 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     () => Boolean(lastAskedQuestion.trim()) && blocks.length > 0,
     [lastAskedQuestion, blocks]
   );
+  React.useEffect(() => {
+    // const cached = readDealBotCache(storageKey);
+    // if (cached) {
+    //   setQuestion(cached.question ?? "");
+    //   setLastAskedQuestion(cached.question ?? "");
+    //   setBlocks(cached.blocks ?? []);
+    // } else {
+    //   setQuestion("");
+    //   setLastAskedQuestion("");
+    //   setBlocks([]);
+    // }
 
-  // React.useEffect(() => {
-  //   const cached = readDealBotCache(storageKey);
-  //   if (cached) {
-  //     setQuestion(cached.question ?? "");
-  //     setLastAskedQuestion(cached.question ?? "");
-  //     setBlocks(cached.blocks ?? []);
-  //   } else {
-  //     setQuestion("");
-  //     setLastAskedQuestion("");
-  //     setBlocks([]);
-  //   }
+    setQuestion("");
+    setLastAskedQuestion("");
+    setBlocks([]);
+    setQueryError(null);
+    setApiData(null);
+    setShowRecentQuestions(true);
 
-  //   setQueryError(null);
-  //   setApiData(null);
-  //   setShowRecentQuestions(true);
+    if (!apiUrl) {
+      setPrepError("API URL is not configured.");
+      setPrepLoading(false);
+      return;
+    }
 
-  //   if (!apiUrl) {
-  //     setPrepError("API URL is not configured.");
-  //     setPrepLoading(false);
-  //     return;
-  //   }
+    const { ticker, pricing_date, deal_type, unique_deal_id, deal_id } = basicDealDetails ?? {};
 
-  //   const { ticker, pricing_date, deal_type, unique_deal_id, deal_id } = basicDealDetails ?? {};
+    if (!ticker && !deal_id && !unique_deal_id) {
+      setPrepError("Missing deal identifiers.");
+      setPrepLoading(false);
+      return;
+    }
 
-  //   if (!ticker && !deal_id && !unique_deal_id) {
-  //     setPrepError("Missing deal identifiers.");
-  //     setPrepLoading(false);
-  //     return;
-  //   }
+    const controller = new AbortController();
 
-  //   const controller = new AbortController();
+    const fetchDataPrep = async () => {
+      setPrepLoading(true);
+      setPrepError(null);
 
-  //   const fetchDataPrep = async () => {
-  //     setPrepLoading(true);
-  //     setPrepError(null);
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(`${apiUrl}/api/midas_chat_data_prep/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            ticker,
+            pricing_date,
+            deal_type,
+            unique_deal_id,
+            deal_id,
+          }),
+        });
 
-  //     try {
-  //       const token = localStorage.getItem("access_token");
-  //       const res = await fetch(`${apiUrl}/api/midas_chat_data_prep/`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  //         },
-  //         signal: controller.signal,
-  //         body: JSON.stringify({
-  //           ticker,
-  //           pricing_date,
-  //           deal_type,
-  //           unique_deal_id,
-  //           deal_id,
-  //         }),
-  //       });
+        if (!res.ok) {
+          const json = await res.json().catch(() => null);
+          console.error("Deal data prep failed", json, res.status);
+          setPrepError(friendlyErrorMessage);
+          return;
+        }
 
-  //       if (!res.ok) {
-  //         const json = await res.json().catch(() => null);
-  //         console.error("Deal data prep failed", json, res.status);
-  //         setPrepError(friendlyErrorMessage);
-  //         return;
-  //       }
+        const data = await res.json();
+        setApiData(data);
+      } catch (error: any) {
+        if (controller.signal.aborted) return;
+        console.error("Deal data prep threw", error);
+        setPrepError(friendlyErrorMessage);
+      } finally {
+        setPrepLoading(false);
+      }
+    };
 
-  //       const data = await res.json();
-  //       setApiData(data);
-  //     } catch (error: any) {
-  //       if (controller.signal.aborted) return;
-  //       console.error("Deal data prep threw", error);
-  //       setPrepError(friendlyErrorMessage);
-  //     } finally {
-  //       setPrepLoading(false);
-  //     }
-  //   };
+    fetchDataPrep();
 
-  //   fetchDataPrep();
-
-  //   return () => controller.abort();
-  // }, [
-  //   apiUrl,
-  //   storageKey,
-  //   basicDealDetails.deal_id,
-  //   basicDealDetails.deal_type,
-  //   basicDealDetails.pricing_date,
-  //   basicDealDetails.ticker,
-  //   basicDealDetails.unique_deal_id,
-  //   friendlyErrorMessage,
-  // ]);
-
+    return () => controller.abort();
+  }, [
+    apiUrl,
+    basicDealDetails.deal_id,
+    basicDealDetails.deal_type,
+    basicDealDetails.pricing_date,
+    basicDealDetails.ticker,
+    basicDealDetails.unique_deal_id,
+    friendlyErrorMessage,
+  ]);
   React.useEffect(() => {
     if (!apiUrl) return;
 
