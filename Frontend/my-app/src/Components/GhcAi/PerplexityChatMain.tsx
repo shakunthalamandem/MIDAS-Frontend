@@ -337,10 +337,20 @@ const PerplexityChatMain: React.FC = () => {
           <Box>
             <Stack direction="row" spacing={1} alignItems="center" mb={2} flexWrap="wrap">
               <Button
-                variant="outlined"
+                variant="contained"
                 size="small"
                 onClick={() => setShowMidasRecent((prev) => !prev)}
-                sx={{ textTransform: "none" }}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 999,
+                  px: 2,
+                  backgroundColor: "#002060",
+                  boxShadow: "0 8px 18px rgba(0, 32, 96, 0.25)",
+                  "&:hover": {
+                    backgroundColor: "#001840",
+                    boxShadow: "0 10px 22px rgba(0, 32, 96, 0.35)",
+                  },
+                }}
               >
                 {showMidasRecent ? "Hide recent questions" : "Show recent questions"}
               </Button>
@@ -365,9 +375,13 @@ const PerplexityChatMain: React.FC = () => {
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
+                      borderColor: "rgba(0, 32, 96, 0.2)",
+                      background:
+                        "linear-gradient(180deg, rgba(248, 250, 255, 0.95), rgba(255,255,255,1))",
                       display: "flex",
                       flexDirection: "column",
                       gap: 1,
+                      boxShadow: "0 10px 18px rgba(0, 32, 96, 0.08)",
                     }}
                   >
                     <Typography variant="subtitle2">{item.question}</Typography>
@@ -379,7 +393,13 @@ const PerplexityChatMain: React.FC = () => {
                         setMidasData(toBlockArray(item.answer));
                         setMidasError(null);
                       }}
-                      sx={{ alignSelf: "flex-start", textTransform: "none", px: 0 }}
+                      sx={{
+                        alignSelf: "flex-start",
+                        textTransform: "none",
+                        px: 0,
+                        color: "#002060",
+                        fontWeight: 600,
+                      }}
                     >
                       View answer
                     </Button>
@@ -497,10 +517,20 @@ const PerplexityChatMain: React.FC = () => {
             <Box sx={{ mt: 2 }}>
               <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   onClick={() => setShowGlobalRecent((prev) => !prev)}
-                  sx={{ textTransform: "none" }}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: 999,
+                    px: 2,
+                    background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
+                    color: "#002060",
+                    boxShadow: "0 8px 18px rgba(0, 0, 0, 0.12)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #b9d5d3, #e8e6c5)",
+                    },
+                  }}
                 >
                   {showGlobalRecent ? "Hide recent questions" : "Show recent questions"}
                 </Button>
@@ -527,9 +557,13 @@ const PerplexityChatMain: React.FC = () => {
                       sx={{
                         p: 1.5,
                         borderRadius: 2,
+                        borderColor: "rgba(0, 32, 96, 0.18)",
+                        background:
+                          "linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 247, 246, 0.9))",
                         display: "flex",
                         flexDirection: "column",
                         gap: 1,
+                        boxShadow: "0 10px 18px rgba(0, 0, 0, 0.08)",
                       }}
                     >
                       <Typography variant="subtitle2">{item.question}</Typography>
@@ -541,7 +575,13 @@ const PerplexityChatMain: React.FC = () => {
                           setData(toBlockArray(item.answer));
                           setError(null);
                         }}
-                        sx={{ alignSelf: "flex-start", textTransform: "none", px: 0 }}
+                        sx={{
+                          alignSelf: "flex-start",
+                          textTransform: "none",
+                          px: 0,
+                          color: "#002060",
+                          fontWeight: 600,
+                        }}
                       >
                         View answer
                       </Button>

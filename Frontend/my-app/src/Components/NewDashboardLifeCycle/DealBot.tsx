@@ -531,29 +531,22 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           </IconButton>
         </Box>
 
-        {prepLoading && <LinearProgress />}
-        {prepError && (
-          <Typography variant="body2" color="error">
-            {prepError}
-          </Typography>
-        )}
-        {queryError && (
-          <Typography variant="body2" color="error">
-            {queryError}
-          </Typography>
-        )}
-
-        {blocks.length > 0 && (
-          <GENAIRenderer blocks={blocks} renderAll disableMotion />
-        )}
-
         <Box>
           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={() => setShowRecent((prev) => !prev)}
-              sx={{ textTransform: "none" }}
+              sx={{
+                textTransform: "none",
+                borderRadius: 999,
+                px: 2,
+                background: "linear-gradient(135deg, #6b6bff, #8f5bff)",
+                boxShadow: "0 8px 18px rgba(99, 102, 241, 0.35)",
+                "&:hover": {
+                  boxShadow: "0 10px 22px rgba(99, 102, 241, 0.45)",
+                },
+              }}
             >
               {showRecent ? "Hide recent questions" : "Show recent questions"}
             </Button>
@@ -578,9 +571,13 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   sx={{
                     p: 1.5,
                     borderRadius: 2,
+                    borderColor: "rgba(99, 102, 241, 0.35)",
+                    background:
+                      "linear-gradient(180deg, rgba(248, 249, 255, 0.95), rgba(255,255,255,1))",
                     display: "flex",
                     flexDirection: "column",
                     gap: 1,
+                    boxShadow: "0 12px 22px rgba(99, 102, 241, 0.08)",
                   }}
                 >
                   <Typography variant="subtitle2">{item.question}</Typography>
@@ -588,7 +585,13 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                     variant="text"
                     size="small"
                     onClick={() => handleSelectRecent(item)}
-                    sx={{ alignSelf: "flex-start", textTransform: "none", px: 0 }}
+                    sx={{
+                      alignSelf: "flex-start",
+                      textTransform: "none",
+                      px: 0,
+                      color: "#4f46e5",
+                      fontWeight: 600,
+                    }}
                   >
                     View answer
                   </Button>
@@ -597,6 +600,23 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             </Stack>
           )}
         </Box>
+
+        {prepLoading && <LinearProgress />}
+        {prepError && (
+          <Typography variant="body2" color="error">
+            {prepError}
+          </Typography>
+        )}
+        {queryError && (
+          <Typography variant="body2" color="error">
+            {queryError}
+          </Typography>
+        )}
+
+        {blocks.length > 0 && (
+          <GENAIRenderer blocks={blocks} renderAll disableMotion />
+        )}
+
       </Stack>
     </Paper>
   );
