@@ -367,11 +367,33 @@ const PerplexityChatMain: React.FC = () => {
               </Typography>
             )}
             {showMidasRecent && midasRecent.length > 0 && (
-              <Stack spacing={1.5} mb={3}>
+              <Box
+                sx={{
+                  mb: 3,
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                  gap: 1.5,
+                }}
+              >
                 {midasRecent.map((item) => (
                   <Paper
                     key={item.id}
                     variant="outlined"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setMidasQuestion(item.question ?? "");
+                      setMidasData(toBlockArray(item.answer));
+                      setMidasError(null);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setMidasQuestion(item.question ?? "");
+                        setMidasData(toBlockArray(item.answer));
+                        setMidasError(null);
+                      }
+                    }}
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
@@ -382,30 +404,18 @@ const PerplexityChatMain: React.FC = () => {
                       flexDirection: "column",
                       gap: 1,
                       boxShadow: "0 10px 18px rgba(0, 32, 96, 0.08)",
-                    }}
-                  >
-                    <Typography variant="subtitle2">{item.question}</Typography>
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() => {
-                        setMidasQuestion(item.question ?? "");
-                        setMidasData(toBlockArray(item.answer));
-                        setMidasError(null);
-                      }}
-                      sx={{
-                        alignSelf: "flex-start",
-                        textTransform: "none",
-                        px: 0,
-                        color: "#002060",
-                        fontWeight: 600,
-                      }}
-                    >
-                      View answer
-                    </Button>
-                  </Paper>
-                ))}
-              </Stack>
+                      cursor: "pointer",
+                      transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                      "&:hover": {
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 12px 22px rgba(0, 32, 96, 0.16)",
+                      },
+                  }}
+                >
+                  <Typography variant="subtitle2">{item.question}</Typography>
+                </Paper>
+              ))}
+              </Box>
             )}
             <MidasChat
               question={midasQuestion}
@@ -549,11 +559,33 @@ const PerplexityChatMain: React.FC = () => {
                   </Typography>
                 )}
               {showGlobalRecent && globalRecent.length > 0 && (
-                <Stack spacing={1.5} sx={{ mt: 2 }}>
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                    gap: 1.5,
+                  }}
+                >
                   {globalRecent.map((item) => (
                     <Paper
                       key={item.id}
                       variant="outlined"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setQuestion(item.question ?? "");
+                        setData(toBlockArray(item.answer));
+                        setError(null);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setQuestion(item.question ?? "");
+                          setData(toBlockArray(item.answer));
+                          setError(null);
+                        }
+                      }}
                       sx={{
                         p: 1.5,
                         borderRadius: 2,
@@ -564,30 +596,18 @@ const PerplexityChatMain: React.FC = () => {
                         flexDirection: "column",
                         gap: 1,
                         boxShadow: "0 10px 18px rgba(0, 0, 0, 0.08)",
+                        cursor: "pointer",
+                        transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                        "&:hover": {
+                          transform: "translateY(-1px)",
+                          boxShadow: "0 12px 22px rgba(0, 0, 0, 0.14)",
+                        },
                       }}
                     >
                       <Typography variant="subtitle2">{item.question}</Typography>
-                      <Button
-                        variant="text"
-                        size="small"
-                        onClick={() => {
-                          setQuestion(item.question ?? "");
-                          setData(toBlockArray(item.answer));
-                          setError(null);
-                        }}
-                        sx={{
-                          alignSelf: "flex-start",
-                          textTransform: "none",
-                          px: 0,
-                          color: "#002060",
-                          fontWeight: 600,
-                        }}
-                      >
-                        View answer
-                      </Button>
                     </Paper>
                   ))}
-                </Stack>
+                </Box>
               )}
             </Box>
 

@@ -563,11 +563,27 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             </Typography>
           )}
           {showRecent && recentResponses.length > 0 && (
-            <Stack spacing={1.5} sx={{ mt: 2 }}>
+            <Box
+              sx={{
+                mt: 2,
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: 1.5,
+              }}
+            >
               {recentResponses.map((item) => (
                 <Paper
                   key={item.id}
                   variant="outlined"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectRecent(item)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleSelectRecent(item);
+                    }
+                  }}
                   sx={{
                     p: 1.5,
                     borderRadius: 2,
@@ -578,26 +594,18 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                     flexDirection: "column",
                     gap: 1,
                     boxShadow: "0 12px 22px rgba(99, 102, 241, 0.08)",
+                    cursor: "pointer",
+                    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                    "&:hover": {
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 14px 24px rgba(99, 102, 241, 0.16)",
+                    },
                   }}
                 >
                   <Typography variant="subtitle2">{item.question}</Typography>
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={() => handleSelectRecent(item)}
-                    sx={{
-                      alignSelf: "flex-start",
-                      textTransform: "none",
-                      px: 0,
-                      color: "#4f46e5",
-                      fontWeight: 600,
-                    }}
-                  >
-                    View answer
-                  </Button>
                 </Paper>
               ))}
-            </Stack>
+            </Box>
           )}
         </Box>
 
