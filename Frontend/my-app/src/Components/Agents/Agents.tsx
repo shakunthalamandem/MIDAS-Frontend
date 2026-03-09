@@ -44,7 +44,7 @@ const activeAgents: AgentConfig[] = [
     description:
       "Continuously analyzes portfolio exposures to detect potential risks early. Highlights vulnerabilities, volatility signals, and areas requiring immediate attention.",
     schedule: "Once a Week on Monday",
-    route: "/ai_portfolio_review",
+    route: "/ai_risk_review",
   },
   {
     title: "Recent IPO Agent",
