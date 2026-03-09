@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Autocomplete,
   Box,
@@ -84,7 +85,7 @@ interface ReportData {
   sections: Record<string, any>;
 }
 
-type ActiveTab = "portfolio" | "risk";
+export type ActiveTab = "portfolio" | "risk";
 
 // ═══════════════════════════════════════════════════════
 // Tab section definitions (CIO-optimized order)
@@ -226,6 +227,7 @@ interface PortfolioReportDocumentMainProps {
   reportList?: ReportListItem[];
   reportListLoading?: boolean;
   onSelectReport?: (report: ReportListItem | null) => void;
+  reviewMode?: ActiveTab;
 }
 
 const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = ({
@@ -233,9 +235,11 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   reportList = [],
   reportListLoading = false,
   onSelectReport,
+  reviewMode = "portfolio",
 }) => {
+  const navigate = useNavigate();
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("portfolio");
+  const activeTab: ActiveTab = reviewMode;
   const [activeSection, setActiveSection] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -307,7 +311,8 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
       }
       const data: ReportData = await res.json();
       setReportData(data);
-      setActiveSection(PORTFOLIO_SECTIONS[0].key);
+      const sections = reviewMode === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS;
+      setActiveSection(sections[0].key);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -321,12 +326,11 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   }, []);
 
   const handleTabChange = (_: React.SyntheticEvent, newTab: ActiveTab) => {
-    setActiveTab(newTab);
-    sectionRefs.current = {};
-    const firstSection = (newTab === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS)[0];
-    setActiveSection(firstSection.key);
-    // Reset scroll
-    if (contentRef.current) contentRef.current.scrollTop = 0;
+    if (newTab === "portfolio") {
+      navigate("/ai_portfolio_review");
+    } else {
+      navigate("/ai_risk_review");
+    }
   };
 
   const formatDateShort = (dateStr: string) => {

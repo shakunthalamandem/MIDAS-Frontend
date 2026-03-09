@@ -29,9 +29,10 @@ interface RankingReportItem {
 
 interface AIPortfolioReviewProps {
   mode: "portfolioReview" | "stockRanking";
+  reviewTab?: "portfolio" | "risk";
 }
 
-const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode }) => {
+const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode, reviewTab = "portfolio" }) => {
   // Tab 1 (CIO Review) search state
   const [cioReports, setCioReports] = useState<CIOReportItem[]>([]);
   const [selectedCioReport, setSelectedCioReport] = useState<CIOReportItem | null>(null);
@@ -120,6 +121,7 @@ const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode }) => {
           reportList={cioReports}
           reportListLoading={cioListLoading}
           onSelectReport={setSelectedCioReport}
+          reviewMode={reviewTab}
         />
       </Container>
     );
