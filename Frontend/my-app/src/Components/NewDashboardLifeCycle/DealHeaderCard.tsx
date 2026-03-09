@@ -21,6 +21,10 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
   onDealBotClick,
   isDealBotActive = false,
 }) => {
+  const companyLabel = activePayload?.company_name || activePayload?.issuer_name || "-";
+  const tickerLabel = activePayload?.ticker || "N/A";
+  const titleLabel = `${tickerLabel} - ${companyLabel}`;
+
   return (
     <Paper
       elevation={0}
@@ -65,7 +69,6 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
           </Button>
         </Box>
 
-        {/* Center */}
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Box
             sx={{
@@ -73,15 +76,22 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               alignItems: "center",
               justifyContent: "center",
               flexWrap: "wrap",
-              gap: { xs: 1.5, sm: 2.8 },
+              gap: { xs: 1.2, md: 1.6 },
             }}
           >
             <Typography
               variant="h5"
-              sx={{ fontWeight: 700, lineHeight: 1.15, color: "#600e79ff" }}
-              title={activePayload?.company_name || activePayload?.issuer_name}
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.15,
+                color: "#600e79ff",
+                maxWidth: { xs: "100%", md: "100%" },
+                whiteSpace: "normal",
+                textAlign: "center",
+              }}
+              title={titleLabel}
             >
-              {activePayload?.company_name || activePayload?.issuer_name || "-"}
+              {titleLabel}
             </Typography>
             {onDealBotClick ? (
               <Button
@@ -89,8 +99,8 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                 variant={isDealBotActive ? "contained" : "outlined"}
                 onClick={onDealBotClick}
                 sx={{
-                  ml: { xs: 0, sm: 0 },
-                  mt: { xs: 0.5, sm: 0 },
+                  ml: { xs: 0, md: 0.6 },
+                  mt: { xs: 0.35, md: 0 },
                   borderRadius: 999,
                   textTransform: "none",
                   fontWeight: 800,
@@ -216,7 +226,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                 }
               >
                 <Box component="span" className="dealBotText">
-                  Deal Bot
+                  Ask My Analyst
                 </Box>
                 <Box component="span" className="dealBotSparkle">
                   <AutoAwesomeRoundedIcon sx={{ fontSize: 14 }} />
@@ -224,25 +234,12 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
               </Button>
             ) : null}
           </Box>
-
-          <Typography
-            variant="body2"
-            color="#000000"
-            sx={{
-              fontWeight: 600,
-              mt: 0.3,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              color: "#22252a",
-            }}
-          >
-            {activePayload?.ticker || "N/A"}
-          </Typography>
         </Box>
 
         {/* Right */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>{SearchComponent}</Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", minWidth: 0, width: "100%" }}>
+          {SearchComponent}
+        </Box>
       </Box>
     </Paper>
   );

@@ -123,6 +123,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   }
 
   const isIpo = (activePayload.deal_type || "").toLowerCase().includes("ipo");
+  const dealBotDetails = {
+    deal_id: activePayload.deal_id,
+    unique_deal_id: activePayload.unique_deal_id,
+    ticker: activePayload.ticker,
+    pricing_date: activePayload.pricing_date,
+    deal_type: activePayload.deal_type,
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
@@ -153,7 +160,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <DealHeaderCard
             activePayload={activePayload}
             formatDate={formatDate}
-            onDealBotClick={() => setShowDealBot((prev) => !prev)}
+            onDealBotClick={() => {
+              if (!showDealBot) {
+                setShowDealBot(true);
+              }
+            }}
             isDealBotActive={showDealBot}
             onBack={() =>
               navigate("/deals/new_dashboard", {
@@ -164,7 +175,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               })
             }
             SearchComponent={
-              <Box sx={{ width: { xs: "100%", md: 320 } }}>
+              <Box sx={{ width: { xs: "100%", md: 215 } }}>
                 <NewDashbaordIPOTickerList
                   selectedTicker={activePayload.ticker}
                   onSelect={setSelectedOption}
@@ -242,99 +253,90 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {showDealBot ? (
+          <Box sx={{ display: showDealBot ? "block" : "none" }}>
             <DealBot
-              basicDealDetails={{
-                deal_id: activePayload.deal_id,
-                unique_deal_id: activePayload.unique_deal_id,
-                ticker: activePayload.ticker,
-                pricing_date: activePayload.pricing_date,
-                deal_type: activePayload.deal_type,
-              }}
+              basicDealDetails={dealBotDetails}
             />
-          ) : tabItems[tabValue]?.label === "Trading Dynamics" ? (
-            <TradingSignalsMain
-              ticker={activePayload.ticker}
-              trade_date={activePayload.pricing_date}
-            />
-          ) : tabItems[tabValue]?.label === "Write Up New" ? (
-            isIpo ? (
-              <FebWriteUpDashboardMain
+          </Box>
+
+          <Box sx={{ display: showDealBot ? "none" : "block" }}>
+            {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+              <TradingSignalsMain
+                ticker={activePayload.ticker}
+                trade_date={activePayload.pricing_date}
+              />
+            ) : tabItems[tabValue]?.label === "Write Up New" ? (
+              isIpo ? (
+                <FebWriteUpDashboardMain
+                  basicDealDetails={{
+                    deal_id: activePayload.deal_id,
+                    unique_deal_id: activePayload.unique_deal_id,
+                    ticker: activePayload.ticker,
+                    pricing_date: activePayload.pricing_date,
+                    region: activePayload.region,
+                    deal_type: activePayload.deal_type,
+                    issuer_name: activePayload.issuer_name,
+                    exchange: activePayload.exchange,
+                  }}
+                />
+              ) : (
+                <NewDashboardLifeCycleOverviewFO
+                  ticker={activePayload.ticker}
+                  pricingDate={activePayload.pricing_date}
+                />
+              )
+            ) : tabItems[tabValue]?.label === "Write Up Old" ? (
+              isIpo ? (
+                <WriteUpIPODashbaord ticker={activePayload.ticker} />
+              ) : (
+                <FOWriteUpDashboardMain
+                  ticker={activePayload.ticker}
+                  deal_id={activePayload.deal_id}
+                />
+              )
+            ) : tabItems[tabValue]?.label === "Deal Recommendation" ? (
+              isUpcoming ? (
+                // <UpcomingDealRecomendation ticker={activePayload.ticker}
+                // />
+                <DealRecommendationHome ticker={activePayload.ticker} />
+              ) : (
+                // <RecentDealRecomendation ticker={activePayload.ticker}
+                // />
+                <DealRecommendationHome ticker={activePayload.ticker} />
+              )
+            ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
+              <NewDashboardLifeCyclePeerDeals selectedDeal={activePayload} />
+            ) : tabItems[tabValue]?.label === "NEWS" ? (
+              <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
+            ) : tabItems[tabValue]?.label === "ML Model" ? (
+              <AIMLDealDetails ticker={activePayload.ticker} />
+            ) : tabItems[tabValue]?.label === "AI based on previous 30 deals" ? (
+              <DashboardAIFewShotAnalysis
                 basicDealDetails={{
-                  deal_id: activePayload.deal_id,
                   unique_deal_id: activePayload.unique_deal_id,
+                }}
+                prefillTicker={{
                   ticker: activePayload.ticker,
-                  pricing_date: activePayload.pricing_date,
-                  region: activePayload.region,
-                  deal_type: activePayload.deal_type,
-                  issuer_name: activePayload.issuer_name,
-                  exchange: activePayload.exchange,
+                  pricing_date: activePayload.pricing_date ?? null,
                 }}
               />
-
-
-            ) : (
-              <NewDashboardLifeCycleOverviewFO
+            ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
+              <DashboardSentimentAnalysis
+                focusTicker={activePayload.ticker ?? null}
+                region={activePayload.region ?? null}
+              />
+            ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
+              <S1QueryBot ticker={activePayload.ticker} />
+            ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
+              <NewDashboardLifeCycleMeetingNotes
                 ticker={activePayload.ticker}
                 pricingDate={activePayload.pricing_date}
+                dealType={activePayload.deal_type}
               />
-            )
-          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
-            isIpo ? (
-              <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
-              <FOWriteUpDashboardMain
-                ticker={activePayload.ticker}
-                deal_id={activePayload.deal_id}
-              />
-            )
-
-
-          ) : tabItems[tabValue]?.label === "Deal Recommendation" ? (
-            isUpcoming ? (
-              // <UpcomingDealRecomendation ticker={activePayload.ticker}
-              // />
-              <DealRecommendationHome ticker={activePayload.ticker} />
-            ) : (
-              // <RecentDealRecomendation ticker={activePayload.ticker}
-              // />
-              <DealRecommendationHome ticker={activePayload.ticker} />
-            )
-          ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
-            <NewDashboardLifeCyclePeerDeals
-              selectedDeal={activePayload}
-            />
-
-          ) : tabItems[tabValue]?.label === "NEWS" ? (
-            <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "ML Model" ? (
-            <AIMLDealDetails ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "AI based on previous 30 deals" ? (
-            <DashboardAIFewShotAnalysis
-              basicDealDetails={{
-                unique_deal_id: activePayload.unique_deal_id,
-              }}
-              prefillTicker={{
-                ticker: activePayload.ticker,
-                pricing_date: activePayload.pricing_date ?? null,
-              }}
-            />
-          ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
-            <DashboardSentimentAnalysis
-              focusTicker={activePayload.ticker ?? null}
-              region={activePayload.region ?? null}
-            />
-          ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
-            <S1QueryBot ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
-            <NewDashboardLifeCycleMeetingNotes
-              ticker={activePayload.ticker}
-              pricingDate={activePayload.pricing_date}
-              dealType={activePayload.deal_type}
-            />
-          ) : (
-            <PageUnderDevelopment />
-          )}
+              <PageUnderDevelopment />
+            )}
+          </Box>
         </Box>
       </Paper>
     </Container>
