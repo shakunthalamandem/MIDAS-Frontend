@@ -311,7 +311,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               Deal Bot
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.92rem" }}>
               Ask questions about {basicDealDetails.ticker }
             </Typography>
           </Box>
@@ -386,6 +386,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   borderRadius: 999,
                   bgcolor: "common.white",
                   color: "text.primary",
+                  fontSize: "0.92rem",
                   boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderColor: " rgba(99, 102, 241, 0.85)",
@@ -396,7 +397,8 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
                   },
                   "& textarea": {
-                    padding: "12px 16px",
+                    padding: "10px 16px",
+                    fontSize: "0.92rem",
                   },
                 },
                 endAdornment: question ? (
