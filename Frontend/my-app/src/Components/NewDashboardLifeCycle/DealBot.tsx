@@ -15,14 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
-
-type DealBotBasicDealDetails = {
-  ticker?: string;
-  pricing_date?: string;
-  deal_type?: string;
-  unique_deal_id?: string;
-  deal_id?: string;
-};
+import { type DealBotBasicDealDetails } from "./DealBotPdfExport";
 
 type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
@@ -403,11 +396,6 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
             }}
           >
             {prepLoading && <CircularProgress size={18} />}
-            {!prepLoading && apiData && (
-              <Typography variant="body2" color="success.main">
-                Deal data ready
-              </Typography>
-            )}
             {!prepLoading && !apiData && !prepError && (
               <Typography variant="body2" color="text.secondary">
                 Waiting for deal data
@@ -446,6 +434,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                   borderRadius: 999,
                   bgcolor: "common.white",
                   color: "text.primary",
+                  fontSize: "0.92rem",
                   boxShadow: "0 20px 35px rgba(31, 74, 188, 0.15)",
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderColor: "rgba(99, 102, 241, 0.3)",
@@ -454,7 +443,8 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
                     borderColor: "rgba(99, 102, 241, 0.65)",
                   },
                   "& textarea": {
-                    padding: "12px 16px",
+                    padding: "10px 16px",
+                    fontSize: "0.92rem",
                   },
                 },
                 endAdornment: question ? (
@@ -626,7 +616,10 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           </Typography>
         )}
 
-        {blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll disableMotion />}
+        {blocks.length > 0 && (
+  
+            <GENAIRenderer blocks={blocks} renderAll disableMotion />
+        )}
       </Stack>
     </Paper>
   );

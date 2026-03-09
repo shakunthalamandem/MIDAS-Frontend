@@ -38,17 +38,17 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
       })}
     >
       {/* ROW 1 */}
-      <Box
-        sx={(theme) => ({
-          px: 2,
-          py: 1.5,
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 2fr 1fr" },
-          alignItems: "center",
-          gap: 1.5,
-          borderBottom: "none",
-          backgroundColor: "transparent",
-        })}
+        <Box
+          sx={(theme) => ({
+            px: 2,
+            py: 1.5,
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "auto minmax(0, 1fr) auto" },
+            alignItems: "center",
+            gap: 1.5,
+            borderBottom: "none",
+            backgroundColor: "transparent",
+          })}
       >
         {/* Left */}
         <Box>
@@ -69,15 +69,15 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
           </Button>
         </Box>
 
-        {/* Center */}
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              flexWrap: "wrap",
+              flexWrap: { xs: "wrap", md: "nowrap" },
               gap: { xs: 1.2, md: 1.6 },
+              width: "100%",
             }}
           >
             <Typography
@@ -86,8 +86,12 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                 fontWeight: 700,
                 lineHeight: 1.15,
                 color: "#600e79ff",
-                maxWidth: { xs: "100%", md: "100%" },
-                whiteSpace: "normal",
+                fontSize: { xs: "1.5rem", md: "1.95rem" },
+                maxWidth: "100%",
+                whiteSpace: { xs: "normal", md: "nowrap" },
+                overflow: "visible",
+                textOverflow: "clip",
+                wordBreak: "normal",
                 textAlign: "center",
               }}
               title={titleLabel}
@@ -100,8 +104,9 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                 variant={isDealBotActive ? "contained" : "outlined"}
                 onClick={onDealBotClick}
                 sx={{
-                  ml: { xs: 0, md: 0.6 },
+                  ml: { xs: 0, md: 0.8 },
                   mt: { xs: 0.35, md: 0 },
+                  flexShrink: 0,
                   borderRadius: 999,
                   textTransform: "none",
                   fontWeight: 800,
