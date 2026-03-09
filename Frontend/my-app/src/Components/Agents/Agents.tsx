@@ -47,14 +47,14 @@ const activeAgents: AgentConfig[] = [
     route: "/ai_risk_review",
   },
   {
-    title: "Recent IPO Agent",
+    title: "Recent IPOs Agent",
     description:
-      "AI-generated ranking of the most promising IPOs from the last 30 days based on data and market signals.",
+      "Ranking of the most promising IPOs from the last 30 days based on data and market signals using ai-tools.",
     schedule: "Weekly Once",
     route: "/last_30_days_ai_ranking",
   },
   {
-    title: "Peer Analysis Agent",
+    title: "Prediction Agent",
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.Highlights likely early trading patterns, including sentiment shifts, volatility, and short-term risks.",
     schedule: "One Time for each IPO",
@@ -64,7 +64,7 @@ const activeAgents: AgentConfig[] = [
     title: "Sentiment Agent",
     description:
       "Run sentiment analysis for selected stocks every day to generate updated market sentiment.Enable this agent to retrieve the latest sentiment analysis results after each run.",
-    schedule: "Runs Daily",
+    schedule: "Run Daily",
     route: "/ai_sentiment_view",
   },
 ];

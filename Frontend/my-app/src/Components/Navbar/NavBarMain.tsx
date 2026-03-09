@@ -255,7 +255,7 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-              New Dashboard
+              Dashboard
             </Button>
             <DropdownTab
               label="AI-ML"
