@@ -36,19 +36,15 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
     <Box
       sx={{
         position: "relative",
-        borderRadius: 4,
-        p: 3,
-        mt: 3,
+        borderRadius: 2.5,
+        p: 2,
         backdropFilter: "blur(12px)",
         background: "linear-gradient(145deg, #ffffff, #f8fafc)",
         border: "1px solid rgba(99,102,241,0.15)",
-        boxShadow:
-          "0 10px 30px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
-        transition: "all 0.3s ease",
+        boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+        transition: "all 0.2s ease",
         "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow:
-            "0 18px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7)",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.07)",
         },
       }}
     >
@@ -58,18 +54,15 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2.5,
+          mb: 1.5,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography
             sx={{
               fontWeight: 800,
-              fontSize: 20,
-              letterSpacing: 0.5,
-              // background: "linear-gradient(90deg,#1e293b,#6366f1)",
-              // WebkitBackgroundClip: "text",
-              // WebkitTextFillColor: "transparent",
+              fontSize: 15,
+              letterSpacing: 0.3,
             }}
           >
             {item.ticker || item.title || item.name}
@@ -84,10 +77,10 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
                   "linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)",
                 color: "#fff",
                 fontWeight: 700,
-                fontSize: 12,
-                height: 26,
+                fontSize: 11,
+                height: 22,
                 borderRadius: "999px",
-                boxShadow: "0 4px 12px rgba(168,85,247,0.3)",
+                boxShadow: "0 2px 8px rgba(168,85,247,0.25)",
               }}
             />
           )}
@@ -101,22 +94,23 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
               backgroundColor: badge.bg,
               color: badge.color,
               fontWeight: 600,
-              fontSize: 12,
+              fontSize: 11,
+              height: 22,
               borderRadius: "999px",
-              px: 1,
+              px: 0.5,
             }}
           />
         )}
       </Box>
 
-      <Divider sx={{ mb: 2.5, opacity: 0.4 }} />
+      <Divider sx={{ mb: 1.5, opacity: 0.3 }} />
 
-      {/* CONTENT GRID */}
+      {/* CONTENT GRID — compact */}
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 2,
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: 1,
         }}
       >
         {fields.map((field, index) => {
@@ -126,29 +120,25 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
             <Box
               key={index}
               sx={{
-                borderRadius: 3,
-                p: 2,
+                borderRadius: 2,
+                px: 1.5,
+                py: 1,
                 background: isAction
-                  ? "linear-gradient(135deg, rgba(239,68,68,0.08), rgba(220,38,38,0.05))"
-                  : "rgba(248,250,252,0.7)",
+                  ? "linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.03))"
+                  : "rgba(248,250,252,0.6)",
                 border: isAction
-                  ? "1px solid rgba(239,68,68,0.25)"
-                  : "1px solid rgba(148,163,184,0.15)",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
-                },
+                  ? "1px solid rgba(239,68,68,0.2)"
+                  : "1px solid rgba(148,163,184,0.12)",
               }}
             >
               <Typography
                 sx={{
-                  fontSize: 14,
+                  fontSize: 10.5,
                   fontWeight: 700,
                   textTransform: "uppercase",
-                  // letterSpacing: 1,
-                  color: "#001068",
-                  mb: 0.8,
+                  letterSpacing: 0.5,
+                  color: "#64748b",
+                  mb: 0.3,
                 }}
               >
                 {field.label}
@@ -156,8 +146,8 @@ const ImmediateDecisionCard: React.FC<Props> = ({ item }) => {
 
               <Typography
                 sx={{
-                  fontSize: 14,
-                  lineHeight: 1.6,
+                  fontSize: 12.5,
+                  lineHeight: 1.5,
                   color: isAction ? "#dc2626" : "#0f172a",
                   fontWeight: isAction ? 700 : 500,
                 }}
