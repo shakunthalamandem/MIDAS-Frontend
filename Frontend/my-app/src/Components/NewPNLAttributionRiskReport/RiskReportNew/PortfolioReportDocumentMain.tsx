@@ -7,8 +7,6 @@ import {
   IconButton,
   Chip,
   Container,
-  Tab,
-  Tabs,
   TextField,
 } from "@mui/material";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -84,7 +82,7 @@ interface ReportData {
   sections: Record<string, any>;
 }
 
-type ActiveTab = "portfolio" | "risk";
+export type ActiveTab = "portfolio" | "risk";
 
 // ═══════════════════════════════════════════════════════
 // Tab section definitions (CIO-optimized order)
@@ -226,6 +224,7 @@ interface PortfolioReportDocumentMainProps {
   reportList?: ReportListItem[];
   reportListLoading?: boolean;
   onSelectReport?: (report: ReportListItem | null) => void;
+  reviewMode?: ActiveTab;
 }
 
 const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = ({
@@ -233,9 +232,10 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   reportList = [],
   reportListLoading = false,
   onSelectReport,
+  reviewMode = "portfolio",
 }) => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("portfolio");
+  const activeTab: ActiveTab = reviewMode;
   const [activeSection, setActiveSection] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -307,7 +307,8 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
       }
       const data: ReportData = await res.json();
       setReportData(data);
-      setActiveSection(PORTFOLIO_SECTIONS[0].key);
+      const sections = reviewMode === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS;
+      setActiveSection(sections[0].key);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -319,15 +320,6 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
     setActiveSection(key);
     sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
-
-  const handleTabChange = (_: React.SyntheticEvent, newTab: ActiveTab) => {
-    setActiveTab(newTab);
-    sectionRefs.current = {};
-    const firstSection = (newTab === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS)[0];
-    setActiveSection(firstSection.key);
-    // Reset scroll
-    if (contentRef.current) contentRef.current.scrollTop = 0;
-  };
 
   const formatDateShort = (dateStr: string) => {
     try {
@@ -683,54 +675,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
               </Box>
             )}
 
-            {/* ─── Tab Switcher ─── */}
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1.5 }}>
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                sx={{
-                  minHeight: 36,
-                  "& .MuiTabs-indicator": {
-                    height: 3,
-                    borderRadius: "3px 3px 0 0",
-                    backgroundColor: activeTab === "portfolio" ? "#2563eb" : "#dc2626",
-                  },
-                }}
-              >
-                <Tab
-                  value="portfolio"
-                  icon={<TrendingUpOutlinedIcon sx={{ fontSize: 18 }} />}
-                  iconPosition="start"
-                  label="Portfolio Review"
-                  sx={{
-                    minHeight: 36,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: activeTab === "portfolio" ? "#2563eb" : "#64748b",
-                    "&.Mui-selected": { color: "#2563eb" },
-                    gap: 0.5,
-                    px: 2,
-                  }}
-                />
-                <Tab
-                  value="risk"
-                  icon={<ShieldOutlinedIcon sx={{ fontSize: 18 }} />}
-                  iconPosition="start"
-                  label="Risk Review"
-                  sx={{
-                    minHeight: 36,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: activeTab === "risk" ? "#dc2626" : "#64748b",
-                    "&.Mui-selected": { color: "#dc2626" },
-                    gap: 0.5,
-                    px: 2,
-                  }}
-                />
-              </Tabs>
-            </Box>
+            {/* Tab switcher moved to top-level AIPortfolioReview */}
           </Box>
 
           {/* ─── Scrollable Section Content ─── */}
