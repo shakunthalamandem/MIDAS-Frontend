@@ -153,7 +153,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <DealHeaderCard
             activePayload={activePayload}
             formatDate={formatDate}
-            onDealBotClick={() => setShowDealBot((prev) => !prev)}
+            onDealBotClick={() =>
+              setShowDealBot((prev) => {
+                return !prev;
+              })
+            }
             isDealBotActive={showDealBot}
             onBack={() =>
               navigate("/deals/new_dashboard", {
@@ -176,7 +180,6 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
           <Tabs
             value={tabValue}
             onChange={(_: React.SyntheticEvent, newValue: number) => {
-              if (showDealBot) return;
               setShowDealBot(false);
               setTabValue(newValue);
             }}
