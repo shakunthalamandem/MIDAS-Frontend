@@ -37,14 +37,14 @@ const activeAgents: AgentConfig[] = [
     description:
       "AI-powered decision engine for portfolio oversight. Identifies emerging risks, prioritizes actions, and supports faster capital allocation and investment decisions.",
     schedule: "Once a Week on Monday",
-    route: "/ai_portfolio_review",
+    route: "/ai_portfolio_review?tab=portfolio",
   },
   {
     title: "Risk Agent",
     description:
       "Continuously analyzes portfolio exposures to detect potential risks early. Highlights vulnerabilities, volatility signals, and areas requiring immediate attention.",
     schedule: "Once a Week on Monday",
-    route: "/ai_portfolio_review",
+    route: "/ai_portfolio_review?tab=risk",
   },
   {
     title: "Recent IPO Agent",
@@ -68,7 +68,6 @@ const activeAgents: AgentConfig[] = [
     route: "/ai_sentiment_view",
   },
 ];
-
 const comingSoonAgents = [
   {
     title: "IPO Calendar Alerts",
