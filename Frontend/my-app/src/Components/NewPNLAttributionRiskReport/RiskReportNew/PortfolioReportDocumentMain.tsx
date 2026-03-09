@@ -462,7 +462,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
         {/* ═══════ Sidebar ═══════ */}
         <Box
           sx={{
-            width: sw,
+            width: 100,
             minWidth: sw,
             transition: "width 0.3s ease, min-width 0.3s ease",
             display: "flex",
