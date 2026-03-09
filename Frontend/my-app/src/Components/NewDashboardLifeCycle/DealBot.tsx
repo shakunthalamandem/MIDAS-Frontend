@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Button,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -30,6 +31,16 @@ type DealBotProps = {
 type DealBotCache = {
   question: string;
   blocks: Block[];
+};
+
+type BotResponseItem = {
+  id: number;
+  ticker?: string | null;
+  unique_deal_id?: string | null;
+  bot_type?: string | null;
+  question: string;
+  answer: unknown;
+  created_at?: string;
 };
 
 const getDealBotStorageKey = (details: DealBotBasicDealDetails) => {
@@ -121,8 +132,18 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [blocks, setBlocks] = React.useState<Block[]>([]);
   const [queryLoading, setQueryLoading] = React.useState(false);
   const [queryError, setQueryError] = React.useState<string | null>(null);
+  const [recentResponses, setRecentResponses] = React.useState<BotResponseItem[]>([]);
+  const [recentLoading, setRecentLoading] = React.useState(false);
+  const [recentError, setRecentError] = React.useState<string | null>(null);
+  const [showRecent, setShowRecent] = React.useState(false);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
+  const botType = React.useMemo(() => "deal_bot", []);
+  const normalizedTicker = React.useMemo(() => {
+    const raw = (basicDealDetails?.ticker ?? "").toString();
+    if (!raw) return "";
+    return raw.split("(")[0].split(" ")[0].trim();
+  }, [basicDealDetails?.ticker]);
   const storageKey = React.useMemo(
     () => getDealBotStorageKey(basicDealDetails ?? {}),
     [
@@ -137,6 +158,13 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     () => "Something went wrong. Please rerun to try again.",
     []
   );
+
+  const recentQueryParams = React.useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("bot_type", botType);
+    if (normalizedTicker) params.set("ticker", normalizedTicker);
+    return params;
+  }, [botType, normalizedTicker]);
 
   React.useEffect(() => {
     const cached = readDealBotCache(storageKey);
@@ -218,6 +246,96 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     basicDealDetails.unique_deal_id,
   ]);
 
+  React.useEffect(() => {
+    if (!apiUrl) return;
+    if (!normalizedTicker && !basicDealDetails?.unique_deal_id) {
+      setRecentResponses([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const loadRecent = async () => {
+      setRecentLoading(true);
+      setRecentError(null);
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(
+          `${apiUrl}/api/bot_responses/?${recentQueryParams.toString()}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            signal: controller.signal,
+          }
+        );
+        if (!res.ok) {
+          const json = await res.json().catch(() => null);
+          console.error("Deal bot recent fetch failed", json, res.status);
+          setRecentError(friendlyErrorMessage);
+          return;
+        }
+        const data = await res.json();
+        setRecentResponses(Array.isArray(data?.results) ? data.results : []);
+      } catch (error: any) {
+        if (controller.signal.aborted) return;
+        console.error("Deal bot recent fetch threw", error);
+        setRecentError(friendlyErrorMessage);
+      } finally {
+        setRecentLoading(false);
+      }
+    };
+
+    loadRecent();
+    return () => controller.abort();
+  }, [
+    apiUrl,
+    basicDealDetails?.ticker,
+    basicDealDetails?.unique_deal_id,
+    friendlyErrorMessage,
+    recentQueryParams,
+  ]);
+
+  const saveBotResponse = async (nextBlocks: Block[], askedQuestion: string) => {
+    if (!apiUrl) return;
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${apiUrl}/api/bot_responses/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          bot_type: botType,
+          question: askedQuestion,
+          answer: nextBlocks,
+          ticker: normalizedTicker || null,
+        }),
+      });
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => null);
+        console.error("Deal bot response save failed", json, res.status);
+        return;
+      }
+
+      const saved = await res.json();
+      const newItem: BotResponseItem = {
+        id: saved.id,
+        ticker: saved.ticker,
+        unique_deal_id: saved.unique_deal_id,
+        bot_type: saved.bot_type,
+        question: saved.question,
+        answer: saved.answer,
+        created_at: saved.created_at,
+      };
+      setRecentResponses((prev) => [newItem, ...prev]);
+    } catch (error: any) {
+      console.error("Deal bot response save threw", error);
+    }
+  };
+
   const handleAsk = async () => {
     const trimmed = question.trim();
     if (!trimmed || queryLoading) return;
@@ -259,6 +377,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       const nextBlocks = toBlocks(payload);
       setBlocks(nextBlocks);
       writeDealBotCache(storageKey, { question: trimmed, blocks: nextBlocks });
+      saveBotResponse(nextBlocks, trimmed);
     } catch (error: any) {
       console.error("Deal query threw", error);
       setQueryError(friendlyErrorMessage);
@@ -269,6 +388,14 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
 
   const handleClearQuestion = () => {
     setQuestion("");
+  };
+
+  const handleSelectRecent = (item: BotResponseItem) => {
+    const nextBlocks = toBlocks(item.answer);
+    setQuestion(item.question ?? "");
+    setBlocks(nextBlocks);
+    setQueryError(null);
+    writeDealBotCache(storageKey, { question: item.question ?? "", blocks: nextBlocks });
   };
 
   return (
@@ -417,9 +544,59 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         )}
 
         {blocks.length > 0 && (
-  
-            <GENAIRenderer blocks={blocks} renderAll disableMotion />
+          <GENAIRenderer blocks={blocks} renderAll disableMotion />
         )}
+
+        <Box>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setShowRecent((prev) => !prev)}
+              sx={{ textTransform: "none" }}
+            >
+              {showRecent ? "Hide recent questions" : "Show recent questions"}
+            </Button>
+            {recentLoading && <CircularProgress size={16} />}
+          </Stack>
+          {recentError && (
+            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+              {recentError}
+            </Typography>
+          )}
+          {showRecent && recentResponses.length === 0 && !recentLoading && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              No previous questions for this deal yet.
+            </Typography>
+          )}
+          {showRecent && recentResponses.length > 0 && (
+            <Stack spacing={1.5} sx={{ mt: 2 }}>
+              {recentResponses.map((item) => (
+                <Paper
+                  key={item.id}
+                  variant="outlined"
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
+                  }}
+                >
+                  <Typography variant="subtitle2">{item.question}</Typography>
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => handleSelectRecent(item)}
+                    sx={{ alignSelf: "flex-start", textTransform: "none", px: 0 }}
+                  >
+                    View answer
+                  </Button>
+                </Paper>
+              ))}
+            </Stack>
+          )}
+        </Box>
       </Stack>
     </Paper>
   );
