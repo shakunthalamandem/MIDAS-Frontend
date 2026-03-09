@@ -106,6 +106,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
   const [recentResponses, setRecentResponses] = React.useState<BotResponseItem[]>([]);
   const [recentLoading, setRecentLoading] = React.useState(false);
   const [recentError, setRecentError] = React.useState<string | null>(null);
+  const [showRecentQuestions, setShowRecentQuestions] = React.useState(true);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
   const botType = React.useMemo(() => "deal_bot", []);
@@ -119,6 +120,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     setBlocks([]);
     setQueryError(null);
     setApiData(null);
+    setShowRecentQuestions(true);
 
     if (!apiUrl) {
       setPrepError("API URL is not configured.");
@@ -356,9 +358,11 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     setQuestion(item.question ?? "");
     setBlocks(nextBlocks);
     setQueryError(null);
+    setShowRecentQuestions(false);
   };
 
-  const shouldShowRecentCards = !prepLoading && recentResponses.length > 0;
+  const shouldShowRecentCards =
+    showRecentQuestions && !prepLoading && recentResponses.length > 0;
 
   return (
     <Paper
@@ -491,16 +495,52 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
           </IconButton>
         </Box>
 
+        {recentResponses.length > 0 && (
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={2}
+            sx={{ mb: shouldShowRecentCards ? 2 : 0 }}
+          >
+            {showRecentQuestions ? (
+              <Stack direction="row" alignItems="center" spacing={1}>
+                {/* <BoltOutlinedIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+                <Typography variant="body2" sx={{ color: "#2563eb", fontWeight: 600 }}>
+                  Recently asked questions
+                </Typography> */}
+                {recentLoading && <CircularProgress size={14} />}
+              </Stack>
+            ) : (
+              <Box />
+            )}
+
+            <Typography
+              variant="body2"
+              role="button"
+              tabIndex={0}
+              onClick={() => setShowRecentQuestions((prev) => !prev)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setShowRecentQuestions((prev) => !prev);
+                }
+              }}
+              sx={{
+                color: "#4f46e5",
+                fontWeight: 600,
+                cursor: "pointer",
+                userSelect: "none",
+              }}
+            >
+              {showRecentQuestions
+                ? "Hide recently asked questions"
+                : "Show recently asked questions"}
+            </Typography>
+          </Stack>
+        )}
         {shouldShowRecentCards && (
           <Box>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-              <BoltOutlinedIcon sx={{ color: "#2563eb", fontSize: 18 }} />
-              <Typography variant="body2" sx={{ color: "#2563eb", fontWeight: 600 }}>
-                Recently asked questions
-              </Typography>
-              {recentLoading && <CircularProgress size={14} />}
-            </Stack>
-
             <Box
               sx={{
                 display: "grid",
