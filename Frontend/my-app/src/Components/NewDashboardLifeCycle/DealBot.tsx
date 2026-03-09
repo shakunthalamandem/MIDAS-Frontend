@@ -290,6 +290,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
     setPdfStatus("Preparing content...");
 
     try {
+      // Save and expand container so all content is visible
       const originalOverflow = container.style.overflow;
       const originalHeight = container.style.height;
       const originalMaxHeight = container.style.maxHeight;
@@ -302,30 +303,44 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         requestAnimationFrame(() => setTimeout(resolve, 500))
       );
 
-      setPdfProgress(20);
-      setPdfStatus("Capturing content...");
+      // Collect sections: each MUI Grid row is a section
+      // The GENAIRenderer wraps rows in MuiGrid-container divs
+      const gridRows = Array.from(
+        container.querySelectorAll<HTMLElement>(".MuiGrid-container")
+      ).filter((el) => el.offsetHeight > 0);
 
-      const captureWidth = Math.max(container.scrollWidth, 1100);
-      const canvas = await html2canvas(container, {
-        scale: 2.5,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        width: captureWidth,
-        windowWidth: captureWidth,
-        windowHeight: container.scrollHeight * 2,
-      });
+      // If no grid rows found, fall back to direct children of the CardContent
+      let sections: HTMLElement[] = gridRows;
+      if (sections.length === 0) {
+        const cardContent = container.querySelector<HTMLElement>(
+          ".MuiCardContent-root"
+        );
+        if (cardContent) {
+          sections = Array.from(cardContent.children).filter(
+            (el): el is HTMLElement =>
+              el instanceof HTMLElement && el.offsetHeight > 0
+          );
+        }
+      }
+      // Ultimate fallback: treat the whole container as one section
+      if (sections.length === 0) {
+        sections = [container];
+      }
 
-      setPdfProgress(60);
-      setPdfStatus("Building PDF...");
+      const totalSections = sections.length;
+
+      setPdfProgress(15);
+      setPdfStatus(`Found ${totalSections} sections to capture...`);
 
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const marginX = 8;
+      const marginTop = 4;
       const contentWidth = pdfWidth - marginX * 2;
       const bottomMargin = 12;
       const headerHeight = 22;
+      const sectionGap = 3;
 
       const ticker = basicDealDetails.ticker ?? "Deal";
       const reportTitle = `Deal Bot - ${ticker}`;
@@ -370,128 +385,118 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
         pdf.line(0, headerHeight, pdfWidth, headerHeight);
 
         pdf.setTextColor(0, 0, 0);
-        return headerHeight + 4;
+        return headerHeight + marginTop;
       };
 
-      const imgWidth = contentWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pxPerMm = canvas.height / imgHeight;
+      // Capture a single section to canvas
+      const captureSection = async (section: HTMLElement) => {
+        const captureWidth = Math.max(section.scrollWidth, section.offsetWidth, 1100);
+        return html2canvas(section, {
+          scale: 2.5,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          logging: false,
+          width: captureWidth,
+          windowWidth: captureWidth,
+          windowHeight: section.scrollHeight * 2,
+        });
+      };
 
-      // Scan canvas to find "safe" break rows (rows that are mostly white/blank)
-      const findSafeBreakPoint = (
-        targetPx: number,
-        startPx: number
-      ): number => {
-        const scanCtx = canvas.getContext("2d");
-        if (!scanCtx) return targetPx;
+      // Place a captured canvas image onto the PDF, splitting across pages if needed
+      const placeImage = (canvas: HTMLCanvasElement, startY: number): number => {
+        const imgWidth = contentWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-        // Search zone: look up to 15% above the target line for a blank row
-        const searchRange = Math.floor((targetPx - startPx) * 0.15);
-        const searchStart = Math.max(startPx, targetPx - searchRange);
+        // Fits entirely on the current page
+        if (startY + imgHeight <= pdfHeight - bottomMargin) {
+          const imgData = canvas.toDataURL("image/jpeg", 0.95);
+          pdf.addImage(imgData, "JPEG", marginX, startY, imgWidth, imgHeight);
+          return startY + imgHeight + sectionGap;
+        }
 
-        // Scan rows from target upward to find a row that is mostly white
-        const sampleStep = Math.max(1, Math.floor(canvas.width / 200));
-        for (let row = targetPx; row >= searchStart; row--) {
-          const rowData = scanCtx.getImageData(0, row, canvas.width, 1).data;
-          let whitePixels = 0;
-          let totalSampled = 0;
-          for (let x = 0; x < canvas.width; x += sampleStep) {
-            totalSampled++;
-            const idx = x * 4;
-            const r = rowData[idx];
-            const g = rowData[idx + 1];
-            const b = rowData[idx + 2];
-            // Consider near-white (> 240 for all channels) as blank
-            if (r > 240 && g > 240 && b > 240) {
-              whitePixels++;
-            }
+        // Need to slice across pages
+        const pxPerMm = canvas.height / imgHeight;
+        let remainingPx = canvas.height;
+        let canvasY = 0;
+        let currentPageY = startY;
+
+        while (remainingPx > 0) {
+          const availableMm = pdfHeight - bottomMargin - currentPageY;
+          const availablePx = Math.floor(availableMm * pxPerMm);
+          const sliceHeight = Math.min(availablePx, remainingPx);
+          const sliceMm = sliceHeight / pxPerMm;
+
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceHeight;
+          const ctx = sliceCanvas.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            ctx.drawImage(
+              canvas,
+              0,
+              canvasY,
+              canvas.width,
+              sliceHeight,
+              0,
+              0,
+              canvas.width,
+              sliceHeight
+            );
           }
-          // If 95%+ of sampled pixels are white, this is a safe break row
-          if (whitePixels / totalSampled >= 0.95) {
-            return row;
+
+          const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
+          pdf.addImage(sliceData, "JPEG", marginX, currentPageY, imgWidth, sliceMm);
+
+          canvasY += sliceHeight;
+          remainingPx -= sliceHeight;
+
+          if (remainingPx > 0) {
+            pdf.addPage();
+            currentPageY = drawPageHeader();
+          } else {
+            currentPageY = currentPageY + sliceMm + sectionGap;
           }
         }
-        // No safe break found — fall back to the original target
-        return targetPx;
+
+        return currentPageY;
       };
 
       let currentY = drawPageHeader();
-      let canvasY = 0;
-      let remainingCanvasHeight = canvas.height;
 
-      while (remainingCanvasHeight > 0) {
-        const availableMm = pdfHeight - bottomMargin - currentY;
-        const availablePx = Math.floor(availableMm * pxPerMm);
-        let sliceHeight = Math.min(availablePx, remainingCanvasHeight);
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        setPdfStatus(`Capturing section ${i + 1} of ${totalSections}...`);
+        setPdfProgress(15 + Math.round(((i + 1) / totalSections) * 70));
 
-        // Only look for safe breaks if we're not on the last slice
-        if (sliceHeight < remainingCanvasHeight) {
-          sliceHeight = findSafeBreakPoint(
-            canvasY + sliceHeight,
-            canvasY
-          ) - canvasY;
-          // Ensure we always advance at least some pixels
-          if (sliceHeight < 100) sliceHeight = availablePx;
-        }
+        // Small delay to let browser settle rendering
+        await new Promise<void>((r) => setTimeout(r, 150));
 
-        const sliceMm = sliceHeight / pxPerMm;
+        const canvas = await captureSection(section);
+        const imgHeight = (canvas.height * contentWidth) / canvas.width;
 
-        const sliceCanvas = document.createElement("canvas");
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = sliceHeight;
-        const ctx = sliceCanvas.getContext("2d");
-        if (ctx) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-          ctx.drawImage(
-            canvas,
-            0,
-            canvasY,
-            canvas.width,
-            sliceHeight,
-            0,
-            0,
-            canvas.width,
-            sliceHeight
-          );
-        }
-
-        const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
-        pdf.addImage(
-          sliceData,
-          "JPEG",
-          marginX,
-          currentY,
-          imgWidth,
-          sliceMm
-        );
-
-        canvasY += sliceHeight;
-        remainingCanvasHeight -= sliceHeight;
-
-        if (remainingCanvasHeight > 0) {
-          const remainingMm = remainingCanvasHeight / pxPerMm;
-          if (remainingMm < 10) break;
+        // If the section doesn't fit on the current page and there's less than
+        // 40mm left, start a new page so the section begins fresh
+        const remainingSpace = pdfHeight - bottomMargin - currentY;
+        if (imgHeight > remainingSpace && remainingSpace < pdfHeight * 0.35) {
           pdf.addPage();
           currentY = drawPageHeader();
         }
 
-        setPdfProgress(60 + Math.round((canvasY / canvas.height) * 30));
+        currentY = placeImage(canvas, currentY);
       }
 
-      setPdfProgress(95);
+      setPdfProgress(90);
       setPdfStatus("Adding finishing touches...");
 
-      // Remove trailing blank page if the last page only has the header
+      // Remove trailing blank page if it only has the header
       const totalPages = pdf.getNumberOfPages();
-      if (totalPages > 1) {
-        // currentY will be near headerHeight if nothing was drawn on the last page
-        const lastPageContentY = currentY;
-        if (lastPageContentY <= headerHeight + 6) {
-          pdf.deletePage(totalPages);
-        }
+      if (totalPages > 1 && currentY <= headerHeight + 8) {
+        pdf.deletePage(totalPages);
       }
 
+      // Add page numbers and footer
       const pageCount = pdf.getNumberOfPages();
       for (let p = 1; p <= pageCount; p++) {
         pdf.setPage(p);
@@ -518,6 +523,7 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       const fileName = `DealBot_${ticker}_${new Date().toISOString().slice(0, 10)}.pdf`;
       pdf.save(fileName);
 
+      // Restore container styles
       container.style.overflow = originalOverflow;
       container.style.height = originalHeight;
       container.style.maxHeight = originalMaxHeight;
