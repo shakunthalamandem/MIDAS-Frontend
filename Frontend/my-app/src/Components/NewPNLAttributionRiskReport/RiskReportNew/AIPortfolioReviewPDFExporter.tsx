@@ -156,11 +156,8 @@ const AIPortfolioReviewPDFExporter: React.FC<
       const captureSection = async (
         section: HTMLElement
       ): Promise<HTMLCanvasElement> => {
-        const captureWidth = Math.max(
-          section.scrollWidth,
-          section.offsetWidth,
-          1100
-        );
+        // Use the actual element width — no artificial minimum that creates blank right-side space
+        const captureWidth = Math.max(section.scrollWidth, section.offsetWidth);
         return html2canvas(section, {
           scale: 3,
           backgroundColor: "#ffffff",
