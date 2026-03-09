@@ -235,7 +235,8 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   onSelectReport,
 }) => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
- const [activeSection, setActiveSection] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("portfolio");
+  const [activeSection, setActiveSection] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -243,24 +244,13 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const contentRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-const getInitialTab = (): ActiveTab => {
-  const params = new URLSearchParams(window.location.search);
-  const tab = params.get("tab");
-
-  return tab === "risk" ? "risk" : "portfolio";
-};
-const [activeTab, setActiveTab] = useState<ActiveTab>(getInitialTab); 
 
   // Current tab sections
   const tabSections = useMemo(
     () => (activeTab === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS),
     [activeTab]
   );
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const tab = params.get("tab");
-  setActiveTab(tab === "risk" ? "risk" : "portfolio");
-}, []);
+
   // React to external report selection
   useEffect(() => {
     if (externalReport) {
@@ -330,21 +320,14 @@ useEffect(() => {
     sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-const handleTabChange = (_: React.SyntheticEvent, newTab: ActiveTab) => {
-  setActiveTab(newTab);
-
-  const params = new URLSearchParams(window.location.search);
-  params.set("tab", newTab);
-  window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
-
-  sectionRefs.current = {};
-  const firstSection =
-    (newTab === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS)[0];
-
-  setActiveSection(firstSection.key);
-
-  if (contentRef.current) contentRef.current.scrollTop = 0;
-};
+  const handleTabChange = (_: React.SyntheticEvent, newTab: ActiveTab) => {
+    setActiveTab(newTab);
+    sectionRefs.current = {};
+    const firstSection = (newTab === "portfolio" ? PORTFOLIO_SECTIONS : RISK_SECTIONS)[0];
+    setActiveSection(firstSection.key);
+    // Reset scroll
+    if (contentRef.current) contentRef.current.scrollTop = 0;
+  };
 
   const formatDateShort = (dateStr: string) => {
     try {
