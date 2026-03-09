@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Autocomplete,
   Box,
@@ -8,8 +7,6 @@ import {
   IconButton,
   Chip,
   Container,
-  Tab,
-  Tabs,
   TextField,
 } from "@mui/material";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
@@ -237,7 +234,6 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   onSelectReport,
   reviewMode = "portfolio",
 }) => {
-  const navigate = useNavigate();
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const activeTab: ActiveTab = reviewMode;
   const [activeSection, setActiveSection] = useState<string>("");
@@ -324,14 +320,6 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
     setActiveSection(key);
     sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
-
-  const handleTabChange = (_: React.SyntheticEvent, newTab: ActiveTab) => {
-    if (newTab === "portfolio") {
-      navigate("/ai_portfolio_review");
-    } else {
-      navigate("/ai_risk_review");
-    }
-  };
 
   const formatDateShort = (dateStr: string) => {
     try {
@@ -687,54 +675,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
               </Box>
             )}
 
-            {/* ─── Tab Switcher ─── */}
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1.5 }}>
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                sx={{
-                  minHeight: 36,
-                  "& .MuiTabs-indicator": {
-                    height: 3,
-                    borderRadius: "3px 3px 0 0",
-                    backgroundColor: activeTab === "portfolio" ? "#2563eb" : "#dc2626",
-                  },
-                }}
-              >
-                <Tab
-                  value="portfolio"
-                  icon={<TrendingUpOutlinedIcon sx={{ fontSize: 18 }} />}
-                  iconPosition="start"
-                  label="Portfolio Review"
-                  sx={{
-                    minHeight: 36,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: activeTab === "portfolio" ? "#2563eb" : "#64748b",
-                    "&.Mui-selected": { color: "#2563eb" },
-                    gap: 0.5,
-                    px: 2,
-                  }}
-                />
-                <Tab
-                  value="risk"
-                  icon={<ShieldOutlinedIcon sx={{ fontSize: 18 }} />}
-                  iconPosition="start"
-                  label="Risk Review"
-                  sx={{
-                    minHeight: 36,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: activeTab === "risk" ? "#dc2626" : "#64748b",
-                    "&.Mui-selected": { color: "#dc2626" },
-                    gap: 0.5,
-                    px: 2,
-                  }}
-                />
-              </Tabs>
-            </Box>
+            {/* Tab switcher moved to top-level AIPortfolioReview */}
           </Box>
 
           {/* ─── Scrollable Section Content ─── */}
