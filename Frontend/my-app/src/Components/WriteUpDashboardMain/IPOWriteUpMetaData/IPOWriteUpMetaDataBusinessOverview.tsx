@@ -692,7 +692,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         sx={{
           display: "grid",
           gridTemplateColumns: pdfMode ? "1fr" : { xs: "1fr", md: "1fr 1fr" },
-          gap: 2
+          gap: 2,
+          alignItems: "stretch"
         }}
       >
         {ACCORDION_SECTIONS.map(({ section, title }) => {
@@ -702,6 +703,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
           <Accordion
             key={section}
             defaultExpanded={pdfMode}
+            disableGutters
             sx={{
               borderRadius: 2,
               border: "1px solid #E6ECF5",
@@ -709,6 +711,10 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               "&:before": { display: "none" },
                 // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
                                   background: "#ffffff",
+              
+              height: "100%",
+              margin: 0,
+              "&.Mui-expanded": { margin: 0 }
 
             }}
           >
@@ -720,6 +726,12 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 borderRadius: "8px 8px 0 0",
                 "&:hover": {
                   background: "linear-gradient(135deg, #e8f0fe, #dae7fc)"
+                },
+                "&.Mui-expanded": {
+                  minHeight: 64
+                },
+                "& .MuiAccordionSummary-content.Mui-expanded": {
+                  margin: "12px 0"
                 }
               }}
             >
@@ -771,7 +783,8 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 p: 3,
                 // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
                 background: "#ffffff",
-                borderRadius: "0 0 8px 8px"
+                borderRadius: "0 0 8px 8px",
+                flexGrow: 1
               }}
             >
               {editMode === section ? (
