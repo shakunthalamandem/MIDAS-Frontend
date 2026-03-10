@@ -15,9 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 import ActiveAgentCard, {
   AgentConfig,
@@ -31,7 +28,6 @@ import PortfolioAnalysisAgent from "./AgentCards/PortfolioAnalysisAgent";
 import AISentimentAnalysisAgent from "./AgentCards/AISentimentAnalysisAgent";
 
 const apiUrl = process.env.REACT_APP_API_URL;
-const EMAIL_VERIFIED_KEY = "email_verified";
 
 const activeAgents: AgentConfig[] = [
   {
@@ -44,21 +40,21 @@ const activeAgents: AgentConfig[] = [
   {
     title: "Risk Agent",
     description:
-      "Continuously analyzes portfolio exposures to detect potential risks early. Highlights vulnerabilities, volatility signals, and areas requiring immediate attention.",
+      "Continuously analyzes portfolio exposures to detect potential risks early.",
     schedule: "Once a Week on Monday",
     route: "/ai_risk_review",
   },
   {
     title: "Recent IPOs Agent",
     description:
-      "Ranking of the most promising IPOs from the last 30 days based on data and market signals using ai-tools.",
+      "Ranking of the most promising IPOs from the last 30 days based on data and market signals.",
     schedule: "Once a Week",
     route: "/last_30_days_ai_ranking",
   },
   {
     title: "Prediction Agent",
     description:
-      "Analyzes a company’s pre-listing fundamentals by comparing them with around 30 similar past IPO deals.",
+      "Analyzes a company’s pre-listing fundamentals by comparing them with similar past IPO deals.",
     schedule: "One Time for each IPO",
     route: "/ai_fewshot_analysis",
   },
@@ -105,17 +101,11 @@ const reverseScheduleMap: Record<number, string> = {
 type AgentLatestUpdatedDates = Record<
   string,
   {
-    id?: number;
     updated_at?: string;
-    [key: string]: any;
   }
 >;
 
 const Agents: React.FC = () => {
-  const [emailVerified] = useState(
-    () => localStorage.getItem(EMAIL_VERIFIED_KEY) === "true"
-  );
-
   const [activations, setActivations] = useState(
     activeAgents.reduce(
       (acc, agent) => ({
@@ -134,7 +124,6 @@ const Agents: React.FC = () => {
   const [pendingAgent, setPendingAgent] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-
   const totalAgents = activeAgents.length;
 
   const activeCount = useMemo(
@@ -155,8 +144,6 @@ const Agents: React.FC = () => {
     try {
       const token = localStorage.getItem("access_token");
 
-      const scheduleNumber = scheduleMap[value];
-
       await fetch(`${apiUrl}/api/update_agent_schedule/`, {
         method: "POST",
         headers: {
@@ -164,12 +151,12 @@ const Agents: React.FC = () => {
           Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
-          agent_number: `agent${String(agentIndex).padStart(2, "0")}`,
-          schedule: scheduleNumber,
+          agent_number: `agent${String(agentIndex + 1).padStart(2, "0")}`,
+          schedule: scheduleMap[value],
         }),
       });
     } catch (err) {
-      console.error("Failed to update schedule", err);
+      console.error(err);
     }
   };
 
@@ -180,13 +167,11 @@ const Agents: React.FC = () => {
       try {
         const res = await fetch(`${apiUrl}/api/agent_membership/`, {
           headers: {
-            "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
 
         const agentSet = new Set<string>(data?.agentnumbers ?? []);
         const schedulesFromApi = data?.schedules ?? {};
@@ -200,14 +185,10 @@ const Agents: React.FC = () => {
             const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
 
             if (agentSet.has(agentNumber)) {
-              next[agent.title] = {
-                ...next[agent.title],
-                enabled: true,
-              };
+              next[agent.title] = { ...next[agent.title], enabled: true };
             }
 
             const scheduleValue = schedulesFromApi[agentNumber];
-
             if (scheduleValue) {
               newSchedules[agent.title] =
                 reverseScheduleMap[Number(scheduleValue)];
@@ -219,7 +200,7 @@ const Agents: React.FC = () => {
 
         setRunSchedules(newSchedules);
       } catch (err) {
-        console.error("Failed to load membership", err);
+        console.error(err);
       }
     };
 
@@ -238,8 +219,6 @@ const Agents: React.FC = () => {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-
         setLatestUpdatedDates(data || {});
       } catch (err) {
         console.error(err);
@@ -254,14 +233,21 @@ const Agents: React.FC = () => {
     index: number,
     action: "add" | "remove"
   ) => {
-    setPendingAgent({ agent, index, action });
+    setSaveError(null);
+
+    setPendingAgent({
+      agent,
+      index,
+      action,
+    });
+
     setDialogOpen(true);
   };
-
   const handleConfirmSave = async () => {
     if (!pendingAgent) return;
 
     setSaving(true);
+    setSaveError(null);
 
     try {
       const token = localStorage.getItem("access_token");
@@ -279,6 +265,7 @@ const Agents: React.FC = () => {
       });
 
       const data = await res.json();
+
       if (!res.ok) throw new Error(data.error);
 
       setActivations((prev) => ({
@@ -291,12 +278,16 @@ const Agents: React.FC = () => {
 
       setDialogOpen(false);
     } catch (err: any) {
-      setSaveError(err.message);
+      setSaveError(err.message || "Failed to update agent.");
     } finally {
       setSaving(false);
     }
   };
-
+  const handleDialogClose = () => {
+    if (saving) return;
+    setDialogOpen(false);
+    setPendingAgent(null);
+  };
   return (
     <Box sx={{ backgroundColor: "#edf0f7", minHeight: "100vh", p: 4 }}>
       <Box sx={{ maxWidth: 1200, mx: "auto" }}>
@@ -333,10 +324,12 @@ const Agents: React.FC = () => {
         >
           {activeAgents.map((agent, index) => {
             const state = activations[agent.title];
+
             const Component =
               agentComponentMap[agent.title] ?? ActiveAgentCard;
 
             const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
+
             const lastUpdatedAt =
               latestUpdatedDates?.[agentNumber]?.updated_at ?? null;
 
@@ -349,14 +342,14 @@ const Agents: React.FC = () => {
                 lastUpdatedAt={lastUpdatedAt}
                 runSchedule={runSchedules[agent.title]}
                 onRunScheduleChange={(ag, value) =>
-                  handleRunScheduleChange(ag, index + 1, value)
+                  handleRunScheduleChange(ag, index, value)
                 }
-                onToggle={(ag, key, currentValue) => {
+                onToggle={(ag, key, checked) => {
                   if (key === "enabled") {
                     handleAgentRequest(
                       ag,
                       index + 1,
-                      currentValue ? "remove" : "add"
+                      checked ? "add" : "remove"
                     );
                   }
                 }}
@@ -380,6 +373,43 @@ const Agents: React.FC = () => {
           })}
         </Box>
       </Box>
+
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>
+          {pendingAgent?.action === "add"
+            ? "Enable this agent?"
+            : "Disable this agent?"}
+        </DialogTitle>
+
+        <DialogContent>
+          {saveError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {saveError}
+            </Alert>
+          )}
+
+          <DialogContentText>
+            {pendingAgent?.action === "add"
+              ? `Enable ${pendingAgent?.agent.title} and get the latest updates.`
+              : `Disable ${pendingAgent?.agent.title} and stop receiving updates.`}
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleDialogClose} disabled={saving}>
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            color={pendingAgent?.action === "remove" ? "error" : "primary"}
+            onClick={handleConfirmSave}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Confirm"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
