@@ -8,6 +8,9 @@ import {
   Stack,
   Switch,
   Typography,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -29,13 +32,30 @@ export interface ActiveAgentState {
 export interface ActiveAgentCardProps {
   agent: AgentConfig;
   state: ActiveAgentState;
-  onToggle: (agent: AgentConfig, key: "enabled" | "email", currentValue: boolean) => void;
+  onToggle: (
+    agent: AgentConfig,
+    key: "enabled" | "email",
+    currentValue: boolean
+  ) => void;
   agentIndex?: number;
   onRunSentimentClick?: () => void;
   children?: React.ReactNode;
   footerAction?: React.ReactNode;
   lastUpdatedAt?: string | null;
+
+  runSchedule?: string;
+  onRunScheduleChange?: (agent: AgentConfig, value: string) => void;
 }
+
+const runOptions = [
+  "Daily",
+  "2 Days",
+  "3 Days",
+  "4 Days",
+  "5 Days",
+  "6 Days",
+  "Once a Week",
+];
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,
@@ -46,6 +66,8 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   children,
   footerAction,
   lastUpdatedAt,
+  runSchedule,
+  onRunScheduleChange,
 }) => {
   const statusLabel = state.enabled ? "Active" : "Paused";
   const statusColor = state.enabled ? "success" : "warning";
@@ -56,8 +78,6 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         day: "2-digit",
         month: "short",
         year: "numeric",
-        // hour: "2-digit",
-        // minute: "2-digit",
       })
     : dayjs().format("DD MMM YYYY");
 
@@ -74,11 +94,9 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
         display: "flex",
         flexDirection: "column",
         gap: 2.5,
-        boxShadow: state.enabled
-          ? "0 20px 40px rgba(79, 101, 182, 0.08)"
-          : "0 20px 40px rgba(79, 101, 182, 0.03)",
       }}
     >
+      {/* Header */}
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box
@@ -97,38 +115,39 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           >
             {displayIndex}
           </Box>
+
           <Typography variant="h6" sx={{ color: "#481f93", fontWeight: 700 }}>
             {agent.title}
           </Typography>
         </Stack>
+
         <Switch
           checked={state.enabled}
-          onClick={(event) => event.stopPropagation()}
-          onChange={(event) => {
-            event.stopPropagation();
+          onClick={(e) => e.stopPropagation()}
+          onChange={(e) => {
+            e.stopPropagation();
             onToggle(agent, "enabled", state.enabled);
           }}
         />
       </Stack>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2" color="#2f323a">
-          {agent.description}
-        </Typography>
+      {/* Description */}
+      <Box>
+        <Typography variant="body2">{agent.description}</Typography>
 
-        {children && <Box sx={{ mt: 0, mb: 0 }}>{children}</Box>}
+        {children && <Box mt={1}>{children}</Box>}
 
-        <Divider sx={{ borderColor: "rgba(79, 101, 182, 0.2)", my: 0 }} />
+        <Divider sx={{ my: 1 }} />
       </Box>
 
-      <Stack spacing={1} sx={{ mt: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
-          >
+      {/* Info section */}
+      <Stack spacing={1}>
+        {/* Active */}
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography sx={{ fontWeight: 600, minWidth: 70 }}>
             Active:
           </Typography>
+
           <Chip
             label={statusLabel}
             color={
@@ -140,44 +159,54 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
                 | "error"
                 | "warning"
             }
-            variant="outlined"
             size="small"
-            sx={{ borderRadius: 3, textTransform: "none" }}
           />
         </Stack>
 
-        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: "#715579", minWidth: 60 }}
-          >
+        {/* Run */}
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography sx={{ fontWeight: 600, minWidth: 70 }}>
             Run:
           </Typography>
-          <Chip
-            icon={<CalendarTodayIcon />}
-            label={agent.schedule}
-            variant="filled"
-            sx={{
-              borderRadius: 3,
-              textTransform: "none",
-              bgcolor: "#f6f6ff",
-              color: "#3f467a",
-            }}
-            size="small"
-          />
+
+          {agent.title === "Recent IPOs Agent" ? (
+            <FormControl size="small">
+              <Select
+                value={runSchedule || agent.schedule}
+                onChange={(e) =>
+                  onRunScheduleChange?.(agent, e.target.value)
+                }
+                sx={{
+                  height: 30,
+                  borderRadius: 3,
+                  bgcolor: "#f6f6ff",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {runOptions.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <Chip
+              icon={<CalendarTodayIcon />}
+              label={agent.schedule}
+              size="small"
+              sx={{
+                bgcolor: "#f6f6ff",
+              }}
+            />
+          )}
+
           {onRunSentimentClick && (
             <Button
-              variant="outlined"
               size="small"
               startIcon={<PlayArrowIcon />}
-              sx={{
-                borderRadius: 3,
-                textTransform: "none",
-                fontWeight: 600,
-                letterSpacing: 0.5,
-              }}
-              onClick={(event) => {
-                event.stopPropagation();
+              onClick={(e) => {
+                e.stopPropagation();
                 onRunSentimentClick();
               }}
             >
@@ -195,28 +224,24 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           </Typography>
           <Chip
             icon={<EmailOutlinedIcon />}
-            label={state.email ? "Send Email" : "Email disabled"}
+            label={state.email ? "Send Email" : "Email Disabled"}
+            size="small"
             color={state.email ? "success" : "default"}
-            variant="outlined"
-            sx={{ borderRadius: 3, textTransform: "none" }}
           />
         </Stack>
 
-        <Stack direction="row" alignItems="flex-start" spacing={1} flexWrap="wrap">
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: "#4f5973", minWidth: 60 }}
-          >
+        {/* Last Updated */}
+        <Stack direction="row" spacing={1}>
+          <Typography sx={{ fontWeight: 600, minWidth: 70 }}>
             Last Updated:
           </Typography>
-          <Typography variant="body2" sx={{ color: "#2e3035" }}>
-            {formattedUpdatedAt}
-          </Typography>
+
+          <Typography variant="body2">{formattedUpdatedAt}</Typography>
         </Stack>
       </Stack>
 
       {footerAction && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end"}}>
+        <Box display="flex" justifyContent="flex-end">
           {footerAction}
         </Box>
       )}
