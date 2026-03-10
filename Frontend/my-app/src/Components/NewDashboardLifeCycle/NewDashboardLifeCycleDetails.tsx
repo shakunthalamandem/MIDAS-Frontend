@@ -52,12 +52,12 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const tabItems = useMemo(
     () => [
       ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
-      { label: "Write Up New", requiresWriteup: true },
-      { label: "Write Up Old", requiresWriteup: true },
+      { label: "Write Up", requiresWriteup: true },
+      // { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
-      { label: "AI - Sentiment View" },
+      { label: "Sentiment Agent" },
       { label: "AI based on previous 30 deals" },
       { label: "ML Model" },
      
@@ -265,7 +265,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 ticker={activePayload.ticker}
                 trade_date={activePayload.pricing_date}
               />
-            ) : tabItems[tabValue]?.label === "Write Up New" ? (
+            ) : tabItems[tabValue]?.label === "Write Up" ? (
               isIpo ? (
                 <FebWriteUpDashboardMain
                   basicDealDetails={{
@@ -320,7 +320,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                   pricing_date: activePayload.pricing_date ?? null,
                 }}
               />
-            ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
+            ) : tabItems[tabValue]?.label === "Sentiment Agent" ? (
               <DashboardSentimentAnalysis
                 focusTicker={activePayload.ticker ?? null}
                 region={activePayload.region ?? null}
