@@ -5,6 +5,7 @@ import GenericDataRenderer from "./GenericDataRenderer";
 
 interface Props {
   data: any;
+  variant?: "portfolio" | "risk";  // split view: portfolio shows performance, risk shows risk metrics
 }
 
 const cardColors: Record<string, { bg: string; border: string; dot: string; title: string; gradient: string }> = {
@@ -95,15 +96,52 @@ const metricValueColor = (value: string): string => {
   return "#1e293b";
 };
 
-const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
+// ── Variant filter helpers ──
+const PORTFOLIO_CARD_KEYWORDS = ["winning", "losing", "opportunity", "going well"];
+const RISK_CARD_KEYWORDS = ["hidden risk", "going wrong", "fearful"];
+const PORTFOLIO_METRIC_KEYWORDS = ["exposure", "beta", "p&l", "pnl", "dtd", "cumulative"];
+const RISK_METRIC_KEYWORDS = ["risk", "stop", "impact", "spx", "concentration", "sector", "gain potential"];
+
+const matchesAny = (text: string, keywords: string[]): boolean => {
+  const lower = (text || "").toLowerCase();
+  return keywords.some((kw) => lower.includes(kw));
+};
+
+const ExecutiveDashboard: React.FC<Props> = ({ data, variant }) => {
   if (!data) return null;
 
-  const qualitativeCards: any[] = data.qualitative_cards || data.cards || [];
-  const metricCards: any[] = data.metric_cards || data.metrics || [];
-  const riskTable: any[] = data.risk_table || data.risks || data.risk_metrics || [];
+  const allQualCards: any[] = data.qualitative_cards || data.cards || [];
+  const allMetricCards: any[] = data.metric_cards || data.metrics || [];
+  const riskTableRaw: any[] = data.risk_table || data.risks || data.risk_metrics || [];
   const portfolioBias = data.portfolio_bias || data.bias;
 
-  const hasStructuredData = qualitativeCards.length > 0 || metricCards.length > 0 || riskTable.length > 0 || portfolioBias;
+  // Apply variant filtering
+  let qualitativeCards = allQualCards;
+  let metricCards = allMetricCards;
+  let riskTable = riskTableRaw;
+  let showPortfolioBias = true;
+
+  if (variant === "portfolio") {
+    qualitativeCards = allQualCards.filter((c: any) =>
+      matchesAny(c.title || c.label || c.name || "", PORTFOLIO_CARD_KEYWORDS)
+    );
+    metricCards = allMetricCards.filter((c: any) =>
+      matchesAny(c.label || c.title || c.name || "", PORTFOLIO_METRIC_KEYWORDS)
+    );
+    riskTable = []; // hide risk table on portfolio tab
+    showPortfolioBias = true;
+  } else if (variant === "risk") {
+    qualitativeCards = allQualCards.filter((c: any) =>
+      matchesAny(c.title || c.label || c.name || "", RISK_CARD_KEYWORDS)
+    );
+    metricCards = allMetricCards.filter((c: any) =>
+      matchesAny(c.label || c.title || c.name || "", RISK_METRIC_KEYWORDS)
+    );
+    // riskTable stays as-is
+    showPortfolioBias = false; // portfolio bias shown on portfolio tab only
+  }
+
+  const hasStructuredData = qualitativeCards.length > 0 || metricCards.length > 0 || riskTable.length > 0 || (showPortfolioBias && portfolioBias);
 
   if (!hasStructuredData) {
     return <GenericDataRenderer data={data} accentColor="#ec4899" />;
@@ -280,7 +318,7 @@ const ExecutiveDashboard: React.FC<Props> = ({ data }) => {
       )}
 
       {/* PORTFOLIO BIAS */}
-      {portfolioBias && (
+      {showPortfolioBias && portfolioBias && (
         <Box
           sx={{
             background: "linear-gradient(135deg, #faf5ff, #ede9fe)",

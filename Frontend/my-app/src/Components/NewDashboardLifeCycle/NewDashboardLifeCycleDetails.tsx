@@ -206,9 +206,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 textTransform: "none",
                 fontWeight: 600,
                 color: "#0f0f0fff",
-                fontSize: "0.725rem",
-                minHeight: 40,
-                px: 2,
+                fontSize: "0.7rem",
+                minHeight: 36,
+                px: 1.8,
                 borderRadius: 999,
                 border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
@@ -216,9 +216,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
               },
               "& .Mui-selected": {
-                color: "#ffff",
-                backgroundColor: "#262268ff",
-                borderColor: "#c7d2fe",
+                color: showDealBot ? "#0f0f0fff" : "#ffff",
+                backgroundColor: showDealBot ? "#ffffff" : "#262268ff",
+                borderColor: showDealBot ? "#e2e8f0" : "#c7d2fe",
                 boxShadow: "none",
               },
             }}
@@ -235,8 +235,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                     borderRadius: 999,
                     mr: 1,
                     "&.Mui-selected": {
-                      color: "#ffff",
-                      backgroundColor: "#262268ff",
+                      color: showDealBot ? "#0f0f0fff" : "#ffff",
+                      backgroundColor: showDealBot ? "#ffffff" : "#262268ff",
                     },
                     "&.Mui-disabled": {
                       color: "#a0a0a0",
