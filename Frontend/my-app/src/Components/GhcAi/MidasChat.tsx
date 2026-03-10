@@ -19,6 +19,15 @@ type MidasChatProps = {
   loading: boolean;
   error: string | null;
   onAsk: (e?: React.FormEvent | Event, customQuestion?: string) => Promise<void>;
+  showRecentQuestions: boolean;
+  onToggleRecentQuestions: () => void;
+  recentLoading?: boolean;
+  recentError?: string | null;
+  recentItems?: Array<{
+    id: number;
+    question?: string | null;
+  }>;
+  onSelectRecent?: (id: number) => void;
 };
 
 const MidasChat: React.FC<MidasChatProps> = ({
@@ -28,6 +37,12 @@ const MidasChat: React.FC<MidasChatProps> = ({
   loading,
   error,
   onAsk,
+  showRecentQuestions,
+  onToggleRecentQuestions,
+  recentLoading = false,
+  recentError = null,
+  recentItems = [],
+  onSelectRecent,
 }) => {
   return (
     <Box>
@@ -97,6 +112,97 @@ const MidasChat: React.FC<MidasChatProps> = ({
             {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
           </Button>
         </Box>
+
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {recentLoading && <CircularProgress size={16} />}
+          </Box>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={onToggleRecentQuestions}
+            sx={{
+              textTransform: "none",
+              borderRadius: 999,
+              px: 2,
+              backgroundColor: "#002060",
+              boxShadow: "0 8px 18px rgba(0, 32, 96, 0.25)",
+              "&:hover": {
+                backgroundColor: "#001840",
+                boxShadow: "0 10px 22px rgba(0, 32, 96, 0.35)",
+              },
+            }}
+          >
+            {showRecentQuestions ? "Hide recent questions" : "Show recent questions"}
+          </Button>
+        </Box>
+
+        {recentError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {recentError}
+          </Typography>
+        )}
+
+        {showRecentQuestions && recentItems.length === 0 && !recentLoading && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            No previous MIDAS questions yet.
+          </Typography>
+        )}
+
+        {showRecentQuestions && recentItems.length > 0 && (
+          <Box
+            sx={{
+              mt: 2,
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: 1.5,
+            }}
+          >
+            {recentItems.map((item) => (
+              <Paper
+                key={item.id}
+                variant="outlined"
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectRecent?.(item.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectRecent?.(item.id);
+                  }
+                }}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  borderColor: "rgba(0, 32, 96, 0.2)",
+                  background:
+                    "linear-gradient(180deg, rgba(248, 250, 255, 0.95), rgba(255,255,255,1))",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  boxShadow: "0 10px 18px rgba(0, 32, 96, 0.08)",
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                  "&:hover": {
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 12px 22px rgba(0, 32, 96, 0.16)",
+                  },
+                }}
+              >
+                <Typography variant="subtitle2">{item.question}</Typography>
+              </Paper>
+            ))}
+          </Box>
+        )}
       </Paper>
 
       <GHCAIMain data={data} loading={loading} error={error} />

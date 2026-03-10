@@ -183,6 +183,7 @@ const PerplexityChatMain: React.FC = () => {
       if (Array.isArray(result.answer)) {
         setData(result.answer);
         saveBotResponse("global_bot", query.trim(), result.answer, setGlobalRecent);
+        setShowGlobalRecent(false);
       }
       else throw new Error("Invalid response format");
     } catch (err: any) {
@@ -221,6 +222,7 @@ const PerplexityChatMain: React.FC = () => {
       if (Array.isArray(result.answer)) {
         setMidasData(result.answer);
         saveBotResponse("midas_bot", query, result.answer, setMidasRecent);
+        setShowMidasRecent(false);
       }
       else throw new Error("Invalid response format");
     } catch (err: any) {
@@ -337,88 +339,6 @@ const PerplexityChatMain: React.FC = () => {
         {/* MIDAS TAB */}
         {activeTab === 0 && (
           <Box>
-            <Stack direction="row" spacing={1} alignItems="center" mb={2} flexWrap="wrap">
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => setShowMidasRecent((prev) => !prev)}
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 999,
-                  px: 2,
-                  backgroundColor: "#002060",
-                  boxShadow: "0 8px 18px rgba(0, 32, 96, 0.25)",
-                  "&:hover": {
-                    backgroundColor: "#001840",
-                    boxShadow: "0 10px 22px rgba(0, 32, 96, 0.35)",
-                  },
-                }}
-              >
-                {showMidasRecent ? "Hide recent questions" : "Show recent questions"}
-              </Button>
-              {midasRecentLoading && <CircularProgress size={16} />}
-            </Stack>
-            {midasRecentError && (
-              <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-                {midasRecentError}
-              </Typography>
-            )}
-            {showMidasRecent && midasRecent.length === 0 && !midasRecentLoading && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                No previous MIDAS questions yet.
-              </Typography>
-            )}
-            {showMidasRecent && midasRecent.length > 0 && (
-              <Box
-                sx={{
-                  mb: 3,
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                  gap: 1.5,
-                }}
-              >
-                {midasRecent.map((item) => (
-                  <Paper
-                    key={item.id}
-                    variant="outlined"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      setMidasQuestion(item.question ?? "");
-                      setMidasData(toBlockArray(item.answer));
-                      setMidasError(null);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        setMidasQuestion(item.question ?? "");
-                        setMidasData(toBlockArray(item.answer));
-                        setMidasError(null);
-                      }
-                    }}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      borderColor: "rgba(0, 32, 96, 0.2)",
-                      background:
-                        "linear-gradient(180deg, rgba(248, 250, 255, 0.95), rgba(255,255,255,1))",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 1,
-                      boxShadow: "0 10px 18px rgba(0, 32, 96, 0.08)",
-                      cursor: "pointer",
-                      transition: "transform 0.15s ease, box-shadow 0.15s ease",
-                      "&:hover": {
-                        transform: "translateY(-1px)",
-                        boxShadow: "0 12px 22px rgba(0, 32, 96, 0.16)",
-                      },
-                  }}
-                >
-                  <Typography variant="subtitle2">{item.question}</Typography>
-                </Paper>
-              ))}
-              </Box>
-            )}
             <MidasChat
               question={midasQuestion}
               data={midasData}
@@ -426,6 +346,22 @@ const PerplexityChatMain: React.FC = () => {
               error={midasError}
               setQuestion={setMidasQuestion}
               onAsk={handleMidasAsk}
+              showRecentQuestions={showMidasRecent}
+              onToggleRecentQuestions={() => setShowMidasRecent((prev) => !prev)}
+              recentLoading={midasRecentLoading}
+              recentError={midasRecentError}
+              recentItems={midasRecent.map((item) => ({
+                id: item.id,
+                question: item.question,
+              }))}
+              onSelectRecent={(id) => {
+                const item = midasRecent.find((entry) => entry.id === id);
+                if (!item) return;
+                setMidasQuestion(item.question ?? "");
+                setMidasData(toBlockArray(item.answer));
+                setMidasError(null);
+                setShowMidasRecent(false);
+              }}
             />
           </Box>
         )}
@@ -518,6 +454,105 @@ const PerplexityChatMain: React.FC = () => {
                     )}
                   </Button>
                 </Box>
+
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {globalRecentLoading && <CircularProgress size={16} />}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => setShowGlobalRecent((prev) => !prev)}
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: 999,
+                      px: 2,
+                      background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
+                      color: "#002060",
+                      boxShadow: "0 8px 18px rgba(0, 0, 0, 0.12)",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #b9d5d3, #e8e6c5)",
+                      },
+                    }}
+                  >
+                    {showGlobalRecent ? "Hide recent questions" : "Show recent questions"}
+                  </Button>
+                </Box>
+
+                {globalRecentError && (
+                  <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                    {globalRecentError}
+                  </Typography>
+                )}
+                {showGlobalRecent &&
+                  globalRecent.length === 0 &&
+                  !globalRecentLoading && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      No previous Global questions yet.
+                    </Typography>
+                  )}
+                {showGlobalRecent && globalRecent.length > 0 && (
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                      gap: 1.5,
+                    }}
+                  >
+                    {globalRecent.map((item) => (
+                      <Paper
+                        key={item.id}
+                        variant="outlined"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setQuestion(item.question ?? "");
+                          setData(toBlockArray(item.answer));
+                          setError(null);
+                          setShowGlobalRecent(false);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setQuestion(item.question ?? "");
+                            setData(toBlockArray(item.answer));
+                            setError(null);
+                            setShowGlobalRecent(false);
+                          }
+                        }}
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 2,
+                          borderColor: "rgba(0, 32, 96, 0.18)",
+                          background:
+                            "linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 247, 246, 0.9))",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 1,
+                          boxShadow: "0 10px 18px rgba(0, 0, 0, 0.08)",
+                          cursor: "pointer",
+                          transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                          "&:hover": {
+                            transform: "translateY(-1px)",
+                            boxShadow: "0 12px 22px rgba(0, 0, 0, 0.14)",
+                          },
+                        }}
+                      >
+                        <Typography variant="subtitle2">{item.question}</Typography>
+                      </Paper>
+                    ))}
+                  </Box>
+                )}
               </Paper>
 
               {/* Right side - Open Heatmap Button */}
@@ -526,92 +561,7 @@ const PerplexityChatMain: React.FC = () => {
             {/* AI Response and Suggestions */}
             <GHCAIMain data={data} loading={loading} error={error} />
 
-            <Box sx={{ mt: 2 }}>
-              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => setShowGlobalRecent((prev) => !prev)}
-                  sx={{
-                    textTransform: "none",
-                    borderRadius: 999,
-                    px: 2,
-                    background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
-                    color: "#002060",
-                    boxShadow: "0 8px 18px rgba(0, 0, 0, 0.12)",
-                    "&:hover": {
-                      background: "linear-gradient(45deg, #b9d5d3, #e8e6c5)",
-                    },
-                  }}
-                >
-                  {showGlobalRecent ? "Hide recent questions" : "Show recent questions"}
-                </Button>
-                {globalRecentLoading && <CircularProgress size={16} />}
-              </Stack>
-              {globalRecentError && (
-                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                  {globalRecentError}
-                </Typography>
-              )}
-              {showGlobalRecent &&
-                globalRecent.length === 0 &&
-                !globalRecentLoading && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    No previous Global questions yet.
-                  </Typography>
-                )}
-              {showGlobalRecent && globalRecent.length > 0 && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                    gap: 1.5,
-                  }}
-                >
-                  {globalRecent.map((item) => (
-                    <Paper
-                      key={item.id}
-                      variant="outlined"
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        setQuestion(item.question ?? "");
-                        setData(toBlockArray(item.answer));
-                        setError(null);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          setQuestion(item.question ?? "");
-                          setData(toBlockArray(item.answer));
-                          setError(null);
-                        }
-                      }}
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        borderColor: "rgba(0, 32, 96, 0.18)",
-                        background:
-                          "linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 247, 246, 0.9))",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 1,
-                        boxShadow: "0 10px 18px rgba(0, 0, 0, 0.08)",
-                        cursor: "pointer",
-                        transition: "transform 0.15s ease, box-shadow 0.15s ease",
-                        "&:hover": {
-                          transform: "translateY(-1px)",
-                          boxShadow: "0 12px 22px rgba(0, 0, 0, 0.14)",
-                        },
-                      }}
-                    >
-                      <Typography variant="subtitle2">{item.question}</Typography>
-                    </Paper>
-                  ))}
-                </Box>
-              )}
-            </Box>
+            <Box sx={{ mt: 2 }} />
 
             {/* <SuggestedQuestions
               questions={
