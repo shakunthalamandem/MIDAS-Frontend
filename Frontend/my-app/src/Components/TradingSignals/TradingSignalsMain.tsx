@@ -1,75 +1,69 @@
-import React from "react";
-import { Box, Typography, Chip } from "@mui/material";
+import React, { useRef, useCallback, useState } from "react";
+import { Box } from "@mui/material";
 import { motion } from "framer-motion";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
 
+import IntelligenceSourcesBar from "./IntelligenceSourcesBar";
 import TradingSignalCard from "./TradingSignalCard";
 import AIMLIntelligencePanel from "./AIMLIntelligencePanel";
 import PriceChartsSection from "./PriceChartsSection";
+import type { SourceStatus } from "./types";
 
 const MotionBox = motion(Box);
 
 interface Props {
   ticker: string;
   trade_date: string;
+  isUpcoming?: boolean;
+  dealStatus?: string;
+  issuerName?: string;
+  expectedDate?: string;
 }
 
-const TradingSignalsMain: React.FC<Props> = ({ ticker, trade_date }) => {
+const TradingSignalsMain: React.FC<Props> = ({
+  ticker,
+  trade_date,
+  isUpcoming,
+  dealStatus,
+  issuerName,
+  expectedDate,
+}) => {
+  const mlPredictionsRef = useRef<HTMLDivElement>(null);
+  const aiModelRef = useRef<HTMLDivElement>(null);
+  const aiSentimentRef = useRef<HTMLDivElement>(null);
+  const priceChartsRef = useRef<HTMLDivElement>(null);
+
+  const [sourceStatus, setSourceStatus] = useState<SourceStatus>({
+    mlModel: false,
+    aiModel: false,
+    aiSentiment: false,
+  });
+
+  const handleDataStatus = useCallback((status: SourceStatus) => {
+    setSourceStatus(status);
+  }, []);
+
+  const handleSourceClick = useCallback((sectionId: string) => {
+    const refMap: Record<string, React.RefObject<HTMLDivElement>> = {
+      "ml-predictions": mlPredictionsRef,
+      "ai-model": aiModelRef,
+      "ai-sentiment": aiSentimentRef,
+      "market-news": aiSentimentRef,
+      "price-charts": priceChartsRef,
+    };
+    refMap[sectionId]?.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
+
   return (
     <Box sx={{ maxWidth: "100%" }}>
-      {/* Compact header bar */}
-      <MotionBox
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        sx={{
-          borderRadius: 2,
-          bgcolor: "#FFFFFF",
-          border: "1px solid #E2E8F0",
-          p: 2,
-          mb: 2.5,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Box
-            sx={{
-              width: 36,
-              height: 36,
-              borderRadius: 1.5,
-              bgcolor: "#1E293B",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ShowChartIcon sx={{ fontSize: 20, color: "#FFFFFF" }} />
-          </Box>
-          <Box>
-            <Typography sx={{ fontWeight: 800, fontSize: 15, color: "#0F172A", lineHeight: 1.2 }}>
-              Trading Dynamics
-            </Typography>
-            <Typography sx={{ fontSize: 13.5, color: "#64748B", fontWeight: 600 }}>
-              AI signals, ML predictions, sentiment & price charts
-            </Typography>
-          </Box>
-        </Box>
-        <Chip
-          label={ticker}
-          size="small"
-          sx={{
-            bgcolor: "#F1F5F9",
-            color: "#334155",
-            fontWeight: 700,
-            fontSize: 12,
-            height: 26,
-            border: "1px solid #E2E8F0",
-          }}
-        />
-      </MotionBox>
+      {/* Intelligence Sources */}
+      <IntelligenceSourcesBar
+        onSourceClick={handleSourceClick}
+        sourceStatus={sourceStatus}
+        isUpcoming={isUpcoming}
+      />
 
       {/* Section 1: AI Trading Signal */}
       <MotionBox
@@ -88,16 +82,31 @@ const TradingSignalsMain: React.FC<Props> = ({ ticker, trade_date }) => {
         transition={{ duration: 0.3, delay: 0.1 }}
         sx={{ mb: 2.5 }}
       >
-        <AIMLIntelligencePanel ticker={ticker} />
+        <AIMLIntelligencePanel
+          ticker={ticker}
+          mlPredictionsRef={mlPredictionsRef}
+          aiModelRef={aiModelRef}
+          aiSentimentRef={aiSentimentRef}
+          onDataStatus={handleDataStatus}
+        />
       </MotionBox>
 
       {/* Section 3: Price Charts */}
       <MotionBox
+        ref={priceChartsRef}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
+        sx={{ scrollMarginTop: "120px" }}
       >
-        <PriceChartsSection ticker={ticker} trade_date={trade_date} />
+        <PriceChartsSection
+          ticker={ticker}
+          trade_date={trade_date}
+          isUpcoming={isUpcoming}
+          dealStatus={dealStatus}
+          issuerName={issuerName}
+          expectedDate={expectedDate}
+        />
       </MotionBox>
     </Box>
   );

@@ -9,6 +9,7 @@ import {
   CandlestickChart as CandlestickChartIcon,
   Assessment as AssessmentIcon,
   AutoGraph as AutoGraphIcon,
+  Psychology as PsychologyIcon,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import AIMLDealDetails from "./AIMLDealDetails";
@@ -18,6 +19,7 @@ import TrendlyneWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneWid
 import TrendlyneTechnicalWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneTechnicalWidget";
 import TrendlyneChecklistWidget from "../Main/InvestmentStrategy/Tradingview/TrendlyneChecklistWidget";
 import NewDashboardDealPricesChart from "../AIMLResults/NewDashboardDealPricesChart";
+import SentimentOverview from "./SentimentOverview";
 
 interface TradingDynamicsProps {
   ticker: string;
@@ -489,7 +491,44 @@ const TradingDynamics: React.FC<TradingDynamicsProps> = ({
           </Paper>
         </MotionBox>
 
-        {/* ── Section 2: Live Trading Chart ── */}
+        {/* ── Section 2: Sentiment Overview ── */}
+        <MotionBox
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.15 }}
+          sx={{ mb: 3.5 }}
+        >
+          <SectionHeader
+            icon={<PsychologyIcon sx={{ fontSize: 22 }} />}
+            title="Sentiment Overview"
+            subtitle="AI-generated market sentiment summary and outlook"
+            gradient="linear-gradient(135deg, #10b981, #059669)"
+            chipLabel="SENTIMENT"
+            chipColor="#059669"
+          />
+          <Paper
+            elevation={0}
+            sx={{
+              borderRadius: "16px",
+              border: "1px solid rgba(16,185,129,0.12)",
+              boxShadow: "0 4px 20px rgba(16,185,129,0.08)",
+              overflow: "hidden",
+              background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)",
+            }}
+          >
+            <Box
+              sx={{
+                height: 3,
+                background: "linear-gradient(90deg, #10b981, #059669, #047857)",
+              }}
+            />
+            <Box sx={{ p: { xs: 2, md: 3 } }}>
+              <SentimentOverview ticker={ticker} />
+            </Box>
+          </Paper>
+        </MotionBox>
+
+        {/* ── Section 3: Live Trading Chart ── */}
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

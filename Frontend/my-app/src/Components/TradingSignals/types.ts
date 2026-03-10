@@ -6,6 +6,9 @@ export interface FewShotFinalOutlook {
 }
 
 export interface SentimentSummary {
+  one_week?: string;
+  one_month?: string;
+  // Handle legacy nested format
   sentiment_summary?: {
     one_week?: string;
     one_month?: string;
@@ -44,6 +47,12 @@ export interface TradingSignalIntelligence {
   // Few-shot
   few_shot_executive_summary: string;
   few_shot_final_outlook: FewShotFinalOutlook;
+}
+
+export interface SourceStatus {
+  mlModel: boolean;
+  aiModel: boolean;
+  aiSentiment: boolean;
 }
 
 export interface TradingSignalData {
