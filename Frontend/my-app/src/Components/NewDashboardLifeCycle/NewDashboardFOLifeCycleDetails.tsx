@@ -53,14 +53,14 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     () => [
       { label: "Trading Dynamics" },
       { label: "Write Up New", requiresWriteup: true },
-      { label: "Write Up Old", requiresWriteup: true },
+      // { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
        {
         label: "Deal Bot",
       },
       { label: "Peer Deals Performance", requiresWriteup: true },
-      { label: "AI - Sentiment View" },
+      { label: "Sentiment Agent" },
       { label: "Previous FO deals" },
       { label: "ML Model" },
      
@@ -107,7 +107,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     lastSelectedTickerRef.current = nextTicker;
 
     const writeUpNewIndex = tabItems.findIndex(
-      (item) => item.label === "Write Up New"
+      (item) => item.label === "Write Up"
     );
     const firstNonWriteupIndex = tabItems.findIndex(
       (item) => !item.requiresWriteup
@@ -295,7 +295,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
-          ) : tabItems[tabValue]?.label === "Write Up New" ? (
+          ) : tabItems[tabValue]?.label === "Write Up" ? (
             <FebFOWriteUpDashboardMain
               basicDealDetails={{
                 deal_id: activePayload.deal_id,
@@ -316,7 +316,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
             <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
-          ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
+          ) : tabItems[tabValue]?.label === "Sentiment Agent" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
             <TechnicalMain

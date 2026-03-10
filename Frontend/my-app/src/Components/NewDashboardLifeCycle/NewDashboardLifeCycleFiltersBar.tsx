@@ -276,7 +276,8 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
               backgroundColor: "transparent",
               borderRadius: 999,
               border: "1px solid #d7ddea",
-              p: 0.35,
+              p: 0.45,
+              gap: 0.5,
               "& .MuiToggleButton-root": {
                 border: "none",
                 px: 2,
@@ -287,6 +288,7 @@ const NewDashboardLifeCycleFiltersBar: React.FC<FiltersBarProps> = ({
                 fontWeight: 700,
                 borderRadius: 999,
                 backgroundColor: "#ffffff",
+                boxShadow: "inset 0 0 0 1px #e6ebf4",
               },
               "& .MuiToggleButton-root:hover": {
                 backgroundColor: "#002060",
