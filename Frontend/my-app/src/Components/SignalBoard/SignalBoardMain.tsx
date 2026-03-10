@@ -618,7 +618,8 @@ const SignalBoardMain: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3, bgcolor: "#F8FAFC", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#F8FAFC", minHeight: "100vh", py: 3, px: 2 }}>
+    <Box sx={{ maxWidth: 1400, mx: "auto" }}>
       {/* ── Header ── */}
       <MotionBox
         initial={{ opacity: 0, y: -10 }}
@@ -742,6 +743,7 @@ const SignalBoardMain: React.FC = () => {
           buySellHoldCounts={tradingCounts}
         />
       </MotionBox>
+    </Box>
     </Box>
   );
 };
