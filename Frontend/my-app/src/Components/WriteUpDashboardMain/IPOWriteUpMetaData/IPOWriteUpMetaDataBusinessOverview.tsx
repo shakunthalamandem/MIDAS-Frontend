@@ -711,8 +711,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
               "&:before": { display: "none" },
                 // background: "linear-gradient(135deg, #ffffff, #e9f2ff)",
                                   background: "#ffffff",
-              display: "flex",
-              flexDirection: "column",
+              
               height: "100%",
               margin: 0,
               "&.Mui-expanded": { margin: 0 }
