@@ -79,7 +79,7 @@ const TradingSignalsMain: React.FC<Props> = ({
     };
     const el = refMap[sectionId]?.current;
     if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - 220;
+    const y = el.getBoundingClientRect().top + window.scrollY - 240;
     window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
   }, []);
 
@@ -97,27 +97,30 @@ const TradingSignalsMain: React.FC<Props> = ({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
-          my: -0.5,
+          flexDirection: "column",
+          alignItems: "center",
+          py: 0.5,
         }}
       >
-        <svg width="40" height="36" viewBox="0 0 40 36" fill="none">
-          <defs>
-            <linearGradient id="arrow-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#262268" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#262268" stopOpacity="0.9" />
-            </linearGradient>
-          </defs>
-          <line
-            x1="20"
-            y1="0"
-            x2="20"
-            y2="26"
-            stroke="url(#arrow-grad)"
-            strokeWidth="2.5"
-          />
-          <polygon points="12,22 20,34 28,22" fill="#262268" fillOpacity="0.85" />
-        </svg>
+        <Box
+          sx={{
+            width: 2,
+            height: 16,
+            bgcolor: "#262268",
+            opacity: 0.35,
+            borderRadius: 1,
+          }}
+        />
+        <Box
+          sx={{
+            width: 0,
+            height: 0,
+            borderLeft: "6px solid transparent",
+            borderRight: "6px solid transparent",
+            borderTop: "8px solid #262268",
+            opacity: 0.5,
+          }}
+        />
       </Box>
 
       {/* Section 1: AI Trading Signal */}
@@ -153,7 +156,7 @@ const TradingSignalsMain: React.FC<Props> = ({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
-        sx={{ scrollMarginTop: "220px" }}
+        sx={{ scrollMarginTop: "240px" }}
       >
         <PriceChartsSection
           ticker={ticker}

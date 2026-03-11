@@ -29,16 +29,12 @@ const MotionBox = motion(Box);
    Constants & Helpers
    ═══════════════════════════════════════════ */
 
-const UPCOMING_STATUSES = new Set([
-  "Price Range",
-  "Upcoming",
-  "Priced",
-  "Postponed",
-  "Withdrawn",
-]);
+const TRADING_STATUSES = new Set(["Issued"]);
 
 function isUpcoming(status: string | null): boolean {
-  return UPCOMING_STATUSES.has((status || "").trim());
+  const s = (status || "").trim();
+  // Only "Issued" deals go to Trading; everything else (including empty) is Upcoming
+  return !TRADING_STATUSES.has(s);
 }
 
 /** Signal colors for badges */
@@ -417,19 +413,28 @@ function SignalSection({
   buySellHoldCounts: { buy: number; hold: number; sell: number };
 }) {
   const upcoming = title.toLowerCase().includes("upcoming");
+  const [activeFilter, setActiveFilter] = React.useState<string | null>(null);
 
   // Label mapping for summary chips
   const chipConfigs = upcoming
     ? [
-        { label: "Subscribe", count: buySellHoldCounts.buy, color: "#059669" },
-        { label: "Caution", count: buySellHoldCounts.hold, color: "#D97706" },
-        { label: "Avoid", count: buySellHoldCounts.sell, color: "#DC2626" },
+        { label: "Subscribe", signal: "BUY", count: buySellHoldCounts.buy, color: "#059669" },
+        { label: "Caution", signal: "HOLD", count: buySellHoldCounts.hold, color: "#D97706" },
+        { label: "Avoid", signal: "SELL", count: buySellHoldCounts.sell, color: "#DC2626" },
       ]
     : [
-        { label: "BUY", count: buySellHoldCounts.buy, color: "#059669" },
-        { label: "HOLD", count: buySellHoldCounts.hold, color: "#D97706" },
-        { label: "SELL", count: buySellHoldCounts.sell, color: "#DC2626" },
+        { label: "BUY", signal: "BUY", count: buySellHoldCounts.buy, color: "#059669" },
+        { label: "HOLD", signal: "HOLD", count: buySellHoldCounts.hold, color: "#D97706" },
+        { label: "SELL", signal: "SELL", count: buySellHoldCounts.sell, color: "#DC2626" },
       ];
+
+  const handleChipClick = (signal: string) => {
+    setActiveFilter((prev) => (prev === signal ? null : signal));
+  };
+
+  const filteredItems = activeFilter
+    ? items.filter((item) => item.signal === activeFilter)
+    : items;
 
   return (
     <Box
@@ -467,30 +472,62 @@ function SignalSection({
             {subtitle}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 0.75 }}>
-          {chipConfigs.map((c) => (
+        <Box sx={{ display: "flex", gap: 0.75, alignItems: "center" }}>
+          {chipConfigs.map((c) => {
+            const isActive = activeFilter === c.signal;
+            return (
+              <Chip
+                key={c.label}
+                label={`${c.label} ${c.count}`}
+                size="small"
+                onClick={() => handleChipClick(c.signal)}
+                sx={{
+                  height: 24,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  color: isActive ? "#FFFFFF" : c.color,
+                  bgcolor: isActive ? c.color : `${c.color}12`,
+                  border: `1px solid ${isActive ? c.color : `${c.color}30`}`,
+                  borderRadius: 1.5,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    bgcolor: isActive ? c.color : `${c.color}20`,
+                  },
+                }}
+              />
+            );
+          })}
+          {activeFilter && (
             <Chip
-              key={c.label}
-              label={`${c.label} ${c.count}`}
+              label="Clear"
               size="small"
+              onClick={() => setActiveFilter(null)}
+              onDelete={() => setActiveFilter(null)}
               sx={{
                 height: 24,
                 fontSize: 11,
                 fontWeight: 700,
-                color: c.color,
-                bgcolor: `${c.color}12`,
-                border: `1px solid ${c.color}30`,
+                color: "#64748B",
+                bgcolor: "#F1F5F9",
+                border: "1px solid #E2E8F0",
                 borderRadius: 1.5,
+                cursor: "pointer",
+                "& .MuiChip-deleteIcon": {
+                  fontSize: 16,
+                  color: "#94A3B8",
+                  "&:hover": { color: "#64748B" },
+                },
               }}
             />
-          ))}
+          )}
         </Box>
       </Box>
 
       {/* Deal rows */}
       <Box sx={{ flex: 1, overflowY: "auto", maxHeight: "calc(100vh - 320px)" }}>
-        {items.length > 0 ? (
-          items.map((item) => {
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => {
             const key = `${item.ticker}-${item.signal_date}`;
             return (
               <DealRow
@@ -511,7 +548,7 @@ function SignalSection({
             }}
           >
             <Typography sx={{ color: "#94A3B8", fontWeight: 600, fontSize: 13 }}>
-              No signals available
+              {activeFilter ? "No signals matching this filter" : "No signals available"}
             </Typography>
           </Box>
         )}

@@ -440,7 +440,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
           mb: 2.5,
           position: "relative",
           overflow: "hidden",
-          scrollMarginTop: "220px",
+          scrollMarginTop: "240px",
         }}
       >
         <Box
@@ -534,7 +534,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
           mb: 2.5,
           position: "relative",
           overflow: "hidden",
-          scrollMarginTop: "220px",
+          scrollMarginTop: "240px",
         }}
       >
         <Box
@@ -667,7 +667,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
           p: 2.5,
           position: "relative",
           overflow: "hidden",
-          scrollMarginTop: "220px",
+          scrollMarginTop: "240px",
         }}
       >
         <Box
