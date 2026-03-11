@@ -328,12 +328,12 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
         })}
       </Box>
 
-      {/* Connecting lines from each source to synthesized signal */}
+      {/* Curved connecting threads from each source to synthesized signal */}
       <Box
         ref={svgContainerRef}
         sx={{
           position: "relative",
-          height: 35,
+          height: 50,
         }}
       >
         <svg
@@ -346,31 +346,47 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
             overflow: "visible",
           }}
         >
+          <defs>
+            {LINE_COLORS.map((color, i) => (
+              <linearGradient
+                key={`grad-${i}`}
+                id={`line-grad-${i}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                <stop offset="100%" stopColor={BLUE_PRIMARY} stopOpacity={0.7} />
+              </linearGradient>
+            ))}
+          </defs>
           {cardCenters.map((cx, i) => {
             const color = LINE_COLORS[i % LINE_COLORS.length];
+            const midX = svgWidth / 2;
+            const h = 50;
+            // Cubic bezier: start vertical from card, curve to center
+            const d = `M ${cx},0 C ${cx},${h * 0.55} ${midX},${h * 0.45} ${midX},${h}`;
             return (
               <React.Fragment key={i}>
-                <line
-                  x1={cx}
-                  y1={0}
-                  x2={svgWidth / 2}
-                  y2={35}
-                  stroke={color}
+                <path
+                  d={d}
+                  stroke={`url(#line-grad-${i})`}
                   strokeWidth={2}
-                  strokeDasharray="5 3"
-                  strokeOpacity={0.7}
+                  fill="none"
+                  strokeOpacity={0.8}
                 />
-                <circle cx={cx} cy={0} r={3.5} fill={color} fillOpacity={0.85} />
+                <circle cx={cx} cy={0} r={3.5} fill={color} fillOpacity={0.9} />
               </React.Fragment>
             );
           })}
           {cardCenters.length > 0 && (
             <circle
               cx={svgWidth / 2}
-              cy={35}
+              cy={50}
               r={5}
               fill={BLUE_PRIMARY}
-              fillOpacity={0.7}
+              fillOpacity={0.8}
             />
           )}
         </svg>
