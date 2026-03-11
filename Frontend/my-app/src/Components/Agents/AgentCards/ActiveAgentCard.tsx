@@ -48,14 +48,21 @@ export interface ActiveAgentCardProps {
 }
 
 const runOptions = [
-  "Daily",
-  "2 Days",
-  "3 Days",
-  "4 Days",
-  "5 Days",
-  "6 Days",
-  "Once a Week",
+  "Mon - Fri",
+  "Every Monday",
+  "Every Tuesday",
+  "Every Wednesday",
+  "Every Thursday",
+  "Every Friday",
 ];
+
+const dropdownAgents = new Set([
+  "Portfolio CIO Agent",
+  "Risk Agent",
+  "Recent IPOs Agent",
+]);
+
+const normalizeScheduleValue = (schedule: string) => schedule;
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,
@@ -72,6 +79,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   const statusLabel = state.enabled ? "Active" : "Paused";
   const statusColor = state.enabled ? "success" : "warning";
   const displayIndex = agentIndex ?? "-";
+  const showRunDropdown = dropdownAgents.has(agent.title);
+  const selectedRunSchedule = normalizeScheduleValue(
+    runSchedule || agent.schedule
+  );
 
   const formattedUpdatedAt = lastUpdatedAt
     ? new Date(lastUpdatedAt).toLocaleString("en-IN", {
@@ -169,10 +180,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
             Run:
           </Typography>
 
-          {agent.title === "Recent IPOs Agent" ? (
+          {showRunDropdown ? (
             <FormControl size="small">
               <Select
-                value={runSchedule || agent.schedule}
+                value={selectedRunSchedule}
                 onChange={(e) =>
                   onRunScheduleChange?.(agent, e.target.value)
                 }
