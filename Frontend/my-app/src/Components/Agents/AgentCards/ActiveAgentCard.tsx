@@ -93,10 +93,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
 
   const formattedUpdatedAt = lastUpdatedAt
     ? new Date(lastUpdatedAt).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
     : dayjs().format("DD MMM YYYY");
 
   return (
@@ -144,7 +144,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => {
             e.stopPropagation();
-            onToggle(agent, "enabled", state.enabled);
+            onToggle(agent, "enabled", e.target.checked);
           }}
         />
       </Stack>
@@ -170,12 +170,12 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
             label={statusLabel}
             color={
               statusColor as
-                | "default"
-                | "primary"
-                | "info"
-                | "success"
-                | "error"
-                | "warning"
+              | "default"
+              | "primary"
+              | "info"
+              | "success"
+              | "error"
+              | "warning"
             }
             size="small"
           />
