@@ -51,8 +51,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-      ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
-      { label: "Write Up", requiresWriteup: true },
+      { label: "Trading Dynamics" },
+      { label: "Write Up New", requiresWriteup: true },
       // { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
@@ -264,6 +264,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <TradingSignalsMain
                 ticker={activePayload.ticker}
                 trade_date={activePayload.pricing_date}
+                isUpcoming={isUpcoming}
+                dealStatus={status}
+                issuerName={activePayload.issuer_name || activePayload.company_name || ""}
+                expectedDate={activePayload.pricing_date || ""}
               />
             ) : tabItems[tabValue]?.label === "Write Up" ? (
               isIpo ? (

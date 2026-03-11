@@ -4,7 +4,6 @@ import {
   Typography,
   Chip,
   Divider,
-  LinearProgress,
   IconButton,
   CircularProgress,
   Tooltip,
@@ -21,7 +20,6 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import RemoveIcon from "@mui/icons-material/Remove";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
@@ -378,69 +376,44 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
 
           <Divider sx={{ mb: 2, borderColor: "#F1F5F9" }} />
 
-          {/* Signal badge + confidence row */}
+          {/* Signal badge + insight row */}
           <Box
             sx={{
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 2.5,
               mb: 2,
             }}
           >
-            {/* Signal badge */}
+            {/* Prominent signal badge */}
             <Box
               sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                borderRadius: 2.5,
                 bgcolor: colors.badgeBg,
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
+                gap: 1.5,
                 flexShrink: 0,
+                boxShadow: `0 4px 14px ${colors.badgeBg}66`,
               }}
             >
               {getSignalIcon(signal!.signal)}
               <Typography
                 sx={{
                   color: "#FFFFFF",
-                  fontWeight: 800,
-                  fontSize: 10,
-                  letterSpacing: 0.8,
-                  mt: -0.25,
+                  fontWeight: 900,
+                  fontSize: 22,
+                  letterSpacing: 1.5,
                 }}
               >
                 {signal!.signal}
               </Typography>
             </Box>
 
-            {/* Confidence + insight */}
+            {/* Insight text */}
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, mb: 0.75 }}>
-                <Typography sx={{ fontWeight: 700, fontSize: 12, color: "#64748B" }}>
-                  Confidence
-                </Typography>
-                <Typography sx={{ fontWeight: 800, fontSize: 18, color: colors.text }}>
-                  {signal!.confidence}%
-                </Typography>
-              </Box>
-
-              <LinearProgress
-                variant="determinate"
-                value={signal!.confidence}
-                sx={{
-                  height: 6,
-                  borderRadius: 3,
-                  bgcolor: "#F1F5F9",
-                  mb: 1.5,
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 3,
-                    backgroundColor: colors.bar,
-                  },
-                }}
-              />
-
               <Typography
                 sx={{
                   color: "#475569",
@@ -501,29 +474,6 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
             </Box>
           )}
 
-          {/* Footer: signal date chip */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Chip
-              icon={<CheckCircleOutlineIcon sx={{ fontSize: 12 }} />}
-              label={`Signal for ${signal!.signal_date}`}
-              size="small"
-              sx={{
-                bgcolor: colors.chipBg,
-                color: colors.text,
-                fontWeight: 700,
-                fontSize: 11,
-                height: 22,
-                borderRadius: 1,
-                "& .MuiChip-icon": { color: colors.text },
-              }}
-            />
-          </Box>
 
           {/* Error display */}
           {error && (
