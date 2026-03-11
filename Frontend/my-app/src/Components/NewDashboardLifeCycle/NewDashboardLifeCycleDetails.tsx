@@ -58,7 +58,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       // { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "Sentiment Agent" },
-      { label: "AI based on previous 30 deals" },
+      { label: " Prediction Agent" },
       { label: "ML Model" },
      
       { label: "S1 AI Query" },
@@ -314,7 +314,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
             ) : tabItems[tabValue]?.label === "ML Model" ? (
               <AIMLDealDetails ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "AI based on previous 30 deals" ? (
+            ) : tabItems[tabValue]?.label === " Prediction Agent" ? (
               <DashboardAIFewShotAnalysis
                 basicDealDetails={{
                   unique_deal_id: activePayload.unique_deal_id,
