@@ -57,6 +57,20 @@ const runOptions = [
   "Once a Week",
 ];
 
+const dropdownAgents = new Set([
+  "Portfolio CIO Agent",
+  "Risk Agent",
+  "Recent IPOs Agent",
+]);
+
+const normalizeScheduleValue = (schedule: string) => {
+  if (schedule === "Once a Week on Monday") {
+    return "Once a Week";
+  }
+
+  return schedule;
+};
+
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,
   state,
@@ -72,6 +86,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   const statusLabel = state.enabled ? "Active" : "Paused";
   const statusColor = state.enabled ? "success" : "warning";
   const displayIndex = agentIndex ?? "-";
+  const showRunDropdown = dropdownAgents.has(agent.title);
+  const selectedRunSchedule = normalizeScheduleValue(
+    runSchedule || agent.schedule
+  );
 
   const formattedUpdatedAt = lastUpdatedAt
     ? new Date(lastUpdatedAt).toLocaleString("en-IN", {
@@ -169,10 +187,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
             Run:
           </Typography>
 
-          {agent.title === "Recent IPOs Agent" ? (
+          {showRunDropdown ? (
             <FormControl size="small">
               <Select
-                value={runSchedule || agent.schedule}
+                value={selectedRunSchedule}
                 onChange={(e) =>
                   onRunScheduleChange?.(agent, e.target.value)
                 }
