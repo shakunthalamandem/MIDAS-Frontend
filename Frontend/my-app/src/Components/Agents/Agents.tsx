@@ -364,7 +364,7 @@ const Agents: React.FC = () => {
                         )
                       }
                     >
-                      Explore Insights
+                      Output
                     </Button>
                   )
                 }

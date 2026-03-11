@@ -57,7 +57,7 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
       boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
     }}
   >
-    <TableContainer sx={{ maxHeight: 420 }}>
+    <TableContainer sx={{ maxHeight: 405 }}>
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
