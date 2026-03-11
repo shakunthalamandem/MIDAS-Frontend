@@ -263,7 +263,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             {tabItems[tabValue]?.label === "Trading Dynamics" ? (
               <TradingSignalsMain
                 ticker={activePayload.ticker}
-                trade_date={activePayload.pricing_date}
+                trade_date={activePayload.trade_date}
                 isUpcoming={isUpcoming}
                 dealStatus={status}
                 issuerName={activePayload.issuer_name || activePayload.company_name || ""}

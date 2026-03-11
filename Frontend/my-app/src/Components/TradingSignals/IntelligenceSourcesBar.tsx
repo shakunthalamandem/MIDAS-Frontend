@@ -76,6 +76,8 @@ interface IntelligenceSourcesBarProps {
   sourceDataPoints?: Record<string, string>;
 }
 
+const LINE_COLORS = ["#F59E0B", "#6366F1", "#3B82F6", "#10B981", "#EF4444"];
+
 const DATA_POINT_KEYS: Record<string, string> = {
   "ml-predictions": "mlModel",
   "ai-model": "aiModel",
@@ -287,18 +289,6 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
                 {source.label}
               </Typography>
 
-              {/* Status */}
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: 10,
-                  color: isActive ? BLUE_PRIMARY : "#CBD5E1",
-                  textAlign: "center",
-                }}
-              >
-                {isActive ? source.activeStatus : source.pendingStatus}
-              </Typography>
-
               {/* 1-Month Data Point */}
               {(() => {
                 const key = DATA_POINT_KEYS[source.id];
@@ -318,11 +308,11 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
                   >
                     <Typography
                       sx={{
-                        fontSize: 8.5,
-                        fontWeight: 700,
+                        fontSize: 11,
+                        fontWeight: 800,
                         color: dpStyle.color,
                         textAlign: "center",
-                        lineHeight: 1.2,
+                        lineHeight: 1.3,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -356,34 +346,31 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
             overflow: "visible",
           }}
         >
-          {cardCenters.map((cx, i) => (
-            <React.Fragment key={i}>
-              <line
-                x1={cx}
-                y1={0}
-                x2={svgWidth / 2}
-                y2={35}
-                stroke={BLUE_PRIMARY}
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-                strokeOpacity={0.25}
-              />
-              <circle
-                cx={cx}
-                cy={0}
-                r={3}
-                fill={BLUE_PRIMARY}
-                fillOpacity={0.35}
-              />
-            </React.Fragment>
-          ))}
+          {cardCenters.map((cx, i) => {
+            const color = LINE_COLORS[i % LINE_COLORS.length];
+            return (
+              <React.Fragment key={i}>
+                <line
+                  x1={cx}
+                  y1={0}
+                  x2={svgWidth / 2}
+                  y2={35}
+                  stroke={color}
+                  strokeWidth={2}
+                  strokeDasharray="5 3"
+                  strokeOpacity={0.7}
+                />
+                <circle cx={cx} cy={0} r={3.5} fill={color} fillOpacity={0.85} />
+              </React.Fragment>
+            );
+          })}
           {cardCenters.length > 0 && (
             <circle
               cx={svgWidth / 2}
               cy={35}
-              r={4}
+              r={5}
               fill={BLUE_PRIMARY}
-              fillOpacity={0.5}
+              fillOpacity={0.7}
             />
           )}
         </svg>

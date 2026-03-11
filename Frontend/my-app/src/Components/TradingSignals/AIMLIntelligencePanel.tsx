@@ -334,11 +334,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
     }
     const points: Record<string, string> = {};
     if (!isBlank(data.t1m_pred)) {
-      const conf = toNumber(data.t1m_confidence);
-      points.mlModel =
-        conf !== null
-          ? `${fmtPlain(data.t1m_pred)} (${conf.toFixed(0)}%)`
-          : fmtPlain(data.t1m_pred);
+      points.mlModel = fmtPlain(data.t1m_pred);
     }
     if (
       data.few_shot_final_outlook?.one_month_sentiment &&
