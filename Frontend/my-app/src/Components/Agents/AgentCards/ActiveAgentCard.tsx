@@ -48,13 +48,12 @@ export interface ActiveAgentCardProps {
 }
 
 const runOptions = [
-  "Daily",
-  "2 Days",
-  "3 Days",
-  "4 Days",
-  "5 Days",
-  "6 Days",
-  "Once a Week",
+  "Mon - Fri",
+  "Every Monday",
+  "Every Tuesday",
+  "Every Wednesday",
+  "Every Thursday",
+  "Every Friday",
 ];
 
 const dropdownAgents = new Set([
@@ -63,13 +62,7 @@ const dropdownAgents = new Set([
   "Recent IPOs Agent",
 ]);
 
-const normalizeScheduleValue = (schedule: string) => {
-  if (schedule === "Once a Week on Monday") {
-    return "Once a Week";
-  }
-
-  return schedule;
-};
+const normalizeScheduleValue = (schedule: string) => schedule;
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,

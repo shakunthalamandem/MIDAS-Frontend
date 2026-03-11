@@ -34,21 +34,21 @@ const activeAgents: AgentConfig[] = [
     title: "Portfolio CIO Agent",
     description:
       "AI-powered decision engine for portfolio oversight. Identifies emerging risks, prioritizes actions, and supports faster capital allocation and investment decisions.",
-    schedule: "Once a Week on Monday",
+    schedule: "Every Monday",
     route: "/ai_portfolio_review",
   },
   {
     title: "Risk Agent",
     description:
       "Continuously analyzes portfolio exposures to detect potential risks early.",
-    schedule: "Once a Week on Monday",
+    schedule: "Every Monday",
     route: "/ai_risk_review",
   },
   {
     title: "Recent IPOs Agent",
     description:
       "Ranking of the most promising IPOs from the last 30 days based on data and market signals using AI-tools.",
-    schedule: "Once a Week",
+    schedule: "Every Monday",
     route: "/last_30_days_ai_ranking",
   },
   {
@@ -79,23 +79,22 @@ const agentComponentMap: Record<
 };
 
 const scheduleMap: Record<string, number> = {
-  Daily: 1,
-  "2 Days": 2,
-  "3 Days": 3,
-  "4 Days": 4,
-  "5 Days": 5,
-  "6 Days": 6,
-  "Once a Week": 7,
+  "Mon - Fri": 1,
+  "Every Monday": 2,
+  "Every Tuesday": 3,
+  "Every Wednesday": 4,
+  "Every Thursday": 5,
+  "Every Friday": 6,
 };
 
+
 const reverseScheduleMap: Record<number, string> = {
-  1: "Daily",
-  2: "2 Days",
-  3: "3 Days",
-  4: "4 Days",
-  5: "5 Days",
-  6: "6 Days",
-  7: "Once a Week",
+  1: "Mon - Fri",
+  2: "Every Monday",
+  3: "Every Tuesday",
+  4: "Every Wednesday",
+  5: "Every Thursday",
+  6: "Every Friday",
 };
 
 type AgentLatestUpdatedDates = Record<
