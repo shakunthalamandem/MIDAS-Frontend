@@ -2,7 +2,7 @@ import React from "react";
 import { Typography, Grid, Container, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "./SectionTwo.css";
-import Imagecard from "../../Assets/images/sec2image.jpg";
+import Imagecard from "../../Assets/images/section2img.png";
 import logo from '../../Assets/images/MIDAS_logo.png' // Corrected import
 
 const SectionTwo: React.FC = () => {

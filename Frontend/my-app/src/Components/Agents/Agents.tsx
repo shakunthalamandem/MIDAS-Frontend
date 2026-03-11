@@ -79,22 +79,22 @@ const agentComponentMap: Record<
 };
 
 const scheduleMap: Record<string, number> = {
-  "Mon - Fri": 1,
-  "Every Monday": 2,
-  "Every Tuesday": 3,
-  "Every Wednesday": 4,
-  "Every Thursday": 5,
-  "Every Friday": 6,
+  "Mon - Fri": 0,
+  "Every Monday": 1,
+  "Every Tuesday": 2,
+  "Every Wednesday": 3,
+  "Every Thursday": 4,
+  "Every Friday": 5,
 };
 
 
 const reverseScheduleMap: Record<number, string> = {
-  1: "Mon - Fri",
-  2: "Every Monday",
-  3: "Every Tuesday",
-  4: "Every Wednesday",
-  5: "Every Thursday",
-  6: "Every Friday",
+  0: "Mon - Fri",
+  1: "Every Monday",
+  2: "Every Tuesday",
+  3: "Every Wednesday",
+  4: "Every Thursday",
+  5: "Every Friday",
 };
 
 type AgentLatestUpdatedDates = Record<
