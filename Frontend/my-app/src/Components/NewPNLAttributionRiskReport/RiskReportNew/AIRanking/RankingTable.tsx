@@ -63,7 +63,7 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
           <TableRow>
             <TableCell sx={headerSx}>Ticker</TableCell>
             <TableCell sx={headerSx}>Action</TableCell>
-            <TableCell sx={headerSx}>Sector</TableCell>
+            {/* <TableCell sx={headerSx}>Sector</TableCell> */}
             <TableCell sx={headerSx}>Current vs IPO</TableCell>
             <TableCell sx={headerSx}>Conviction</TableCell>
             <TableCell sx={headerSx}>Sentiment</TableCell>
@@ -99,7 +99,7 @@ export const RankingTable = ({ rows, onSelectTicker, selectedTicker }: Props) =>
                 <TableCell>
                   <ActionBadge action={row.action} />
                 </TableCell>
-                <TableCell sx={{ color: "#475569", fontSize: 13 }}>{row.sector}</TableCell>
+                {/* <TableCell sx={{ color: "#475569", fontSize: 13 }}>{row.sector}</TableCell> */}
                 <TableCell>
                   <Chip
                     label={row.current_vs_ipo}
