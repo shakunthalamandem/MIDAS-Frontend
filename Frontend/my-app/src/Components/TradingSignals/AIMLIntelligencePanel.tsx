@@ -253,6 +253,7 @@ interface Props {
   aiModelRef?: React.RefObject<HTMLDivElement>;
   aiSentimentRef?: React.RefObject<HTMLDivElement>;
   onDataStatus?: (status: SourceStatus) => void;
+  onDataPoints?: (points: Record<string, string>) => void;
 }
 
 const AIMLIntelligencePanel: React.FC<Props> = ({
@@ -261,6 +262,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
   aiModelRef,
   aiSentimentRef,
   onDataStatus,
+  onDataPoints,
 }) => {
   const [data, setData] = useState<TradingSignalIntelligence | null>(null);
   const [loading, setLoading] = useState(false);
@@ -322,6 +324,39 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
       !isBlank(data.one_month_sentiment);
     onDataStatus({ mlModel, aiModel, aiSentiment });
   }, [data, onDataStatus]);
+
+  // Report 1-month data points to parent for Intelligence Sources display
+  useEffect(() => {
+    if (!onDataPoints) return;
+    if (!data) {
+      onDataPoints({});
+      return;
+    }
+    const points: Record<string, string> = {};
+    if (!isBlank(data.t1m_pred)) {
+      const conf = toNumber(data.t1m_confidence);
+      points.mlModel =
+        conf !== null
+          ? `${fmtPlain(data.t1m_pred)} (${conf.toFixed(0)}%)`
+          : fmtPlain(data.t1m_pred);
+    }
+    if (
+      data.few_shot_final_outlook?.one_month_sentiment &&
+      !isBlank(data.few_shot_final_outlook.one_month_sentiment)
+    ) {
+      points.aiModel = data.few_shot_final_outlook.one_month_sentiment;
+    }
+    if (!isBlank(data.one_month_sentiment)) {
+      points.aiSentiment = data.one_month_sentiment;
+    }
+    if (!isBlank(data.one_month_sentiment)) {
+      points.marketNews = data.one_month_sentiment;
+    }
+    if (!isBlank(data.t1m_actual_return)) {
+      points.priceAction = fmtPct(data.t1m_actual_return);
+    }
+    onDataPoints(points);
+  }, [data, onDataPoints]);
 
   if (loading) {
     return (

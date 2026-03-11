@@ -38,9 +38,20 @@ const TradingSignalsMain: React.FC<Props> = ({
     aiSentiment: false,
   });
 
+  const [sourceDataPoints, setSourceDataPoints] = useState<
+    Record<string, string>
+  >({});
+
   const handleDataStatus = useCallback((status: SourceStatus) => {
     setSourceStatus(status);
   }, []);
+
+  const handleDataPoints = useCallback(
+    (points: Record<string, string>) => {
+      setSourceDataPoints(points);
+    },
+    []
+  );
 
   const handleSourceClick = useCallback((sectionId: string) => {
     const refMap: Record<string, React.RefObject<HTMLDivElement>> = {
@@ -63,6 +74,7 @@ const TradingSignalsMain: React.FC<Props> = ({
         onSourceClick={handleSourceClick}
         sourceStatus={sourceStatus}
         isUpcoming={isUpcoming}
+        sourceDataPoints={sourceDataPoints}
       />
 
       {/* Section 1: AI Trading Signal */}
@@ -88,6 +100,7 @@ const TradingSignalsMain: React.FC<Props> = ({
           aiModelRef={aiModelRef}
           aiSentimentRef={aiSentimentRef}
           onDataStatus={handleDataStatus}
+          onDataPoints={handleDataPoints}
         />
       </MotionBox>
 
