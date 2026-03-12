@@ -78,14 +78,20 @@ const fetchDealList = async (params: Record<string, any>): Promise<Deal[]> => {
 };
 
 const fetchSentimentDeals = async (): Promise<SentimentDeal[]> => {
-  const [ipoDeals, foDeals] = await Promise.all([
+  const [issuedIpo, issuedFo, upcomingIpo, upcomingFo] = await Promise.all([
     fetchDealList({ operation: "Issued", deal_type: "IPO" }),
     fetchDealList({ operation: "Issued", deal_type: "FO" }),
+    fetchDealList({ operation: "Upcoming Deals", deal_type: "IPO" }),
+    fetchDealList({ operation: "Upcoming Deals", deal_type: "FO" }),
   ]);
-  return [
-    ...ipoDeals.map((deal) => ({ ...deal, source: "IPO" as const })),
-    ...foDeals.map((deal) => ({ ...deal, source: "FO" as const })),
-  ];
+
+  return  [
+    ...issuedIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
+    ...issuedFo.map((deal) => ({ ...deal, source: "FO" as const })),
+    ...upcomingIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
+    ...upcomingFo.map((deal) => ({ ...deal, source: "FO" as const })),
+  ]
+
 };
 
 const normalizeBlocks = (val: any): Block[] => {
