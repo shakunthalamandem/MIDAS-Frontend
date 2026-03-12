@@ -429,7 +429,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
 
   return (
     <>
-      <Button
+      {/* <Button
         variant="contained"
         onClick={handleExportPDF}
         disabled={loading}
@@ -460,7 +460,7 @@ const AIPortfolioReviewPDFExporter: React.FC<
         }}
       >
         {loading ? "Generating..." : "Export PDF"}
-      </Button>
+      </Button> */}
 
       <Dialog
         open={loading}

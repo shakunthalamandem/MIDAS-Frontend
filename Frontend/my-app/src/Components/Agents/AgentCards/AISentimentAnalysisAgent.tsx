@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   AlertColor,
@@ -20,7 +19,7 @@ import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 type Deal = {
@@ -86,7 +85,7 @@ const fetchSentimentDeals = async (): Promise<SentimentDeal[]> => {
     fetchDealList({ operation: "Upcoming Deals", deal_type: "FO" }),
   ]);
 
-  return  [
+  return [
     ...issuedIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
     ...issuedFo.map((deal) => ({ ...deal, source: "FO" as const })),
     ...upcomingIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
@@ -206,7 +205,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
   const { state } = props;
 
   const enabled = state.enabled;
-
+  const [debouncedTickerSearch, setDebouncedTickerSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [sentimentTickers, setSentimentTickers] = useState<SentimentDeal[]>([]);
@@ -233,16 +232,58 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
     setSnackbarOpen(false);
   };
 
-  const filterTickerOptions = (options: SentimentDeal[], state: { inputValue: string }) => {
-    if (!state.inputValue.trim()) return options;
-    const normalizedInput = state.inputValue.toLowerCase();
-    return options.filter((option) => {
-      const ticker = option.ticker.toLowerCase();
-      const source = option.source.toLowerCase();
-      return ticker.includes(normalizedInput) || source.includes(normalizedInput);
-    });
-  };
+  const normalizeSearchText = (value: string) =>
+    (value || "").trim().toLowerCase();
 
+  const filteredSentimentTickers = useMemo(() => {
+    const query = normalizeSearchText(debouncedTickerSearch);
+
+    if (!query) return [];
+
+    const results: SentimentDeal[] = [];
+
+    for (const deal of sentimentTickers) {
+      if (normalizeSearchText(deal.ticker).startsWith(query)) {
+        results.push(deal);
+        if (results.length >= 100) break;
+      }
+    }
+
+    return results;
+  }, [sentimentTickers, debouncedTickerSearch]);
+  const buildSearchableText = (deal: SentimentDeal) =>
+    normalizeSearchText(
+      [
+        deal.ticker,
+        deal.source,
+        deal.deal_type,
+        deal.fo_type,
+        deal.region,
+        deal.issuer_name,
+        deal.unique_deal_id,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    );
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTickerSearch(tickerSearchValue);
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [tickerSearchValue]);
+  // const filteredSentimentTickers = useMemo(() => {
+  //   const query = normalizeSearchText(tickerSearchValue);
+
+  //   if (!query) return sentimentTickers;
+
+  //   const searchTerms = query.split(" ").filter(Boolean);
+
+  //   return sentimentTickers.filter((deal) => {
+  //     const searchableText = buildSearchableText(deal);
+  //     return searchTerms.every((term) => searchableText.includes(term));
+  //   });
+  // }, [sentimentTickers, tickerSearchValue]);
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [pdfBlocks, setPdfBlocks] = useState<Block[]>([]);
 
@@ -371,7 +412,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
 
       for (const deal of selectedSentimentDeals) {
         try {
-          const prompt = buildPrompt(deal.ticker, deal.deal_type,deal.issuer_name);
+          const prompt = buildPrompt(deal.ticker, deal.deal_type, deal.issuer_name);
 
           const blocks = await askPerplexity(
             prompt,
@@ -410,9 +451,8 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
         try {
           await triggerSentimentEmail(success);
         } catch (emailErr: any) {
-          emailFailureMessage = `Sentiment saved but email failed: ${
-            emailErr?.message || "Unknown error"
-          }`;
+          emailFailureMessage = `Sentiment saved but email failed: ${emailErr?.message || "Unknown error"
+            }`;
           setError(emailFailureMessage);
         }
       }
@@ -477,27 +517,31 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
         <DialogContent >
           <Stack spacing={2}>
             {error && <Alert severity="error">{error}</Alert>}
-
             <Autocomplete
               multiple
               filterSelectedOptions
               openOnFocus
-              options={sentimentTickers}
+              options={filteredSentimentTickers}
               loading={loadingTickers}
               inputValue={tickerSearchValue}
               onInputChange={(_, value) => setTickerSearchValue(value || "")}
-              filterOptions={filterTickerOptions}
+              filterOptions={(options) => options}
               getOptionLabel={(o) => `${o.ticker} (${o.source})`}
               value={selectedSentimentDeals}
               onChange={(_, value) => setSelectedSentimentDeals(value)}
               isOptionEqualToValue={(option, value) =>
                 option.unique_deal_id === value.unique_deal_id && option.source === value.source
               }
+              noOptionsText={
+                tickerSearchValue.trim()
+                  ? "No matching tickers"
+                  : "Type a ticker to search"
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Select tickers"
-                  placeholder="Choose tickers"
+                  placeholder="Search ticker"
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
