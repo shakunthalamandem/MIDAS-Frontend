@@ -29,6 +29,7 @@ type Deal = {
   deal_type: string;
   fo_type?: string;
   region?: string;
+  issuer_name?: string;
 };
 
 type SentimentDeal = Deal & {
@@ -40,9 +41,10 @@ type RenderedPdf = {
   filename: string;
 };
 
-const buildPrompt = (ticker: string, dealType?: string) => {
+const buildPrompt = (ticker: string, dealType?: string, issuerName?: string) => {
   const normalizedType = (dealType || "deal").toUpperCase();
-  return `what is the investor sentiment for ${ticker} ${normalizedType} and tell me the likely trading prospects for this ${ticker} ${normalizedType} over the next one week and one month `;
+  const issuerSuffix = issuerName ? ` of ${issuerName}` : "";
+  return `what is the investor sentiment for ${ticker} ${normalizedType}${issuerSuffix} and tell me the likely trading prospects for this ${ticker} ${normalizedType}${issuerSuffix} over the next one week and one month `;
 };
 
 const normalizeDealRows = (payload: any): Deal[] => {
@@ -55,6 +57,7 @@ const normalizeDealRows = (payload: any): Deal[] => {
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
     }))
     .filter((item: Deal) => item.ticker);
 };
@@ -76,14 +79,20 @@ const fetchDealList = async (params: Record<string, any>): Promise<Deal[]> => {
 };
 
 const fetchSentimentDeals = async (): Promise<SentimentDeal[]> => {
-  const [ipoDeals, foDeals] = await Promise.all([
+  const [issuedIpo, issuedFo, upcomingIpo, upcomingFo] = await Promise.all([
     fetchDealList({ operation: "Issued", deal_type: "IPO" }),
     fetchDealList({ operation: "Issued", deal_type: "FO" }),
+    fetchDealList({ operation: "Upcoming Deals", deal_type: "IPO" }),
+    fetchDealList({ operation: "Upcoming Deals", deal_type: "FO" }),
   ]);
-  return [
-    ...ipoDeals.map((deal) => ({ ...deal, source: "IPO" as const })),
-    ...foDeals.map((deal) => ({ ...deal, source: "FO" as const })),
-  ];
+
+  return  [
+    ...issuedIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
+    ...issuedFo.map((deal) => ({ ...deal, source: "FO" as const })),
+    ...upcomingIpo.map((deal) => ({ ...deal, source: "IPO" as const })),
+    ...upcomingFo.map((deal) => ({ ...deal, source: "FO" as const })),
+  ]
+
 };
 
 const normalizeBlocks = (val: any): Block[] => {
@@ -362,7 +371,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
 
       for (const deal of selectedSentimentDeals) {
         try {
-          const prompt = buildPrompt(deal.ticker, deal.deal_type);
+          const prompt = buildPrompt(deal.ticker, deal.deal_type,deal.issuer_name);
 
           const blocks = await askPerplexity(
             prompt,

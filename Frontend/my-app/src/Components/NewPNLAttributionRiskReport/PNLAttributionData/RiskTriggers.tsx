@@ -65,7 +65,7 @@ const DEFAULT_GUIDELINES: Record<string, number> = {
   liquidity_days: 95,
   top_10_issuer_threshold: 25,
   top_10_issuer_guideline: 35,
-  issuer_delta_net_exposure: 10,
+  // issuer_delta_net_exposure: 10,
 };
 
 const GUIDELINE_LABELS: Record<string, string> = {
@@ -76,8 +76,8 @@ const GUIDELINE_LABELS: Record<string, string> = {
   var_99: "VaR 99% (%)",
   liquidity_days: "Liquidity Days (%)",
   top_10_issuer_threshold: "Top 10 Issuer Threshold (%)",
-  top_10_issuer_guideline: "Top 10 Issuer Guideline (%)",
-  issuer_delta_net_exposure: "Issuer Delta Net Exposure (%)",
+  // top_10_issuer_guideline: "Top 10 Issuer Guideline (%)",
+  // issuer_delta_net_exposure: "Issuer Delta Net Exposure (%)",
 };
 
 /* ── Section config ── */
@@ -94,17 +94,17 @@ const SECTION_CONFIG: Record<string, SectionConfig> = {
   delta_gross_exposure: {
     firstColKey: "fund", firstColLabel: "Fund",
     valueKey: "delta_adjusted_gross_exposure", valueLabel: "Delta Adjusted Gross Exposure",
-    summaryLabel: "Gross Exposure",
+    summaryLabel: "Delta Gross Exposure",
   },
   equity_delta_net_exposure: {
     firstColKey: "fund", firstColLabel: "Fund",
     valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure",
-    summaryLabel: "Net Exposure",
+    summaryLabel: "Delta Net Exposure",
   },
   equity_beta_net_exposure: {
     firstColKey: "fund", firstColLabel: "Fund",
     valueKey: "beta_net_exp", valueLabel: "Beta Net Exposure",
-    summaryLabel: "Beta Exposure",
+    summaryLabel: "Beta Adj Net Exposure",
   },
   drawdown: {
     firstColKey: "fund", firstColLabel: "Fund",
