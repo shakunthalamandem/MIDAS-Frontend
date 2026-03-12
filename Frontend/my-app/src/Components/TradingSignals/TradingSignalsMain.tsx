@@ -1,6 +1,16 @@
 import React, { useRef, useCallback, useState } from "react";
-import { Box } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material";
 import { motion } from "framer-motion";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
 
 import IntelligenceSourcesBar from "./IntelligenceSourcesBar";
 import TradingSignalCard from "./TradingSignalCard";
@@ -38,22 +48,39 @@ const TradingSignalsMain: React.FC<Props> = ({
     aiSentiment: false,
   });
 
+  const [sourceDataPoints, setSourceDataPoints] = useState<
+    Record<string, string>
+  >({});
+
   const handleDataStatus = useCallback((status: SourceStatus) => {
     setSourceStatus(status);
   }, []);
 
+  const handleDataPoints = useCallback(
+    (points: Record<string, string>) => {
+      setSourceDataPoints(points);
+    },
+    []
+  );
+
+  const [marketNewsOpen, setMarketNewsOpen] = useState(false);
+
   const handleSourceClick = useCallback((sectionId: string) => {
+    if (sectionId === "market-news") {
+      setMarketNewsOpen(true);
+      return;
+    }
+
     const refMap: Record<string, React.RefObject<HTMLDivElement>> = {
       "ml-predictions": mlPredictionsRef,
       "ai-model": aiModelRef,
       "ai-sentiment": aiSentimentRef,
-      "market-news": aiSentimentRef,
       "price-charts": priceChartsRef,
     };
-    refMap[sectionId]?.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    const el = refMap[sectionId]?.current;
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 240;
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
   }, []);
 
   return (
@@ -63,7 +90,38 @@ const TradingSignalsMain: React.FC<Props> = ({
         onSourceClick={handleSourceClick}
         sourceStatus={sourceStatus}
         isUpcoming={isUpcoming}
+        sourceDataPoints={sourceDataPoints}
       />
+
+      {/* Arrow from Synthesized Signal → Trading Signal Card */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          py: 0.5,
+        }}
+      >
+        <Box
+          sx={{
+            width: 2,
+            height: 16,
+            bgcolor: "#262268",
+            opacity: 0.35,
+            borderRadius: 1,
+          }}
+        />
+        <Box
+          sx={{
+            width: 0,
+            height: 0,
+            borderLeft: "6px solid transparent",
+            borderRight: "6px solid transparent",
+            borderTop: "8px solid #262268",
+            opacity: 0.5,
+          }}
+        />
+      </Box>
 
       {/* Section 1: AI Trading Signal */}
       <MotionBox
@@ -88,6 +146,7 @@ const TradingSignalsMain: React.FC<Props> = ({
           aiModelRef={aiModelRef}
           aiSentimentRef={aiSentimentRef}
           onDataStatus={handleDataStatus}
+          onDataPoints={handleDataPoints}
         />
       </MotionBox>
 
@@ -97,7 +156,7 @@ const TradingSignalsMain: React.FC<Props> = ({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
-        sx={{ scrollMarginTop: "120px" }}
+        sx={{ scrollMarginTop: "240px" }}
       >
         <PriceChartsSection
           ticker={ticker}
@@ -108,6 +167,102 @@ const TradingSignalsMain: React.FC<Props> = ({
           expectedDate={expectedDate}
         />
       </MotionBox>
+
+      {/* Market News Info Dialog */}
+      <Dialog
+        open={marketNewsOpen}
+        onClose={() => setMarketNewsOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            maxWidth: 480,
+            p: 1,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            pb: 1,
+          }}
+        >
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 2,
+              bgcolor: "#EEF2FF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <NewspaperIcon sx={{ fontSize: 22, color: "#262268" }} />
+          </Box>
+          <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#0F172A" }}>
+            Market News Intelligence
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 0 }}>
+          <Box
+            sx={{
+              bgcolor: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: 2,
+              p: 2.5,
+              mb: 1,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mb: 1.5,
+              }}
+            >
+              <TravelExploreIcon sx={{ color: "#6366F1", fontSize: 20 }} />
+              <Typography
+                sx={{ fontWeight: 700, fontSize: 13.5, color: "#334155" }}
+              >
+                AI-Powered Web Search Agent
+              </Typography>
+            </Box>
+            <Typography
+              sx={{
+                color: "#475569",
+                fontSize: 13,
+                lineHeight: 1.75,
+                fontWeight: 500,
+              }}
+            >
+              Our AI agent automatically searches and analyzes the latest market
+              news, press releases, analyst reports, and financial articles from
+              across the web. This real-time intelligence is factored into the
+              final trading signal to ensure the recommendation reflects the most
+              current market conditions and sentiment.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setMarketNewsOpen(false)}
+            variant="contained"
+            sx={{
+              bgcolor: "#262268",
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 700,
+              px: 4,
+              "&:hover": { bgcolor: "#3A3790" },
+            }}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
