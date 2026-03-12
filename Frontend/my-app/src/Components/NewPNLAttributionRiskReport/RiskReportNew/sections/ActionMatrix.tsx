@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import GenericDataRenderer from "./GenericDataRenderer";
 import ImmediateDecisionCard from "./ImmediateDecisionCard";
 
@@ -226,19 +227,47 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
               if (isTicker) {
                 return (
-                  <Typography
+                  <Box
                     key={k}
                     sx={{
                       px: 3,
                       py: 2,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      letterSpacing: 0.3,
-                      color: "#0f172a",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
                   >
-                    {displayVal}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        letterSpacing: 0.3,
+                        color: "#0f172a",
+                      }}
+                    >
+                      {displayVal}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRowClick(row);
+                      }}
+                      sx={{
+                        width: 22,
+                        height: 22,
+                        p: 0,
+                        borderRadius: "50%",
+                        color: "#94a3b8",
+                        "&:hover": {
+                          backgroundColor: "rgba(148,163,184,0.15)",
+                          color: "#64748b",
+                        },
+                      }}
+                    >
+                      <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </Box>
                 );
               }
 

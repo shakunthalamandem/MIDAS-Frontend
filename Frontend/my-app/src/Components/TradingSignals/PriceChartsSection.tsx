@@ -388,13 +388,18 @@ const PriceChartsSection: React.FC<Props> = ({
 
         const json: ApiResponse = await res.json();
 
-        const raw = (json.data || []).map((row) => ({
-          date: row.date,
-          open: Number(row.open_price),
-          close: Number(row.close_price),
-          high: Number(row.high_price),
-          low: Number(row.low_price),
-        }));
+        const raw = (json.data || [])
+          .map((row) => ({
+            date: row.date,
+            open: Number(row.open_price),
+            close: Number(row.close_price),
+            high: Number(row.high_price),
+            low: Number(row.low_price),
+          }))
+          .filter(
+            (row) =>
+              row.open !== 0 || row.close !== 0 || row.high !== 0 || row.low !== 0
+          );
 
         raw.sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
