@@ -351,7 +351,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <ScheduleIcon sx={{ fontSize: 13, color: "#94A3B8" }} />
-                <Typography sx={{ color: "#94A3B8", fontWeight: 600, fontSize: 11, whiteSpace: "nowrap" }}>
+                <Typography sx={{ color: "#034880", fontWeight: 600, fontSize: 11, whiteSpace: "nowrap" }}>
                   {formatDate(signal!.generated_at)}
                 </Typography>
               </Box>
@@ -368,7 +368,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
                     "&:hover": { bgcolor: "#F1F5F9" },
                   }}
                 >
-                  <RefreshIcon sx={{ fontSize: 15, color: "#64748B" }} />
+                  <RefreshIcon sx={{ fontSize: 15, color: "#06326e" }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -416,9 +416,9 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography
                 sx={{
-                  color: "#475569",
+                  color: "#062d64",
                   fontWeight: 500,
-                  fontSize: 13,
+                  fontSize: 14,
                   lineHeight: 1.5,
                   fontStyle: "italic",
                 }}
@@ -463,7 +463,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
                         }}
                       />
                       <Typography
-                        sx={{ color: "#475569", fontWeight: 500, fontSize: 12.5, lineHeight: 1.55 }}
+                        sx={{ color: "#000000", fontWeight: 500, fontSize: 14, lineHeight: 1.55 }}
                       >
                         {bullet}
                       </Typography>
@@ -515,7 +515,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 3, pt: 0.5, pb: 1 }}>
-          <Typography sx={{ color: "#475569", fontSize: 13, fontWeight: 500, lineHeight: 1.6 }}>
+          <Typography sx={{ color: "#000000", fontSize: 13, fontWeight: 500, lineHeight: 1.6 }}>
             This will generate a new AI trading signal for <strong>{ticker}</strong>, replacing the
             current one.
           </Typography>
@@ -532,8 +532,8 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
                 border: "1px solid #E2E8F0",
               }}
             >
-              <ScheduleIcon sx={{ fontSize: 15, color: "#64748B" }} />
-              <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#64748B" }}>
+              <ScheduleIcon sx={{ fontSize: 15, color: "#000000" }} />
+              <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000000" }}>
                 Last generated: {formatDate(signal.generated_at)}
               </Typography>
             </Box>
@@ -543,7 +543,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
           <Button
             onClick={handleCancelRefresh}
             sx={{
-              color: "#64748B",
+              color: "#000000",
               fontWeight: 700,
               fontSize: 13,
               textTransform: "none",
@@ -565,7 +565,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker }) => {
               borderRadius: 1.5,
               px: 2.5,
               boxShadow: "none",
-              "&:hover": { bgcolor: "#334155", boxShadow: "none" },
+              "&:hover": { bgcolor: "#000000", boxShadow: "none" },
             }}
           >
             Regenerate

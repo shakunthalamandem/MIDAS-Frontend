@@ -688,7 +688,7 @@ const PriceChartsSection: React.FC<Props> = ({
                   >
                     <XAxis
                       dataKey="label"
-                      tick={{ fontSize: 11, fill: "#64748B" }}
+                      tick={{ fontSize: 11, fill: "#000000" }}
                       tickLine={false}
                       axisLine={{ stroke: "#E2E8F0" }}
                     />
@@ -696,7 +696,7 @@ const PriceChartsSection: React.FC<Props> = ({
                       yAxisId="price"
                       domain={[yMin, yMax]}
                       tickLine={false}
-                      tick={{ fontSize: 11, fill: "#64748B" }}
+                      tick={{ fontSize: 11, fill: "#000000" }}
                       axisLine={{ stroke: "#E2E8F0" }}
                     />
 
