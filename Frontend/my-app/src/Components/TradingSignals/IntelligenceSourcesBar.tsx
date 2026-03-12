@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import PsychologyIcon from "@mui/icons-material/Psychology";
@@ -73,13 +73,64 @@ interface IntelligenceSourcesBarProps {
   onSourceClick: (sectionId: string) => void;
   sourceStatus?: SourceStatus;
   isUpcoming?: boolean;
+  sourceDataPoints?: Record<string, string>;
+}
+
+const LINE_COLORS = ["#F59E0B", "#6366F1", "#3B82F6", "#10B981", "#EF4444"];
+
+const DATA_POINT_KEYS: Record<string, string> = {
+  "ml-predictions": "mlModel",
+  "ai-model": "aiModel",
+  "ai-sentiment": "aiSentiment",
+  "market-news": "marketNews",
+  "price-charts": "priceAction",
+};
+
+function getDataPointStyle(value: string): { color: string; bg: string } {
+  const v = (value || "").toLowerCase();
+  if (v.includes("up") || v.includes("bullish"))
+    return { color: "#166534", bg: "#DCFCE7" };
+  if (v.includes("down") || v.includes("bearish"))
+    return { color: "#991B1B", bg: "#FEE2E2" };
+  if (v.includes("neutral"))
+    return { color: "#92400E", bg: "#FEF3C7" };
+  return { color: "#64748B", bg: "#F1F5F9" };
 }
 
 const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
   onSourceClick,
   sourceStatus,
   isUpcoming,
+  sourceDataPoints,
 }) => {
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const [cardCenters, setCardCenters] = useState<number[]>([]);
+  const [svgWidth, setSvgWidth] = useState(0);
+
+  const updateLines = useCallback(() => {
+    const svgEl = svgContainerRef.current;
+    if (!svgEl) return;
+    const svgRect = svgEl.getBoundingClientRect();
+    setSvgWidth(svgRect.width);
+
+    const centers = cardRefs.current.map((el) => {
+      if (!el) return svgRect.width / 2;
+      const rect = el.getBoundingClientRect();
+      return rect.left + rect.width / 2 - svgRect.left;
+    });
+    setCardCenters(centers);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(updateLines, 350);
+    window.addEventListener("resize", updateLines);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateLines);
+    };
+  }, [updateLines, sourceStatus]);
+
   const getIsActive = (source: SourceCardConfig): boolean => {
     if (!sourceStatus) return true;
     if (source.statusKey === "priceAction") return !isUpcoming;
@@ -153,6 +204,9 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
           return (
             <MotionBox
               key={source.id}
+              ref={(el: HTMLDivElement | null) => {
+                cardRefs.current[idx] = el;
+              }}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.04 }}
@@ -235,36 +289,107 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
                 {source.label}
               </Typography>
 
-              {/* Status */}
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: 10,
-                  color: isActive ? BLUE_PRIMARY : "#CBD5E1",
-                  textAlign: "center",
-                }}
-              >
-                {isActive ? source.activeStatus : source.pendingStatus}
-              </Typography>
+              {/* 1-Month Data Point */}
+              {(() => {
+                const key = DATA_POINT_KEYS[source.id];
+                const val = key && sourceDataPoints?.[key];
+                if (!val || val === "-") return null;
+                const dpStyle = getDataPointStyle(val);
+                return (
+                  <Box
+                    sx={{
+                      mt: 0.25,
+                      px: 0.75,
+                      py: 0.2,
+                      borderRadius: 1,
+                      bgcolor: dpStyle.bg,
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: dpStyle.color,
+                        textAlign: "center",
+                        lineHeight: 1.3,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      1M: {val}
+                    </Typography>
+                  </Box>
+                );
+              })()}
             </MotionBox>
           );
         })}
       </Box>
 
-      {/* Connecting lines visual */}
+      {/* Curved connecting threads from each source to synthesized signal */}
       <Box
+        ref={svgContainerRef}
         sx={{
-          display: "flex",
-          justifyContent: "center",
+          position: "relative",
+          height: 50,
         }}
       >
-        <Box
-          sx={{
-            width: 0,
-            height: 10,
-            borderLeft: "1.5px dashed #CBD5E1",
+        <svg
+          width="100%"
+          height="100%"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            overflow: "visible",
           }}
-        />
+        >
+          <defs>
+            {LINE_COLORS.map((color, i) => (
+              <linearGradient
+                key={`grad-${i}`}
+                id={`line-grad-${i}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                <stop offset="100%" stopColor={BLUE_PRIMARY} stopOpacity={0.7} />
+              </linearGradient>
+            ))}
+          </defs>
+          {cardCenters.map((cx, i) => {
+            const color = LINE_COLORS[i % LINE_COLORS.length];
+            const midX = svgWidth / 2;
+            const h = 50;
+            // Cubic bezier: start vertical from card, curve to center
+            const d = `M ${cx},0 C ${cx},${h * 0.55} ${midX},${h * 0.45} ${midX},${h}`;
+            return (
+              <React.Fragment key={i}>
+                <path
+                  d={d}
+                  stroke={`url(#line-grad-${i})`}
+                  strokeWidth={2}
+                  fill="none"
+                  strokeOpacity={0.8}
+                />
+                <circle cx={cx} cy={0} r={3.5} fill={color} fillOpacity={0.9} />
+              </React.Fragment>
+            );
+          })}
+          {cardCenters.length > 0 && (
+            <circle
+              cx={svgWidth / 2}
+              cy={50}
+              r={5}
+              fill={BLUE_PRIMARY}
+              fillOpacity={0.8}
+            />
+          )}
+        </svg>
       </Box>
 
       {/* SYNTHESIZED INTO FINAL SIGNAL banner */}
