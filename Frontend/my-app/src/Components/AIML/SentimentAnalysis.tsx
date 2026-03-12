@@ -86,6 +86,7 @@ const fetchIpoTickers = async (
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
     }))
     .filter((item: Deal) => item.ticker);
 };
@@ -335,7 +336,7 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ focusTicker }) =>
         const deals = await fetchIpoTickers();
         const prepared = deals.map((deal) => ({
           ...deal,
-          prompt: buildPrompt(deal.ticker, deal.deal_type),
+          prompt: buildPrompt(deal.ticker, deal.deal_type,deal.issuer_name),
           status: "pending" as const,
         }));
         setItems(prepared);

@@ -57,6 +57,7 @@ const normalizeDealRows = (payload: any): Deal[] => {
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
     }))
     .filter((item: Deal) => item.ticker);
 };
@@ -370,7 +371,7 @@ const AISentimentAnalysisAgent: React.FC<ActiveAgentCardProps> = (props) => {
 
       for (const deal of selectedSentimentDeals) {
         try {
-          const prompt = buildPrompt(deal.ticker, deal.deal_type);
+          const prompt = buildPrompt(deal.ticker, deal.deal_type,deal.issuer_name);
 
           const blocks = await askPerplexity(
             prompt,

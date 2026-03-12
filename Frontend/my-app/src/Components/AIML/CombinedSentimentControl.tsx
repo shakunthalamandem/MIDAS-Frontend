@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   Box,
@@ -48,13 +54,20 @@ const formatDate = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
-const buildPrompt = (ticker: string, dealType?: string, issuerName?: string) => {
+const buildPrompt = (
+  ticker: string,
+  dealType?: string,
+  issuerName?: string,
+) => {
   const normalizedType = (dealType || "deal").toUpperCase();
   const issuerSuffix = issuerName ? ` of ${issuerName}` : "";
   return `what is the investor sentiment for ${ticker} ${normalizedType}${issuerSuffix} and tell me the likely trading prospects for this ${ticker} ${normalizedType}${issuerSuffix} over the next one week and one month `;
 };
 
-const createCombinedRunItem = (deal: Deal, source: CombinedRunItem["source"]): CombinedRunItem => ({
+const createCombinedRunItem = (
+  deal: Deal,
+  source: CombinedRunItem["source"],
+): CombinedRunItem => ({
   ...deal,
   prompt: buildPrompt(deal.ticker, deal.deal_type, deal.issuer_name),
   status: "pending",
@@ -79,7 +92,8 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
-      unique_deal_id: item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      unique_deal_id:
+        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
@@ -95,7 +109,7 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
       "Content-Type": "application/json",
       Authorization: token ? `Bearer ${token}` : "",
     },
-        body: JSON.stringify({ operation: "Issued" , deal_type: "FO"}),
+    body: JSON.stringify({ operation: "Issued", deal_type: "FO" }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to fetch FO tickers");
@@ -105,15 +119,21 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
-      unique_deal_id: item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      unique_deal_id:
+        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
     }))
     .filter((item: Deal) => item.ticker);
 };
 
-const askPerplexity = async (question: string, uniqueDealId: string, source: "IPO" | "FO"): Promise<Block[]> => {
+const askPerplexity = async (
+  question: string,
+  uniqueDealId: string,
+  source: "IPO" | "FO",
+): Promise<Block[]> => {
   const endpoint =
     source === "FO"
       ? `${apiUrl}/api/fo_sentiment_perplexity_chat/`
@@ -121,7 +141,10 @@ const askPerplexity = async (question: string, uniqueDealId: string, source: "IP
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: question.trim(), unique_deal_id: uniqueDealId }),
+    body: JSON.stringify({
+      question: question.trim(),
+      unique_deal_id: uniqueDealId,
+    }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Perplexity chat failed");
@@ -155,7 +178,7 @@ const postSentiment = async (
   ticker: string,
   unique_deal_id: string,
   region: string | undefined,
-  sentimentBlocks: Block[]
+  sentimentBlocks: Block[],
 ) => {
   const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
     method: "POST",
@@ -188,7 +211,8 @@ const postSentiment = async (
 //   return data;
 // };
 
-const getItemKey = (item: CombinedRunItem) => `${item.source}-${item.ticker}-${item.unique_deal_id || ""}`;
+const getItemKey = (item: CombinedRunItem) =>
+  `${item.source}-${item.ticker}-${item.unique_deal_id || ""}`;
 
 const CombinedSentimentControl: React.FC = () => {
   const [items, setItems] = useState<CombinedRunItem[]>([]);
@@ -203,9 +227,12 @@ const CombinedSentimentControl: React.FC = () => {
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [pdfBlocks, setPdfBlocks] = useState<Block[]>([]);
 
-  const wait = (ms = 200) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  const wait = (ms = 200) =>
+    new Promise<void>((resolve) => setTimeout(resolve, ms));
   const waitForPaint = () =>
-    new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
 
   const filteredItems = useMemo(() => {
     const needle = searchTicker.trim().toUpperCase();
@@ -216,98 +243,132 @@ const CombinedSentimentControl: React.FC = () => {
   const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys]);
   const selectedItems = useMemo(
     () => items.filter((item) => selectedSet.has(getItemKey(item))),
-    [items, selectedSet]
+    [items, selectedSet],
   );
 
   const progress = useMemo(() => {
     if (!items.length) return 0;
-    const completedCount = items.filter((item) => item.status === "completed").length;
+    const completedCount = items.filter(
+      (item) => item.status === "completed",
+    ).length;
     return Math.round((completedCount / items.length) * 100);
   }, [items]);
 
   const completedCount = useMemo(
     () => items.filter((item) => item.status === "completed").length,
-    [items]
+    [items],
   );
 
-  const updateStatus = useCallback((index: number, status: CombinedRunItem["status"], note?: string) => {
-    setItems((prev) =>
-      prev.map((item, idx) => (idx === index ? { ...item, status, note } : item))
-    );
-  }, []);
+  const updateStatus = useCallback(
+    (index: number, status: CombinedRunItem["status"], note?: string) => {
+      setItems((prev) =>
+        prev.map((item, idx) =>
+          idx === index ? { ...item, status, note } : item,
+        ),
+      );
+    },
+    [],
+  );
 
-  const renderBlocksToPdf = useCallback(async (blocks: Block[], filename?: string): Promise<RenderedPdf> => {
-    setPdfBlocks(blocks);
-    await waitForPaint();
-    await wait(500);
-
-    const container = pdfContainerRef.current;
-    if (!container) throw new Error("PDF container not available");
-    if (container.clientHeight < 10) {
+  const renderBlocksToPdf = useCallback(
+    async (blocks: Block[], filename?: string): Promise<RenderedPdf> => {
+      setPdfBlocks(blocks);
       await waitForPaint();
-      await wait(300);
-    }
-
-    let tries = 0;
-    while (container.clientHeight < 20 && tries < 4) {
-      await waitForPaint();
-      await wait(250);
-      tries += 1;
-    }
-
-    const capture = async (): Promise<HTMLCanvasElement> => {
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scrollY: -window.scrollY,
-        windowWidth: container.scrollWidth || undefined,
-        windowHeight: container.scrollHeight || undefined,
-      });
-      if (!canvas || canvas.height < 5 || canvas.width < 5) {
-        throw new Error("Failed to render PDF canvas");
-      }
-      return canvas;
-    };
-
-    let canvas: HTMLCanvasElement | null = null;
-    try {
-      canvas = await capture();
-    } catch (_err) {
       await wait(500);
-      canvas = await capture();
-    }
 
-    const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const mmPerPx = pdfWidth / canvas.width;
-    const pageHeightPx = pdfHeight / mmPerPx;
-
-    let offset = 0;
-    while (offset < canvas.height) {
-      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - offset);
-      const sliceCanvas = document.createElement("canvas");
-      sliceCanvas.width = canvas.width;
-      sliceCanvas.height = sliceHeightPx;
-
-      const ctx = sliceCanvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(canvas, 0, offset, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+      const container = pdfContainerRef.current;
+      if (!container) throw new Error("PDF container not available");
+      if (container.clientHeight < 10) {
+        await waitForPaint();
+        await wait(300);
       }
 
-      const imgData = sliceCanvas.toDataURL("image/jpeg", 0.78);
-      const sliceHeightMm = sliceHeightPx * mmPerPx;
+      let tries = 0;
+      while (container.clientHeight < 20 && tries < 4) {
+        await waitForPaint();
+        await wait(250);
+        tries += 1;
+      }
 
-      if (offset > 0) pdf.addPage();
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, sliceHeightMm, undefined, "FAST");
-      offset += sliceHeightPx;
-    }
+      const capture = async (): Promise<HTMLCanvasElement> => {
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scrollY: -window.scrollY,
+          windowWidth: container.scrollWidth || undefined,
+          windowHeight: container.scrollHeight || undefined,
+        });
+        if (!canvas || canvas.height < 5 || canvas.width < 5) {
+          throw new Error("Failed to render PDF canvas");
+        }
+        return canvas;
+      };
 
-    const pdfBlob = pdf.output("blob") as Blob;
-    const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
-    return { blob: pdfBlob, filename: safeName };
-  }, []);
+      let canvas: HTMLCanvasElement | null = null;
+      try {
+        canvas = await capture();
+      } catch (_err) {
+        await wait(500);
+        canvas = await capture();
+      }
+
+      const pdf = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+        compress: true,
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const mmPerPx = pdfWidth / canvas.width;
+      const pageHeightPx = pdfHeight / mmPerPx;
+
+      let offset = 0;
+      while (offset < canvas.height) {
+        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - offset);
+        const sliceCanvas = document.createElement("canvas");
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeightPx;
+
+        const ctx = sliceCanvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(
+            canvas,
+            0,
+            offset,
+            canvas.width,
+            sliceHeightPx,
+            0,
+            0,
+            canvas.width,
+            sliceHeightPx,
+          );
+        }
+
+        const imgData = sliceCanvas.toDataURL("image/jpeg", 0.78);
+        const sliceHeightMm = sliceHeightPx * mmPerPx;
+
+        if (offset > 0) pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          0,
+          0,
+          pdfWidth,
+          sliceHeightMm,
+          undefined,
+          "FAST",
+        );
+        offset += sliceHeightPx;
+      }
+
+      const pdfBlob = pdf.output("blob") as Blob;
+      const safeName = filename ? `Sentiment-${filename}.pdf` : "Sentiment.pdf";
+      return { blob: pdfBlob, filename: safeName };
+    },
+    [],
+  );
 
   const runAutomation = useCallback(
     async (queue?: CombinedRunItem[]) => {
@@ -324,16 +385,28 @@ const CombinedSentimentControl: React.FC = () => {
           (candidate) =>
             candidate.ticker === entry.ticker &&
             candidate.unique_deal_id === entry.unique_deal_id &&
-            candidate.source === entry.source
+            candidate.source === entry.source,
         );
         const statusIndex = targetIndex === -1 ? i : targetIndex;
         setCurrentTicker(entry.ticker);
         updateStatus(statusIndex, "running");
 
         try {
-          const answerBlocks = await askPerplexity(entry.prompt, entry.unique_deal_id, entry.source);
-          const sentimentPdf = await renderBlocksToPdf(answerBlocks, entry.ticker);
-          await postSentiment(entry.ticker, entry.unique_deal_id, entry.region, answerBlocks);
+          const answerBlocks = await askPerplexity(
+            entry.prompt,
+            entry.unique_deal_id,
+            entry.source,
+          );
+          const sentimentPdf = await renderBlocksToPdf(
+            answerBlocks,
+            entry.ticker,
+          );
+          await postSentiment(
+            entry.ticker,
+            entry.unique_deal_id,
+            entry.region,
+            answerBlocks,
+          );
           // await postSentimentPdf(entry.ticker, entry.unique_deal_id, sentimentPdf);
           updateStatus(statusIndex, "completed");
         } catch (err: any) {
@@ -345,7 +418,7 @@ const CombinedSentimentControl: React.FC = () => {
       setRunning(false);
       setCurrentTicker("");
     },
-    [filteredItems, items, renderBlocksToPdf, updateStatus]
+    [filteredItems, items, renderBlocksToPdf, updateStatus],
   );
 
   useEffect(() => {
@@ -356,7 +429,10 @@ const CombinedSentimentControl: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const [ipoTickers, foTickers] = await Promise.all([fetchIpoTickers(), fetchFoTickers()]);
+        const [ipoTickers, foTickers] = await Promise.all([
+          fetchIpoTickers(),
+          fetchFoTickers(),
+        ]);
         const prepared: CombinedRunItem[] = [
           ...ipoTickers.map((deal) => createCombinedRunItem(deal, "IPO")),
           ...foTickers.map((deal) => createCombinedRunItem(deal, "FO")),
@@ -375,9 +451,16 @@ const CombinedSentimentControl: React.FC = () => {
   const retryFailed = () => {
     const failed = items.filter((item) => item.status === "failed");
     if (!failed.length) return;
-    const resetQueue = failed.map((item) => ({ ...item, status: "pending" as const }));
+    const resetQueue = failed.map((item) => ({
+      ...item,
+      status: "pending" as const,
+    }));
     setItems((prev) =>
-      prev.map((item) => (item.status === "failed" ? { ...item, status: "pending" as const } : item))
+      prev.map((item) =>
+        item.status === "failed"
+          ? { ...item, status: "pending" as const }
+          : item,
+      ),
     );
     runAutomation(resetQueue);
   };
@@ -403,7 +486,13 @@ const CombinedSentimentControl: React.FC = () => {
   };
 
   return (
-    <Box sx={{ background: "linear-gradient(to bottom, #e8eff5, #ffffff)", minHeight: "100vh", py: 6 }}>
+    <Box
+      sx={{
+        background: "linear-gradient(to bottom, #e8eff5, #ffffff)",
+        minHeight: "100vh",
+        py: 6,
+      }}
+    >
       <Container maxWidth="lg">
         <Stack spacing={3}>
           <Typography variant="h4" fontWeight={700} color="#002060">
@@ -426,7 +515,12 @@ const CombinedSentimentControl: React.FC = () => {
                 />
               </Box>
 
-              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                flexWrap="wrap"
+              >
                 <Button
                   variant="contained"
                   disabled={running || !selectedItems.length}
@@ -434,15 +528,27 @@ const CombinedSentimentControl: React.FC = () => {
                 >
                   {running ? "Running selected..." : "Run selected tickers"}
                 </Button>
-                <Button variant="outlined" disabled={!filteredItems.length} onClick={handleSelectAllVisible}>
+                <Button
+                  variant="outlined"
+                  disabled={!filteredItems.length}
+                  onClick={handleSelectAllVisible}
+                >
                   Select visible
                 </Button>
-                <Button variant="text" onClick={handleClearSelection} disabled={!selectedKeys.length}>
+                <Button
+                  variant="text"
+                  onClick={handleClearSelection}
+                  disabled={!selectedKeys.length}
+                >
                   Clear selection
                 </Button>
                 <Button
                   variant="outlined"
-                  disabled={running || loading || !items.some((i) => i.status === "failed")}
+                  disabled={
+                    running ||
+                    loading ||
+                    !items.some((i) => i.status === "failed")
+                  }
                   onClick={retryFailed}
                 >
                   Retry Failed
@@ -453,7 +559,11 @@ const CombinedSentimentControl: React.FC = () => {
               </Stack>
 
               <Box>
-                <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
+                  sx={{ height: 10, borderRadius: 5 }}
+                />
                 <Typography variant="caption" color="#000000">
                   {completedCount}/{items.length} completed
                 </Typography>
@@ -475,16 +585,25 @@ const CombinedSentimentControl: React.FC = () => {
                       item.status === "completed"
                         ? "success.main"
                         : item.status === "failed"
-                        ? "error.main"
-                        : "grey.200",
+                          ? "error.main"
+                          : "grey.200",
                   }}
                 >
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Checkbox checked={isSelected} onChange={() => toggleSelection(key)} />
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={() => toggleSelection(key)}
+                    />
                     <Stack flex={1} spacing={0.5}>
                       <Typography fontWeight={600}>{item.ticker}</Typography>
                       <Typography variant="body2" color="#000000">
-                        {[item.unique_deal_id, item.deal_type, item.fo_type, item.region, item.source]
+                        {[
+                          item.unique_deal_id,
+                          item.deal_type,
+                          item.fo_type,
+                          item.region,
+                          item.source,
+                        ]
                           .filter(Boolean)
                           .join(" | ") || "Deal details NA"}
                       </Typography>
@@ -497,21 +616,29 @@ const CombinedSentimentControl: React.FC = () => {
                           item.status === "completed"
                             ? "success"
                             : item.status === "failed"
-                            ? "error"
-                            : item.status === "running"
-                            ? "info"
-                            : "default"
+                              ? "error"
+                              : item.status === "running"
+                                ? "info"
+                                : "default"
                         }
                         label={item.status}
                       />
-                      {item.status === "running" && <CircularProgress size={18} />}
+                      {item.status === "running" && (
+                        <CircularProgress size={18} />
+                      )}
                       <Button
                         size="small"
                         variant="contained"
-                        disabled={running || loading || item.status === "running"}
+                        disabled={
+                          running || loading || item.status === "running"
+                        }
                         onClick={() => runAutomation([{ ...item }])}
                       >
-                        {item.status === "completed" ? "Start Again" : item.status === "running" ? "Running..." : "Start"}
+                        {item.status === "completed"
+                          ? "Start Again"
+                          : item.status === "running"
+                            ? "Running..."
+                            : "Start"}
                       </Button>
                     </Stack>
                   </Stack>
