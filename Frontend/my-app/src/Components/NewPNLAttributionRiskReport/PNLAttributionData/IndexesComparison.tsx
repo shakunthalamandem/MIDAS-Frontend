@@ -28,9 +28,9 @@ const SELECTED_BG: Record<string, string> = {
 const INDEX_CARDS_CONFIG: IndexCardConfig[] = [
   { label: "1m Beta S&P", valueKey: "one_month_beta_sp", format: "beta", color: "blue", metricKey: "one_month_beta_sp" },
   { label: "3m Beta S&P", valueKey: "three_month_beta_sp", format: "beta", color: "blue", metricKey: "three_month_beta_sp" },
-  { label: "1m Vol / S&P", valueKey: "one_month_vol", subKey: "one_month_sp_vol", format: "vol", color: "cyan", metricKey: "one_month_vol" },
-  { label: "3m Vol / S&P", valueKey: "three_month_vol", subKey: "three_month_sp_vol", format: "vol", color: "orange", metricKey: "three_month_vol" },
-  { label: "YTD Vol / S&P", valueKey: "ytd_vol", subKey: "ytd_sp_vol", format: "vol", color: "pink", metricKey: "ytd_vol" },
+  { label: "1m Volatility / S&P", valueKey: "one_month_vol", subKey: "one_month_sp_vol", format: "vol", color: "cyan", metricKey: "one_month_vol" },
+  { label: "3m Volatility / S&P", valueKey: "three_month_vol", subKey: "three_month_sp_vol", format: "vol", color: "orange", metricKey: "three_month_vol" },
+  { label: "YTD Volatility / S&P", valueKey: "ytd_vol", subKey: "ytd_sp_vol", format: "vol", color: "pink", metricKey: "ytd_vol" },
   { label: "Drawdown / S&P", valueKey: "drawdown", subKey: "sp_drawdown", format: "vol", color: "red", metricKey: "drawdown" },
 ];
 
@@ -90,7 +90,7 @@ const IndexesComparison: React.FC<IndexesComparisonProps> = ({
                     className={isSelected ? "" : "index-card-sub"}
                     sx={isSelected ? { fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.7)", ml: 0.5 } : {}}
                   >
-                    {"  "}({subValue.toFixed(2)}%)
+                    {" / "}({subValue.toFixed(2)}%)
                   </Box>
                 )}
               </Box>
