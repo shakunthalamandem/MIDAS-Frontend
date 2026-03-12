@@ -37,7 +37,7 @@ const SOURCES: SourceCardConfig[] = [
   },
   {
     id: "ai-model",
-    label: "AI Model",
+    label: "Prediction Agent",
     activeStatus: "Active",
     pendingStatus: "Pending",
     icon: <AutoAwesomeIcon sx={{ fontSize: 20 }} />,
@@ -45,7 +45,7 @@ const SOURCES: SourceCardConfig[] = [
   },
   {
     id: "ai-sentiment",
-    label: "AI Sentiment",
+    label: "Sentiment Agent",
     activeStatus: "Active",
     pendingStatus: "Pending",
     icon: <SentimentSatisfiedIcon sx={{ fontSize: 20 }} />,
@@ -365,8 +365,13 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
             const color = LINE_COLORS[i % LINE_COLORS.length];
             const midX = svgWidth / 2;
             const h = 50;
+            const centerThreshold = 12;
+            const curveOffset = Math.min(1, Math.max(12, svgWidth * 0.04));
+            const isCenterCard = Math.abs(cx - midX) < centerThreshold;
+            const startCtrlX = isCenterCard ? Math.max(0, cx - curveOffset) : cx;
+            const endCtrlX = isCenterCard ? Math.max(0, midX - curveOffset) : midX;
             // Cubic bezier: start vertical from card, curve to center
-            const d = `M ${cx},0 C ${cx},${h * 0.55} ${midX},${h * 0.45} ${midX},${h}`;
+            const d = `M ${cx},0 C ${startCtrlX},${h * 0.55} ${endCtrlX},${h * 0.45} ${midX},${h}`;
             return (
               <React.Fragment key={i}>
                 <path
