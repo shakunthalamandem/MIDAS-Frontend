@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import GenericDataRenderer from "./GenericDataRenderer";
 import ImmediateDecisionCard from "./ImmediateDecisionCard";
 
@@ -246,31 +247,26 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
                     >
                       {displayVal}
                     </Typography>
-                    <Button
-                      variant="outlined"
+                    <IconButton
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRowClick(row);
                       }}
                       sx={{
-                        minWidth: 28,
-                        height: 24,
+                        width: 22,
+                        height: 22,
                         p: 0,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        lineHeight: 1,
-                        borderRadius: 1,
-                        borderColor: "#94a3b8",
-                        color: "#0f172a",
+                        borderRadius: "50%",
+                        color: "#94a3b8",
                         "&:hover": {
-                          borderColor: "#64748b",
-                          backgroundColor: "rgba(15,23,42,0.06)",
+                          backgroundColor: "rgba(148,163,184,0.15)",
+                          color: "#64748b",
                         },
                       }}
                     >
-                      v
-                    </Button>
+                      <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
                   </Box>
                 );
               }
