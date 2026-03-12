@@ -95,11 +95,11 @@ interface TabSectionDef {
 
 const PORTFOLIO_SECTIONS: TabSectionDef[] = [
   { key: "executive_risk_dashboard", label: "Portfolio Overview" },
-  { key: "cio_decision_brief", label: "CIO Decision Brief" },
-  { key: "immediate_decisions", label: "Immediate Decisions" },
-  { key: "technical_risk_overlay", label: "Technical Risk Overlay" },
-  { key: "opportunity_engine", label: "Opportunity Engine" },
   { key: "final_prioritized_action_matrix", label: "Action Matrix" },
+  // { key: "cio_decision_brief", label: "CIO Decision Brief" },
+  // { key: "immediate_decisions", label: "Immediate Decisions" },
+  { key: "technical_risk_overlay", label: "Technical Risk Overlay" },
+  // { key: "opportunity_engine", label: "Opportunity Engine" },
   { key: "role_specific_action_checklists", label: "Action Checklists" },
 ];
 
@@ -108,8 +108,8 @@ const RISK_SECTIONS: TabSectionDef[] = [
   { key: "base_model_discipline_scorecard", label: "Discipline Scorecard" },
   { key: "sector_peer_news_map", label: "Sector & Peer News" },
   { key: "macro_event_risk_calendar", label: "Macro & Event Risk Calendar" },
-  { key: "macro_regime_sector_rotation_model", label: "Macro Regime & Sector Rotation" },
-  { key: "upcoming_week_focus", label: "Upcoming Week Focus" },
+  // { key: "macro_regime_sector_rotation_model", label: "Macro Regime & Sector Rotation" },
+  // { key: "upcoming_week_focus", label: "Upcoming Week Focus" },
   { key: "upcoming_month_strategic_outlook", label: "Monthly Strategic Outlook" },
 ];
 
@@ -209,8 +209,8 @@ const extractKpis = (sections: Record<string, any>): KpiItem[] => {
   const exp = findMetric(["total long exposure", "total exposure"]);
   if (exp) kpis.push({ label: "Exposure", value: exp.value, color: "#2563eb" });
 
-  const risk = findMetric(["capital at risk"]);
-  if (risk) kpis.push({ label: "Cap Risk", value: risk.value, color: "#dc2626" });
+  // const risk = findMetric(["capital at risk"]);
+  // if (risk) kpis.push({ label: "Cap Risk", value: risk.value, color: "#dc2626" });
 
   return kpis;
 };

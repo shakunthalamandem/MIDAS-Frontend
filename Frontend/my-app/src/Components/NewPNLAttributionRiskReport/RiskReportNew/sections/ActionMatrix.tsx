@@ -226,19 +226,52 @@ const ActionMatrix: React.FC<Props> = ({ data, detailItems }) => {
 
               if (isTicker) {
                 return (
-                  <Typography
+                  <Box
                     key={k}
                     sx={{
                       px: 3,
                       py: 2,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      letterSpacing: 0.3,
-                      color: "#0f172a",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
                   >
-                    {displayVal}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        letterSpacing: 0.3,
+                        color: "#0f172a",
+                      }}
+                    >
+                      {displayVal}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRowClick(row);
+                      }}
+                      sx={{
+                        minWidth: 28,
+                        height: 24,
+                        p: 0,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        borderRadius: 1,
+                        borderColor: "#94a3b8",
+                        color: "#0f172a",
+                        "&:hover": {
+                          borderColor: "#64748b",
+                          backgroundColor: "rgba(15,23,42,0.06)",
+                        },
+                      }}
+                    >
+                      v
+                    </Button>
+                  </Box>
                 );
               }
 
