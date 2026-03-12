@@ -234,6 +234,7 @@ Recent IPOs Agent        </Typography>
                 <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#002060" }}>
                   {option.report_name}
                 </Typography>
+                
                 <Typography sx={{ fontSize: 11, color: "#64748b" }}>
                   {formatDate(option.date)}
                 </Typography>

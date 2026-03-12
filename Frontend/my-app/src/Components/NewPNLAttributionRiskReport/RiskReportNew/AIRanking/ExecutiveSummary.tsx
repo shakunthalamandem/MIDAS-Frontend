@@ -110,12 +110,23 @@ export const ExecutiveSummary = ({ summary, actionSummary, metadata }: SummaryPr
             gap: 2,
           }}
         >
-          <Box>
+          {/* <Box>
             <Typography variant="h5" sx={{ color: "#002060", fontWeight: 700 }}>
               {metadata.fund_style}
             </Typography>
             <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
               {metadata.analysis_focus} · {metadata.investment_horizon} horizon · {metadata.report_date}
+            </Typography>
+          </Box> */}
+                    <Box>
+            <Typography variant="h5" sx={{ color: "#002060", fontWeight: 700 }}>
+              Rank Order of IPOs from last 60 days
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
+              Based on each stock's news, trading information of every day since it has gone IPO, sentiment from investors for near term,
+            </Typography>
+                        <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
+               daily trading volume since IPO to current date, and longer term potential based on fundamental data like Revenues, Revenue growth and Profitability.
             </Typography>
           </Box>
 
