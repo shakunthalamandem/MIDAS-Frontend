@@ -8,6 +8,7 @@ interface TradingViewWidgetProps {
 const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
   const cleanedTicker = ticker.replace(/\s+US$/, "");
   const container = useRef<HTMLDivElement | null>(null);
+  const loadIdRef = useRef(0);
 
   useEffect(() => {
     if (!container.current) {
@@ -15,13 +16,17 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
       return;
     }
 
+    loadIdRef.current += 1;
+    const loadId = loadIdRef.current;
+
     // Clean up any existing widget before loading a new one
     container.current.innerHTML = `
       <div class="tradingview-widget-container__widget"></div>
     `;
 
-    setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       if (!container.current) return;
+      if (loadId !== loadIdRef.current) return;
 
       const script = document.createElement("script");
       script.src =
@@ -51,6 +56,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = ({ ticker }) => {
 
     // Cleanup on unmount
     return () => {
+      window.clearTimeout(timeoutId);
       if (container.current) {
         container.current.innerHTML = "";
       }

@@ -40,7 +40,7 @@ const METRIC_INFO: Array<{ keywords: string[]; description: string }> = [
   {
     keywords: ['capital at risk to stops', 'capital at risk'],
     description:
-      'Capital at Risk, expressed as a percentage of the $200M NAV, shows the total potential loss if all positions decline to their stop levels.',
+      'Capital at Risk, expressed as a percentage of the $500M NAV, shows the total potential loss if all positions decline to their stop levels.',
   },
   {
     keywords: ['capital gain potential to targets', 'gain potential'],
