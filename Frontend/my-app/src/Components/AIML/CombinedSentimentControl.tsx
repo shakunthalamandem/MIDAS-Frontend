@@ -24,6 +24,7 @@ type Deal = {
   deal_type: string;
   fo_type?: string;
   region?: string;
+  issuer_name?: string;
 };
 
 type CombinedRunItem = Deal & {
@@ -47,14 +48,15 @@ const formatDate = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
-const buildPrompt = (ticker: string, dealType?: string) => {
+const buildPrompt = (ticker: string, dealType?: string, issuerName?: string) => {
   const normalizedType = (dealType || "deal").toUpperCase();
-  return `what is the investor sentiment for ${ticker} ${normalizedType} and tell me the likely trading prospects for this ${ticker} ${normalizedType} over the next one week and one month `;
+  const issuerSuffix = issuerName ? ` of ${issuerName}` : "";
+  return `what is the investor sentiment for ${ticker} ${normalizedType}${issuerSuffix} and tell me the likely trading prospects for this ${ticker} ${normalizedType}${issuerSuffix} over the next one week and one month `;
 };
 
 const createCombinedRunItem = (deal: Deal, source: CombinedRunItem["source"]): CombinedRunItem => ({
   ...deal,
-  prompt: buildPrompt(deal.ticker, deal.deal_type),
+  prompt: buildPrompt(deal.ticker, deal.deal_type, deal.issuer_name),
   status: "pending",
   source,
 });
