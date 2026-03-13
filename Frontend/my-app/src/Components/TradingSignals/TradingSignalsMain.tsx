@@ -202,7 +202,7 @@ const TradingSignalsMain: React.FC<Props> = ({
             <NewspaperIcon sx={{ fontSize: 22, color: "#262268" }} />
           </Box>
           <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#0F172A" }}>
-            Market News Intelligence
+             News Agent Intelligence
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ pt: 0 }}>

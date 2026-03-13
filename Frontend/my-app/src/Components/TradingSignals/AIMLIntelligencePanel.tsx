@@ -455,7 +455,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
         />
         <SectionHeader
           icon={<PsychologyIcon sx={{ color: "#D97706", fontSize: 22 }} />}
-          title="ML Model Predictions & Outcomes"
+          title="Factors Based Agent Predictions & Outcomes"
         />
         <Typography sx={{ color: "#64748B", fontWeight: 500, fontSize: 12.5, mb: 2 }}>
           AI-powered forecasts compared to actual market performance
@@ -514,7 +514,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
               Deal Not Yet Predicted
             </Typography>
             <Typography sx={{ fontSize: 13, color: "#94A3B8", fontWeight: 500 }}>
-              ML model predictions will appear here once generated
+              Factors Based Agent predictions will appear here once generated
             </Typography>
           </Box>
         )}
@@ -550,7 +550,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
 
         <SectionHeader
           icon={<AutoAwesomeIcon sx={{ color: "#6366F1", fontSize: 22 }} />}
-          title="Prediction Agent Analysis" 
+          title="Deal(IPO) Agent Analysis" 
         />
 
         {/* Executive Summary */}

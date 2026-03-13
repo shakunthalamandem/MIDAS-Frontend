@@ -192,7 +192,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
                   color: "#002060",
                 }}
               >
-                Latest Date: {new Date(latestDate).toISOString().split("T")[0]}
+                Last Updated Date: {new Date(latestDate).toISOString().split("T")[0]}
               </Typography>
             )}
           </Box>
