@@ -550,7 +550,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
 
         <SectionHeader
           icon={<AutoAwesomeIcon sx={{ color: "#6366F1", fontSize: 22 }} />}
-          title="AI Unsupervised Analysis"
+          title="Prediction Agent Analysis" 
         />
 
         {/* Executive Summary */}
@@ -572,7 +572,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
             </Box>
             <Typography
               sx={{
-                color: "#475569",
+                color: "#000000",
                 fontWeight: 500,
                 fontSize: 13,
                 lineHeight: 1.7,
@@ -683,7 +683,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
 
         <SectionHeader
           icon={<SentimentSatisfiedIcon sx={{ color: "#3B82F6", fontSize: 22 }} />}
-          title="Classified Sentiment Analysis"
+          title="Sentiment Agent Analysis"
         />
 
         {/* AI Sentiment Summary (if available) */}
@@ -713,7 +713,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
                   </Typography>
                   <Typography
                     sx={{
-                      color: "#475569",
+                      color: "#000000",
                       fontSize: 13,
                       lineHeight: 1.7,
                       fontWeight: 500,
@@ -733,7 +733,7 @@ const AIMLIntelligencePanel: React.FC<Props> = ({
                   </Typography>
                   <Typography
                     sx={{
-                      color: "#475569",
+                      color: "#000000",
                       fontSize: 13,
                       lineHeight: 1.7,
                       fontWeight: 500,
