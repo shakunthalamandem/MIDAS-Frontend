@@ -1,0 +1,83 @@
+name: Deploy Frontend to Test (Docker)
+
+# ──────────────────────────────────────────────────────────────
+# Triggers when code is pushed to the 'test' branch
+# Runs on your self-hosted Windows production server
+# Automatically rebuilds Docker image and restarts the container
+# ──────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [test]
+
+jobs:
+  deploy:
+    name: Build & Deploy Frontend
+    runs-on: self-hosted  # Runs on YOUR Windows machine, not GitHub cloud
+
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+      # ── Step 1: Pull latest code ──
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Step 2: Stop old container (ignore error if not running) ──
+      - name: Stop existing frontend container
+        run: |
+          docker stop midas-frontend 2>$null
+          docker rm midas-frontend 2>$null
+          Write-Host "Old container removed (or was not running)"
+        continue-on-error: true
+
+      # ── Step 3: Build new Docker image ──
+      - name: Build Docker image
+        run: |
+          cd Frontend/my-app
+          docker build -t midas-frontend .
+        timeout-minutes: 15
+
+      # ── Step 4: Run new container ──
+      - name: Start frontend container
+        run: |
+          docker run -d `
+            --name midas-frontend `
+            -p 3080:80 `
+            --restart unless-stopped `
+            midas-frontend
+          Write-Host "Frontend container started on port 3080"
+
+      # ── Step 5: Wait and verify container is healthy ──
+      - name: Health check
+        run: |
+          Start-Sleep -Seconds 5
+          $status = docker inspect --format='{{.State.Running}}' midas-frontend
+          if ($status -eq "true") {
+            Write-Host "Container is running successfully"
+          } else {
+            Write-Host "Container failed to start!"
+            docker logs midas-frontend --tail 50
+            exit 1
+          }
+
+      # ── Step 6: Clean up old Docker images ──
+      - name: Cleanup dangling images
+        run: |
+          docker image prune -f
+          Write-Host "Cleaned up unused Docker images"
+        continue-on-error: true
+
+      # ── Step 7: Deployment summary ──
+      - name: Deployment summary
+        run: |
+          Write-Host "================================================"
+          Write-Host "  FRONTEND DEPLOYMENT COMPLETE"
+          Write-Host "================================================"
+          Write-Host "  Container:  midas-frontend"
+          Write-Host "  Port:       3080"
+          Write-Host "  URL:        https://trail2.goldenhillsindia.com"
+          Write-Host "  Time:       $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          Write-Host "================================================"
+          docker ps --filter "name=midas-frontend" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
