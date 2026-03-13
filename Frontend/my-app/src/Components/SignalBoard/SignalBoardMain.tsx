@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -216,10 +217,12 @@ function DealRow({
   item,
   expanded,
   onToggle,
+  onTickerClick,
 }: {
   item: SignalBoardItem;
   expanded: boolean;
   onToggle: () => void;
+  onTickerClick: () => void;
 }) {
   const upcoming = isUpcoming(item.deal_status);
   const style = getSignalStyle(item.signal);
@@ -251,7 +254,19 @@ function DealRow({
         {/* Ticker + Company */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 13.5, color: "#1E40AF" }}>
+            <Typography
+              onClick={(e) => {
+                e.stopPropagation();
+                onTickerClick();
+              }}
+              sx={{
+                fontWeight: 800,
+                fontSize: 13.5,
+                color: "#1E40AF",
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
               {item.ticker}
             </Typography>
             {item.deal_status && (
@@ -402,6 +417,7 @@ function SignalSection({
   accentColor,
   expandedSet,
   onToggle,
+  onTickerClick,
   buySellHoldCounts,
 }: {
   title: string;
@@ -410,6 +426,7 @@ function SignalSection({
   accentColor: string;
   expandedSet: Set<string>;
   onToggle: (key: string) => void;
+  onTickerClick: (item: SignalBoardItem) => void;
   buySellHoldCounts: { buy: number; hold: number; sell: number };
 }) {
   const upcoming = title.toLowerCase().includes("upcoming");
@@ -535,6 +552,7 @@ function SignalSection({
                 item={item}
                 expanded={expandedSet.has(key)}
                 onToggle={() => onToggle(key)}
+                onTickerClick={() => onTickerClick(item)}
               />
             );
           })
@@ -562,6 +580,7 @@ function SignalSection({
    ═══════════════════════════════════════════ */
 
 const SignalBoardMain: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<SignalBoardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -610,6 +629,21 @@ const SignalBoardMain: React.FC = () => {
         next.add(key);
       }
       return next;
+    });
+  };
+
+  const handleTickerClick = (item: SignalBoardItem) => {
+    const dealType = (item.deal_type || "").toLowerCase();
+
+    const targetPath = dealType.includes("ipo")
+      ? "/deals/new_dashboard/details"
+      : "/deals/new_dashboard/fo_details";
+
+    navigate(targetPath, {
+      state: {
+        payload: item,
+        targetTabLabel: "Trading Dynamics",
+      },
     });
   };
 
@@ -746,41 +780,43 @@ const SignalBoardMain: React.FC = () => {
         />
       </MotionBox>
 
-      {/* ── Two-column layout ── */}
-      <MotionBox
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        sx={{
-          display: "grid",
-          gap: 2.5,
-          gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
-          alignItems: "start",
-        }}
-      >
-        {/* Left: Upcoming */}
-        <SignalSection
-          title="Upcoming & Priced, Yet to Trade"
-          subtitle="Signals represent 1st day (T+1D) performance"
-          items={upcomingSignals}
-          accentColor="#F97316"
-          expandedSet={expandedRows}
-          onToggle={toggleRow}
-          buySellHoldCounts={upcomingCounts}
-        />
+        {/* ── Two-column layout ── */}
+        <MotionBox
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          sx={{
+            display: "grid",
+            gap: 2.5,
+            gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+            alignItems: "start",
+          }}
+        >
+          {/* Left: Upcoming */}
+          <SignalSection
+            title="Upcoming & Priced, Yet to Trade"
+            subtitle="Signals represent 1st day (T+1D) performance"
+            items={upcomingSignals}
+            accentColor="#F97316"
+            expandedSet={expandedRows}
+            onToggle={toggleRow}
+            onTickerClick={handleTickerClick}
+            buySellHoldCounts={upcomingCounts}
+          />
 
-        {/* Right: Trading */}
-        <SignalSection
-          title="Trading"
-          subtitle="Signals represent 1-month hold for exceptional returns"
-          items={tradingSignals}
-          accentColor="#2563EB"
-          expandedSet={expandedRows}
-          onToggle={toggleRow}
-          buySellHoldCounts={tradingCounts}
-        />
-      </MotionBox>
-    </Box>
+          {/* Right: Trading */}
+          <SignalSection
+            title="Trading"
+            subtitle="Signals represent 1-month hold for exceptional returns"
+            items={tradingSignals}
+            accentColor="#2563EB"
+            expandedSet={expandedRows}
+            onToggle={toggleRow}
+            onTickerClick={handleTickerClick}
+            buySellHoldCounts={tradingCounts}
+          />
+        </MotionBox>
+      </Box>
     </Box>
   );
 };

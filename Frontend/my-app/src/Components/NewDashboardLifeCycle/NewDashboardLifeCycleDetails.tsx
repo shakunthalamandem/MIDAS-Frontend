@@ -44,8 +44,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const activePayload = selectedOption || payload;
   const writeupEnabled =
-    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
-    (activePayload?.writeup_available || "").toUpperCase() === "YES";
+  (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
+  (activePayload?.writeup_available || "").toUpperCase() === "YES" ||
+  !!activePayload?.ticker;
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
