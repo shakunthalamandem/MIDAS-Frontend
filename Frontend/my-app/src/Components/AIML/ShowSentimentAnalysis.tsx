@@ -70,6 +70,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [latestDate, setLatestDate] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,6 +123,13 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
             return;
           }
           throw new Error(apiMsg || `Request failed with status ${res.status}`);
+        }
+
+        // capture updated_at from API response
+        if (data?.updated_at) {
+          setLatestDate(data.updated_at);
+        } else {
+          setLatestDate(null);
         }
 
         const raw = data?.sentiment ?? data?.answer ?? data;
@@ -249,6 +257,20 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
                 <Alert severity="warning" sx={{ mt: 1 }}>
                   {tickerError}
                 </Alert>
+              )}
+
+              {latestDate && (
+                <Typography
+                  sx={{
+                    mt: 0.5,
+                    ml: 2.0,          // moves text to the right under search input
+                    fontSize: "11px", // smaller font size
+                    fontWeight: 500,
+                    color: "#002060",
+                  }}
+                >
+                  Latest Date: {new Date(latestDate).toISOString().split("T")[0]}
+                </Typography>
               )}
             </Box>
           </Box>
