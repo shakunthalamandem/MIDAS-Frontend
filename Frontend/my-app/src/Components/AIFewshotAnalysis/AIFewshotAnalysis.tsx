@@ -181,7 +181,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               align="center"
               sx={{ fontWeight: 900, color: "#5D0163" }}
             >
-              Prediction Agent for {companyName}
+             Deal(IPO) Agent for {companyName}
             </Typography>
 
             <Autocomplete
@@ -241,7 +241,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
             <CardContent sx={{ pb: 0 }}>
               <Box display="flex" justifyContent="space-between">
                 <Typography fontWeight={600}>
-                  Prediction Agent                </Typography>
+                  Deal(IPO) Agent                </Typography>
 
                 <IconButton
                   onClick={() => setIsDescriptionExpanded((p) => !p)}

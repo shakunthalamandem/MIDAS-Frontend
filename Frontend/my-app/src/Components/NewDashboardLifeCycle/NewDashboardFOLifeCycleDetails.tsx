@@ -62,7 +62,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "Peer Deals Performance", requiresWriteup: true },
       { label: "Sentiment Agent" },
       { label: "Previous FO deals" },
-      { label: "ML Model" },
+      { label: "Factors Based Agent" },
      
       { label: "Technical Analysis" },
       { label: "NEWS" },
@@ -312,7 +312,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "ML Model" ? (
+          ) : tabItems[tabValue]?.label === "Factors Based Agent" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
             <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />

@@ -29,7 +29,7 @@ interface SourceCardConfig {
 const SOURCES: SourceCardConfig[] = [
   {
     id: "ml-predictions",
-    label: "ML Model",
+    label: "Factors Based Agent",
     activeStatus: "Active",
     pendingStatus: "Pending",
     icon: <PsychologyIcon sx={{ fontSize: 20 }} />,
