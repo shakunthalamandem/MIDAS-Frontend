@@ -45,16 +45,16 @@ const activeAgents: AgentConfig[] = [
     route: "/ai_risk_review",
   },
   {
-    title: "Recent IPOs Agent",
+    title: "IPO Ranking Agent",
     description:
       "Ranking of the most promising IPOs from the last 30 days based on data and market signals using AI-tools.",
     schedule: "Every Monday",
     route: "/last_30_days_ai_ranking",
   },
   {
-    title: "Prediction Agent",
+    title: "Deal(IPO) Agent",
     description:
-      "Analyzes a company’s pre-listing fundamentals by comparing them with similar past IPO deals.prediction agent runs using AI Unsupervised.",
+      "Analyzes a company’s pre-listing fundamentals by comparing them with similar past IPO deals.Deal agent runs using AI Unsupervised.",
     schedule: "One Time for each IPO",
     route: "/ai_fewshot_analysis",
   },

@@ -215,7 +215,7 @@ const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode, reviewTab =
         }}
       >
         <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: 16, whiteSpace: "nowrap" }}>
-Recent IPOs Agent        </Typography>
+         IPO Ranking Agent        </Typography>
         <Box sx={{ flex: 1 }} />
         <Autocomplete
           options={rankingReports}

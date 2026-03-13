@@ -44,8 +44,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const activePayload = selectedOption || payload;
   const writeupEnabled =
-    (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
-    (activePayload?.writeup_available || "").toUpperCase() === "YES";
+  (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
+  (activePayload?.writeup_available || "").toUpperCase() === "YES" ||
+  !!activePayload?.ticker;
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
@@ -58,8 +59,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       // { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "Sentiment Agent" },
-      { label: " Prediction Agent" },
-      { label: "ML Model" },
+      { label: " Deal(IPO) Agent" },
+      { label: "Factors Based Agent" },
      
       { label: "S1 AI Query" },
       { label: "NEWS" },
@@ -312,9 +313,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <NewDashboardLifeCyclePeerDeals selectedDeal={activePayload} />
             ) : tabItems[tabValue]?.label === "NEWS" ? (
               <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "ML Model" ? (
+            ) : tabItems[tabValue]?.label === "Factors Based Agent" ? (
               <AIMLDealDetails ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === " Prediction Agent" ? (
+            ) : tabItems[tabValue]?.label === " Deal(IPO) Agent" ? (
               <DashboardAIFewShotAnalysis
                 basicDealDetails={{
                   unique_deal_id: activePayload.unique_deal_id,

@@ -327,7 +327,7 @@ const AIMLDealInsightsPanel: React.FC<Props> = ({ deal }) => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 1100, mb: 0.5 }}>
-            ML model predictions & outcomes
+            Factors Based Agent predictions & outcomes
           </Typography>
           <Typography
             variant="body2"

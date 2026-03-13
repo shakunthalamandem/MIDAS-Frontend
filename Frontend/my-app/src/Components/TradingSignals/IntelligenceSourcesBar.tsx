@@ -29,7 +29,7 @@ interface SourceCardConfig {
 const SOURCES: SourceCardConfig[] = [
   {
     id: "ml-predictions",
-    label: "ML Model",
+    label: "Factors Based Agent",
     activeStatus: "Active",
     pendingStatus: "Pending",
     icon: <PsychologyIcon sx={{ fontSize: 20 }} />,
@@ -37,7 +37,7 @@ const SOURCES: SourceCardConfig[] = [
   },
   {
     id: "ai-model",
-    label: "Prediction Agent",
+    label: "Deal(IPO) Agent",
     activeStatus: "Active",
     pendingStatus: "Pending",
     icon: <AutoAwesomeIcon sx={{ fontSize: 20 }} />,
@@ -53,7 +53,7 @@ const SOURCES: SourceCardConfig[] = [
   },
   {
     id: "market-news",
-    label: "Market News",
+    label: "News Agent",
     activeStatus: "Analyzed",
     pendingStatus: "Pending",
     icon: <NewspaperIcon sx={{ fontSize: 20 }} />,
@@ -61,7 +61,7 @@ const SOURCES: SourceCardConfig[] = [
   },
   {
     id: "price-charts",
-    label: "Price Action",
+    label: "Technical Agent",
     activeStatus: "Live Data",
     pendingStatus: "Pending",
     icon: <CandlestickChartIcon sx={{ fontSize: 20 }} />,
