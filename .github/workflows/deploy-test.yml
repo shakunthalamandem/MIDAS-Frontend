@@ -27,19 +27,33 @@ jobs:
       # ── Step 2: Stop old container (ignore error if not running) ──
       - name: Stop existing frontend container
         run: |
-          docker stop midas-frontend 2>$null
-          docker rm midas-frontend 2>$null
+          $ErrorActionPreference = 'SilentlyContinue'
+          docker stop midas-frontend 2>&1 | Out-Null
+          docker rm midas-frontend 2>&1 | Out-Null
+          $ErrorActionPreference = 'Continue'
           Write-Host "Old container removed (or was not running)"
         continue-on-error: true
 
-      # ── Step 3: Build new Docker image ──
+      # ── Step 3: Restore .env file from GitHub Secret ──
+      - name: Restore frontend .env file
+        env:
+          FRONTEND_ENV_CONTENT: ${{ secrets.FRONTEND_ENV_FILE }}
+        run: |
+          if (-not $env:FRONTEND_ENV_CONTENT) {
+            Write-Host "ERROR: FRONTEND_ENV_FILE secret is not set in GitHub repository secrets!"
+            exit 1
+          }
+          $env:FRONTEND_ENV_CONTENT | Out-File -FilePath "Frontend/my-app/.env" -Encoding utf8 -NoNewline
+          Write-Host "Restored .env file to Frontend/my-app/.env"
+
+      # ── Step 4: Build new Docker image ──
       - name: Build Docker image
         run: |
           cd Frontend/my-app
           docker build -t midas-frontend .
         timeout-minutes: 15
 
-      # ── Step 4: Run new container ──
+      # ── Step 5: Run new container ──
       - name: Start frontend container
         run: |
           docker run -d `
@@ -49,7 +63,7 @@ jobs:
             midas-frontend
           Write-Host "Frontend container started on port 3080"
 
-      # ── Step 5: Wait and verify container is healthy ──
+      # ── Step 6: Wait and verify container is healthy ──
       - name: Health check
         run: |
           Start-Sleep -Seconds 5
@@ -62,14 +76,14 @@ jobs:
             exit 1
           }
 
-      # ── Step 6: Clean up old Docker images ──
+      # ── Step 7: Clean up old Docker images ──
       - name: Cleanup dangling images
         run: |
           docker image prune -f
           Write-Host "Cleaned up unused Docker images"
         continue-on-error: true
 
-      # ── Step 7: Deployment summary ──
+      # ── Step 8: Deployment summary ──
       - name: Deployment summary
         run: |
           Write-Host "================================================"
