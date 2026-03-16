@@ -1,0 +1,7 @@
+# ──────────────────────────────────────────────────────────
+# CODEOWNERS — MIDAS Frontend
+# Every PR requires review from at least one of these owners
+# ──────────────────────────────────────────────────────────
+
+# All files require review from both owners (GitHub requests both)
+* @charangoldenhills @anumula-ranjith

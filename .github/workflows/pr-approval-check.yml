@@ -1,0 +1,106 @@
+name: PR Approval Gate
+
+# ──────────────────────────────────────────────────────────
+# Enforces approval rules:
+#   test branch  → 1 approval from charangoldenhills OR anumula-ranjith
+#   main branch  → BOTH charangoldenhills AND anumula-ranjith must approve
+#                  (if one is the PR author, only the other needs to approve)
+# ──────────────────────────────────────────────────────────
+
+on:
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [test, main]
+
+jobs:
+  check-approvals:
+    name: Verify Required Approvals
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Check required approvals
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const requiredReviewers = ['charangoldenhills', 'anumula-ranjith'];
+            const targetBranch = context.payload.pull_request.base.ref;
+            const prAuthor = context.payload.pull_request.user.login;
+            const prNumber = context.payload.pull_request.number;
+
+            console.log(`PR #${prNumber} by ${prAuthor} → target: ${targetBranch}`);
+
+            // Get all reviews
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            // Get the latest review state per reviewer (only APPROVED counts)
+            const latestReviews = {};
+            for (const review of reviews) {
+              latestReviews[review.user.login] = review.state;
+            }
+
+            const approvedBy = requiredReviewers.filter(
+              r => latestReviews[r] === 'APPROVED'
+            );
+
+            console.log(`Approved by: ${approvedBy.length > 0 ? approvedBy.join(', ') : 'none'}`);
+
+            if (targetBranch === 'test') {
+              // ── TEST BRANCH: need 1 approval from either reviewer ──
+              // If author is one of the required reviewers, they implicitly approve
+              const authorIsReviewer = requiredReviewers.includes(prAuthor);
+
+              if (authorIsReviewer) {
+                // Author is one of the reviewers — they implicitly approve their own code
+                // So we just need the OTHER person to approve
+                const otherReviewer = requiredReviewers.find(r => r !== prAuthor);
+                if (approvedBy.includes(otherReviewer)) {
+                  console.log(`✅ test branch: ${otherReviewer} approved (author ${prAuthor} implicit)`);
+                  return;
+                }
+                // But since test only needs 1, and author IS a reviewer, this is fine
+                console.log(`✅ test branch: PR author ${prAuthor} is a required reviewer (implicit approval)`);
+                return;
+              }
+
+              if (approvedBy.length >= 1) {
+                console.log(`✅ test branch: approved by ${approvedBy.join(', ')}`);
+                return;
+              }
+
+              core.setFailed(
+                `❌ test branch requires approval from at least one of: ${requiredReviewers.join(', ')}`
+              );
+
+            } else if (targetBranch === 'main') {
+              // ── MAIN BRANCH: need BOTH reviewers to approve ──
+              // If author is a required reviewer, treat them as implicit approval
+              const authorIsReviewer = requiredReviewers.includes(prAuthor);
+
+              const effectiveApprovals = new Set(approvedBy);
+              if (authorIsReviewer) {
+                effectiveApprovals.add(prAuthor);
+                console.log(`Author ${prAuthor} is a required reviewer — counting as implicit approval`);
+              }
+
+              const missing = requiredReviewers.filter(r => !effectiveApprovals.has(r));
+
+              if (missing.length === 0) {
+                console.log(`✅ main branch: all required approvals received`);
+                return;
+              }
+
+              core.setFailed(
+                `❌ main branch requires approval from BOTH reviewers.\n` +
+                `   Approved: ${[...effectiveApprovals].join(', ') || 'none'}\n` +
+                `   Missing:  ${missing.join(', ')}`
+              );
+            }
