@@ -103,7 +103,7 @@ const SECTION_CONFIG: Record<string, SectionConfig> = {
   },
   equity_beta_net_exposure: {
     firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "beta_net_exp", valueLabel: "Beta Net Exposure",
+    valueKey: "beta_net_exposure", valueLabel: "Beta Net Exposure",
     summaryLabel: "Beta Adj Net Exposure",
   },
   drawdown: {
