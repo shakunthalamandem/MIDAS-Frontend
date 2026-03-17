@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 import axios from "axios";
+import "./SectionThree.css";
 
-// Define types for the API response
 interface USInternationalCount {
   us_international: string;
   count: number;
@@ -18,6 +19,22 @@ interface APIResponse {
   deal_type_counts: DealTypeCount[];
   total_opportunity_value: number;
 }
+
+const statIcons = ["🌍", "📈", "💰", "🇺🇸", "🌐"];
+const iconBgs = [
+  "rgba(167, 139, 250, 0.2)",
+  "rgba(52, 211, 153, 0.2)",
+  "rgba(251, 146, 60, 0.2)",
+  "rgba(96, 165, 250, 0.2)",
+  "rgba(251, 191, 36, 0.2)",
+];
+const valueColors = [
+  "#c4b5fd",  // lavender
+  "#6ee7b7",  // mint green
+  "#fdba74",  // peach orange
+  "#93c5fd",  // sky blue
+  "#fde68a",  // warm yellow
+];
 
 const SectionThree = () => {
   const [counts, setCounts] = useState([
@@ -55,7 +72,7 @@ const SectionThree = () => {
           title: "Billion of Opportunity Value",
           value: Math.round(data.total_opportunity_value / 1e9 / 10) * 10, // Round to the nearest 10 billion
         },
-        
+
         {
           title: "US New Issue Deals",
           value: Math.round((data.us_international_counts.find((item) => item.us_international === "US")?.count || 0) / 100) * 100,
@@ -109,39 +126,35 @@ const SectionThree = () => {
   }, []);
 
   return (
-    <Box sx={{ padding: 4, backgroundColor: "#060d78", mt: 4 }}>
-      <Grid container spacing={3} justifyContent="center">
+    <Box className="section-three-wrapper">
+      <Box className="stats-grid">
         {counts.map((card, index) => (
-          <Grid item key={index}>
-            <Card
-              sx={{
-                width: 240,
-                height: 190,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: 3,
-                borderRadius: 2,
-                color: "#002060",
-              }}
-            >
-              <CardContent>
-                <Typography variant="h4" component="div" align="center" sx={{ fontWeight: "bold" }}>
-                  {card.title === "Billion of Opportunity Value"
-                    ? `$${card.value.toFixed(0)}B   +` // Format with suffix for "Opportunity Value" rounded
-                    : `${card.value}+`} {/* Add "+" for all values */}
-                </Typography>
-                <Typography variant="h6" component="div" align="center" sx={{ fontWeight: "bold" }}>
-                  {card.title}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            style={{ flex: 1, maxWidth: 210, display: 'flex' }}
+          >
+            <Box className="stat-card" sx={{ width: '100%' }}>
+              <Box className="stat-icon" sx={{ background: iconBgs[index] }}>
+                {statIcons[index]}
+              </Box>
+              <Typography className="stat-value" sx={{ color: `${valueColors[index]} !important` }}>
+                {card.title === "Billion of Opportunity Value"
+                  ? `$${card.value.toFixed(0)}B+`
+                  : `${card.value.toLocaleString()}+`}
+              </Typography>
+              <Typography className="stat-label">
+                {card.title}
+              </Typography>
+            </Box>
+          </motion.div>
         ))}
-      </Grid>
-      <Typography mt={4} sx={{ textAlign: "center", color: "#FFFFFF", fontWeight: "bold", fontSize: "30px" }}>
-        SINCE 2001
+      </Box>
+      <Typography className="since-text" sx={{ textAlign: "center", mt: 6 }}>
+        Since 2001
       </Typography>
     </Box>
   );
