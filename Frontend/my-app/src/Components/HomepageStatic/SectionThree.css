@@ -1,5 +1,5 @@
 .section-three-wrapper {
-  background: linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #122d4a 100%);
+  background: #bebfe3;
   padding: 80px 40px 60px;
   position: relative;
   overflow: hidden;
@@ -39,10 +39,10 @@
   flex: 1;
   max-width: 210px;
   min-height: 180px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 16px;
   padding: 28px 16px;
   text-align: center;
@@ -62,15 +62,16 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(100, 180, 255, 0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 50, 120, 0.3), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .stat-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(0, 50, 120, 0.15);
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card:hover::before {
@@ -96,7 +97,7 @@
 }
 
 .stat-label {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: #333333 !important;
   font-size: 0.85rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.3px;
@@ -108,7 +109,7 @@
 }
 
 .since-text {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: #1a1a2e !important;
   font-weight: 700 !important;
   font-size: 1.8rem !important;
   letter-spacing: 5px;

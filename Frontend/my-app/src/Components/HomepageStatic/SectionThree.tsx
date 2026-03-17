@@ -29,11 +29,11 @@ const iconBgs = [
   "rgba(251, 191, 36, 0.2)",
 ];
 const valueColors = [
-  "#c4b5fd",  // lavender
-  "#6ee7b7",  // mint green
-  "#fdba74",  // peach orange
-  "#93c5fd",  // sky blue
-  "#fde68a",  // warm yellow
+  "#6d28d9",  // purple
+  "#059669",  // emerald
+  "#ea580c",  // orange
+  "#2563eb",  // blue
+  "#d97706",  // amber
 ];
 
 const SectionThree = () => {
