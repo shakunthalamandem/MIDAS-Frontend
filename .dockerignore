@@ -1,4 +1,35 @@
+# Dependencies
 **/node_modules
+
+# Build output
 **/build
+**/dist
+
+# Git
 **/.git
+.gitignore
+
+# Environment (keep .env — React needs it at build time for REACT_APP_* vars)
 **/.env.local
+**/.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Docs
+README.md
+*.md
+
+# Logs
+*.log
+npm-debug.log*

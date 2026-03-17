@@ -2,14 +2,18 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
+# Install dependencies (cached unless package files change)
 COPY Frontend/my-app/package.json Frontend/my-app/package-lock.json ./
-RUN npm install --legacy-peer-deps && npm install date-fns --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
+# Copy source and build
 COPY Frontend/my-app/ ./
-ENV CI=false
-ENV TSC_COMPILE_ON_ERROR=true
+ENV CI=false \
+    TSC_COMPILE_ON_ERROR=true \
+    NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
+# Production image
 FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
