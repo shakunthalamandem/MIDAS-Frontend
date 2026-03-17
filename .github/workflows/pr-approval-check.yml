@@ -31,8 +31,16 @@ jobs:
             const targetBranch = context.payload.pull_request.base.ref;
             const prAuthor = context.payload.pull_request.user.login;
             const prNumber = context.payload.pull_request.number;
+            const eventName = context.eventName;
 
-            console.log(`PR #${prNumber} by ${prAuthor} → target: ${targetBranch}`);
+            console.log(`PR #${prNumber} by ${prAuthor} → target: ${targetBranch} (event: ${eventName})`);
+
+            // On pull_request events (opened/synchronize/reopened), reviews may not exist yet.
+            // Skip approval check — it will be enforced by the pull_request_review event.
+            if (eventName === 'pull_request') {
+              console.log('✅ Skipping approval check on pull_request event — will be verified on review submission.');
+              return;
+            }
 
             // Get all reviews
             const { data: reviews } = await github.rest.pulls.listReviews({
