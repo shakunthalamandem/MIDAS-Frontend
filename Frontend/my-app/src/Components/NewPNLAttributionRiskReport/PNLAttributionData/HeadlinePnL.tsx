@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import type { HeadlinePnl } from "./types";
-import { formatCurrency, formatFullCurrency } from "./utils";
+import { formatCurrencyAsK, formatFullCurrency } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
@@ -16,6 +16,13 @@ const PNL_CARDS = [
   { title: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", metricKey: "ytd_pnl" },
 ] as const;
 
+const toNumber = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  return null;
+};
+
 const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
   data,
   selectedMetric,
@@ -26,9 +33,9 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
       <Box className="risk-dashboard-section-title">HEADLINE P&L</Box>
       <Box className="pnl-cards-grid">
         {PNL_CARDS.map((cfg) => {
-          const value = data[cfg.valueKey] as number;
-          const pct = data[cfg.pctKey] as number;
-          const isPositive = value >= 0;
+          const value = toNumber(data[cfg.valueKey]);
+          const pct = toNumber(data[cfg.pctKey]);
+          const isPositive = (value ?? 0) >= 0;
           const modifier = isPositive ? "positive" : "negative";
           const isSelected = selectedMetric === cfg.metricKey;
 
@@ -62,14 +69,14 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
                   className={isSelected ? "" : `pnl-card-value pnl-card-value--${modifier}`}
                   sx={isSelected ? { fontSize: 20, fontWeight: 700, color: "#fff" } : undefined}
                 >
-                  {formatCurrency(value)}
+                  {value === null ? "--" : formatCurrencyAsK(value)}
                 </Box>
                 <Box
                   component="span"
                   className={isSelected ? "" : `pnl-card-pct pnl-card-pct--${modifier}`}
                   sx={isSelected ? { fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)", ml: 0.75 } : undefined}
                 >
-                  ({pct.toFixed(2)}%)
+                  {pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}
                 </Box>
               </Box>
 
@@ -77,8 +84,8 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
               {!isSelected && (
                 <Box className={`pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`}>
                   <Box className="pnl-card-hover-label">{cfg.title}</Box>
-                  <Box className="pnl-card-hover-value">{formatFullCurrency(value)}</Box>
-                  <Box className="pnl-card-hover-pct">({pct.toFixed(2)}%)</Box>
+                  <Box className="pnl-card-hover-value">{value === null ? "--" : formatFullCurrency(value)}</Box>
+                  <Box className="pnl-card-hover-pct">{pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}</Box>
                 </Box>
               )}
             </Box>

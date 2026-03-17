@@ -20,6 +20,8 @@ import AIMLDealDetails from "./AIMLDealDetails";
 import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
 import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
 import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
+// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
+import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 
 import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
 import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
@@ -49,22 +51,24 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
+      { label: "Trading Dynamics" },
       { label: "Write Up New", requiresWriteup: true },
-      { label: "Write Up Old", requiresWriteup: true },
+      // { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
-      { label: "Peer Deals Performance", requiresWriteup: true },
-      { label: "AI - Sentiment View" },
-      { label: "Previous FO deals" },
-      { label: "ML Model" },
-      {
+       {
         label: "Deal Bot",
       },
+      { label: "Peer Deals Performance", requiresWriteup: true },
+      { label: "Sentiment Agent" },
+      { label: "Previous FO deals" },
+      { label: "Factors Based Agent" },
+     
       { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
     ],
-    []
+    [isUpcoming]
   );
 
   React.useEffect(() => {
@@ -103,7 +107,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     lastSelectedTickerRef.current = nextTicker;
 
     const writeUpNewIndex = tabItems.findIndex(
-      (item) => item.label === "Write Up New"
+      (item) => item.label === "Write Up"
     );
     const firstNonWriteupIndex = tabItems.findIndex(
       (item) => !item.requiresWriteup
@@ -259,7 +263,16 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          {tabItems[tabValue]?.label === "Write Up Old" ? (
+          {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+            <TradingSignalsMain
+              ticker={activePayload.ticker}
+              trade_date={activePayload.trade_date}
+              isUpcoming={isUpcoming}
+              dealStatus={status}
+              issuerName={activePayload.issuer_name || activePayload.company_name || ""}
+              expectedDate={activePayload.pricing_date || ""}
+            />
+          ) : tabItems[tabValue]?.label === "Write Up Old" ? (
             isIpo ? (
               <WriteUpIPODashbaord ticker={activePayload.ticker} />
             ) : (
@@ -282,7 +295,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             <NewDashboardLifeCyclePeerDeals
               selectedDeal={activePayload}
             />
-          ) : tabItems[tabValue]?.label === "Write Up New" ? (
+          ) : tabItems[tabValue]?.label === "Write Up" ? (
             <FebFOWriteUpDashboardMain
               basicDealDetails={{
                 deal_id: activePayload.deal_id,
@@ -299,11 +312,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             />
           ) : tabItems[tabValue]?.label === "NEWS" ? (
             <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-          ) : tabItems[tabValue]?.label === "ML Model" ? (
+          ) : tabItems[tabValue]?.label === "Factors Based Agent" ? (
             <AIMLDealDetails ticker={activePayload.ticker} />
           ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
             <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
-          ) : tabItems[tabValue]?.label === "AI - Sentiment View" ? (
+          ) : tabItems[tabValue]?.label === "Sentiment Agent" ? (
             <DashboardSentimentAnalysis focusTicker={activePayload.ticker ?? null} />
           ) : tabItems[tabValue]?.label === "Technical Analysis" ? (
             <TechnicalMain

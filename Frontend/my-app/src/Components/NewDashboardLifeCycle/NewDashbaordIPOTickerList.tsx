@@ -106,7 +106,7 @@ const NewDashbaordIPOTickerList: React.FC<
   }, [options]);
 
   return (
-    <Box sx={{ minWidth: { xs: "100%", sm: 320 } }}>
+    <Box sx={{ width: "100%", minWidth: 0 }}>
       <Autocomplete
         size="small"
         options={sortedOptions}
@@ -139,6 +139,16 @@ const NewDashbaordIPOTickerList: React.FC<
           <TextField
             {...params}
             placeholder="Search Company or Ticker..."
+            sx={{
+              "& .MuiInputBase-root": {
+                minHeight: 34,
+                fontSize: "0.88rem",
+              },
+              "& .MuiInputBase-input": {
+                py: 0.35,
+                fontSize: "0.88rem",
+              },
+            }}
             InputProps={{
               ...params.InputProps,
               startAdornment: (
@@ -158,15 +168,33 @@ const NewDashbaordIPOTickerList: React.FC<
         renderOption={(props, option) => (
           <li {...props} key={`${option.ticker}-${option.pricing_date ?? ""}`}>
             <Box sx={{ width: "100%" }}>
-              <Typography sx={{ fontWeight: 700, color: "#002060" }}>
+              <Typography sx={{ fontWeight: 700, color: "#002060", fontSize: "0.82rem" }}>
                 {option.ticker} ({formatPricingDate(option.pricing_date)})
               </Typography>
-              <Typography variant="caption" sx={{ color: "#15803d", fontWeight: 600, fontSize: "0.7rem" }}>
+              <Typography variant="caption" sx={{ color: "#15803d", fontWeight: 600, fontSize: "0.62rem" }}>
                 {option.issuer_name || "Issuer name unavailable"}
               </Typography>
             </Box>
           </li>
         )}
+        sx={{
+          "& .MuiAutocomplete-inputRoot": {
+            minHeight: 34,
+          },
+          "& .MuiAutocomplete-popupIndicator, & .MuiAutocomplete-clearIndicator": {
+            p: 0.35,
+          },
+          "& .MuiAutocomplete-listbox .MuiAutocomplete-option": {
+            minHeight: 32,
+            py: 0.3,
+          },
+        }}
+        ListboxProps={{
+          sx: {
+            maxHeight: 220,
+            py: 0.25,
+          },
+        }}
       />
     </Box>
   );

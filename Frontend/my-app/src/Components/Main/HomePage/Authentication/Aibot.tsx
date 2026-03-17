@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import aibotImage from '../../../../Assets/images/ChatGPT Image Feb 23, 2026, 03_57_26 PM.png';
+import aibotImage from '../../../../Assets/images/ai_bot4.jpg';
 
 const ARROW_RIGHT_OFFSET = '20px'; // must match arrow's right
 const ARROW_BOTTOM_OFFSET = '10px'; // must match arrow's bottom

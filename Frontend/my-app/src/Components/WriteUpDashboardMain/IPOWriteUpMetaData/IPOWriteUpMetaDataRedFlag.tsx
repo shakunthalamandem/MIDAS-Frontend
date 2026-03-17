@@ -13,7 +13,9 @@ import {
   Slider,
   Stack,
   TextField,
-  Typography
+  Typography,
+  Snackbar,
+  Alert
 } from "@mui/material"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BasicDealDetails } from "../types/DealInformation"
@@ -21,6 +23,11 @@ import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
+import {
+  clampHtmlToWordLimit,
+  countWordsFromHtml,
+  getWordLimitStats
+} from "../utils/wordLimit"
 
 interface IPOWriteUpMetaDataRedFlagProps {
   basicDealDetails: BasicDealDetails
@@ -51,6 +58,7 @@ type RedFlagResponse = {
 }
 
 const RISK_SCORE_MAX = 5
+const RISK_OBSERVATION_WORD_LIMIT = 50
 
 const riskBandColors = [
   "#dbe9ff",
@@ -221,6 +229,7 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
   const [pendingDeleteCategories, setPendingDeleteCategories] = useState<string[]>([])
   const [draftRatingScore, setDraftRatingScore] = useState<number | null>(null)
   const [writeupRatings, setWriteupRatings] = useState<Record<string, number>>({})
+  const [wordLimitToastOpen, setWordLimitToastOpen] = useState(false)
 
   const apiUrl = process.env.REACT_APP_API_URL
   const ticker = basicDealDetails.ticker
@@ -590,6 +599,19 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
     if (!isEditing) setIsEditing(true)
   }
 
+  const handleObservationChange = (index: number, value: string) => {
+    setDraftItems((prev) => {
+      const clampedValue = clampHtmlToWordLimit(value, RISK_OBSERVATION_WORD_LIMIT)
+      if (clampedValue !== value) {
+        setWordLimitToastOpen(true)
+      }
+
+      return prev.map((entry, idx) =>
+        idx === index ? { ...entry, observation: clampedValue } : entry
+      )
+    })
+  }
+
   return (
     <Box
       sx={{
@@ -726,6 +748,10 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
               const rowKey = `red-flag-${index}`
               const color = riskBandColors[index % riskBandColors.length]
               const displayScore = item.score
+              const observationWordStats = getWordLimitStats(
+                countWordsFromHtml(item.observation ?? ""),
+                RISK_OBSERVATION_WORD_LIMIT
+              )
               return (
                 <Box
                   key={rowKey}
@@ -797,16 +823,21 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
                         </Box>{" "} */}
                         {isEditing ? (
                           <Box sx={{ mt: 0.5, background: "#ffffff", borderRadius: 1 }}>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", px: 1, pt: 1 }}>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: observationWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+                                }}
+                              >
+                                Words left: {observationWordStats.remaining}/{observationWordStats.limit}
+                              </Typography>
+                            </Box>
                             <ReactQuill
                               theme="snow"
                               value={item.observation ?? ""}
-                              onChange={(value) =>
-                                setDraftItems((prev) =>
-                                  prev.map((entry, idx) =>
-                                    idx === index ? { ...entry, observation: value } : entry
-                                  )
-                                )
-                              }
+                              onChange={(value) => handleObservationChange(index, value)}
                               modules={quillModules}
                               formats={quillFormats}
                               placeholder="Observation"
@@ -930,6 +961,21 @@ const IPOWriteUpMetaDataRedFlag: React.FC<IPOWriteUpMetaDataRedFlagProps> = ({
           Note: O = Observation, I = Impact. The red flag scores are indicative
           and based on the analysis of available information.
         </Typography> */}
+        <Snackbar
+          open={wordLimitToastOpen}
+          autoHideDuration={1800}
+          onClose={() => setWordLimitToastOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            severity="warning"
+            variant="filled"
+            onClose={() => setWordLimitToastOpen(false)}
+            sx={{ fontSize: 12, py: 0 }}
+          >
+            You have reached your word limit.
+          </Alert>
+        </Snackbar>
       </Stack>
     </Box>
   )

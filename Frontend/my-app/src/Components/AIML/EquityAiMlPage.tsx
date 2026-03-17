@@ -14,8 +14,6 @@ import {
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PredictionLayout from "./PredictionLayout";
-import AIFewshotAnalysis from "../AIFewshotAnalysis/AIFewshotAnalysis";
-import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 type OptionsData = {
@@ -28,12 +26,6 @@ type OptionsData = {
 };
 
 type TickerOption = {
-  id: string;
-  ticker: string;
-  pricing_date?: string | null;
-};
-
-type SentimentTickerOption = {
   id: string;
   ticker: string;
   pricing_date?: string | null;
@@ -130,12 +122,8 @@ const EquityAiMlPage: React.FC = () => {
 
   const [tickerOptions, setTickerOptions] = useState<TickerOption[]>([]);
   const [mlTicker, setMlTicker] = useState<TickerOption | null>(null);
-  const [sentimentOptions, setSentimentOptions] = useState<SentimentTickerOption[]>([]);
-  const [sentimentTicker, setSentimentTicker] = useState<SentimentTickerOption | null>(null);
   const [tickerLoading, setTickerLoading] = useState(false);
   const [tickerErr, setTickerErr] = useState<string | null>(null);
-  const [sentimentLoading, setSentimentLoading] = useState(false);
-  const [sentimentErr, setSentimentErr] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -212,50 +200,6 @@ const EquityAiMlPage: React.FC = () => {
     loadTickers();
   }, [apiUrl]);
 
-  useEffect(() => {
-    const loadSentimentTickers = async () => {
-      if (!apiUrl) {
-        setSentimentErr("API URL is missing");
-        return;
-      }
-      setSentimentLoading(true);
-      setSentimentErr(null);
-      try {
-        const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/us_sentiment_tickers/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        const text = await res.text();
-        const data = text ? JSON.parse(text) : null;
-        if (!res.ok) {
-          throw new Error(data?.error || data?.detail || "Failed to load sentiment tickers");
-        }
-
-        const items = Array.isArray(data?.tickers)
-          ? (data.tickers as { ticker: string; pricing_date?: string | null }[]).map((t, idx) => ({
-              id: `${t.ticker}-${t.pricing_date ?? idx}`,
-              ticker: t.ticker,
-              pricing_date: t.pricing_date ?? null,
-            }))
-          : [];
-        setSentimentOptions(items);
-        setSentimentTicker((prev) => prev ?? (items[0] || null));
-      } catch (e: any) {
-        setSentimentErr(e.message || "Unable to load sentiment ticker list");
-      } finally {
-        setSentimentLoading(false);
-      }
-    };
-
-    loadSentimentTickers();
-  }, [apiUrl]);
-
   const selectedMlTickerPayload = useMemo(
     () =>
       mlTicker
@@ -315,30 +259,6 @@ const EquityAiMlPage: React.FC = () => {
                     }
                     sx={tabStyles}
                   />
-                  <Tab
-                    id="ai-ml-tab-1"
-                    aria-controls="ai-ml-tabpanel-1"
-                    label={
-                      <TabLabel
-                        icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="AI Unsupervised"
-                        secondary=""
-                      />
-                    }
-                    sx={tabStyles}
-                  />
-                  <Tab
-                    id="ai-ml-tab-2"
-                    aria-controls="ai-ml-tabpanel-2"
-                    label={
-                      <TabLabel
-                        icon={<DescriptionOutlinedIcon fontSize="small" />}
-                        primary="AI View "
-                        secondary="(Outside Sentiment)"
-                      />
-                    }
-                    sx={tabStyles}
-                  />
                 </Tabs>
               </Box>
 
@@ -372,21 +292,6 @@ const EquityAiMlPage: React.FC = () => {
                     <PredictionLayout options={options} prefillTicker={selectedMlTickerPayload} />
                   </Box>
                 </Card>
-              </TabPanel>
-
-              <TabPanel value={activeTab} index={1}>
-                <AIFewshotAnalysis />
-              </TabPanel>
-
-              <TabPanel value={activeTab} index={2}>
-                <ShowSentimentAnalysis
-                  focusTicker={sentimentTicker?.ticker ?? null}
-                  tickerOptions={sentimentOptions}
-                  selectedTicker={sentimentTicker}
-                  onSelectTicker={setSentimentTicker}
-                  loadingTickers={sentimentLoading}
-                  tickerError={sentimentErr}
-                />
               </TabPanel>
             </Stack>
           {/* </Card> */}

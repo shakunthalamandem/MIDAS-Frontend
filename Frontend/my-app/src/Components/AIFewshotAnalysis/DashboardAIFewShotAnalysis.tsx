@@ -299,7 +299,7 @@ const DashboardAIFewShotAnalysis: React.FC<DashboardAIFewShotAnalysisProps> = ({
                   fontSize: { xs: "1.15rem", md: "1.35rem" },
                 }}
               >
-                AI based on previous 30 deals Analysis for {companyName}
+                 Deal(IPO) Agent Analysis for {companyName}
               </Typography>
             </Box>
           </Box>

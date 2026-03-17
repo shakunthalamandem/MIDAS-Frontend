@@ -54,6 +54,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [latestDate, setLatestDate] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +114,12 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
           throw new Error(apiMsg || `Request failed with status ${res.status}`);
         }
 
+        if (data?.updated_at) {
+          setLatestDate(data.updated_at);
+        } else {
+          setLatestDate(null);
+        }
+
         const raw = data?.sentiment ?? data?.answer ?? data;
         const parsedBlocks = normalizeBlocks(raw);
         if (!parsedBlocks.length) {
@@ -162,6 +169,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
               gap: 1.5,
               flexWrap: "wrap",
               mb: 2,
+              position: "relative"
             }}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -172,6 +180,21 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
                 A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, aggregating market data, news sentiment, analyst commentary, and historical IPO performance signals to deliver consistent yet deal-specific insights on first-week and first-month performance drivers.
               </Typography>
             </Box>
+
+            {latestDate && (
+              <Typography
+                sx={{
+                  position: "absolute",
+                  right: 28,
+                  top: 14,
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: "#002060",
+                }}
+              >
+                Last Updated Date: {new Date(latestDate).toISOString().split("T")[0]}
+              </Typography>
+            )}
           </Box>
 
           {loading && (

@@ -24,8 +24,8 @@ const SectionOne: React.FC = () => {
               transition={{ duration: 0.8 }}
             >
               <Typography variant="h3" className="section-one-heading" gutterBottom>
-                Your Comprehensive Platform for New Issue Market
-              </Typography>
+                Capital Markets Intelligence driven by Proprietary AI
+                   </Typography>
               <Typography variant="h4" className="section-one-text" gutterBottom>
                 Monashee Insights & Data Application System "MIDAS"
               </Typography>

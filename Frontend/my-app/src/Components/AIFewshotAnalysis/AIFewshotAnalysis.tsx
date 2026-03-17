@@ -50,7 +50,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
   const [status, setStatus] = useState<ApiState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<TickerItem | null>(null);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
 
   const loadTickers = async () => {
     setStatus("loading");
@@ -79,20 +79,20 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
 
       const items: TickerItem[] = Array.isArray(data?.tickers)
         ? data.tickers.map(
-            (
-              t: {
-                ticker: string;
-                pricing_date?: string | null;
-                unique_deal_id?: string | null;
-              },
-              idx: number
-            ) => ({
-              ticker: t.ticker,
-              pricing_date: t.pricing_date ?? null,
-              unique_deal_id: t.unique_deal_id ?? null,
-              id: t.unique_deal_id ?? `${t.ticker}-${idx}`,
-            })
-          )
+          (
+            t: {
+              ticker: string;
+              pricing_date?: string | null;
+              unique_deal_id?: string | null;
+            },
+            idx: number
+          ) => ({
+            ticker: t.ticker,
+            pricing_date: t.pricing_date ?? null,
+            unique_deal_id: t.unique_deal_id ?? null,
+            id: t.unique_deal_id ?? `${t.ticker}-${idx}`,
+          })
+        )
         : [];
 
       setTickers(items);
@@ -181,7 +181,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               align="center"
               sx={{ fontWeight: 900, color: "#5D0163" }}
             >
-              AI Unsupervised Analysis for {companyName}
+             Deal(IPO) Agent for {companyName}
             </Typography>
 
             <Autocomplete
@@ -190,11 +190,10 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               value={selectedTicker}
               onChange={(_, value) => setSelectedTicker(value)}
               isOptionEqualToValue={(opt, val) => opt.id === val.id}
-              
+
               /* 🔥 Search Label */
               getOptionLabel={(option) =>
-                `${option.ticker} - ${formatPricingDate(option.pricing_date)} ${
-                  option.unique_deal_id ? `(${option.unique_deal_id})` : ""
+                `${option.ticker} - ${formatPricingDate(option.pricing_date)} ${option.unique_deal_id ? `(${option.unique_deal_id})` : ""
                 }`
               }
 
@@ -242,8 +241,7 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
             <CardContent sx={{ pb: 0 }}>
               <Box display="flex" justifyContent="space-between">
                 <Typography fontWeight={600}>
-                  About AI Unsupervised Analysis
-                </Typography>
+                  Deal(IPO) Agent                </Typography>
 
                 <IconButton
                   onClick={() => setIsDescriptionExpanded((p) => !p)}
@@ -257,15 +255,15 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               </Box>
 
               <Collapse in={isDescriptionExpanded}>
-                  <Typography variant="body2" color="#000000" sx={{ lineHeight: 1.7 }}>
-                    This analysis explains how an IPO is likely to behave in its early trading period rather than
-                    predicting exact prices or returns. It evaluates the company's pre-listing fundamentals and compares
-                    them with five to ten similar past IPOs that traded under comparable conditions. By reviewing how
-                    those IPOs performed in their first week and first month, the analysis identifies common market
-                    patterns such as sentiment shifts, volatility, and valuation reassessment. The output provides a
-                    clear, analyst-style view of likely short-term direction and risks, designed to complement
-                    quantitative price models and support informed interpretation of early IPO behavior.
-                  </Typography>
+                <Typography variant="body2" color="#000000" sx={{ lineHeight: 1.7 }}>
+                  This analysis explains how an IPO is likely to behave in its early trading period rather than
+                  predicting exact prices or returns. It evaluates the company's pre-listing fundamentals and compares
+                  them with five to ten similar past IPOs that traded under comparable conditions. By reviewing how
+                  those IPOs performed in their first week and first month, the analysis identifies common market
+                  patterns such as sentiment shifts, volatility, and valuation reassessment. The output provides a
+                  clear, analyst-style view of likely short-term direction and risks, designed to complement
+                  quantitative price models and support informed interpretation of early IPO behavior.
+                </Typography>
               </Collapse>
             </CardContent>
           </Card>

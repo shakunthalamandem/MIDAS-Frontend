@@ -7,12 +7,50 @@ import {
   Paper,
   CircularProgress,
   Container,
+  Stack,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 import GHCAIMain from "./GHCAIMain";
 import MidasChat from "./MidasChat";
+
+type BotResponseItem = {
+  id: number;
+  question: string;
+  answer: unknown;
+  created_at?: string;
+  bot_type?: string | null;
+};
+
+const toBlockArray = (payload: unknown): any[] => {
+  if (!payload) return [];
+  if (Array.isArray(payload)) return payload;
+  if (typeof payload === "object" && payload !== null) {
+    const candidates = [
+      (payload as Record<string, unknown>).answer,
+      (payload as Record<string, unknown>).blocks,
+      (payload as Record<string, unknown>).data,
+      (payload as Record<string, unknown>).response,
+    ];
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) return candidate;
+    }
+    const textCandidate = candidates.find((c) => typeof c === "string") as
+      | string
+      | undefined;
+    if (textCandidate) {
+      return [{ type: "text", content: textCandidate }];
+    }
+    try {
+      return [{ type: "text", content: JSON.stringify(payload, null, 2) }];
+    } catch {
+      return [{ type: "text", content: "Received response." }];
+    }
+  }
+  return [{ type: "text", content: String(payload) }];
+};
+
 const PerplexityChatMain: React.FC = () => {
   const location = useLocation();
   const stockData = location.state?.stock;
@@ -31,8 +69,89 @@ const PerplexityChatMain: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [midasQuestion, setMidasQuestion] = useState<string>("");
+  const [midasData, setMidasData] = useState<any[]>([]);
+  const [midasLoading, setMidasLoading] = useState(false);
+  const [midasError, setMidasError] = useState<string | null>(null);
+  const [midasRecent, setMidasRecent] = useState<BotResponseItem[]>([]);
+  const [midasRecentLoading, setMidasRecentLoading] = useState(false);
+  const [midasRecentError, setMidasRecentError] = useState<string | null>(null);
+  const [showMidasRecent, setShowMidasRecent] = useState(false);
+
+  const [globalRecent, setGlobalRecent] = useState<BotResponseItem[]>([]);
+  const [globalRecentLoading, setGlobalRecentLoading] = useState(false);
+  const [globalRecentError, setGlobalRecentError] = useState<string | null>(null);
+  const [showGlobalRecent, setShowGlobalRecent] = useState(false);
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
+
+  const fetchRecentResponses = async (
+    botType: string,
+    setItems: React.Dispatch<React.SetStateAction<BotResponseItem[]>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    if (!apiUrl) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${apiUrl}/api/bot_responses/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          action: "list",
+          bot_type: botType,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      setItems(Array.isArray(result?.results) ? result.results : []);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch recent questions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveBotResponse = async (
+    botType: string,
+    askedQuestion: string,
+    answerPayload: unknown,
+    setItems: React.Dispatch<React.SetStateAction<BotResponseItem[]>>
+  ) => {
+    if (!apiUrl) return;
+    try {
+      const response = await fetch(`${apiUrl}/api/bot_responses/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          action: "save",
+          bot_type: botType,
+          question: askedQuestion,
+          answer: answerPayload,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      const newItem: BotResponseItem = {
+        id: result.id,
+        question: result.question,
+        answer: result.answer,
+        created_at: result.created_at,
+        bot_type: result.bot_type,
+      };
+      setItems((prev) => [newItem, ...prev]);
+    } catch (err: any) {
+      console.error("Failed to save bot response", err);
+    }
+  };
 
   const handleSubmit = async (
     e?: React.FormEvent | Event,
@@ -61,7 +180,11 @@ const PerplexityChatMain: React.FC = () => {
 
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Something went wrong");
-      if (Array.isArray(result.answer)) setData(result.answer);
+      if (Array.isArray(result.answer)) {
+        setData(result.answer);
+        saveBotResponse("global_bot", query.trim(), result.answer, setGlobalRecent);
+        setShowGlobalRecent(false);
+      }
       else throw new Error("Invalid response format");
     } catch (err: any) {
       setError(err.message || "Failed to fetch answer");
@@ -70,7 +193,62 @@ const PerplexityChatMain: React.FC = () => {
     }
   };
 
+  const handleMidasAsk = async (
+    e?: React.FormEvent | Event,
+    customQuestion?: string
+  ) => {
+    if (e?.preventDefault) e.preventDefault();
+    const query = (customQuestion ?? midasQuestion).trim();
+    if (!query) return;
+
+    setMidasLoading(true);
+    setMidasData([]);
+    setMidasError(null);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/midas_universal_rag_query/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          question: query,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Something went wrong");
+      if (Array.isArray(result.answer)) {
+        setMidasData(result.answer);
+        saveBotResponse("midas_bot", query, result.answer, setMidasRecent);
+        setShowMidasRecent(false);
+      }
+      else throw new Error("Invalid response format");
+    } catch (err: any) {
+      setMidasError(err.message || "Failed to fetch answer");
+    } finally {
+      setMidasLoading(false);
+    }
+  };
+
   useEffect(() => {
+    if (activeTab === 0) {
+      fetchRecentResponses(
+        "midas_bot",
+        setMidasRecent,
+        setMidasRecentLoading,
+        setMidasRecentError
+      );
+    }
+    if (activeTab === 1) {
+      fetchRecentResponses(
+        "global_bot",
+        setGlobalRecent,
+        setGlobalRecentLoading,
+        setGlobalRecentError
+      );
+    }
     // keep your existing auto-run behavior, but only for Global Chat
     if (activeTab !== 1) return;
 
@@ -160,8 +338,32 @@ const PerplexityChatMain: React.FC = () => {
 
         {/* MIDAS TAB */}
         {activeTab === 0 && (
-  
- <MidasChat />
+          <Box>
+            <MidasChat
+              question={midasQuestion}
+              data={midasData}
+              loading={midasLoading}
+              error={midasError}
+              setQuestion={setMidasQuestion}
+              onAsk={handleMidasAsk}
+              showRecentQuestions={showMidasRecent}
+              onToggleRecentQuestions={() => setShowMidasRecent((prev) => !prev)}
+              recentLoading={midasRecentLoading}
+              recentError={midasRecentError}
+              recentItems={midasRecent.map((item) => ({
+                id: item.id,
+                question: item.question,
+              }))}
+              onSelectRecent={(id) => {
+                const item = midasRecent.find((entry) => entry.id === id);
+                if (!item) return;
+                setMidasQuestion(item.question ?? "");
+                setMidasData(toBlockArray(item.answer));
+                setMidasError(null);
+                setShowMidasRecent(false);
+              }}
+            />
+          </Box>
         )}
 
         {/* GLOBAL TAB (your existing UI + functionality) */}
@@ -252,6 +454,105 @@ const PerplexityChatMain: React.FC = () => {
                     )}
                   </Button>
                 </Box>
+
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {globalRecentLoading && <CircularProgress size={16} />}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => setShowGlobalRecent((prev) => !prev)}
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: 999,
+                      px: 2,
+                      background: "linear-gradient(45deg, #c7dddbff, #f0efd1ff)",
+                      color: "#002060",
+                      boxShadow: "0 8px 18px rgba(0, 0, 0, 0.12)",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #b9d5d3, #e8e6c5)",
+                      },
+                    }}
+                  >
+                    {showGlobalRecent ? "Hide recent questions" : "Show recent questions"}
+                  </Button>
+                </Box>
+
+                {globalRecentError && (
+                  <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                    {globalRecentError}
+                  </Typography>
+                )}
+                {showGlobalRecent &&
+                  globalRecent.length === 0 &&
+                  !globalRecentLoading && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      No previous Global questions yet.
+                    </Typography>
+                  )}
+                {showGlobalRecent && globalRecent.length > 0 && (
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                      gap: 1.5,
+                    }}
+                  >
+                    {globalRecent.map((item) => (
+                      <Paper
+                        key={item.id}
+                        variant="outlined"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setQuestion(item.question ?? "");
+                          setData(toBlockArray(item.answer));
+                          setError(null);
+                          setShowGlobalRecent(false);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setQuestion(item.question ?? "");
+                            setData(toBlockArray(item.answer));
+                            setError(null);
+                            setShowGlobalRecent(false);
+                          }
+                        }}
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 2,
+                          borderColor: "rgba(0, 32, 96, 0.18)",
+                          background:
+                            "linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 247, 246, 0.9))",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 1,
+                          boxShadow: "0 10px 18px rgba(0, 0, 0, 0.08)",
+                          cursor: "pointer",
+                          transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                          "&:hover": {
+                            transform: "translateY(-1px)",
+                            boxShadow: "0 12px 22px rgba(0, 0, 0, 0.14)",
+                          },
+                        }}
+                      >
+                        <Typography variant="subtitle2">{item.question}</Typography>
+                      </Paper>
+                    ))}
+                  </Box>
+                )}
               </Paper>
 
               {/* Right side - Open Heatmap Button */}
@@ -260,7 +561,9 @@ const PerplexityChatMain: React.FC = () => {
             {/* AI Response and Suggestions */}
             <GHCAIMain data={data} loading={loading} error={error} />
 
-            <SuggestedQuestions
+            <Box sx={{ mt: 2 }} />
+
+            {/* <SuggestedQuestions
               questions={
                 data.find((block) => block.type === "suggested_questions")
                   ?.questions || []
@@ -270,7 +573,7 @@ const PerplexityChatMain: React.FC = () => {
                 handleSubmit(undefined, selected);
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-            />
+            /> */}
           </>
         )}
       </Container>

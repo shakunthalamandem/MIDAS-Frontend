@@ -1,5 +1,5 @@
 // src/components/MidasChat.tsx
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   TextField,
@@ -12,49 +12,38 @@ import SendIcon from "@mui/icons-material/Send";
 import GHCAIMain from "./GHCAIMain";
 import SuggestedQuestions from "./AIPages/SuggestedQuestions";
 
-const MidasChat: React.FC = () => {
-  const [question, setQuestion] = useState<string>("");
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+type MidasChatProps = {
+  question: string;
+  setQuestion: React.Dispatch<React.SetStateAction<string>>;
+  data: any[];
+  loading: boolean;
+  error: string | null;
+  onAsk: (e?: React.FormEvent | Event, customQuestion?: string) => Promise<void>;
+  showRecentQuestions: boolean;
+  onToggleRecentQuestions: () => void;
+  recentLoading?: boolean;
+  recentError?: string | null;
+  recentItems?: Array<{
+    id: number;
+    question?: string | null;
+  }>;
+  onSelectRecent?: (id: number) => void;
+};
 
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem("access_token");
-
-  const handleAsk = async (e?: React.FormEvent | Event, customQuestion?: string) => {
-    if (e?.preventDefault) e.preventDefault();
-    const query = (customQuestion ?? question).trim();
-    if (!query) return;
-
-    setLoading(true);
-    setData([]);
-    setError(null);
-
-    try {
-      const response = await fetch(`${apiUrl}/api/midas_universal_rag_query/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          question: query, // payload as requested
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Something went wrong");
-
-      // Same response shape as existing API: result.answer is array
-      if (Array.isArray(result.answer)) setData(result.answer);
-      else throw new Error("Invalid response format");
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch answer");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const MidasChat: React.FC<MidasChatProps> = ({
+  question,
+  setQuestion,
+  data,
+  loading,
+  error,
+  onAsk,
+  showRecentQuestions,
+  onToggleRecentQuestions,
+  recentLoading = false,
+  recentError = null,
+  recentItems = [],
+  onSelectRecent,
+}) => {
   return (
     <Box>
       <Paper
@@ -84,7 +73,7 @@ const MidasChat: React.FC = () => {
 
         <Box
           component="form"
-          onSubmit={handleAsk}
+          onSubmit={onAsk}
           display="flex"
           gap={2}
           flexDirection={{ xs: "column", sm: "row" }}
@@ -123,21 +112,111 @@ const MidasChat: React.FC = () => {
             {loading ? <CircularProgress size={22} color="inherit" /> : <SendIcon />}
           </Button>
         </Box>
+
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {recentLoading && <CircularProgress size={16} />}
+          </Box>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={onToggleRecentQuestions}
+            sx={{
+              textTransform: "none",
+              borderRadius: 999,
+              px: 2,
+              backgroundColor: "#002060",
+              boxShadow: "0 8px 18px rgba(0, 32, 96, 0.25)",
+              "&:hover": {
+                backgroundColor: "#001840",
+                boxShadow: "0 10px 22px rgba(0, 32, 96, 0.35)",
+              },
+            }}
+          >
+            {showRecentQuestions ? "Hide recent questions" : "Show recent questions"}
+          </Button>
+        </Box>
+
+        {recentError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {recentError}
+          </Typography>
+        )}
+
+        {showRecentQuestions && recentItems.length === 0 && !recentLoading && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            No previous MIDAS questions yet.
+          </Typography>
+        )}
+
+        {showRecentQuestions && recentItems.length > 0 && (
+          <Box
+            sx={{
+              mt: 2,
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: 1.5,
+            }}
+          >
+            {recentItems.map((item) => (
+              <Paper
+                key={item.id}
+                variant="outlined"
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectRecent?.(item.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectRecent?.(item.id);
+                  }
+                }}
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  borderColor: "rgba(0, 32, 96, 0.2)",
+                  background:
+                    "linear-gradient(180deg, rgba(248, 250, 255, 0.95), rgba(255,255,255,1))",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  boxShadow: "0 10px 18px rgba(0, 32, 96, 0.08)",
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                  "&:hover": {
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 12px 22px rgba(0, 32, 96, 0.16)",
+                  },
+                }}
+              >
+                <Typography variant="subtitle2">{item.question}</Typography>
+              </Paper>
+            ))}
+          </Box>
+        )}
       </Paper>
 
-      {/* Reuse existing UI blocks exactly like Global */}
       <GHCAIMain data={data} loading={loading} error={error} />
 
-      {/* <SuggestedQuestions
+      <SuggestedQuestions
         questions={
           data.find((block) => block.type === "suggested_questions")?.questions || []
         }
         onSelect={(selected) => {
           setQuestion(selected);
-          handleAsk(undefined, selected);
+          onAsk(undefined, selected);
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
-      /> */}
+      />
     </Box>
   );
 };
