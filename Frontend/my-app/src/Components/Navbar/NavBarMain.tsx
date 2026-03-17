@@ -255,7 +255,7 @@ const NavbarMain: React.FC = () => {
                 },
               }}
             >
-              Dashboard
+              Deal Calendar
             </Button>
             <DropdownTab
               label="AI-ML"

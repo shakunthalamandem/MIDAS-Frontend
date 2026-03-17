@@ -1,9 +1,9 @@
 import React from "react";
-import { Typography, Grid, Container, Button, Box } from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import "./SectionTwo.css";
 import Imagecard from "../../Assets/images/section2imgnew.png";
-import logo from '../../Assets/images/MIDAS_logo.png' // Corrected import
 
 const SectionTwo: React.FC = () => {
   const navigate = useNavigate();
@@ -13,87 +13,62 @@ const SectionTwo: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" className="section-container">
-      <Grid
-        container
-        spacing={2}
-        // mt={4}
-        alignItems="stretch" // Ensure all child grids have the same height
-        className="section-content"
+    <Box className="section-two-wrapper">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
       >
-        {/* Left Column */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            backgroundImage: `url(${Imagecard})`,
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            color: "white",
-            padding: "1rem",
-            display: "flex", // Aligns content vertically
-            alignItems: "left",
-            justifyContent: "center",
-          }}
-        >
-          {/* <Typography
-          className="section-title"
-          gutterBottom
-          style={{ fontWeight: "bold",fontSize:'28px' }} // Makes text bold
-        >
-          Monashee Proprietary Database for insights into IPO's and Follow-on's
-        </Typography> */}
-
-
-        </Grid>
-
-        {/* Right Column */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: "flex", // Align content to match Left Column
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Typography className="section-title" variant="h4" style={{ color: '#002060', fontWeight: 'bold' }}>
-            Monashee Proprietary Database for insights into IPO's and Follow-on's
-          </Typography>
-          <Typography className="section-text" variant="body1">
-            Monashee's new real-time data platform enables investment decisions based on performance of similar new issue transactions (by sub-sector, by bank, by strategy) and utilizing Artificial Intelligence (AI) based machine learning models to predict the potential returns and help improve the overall skew of the portfolio towards positively performing investments.
-          </Typography>
-          <br />
-          <Typography className="section-text" variant="body1" style={{ fontWeight: 'bold', color: '#002060' }}>
-            Stay tuned for our <span style={{ cursor: 'pointer' }} onClick={handleLearnMore}>risk</span> management tools.
-          </Typography>
-          <Box
-            sx={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}
-          >
-            <Button
-              variant="contained"
-              onClick={handleLearnMore}
-              sx={{
-                width: "200px",
-                border: "1px solid #c55e28",
-                color: "#dd6d2f",
-                backgroundColor: "#ffffff",
-                fontWeight: "bold",
-                "&:hover": {
-                  border: "1px solid #c55e28",
-                  backgroundColor: "#ffffff",
-                },
-              }}
-            >
-              Learn More
-            </Button>
+        <Box className="section-two-body">
+          {/* Left - Image */}
+          <Box className="section-two-image-container">
+            <img src={Imagecard} alt="MIDAS Dashboard" />
           </Box>
-        </Grid>
-      </Grid>
-    </Container>
+
+          {/* Right - Title + Text + Button */}
+          <Box className="section-two-content">
+            <Typography className="section-two-title">
+              Monashee Proprietary Database for insights into IPO's and Follow-on's
+            </Typography>
+            <Typography className="section-two-text">
+              Monashee's new real-time data platform enables investment decisions based on
+              performance of similar new issue transactions (by sub-sector, by bank, by strategy)
+              and utilizing Artificial Intelligence (AI) based machine learning models to predict
+              the potential returns and help improve the overall skew of the portfolio towards
+              positively performing investments.
+            </Typography>
+            <Typography className="section-two-highlight" sx={{ mt: 1 }}>
+              Stay tuned for our risk management tools.
+            </Typography>
+            <Box sx={{ mt: 3 }}>
+              <Button
+                variant="contained"
+                onClick={handleLearnMore}
+                sx={{
+                  background: "linear-gradient(135deg, #ff7e5f, #feb47b)",
+                  fontWeight: 600,
+                  color: "white",
+                  borderRadius: "10px",
+                  padding: "10px 28px",
+                  fontSize: "0.9rem",
+                  textTransform: "none",
+                  boxShadow: "0 4px 20px rgba(255, 126, 95, 0.25)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #ff6a4d, #fd9c67)",
+                    boxShadow: "0 6px 24px rgba(255, 126, 95, 0.35)",
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Learn More
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </motion.div>
+    </Box>
   );
 };
 
