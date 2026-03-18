@@ -48,13 +48,12 @@ export interface ActiveAgentCardProps {
 }
 
 const runOptions = [
-  "Daily",
-  "2 Days",
-  "3 Days",
-  "4 Days",
-  "5 Days",
-  "6 Days",
-  "Once a Week",
+  "Mon - Fri",
+  "Every Monday",
+  "Every Tuesday",
+  "Every Wednesday",
+  "Every Thursday",
+  "Every Friday",
 ];
 
 const dropdownAgents = new Set([
@@ -63,13 +62,7 @@ const dropdownAgents = new Set([
   "Recent IPOs Agent",
 ]);
 
-const normalizeScheduleValue = (schedule: string) => {
-  if (schedule === "Once a Week on Monday") {
-    return "Once a Week";
-  }
-
-  return schedule;
-};
+const normalizeScheduleValue = (schedule: string) => schedule;
 
 const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
   agent,
@@ -93,10 +86,10 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
 
   const formattedUpdatedAt = lastUpdatedAt
     ? new Date(lastUpdatedAt).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
     : dayjs().format("DD MMM YYYY");
 
   return (
@@ -144,7 +137,7 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
           onClick={(e) => e.stopPropagation()}
           onChange={(e) => {
             e.stopPropagation();
-            onToggle(agent, "enabled", state.enabled);
+            onToggle(agent, "enabled", e.target.checked);
           }}
         />
       </Stack>
@@ -170,12 +163,12 @@ const ActiveAgentCard: React.FC<ActiveAgentCardProps> = ({
             label={statusLabel}
             color={
               statusColor as
-                | "default"
-                | "primary"
-                | "info"
-                | "success"
-                | "error"
-                | "warning"
+              | "default"
+              | "primary"
+              | "info"
+              | "success"
+              | "error"
+              | "warning"
             }
             size="small"
           />

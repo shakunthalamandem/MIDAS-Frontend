@@ -51,14 +51,14 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
   const tabItems = useMemo(
     () => [
-      ...(!isUpcoming ? [{ label: "Trading Dynamics" }] : []),
+      { label: "Trading Dynamics" },
       { label: "Write Up", requiresWriteup: true },
       // { label: "Write Up Old", requiresWriteup: true },
       // { label: "Red Flag Analysis" },
       // { label: "Deal Recommendation" },
       { label: "Peer Deals Performance" },
       { label: "Sentiment Agent" },
-      { label: "AI based on previous 30 deals" },
+      { label: " Prediction Agent" },
       { label: "ML Model" },
      
       { label: "S1 AI Query" },
@@ -264,6 +264,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <TradingSignalsMain
                 ticker={activePayload.ticker}
                 trade_date={activePayload.pricing_date}
+                isUpcoming={isUpcoming}
+                dealStatus={status}
+                issuerName={activePayload.issuer_name || activePayload.company_name || ""}
+                expectedDate={activePayload.pricing_date || ""}
               />
             ) : tabItems[tabValue]?.label === "Write Up" ? (
               isIpo ? (
@@ -310,7 +314,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
             ) : tabItems[tabValue]?.label === "ML Model" ? (
               <AIMLDealDetails ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "AI based on previous 30 deals" ? (
+            ) : tabItems[tabValue]?.label === " Prediction Agent" ? (
               <DashboardAIFewShotAnalysis
                 basicDealDetails={{
                   unique_deal_id: activePayload.unique_deal_id,
