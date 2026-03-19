@@ -107,6 +107,7 @@ import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/Risk
 import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs";
 import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
 import SentimentSummary from "../Components/AIML/SentimentSummary";
+import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
 
 
 const AppRouters: React.FC = () => {
@@ -296,6 +297,7 @@ const AppRouters: React.FC = () => {
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
       <Route path="/ai_sentiment_summary" element={<SentimentSummary />} />
       <Route path="/ai_sentiment_view" element={<ShowUSSentimentAnalysis />} />
+      <Route path="/ai_unsupervised_summary" element={<AuthGuard><UnsupervisedDealSummary /></AuthGuard>} />
 
 
         <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
