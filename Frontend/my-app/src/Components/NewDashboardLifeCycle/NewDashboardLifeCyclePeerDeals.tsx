@@ -21,6 +21,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import DashboardStateCard from "./DashboardStateCard";
 
 // ─── types ───────────────────────────────────────────────────────────────────
 type PeerRow = {
@@ -570,9 +571,11 @@ const NewDashboardLifeCyclePeerDeals: React.FC<
   return (
     <>
       {!baseTicker ? (
-        <Alert severity="info">
-          Ticker is missing. Provide selectedDeal.ticker or prop ticker.
-        </Alert>
+        <DashboardStateCard
+          variant="missing-field"
+          title="Peer deals cannot be loaded"
+          message="A valid ticker is required to display peer deal comparisons. Please select a deal with a ticker symbol."
+        />
       ) : null}
 
       {/* ── SUMMARY + ADD PEER CONTROLS ───────────────────────────────────── */}
