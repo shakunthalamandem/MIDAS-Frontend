@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { DealRecord } from "../AIMLResults/types";
 import AIMLDealInsightsPanel from "./AIMLDealInsightsPanel";
+import DashboardStateCard from "./DashboardStateCard";
 
 type AIMLDealDetailsProps = {
   ticker: string;
@@ -73,9 +74,8 @@ const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
 
   if (loading) {
     return (
-      <Box mt={2} display="flex" alignItems="center" gap={2}>
-        <CircularProgress size={22} />
-        <span>Loading ML Model data…</span>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 320, mt: 2 }}>
+        <CircularProgress size={36} />
       </Box>
     );
   }
@@ -83,7 +83,13 @@ const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
   if (error) {
     return (
       <Box mt={2}>
-        <Alert severity="error">{error}</Alert>
+        <DashboardStateCard
+          variant="error"
+          title="Factors Based Agent unavailable"
+          message={error}
+          context={[{ label: "Ticker", value: ticker }]}
+          onRetry={() => window.location.reload()}
+        />
       </Box>
     );
   }
@@ -91,7 +97,12 @@ const AIMLDealDetails: React.FC<AIMLDealDetailsProps> = ({ ticker }) => {
   if (!selectedDeal) {
     return (
       <Box mt={2}>
-        <Alert severity="info">No ML Model data available.</Alert>
+        <DashboardStateCard
+          variant="empty"
+          title="No ML model data available"
+          message="The Factors Based Agent has not generated any analysis for this deal yet. Please check back later."
+          context={[{ label: "Ticker", value: ticker }]}
+        />
       </Box>
     );
   }
