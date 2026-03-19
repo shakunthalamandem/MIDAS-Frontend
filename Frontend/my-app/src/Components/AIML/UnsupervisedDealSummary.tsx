@@ -226,72 +226,47 @@ const UnsupervisedDealSummary: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Search Bar */}
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            placeholder="Search by ticker, issuer name, or deal ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            fullWidth
-            size="small"
-            sx={{
-              backgroundColor: "#f8f9fa",
-              borderRadius: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-                backgroundColor: "#ffffff",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  backgroundColor: "#f8f9fa",
-                },
-                "&.Mui-focused": {
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.1)",
-                },
-              },
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#e0e0e0",
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <SearchOutlinedIcon sx={{ mr: 1.5, fontSize: 20, color: "text.secondary" }} />
-              ),
-            }}
-          />
-        </Box>
+        {/* Results Count and Search Bar */}
+        <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
+            {filteredData.length} result{filteredData.length !== 1 ? "s" : ""}
+          </Typography>
 
-        {/* Stats */}
-        <Box sx={{ mb: 3, display: "flex", gap: 2 }}>
-          <Box sx={{
-            p: 2,
-            backgroundColor: "#f8f9fa",
-            borderRadius: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1
-          }}>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              Total Deals:
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#667eea" }}>
-              {data.length}
-            </Typography>
-          </Box>
-          <Box sx={{
-            p: 2,
-            backgroundColor: "#f8f9fa",
-            borderRadius: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1
-          }}>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              Showing:
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#667eea" }}>
-              {filteredData.length}
-            </Typography>
+          {/* Empty space to push search to right */}
+          <Box sx={{ flex: 1 }} />
+
+          <Box sx={{ maxWidth: 400 }}>
+            <TextField
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              sx={{
+                backgroundColor: "#f8f9fa",
+                borderRadius: 2,
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#ffffff",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#f8f9fa",
+                  },
+                  "&.Mui-focused": {
+                    backgroundColor: "#ffffff",
+                    boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.1)",
+                  },
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#e0e0e0",
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <SearchOutlinedIcon sx={{ mr: 1.5, fontSize: 20, color: "text.secondary" }} />
+                ),
+              }}
+            />
           </Box>
         </Box>
 
