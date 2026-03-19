@@ -14,7 +14,8 @@ import {
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useSearchParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import AiAnalysis from "./AiAnalysis";
 
 type ApiState = "idle" | "loading" | "success" | "error";
@@ -47,6 +48,7 @@ interface AIFewshotAnalysisProps {
 const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [status, setStatus] = useState<ApiState>("idle");
@@ -192,13 +194,26 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
               mb: 2.5,
             }}
           >
-            <Typography
-              variant="h5"
-              align="center"
-              sx={{ fontWeight: 900, color: "#5D0163" }}
-            >
-             Deal(IPO) Agent for {companyName}
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton
+                onClick={() => navigate("/ai_unsupervised_summary")}
+                size="small"
+                sx={{
+                  color: "#5D0163",
+                  "&:hover": { backgroundColor: "rgba(93, 1, 99, 0.1)" },
+                }}
+                title="Back to Unsupervised Summary"
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              <Typography
+                variant="h5"
+                align="center"
+                sx={{ fontWeight: 900, color: "#5D0163" }}
+              >
+                Deal(IPO) Agent for {companyName}
+              </Typography>
+            </Box>
 
             <Autocomplete
               options={options}
