@@ -8,22 +8,24 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   CircularProgress,
   Alert,
   TextField,
   Button,
   Typography,
   Chip,
-  ChipProps,
   TableSortLabel,
   Card,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-interface UnsupervisedDealData {
+interface Data {
   ticker: string;
   issuer_name: string;
   pricing_date: string | null;
@@ -31,123 +33,117 @@ interface UnsupervisedDealData {
   few_shot_review: string;
   one_week_sentiment?: string | null;
   one_month_sentiment?: string | null;
+  executive_summary?: string;
 }
 
-// Helper function to parse few_shot_review JSON and extract sentiment values
-const parseSentimentData = (fewShotReview: string): { oneWeekSentiment: string | null; oneMonthSentiment: string | null } => {
-  try {
-    const parsed = JSON.parse(fewShotReview);
-    if (parsed.answer && Array.isArray(parsed.answer) && parsed.answer.length > 0) {
-      const firstAnswer = parsed.answer[0];
-      const finalOutlook = firstAnswer["Final Sentiment & Volatility Outlook"];
-      if (finalOutlook) {
-        return {
-          oneWeekSentiment: finalOutlook["1-Week Sentiment"] || null,
-          oneMonthSentiment: finalOutlook["1-Month Sentiment"] || null,
-        };
-      }
-    }
-  } catch (e) {
-    console.error("Error parsing few_shot_review:", e);
-  }
-  return { oneWeekSentiment: null, oneMonthSentiment: null };
-};
+type SortField =
+  | "ticker"
+  | "issuer_name"
+  | "pricing_date"
+  | "one_week_sentiment"
+  | "one_month_sentiment"
+  | "executive_summary";
 
-type SortField = "ticker" | "issuer_name" | "pricing_date" | "one_week_sentiment" | "one_month_sentiment";
 type SortOrder = "asc" | "desc";
 
-const UnsupervisedDealSummary: React.FC = () => {
+const parseData = (review: string) => {
+  try {
+    const parsed = JSON.parse(review);
+    const obj = parsed?.answer?.[0];
+
+    return {
+      oneWeek:
+        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Week Sentiment"],
+      oneMonth:
+        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Month Sentiment"],
+      summary: obj?.["Executive Summary"],
+    };
+  } catch {
+    return { oneWeek: null, oneMonth: null, summary: "" };
+  }
+};
+
+const Component: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
-  const [data, setData] = useState<UnsupervisedDealData[]>([]);
+  const [data, setData] = useState<Data[]>([]);
+  const [filteredData, setFilteredData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<UnsupervisedDealData[]>([]);
   const [sortField, setSortField] = useState<SortField>("ticker");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
-  // Fetch data
-  useEffect(() => {
-    const fetchUnsupervisedData = async () => {
-      if (!apiUrl) {
-        setError("API URL is missing");
-        setLoading(false);
-        return;
-      }
+  const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await fetch(`${apiUrl}/api/unsupervised_summary/`, {
+        const res = await fetch(`${apiUrl}/api/unsupervised_summary/`, {
           headers: {
-            "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
-        if (!response.ok) {
-          throw new Error(`Failed: ${response.statusText}`);
-        }
-
-        const result = await response.json();
+        const result = await res.json();
         const arr = Array.isArray(result) ? result : result.data || [];
 
         const mapped = arr.map((item: any) => {
-          const { oneWeekSentiment, oneMonthSentiment } = parseSentimentData(item.few_shot_review);
+          const parsed = parseData(item.few_shot_review);
+
           return {
-            ticker: item.ticker,
-            issuer_name: item.issuer_name,
-            pricing_date: item.pricing_date,
-            unique_deal_id: item.unique_deal_id,
-            few_shot_review: item.few_shot_review,
-            one_week_sentiment: oneWeekSentiment,
-            one_month_sentiment: oneMonthSentiment,
+            ...item,
+            one_week_sentiment: parsed.oneWeek,
+            one_month_sentiment: parsed.oneMonth,
+            executive_summary: parsed.summary,
           };
         });
 
         setData(mapped);
         setFilteredData(mapped);
       } catch (err: any) {
-        setError(err.message || "Failed to load unsupervised summary data");
-        setData([]);
-        setFilteredData([]);
+        setError(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUnsupervisedData();
+    fetchData();
   }, [apiUrl]);
 
-  // Search filter and sorting
   useEffect(() => {
     let filtered = data;
+
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtered = data.filter(
-        (item) =>
-          item.ticker.toLowerCase().includes(term) ||
-          item.issuer_name.toLowerCase().includes(term) ||
-          item.unique_deal_id.toLowerCase().includes(term)
+        (d) =>
+          d.ticker?.toLowerCase().includes(term) ||
+          d.issuer_name?.toLowerCase().includes(term) ||
+          d.unique_deal_id?.toLowerCase().includes(term)
       );
     }
 
-    // Sorting logic
     const sorted = [...filtered].sort((a, b) => {
-      let aValue: any = a[sortField];
-      let bValue: any = b[sortField];
+      let aVal: any = a[sortField] || "";
+      let bVal: any = b[sortField] || "";
 
-      if (aValue === null || aValue === undefined) aValue = "";
-      if (bValue === null || bValue === undefined) bValue = "";
-
-      if (typeof aValue === "string") {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
+      if (sortField === "pricing_date") {
+        aVal = aVal && aVal !== "TBA" ? new Date(aVal).getTime() : 0;
+        bVal = bVal && bVal !== "TBA" ? new Date(bVal).getTime() : 0;
       }
 
-      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -155,327 +151,332 @@ const UnsupervisedDealSummary: React.FC = () => {
   }, [searchTerm, data, sortField, sortOrder]);
 
   const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
+    setSortField(field);
+    setSortOrder(sortField === field && sortOrder === "asc" ? "desc" : "asc");
   };
 
-  // Navigation to AI Few Shot Analysis with auto-filled fields
-  const handleRowClick = (row: UnsupervisedDealData) => {
-    navigate(
-      `/ai_fewshot_analysis?ticker=${encodeURIComponent(
-        row.ticker
-      )}&unique_deal_id=${encodeURIComponent(row.unique_deal_id)}`
-    );
-  };
-
-  // Helper function to get sentiment color and label
-  const getSentiment = (
-    sentiment: string | null | undefined
-  ): { color: ChipProps["color"]; label: string } => {
-    switch (sentiment?.toLowerCase()) {
+  const getSentiment = (s: string | null | undefined) => {
+    switch (s?.toLowerCase()) {
       case "bullish":
-        return { color: "success", label: "Bullish" };
+        return { label: "Bullish", bg: "#1f8b3d" };
       case "bearish":
-        return { color: "error", label: "Bearish" };
+        return { label: "Bearish", bg: "#d64541" };
       case "neutral":
-        return { color: "warning", label: "Neutral" };
-      case "neutral to slightly bullish":
-        return { color: "success", label: "Neutral to Slightly Bullish" };
-      case "neutral to cautiously positive":
-        return { color: "success", label: "Neutral to Cautiously Positive" };
+        return { label: "Neutral", bg: "#f08a24" };
       default:
-        return { color: "default", label: sentiment || "N/A" };
+        return { label: s || "N/A", bg: "#9e9e9e" };
     }
   };
 
-  // Loading
+  const preview = (text?: string) =>
+    text ? text.split(" ").slice(0, 12).join(" ") + "..." : "N/A";
+
   if (loading) {
     return (
-      <Container maxWidth={false}>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth={false} sx={{ py: 4 }}>
-      <Box sx={{ width: "100%", mx: "auto" }}>
-        {/* Header Section */}
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              mb: 1,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Unsupervised Deal Summary
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Box
+        sx={{
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 2,
+          flexWrap: "wrap",
+        }}
+      >
+        <Box>
+          <Typography variant="h5" fontWeight={700}>
+            Sentiment Summary
           </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            Explore AI-powered deal insights with real-time sentiment analysis
+          <Typography variant="body2" sx={{ color: "#6b7280", mt: 0.5 }}>
+            AI-driven IPO sentiment insights
           </Typography>
         </Box>
 
-        {/* Results Count and Search Bar */}
-        <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}>
-          <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
-            {filteredData.length} result{filteredData.length !== 1 ? "s" : ""}
-          </Typography>
-
-          {/* Empty space to push search to right */}
-          <Box sx={{ flex: 1 }} />
-
-          <Box sx={{ maxWidth: 400 }}>
-            <TextField
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              size="small"
-              sx={{
-                backgroundColor: "#f8f9fa",
-                borderRadius: 2,
-                width: "100%",
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  backgroundColor: "#ffffff",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "#f8f9fa",
-                  },
-                  "&.Mui-focused": {
-                    backgroundColor: "#ffffff",
-                    boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.1)",
-                  },
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e0e0e0",
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <SearchOutlinedIcon sx={{ mr: 1.5, fontSize: 20, color: "text.secondary" }} />
-                ),
-              }}
-            />
-          </Box>
-        </Box>
-
-        {/* Error Alert */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* Table Card */}
-        <Card
+        <TextField
+          size="small"
+          placeholder="Search ticker, issuer..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
-            borderRadius: 3,
-            overflow: "hidden",
-            border: "1px solid #e0e0e0",
+            width: 280,
+            backgroundColor: "#fff",
+            borderRadius: 2,
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlinedIcon sx={{ fontSize: 18, color: "#6b7280" }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Card
+        sx={{
+          borderRadius: "16px",
+          boxShadow: "0 4px 18px rgba(0,0,0,0.12)",
+          overflow: "hidden",
+          backgroundColor: "#fff",
+        }}
+      >
+        <TableContainer
+          sx={{
+            maxHeight: 550,
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#a9a9a9",
+              borderRadius: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#f3f4f6",
+            },
           }}
         >
-          <TableContainer sx={{ maxHeight: 600 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                {[
+                  ["Ticker", "ticker"],
+                  ["Issuer", "issuer_name"],
+                  ["Date", "pricing_date"],
+                  ["1-Week", "one_week_sentiment"],
+                  ["1-Month", "one_month_sentiment"],
+                  ["Summary", "executive_summary"],
+                ].map(([label, key]) => (
+                  <TableCell
+                    key={key}
+                    sx={{
+                      backgroundColor: "#b9d4e1",
+                      color: "#000",
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      borderBottom: "none",
+                      py: 2.2,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <TableSortLabel
+                      active={sortField === key}
+                      direction={sortOrder}
+                      onClick={() => handleSort(key as SortField)}
+                      sx={{
+                        "& .MuiTableSortLabel-icon": {
+                          color: "#5f6368 !important",
+                        },
+                      }}
+                    >
+                      {label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
+
+                <TableCell
                   sx={{
-                    backgroundColor: "#f8f9fa",
-                    "& .MuiTableCell-head": {
-                      backgroundColor: "#f8f9fa",
-                      fontWeight: 600,
-                      color: "#333",
-                      borderBottom: "2px solid #e0e0e0",
-                      padding: "16px 24px",
-                    },
+                    backgroundColor: "#b9d4e1",
+                    color: "#000",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                    borderBottom: "none",
+                    py: 2.2,
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === "ticker"}
-                      direction={sortField === "ticker" ? sortOrder : "asc"}
-                      onClick={() => handleSort("ticker")}
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        "&:hover": { color: "#667eea" },
-                      }}
-                    >
-                      Ticker
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === "issuer_name"}
-                      direction={sortField === "issuer_name" ? sortOrder : "asc"}
-                      onClick={() => handleSort("issuer_name")}
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        "&:hover": { color: "#667eea" },
-                      }}
-                    >
-                      Issuer Name
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === "pricing_date"}
-                      direction={sortField === "pricing_date" ? sortOrder : "asc"}
-                      onClick={() => handleSort("pricing_date")}
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        "&:hover": { color: "#667eea" },
-                      }}
-                    >
-                      Pricing Date
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === "one_week_sentiment"}
-                      direction={sortField === "one_week_sentiment" ? sortOrder : "asc"}
-                      onClick={() => handleSort("one_week_sentiment")}
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        "&:hover": { color: "#667eea" },
-                      }}
-                    >
-                      1W Sentiment
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortField === "one_month_sentiment"}
-                      direction={sortField === "one_month_sentiment" ? sortOrder : "asc"}
-                      onClick={() => handleSort("one_month_sentiment")}
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        "&:hover": { color: "#667eea" },
-                      }}
-                    >
-                      1M Sentiment
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontSize: "0.875rem", fontWeight: 600 }}>
-                    Action
-                  </TableCell>
-                </TableRow>
-              </TableHead>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
 
-              <TableBody>
-                {filteredData.length > 0 ? (
-                  filteredData.map((row, index) => {
-                    const weekSentiment = getSentiment(row.one_week_sentiment);
-                    const monthSentiment = getSentiment(row.one_month_sentiment);
+            <TableBody>
+              {filteredData.map((row, i) => {
+                const w = getSentiment(row.one_week_sentiment);
+                const m = getSentiment(row.one_month_sentiment);
 
-                    return (
-                      <TableRow
-                        key={index}
+                return (
+                  <TableRow
+                    key={row.unique_deal_id }
+                    // sx={{
+                    //   backgroundColor: i === 0 ? "#c7e4f1" : "#fff",
+                    //   "&:hover": {
+                    //     backgroundColor: i === 0 ? "#c7e4f1" : "#f7fbfd",
+                    //   },
+                    //   "& td": {
+                    //     borderBottom: "1px solid #d9d9d9",
+                    //     py: 2.2,
+                    //   },
+                    // }}
+                  >
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "0.98rem",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {row.ticker || "N/A"}
+                    </TableCell>
+
+                    <TableCell
+                      sx={{
+                        minWidth: 260,
+                        fontSize: "0.98rem",
+                      }}
+                    >
+                      {row.issuer_name || "N/A"}
+                    </TableCell>
+
+                    <TableCell sx={{ whiteSpace: "nowrap", fontSize: "0.98rem" }}>
+                      {row.pricing_date || "TBA"}
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={w.label}
+                        size="small"
                         sx={{
-                          borderBottom: "1px solid #f0f0f0",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            backgroundColor: "#fafafa",
-                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-                          },
-                          "& .MuiTableCell-body": {
-                            padding: "16px 24px",
-                            color: "#333",
-                          },
+                          backgroundColor: w.bg,
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "0.78rem",
+                          height: 26,
+                          borderRadius: "14px",
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={m.label}
+                        size="small"
+                        sx={{
+                          backgroundColor: m.bg,
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "0.78rem",
+                          height: 26,
+                          borderRadius: "14px",
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell sx={{ minWidth: 340, maxWidth: 360 }}>
+                      <Typography
+                        sx={{
+                          fontSize: "0.95rem",
+                          color: "#4b5563",
+                          lineHeight: 1.4,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          mb: 0.5,
                         }}
                       >
-                        <TableCell sx={{ fontWeight: 700, color: "#667eea" }}>
-                          {row.ticker}
-                        </TableCell>
-                        <TableCell sx={{ fontSize: "0.9rem" }}>
-                          {row.issuer_name}
-                        </TableCell>
-                        <TableCell sx={{ fontSize: "0.9rem", color: "#666" }}>
-                          {row.pricing_date || "TBA"}
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={weekSentiment.label}
-                            color={weekSentiment.color}
-                            size="small"
-                            variant="filled"
-                            sx={{
-                              fontWeight: 500,
-                              fontSize: "0.75rem",
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={monthSentiment.label}
-                            color={monthSentiment.color}
-                            size="small"
-                            variant="filled"
-                            sx={{
-                              fontWeight: 500,
-                              fontSize: "0.75rem",
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRowClick(row);
-                            }}
-                            endIcon={<ArrowForwardIcon sx={{ fontSize: "0.9rem" }} />}
-                            sx={{
-                              textTransform: "none",
-                              fontSize: "0.85rem",
-                              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                              "&:hover": {
-                                background: "linear-gradient(135deg, #5568d3 0%, #6a3a90 100%)",
-                              },
-                            }}
-                          >
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Box sx={{ py: 4 }}>
-                        <Typography variant="body1" sx={{ color: "text.secondary" }}>
-                          {searchTerm
-                            ? "🔍 No deals found matching your search"
-                            : "📊 No unsupervised deal data available"}
-                        </Typography>
-                      </Box>
+                        {preview(row.executive_summary)}
+                      </Typography>
+
+                      <Button
+                        size="small"
+                        variant="text"
+                        sx={{
+                          textTransform: "none",
+                          p: 0,
+                          minWidth: 0,
+                          fontSize: "0.95rem",
+                          color: "#2563eb",
+                          fontWeight: 500,
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSummary(row.executive_summary || "");
+                          setOpenDialog(true);
+                        }}
+                      >
+                        Read more
+                      </Button>
+                    </TableCell>
+
+                    <TableCell>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        sx={{
+                          textTransform: "none",
+                          backgroundColor: "#4f7bd9",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          px: 2.4,
+                          minWidth: 64,
+                          boxShadow: "0 2px 6px rgba(79,123,217,0.35)",
+                          "&:hover": {
+                            backgroundColor: "#3f6ac4",
+                          },
+                        }}
+                        onClick={() =>
+                          navigate(`/ai_fewshot_analysis?ticker=${row.ticker}`)
+                        }
+                      >
+                        View
+                      </Button>
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
-      </Box>
+                );
+              })}
+
+              {!filteredData.length && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                    <Typography color="text.secondary">
+                      No records found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>Executive Summary</DialogTitle>
+
+        <DialogContent dividers>
+          <Box
+            sx={{ fontSize: "0.95rem", lineHeight: 1.7 }}
+            dangerouslySetInnerHTML={{
+              __html: selectedSummary || "No summary available",
+            }}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 
-export default UnsupervisedDealSummary;
+export default Component;
