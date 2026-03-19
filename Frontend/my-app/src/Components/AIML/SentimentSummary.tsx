@@ -15,6 +15,7 @@ import {
   Button,
   Typography,
   Chip,
+  ChipProps,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -38,7 +39,7 @@ const SentimentSummary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState<SentimentData[]>([]);
 
-  // Fetch sentiment data
+  // Fetch data
   useEffect(() => {
     const fetchSentimentData = async () => {
       if (!apiUrl) {
@@ -50,23 +51,20 @@ const SentimentSummary: React.FC = () => {
       try {
         const token = localStorage.getItem("access_token");
         const response = await fetch(`${apiUrl}/api/sentiment_sumamry_data/`, {
-          method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch sentiment data: ${response.statusText}`);
+          throw new Error(`Failed: ${response.statusText}`);
         }
 
         const result = await response.json();
-        const sentimentDataArray = Array.isArray(result) ? result : result.data || [];
+        const arr = Array.isArray(result) ? result : result.data || [];
 
-        // Map and filter the data to exclude sentiment field
-        const mappedData: SentimentData[] = sentimentDataArray.map((item: any) => ({
+        const mapped = arr.map((item: any) => ({
           ticker: item.ticker,
           issuer_name: item.issuer_name,
           pricing_date: item.pricing_date,
@@ -75,9 +73,8 @@ const SentimentSummary: React.FC = () => {
           one_month_sentiment: item.one_month_sentiment,
         }));
 
-        setData(mappedData);
-        setFilteredData(mappedData);
-        setError(null);
+        setData(mapped);
+        setFilteredData(mapped);
       } catch (err: any) {
         setError(err.message || "Failed to load sentiment data");
         setData([]);
@@ -90,25 +87,25 @@ const SentimentSummary: React.FC = () => {
     fetchSentimentData();
   }, [apiUrl]);
 
-  // Handle search filtering
+  // Search filter
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredData(data);
     } else {
       const term = searchTerm.toLowerCase();
-      const filtered = data.filter(
-        (item) =>
-          item.ticker.toLowerCase().includes(term) ||
-          item.issuer_name.toLowerCase().includes(term) ||
-          item.unique_deal_id.toLowerCase().includes(term)
+      setFilteredData(
+        data.filter(
+          (item) =>
+            item.ticker.toLowerCase().includes(term) ||
+            item.issuer_name.toLowerCase().includes(term) ||
+            item.unique_deal_id.toLowerCase().includes(term)
+        )
       );
-      setFilteredData(filtered);
     }
   }, [searchTerm, data]);
 
-  // Handle row click to navigate to detailed view
+  // Navigation
   const handleRowClick = (row: SentimentData) => {
-    // Navigate to sentiment view with search parameters
     navigate(
       `/ai_sentiment_view?ticker=${encodeURIComponent(
         row.ticker
@@ -118,8 +115,10 @@ const SentimentSummary: React.FC = () => {
     );
   };
 
-  // Get sentiment color
-  const getSentimentColor = (sentiment: string | null) => {
+  // ✅ Properly typed sentiment helper
+  const getSentiment = (
+    sentiment: string | null
+  ): { color: ChipProps["color"]; label: string } => {
     switch (sentiment?.toLowerCase()) {
       case "bullish":
         return { color: "success", label: "Bullish" };
@@ -132,10 +131,11 @@ const SentimentSummary: React.FC = () => {
     }
   };
 
+  // Loading
   if (loading) {
     return (
-      <Container maxWidth={false} disableGutters>
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
+      <Container maxWidth={false}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
           <CircularProgress />
         </Box>
       </Container>
@@ -143,146 +143,143 @@ const SentimentSummary: React.FC = () => {
   }
 
   return (
-    <Container maxWidth={false} disableGutters>
-      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Box sx={{ width: { xs: "96%", sm: "90%", md: "95%" }, mt: { xs: 1.5, md: 2.5 }, mb: 3 }}>
-          {/* Header */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              Sentiment Summary Dashboard
-            </Typography>
+    <Container maxWidth={false}>
+      <Box sx={{ width: "95%", mx: "auto", mt: 3 }}>
+        {/* Header + Search */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            Sentiment Summary Dashboard
+          </Typography>
 
-            {/* Search Bar */}
-            <TextField
-              fullWidth
-              placeholder="Search by ticker, issuer name, or deal ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchOutlinedIcon sx={{ mr: 1, color: "action.active" }} />,
-              }}
-              size="small"
-              sx={{
-                mb: 2,
-                backgroundColor: "background.paper",
-                borderRadius: 1,
-              }}
-            />
+          <TextField
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            size="small"
+            sx={{ width: 260 }}
+            InputProps={{
+              startAdornment: (
+                <SearchOutlinedIcon sx={{ mr: 1, fontSize: 18 }} />
+              ),
+            }}
+          />
+        </Box>
 
-            {/* Results count */}
-            <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-              Showing {filteredData.length} of {data.length} records
-            </Typography>
-          </Box>
+        {/* Count */}
+        <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
+          Showing {filteredData.length} of {data.length}
+        </Typography>
 
-          {/* Error Alert */}
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+        {/* Error */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-          {/* Table */}
-          <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
-            <Table stickyHeader aria-label="sentiment summary table">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 120 }}>Ticker</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 250 }}>Issuer Name</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 130 }}>Pricing Date</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 180 }}>Deal ID</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 130 }}>1-Week Sentiment</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 130 }}>1-Month Sentiment</TableCell>
-                  <TableCell sx={{ fontWeight: "bold", minWidth: 100 }}>Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredData.length > 0 ? (
-                  filteredData.map((row, index) => (
+        {/* Table */}
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: 500,
+            overflow: "auto",
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell><b>Ticker</b></TableCell>
+                <TableCell><b>Issuer Name</b></TableCell>
+                <TableCell><b>Pricing Date</b></TableCell>
+                <TableCell><b>Deal ID</b></TableCell>
+                <TableCell><b>1W</b></TableCell>
+                <TableCell><b>1M</b></TableCell>
+                <TableCell><b>Action</b></TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {filteredData.length > 0 ? (
+                filteredData.map((row, index) => {
+                  const weekSentiment = getSentiment(
+                    row.one_week_sentiment
+                  );
+                  const monthSentiment = getSentiment(
+                    row.one_month_sentiment
+                  );
+
+                  return (
                     <TableRow
                       key={index}
                       hover
+                      onClick={() => handleRowClick(row)}
                       sx={{
                         cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f9f9f9" },
-                        transition: "background-color 0.2s",
+                        "&:hover": { backgroundColor: "#f5f5f5" },
                       }}
                     >
-                      <TableCell sx={{ fontWeight: "600", color: "primary.main" }}>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         {row.ticker}
                       </TableCell>
                       <TableCell>{row.issuer_name}</TableCell>
                       <TableCell>{row.pricing_date || "TBA"}</TableCell>
-                      <TableCell sx={{ fontSize: "0.85rem", fontFamily: "monospace" }}>
+                      <TableCell sx={{ fontSize: "0.8rem" }}>
                         {row.unique_deal_id}
                       </TableCell>
+
                       <TableCell>
-                        {row.one_week_sentiment ? (
-                          <Chip
-                            label={getSentimentColor(row.one_week_sentiment).label}
-                            color={
-                              getSentimentColor(row.one_week_sentiment).color as
-                                | "success"
-                                | "error"
-                                | "warning"
-                                | "default"
-                            }
-                            size="small"
-                            variant="outlined"
-                          />
-                        ) : (
-                          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                            N/A
-                          </Typography>
-                        )}
+                        <Chip
+                          label={weekSentiment.label}
+                          color={weekSentiment.color}
+                          size="small"
+                          variant="outlined"
+                        />
                       </TableCell>
+
                       <TableCell>
-                        {row.one_month_sentiment ? (
-                          <Chip
-                            label={getSentimentColor(row.one_month_sentiment).label}
-                            color={
-                              getSentimentColor(row.one_month_sentiment).color as
-                                | "success"
-                                | "error"
-                                | "warning"
-                                | "default"
-                            }
-                            size="small"
-                            variant="outlined"
-                          />
-                        ) : (
-                          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                            N/A
-                          </Typography>
-                        )}
+                        <Chip
+                          label={monthSentiment.label}
+                          color={monthSentiment.color}
+                          size="small"
+                          variant="outlined"
+                        />
                       </TableCell>
+
                       <TableCell>
                         <Button
                           size="small"
                           variant="contained"
-                          color="primary"
-                          onClick={() => handleRowClick(row)}
-                          startIcon={<SearchOutlinedIcon />}
-                          sx={{ textTransform: "none", fontSize: "0.85rem" }}
+                          onClick={(e) => {
+                            e.stopPropagation(); // ✅ prevent row click
+                            handleRowClick(row);
+                          }}
+                          sx={{ textTransform: "none" }}
                         >
                           View
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} sx={{ textAlign: "center", py: 4 }}>
-                      <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        {searchTerm ? "No results found matching your search." : "No sentiment data available."}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    {searchTerm
+                      ? "No results found"
+                      : "No sentiment data available"}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </Container>
   );
