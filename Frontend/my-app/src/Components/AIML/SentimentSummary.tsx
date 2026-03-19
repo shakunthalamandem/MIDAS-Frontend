@@ -172,18 +172,19 @@ const SentimentSummary: React.FC = () => {
                     borderRadius: 3,
                     boxShadow: 3,
                     maxHeight: 550,
+                    mb: 5,
                 }}
             >
-                <Table stickyHeader>
+                <Table stickyHeader >
                     <TableHead>
                         <TableRow>
-                            {["Ticker", "Issuer", "Date", "1W", "1M", "Summary", "Action"].map(
+                            {["Ticker", "Issuer", "Date", "1-Week", "1-Month", "Summary", "Action"].map(
                                 (h) => (
                                     <TableCell
                                         key={h}
                                         sx={{
                                             fontWeight: 600,
-                                            backgroundColor: "#fafafa",
+                                            backgroundColor: "#c7e4f1",
                                         }}
                                     >
                                         {h}
@@ -206,7 +207,7 @@ const SentimentSummary: React.FC = () => {
                                         cursor: "pointer",
                                         transition: "0.2s",
                                         "&:hover": {
-                                            backgroundColor: "#f9fafb",
+                                            backgroundColor: "#c7e4f1",
                                         },
                                     }}
                                     onClick={() => handleRowClick(row)}
