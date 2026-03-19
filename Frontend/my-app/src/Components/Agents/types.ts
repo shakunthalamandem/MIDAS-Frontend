@@ -57,6 +57,7 @@ export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
   "IPO Ranking Agent": "/last_30_days_ai_ranking",
   "Deal(IPO) Agent": "/ai_fewshot_analysis",
   "Sentiment Agent": "/ai_sentiment_view",
+  "Jay Ritter IPO Agent": "/jay_ritter_ipo_analysis",
 };
 
 export const SCHEDULE_LABELS: Record<string, string> = {
@@ -94,6 +95,10 @@ export function formatSchedule(agent: AIAgent): string {
     return "One Time";
   }
   if (schedule_type === "cron") {
+    // Friendly label for known cron patterns
+    if (schedule_value === "0 10 1-7 * 1") {
+      return "1st Monday of each month at 10:00";
+    }
     return `Cron: ${schedule_value}`;
   }
   return SCHEDULE_LABELS[schedule_type] || schedule_type;
