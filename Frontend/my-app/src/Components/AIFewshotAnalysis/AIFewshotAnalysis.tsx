@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useSearchParams } from "react-router-dom";
 import AiAnalysis from "./AiAnalysis";
 
 type ApiState = "idle" | "loading" | "success" | "error";
@@ -45,12 +46,28 @@ interface AIFewshotAnalysisProps {
 
 const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) => {
   const API_URL = process.env.REACT_APP_API_URL;
+  const [searchParams] = useSearchParams();
 
   const [tickers, setTickers] = useState<TickerItem[]>([]);
   const [status, setStatus] = useState<ApiState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<TickerItem | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
+
+  // Get prefill data from URL query params or props
+  const prefillTickerData = useMemo(() => {
+    const ticker = searchParams.get("ticker");
+    const uniqueDealId = searchParams.get("unique_deal_id");
+
+    if (ticker) {
+      return {
+        ticker,
+        unique_deal_id: uniqueDealId || undefined,
+        pricing_date: null,
+      };
+    }
+    return prefillTicker;
+  }, [searchParams, prefillTicker]);
 
   const loadTickers = async () => {
     setStatus("loading");
@@ -133,17 +150,16 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
   const hasError = status === "error";
 
   useEffect(() => {
-    if (!prefillTicker?.ticker || !options.length) return;
+    if (!prefillTickerData?.ticker || !options.length) return;
 
     const match = options.find(
       (opt) =>
-        opt.ticker === prefillTicker.ticker &&
-        (opt.pricing_date ?? "") === (prefillTicker.pricing_date ?? "") &&
-        (opt.unique_deal_id ?? "") === (prefillTicker.unique_deal_id ?? "")
+        opt.ticker === prefillTickerData.ticker &&
+        (opt.unique_deal_id ?? "") === (prefillTickerData.unique_deal_id ?? "")
     );
 
     if (match) setSelectedTicker(match);
-  }, [prefillTicker, options]);
+  }, [prefillTickerData, options]);
 
   const companyName = selectedTicker?.ticker ?? "the selected company";
 
