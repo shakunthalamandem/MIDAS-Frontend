@@ -14,6 +14,8 @@ import {
   TextField,
   Button,
   Typography,
+  Chip,
+  ChipProps,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -24,7 +26,29 @@ interface UnsupervisedDealData {
   pricing_date: string | null;
   unique_deal_id: string;
   few_shot_review: string;
+  one_week_sentiment?: string | null;
+  one_month_sentiment?: string | null;
 }
+
+// Helper function to parse few_shot_review JSON and extract sentiment values
+const parseSentimentData = (fewShotReview: string): { oneWeekSentiment: string | null; oneMonthSentiment: string | null } => {
+  try {
+    const parsed = JSON.parse(fewShotReview);
+    if (parsed.answer && Array.isArray(parsed.answer) && parsed.answer.length > 0) {
+      const firstAnswer = parsed.answer[0];
+      const finalOutlook = firstAnswer["Final Sentiment & Volatility Outlook"];
+      if (finalOutlook) {
+        return {
+          oneWeekSentiment: finalOutlook["1-Week Sentiment"] || null,
+          oneMonthSentiment: finalOutlook["1-Month Sentiment"] || null,
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing few_shot_review:", e);
+  }
+  return { oneWeekSentiment: null, oneMonthSentiment: null };
+};
 
 const UnsupervisedDealSummary: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -61,13 +85,18 @@ const UnsupervisedDealSummary: React.FC = () => {
         const result = await response.json();
         const arr = Array.isArray(result) ? result : result.data || [];
 
-        const mapped = arr.map((item: any) => ({
-          ticker: item.ticker,
-          issuer_name: item.issuer_name,
-          pricing_date: item.pricing_date,
-          unique_deal_id: item.unique_deal_id,
-          few_shot_review: item.few_shot_review,
-        }));
+        const mapped = arr.map((item: any) => {
+          const { oneWeekSentiment, oneMonthSentiment } = parseSentimentData(item.few_shot_review);
+          return {
+            ticker: item.ticker,
+            issuer_name: item.issuer_name,
+            pricing_date: item.pricing_date,
+            unique_deal_id: item.unique_deal_id,
+            few_shot_review: item.few_shot_review,
+            one_week_sentiment: oneWeekSentiment,
+            one_month_sentiment: oneMonthSentiment,
+          };
+        });
 
         setData(mapped);
         setFilteredData(mapped);
@@ -107,6 +136,26 @@ const UnsupervisedDealSummary: React.FC = () => {
         row.ticker
       )}&unique_deal_id=${encodeURIComponent(row.unique_deal_id)}`
     );
+  };
+
+  // Helper function to get sentiment color and label
+  const getSentiment = (
+    sentiment: string | null | undefined
+  ): { color: ChipProps["color"]; label: string } => {
+    switch (sentiment?.toLowerCase()) {
+      case "bullish":
+        return { color: "success", label: "Bullish" };
+      case "bearish":
+        return { color: "error", label: "Bearish" };
+      case "neutral":
+        return { color: "warning", label: "Neutral" };
+      case "neutral to slightly bullish":
+        return { color: "success", label: "Neutral to Slightly Bullish" };
+      case "neutral to cautiously positive":
+        return { color: "success", label: "Neutral to Cautiously Positive" };
+      default:
+        return { color: "default", label: sentiment || "N/A" };
+    }
   };
 
   // Loading
@@ -182,8 +231,14 @@ const UnsupervisedDealSummary: React.FC = () => {
                 <TableCell>
                   <b>Pricing Date</b>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <b>Deal ID</b>
+                </TableCell> */}
+                <TableCell>
+                  <b>1W Sentiment</b>
+                </TableCell>
+                <TableCell>
+                  <b>1M Sentiment</b>
                 </TableCell>
                 <TableCell>
                   <b>Action</b>
@@ -193,43 +248,66 @@ const UnsupervisedDealSummary: React.FC = () => {
 
             <TableBody>
               {filteredData.length > 0 ? (
-                filteredData.map((row, index) => (
-                  <TableRow
-                    key={index}
-                    hover
-                    onClick={() => handleRowClick(row)}
-                    sx={{
-                      cursor: "pointer",
-                      "&:hover": { backgroundColor: "#f5f5f5" },
-                    }}
-                  >
-                    <TableCell sx={{ fontWeight: 600 }}>
-                      {row.ticker}
-                    </TableCell>
-                    <TableCell>{row.issuer_name}</TableCell>
-                    <TableCell>{row.pricing_date || "TBA"}</TableCell>
-                    <TableCell sx={{ fontSize: "0.8rem" }}>
-                      {row.unique_deal_id}
-                    </TableCell>
+                filteredData.map((row, index) => {
+                  const weekSentiment = getSentiment(row.one_week_sentiment);
+                  const monthSentiment = getSentiment(row.one_month_sentiment);
 
-                    <TableCell>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowClick(row);
-                        }}
-                        sx={{ textTransform: "none" }}
-                      >
-                        View Analysis
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  return (
+                    <TableRow
+                      key={index}
+                      hover
+                      onClick={() => handleRowClick(row)}
+                      sx={{
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                      }}
+                    >
+                      <TableCell sx={{ fontWeight: 600 }}>
+                        {row.ticker}
+                      </TableCell>
+                      <TableCell>{row.issuer_name}</TableCell>
+                      <TableCell>{row.pricing_date || "TBA"}</TableCell>
+                      {/* <TableCell sx={{ fontSize: "0.8rem" }}>
+                        {row.unique_deal_id}
+                      </TableCell> */}
+
+                      <TableCell>
+                        <Chip
+                          label={weekSentiment.label}
+                          color={weekSentiment.color}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <Chip
+                          label={monthSentiment.label}
+                          color={monthSentiment.color}
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRowClick(row);
+                          }}
+                          sx={{ textTransform: "none" }}
+                        >
+                          View Analysis
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">
+                  <TableCell colSpan={7} align="center">
                     {searchTerm
                       ? "No results found"
                       : "No unsupervised deal data available"}

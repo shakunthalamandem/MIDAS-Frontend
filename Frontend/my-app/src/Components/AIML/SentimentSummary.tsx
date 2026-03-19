@@ -198,9 +198,9 @@ const SentimentSummary: React.FC = () => {
                 <TableCell><b>Ticker</b></TableCell>
                 <TableCell><b>Issuer Name</b></TableCell>
                 <TableCell><b>Pricing Date</b></TableCell>
-                <TableCell><b>Deal ID</b></TableCell>
-                <TableCell><b>1W</b></TableCell>
-                <TableCell><b>1M</b></TableCell>
+                {/* <TableCell><b>unique_deal_id</b></TableCell> */}
+                <TableCell><b>1Week</b></TableCell>
+                <TableCell><b>1Month</b></TableCell>
                 <TableCell><b>Action</b></TableCell>
               </TableRow>
             </TableHead>
@@ -230,9 +230,9 @@ const SentimentSummary: React.FC = () => {
                       </TableCell>
                       <TableCell>{row.issuer_name}</TableCell>
                       <TableCell>{row.pricing_date || "TBA"}</TableCell>
-                      <TableCell sx={{ fontSize: "0.8rem" }}>
+                      {/* <TableCell sx={{ fontSize: "0.8rem" }}>
                         {row.unique_deal_id}
-                      </TableCell>
+                      </TableCell> */}
 
                       <TableCell>
                         <Chip
