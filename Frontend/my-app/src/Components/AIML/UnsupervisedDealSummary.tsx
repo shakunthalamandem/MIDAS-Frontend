@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Container,
@@ -21,9 +21,12 @@ import {
   DialogContent,
   DialogActions,
   InputAdornment,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface Data {
   ticker: string;
@@ -53,14 +56,48 @@ const parseData = (review: string) => {
 
     return {
       oneWeek:
-        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Week Sentiment"],
+        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Week Sentiment"] || null,
       oneMonth:
-        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Month Sentiment"],
-      summary: obj?.["Executive Summary"],
+        obj?.["Final Sentiment & Volatility Outlook"]?.["1-Month Sentiment"] || null,
+      summary: obj?.["Executive Summary"] || "",
     };
   } catch {
     return { oneWeek: null, oneMonth: null, summary: "" };
   }
+};
+
+const escapeHtml = (text: string) => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+};
+
+const formatSummaryHtml = (text?: string) => {
+  if (!text) return "N/A";
+
+  let html = escapeHtml(text);
+
+  // bold: **text**
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // italic: *text*
+  html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+  // line breaks / paragraphs
+  html = html
+    .split(/\n\s*\n/)
+    .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
+    .join("");
+
+  return html;
+};
+
+const stripHtml = (html?: string) => {
+  if (!html) return "";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
 };
 
 const Component: React.FC = () => {
@@ -76,7 +113,7 @@ const Component: React.FC = () => {
   const [sortField, setSortField] = useState<SortField>("ticker");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
-  const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
+  const [selectedRow, setSelectedRow] = useState<Data | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
@@ -168,8 +205,20 @@ const Component: React.FC = () => {
     }
   };
 
-  const preview = (text?: string) =>
-    text ? text.split(" ").slice(0, 12).join(" ") + "..." : "N/A";
+  const handleOpenDialog = (row: Data) => {
+    setSelectedRow(row);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedRow(null);
+  };
+
+  const selectedSummaryHtml = useMemo(
+    () => formatSummaryHtml(selectedRow?.executive_summary),
+    [selectedRow]
+  );
 
   if (loading) {
     return (
@@ -275,7 +324,7 @@ const Component: React.FC = () => {
                   >
                     <TableSortLabel
                       active={sortField === key}
-                      direction={sortOrder}
+                      direction={sortField === key ? sortOrder : "asc"}
                       onClick={() => handleSort(key as SortField)}
                       sx={{
                         "& .MuiTableSortLabel-icon": {
@@ -305,23 +354,24 @@ const Component: React.FC = () => {
             </TableHead>
 
             <TableBody>
-              {filteredData.map((row, i) => {
+              {filteredData.map((row) => {
                 const w = getSentiment(row.one_week_sentiment);
                 const m = getSentiment(row.one_month_sentiment);
+                const summaryHtml = formatSummaryHtml(row.executive_summary);
 
                 return (
                   <TableRow
-                    key={row.unique_deal_id }
-                    // sx={{
-                    //   backgroundColor: i === 0 ? "#c7e4f1" : "#fff",
-                    //   "&:hover": {
-                    //     backgroundColor: i === 0 ? "#c7e4f1" : "#f7fbfd",
-                    //   },
-                    //   "& td": {
-                    //     borderBottom: "1px solid #d9d9d9",
-                    //     py: 2.2,
-                    //   },
-                    // }}
+                    key={row.unique_deal_id}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#f7fbfd",
+                      },
+                      "& td": {
+                        borderBottom: "1px solid #d9d9d9",
+                        py: 2.2,
+                        verticalAlign: "top",
+                      },
+                    }}
                   >
                     <TableCell
                       sx={{
@@ -377,20 +427,36 @@ const Component: React.FC = () => {
                     </TableCell>
 
                     <TableCell sx={{ minWidth: 340, maxWidth: 360 }}>
-                      <Typography
+                      <Box
                         sx={{
                           fontSize: "0.95rem",
                           color: "#4b5563",
-                          lineHeight: 1.4,
+                          lineHeight: 1.6,
+                          mb: 0.5,
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: "vertical",
                           overflow: "hidden",
-                          mb: 0.5,
+                          wordBreak: "break-word",
+                          "& p": {
+                            m: 0,
+                            display: "inline",
+                          },
+                          "& br": {
+                            display: "none",
+                          },
+                          "& strong": {
+                            fontWeight: 700,
+                            color: "#1f2937",
+                          },
+                          "& em": {
+                            fontStyle: "italic",
+                          },
                         }}
-                      >
-                        {preview(row.executive_summary)}
-                      </Typography>
+                        dangerouslySetInnerHTML={{
+                          __html: summaryHtml,
+                        }}
+                      />
 
                       <Button
                         size="small"
@@ -405,8 +471,7 @@ const Component: React.FC = () => {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedSummary(row.executive_summary || "");
-                          setOpenDialog(true);
+                          handleOpenDialog(row);
                         }}
                       >
                         Read more
@@ -456,23 +521,141 @@ const Component: React.FC = () => {
 
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        onClose={handleCloseDialog}
         fullWidth
         maxWidth="md"
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            overflow: "hidden",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+            background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+          },
+        }}
       >
-        <DialogTitle>Executive Summary</DialogTitle>
-
-        <DialogContent dividers>
+        <DialogTitle
+          sx={{
+            px: 3,
+            py: 2,
+            background: "linear-gradient(90deg, #eef8fd 0%, #f8fbff 100%)",
+          }}
+        >
           <Box
-            sx={{ fontSize: "0.95rem", lineHeight: 1.7 }}
-            dangerouslySetInnerHTML={{
-              __html: selectedSummary || "No summary available",
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: 2,
             }}
-          />
+          >
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "#1f2937" }}>
+                {selectedRow?.ticker} Executive Summary
+              </Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                {selectedRow?.issuer_name || "AI-generated sentiment overview"}
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+              <Chip
+                label={`1W: ${getSentiment(selectedRow?.one_week_sentiment).label}`}
+                size="small"
+                sx={{
+                  backgroundColor: getSentiment(selectedRow?.one_week_sentiment).bg,
+                  color: "#fff",
+                  fontWeight: 700,
+                }}
+              />
+              <Chip
+                label={`1M: ${getSentiment(selectedRow?.one_month_sentiment).label}`}
+                size="small"
+                sx={{
+                  backgroundColor: getSentiment(selectedRow?.one_month_sentiment).bg,
+                  color: "#fff",
+                  fontWeight: 700,
+                }}
+              />
+              <IconButton onClick={handleCloseDialog} size="small">
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
+        </DialogTitle>
+
+        <Divider />
+
+        <DialogContent sx={{ px: 3, py: 3 }}>
+          <Box
+            sx={{
+              p: 2.5,
+              borderRadius: 3,
+              backgroundColor: "#f4fbff",
+              border: "1px solid #d9ebf7",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                mb: 1.2,
+                color: "#0f4c75",
+              }}
+            >
+              Executive Summary
+            </Typography>
+
+            <Box
+              sx={{
+                color: "#374151",
+                fontSize: "0.97rem",
+                lineHeight: 1.9,
+                "& p": { margin: 0, marginBottom: 1.5 },
+                "& ul, & ol": { paddingLeft: 3, marginTop: 1, marginBottom: 1 },
+                "& li": { marginBottom: 0.6 },
+                "& strong": { color: "#111827", fontWeight: 700 },
+                "& em": { fontStyle: "italic" },
+              }}
+              dangerouslySetInnerHTML={{
+                __html: selectedSummaryHtml,
+              }}
+            />
+          </Box>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+        <Divider />
+
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleCloseDialog}
+            variant="outlined"
+            sx={{
+              textTransform: "none",
+              borderRadius: 2,
+              px: 2.5,
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (selectedRow?.ticker) {
+                handleCloseDialog();
+                navigate(`/ai_fewshot_analysis?ticker=${selectedRow.ticker}`);
+              }
+            }}
+            sx={{
+              textTransform: "none",
+              borderRadius: 2,
+              px: 2.5,
+              fontWeight: 600,
+            }}
+          >
+            View Details
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

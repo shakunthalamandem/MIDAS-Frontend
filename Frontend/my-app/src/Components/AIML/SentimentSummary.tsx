@@ -21,9 +21,12 @@ import {
   DialogContent,
   DialogActions,
   TableSortLabel,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface SentimentData {
   ticker: string;
@@ -51,11 +54,9 @@ const SentimentSummary: React.FC = () => {
   const [selectedSummary, setSelectedSummary] = useState<SentimentData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  // ✅ Sorting state
   const [orderBy, setOrderBy] = useState<keyof SentimentData | "summary">("ticker");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
-  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -80,7 +81,7 @@ const SentimentSummary: React.FC = () => {
         setData(mapped);
         setFilteredData(mapped);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || "Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -89,7 +90,6 @@ const SentimentSummary: React.FC = () => {
     fetchData();
   }, [apiUrl]);
 
-  // Search filter
   useEffect(() => {
     const term = searchTerm.toLowerCase();
     setFilteredData(
@@ -102,15 +102,13 @@ const SentimentSummary: React.FC = () => {
     );
   }, [searchTerm, data]);
 
-  // Sorting handler
   const handleSort = (column: keyof SentimentData | "summary") => {
     const isAsc = orderBy === column && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(column);
   };
 
-  // Value extractor
-  const getComparableValue = (row: SentimentData, column: any) => {
+  const getComparableValue = (row: SentimentData, column: keyof SentimentData | "summary") => {
     switch (column) {
       case "summary":
         return row.sentiment_summary?.one_week || "";
@@ -118,13 +116,12 @@ const SentimentSummary: React.FC = () => {
         return row.pricing_date ? new Date(row.pricing_date).getTime() : 0;
       case "one_week_sentiment":
       case "one_month_sentiment":
-        return row[column as keyof SentimentData] || "";
+        return row[column] || "";
       default:
-        return (row as any)[column] || "";
+        return row[column] || "";
     }
   };
 
-  // Sorted data
   const sortedData = [...filteredData].sort((a, b) => {
     const valA = getComparableValue(a, orderBy);
     const valB = getComparableValue(b, orderBy);
@@ -134,7 +131,6 @@ const SentimentSummary: React.FC = () => {
     return 0;
   });
 
-  // Sentiment styling
   const getSentiment = (
     sentiment: string | null
   ): { color: ChipProps["color"]; label: string } => {
@@ -151,11 +147,16 @@ const SentimentSummary: React.FC = () => {
   };
 
   const preview = (text?: string) =>
-    text ? text.split(" ").slice(0, 15).join(" ") + "..." : "N/A";
+    text ? `${text.split(" ").slice(0, 15).join(" ")}...` : "N/A";
 
   const handleOpenDialog = (row: SentimentData) => {
     setSelectedSummary(row);
     setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedSummary(null);
   };
 
   const handleRowClick = (row: SentimentData) => {
@@ -172,13 +173,14 @@ const SentimentSummary: React.FC = () => {
 
   return (
     <Container maxWidth="xl">
-      {/* Header + Search */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           mb: 3,
+          flexWrap: "wrap",
+          gap: 2,
         }}
       >
         <Box>
@@ -197,14 +199,17 @@ const SentimentSummary: React.FC = () => {
           size="small"
           sx={{ width: 280 }}
           InputProps={{
-            startAdornment: <SearchOutlinedIcon sx={{ mr: 1 }} />,
+            startAdornment: <SearchOutlinedIcon sx={{ mr: 1, color: "text.secondary" }} />,
           }}
         />
       </Box>
 
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && (
+        <Box sx={{ mb: 2 }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      )}
 
-      {/* Table */}
       <TableContainer
         component={Paper}
         sx={{
@@ -237,7 +242,7 @@ const SentimentSummary: React.FC = () => {
                     <TableSortLabel
                       active={orderBy === col.key}
                       direction={orderBy === col.key ? order : "asc"}
-                      onClick={() => handleSort(col.key as any)}
+                      onClick={() => handleSort(col.key as keyof SentimentData | "summary")}
                     >
                       {col.label}
                     </TableSortLabel>
@@ -260,13 +265,11 @@ const SentimentSummary: React.FC = () => {
                   hover
                   sx={{
                     cursor: "pointer",
-                    "&:hover": { backgroundColor: "#c7e4f1" },
+                    "&:hover": { backgroundColor: "#f4fbfe" },
                   }}
                   onClick={() => handleRowClick(row)}
                 >
-                  <TableCell sx={{ fontWeight: 600 }}>
-                    {row.ticker}
-                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{row.ticker}</TableCell>
 
                   <TableCell>{row.issuer_name}</TableCell>
 
@@ -280,7 +283,7 @@ const SentimentSummary: React.FC = () => {
                     <Chip label={month.label} color={month.color} size="small" />
                   </TableCell>
 
-                  <TableCell sx={{ maxWidth: 300 }}>
+                  <TableCell sx={{ maxWidth: 320 }}>
                     <Typography
                       variant="body2"
                       sx={{
@@ -288,8 +291,9 @@ const SentimentSummary: React.FC = () => {
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
-                        fontSize: "0.8rem",
+                        fontSize: "0.84rem",
                         color: "text.secondary",
+                        lineHeight: 1.6,
                       }}
                     >
                       {preview(row.sentiment_summary?.one_week)}
@@ -297,7 +301,7 @@ const SentimentSummary: React.FC = () => {
 
                     <Button
                       size="small"
-                      sx={{ mt: 0.5, textTransform: "none" }}
+                      sx={{ mt: 0.5, textTransform: "none", fontWeight: 600 }}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenDialog(row);
@@ -327,26 +331,166 @@ const SentimentSummary: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
-        <DialogTitle>
-          {selectedSummary?.ticker} Sentiment Details
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            overflow: "hidden",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+            background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            px: 3,
+            py: 2,
+            background: "linear-gradient(90deg, #eef8fd 0%, #f8fbff 100%)",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: 2,
+            }}
+          >
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: "#1f2937" }}>
+                {selectedSummary?.ticker} Sentiment Details
+              </Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+                {selectedSummary?.issuer_name}
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Chip
+                label={`1W: ${
+                  getSentiment(selectedSummary?.one_week_sentiment || null).label
+                }`}
+                color={getSentiment(selectedSummary?.one_week_sentiment || null).color}
+                size="small"
+              />
+              <Chip
+                label={`1M: ${
+                  getSentiment(selectedSummary?.one_month_sentiment || null).label
+                }`}
+                color={getSentiment(selectedSummary?.one_month_sentiment || null).color}
+                size="small"
+              />
+              <IconButton onClick={handleCloseDialog} size="small">
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
         </DialogTitle>
 
-        <DialogContent>
-          <Typography variant="subtitle2">1 Week</Typography>
-          <Typography sx={{ mb: 2 }}>
-            {selectedSummary?.sentiment_summary?.one_week}
-          </Typography>
+        <Divider />
 
-          <Typography variant="subtitle2">1 Month</Typography>
-          <Typography>
-            {selectedSummary?.sentiment_summary?.one_month}
-          </Typography>
+        <DialogContent sx={{ px: 3, py: 3 }}>
+          <Box
+            sx={{
+              mb: 3,
+              p: 2.5,
+              borderRadius: 3,
+              backgroundColor: "#f4fbff",
+              border: "1px solid #d9ebf7",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                mb: 1.2,
+                color: "#0f4c75",
+              }}
+            >
+              1 Week Outlook
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                lineHeight: 1.9,
+                color: "#374151",
+                fontSize: "0.97rem",
+              }}
+            >
+              {selectedSummary?.sentiment_summary?.one_week || "N/A"}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              p: 2.5,
+              borderRadius: 3,
+              backgroundColor: "#fffaf3",
+              border: "1px solid #f3dfb1",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                mb: 1.2,
+                color: "#9a6700",
+              }}
+            >
+              1 Month Outlook
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                lineHeight: 1.9,
+                color: "#374151",
+                fontSize: "0.97rem",
+              }}
+            >
+              {selectedSummary?.sentiment_summary?.one_month || "N/A"}
+            </Typography>
+          </Box>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Close</Button>
+        <Divider />
+
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleCloseDialog}
+            variant="outlined"
+            sx={{
+              textTransform: "none",
+              borderRadius: 2,
+              px: 2.5,
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (selectedSummary) {
+                handleCloseDialog();
+                navigate(`/ai_sentiment_view?ticker=${selectedSummary.ticker}`);
+              }
+            }}
+            sx={{
+              textTransform: "none",
+              borderRadius: 2,
+              px: 2.5,
+              fontWeight: 600,
+            }}
+          >
+            View Details
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
