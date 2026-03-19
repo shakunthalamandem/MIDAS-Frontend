@@ -56,7 +56,7 @@ const activeAgents: AgentConfig[] = [
     description:
       "Analyzes a company’s pre-listing fundamentals by comparing them with similar past IPO deals.Deal agent runs using AI Unsupervised.",
     schedule: "One Time for each IPO",
-    route: "/ai_fewshot_analysis",
+    route: "/ai_unsupervised_summary",
   },
   {
     title: "Sentiment Agent",
