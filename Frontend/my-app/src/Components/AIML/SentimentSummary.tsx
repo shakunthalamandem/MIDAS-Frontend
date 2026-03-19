@@ -291,8 +291,8 @@ const SentimentSummary: React.FC = () => {
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical",
-                        fontSize: "0.84rem",
-                        color: "text.secondary",
+                        fontSize: "0.9rem",
+                        color: "text.primary",
                         lineHeight: 1.6,
                       }}
                     >
@@ -364,7 +364,7 @@ const SentimentSummary: React.FC = () => {
               <Typography variant="h5" sx={{ fontWeight: 700, color: "#1f2937" }}>
                 {selectedSummary?.ticker} Sentiment Details
               </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: "text.primary", mt: 0.5 }}>
                 {selectedSummary?.issuer_name}
               </Typography>
             </Box>
