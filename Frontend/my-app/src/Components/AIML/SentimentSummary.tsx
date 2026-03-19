@@ -1,288 +1,308 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Alert,
-  TextField,
-  Button,
-  Typography,
-  Chip,
-  ChipProps,
+    Box,
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    CircularProgress,
+    Alert,
+    TextField,
+    Button,
+    Typography,
+    Chip,
+    ChipProps,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 interface SentimentData {
-  ticker: string;
-  issuer_name: string;
-  pricing_date: string | null;
-  unique_deal_id: string;
-  one_week_sentiment: string | null;
-  one_month_sentiment: string | null;
+    ticker: string;
+    issuer_name: string;
+    pricing_date: string | null;
+    unique_deal_id: string;
+    one_week_sentiment: string | null;
+    one_month_sentiment: string | null;
+    sentiment_summary?: {
+        one_week?: string;
+        one_month?: string;
+    };
 }
 
 const SentimentSummary: React.FC = () => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-  const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
 
-  const [data, setData] = useState<SentimentData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<SentimentData[]>([]);
+    const [data, setData] = useState<SentimentData[]>([]);
+    const [filteredData, setFilteredData] = useState<SentimentData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch data
-  useEffect(() => {
-    const fetchSentimentData = async () => {
-      if (!apiUrl) {
-        setError("API URL is missing");
-        setLoading(false);
-        return;
-      }
+    const [selectedSummary, setSelectedSummary] = useState<SentimentData | null>(null);
+    const [openDialog, setOpenDialog] = useState(false);
 
-      try {
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(`${apiUrl}/api/sentiment_sumamry_data/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem("access_token");
+                const res = await fetch(`${apiUrl}/api/sentiment_sumamry_data/`, {
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : "",
+                    },
+                });
 
-        if (!response.ok) {
-          throw new Error(`Failed: ${response.statusText}`);
+                const result = await res.json();
+                const arr = Array.isArray(result) ? result : result.data || [];
+
+                const mapped = arr.map((item: any) => ({
+                    ...item,
+                    sentiment_summary:
+                        typeof item.sentiment_summary === "string"
+                            ? JSON.parse(item.sentiment_summary)
+                            : item.sentiment_summary,
+                }));
+
+                setData(mapped);
+                setFilteredData(mapped);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [apiUrl]);
+
+    useEffect(() => {
+        const term = searchTerm.toLowerCase();
+        setFilteredData(
+            data.filter(
+                (d) =>
+                    d.ticker.toLowerCase().includes(term) ||
+                    d.issuer_name.toLowerCase().includes(term) ||
+                    d.unique_deal_id.toLowerCase().includes(term)
+            )
+        );
+    }, [searchTerm, data]);
+
+    const getSentiment = (
+        sentiment: string | null
+    ): { color: ChipProps["color"]; label: string } => {
+        switch (sentiment?.toLowerCase()) {
+            case "bullish":
+                return { color: "success", label: "Bullish" };
+            case "bearish":
+                return { color: "error", label: "Bearish" };
+            case "neutral":
+                return { color: "warning", label: "Neutral" };
+            default:
+                return { color: "default", label: sentiment || "N/A" };
         }
-
-        const result = await response.json();
-        const arr = Array.isArray(result) ? result : result.data || [];
-
-        const mapped = arr.map((item: any) => ({
-          ticker: item.ticker,
-          issuer_name: item.issuer_name,
-          pricing_date: item.pricing_date,
-          unique_deal_id: item.unique_deal_id,
-          one_week_sentiment: item.one_week_sentiment,
-          one_month_sentiment: item.one_month_sentiment,
-        }));
-
-        setData(mapped);
-        setFilteredData(mapped);
-      } catch (err: any) {
-        setError(err.message || "Failed to load sentiment data");
-        setData([]);
-        setFilteredData([]);
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchSentimentData();
-  }, [apiUrl]);
+    const preview = (text?: string) =>
+        text ? text.split(" ").slice(0, 15).join(" ") + "..." : "N/A";
 
-  // Search filter
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredData(data);
-    } else {
-      const term = searchTerm.toLowerCase();
-      setFilteredData(
-        data.filter(
-          (item) =>
-            item.ticker.toLowerCase().includes(term) ||
-            item.issuer_name.toLowerCase().includes(term) ||
-            item.unique_deal_id.toLowerCase().includes(term)
-        )
-      );
+    const handleOpenDialog = (row: SentimentData) => {
+        setSelectedSummary(row);
+        setOpenDialog(true);
+    };
+
+    const handleRowClick = (row: SentimentData) => {
+        navigate(`/ai_sentiment_view?ticker=${row.ticker}`);
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+                <CircularProgress />
+            </Box>
+        );
     }
-  }, [searchTerm, data]);
 
-  // Navigation
-  const handleRowClick = (row: SentimentData) => {
-    navigate(
-      `/ai_sentiment_view?ticker=${encodeURIComponent(
-        row.ticker
-      )}&unique_deal_id=${encodeURIComponent(
-        row.unique_deal_id
-      )}&pricing_date=${encodeURIComponent(row.pricing_date || "")}`
-    );
-  };
-
-  // ✅ Properly typed sentiment helper
-  const getSentiment = (
-    sentiment: string | null
-  ): { color: ChipProps["color"]; label: string } => {
-    switch (sentiment?.toLowerCase()) {
-      case "bullish":
-        return { color: "success", label: "Bullish" };
-      case "bearish":
-        return { color: "error", label: "Bearish" };
-      case "neutral":
-        return { color: "warning", label: "Neutral" };
-      default:
-        return { color: "default", label: sentiment || "N/A" };
-    }
-  };
-
-  // Loading
-  if (loading) {
     return (
-      <Container maxWidth={false}>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+        <Container maxWidth="xl">
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 3,
+                }}
+            >
+                {/* Left: Title */}
+                <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                        Sentiment Summary
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        AI-driven IPO sentiment insights
+                    </Typography>
+                </Box>
+
+                {/* Right: Search */}
+                <TextField
+                    placeholder="Search ticker, issuer..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: 280 }}
+                    InputProps={{
+                        startAdornment: <SearchOutlinedIcon sx={{ mr: 1 }} />,
+                    }}
+                />
+            </Box>
+
+            {error && <Alert severity="error">{error}</Alert>}
+
+            {/* Table */}
+            <TableContainer
+                component={Paper}
+                sx={{
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    maxHeight: 550,
+                }}
+            >
+                <Table stickyHeader>
+                    <TableHead>
+                        <TableRow>
+                            {["Ticker", "Issuer", "Date", "1W", "1M", "Summary", "Action"].map(
+                                (h) => (
+                                    <TableCell
+                                        key={h}
+                                        sx={{
+                                            fontWeight: 600,
+                                            backgroundColor: "#fafafa",
+                                        }}
+                                    >
+                                        {h}
+                                    </TableCell>
+                                )
+                            )}
+                        </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                        {filteredData.map((row, i) => {
+                            const week = getSentiment(row.one_week_sentiment);
+                            const month = getSentiment(row.one_month_sentiment);
+
+                            return (
+                                <TableRow
+                                    key={i}
+                                    hover
+                                    sx={{
+                                        cursor: "pointer",
+                                        transition: "0.2s",
+                                        "&:hover": {
+                                            backgroundColor: "#f9fafb",
+                                        },
+                                    }}
+                                    onClick={() => handleRowClick(row)}
+                                >
+                                    <TableCell sx={{ fontWeight: 600 }}>
+                                        {row.ticker}
+                                    </TableCell>
+
+                                    <TableCell>{row.issuer_name}</TableCell>
+
+                                    <TableCell>
+                                        {row.pricing_date || "TBA"}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Chip label={week.label} color={week.color} size="small" />
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Chip label={month.label} color={month.color} size="small" />
+                                    </TableCell>
+
+                                    {/* Summary */}
+                                    <TableCell sx={{ maxWidth: 300 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: "vertical",
+                                                fontSize: "0.8rem",
+                                                color: "text.secondary",
+                                            }}
+                                        >
+                                            {preview(row.sentiment_summary?.one_week)}
+                                        </Typography>
+
+                                        <Button
+                                            size="small"
+                                            sx={{ mt: 0.5, textTransform: "none" }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleOpenDialog(row);
+                                            }}
+                                        >
+                                            Read more
+                                        </Button>
+                                    </TableCell>
+
+                                    {/* Action */}
+                                    <TableCell>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRowClick(row);
+                                            }}
+                                            sx={{ textTransform: "none" }}
+                                        >
+                                            View
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Dialog */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
+                <DialogTitle>
+                    {selectedSummary?.ticker} Sentiment Details
+                </DialogTitle>
+
+                <DialogContent>
+                    <Typography variant="subtitle2">1 Week</Typography>
+                    <Typography sx={{ mb: 2 }}>
+                        {selectedSummary?.sentiment_summary?.one_week}
+                    </Typography>
+
+                    <Typography variant="subtitle2">1 Month</Typography>
+                    <Typography>
+                        {selectedSummary?.sentiment_summary?.one_month}
+                    </Typography>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
     );
-  }
-
-  return (
-    <Container maxWidth={false}>
-      <Box sx={{ width: "95%", mx: "auto", mt: 3 }}>
-        {/* Header + Search */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 2,
-          }}
-        >
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
-            Sentiment Summary Dashboard
-          </Typography>
-
-          <TextField
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            sx={{ width: 260 }}
-            InputProps={{
-              startAdornment: (
-                <SearchOutlinedIcon sx={{ mr: 1, fontSize: 18 }} />
-              ),
-            }}
-          />
-        </Box>
-
-        {/* Count */}
-        <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
-          Showing {filteredData.length} of {data.length}
-        </Typography>
-
-        {/* Error */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* Table */}
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxHeight: 500,
-            overflow: "auto",
-          }}
-        >
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell><b>Ticker</b></TableCell>
-                <TableCell><b>Issuer Name</b></TableCell>
-                <TableCell><b>Pricing Date</b></TableCell>
-                {/* <TableCell><b>unique_deal_id</b></TableCell> */}
-                <TableCell><b>1Week</b></TableCell>
-                <TableCell><b>1Month</b></TableCell>
-                <TableCell><b>Action</b></TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((row, index) => {
-                  const weekSentiment = getSentiment(
-                    row.one_week_sentiment
-                  );
-                  const monthSentiment = getSentiment(
-                    row.one_month_sentiment
-                  );
-
-                  return (
-                    <TableRow
-                      key={index}
-                      hover
-                      onClick={() => handleRowClick(row)}
-                      sx={{
-                        cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f5f5f5" },
-                      }}
-                    >
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {row.ticker}
-                      </TableCell>
-                      <TableCell>{row.issuer_name}</TableCell>
-                      <TableCell>{row.pricing_date || "TBA"}</TableCell>
-                      {/* <TableCell sx={{ fontSize: "0.8rem" }}>
-                        {row.unique_deal_id}
-                      </TableCell> */}
-
-                      <TableCell>
-                        <Chip
-                          label={weekSentiment.label}
-                          color={weekSentiment.color}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-
-                      <TableCell>
-                        <Chip
-                          label={monthSentiment.label}
-                          color={monthSentiment.color}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-
-                      <TableCell>
-                        <Button
-                          size="small"
-                          variant="contained"
-                          onClick={(e) => {
-                            e.stopPropagation(); // ✅ prevent row click
-                            handleRowClick(row);
-                          }}
-                          sx={{ textTransform: "none" }}
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    {searchTerm
-                      ? "No results found"
-                      : "No sentiment data available"}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Container>
-  );
 };
 
 export default SentimentSummary;
