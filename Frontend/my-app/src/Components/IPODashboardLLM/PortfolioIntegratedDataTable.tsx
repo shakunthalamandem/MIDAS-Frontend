@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Table,
@@ -13,6 +13,8 @@ import {
   Alert,
   Chip,
   Tooltip,
+  Typography,
+  Button,
 } from "@mui/material";
 
 interface SentimentData {
@@ -56,7 +58,13 @@ interface PortfolioItem {
   ipo_ranking: IPORankingData;
 }
 
-type SortField = keyof PortfolioItem | "sentiment_week" | "sentiment_month" | "ml_prediction" | "ipo_action";
+type SortField =
+  | "ticker"
+  | "sentiment_week"
+  | "sentiment_month"
+  | "ml_prediction"
+  | "ipo_action";
+
 type SortOrder = "asc" | "desc";
 
 const PortfolioIntegratedDataTable: React.FC = () => {
@@ -66,7 +74,10 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{
     field: SortField;
     order: SortOrder;
-  }>({ field: "ticker", order: "asc" });
+  }>({
+    field: "ticker",
+    order: "asc",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +112,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     fetchData();
   }, []);
 
-  // Parse volatility outlook from few_shot_review
   const parseVolatilityOutlook = (
     unsupervisedData: UnsupervisedData | null
   ): VolatilityOutlook | null => {
@@ -115,10 +125,10 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     } catch {
       return null;
     }
+
     return null;
   };
 
-  // Sentiment color mapping
   const getSentimentColor = (sentiment: string | null) => {
     if (!sentiment) return "default";
     const lower = sentiment.toLowerCase();
@@ -128,48 +138,38 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     return "default";
   };
 
-  // ML prediction color mapping
   const getPredictionColor = (prediction: string | null) => {
     if (!prediction) return "default";
     const lower = prediction.toLowerCase();
     if (lower.includes("negative")) return "error";
     if (lower.includes("positive")) return "success";
+    if (lower.includes("neutral")) return "warning";
     return "default";
   };
 
-  // Sorting logic
-  const sortedData = React.useMemo(() => {
-    let sorted = [...data];
+  const getSortableValue = (item: PortfolioItem, field: SortField) => {
+    switch (field) {
+      case "ticker":
+        return item.ticker || "";
+      case "sentiment_week":
+        return item.sentiment_summary?.one_week_sentiment || "";
+      case "sentiment_month":
+        return item.sentiment_summary?.one_month_sentiment || "";
+      case "ml_prediction":
+        return item.ml_results?.t1w_pred || "";
+      case "ipo_action":
+        return item.ipo_ranking?.decision?.action || "";
+      default:
+        return "";
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    const sorted = [...data];
 
     sorted.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      switch (sortConfig.field) {
-        case "ticker":
-          aValue = a.ticker;
-          bValue = b.ticker;
-          break;
-        case "sentiment_week":
-          aValue = a.sentiment_summary?.one_week_sentiment || "";
-          bValue = b.sentiment_summary?.one_week_sentiment || "";
-          break;
-        case "sentiment_month":
-          aValue = a.sentiment_summary?.one_month_sentiment || "";
-          bValue = b.sentiment_summary?.one_month_sentiment || "";
-          break;
-        case "ml_prediction":
-          aValue = a.ml_results?.t1w_pred || "";
-          bValue = b.ml_results?.t1w_pred || "";
-          break;
-        case "ipo_action":
-          aValue = a.ipo_ranking?.decision?.action || "";
-          bValue = b.ipo_ranking?.decision?.action || "";
-          break;
-        default:
-          aValue = "";
-          bValue = "";
-      }
+      const aValue = String(getSortableValue(a, sortConfig.field)).toLowerCase();
+      const bValue = String(getSortableValue(b, sortConfig.field)).toLowerCase();
 
       if (aValue < bValue) return sortConfig.order === "asc" ? -1 : 1;
       if (aValue > bValue) return sortConfig.order === "asc" ? 1 : -1;
@@ -188,7 +188,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -203,212 +203,350 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   }
 
   return (
-    <Box sx={{ width: "100%", overflow: "auto" }}>
-      <TableContainer component={Paper} sx={{ mb: 2 }}>
-        <Table sx={{ minWidth: 1200 }} stickyHeader>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell sx={{ fontWeight: 600, width: "10%" }}>
-                <TableSortLabel
-                  active={sortConfig.field === "ticker"}
-                  direction={sortConfig.field === "ticker" ? sortConfig.order : "asc"}
-                  onClick={() => handleSort("ticker")}
-                >
-                  Ticker
-                </TableSortLabel>
-              </TableCell>
+    <Box  sx={{
+    maxWidth: "1800px",   // control width here
+    mx: "auto",           // center horizontally
+    px: 2,                // side padding
+    mb: 3,                // margin bottom (your requirement)
+  }}>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h4" fontWeight={700}>
+          Portfolio Summary
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          AI-driven IPO sentiment insights
+        </Typography>
+      </Box>
 
-              {/* Sentiment Column */}
-              <TableCell sx={{ fontWeight: 600, width: "15%" }}>
-                <Tooltip title="1-Week and 1-Month Sentiment from sentiment_summary">
-                  <span>
-                    <TableSortLabel
-                      active={sortConfig.field === "sentiment_week"}
-                      direction={sortConfig.field === "sentiment_week" ? sortConfig.order : "asc"}
-                      onClick={() => handleSort("sentiment_week")}
-                    >
-                      Sentiment
-                    </TableSortLabel>
-                  </span>
-                </Tooltip>
-              </TableCell>
-
-              {/* Unsupervised Column */}
-              <TableCell sx={{ fontWeight: 600, width: "15%" }}>
-                <Tooltip title="Sentiment & Volatility Outlook from unsupervised_summary">
-                  <span>Unsupervised Analysis</span>
-                </Tooltip>
-              </TableCell>
-
-              {/* ML Results Column */}
-              <TableCell sx={{ fontWeight: 600, width: "20%" }}>
-                <Tooltip title="ML Predictions for 1-Day, 1-Week, 1-Month">
-                  <span>ML Predictions</span>
-                </Tooltip>
-              </TableCell>
-
-              {/* IPO Ranking Column */}
-              <TableCell sx={{ fontWeight: 600, width: "15%" }}>
-                <Tooltip title="IPO Ranking Action from decision">
-                  <span>IPO Ranking</span>
-                </Tooltip>
-              </TableCell>
-
-              {/* Confidence Column */}
-              <TableCell sx={{ fontWeight: 600, width: "10%" }}>
-                <Tooltip title="Confidence Level & Conviction Rating">
-                  <span>Confidence</span>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {sortedData.map((item) => {
-              const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
-
-              return (
-                <TableRow
-                  key={item.ticker}
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "18px",
+          border: "1px solid #d9e2ec",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+          overflow: "hidden",
+        }}
+      >
+        <TableContainer
+          sx={{
+            height: 560,
+            maxHeight: 560,
+            overflowY: "auto",
+            overflowX: "auto",
+            "&::-webkit-scrollbar": {
+              width: "10px",
+              height: "10px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#eef3f8",
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#b0bec5",
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#90a4ae",
+            },
+          }}
+        >
+          <Table stickyHeader sx={{ minWidth: 800 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell
                   sx={{
-                    "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
-                    "&:hover": { backgroundColor: "#f0f0f0" },
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 160,
                   }}
                 >
-                  {/* Ticker */}
-                  <TableCell sx={{ fontWeight: 500 }}>{item.ticker}</TableCell>
+                  <TableSortLabel
+                    active={sortConfig.field === "ticker"}
+                    direction={sortConfig.field === "ticker" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("ticker")}
+                  >
+                    Ticker
+                  </TableSortLabel>
+                </TableCell>
 
-                  {/* Sentiment */}
-                  <TableCell>
-                    <Box sx={{ display: "flex", gap: 0.5, flexDirection: "column" }}>
-                      {item.sentiment_summary?.one_week_sentiment && (
-                        <Chip
-                          label={`1W: ${item.sentiment_summary.one_week_sentiment}`}
-                          size="small"
-                          color={getSentimentColor(item.sentiment_summary.one_week_sentiment)}
-                          variant="outlined"
-                        />
-                      )}
-                      {item.sentiment_summary?.one_month_sentiment && (
-                        <Chip
-                          label={`1M: ${item.sentiment_summary.one_month_sentiment}`}
-                          size="small"
-                          color={getSentimentColor(item.sentiment_summary.one_month_sentiment)}
-                          variant="outlined"
-                        />
-                      )}
-                      {!item.sentiment_summary && <span style={{ color: "#999" }}>N/A</span>}
-                    </Box>
-                  </TableCell>
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 210,
+                  }}
+                >
+                  <TableSortLabel
+                    active={sortConfig.field === "sentiment_week"}
+                    direction={
+                      sortConfig.field === "sentiment_week" ? sortConfig.order : "asc"
+                    }
+                    onClick={() => handleSort("sentiment_week")}
+                  >
+                    Sentiment
+                  </TableSortLabel>
+                </TableCell>
 
-                  {/* Unsupervised */}
-                  <TableCell>
-                    {volatilityOutlook ? (
-                      <Box sx={{ display: "flex", gap: 0.5, flexDirection: "column" }}>
-                        {volatilityOutlook["1-Week Sentiment"] && (
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 250,
+                  }}
+                >
+                  Unsupervised Analysis
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 240,
+                  }}
+                >
+                  <TableSortLabel
+                    active={sortConfig.field === "ml_prediction"}
+                    direction={
+                      sortConfig.field === "ml_prediction" ? sortConfig.order : "asc"
+                    }
+                    onClick={() => handleSort("ml_prediction")}
+                  >
+                    ML Predictions
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 190,
+                  }}
+                >
+                  <TableSortLabel
+                    active={sortConfig.field === "ipo_action"}
+                    direction={sortConfig.field === "ipo_action" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("ipo_action")}
+                  >
+                    IPO Ranking
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 170,
+                  }}
+                >
+                  Confidence
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 140,
+                    textAlign: "center",
+                  }}
+                >
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {sortedData.map((item, index) => {
+                const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
+
+                return (
+                  <TableRow
+                    key={item.ticker}
+                    hover
+                    sx={{
+                      backgroundColor: index % 2 === 0 ? "#fff" : "#fcfcfc",
+                      "& td": {
+                        py: 2.8,
+                        borderBottom: "1px solid #e6eaf0",
+                        verticalAlign: "middle",
+                      },
+                    }}
+                  >
+                    <TableCell sx={{ fontWeight: 700 }}>{item.ticker}</TableCell>
+
+                    <TableCell>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        {item.sentiment_summary?.one_week_sentiment && (
                           <Chip
-                            label={`1W: ${volatilityOutlook["1-Week Sentiment"]}`}
+                            label={`1W: ${item.sentiment_summary.one_week_sentiment}`}
                             size="small"
-                            color={getSentimentColor(volatilityOutlook["1-Week Sentiment"])}
-                            variant="outlined"
+                            color={getSentimentColor(
+                              item.sentiment_summary.one_week_sentiment
+                            )}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
                           />
                         )}
-                        {volatilityOutlook["1-Month Sentiment"] && (
+
+                        {item.sentiment_summary?.one_month_sentiment && (
                           <Chip
-                            label={`1M: ${volatilityOutlook["1-Month Sentiment"]}`}
+                            label={`1M: ${item.sentiment_summary.one_month_sentiment}`}
                             size="small"
-                            color={getSentimentColor(volatilityOutlook["1-Month Sentiment"])}
-                            variant="outlined"
+                            color={getSentimentColor(
+                              item.sentiment_summary.one_month_sentiment
+                            )}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
                           />
+                        )}
+
+                        {!item.sentiment_summary && (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
+                          </Typography>
                         )}
                       </Box>
-                    ) : (
-                      <span style={{ color: "#999" }}>N/A</span>
-                    )}
-                  </TableCell>
+                    </TableCell>
 
-                  {/* ML Results */}
-                  <TableCell>
-                    <Box sx={{ display: "flex", gap: 0.5, flexDirection: "column" }}>
-                      {item.ml_results?.t1d_pred && (
-                        <Chip
-                          label={`1D: ${item.ml_results.t1d_pred}`}
-                          size="small"
-                          color={getPredictionColor(item.ml_results.t1d_pred)}
-                          variant="outlined"
-                        />
-                      )}
-                      {item.ml_results?.t1w_pred && (
-                        <Chip
-                          label={`1W: ${item.ml_results.t1w_pred}`}
-                          size="small"
-                          color={getPredictionColor(item.ml_results.t1w_pred)}
-                          variant="outlined"
-                        />
-                      )}
-                      {item.ml_results?.t1m_pred && (
-                        <Chip
-                          label={`1M: ${item.ml_results.t1m_pred}`}
-                          size="small"
-                          color={getPredictionColor(item.ml_results.t1m_pred)}
-                          variant="outlined"
-                        />
-                      )}
-                      {!item.ml_results && <span style={{ color: "#999" }}>N/A</span>}
-                    </Box>
-                  </TableCell>
+                    <TableCell>
+                      {volatilityOutlook ? (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          {volatilityOutlook["1-Week Sentiment"] && (
+                            <Chip
+                              label={`1W: ${volatilityOutlook["1-Week Sentiment"]}`}
+                              size="small"
+                              color={getSentimentColor(
+                                volatilityOutlook["1-Week Sentiment"]
+                              )}
+                              sx={{ width: "fit-content", fontWeight: 600 }}
+                            />
+                          )}
 
-                  {/* IPO Ranking */}
-                  <TableCell>
-                    {item.ipo_ranking?.decision?.action ? (
-                      <Tooltip
-                        title={`Confidence: ${item.ipo_ranking.decision.confidence_level}`}
-                      >
-                        <Chip
-                          label={item.ipo_ranking.decision.action}
-                          color={
-                            item.ipo_ranking.decision.action.toLowerCase().includes("buy")
-                              ? "success"
-                              : item.ipo_ranking.decision.action.toLowerCase().includes("sell")
-                              ? "error"
-                              : "warning"
-                          }
-                          size="small"
-                        />
-                      </Tooltip>
-                    ) : (
-                      <span style={{ color: "#999" }}>N/A</span>
-                    )}
-                  </TableCell>
+                          {volatilityOutlook["1-Month Sentiment"] && (
+                            <Chip
+                              label={`1M: ${volatilityOutlook["1-Month Sentiment"]}`}
+                              size="small"
+                              color={getSentimentColor(
+                                volatilityOutlook["1-Month Sentiment"]
+                              )}
+                              sx={{ width: "fit-content", fontWeight: 600 }}
+                            />
+                          )}
+                        </Box>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          N/A
+                        </Typography>
+                      )}
+                    </TableCell>
 
-                  {/* Confidence */}
-                  <TableCell>
-                    {item.ipo_ranking?.decision ? (
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                        <span style={{ fontSize: "0.85rem" }}>
-                          {item.ipo_ranking.decision.confidence_level}
-                        </span>
-                        {item.ipo_ranking.decision.conviction_rating && (
-                          <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                    <TableCell>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        {item.ml_results?.t1d_pred && (
+                          <Chip
+                            label={`1D: ${item.ml_results.t1d_pred}`}
+                            size="small"
+                            color={getPredictionColor(item.ml_results.t1d_pred)}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
+                          />
+                        )}
+
+                        {item.ml_results?.t1w_pred && (
+                          <Chip
+                            label={`1W: ${item.ml_results.t1w_pred}`}
+                            size="small"
+                            color={getPredictionColor(item.ml_results.t1w_pred)}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
+                          />
+                        )}
+
+                        {item.ml_results?.t1m_pred && (
+                          <Chip
+                            label={`1M: ${item.ml_results.t1m_pred}`}
+                            size="small"
+                            color={getPredictionColor(item.ml_results.t1m_pred)}
+                            sx={{ width: "fit-content", fontWeight: 600 }}
+                          />
+                        )}
+
+                        {!item.ml_results && (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>
+                      {item.ipo_ranking?.decision?.action ? (
+                        <Tooltip
+                          title={`Confidence: ${item.ipo_ranking.decision.confidence_level}`}
+                        >
+                          <Chip
+                            label={item.ipo_ranking.decision.action}
+                            size="small"
+                            color={
+                              item.ipo_ranking.decision.action.toLowerCase().includes("buy")
+                                ? "success"
+                                : item.ipo_ranking.decision.action
+                                    .toLowerCase()
+                                    .includes("sell")
+                                ? "error"
+                                : "warning"
+                            }
+                            sx={{ fontWeight: 700 }}
+                          />
+                        </Tooltip>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          N/A
+                        </Typography>
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      {item.ipo_ranking?.decision ? (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {item.ipo_ranking.decision.confidence_level}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
                             ★ {item.ipo_ranking.decision.conviction_rating}/5
-                          </span>
-                        )}
-                      </Box>
-                    ) : (
-                      <span style={{ color: "#999" }}>N/A</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          N/A
+                        </Typography>
+                      )}
+                    </TableCell>
 
-      {/* Info text */}
-      <Box sx={{ mt: 2, p: 2, backgroundColor: "#f9f9f9", borderRadius: 1 }}>
-        <strong>Legend:</strong> 1D = 1-Day, 1W = 1-Week, 1M = 1-Month predictions
-      </Box>
+                    <TableCell align="center">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: "8px",
+                          px: 2.5,
+                          minWidth: 66,
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
+                        }}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </Box>
   );
 };
