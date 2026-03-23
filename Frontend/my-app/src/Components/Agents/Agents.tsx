@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddIcon from "@mui/icons-material/Add";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
@@ -24,9 +25,12 @@ import { AIAgent } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
 
 const Agents: React.FC = () => {
+  const isAdmin = localStorage.getItem("is_superuser") === "true";
+
   const [agents, setAgents] = useState<AIAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
+  const [adminGateOpen, setAdminGateOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agentToDelete, setAgentToDelete] = useState<AIAgent | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -149,12 +153,12 @@ const Agents: React.FC = () => {
 
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setCreateOpen(true)}
+              startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
+              onClick={() => isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)}
               sx={{
                 textTransform: "none",
-                bgcolor: "#5b2fff",
-                "&:hover": { bgcolor: "#481f93" },
+                bgcolor: isAdmin ? "#5b2fff" : "#6b7280",
+                "&:hover": { bgcolor: isAdmin ? "#481f93" : "#4b5563" },
                 whiteSpace: "nowrap",
               }}
             >
@@ -179,15 +183,17 @@ const Agents: React.FC = () => {
               No agents found
             </Typography>
             <Typography color="text.secondary" mb={2}>
-              Create your first AI agent to get started.
+              {isAdmin ? "Create your first AI agent to get started." : "No agents have been set up yet. Contact your admin."}
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setCreateOpen(true)}
-            >
-              Create Agent
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setCreateOpen(true)}
+              >
+                Create Agent
+              </Button>
+            )}
           </Paper>
         ) : (
           <Box
@@ -217,12 +223,31 @@ const Agents: React.FC = () => {
         )}
       </Box>
 
-      {/* Create Agent Dialog */}
+      {/* Create Agent Dialog — admin only */}
       <CreateAgentDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={loadAgents}
       />
+
+      {/* Admin Gate Dialog — shown to non-admin users */}
+      <Dialog open={adminGateOpen} onClose={() => setAdminGateOpen(false)}>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <LockOutlinedIcon sx={{ color: "#6b7280" }} />
+          Admin Access Required
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Creating new agents is restricted to administrators. Please reach
+            out to your MIDAS admin to request a new agent be set up.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAdminGateOpen(false)} variant="contained" sx={{ bgcolor: "#5b2fff", "&:hover": { bgcolor: "#481f93" }, textTransform: "none" }}>
+            Got it
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog
