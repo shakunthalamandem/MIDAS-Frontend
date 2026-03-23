@@ -61,7 +61,7 @@ const NewDashbaordIPOTickerList: React.FC<
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
           },
-          body: JSON.stringify({ type: "ticker_list", deal_type: "IPO" }),
+          body: JSON.stringify({ type: "writeup_list", deal_type: "IPO" }),
         });
         if (!response.ok) throw new Error("Failed to fetch tickers");
         const data = await response.json();

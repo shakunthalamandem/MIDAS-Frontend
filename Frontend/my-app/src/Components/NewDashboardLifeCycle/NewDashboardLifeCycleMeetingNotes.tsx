@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Paper, Typography } from "@mui/material";
 import MeetingDealNoteCreate from "../Main/DealMeetingNotes/MeetingDealNoteCreate";
 import type { DealSearchResult } from "../Main/DealMeetingNotes/DealMeetingNotesMain";
+import DashboardStateCard from "./DashboardStateCard";
 
 type NewDashboardLifeCycleMeetingNotesProps = {
   ticker?: string | null;
@@ -24,20 +25,15 @@ const NewDashboardLifeCycleMeetingNotes: React.FC<
 
   if (!selectedDeal) {
     return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          textAlign: "center",
-          borderRadius: 3,
-          border: "1px dashed rgba(0,32,96,0.35)",
-          backgroundColor: "#ffffff",
-        }}
-      >
-        <Typography fontWeight={700} color="#002060">
-          Ticker is required, and pricing date is required only for FO deals.
-        </Typography>
-      </Paper>
+      <DashboardStateCard
+        variant="missing-field"
+        title="Meeting notes cannot be loaded"
+        message="A valid ticker is required. For Follow-On (FO) deals, a pricing date is also required."
+        context={[
+          { label: "Ticker", value: ticker || undefined },
+          { label: "Deal Type", value: dealType || undefined },
+        ]}
+      />
     );
   }
 

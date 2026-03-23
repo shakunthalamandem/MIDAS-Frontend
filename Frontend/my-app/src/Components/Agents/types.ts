@@ -55,8 +55,8 @@ export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
   "Portfolio CIO Agent": "/ai_portfolio_review",
   "Risk Agent": "/ai_risk_review",
   "IPO Ranking Agent": "/last_30_days_ai_ranking",
-  "Deal(IPO) Agent": "/ai_fewshot_analysis",
-  "Sentiment Agent": "/ai_sentiment_view",
+  "Deal(IPO) Agent": "/ai_unsupervised_summary",
+  "Sentiment Agent": "/ai_sentiment_summary",
   "Jay Ritter IPO Agent": "/jay_ritter_ipo_analysis",
 };
 

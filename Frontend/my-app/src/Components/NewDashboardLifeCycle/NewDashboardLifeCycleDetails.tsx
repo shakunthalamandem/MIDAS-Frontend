@@ -30,6 +30,8 @@ import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
 import DealBot from "./DealBot";
 // import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
 import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
+import TabErrorBoundary from "./TabErrorBoundary";
+import DashboardStateCard from "./DashboardStateCard";
 
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -255,92 +257,193 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
           <Box sx={{ display: showDealBot ? "block" : "none" }}>
-            <DealBot
-              basicDealDetails={dealBotDetails}
-            />
+            <TabErrorBoundary tabLabel="Ask My Analyst" ticker={activePayload.ticker}>
+              <DealBot
+                basicDealDetails={dealBotDetails}
+              />
+            </TabErrorBoundary>
           </Box>
 
           <Box sx={{ display: showDealBot ? "none" : "block" }}>
-            {tabItems[tabValue]?.label === "Trading Dynamics" ? (
-              <TradingSignalsMain
-                ticker={activePayload.ticker}
-                trade_date={activePayload.trade_date}
-                isUpcoming={isUpcoming}
-                dealStatus={status}
-                issuerName={activePayload.issuer_name || activePayload.company_name || ""}
-                expectedDate={activePayload.pricing_date || ""}
-              />
-            ) : tabItems[tabValue]?.label === "Write Up" ? (
-              isIpo ? (
-                <FebWriteUpDashboardMain
-                  basicDealDetails={{
-                    deal_id: activePayload.deal_id,
-                    unique_deal_id: activePayload.unique_deal_id,
-                    ticker: activePayload.ticker,
-                    pricing_date: activePayload.pricing_date,
-                    region: activePayload.region,
-                    deal_type: activePayload.deal_type,
-                    issuer_name: activePayload.issuer_name,
-                    exchange: activePayload.exchange,
-                  }}
-                />
-              ) : (
-                <NewDashboardLifeCycleOverviewFO
-                  ticker={activePayload.ticker}
-                  pricingDate={activePayload.pricing_date}
-                />
-              )
-            ) : tabItems[tabValue]?.label === "Write Up Old" ? (
-              isIpo ? (
-                <WriteUpIPODashbaord ticker={activePayload.ticker} />
-              ) : (
-                <FOWriteUpDashboardMain
-                  ticker={activePayload.ticker}
-                  deal_id={activePayload.deal_id}
-                />
-              )
-            ) : tabItems[tabValue]?.label === "Deal Recommendation" ? (
-              isUpcoming ? (
-                // <UpcomingDealRecomendation ticker={activePayload.ticker}
-                // />
-                <DealRecommendationHome ticker={activePayload.ticker} />
-              ) : (
-                // <RecentDealRecomendation ticker={activePayload.ticker}
-                // />
-                <DealRecommendationHome ticker={activePayload.ticker} />
-              )
-            ) : tabItems[tabValue]?.label === "Peer Deals Performance" ? (
-              <NewDashboardLifeCyclePeerDeals selectedDeal={activePayload} />
-            ) : tabItems[tabValue]?.label === "NEWS" ? (
-              <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "Factors Based Agent" ? (
-              <AIMLDealDetails ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === " Deal(IPO) Agent" ? (
-              <DashboardAIFewShotAnalysis
-                basicDealDetails={{
-                  unique_deal_id: activePayload.unique_deal_id,
-                }}
-                prefillTicker={{
-                  ticker: activePayload.ticker,
-                  pricing_date: activePayload.pricing_date ?? null,
-                }}
-              />
-            ) : tabItems[tabValue]?.label === "Sentiment Agent" ? (
-              <DashboardSentimentAnalysis
-                focusTicker={activePayload.ticker ?? null}
-                region={activePayload.region ?? null}
-              />
-            ) : tabItems[tabValue]?.label === "S1 AI Query" ? (
-              <S1QueryBot ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "Meeting Notes" ? (
-              <NewDashboardLifeCycleMeetingNotes
-                ticker={activePayload.ticker}
-                pricingDate={activePayload.pricing_date}
-                dealType={activePayload.deal_type}
-              />
-            ) : (
-              <PageUnderDevelopment />
-            )}
+            {(() => {
+              const currentLabel = tabItems[tabValue]?.label;
+              const ticker = activePayload.ticker;
+              const region = activePayload.region;
+              const sector = activePayload.sector;
+
+              // Build context chips for state cards
+              const dealContext = [
+                { label: "Ticker", value: ticker },
+                { label: "Region", value: region },
+                { label: "Sector", value: sector },
+              ];
+
+              // Validate ticker for tabs that require it
+              const tickerRequiredTabs = [
+                "Trading Dynamics",
+                "Write Up",
+                "Peer Deals Performance",
+                "Sentiment Agent",
+                " Deal(IPO) Agent",
+                "Factors Based Agent",
+                "S1 AI Query",
+                "NEWS",
+                "Meeting Notes",
+                "Deal Recommendation",
+              ];
+
+              if (
+                tickerRequiredTabs.includes(currentLabel ?? "") &&
+                !ticker
+              ) {
+                return (
+                  <DashboardStateCard
+                    variant="missing-field"
+                    title="Ticker information is missing"
+                    message={`The "${currentLabel}" section requires a valid ticker symbol. Please select a deal with a ticker or use the search to find one.`}
+                    context={dealContext}
+                  />
+                );
+              }
+
+              // Render each tab wrapped in error boundary
+              if (currentLabel === "Trading Dynamics") {
+                return (
+                  <TabErrorBoundary tabLabel="Trading Dynamics" ticker={ticker}>
+                    <TradingSignalsMain
+                      ticker={ticker}
+                      trade_date={activePayload.trade_date}
+                      isUpcoming={isUpcoming}
+                      dealStatus={status}
+                      issuerName={activePayload.issuer_name || activePayload.company_name || ""}
+                      expectedDate={activePayload.pricing_date || ""}
+                    />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Write Up") {
+                return (
+                  <TabErrorBoundary tabLabel="Write Up" ticker={ticker}>
+                    {isIpo ? (
+                      <FebWriteUpDashboardMain
+                        basicDealDetails={{
+                          deal_id: activePayload.deal_id,
+                          unique_deal_id: activePayload.unique_deal_id,
+                          ticker: ticker,
+                          pricing_date: activePayload.pricing_date,
+                          region: region,
+                          deal_type: activePayload.deal_type,
+                          issuer_name: activePayload.issuer_name,
+                          exchange: activePayload.exchange,
+                        }}
+                      />
+                    ) : (
+                      <NewDashboardLifeCycleOverviewFO
+                        ticker={ticker}
+                        pricingDate={activePayload.pricing_date}
+                      />
+                    )}
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Write Up Old") {
+                return (
+                  <TabErrorBoundary tabLabel="Write Up Old" ticker={ticker}>
+                    {isIpo ? (
+                      <WriteUpIPODashbaord ticker={ticker} />
+                    ) : (
+                      <FOWriteUpDashboardMain
+                        ticker={ticker}
+                        deal_id={activePayload.deal_id}
+                      />
+                    )}
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Deal Recommendation") {
+                return (
+                  <TabErrorBoundary tabLabel="Deal Recommendation" ticker={ticker}>
+                    <DealRecommendationHome ticker={ticker} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Peer Deals Performance") {
+                return (
+                  <TabErrorBoundary tabLabel="Peer Deals Performance" ticker={ticker}>
+                    <NewDashboardLifeCyclePeerDeals selectedDeal={activePayload} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "NEWS") {
+                return (
+                  <TabErrorBoundary tabLabel="NEWS" ticker={ticker}>
+                    <NewDashboardLifeCycleNews ticker={ticker} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Factors Based Agent") {
+                return (
+                  <TabErrorBoundary tabLabel="Factors Based Agent" ticker={ticker}>
+                    <AIMLDealDetails ticker={ticker} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === " Deal(IPO) Agent") {
+                return (
+                  <TabErrorBoundary tabLabel="Deal(IPO) Agent" ticker={ticker}>
+                    <DashboardAIFewShotAnalysis
+                      basicDealDetails={{
+                        unique_deal_id: activePayload.unique_deal_id,
+                      }}
+                      prefillTicker={{
+                        ticker: ticker,
+                        pricing_date: activePayload.pricing_date ?? null,
+                      }}
+                    />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Sentiment Agent") {
+                return (
+                  <TabErrorBoundary tabLabel="Sentiment Agent" ticker={ticker}>
+                    <DashboardSentimentAnalysis
+                      focusTicker={ticker ?? null}
+                      region={region ?? null}
+                    />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "S1 AI Query") {
+                return (
+                  <TabErrorBoundary tabLabel="S1 AI Query" ticker={ticker}>
+                    <S1QueryBot ticker={ticker} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Meeting Notes") {
+                return (
+                  <TabErrorBoundary tabLabel="Meeting Notes" ticker={ticker}>
+                    <NewDashboardLifeCycleMeetingNotes
+                      ticker={ticker}
+                      pricingDate={activePayload.pricing_date}
+                      dealType={activePayload.deal_type}
+                    />
+                  </TabErrorBoundary>
+                );
+              }
+
+              return <PageUnderDevelopment />;
+            })()}
           </Box>
         </Box>
       </Paper>
