@@ -47,8 +47,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const activePayload = selectedOption || payload;
   const writeupEnabled =
   (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
-  (activePayload?.writeup_available || "").toUpperCase() === "YES" ||
-  !!activePayload?.ticker;
+  (activePayload?.writeup_available || "").toUpperCase() === "YES" ;
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
@@ -180,7 +179,10 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             SearchComponent={
               <Box sx={{ width: { xs: "100%", md: 215 } }}>
                 <NewDashbaordIPOTickerList
-                  selectedTicker={activePayload.ticker}
+                  selectedDeal={{
+                    ticker: activePayload?.ticker ?? null,
+                    pricing_date: activePayload?.pricing_date ?? null,
+                  }}
                   onSelect={setSelectedOption}
                 />
               </Box>
@@ -416,6 +418,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                   <TabErrorBoundary tabLabel="Sentiment Agent" ticker={ticker}>
                     <DashboardSentimentAnalysis
                       focusTicker={ticker ?? null}
+                      pricingDate={activePayload?.pricing_date ?? null}
                       region={region ?? null}
                     />
                   </TabErrorBoundary>

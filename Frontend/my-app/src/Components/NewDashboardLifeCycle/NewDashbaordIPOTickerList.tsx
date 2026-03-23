@@ -25,6 +25,10 @@ type TickerOption = {
 
 type NewDashbaordIPOTickerListProps = {
   selectedTicker?: string;
+  selectedDeal?: {
+    ticker?: string | null;
+    pricing_date?: string | null;
+  } | null;
   onSelect: (option: TickerOption | null) => void;
 };
 
@@ -42,7 +46,7 @@ const formatPricingDate = (value: string | null) => {
 
 const NewDashbaordIPOTickerList: React.FC<
   NewDashbaordIPOTickerListProps
-> = ({ selectedTicker, onSelect }) => {
+> = ({ selectedTicker, selectedDeal, onSelect }) => {
   const [options, setOptions] = useState<TickerOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -105,6 +109,26 @@ const NewDashbaordIPOTickerList: React.FC<
     });
   }, [options]);
 
+  const selectedValue = useMemo(() => {
+    const resolvedTicker = selectedDeal?.ticker?.trim() || selectedTicker?.trim();
+    if (!resolvedTicker) return null;
+    const selectedPricingDate = selectedDeal?.pricing_date ?? null;
+
+    return (
+      sortedOptions.find(
+        (opt) =>
+          opt.ticker === resolvedTicker &&
+          (opt.pricing_date ?? null) === selectedPricingDate
+      ) ??
+      sortedOptions.find(
+        (opt) =>
+          opt.ticker === resolvedTicker &&
+          !selectedPricingDate
+      ) ??
+      null
+    );
+  }, [selectedDeal, selectedTicker, sortedOptions]);
+
   return (
     <Box sx={{ width: "100%", minWidth: 0 }}>
       <Autocomplete
@@ -125,13 +149,17 @@ const NewDashbaordIPOTickerList: React.FC<
             );
           });
         }}
-        value={sortedOptions.find((opt) => opt.ticker === selectedTicker) || null}
+        value={selectedValue}
         onChange={(_, newValue) => {
           onSelect(newValue);
           setSearchText("");
         }}
         inputValue={searchText}
         onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
+        isOptionEqualToValue={(option, value) =>
+          option.ticker === value.ticker &&
+          (option.pricing_date ?? null) === (value.pricing_date ?? null)
+        }
         getOptionLabel={(option) =>
           `${option.ticker} (${formatPricingDate(option.pricing_date)})`
         }
