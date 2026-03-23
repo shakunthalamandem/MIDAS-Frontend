@@ -50,12 +50,19 @@ interface IPORankingData {
   };
 }
 
+interface TradingSignal {
+  signal: string;
+  confidence: number;
+  insight?: string;
+}
+
 interface PortfolioItem {
   ticker: string;
   sentiment_summary: SentimentData | null;
   unsupervised_summary: UnsupervisedData | null;
   ml_results: MLResults | null;
   ipo_ranking: IPORankingData;
+  trading_signal?: TradingSignal;
 }
 
 type SortField =
@@ -63,7 +70,8 @@ type SortField =
   | "sentiment_week"
   | "sentiment_month"
   | "ml_prediction"
-  | "ipo_action";
+  | "ipo_action"
+  | "trading_signal";
 
 type SortOrder = "asc" | "desc";
 
@@ -159,6 +167,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         return item.ml_results?.t1w_pred || "";
       case "ipo_action":
         return item.ipo_ranking?.decision?.action || "";
+      case "trading_signal":
+        return item.trading_signal?.signal || "";
       default:
         return "";
     }
@@ -330,11 +340,16 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     backgroundColor: "#cfe3f1",
                     fontWeight: 700,
                     py: 2.2,
-                    minWidth: 140,
-                    textAlign: "center",
+                    minWidth: 180,
                   }}
                 >
-                  Action
+                  <TableSortLabel
+                    active={sortConfig.field === "trading_signal"}
+                    direction={sortConfig.field === "trading_signal" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("trading_signal")}
+                  >
+                    Trading Signal
+                  </TableSortLabel>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -499,20 +514,32 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                       )}
                     </TableCell>
 
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{
-                          textTransform: "none",
-                          borderRadius: "8px",
-                          px: 2.5,
-                          minWidth: 66,
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.18)",
-                        }}
-                      >
-                        View
-                      </Button>
+                    <TableCell>
+                      {item.trading_signal?.signal ? (
+                        <Tooltip title={`Confidence: ${item.trading_signal.confidence}%`}>
+                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                            <Chip
+                              label={item.trading_signal.signal}
+                              size="small"
+                              color={
+                                item.trading_signal.signal.toLowerCase() === "buy"
+                                  ? "success"
+                                  : item.trading_signal.signal.toLowerCase() === "sell"
+                                  ? "error"
+                                  : "warning"
+                              }
+                              sx={{ fontWeight: 700, width: "fit-content" }}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                              {item.trading_signal.confidence}% confidence
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          N/A
+                        </Typography>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
