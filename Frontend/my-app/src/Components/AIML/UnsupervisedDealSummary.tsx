@@ -242,10 +242,10 @@ const Component: React.FC = () => {
       >
         <Box>
           <Typography variant="h5" fontWeight={700}>
-            Sentiment Summary
+            Deal IPO Agent Summary
           </Typography>
           <Typography variant="body2" sx={{ color: "#6b7280", mt: 0.5 }}>
-            AI-driven IPO sentiment insights
+            AI-generated sentiment and executive summaries for recent deals
           </Typography>
         </Box>
 
