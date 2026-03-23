@@ -11,12 +11,14 @@ import {
   InputLabel,
   Container,
   Button,
+  TextField,
 } from "@mui/material";
 
 const FundamentalsTechnical: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState("");
+  const [tradeDate, setTradeDate] = useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedType(
@@ -26,8 +28,9 @@ const FundamentalsTechnical: React.FC = () => {
         | "news"
         | "ipo_facset_comp_data"
         | "fo_facset_comp_data"
+        | "cio_portfolio_review"
     );
-    setResponse(null); // clear previous messages
+    setResponse(null);
   };
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -43,7 +46,8 @@ const FundamentalsTechnical: React.FC = () => {
     setResponse(null);
 
     let endpoint = "";
-    let method: "GET" | "POST" = "POST"; // default is POST
+    let method: "GET" | "POST" = "POST";
+    let body: string | undefined;
 
     if (selectedType === "technical") {
       endpoint = `${apiUrl}/api/technical_data_download/`;
@@ -53,10 +57,17 @@ const FundamentalsTechnical: React.FC = () => {
       endpoint = `${apiUrl}/api/upload_news/`;
     } else if (selectedType === "ipo_facset_comp_data") {
       endpoint = `${apiUrl}/api/fs_comp_data_daily_get/`;
-      method = "GET"; 
+      method = "GET";
     } else if (selectedType === "fo_facset_comp_data") {
       endpoint = `${apiUrl}/api/fo_fs_comp_data_daily_get/`;
-      method = "GET"; 
+      method = "GET";
+    } else if (selectedType === "cio_portfolio_review") {
+      endpoint = `${apiUrl}/api/cio_portfolio_review/`;
+      body = JSON.stringify(tradeDate ? { trade_date: tradeDate } : {});
+    }
+
+    if (!body && method === "POST") {
+      body = JSON.stringify({});
     }
 
     try {
@@ -66,7 +77,7 @@ const FundamentalsTechnical: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: method === "POST" ? JSON.stringify({}) : undefined, // only send body for POST
+        body: method === "POST" ? body : undefined,
       });
 
       if (!res.ok) {
@@ -106,8 +117,21 @@ const FundamentalsTechnical: React.FC = () => {
               <MenuItem value="news">Upload News</MenuItem>
               <MenuItem value="ipo_facset_comp_data"> IPO FS Comps Update</MenuItem>
               <MenuItem value="fo_facset_comp_data">FO FS Comps Update</MenuItem>
+              <MenuItem value="cio_portfolio_review">CIO Portfolio Review</MenuItem>
             </Select>
           </FormControl>
+
+          {selectedType === "cio_portfolio_review" && (
+            <TextField
+              label="Trade Date (optional)"
+              type="date"
+              value={tradeDate}
+              onChange={(e) => setTradeDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              sx={{ minWidth: 220 }}
+              disabled={loading}
+            />
+          )}
 
           <Button
             variant="contained"
