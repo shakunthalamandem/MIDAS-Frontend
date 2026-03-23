@@ -16,7 +16,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return data;
 }
 
-/** List all agents (system + user's own) with email prefs and latest runs */
+/** List all agents — firm-wide visibility, all users see all agents */
 export async function fetchAgents(): Promise<AIAgent[]> {
   const res = await fetch(`${apiUrl}/api/v2/agents/`, {
     headers: authHeaders(),
