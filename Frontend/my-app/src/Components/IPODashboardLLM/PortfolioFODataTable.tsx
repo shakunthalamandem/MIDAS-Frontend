@@ -42,7 +42,7 @@ interface MLResults {
   t1m_pred: string | null;
 }
 
-interface IPORankingData {
+interface FORankingData {
   decision?: {
     action: string;
     confidence_level: string;
@@ -50,12 +50,12 @@ interface IPORankingData {
   };
 }
 
-interface PortfolioItem {
+interface PortfolioFOItem {
   ticker: string;
   sentiment_summary: SentimentData | null;
   unsupervised_summary: UnsupervisedData | null;
   ml_results: MLResults | null;
-  ipo_ranking: IPORankingData;
+  fo_ranking: FORankingData;
 }
 
 type SortField =
@@ -63,12 +63,12 @@ type SortField =
   | "sentiment_week"
   | "sentiment_month"
   | "ml_prediction"
-  | "ipo_action";
+  | "fo_action";
 
 type SortOrder = "asc" | "desc";
 
-const PortfolioIntegratedDataTable: React.FC = () => {
-  const [data, setData] = useState<PortfolioItem[]>([]);
+const PortfolioFODataTable: React.FC = () => {
+  const [data, setData] = useState<PortfolioFOItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -86,7 +86,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
 
-        const response = await fetch(`${apiUrl}/api/portfolio_integrated_ipo_data/`, {
+        const response = await fetch(`${apiUrl}/api/portfolio_integrated_fo_data/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     return "default";
   };
 
-  const getSortableValue = (item: PortfolioItem, field: SortField) => {
+  const getSortableValue = (item: PortfolioFOItem, field: SortField) => {
     switch (field) {
       case "ticker":
         return item.ticker || "";
@@ -157,8 +157,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         return item.sentiment_summary?.one_month_sentiment || "";
       case "ml_prediction":
         return item.ml_results?.t1w_pred || "";
-      case "ipo_action":
-        return item.ipo_ranking?.decision?.action || "";
+      case "fo_action":
+        return item.fo_ranking?.decision?.action || "";
       default:
         return "";
     }
@@ -199,7 +199,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   }
 
   if (data.length === 0) {
-    return <Alert severity="info">No portfolio data available</Alert>;
+    return <Alert severity="info">No FO portfolio data available</Alert>;
   }
 
   return (
@@ -305,23 +305,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     onClick={() => handleSort("ml_prediction")}
                   >
                     ML Predictions
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
-                    minWidth: 190,
-                  }}
-                >
-                  <TableSortLabel
-                    active={sortConfig.field === "ipo_action"}
-                    direction={sortConfig.field === "ipo_action" ? sortConfig.order : "asc"}
-                    onClick={() => handleSort("ipo_action")}
-                  >
-                    IPO Ranking
                   </TableSortLabel>
                 </TableCell>
 
@@ -459,46 +442,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                       </Box>
                     </TableCell>
 
-                    <TableCell>
-                      {item.ipo_ranking?.decision?.action ? (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <Tooltip
-                            title={`Confidence: ${item.ipo_ranking.decision.confidence_level}`}
-                          >
-                            <Chip
-                              label={item.ipo_ranking.decision.action}
-                              size="small"
-                              color={
-                                item.ipo_ranking.decision.action.toLowerCase().includes("buy")
-                                  ? "success"
-                                  : item.ipo_ranking.decision.action
-                                    .toLowerCase()
-                                    .includes("sell")
-                                    ? "error"
-                                    : "warning"
-                              }
-                              sx={{ fontWeight: 700, width: "fit-content" }}
-                            />
-                          </Tooltip>
-                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                              Confidence:
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {item.ipo_ranking.decision.confidence_level}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              ★ {item.ipo_ranking.decision.conviction_rating}/5
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
-                    </TableCell>
-
                     <TableCell align="center">
                       <Button
                         variant="contained"
@@ -525,4 +468,4 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   );
 };
 
-export default PortfolioIntegratedDataTable;
+export default PortfolioFODataTable;
