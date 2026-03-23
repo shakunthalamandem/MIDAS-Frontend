@@ -108,6 +108,7 @@ import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskRe
 import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
 import SentimentSummary from "../Components/AIML/SentimentSummary";
 import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
+import PortfolioIntegratedDataTable from "../Components/IPODashboardLLM/PortfolioIntegratedDataTable";
 
 
 const AppRouters: React.FC = () => {
@@ -295,9 +296,12 @@ const AppRouters: React.FC = () => {
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysisTabs /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
-      <Route path="/ai_sentiment_summary" element={<SentimentSummary />} />
-      <Route path="/ai_sentiment_view" element={<ShowUSSentimentAnalysis />} />
+      <Route path="/ai_sentiment_summary" element={<AuthGuard><SentimentSummary /></AuthGuard>} />
+      <Route path="/ai_sentiment_view" element={<AuthGuard><ShowUSSentimentAnalysis /></AuthGuard>} />
       <Route path="/ai_unsupervised_summary" element={<AuthGuard><UnsupervisedDealSummary /></AuthGuard>} />
+      <Route path="/portfolio_summary" element={<AuthGuard><PortfolioIntegratedDataTable /></AuthGuard>} />
+
+
 
 
         <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
