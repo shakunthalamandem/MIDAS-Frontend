@@ -106,6 +106,7 @@ import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskRepo
 import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
 import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs";
 import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
+import JayRitterIPOAnalysis from "../Components/JayRitter/JayRitterIPOAnalysis";
 
 
 const AppRouters: React.FC = () => {
@@ -324,6 +325,7 @@ const AppRouters: React.FC = () => {
         <Route path='/ai_portfolio_review' element={<AuthGuard><AIPortfolioReview mode="portfolioReview" reviewTab="portfolio" /></AuthGuard>} />
         <Route path='/ai_risk_review' element={<AuthGuard><AIPortfolioReview mode="portfolioReview" reviewTab="risk" /></AuthGuard>} />
         <Route path='/last_30_days_ai_ranking' element={<AuthGuard><AIPortfolioReview mode="stockRanking" /></AuthGuard>} />
+        <Route path='/jay_ritter_ipo_analysis' element={<AuthGuard><JayRitterIPOAnalysis /></AuthGuard>} />
 
         {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
         <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
