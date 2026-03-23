@@ -109,6 +109,7 @@ import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskRep
 import JayRitterIPOAnalysis from "../Components/JayRitter/JayRitterIPOAnalysis";
 import SentimentSummary from "../Components/AIML/SentimentSummary";
 import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
+import PortfolioSummaryTabs from "../Components/IPODashboardLLM/PortfolioSummaryTabs";
 
 
 const AppRouters: React.FC = () => {
@@ -121,9 +122,9 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/logout" element={<Logout />} /> */}
         <Route path="/summarypopup" element={<SummaryPopup />} />
         <Route path="/user_log" element={<Logs />} />
-        
+
         <Route path="/equity/ai_ml_models" element={<AuthGuard><EquityAiMlPage /></AuthGuard>} />
-        <Route path='/equity/apac_ai_ml_models'element={<AuthGuard><APACEquityAiMlPage /></AuthGuard>} />
+        <Route path='/equity/apac_ai_ml_models' element={<AuthGuard><APACEquityAiMlPage /></AuthGuard>} />
         <Route path="/equity/ai_ml_results" element={<AuthGuard><AIMLResultsHome /></AuthGuard>} />
 
 
@@ -140,14 +141,14 @@ const AppRouters: React.FC = () => {
         </Route>
 
         <Route path="/opportunity/high-yield" element={<AuthGuard><HighYieldsMain /></AuthGuard>} >
-          <Route path="search" element={<HighYieldsMain/>} />
+          <Route path="search" element={<HighYieldsMain />} />
           <Route path="deal-stats" element={<DealStatsMain />} />
           <Route path="skew-table" element={<HYSkewTableMain />} />
         </Route>
 
 
         <Route path="/opportunity/converts" element={<AuthGuard><ConvertsMain /></AuthGuard>} >
-          <Route path="search" element={<ConvertsMain/>} />
+          <Route path="search" element={<ConvertsMain />} />
           <Route path="deal-stats" element={<ConvertsDealStatsMain />} />
           <Route path="skew-table" element={<ConvertsSkewMain />} />
         </Route>
@@ -156,7 +157,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path="/equity/monashee-deals" element={<AuthGuard><MonasheeDeals /></AuthGuard>}>
-          <Route path="search" element={<MDDSelectedTicker ticker={'CGRX'}/>} />
+          <Route path="search" element={<MDDSelectedTicker ticker={'CGRX'} />} />
           <Route path="mdd_deal_stats" element={<DealStats />} />
           <Route path="gap-analysis" element={<AllocationCaptureReturn />} />
           <Route path="follow-on-discount" element={<FOllowOnDiscount />} />
@@ -169,7 +170,7 @@ const AppRouters: React.FC = () => {
 
         <Route path="/portfolio-attribution" element={<Navigate to="/portfolio-attribution/summary_pnl" />} />
         <Route path="/portfolio-attribution/:tab" element={<AuthGuard><PNLTabMain /></AuthGuard>} />
-        <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>}/>
+        <Route path="/portfolio-attribution/details/:assetType" element={<AuthGuard><DeatiledRegionPnlAttribution /></AuthGuard>} />
 
         <Route path="/macro/prime" element={<AuthGuard><InvestmentMain /></AuthGuard>} />
         <Route path="/equity/technical/:ticker" element={<AuthGuard><TechnicalMain /></AuthGuard>} />
@@ -199,7 +200,7 @@ const AppRouters: React.FC = () => {
         <Route path="/lk_upload" element={<AuthGuard><LkFileUpload /></AuthGuard>} />
         {/* <Route path="/upload" element={<AuthGuard><UploadMarketIndices/></AuthGuard>} /> */}
         <Route path="/fs_upload" element={<AuthGuard><UploadFactSetTickers /></AuthGuard>} />
-        <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical/></AuthGuard>} />
+        <Route path="/data_upload" element={<AuthGuard><FundamentalsTechnical /></AuthGuard>} />
         <Route path="/upcoming" element={<AuthGuard><ExcelUploads /></AuthGuard>} />
         <Route path="/ai_upload" element={<AuthGuard><UploadAiInsights /></AuthGuard>} />
         <Route
@@ -213,7 +214,7 @@ const AppRouters: React.FC = () => {
           <Route path="/download_deals_data" element={<ExportUnifiedDealData />} />
           <Route path="/delete_new_deal_data" element={<DeleteUnifiedDealData />} />
           <Route path="/deal_data_upload" element={<UnifiedDealDataUpload />} />
-        </Route>    
+        </Route>
         <Route path="/equity/ipo_dashboard" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
 
         <Route path="/equity/ipo_dashboard/:ticker" element={<AuthGuard><WriteUpIPODashbaord /></AuthGuard>} />
@@ -235,32 +236,32 @@ const AppRouters: React.FC = () => {
 
 
 
-        <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain/></AuthGuard>} />
-        <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO/></AuthGuard>} />
-        <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MDRMainTableS3Data/></AuthGuard>} />
-       
-        <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain/></AuthGuard>} />
-         <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
+        <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain /></AuthGuard>} />
+        <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO /></AuthGuard>} />
+        <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MDRMainTableS3Data /></AuthGuard>} />
+
+        <Route path="/deals/dashboard" element={<AuthGuard><NewDealsCycleMain /></AuthGuard>} />
+        <Route path="/deals/dashboard/Tracking" element={<AuthGuard><TickerTrackingWrapper /></AuthGuard>} />
         <Route path="/deals/new_dashboard/details" element={<AuthGuard><NewDashboardLifeCycleDetails /></AuthGuard>} />
         <Route path="/deals/new_dashboard/fo_details" element={<AuthGuard><NewDashboardFOLifeCycleDetails /></AuthGuard>} />
 
 
 
 
-        <Route path="/reportdata" element={<AuthGuard><DailyReportPost/></AuthGuard>} />
+        <Route path="/reportdata" element={<AuthGuard><DailyReportPost /></AuthGuard>} />
         <Route path="/data-analytics/writeups" element={<AuthGuard><ReportWriteUpMain /></AuthGuard>} />
 
         <Route path="/gen_ai_tool" element={<AuthGuard><PerplexityChatMain /></AuthGuard>} />
 
-        <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis/></AuthGuard>} />
-        <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain/></AuthGuard>} />
+        <Route path="/gapreport" element={<AuthGuard><DealDetailedGapAnalysis /></AuthGuard>} />
+        <Route path="/genai_data_set" element={<AuthGuard><HeatMapMain /></AuthGuard>} />
 
 
 
-        
 
 
-        
+
+
 
         <Route path="/detailed-deals" element={<AuthGuard><DetailedDealsView /></AuthGuard>} />
         <Route path="/detailed-banks" element={<AuthGuard><DetailedLeadBankView /></AuthGuard>} />
@@ -274,10 +275,10 @@ const AppRouters: React.FC = () => {
 
         <Route path="/pdf_upload" element={<AuthGuard><UploadsWriteUpMain /></AuthGuard>} />
 
-            {/* FO Write Up Routes */}
+        {/* FO Write Up Routes */}
 
         <Route path="/equity/fo_dashboard" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
-         <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
+        <Route path="/equity/fo_dashboard/:ticker" element={<AuthGuard><FOWriteUpMain /></AuthGuard>} />
         <Route path="/fo_financial_forecasts_upload" element={<AuthGuard><FOFinancialForecastUpload /></AuthGuard>} />
 
 
@@ -287,7 +288,7 @@ const AppRouters: React.FC = () => {
         <Route path="/daily_note" element={<AuthGuard><DailyNoteDeleteTickersData /></AuthGuard>} />
 
         <Route path="/equity/abb_model" element={<AuthGuard><ABBModelMain /></AuthGuard>} />
-                {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
+        {/* <Route path="/equity/abb_model" element={<AuthGuard><ABBDiscountDataMainFunction /></AuthGuard>} /> */}
 
         {/* <Route path="/chat" element={<MattermostChat />} /> */}
         <Route path="/chat" element={<AuthGuard><MattermostChat /></AuthGuard>} />
@@ -295,10 +296,13 @@ const AppRouters: React.FC = () => {
 
         <Route path="/sentiment_analysis" element={<AuthGuard><SentimentAnalysisTabs /></AuthGuard>} />
         <Route path="/fewshot_analysis_upload" element={<AuthGuard><FewShotAnalysisUpload /></AuthGuard>} />
-       <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
-      <Route path="/ai_sentiment_summary" element={<SentimentSummary />} />
-      <Route path="/ai_sentiment_view" element={<ShowUSSentimentAnalysis />} />
-      <Route path="/ai_unsupervised_summary" element={<AuthGuard><UnsupervisedDealSummary /></AuthGuard>} />
+        <Route path="/ai_fewshot_analysis" element={<AuthGuard><AIFewshotAnalysis /></AuthGuard>} />
+        <Route path="/ai_sentiment_summary" element={<AuthGuard><SentimentSummary /></AuthGuard>} />
+        <Route path="/ai_sentiment_view" element={<AuthGuard><ShowUSSentimentAnalysis /></AuthGuard>} />
+        <Route path="/ai_unsupervised_summary" element={<AuthGuard><UnsupervisedDealSummary /></AuthGuard>} />
+        <Route path="/portfolio_summary" element={<AuthGuard><PortfolioSummaryTabs /></AuthGuard>} />
+
+
 
 
         <Route path="/deal_meeting_notes" element={<AuthGuard><DealMeetingNotesMain /></AuthGuard>} />
@@ -336,19 +340,19 @@ const AppRouters: React.FC = () => {
 
 
 
-        
 
 
-        
+
+
 
 
 
 
       </Routes>
     </ErrorBoundary>
-    
+
   );
-  
+
 };
 
 
