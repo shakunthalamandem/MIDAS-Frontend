@@ -333,7 +333,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
   const [sortField, setSortField]         = useState<SortField>("confidence_score");
   const [sortDir, setSortDir]             = useState<"asc" | "desc">("desc");
 
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:9000";
+  const apiBaseUrl = process.env.REACT_APP_API_URL;
   const token      = localStorage.getItem("access_token");
   const headers    = { Authorization: token ? `Bearer ${token}` : "" };
 
