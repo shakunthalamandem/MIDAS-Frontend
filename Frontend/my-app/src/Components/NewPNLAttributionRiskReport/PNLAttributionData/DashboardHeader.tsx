@@ -13,6 +13,7 @@ interface DashboardHeaderProps {
   onDateChange: (date: string) => void;
   aum?: number;
   exportButton?: React.ReactNode;
+  triggersButton?: React.ReactNode;
 }
 
 const ALL_FUNDS = "All Funds";
@@ -67,6 +68,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onDateChange,
   aum,
   exportButton,
+  triggersButton,
 }) => {
   const navigate = useNavigate();
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
@@ -161,6 +163,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <ChevronRightIcon fontSize="small" />
           </IconButton>
         </Box>
+
+        {triggersButton && (
+          <Box>{triggersButton}</Box>
+        )}
 
         {exportButton && (
           <Box className="risk-dashboard-export-btn">{exportButton}</Box>

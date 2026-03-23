@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, CircularProgress, Alert, Container, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box, CircularProgress, Alert, Container, Typography, Button } from "@mui/material";
 import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
@@ -25,6 +26,7 @@ const getAuthHeaders = (contentType?: string) => {
 };
 
 const RiskDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
@@ -185,6 +187,7 @@ const RiskDashboard: React.FC = () => {
       : `${selectedFunds.length} Funds`;
 
   const allDataReady = !loading && !chartLoading && !indexChartLoading && !topBottomLoading && !!data;
+  const isDataAvailable = data?.data_available !== false;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -197,6 +200,31 @@ const RiskDashboard: React.FC = () => {
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
+          // triggersButton={
+          //   <Button
+          //     variant="contained"
+          //     size="small"
+          //     onClick={() => {
+          //       const fund = selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds[0] || "";
+          //       navigate(`/risk_triggers?fund=${encodeURIComponent(fund)}&date=${encodeURIComponent(selectedDate)}`);
+          //     }}
+          //     sx={{
+          //       borderRadius: "20px",
+          //       background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
+          //       color: "#fff",
+          //       fontWeight: 700,
+          //       fontSize: "12px",
+          //       textTransform: "none",
+          //       px: 2.5,
+          //       py: 0.8,
+          //       "&:hover": {
+          //         background: "linear-gradient(135deg, #c0392b 0%, #96281b 100%)",
+          //       },
+          //     }}
+          //   >
+          //     Triggers
+          //   </Button>
+          // }
           exportButton={
             allDataReady ? (
               <RiskDashboardPDFExporter
@@ -223,7 +251,13 @@ const RiskDashboard: React.FC = () => {
         </Box>
       )}
 
-      {!loading && data && (
+      {!loading && data && !isDataAvailable && (
+        <Alert severity="info" className="risk-dashboard-error">
+          {data.message || "Data is not available for selected date."}
+        </Alert>
+      )}
+
+      {!loading && data && isDataAvailable && (
         <>
           {data.headline_risks && (
             <Box className="pdf-section" data-pdf-page="1">

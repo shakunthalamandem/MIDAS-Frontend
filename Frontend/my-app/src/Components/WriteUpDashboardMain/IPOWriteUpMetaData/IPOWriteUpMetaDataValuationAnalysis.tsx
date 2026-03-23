@@ -6,7 +6,9 @@ import {
   IconButton,
   Stack,
   Typography,
-  Button
+  Button,
+  Snackbar,
+  Alert
 } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
 import SaveIcon from "@mui/icons-material/Save"
@@ -15,6 +17,11 @@ import StarRateOutlinedIcon from "@mui/icons-material/StarRateOutlined"
 import NoDataNotice from "../../AIFewshotAnalysis/NoDataNotice"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
+import {
+  clampHtmlToWordLimit,
+  countWordsFromHtml,
+  getWordLimitStats
+} from "../utils/wordLimit"
 
 interface IPOWriteUpMetaDataValuationAnalysisProps {
   basicDealDetails: BasicDealDetails
@@ -74,6 +81,8 @@ const quillFormats = [
   "link"
 ]
 
+const VALUATION_WORD_LIMIT = 800
+
 const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   IPOWriteUpMetaDataValuationAnalysisProps
 > = ({ basicDealDetails, pdfMode = false }) => {
@@ -88,6 +97,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
   const [isExpanded, setIsExpanded] = useState(false)
   const [showToggle, setShowToggle] = useState(false)
   const valuationRef = React.useRef<HTMLDivElement | null>(null)
+  const [wordLimitToastOpen, setWordLimitToastOpen] = useState(false)
   const [ratingValue, setRatingValue] = useState<number | null>(
     parseRatingValue(
       basicDealDetails.writeup_ratings?.["valuation-analysis"] ??
@@ -232,6 +242,15 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
     setEditMode(false)
   }
 
+  const handleDraftValuationChange = (value: string) => {
+    const clampedValue = clampHtmlToWordLimit(value, VALUATION_WORD_LIMIT)
+    if (clampedValue !== value) {
+      setWordLimitToastOpen(true)
+    }
+
+    setDraftValuationText(clampedValue)
+  }
+
   const renderValuationContent = () => {
     if (loading) {
       return (
@@ -273,7 +292,7 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
               <ReactQuill
                 theme="snow"
                 value={draftValuationText}
-                onChange={setDraftValuationText}
+                onChange={handleDraftValuationChange}
                 modules={quillModules}
                 formats={quillFormats}
               />
@@ -328,8 +347,12 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
     )
   }
 
-  return (
+  const valuationWordStats = getWordLimitStats(
+    countWordsFromHtml(editMode ? draftValuationText : valuationText),
+    VALUATION_WORD_LIMIT
+  )
 
+  return (
       <Box>
         <Box sx={{ position: "relative", mb: 2, background: "#c7d8f1", borderRadius: 2, py: 1.5, px: 2 }}>
           {/* Rating - Left aligned */}
@@ -408,12 +431,40 @@ const IPOWriteUpMetaDataValuationAnalysis: React.FC<
             </Box>
           )}
         </Box>
+        {editMode ? (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: valuationWordStats.isAtLimit ? "#b91c1c" : "#4b5563"
+              }}
+            >
+              Words left: {valuationWordStats.remaining}/{valuationWordStats.limit}
+            </Typography>
+          </Box>
+        ) : null}
         {renderValuationContent()}
         {saveError ? (
           <Typography color="error" variant="body2" sx={{ mt: 2 }}>
             {saveError}
           </Typography>
         ) : null}
+        <Snackbar
+          open={wordLimitToastOpen}
+          autoHideDuration={1800}
+          onClose={() => setWordLimitToastOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            severity="warning"
+            variant="filled"
+            onClose={() => setWordLimitToastOpen(false)}
+            sx={{ fontSize: 12, py: 0 }}
+          >
+            You have reached your word limit.
+          </Alert>
+        </Snackbar>
       </Box>
   )
 }

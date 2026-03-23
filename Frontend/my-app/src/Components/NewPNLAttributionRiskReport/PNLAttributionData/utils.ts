@@ -7,6 +7,16 @@ export const formatCurrency = (value: number): string => {
   return `${sign}$${Math.round(abs)}`;
 };
 
+export const formatCurrencyAsK = (value: number): string => {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 1_000) {
+    const kValue = Math.round(abs / 1_000).toLocaleString("en-US");
+    return `${sign}$${kValue}K`;
+  }
+  return `${sign}$${Math.round(abs).toLocaleString("en-US")}`;
+};
+
 export const formatFullCurrency = (value: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",

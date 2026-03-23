@@ -87,7 +87,8 @@ const stripMarkdown = (input?: unknown): string => {
 
 const bulletize = (text?: string): string[] => {
   if (!text) return [];
-  const bulletRegex = /^(?:-|\u2022)\s*/;
+  // Strip leading bullets and any extra hyphen after a bullet (e.g., "• - Item").
+  const bulletRegex = /^\s*(?:\u2022\s*)?-?\s*/;
   return text
     .split("\n")
     .map((line) => line.replace(bulletRegex, "").trim())
