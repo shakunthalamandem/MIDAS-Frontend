@@ -95,8 +95,29 @@ const quillFormats = [
 ]
 
 const SINGLE_FIELD_SECTIONS: Array<keyof WriteUpData> = [
+  "principal_stockholders_preipo",
   "key_management_personnel"
 ]
+
+const normalizeSectionToArray = (
+  value: string | string[] | null | undefined,
+  { joinValues = false, ensureItem = false } = {}
+) => {
+  if (Array.isArray(value)) {
+    if (joinValues) {
+      const mergedValue = value.filter(Boolean).join("")
+      return mergedValue ? [mergedValue] : ensureItem ? [""] : []
+    }
+
+    return value.length > 0 ? value : ensureItem ? [""] : []
+  }
+
+  if (typeof value === "string") {
+    return value ? [value] : ensureItem ? [""] : []
+  }
+
+  return ensureItem ? [""] : []
+}
 
 const parseSectionRating = (value?: number | string | null) => {
   if (value === undefined || value === null) return null
@@ -236,6 +257,16 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         const data = await res.json()
         const normalizedData = {
           ...data,
+          business_overview: normalizeSectionToArray(data.business_overview),
+          concerns: normalizeSectionToArray(data.concerns),
+          principal_stockholders_preipo: normalizeSectionToArray(
+            data.principal_stockholders_preipo,
+            { joinValues: true, ensureItem: true }
+          ),
+          key_management_personnel: normalizeSectionToArray(
+            data.key_management_personnel,
+            { joinValues: true, ensureItem: true }
+          ),
           differentiated_summary: Array.isArray(data.differentiated_summary)
             ? data.differentiated_summary
             : data.differentiated_summary
@@ -244,7 +275,7 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         }
         setWriteUpData(normalizedData)
         setUpdatedData(normalizedData)
-        setBusinessOverviewDraft((data.business_overview || []).join(""))
+        setBusinessOverviewDraft(normalizedData.business_overview.join(""))
       } catch (e: any) {
         setFetchError(e.message)
       } finally {
@@ -353,7 +384,16 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
     const apiUrl = process.env.REACT_APP_API_URL
     const token = localStorage.getItem("access_token")
-    const sectionValue = ((updatedData[section] as string[]) ?? []).join("")
+    const normalizedSectionArray = normalizeSectionToArray(
+      updatedData[section] as string | string[] | undefined,
+      {
+        joinValues: SINGLE_FIELD_SECTIONS.includes(section),
+        ensureItem: SINGLE_FIELD_SECTIONS.includes(section)
+      }
+    )
+    const sectionValue = SINGLE_FIELD_SECTIONS.includes(section)
+      ? (normalizedSectionArray[0] ?? "")
+      : normalizedSectionArray.join("")
 
     try {
       setSavingSection(section)
@@ -374,9 +414,12 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
 
       if (!res.ok) throw new Error("Save failed")
 
+      setUpdatedData((prev) =>
+        prev ? { ...prev, [section]: normalizedSectionArray } : prev
+      )
       setWriteUpData((prev) =>
         prev
-          ? { ...prev, [section]: [...(((updatedData[section] as string[]) ?? []))] }
+          ? { ...prev, [section]: normalizedSectionArray }
           : prev
       )
       setEditMode(null)
