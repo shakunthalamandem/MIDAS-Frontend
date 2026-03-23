@@ -56,6 +56,11 @@ interface TradingSignal {
   insight?: string;
 }
 
+interface JayRitter {
+  overall_signal: string;
+  confidence_score: number;
+}
+
 interface PortfolioItem {
   ticker: string;
   sentiment_summary: SentimentData | null;
@@ -63,6 +68,7 @@ interface PortfolioItem {
   ml_results: MLResults | null;
   ipo_ranking: IPORankingData;
   trading_signal?: TradingSignal;
+  jay_ritter?: JayRitter;
 }
 
 type SortField =
@@ -71,7 +77,8 @@ type SortField =
   | "sentiment_month"
   | "ml_prediction"
   | "ipo_action"
-  | "trading_signal";
+  | "trading_signal"
+  | "jay_ritter";
 
 type SortOrder = "asc" | "desc";
 
@@ -169,6 +176,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         return item.ipo_ranking?.decision?.action || "";
       case "trading_signal":
         return item.trading_signal?.signal || "";
+      case "jay_ritter":
+        return item.jay_ritter?.overall_signal || "";
       default:
         return "";
     }
@@ -344,6 +353,23 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                   }}
                 >
                   <TableSortLabel
+                    active={sortConfig.field === "jay_ritter"}
+                    direction={sortConfig.field === "jay_ritter" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("jay_ritter")}
+                  >
+                    Jay Ritter Signal
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
+                    minWidth: 180,
+                  }}
+                >
+                  <TableSortLabel
                     active={sortConfig.field === "trading_signal"}
                     direction={sortConfig.field === "trading_signal" ? sortConfig.order : "asc"}
                     onClick={() => handleSort("trading_signal")}
@@ -507,6 +533,34 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                             </Typography>
                           </Box>
                         </Box>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          N/A
+                        </Typography>
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      {item.jay_ritter?.overall_signal ? (
+                        <Tooltip title={`Confidence: ${item.jay_ritter.confidence_score}%`}>
+                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                            <Chip
+                              label={item.jay_ritter.overall_signal}
+                              size="small"
+                              color={
+                                item.jay_ritter.overall_signal.toLowerCase() === "long"
+                                  ? "success"
+                                  : item.jay_ritter.overall_signal.toLowerCase() === "short"
+                                  ? "error"
+                                  : "warning"
+                              }
+                              sx={{ fontWeight: 700, width: "fit-content" }}
+                            />
+                            <Typography variant="caption" color="text.secondary">
+                              {item.jay_ritter.confidence_score}% confidence
+                            </Typography>
+                          </Box>
+                        </Tooltip>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           N/A

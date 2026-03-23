@@ -293,17 +293,6 @@ const PortfolioFODataTable: React.FC = () => {
                     backgroundColor: "#cfe3f1",
                     fontWeight: 700,
                     py: 2.2,
-                    minWidth: 250,
-                  }}
-                >
-                  Unsupervised Analysis
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
                     minWidth: 240,
                   }}
                 >
@@ -386,38 +375,6 @@ const PortfolioFODataTable: React.FC = () => {
                           </Typography>
                         )}
                       </Box>
-                    </TableCell>
-
-                    <TableCell>
-                      {volatilityOutlook ? (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          {volatilityOutlook["1-Week Sentiment"] && (
-                            <Chip
-                              label={`1W: ${volatilityOutlook["1-Week Sentiment"]}`}
-                              size="small"
-                              color={getSentimentColor(
-                                volatilityOutlook["1-Week Sentiment"]
-                              )}
-                              sx={{ width: "fit-content", fontWeight: 600 }}
-                            />
-                          )}
-
-                          {volatilityOutlook["1-Month Sentiment"] && (
-                            <Chip
-                              label={`1M: ${volatilityOutlook["1-Month Sentiment"]}`}
-                              size="small"
-                              color={getSentimentColor(
-                                volatilityOutlook["1-Month Sentiment"]
-                              )}
-                              sx={{ width: "fit-content", fontWeight: 600 }}
-                            />
-                          )}
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
                     </TableCell>
 
                     <TableCell>
