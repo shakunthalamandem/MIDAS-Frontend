@@ -12,6 +12,7 @@ import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 type DashboardSentimentAnalysisProps = {
   focusTicker: string | null;
+  pricingDate?: string | null;
   region?: string | null;
 };
 
@@ -47,6 +48,7 @@ const normalizeBlocks = (val: any): Block[] => {
 
 const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   focusTicker,
+  pricingDate,
   region,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -90,7 +92,10 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: focusTicker }),
+          body: JSON.stringify({
+            ticker: focusTicker,
+            pricing_date: pricingDate ?? null,
+          }),
         });
 
         const text = await res.text();
@@ -152,7 +157,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusTicker, region]);
+  }, [apiUrl, focusTicker, pricingDate, region]);
 
   const showPlaceholder =
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length);
