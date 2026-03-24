@@ -70,7 +70,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
   const [dealSearch, setDealSearch] = useState("");
   const [selectedDealType, setSelectedDealType] = useState<"IPO" | "FO">("IPO");
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
-    dayjs().subtract(30, "day")
+    dayjs().subtract(90, "day")
   );
   const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -244,7 +244,7 @@ const NewDealsUpcomingRecent: React.FC = () => {
 
   useEffect(() => {
     if (selectedOp === "live") {
-      setLiveStartDate(dayjs().subtract(30, "day"));
+      setLiveStartDate(dayjs().subtract(90, "day"));
       setLiveEndDate(dayjs());
     }
   }, [selectedOp]);
