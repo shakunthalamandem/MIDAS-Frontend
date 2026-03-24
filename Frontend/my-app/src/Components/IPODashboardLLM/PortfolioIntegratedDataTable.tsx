@@ -90,10 +90,10 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
-    field: SortField;
+    field: SortField | null;
     order: SortOrder;
   }>({
-    field: "ticker",
+    field: null,
     order: "asc",
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -203,11 +203,13 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   }, [data, searchQuery]);
 
   const sortedData = useMemo(() => {
+    if (!sortConfig.field) return filteredData;
+
     const sorted = [...filteredData];
 
     sorted.sort((a, b) => {
-      const aValue = String(getSortableValue(a, sortConfig.field)).toLowerCase();
-      const bValue = String(getSortableValue(b, sortConfig.field)).toLowerCase();
+      const aValue = String(getSortableValue(a, sortConfig.field!)).toLowerCase();
+      const bValue = String(getSortableValue(b, sortConfig.field!)).toLowerCase();
 
       if (aValue < bValue) return sortConfig.order === "asc" ? -1 : 1;
       if (aValue > bValue) return sortConfig.order === "asc" ? 1 : -1;
