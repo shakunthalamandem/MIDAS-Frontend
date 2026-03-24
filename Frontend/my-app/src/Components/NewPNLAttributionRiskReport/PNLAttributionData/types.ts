@@ -89,6 +89,34 @@ export interface TopBottomPnlTicker {
   pnl: number;
 }
 
+export interface TopBottomMetricTicker {
+  ticker: string;
+  issuer: string;
+  value: number;
+}
+
+export interface MetricChartDataPoint {
+  date: string;
+  value: number;
+}
+
+export interface HeadlineMetricValues {
+  dtd_value: number;
+  dtd_pct: number;
+  wtd_value: number;
+  wtd_pct: number;
+  mtd_value: number;
+  mtd_pct: number;
+  ytd_value: number;
+  ytd_pct: number;
+}
+
+export type DashboardCategory =
+  | "pnl"
+  | "gross_market_value"
+  | "delta_adj_net_mv"
+  | "beta_adj_net_mv";
+
 export interface TopBottomPnlData {
   date: string;
   fund: string[];

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend -type d -name *api* -o -type d -name *view*)",
+      "Bash(find /c/Users/ranjith.a/Documents/MIDAS-Frontend -type f \\\\\\(-name *.py -o -name backend -o -name api \\\\\\))",
+      "Read(//c/Users/ranjith.a/Documents/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\ranjith.a\\Documents\\MIDAS-Backend\\monashee_insights\\monashee\\helpers",
+      "c:\\Users\\ranjith.a\\Documents\\MIDAS-Backend\\monashee_insights\\monashee"
+    ]
+  }
+}

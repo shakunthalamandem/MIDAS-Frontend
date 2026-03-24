@@ -136,6 +136,69 @@
   min-width: 200px;
 }
 
+/* ── Category Toggle Bar ── */
+.category-toggle-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.category-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.category-toggle-btn:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.category-toggle-btn--active {
+  background: linear-gradient(135deg, #002060 0%, #003494 100%);
+  border-color: #002060;
+  box-shadow: 0 4px 16px rgba(0, 32, 96, 0.3);
+}
+
+.category-toggle-btn--active .category-toggle-label {
+  color: #fff;
+  font-weight: 700;
+}
+
+.category-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.category-toggle-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 768px) {
+  .category-toggle-bar {
+    gap: 8px;
+  }
+  .category-toggle-btn {
+    padding: 8px 16px;
+  }
+  .category-toggle-label {
+    font-size: 12px;
+  }
+}
+
 /* ── Sections ── */
 .risk-dashboard-section {
   margin-bottom: 28px;
@@ -367,6 +430,16 @@
   font-size: 15px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Risk Card Selected State ── */
+.risk-card--selected {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.risk-card--selected .risk-card-hover-overlay {
+  display: none;
 }
 
 /* ── P&L Cards Grid ── */
