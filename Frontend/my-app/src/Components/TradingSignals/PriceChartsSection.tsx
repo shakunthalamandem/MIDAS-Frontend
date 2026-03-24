@@ -41,6 +41,8 @@ interface ApiResponse {
   data: PriceApiRow[];
   issue_price: number;
   stop_loss: number;
+  one_month_completed?: boolean;
+  trading_days_elapsed?: number;
 }
 
 interface DealPoint {
@@ -88,6 +90,66 @@ const formatDateLabelSmart = (
     d.getMonth() !== p.getMonth() || d.getFullYear() !== p.getFullYear();
 
   return monthChanged ? `${day} ${mon}` : day;
+};
+
+/** Custom XAxis tick: shows "D1", "D2", etc. with month marker below on month changes */
+const DayTick: React.FC<any> = ({ x, y, payload, allDates }) => {
+  const dateStr = payload?.value;
+  if (!dateStr) return null;
+
+  const idx = allDates.indexOf(dateStr);
+  const dayNum = idx >= 0 ? idx + 1 : 1;
+
+  // Determine if month changed from previous date
+  let monthLabel = "";
+  if (idx >= 0) {
+    const d = new Date(dateStr);
+    if (!Number.isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, "0");
+      const mon = new Intl.DateTimeFormat("en-US", { month: "short" }).format(d);
+
+      if (idx === 0) {
+        // Always show month on first date
+        monthLabel = `${day} ${mon}`;
+      } else {
+        const prevDate = allDates[idx - 1];
+        if (prevDate) {
+          const p = new Date(prevDate);
+          if (
+            !Number.isNaN(p.getTime()) &&
+            (d.getMonth() !== p.getMonth() || d.getFullYear() !== p.getFullYear())
+          ) {
+            monthLabel = `${day} ${mon}`;
+          }
+        }
+      }
+    }
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        textAnchor="middle"
+        dy={12}
+        fontSize={10.5}
+        fontWeight={600}
+        fill="#334155"
+      >
+        D{dayNum}
+      </text>
+      {monthLabel && (
+        <text
+          textAnchor="middle"
+          dy={26}
+          fontSize={9.5}
+          fontWeight={700}
+          fill="#6366F1"
+        >
+          {monthLabel}
+        </text>
+      )}
+    </g>
+  );
 };
 
 /* ---------- chart sub-components ---------- */
@@ -165,8 +227,8 @@ const Candles: React.FC<any> = (props) => {
   return (
     <g>
       {(data as DealPoint[]).map((entry, index) => {
-        const { label, open, close, high, low } = entry;
-        const xCenter = (xScale(label) ?? 0) + bandWidth / 2;
+        const { date, open, close, high, low } = entry;
+        const xCenter = (xScale(date) ?? 0) + bandWidth / 2;
         const color = close >= open ? "#10B981" : "#EF4444";
         const highY = yScale(high);
         const lowY = yScale(low);
@@ -349,6 +411,8 @@ const PriceChartsSection: React.FC<Props> = ({
   const [stopLoss, setStopLoss] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [oneMonthCompleted, setOneMonthCompleted] = useState(false);
+  const [tradingDaysElapsed, setTradingDaysElapsed] = useState(0);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -358,6 +422,8 @@ const PriceChartsSection: React.FC<Props> = ({
     setIssuePrice(null);
     setStopLoss(null);
     setError(null);
+    setOneMonthCompleted(false);
+    setTradingDaysElapsed(0);
 
     if (!ticker || !trade_date || !apiUrl || isUpcoming) return;
 
@@ -418,6 +484,8 @@ const PriceChartsSection: React.FC<Props> = ({
           json.issue_price != null ? Number(json.issue_price) : null
         );
         setStopLoss(json.stop_loss != null ? Number(json.stop_loss) : null);
+        setOneMonthCompleted(json.one_month_completed ?? false);
+        setTradingDaysElapsed(json.trading_days_elapsed ?? 0);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
       } finally {
@@ -427,6 +495,9 @@ const PriceChartsSection: React.FC<Props> = ({
 
     fetchPrices();
   }, [apiUrl, token, ticker, trade_date, isUpcoming]);
+
+  // Build ordered date list for smart tick formatting
+  const allDates = useMemo(() => chartData.map((d) => d.date), [chartData]);
 
   const { yMin, yMax } = useMemo(() => {
     if (!chartData.length)
@@ -622,34 +693,67 @@ const PriceChartsSection: React.FC<Props> = ({
             </Typography>
           </Box>
 
-          {/* T+1M Prediction badge */}
-          <Box
-            sx={{
-              bgcolor: "rgba(16, 185, 129, 0.12)",
-              border: "1px solid rgba(16, 185, 129, 0.25)",
-              borderRadius: 2,
-              px: 1.5,
-              py: 0.75,
-              textAlign: "right",
-              minWidth: 100,
-            }}
-          >
-            <Typography
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            {/* Trading duration badge */}
+            {oneMonthCompleted && (
+              <Box
+                sx={{
+                  bgcolor: "rgba(251, 191, 36, 0.12)",
+                  border: "1px solid rgba(251, 191, 36, 0.3)",
+                  borderRadius: 2,
+                  px: 1.5,
+                  py: 0.75,
+                  textAlign: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#FCD34D",
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    letterSpacing: 0.5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Trading Duration
+                </Typography>
+                <Typography
+                  sx={{ color: "#FBBF24", fontSize: 13, fontWeight: 800 }}
+                >
+                  {tradingDaysElapsed} Days
+                </Typography>
+              </Box>
+            )}
+
+            {/* T+1M Prediction badge */}
+            <Box
               sx={{
-                color: "#6EE7B7",
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: 0.5,
-                textTransform: "uppercase",
+                bgcolor: "rgba(16, 185, 129, 0.12)",
+                border: "1px solid rgba(16, 185, 129, 0.25)",
+                borderRadius: 2,
+                px: 1.5,
+                py: 0.75,
+                textAlign: "right",
+                minWidth: 100,
               }}
             >
-              T+1M Prediction
-            </Typography>
-            <Typography
-              sx={{ color: "#10B981", fontSize: 13, fontWeight: 800 }}
-            >
-              Positive
-            </Typography>
+              <Typography
+                sx={{
+                  color: "#6EE7B7",
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  textTransform: "uppercase",
+                }}
+              >
+                T+1M Prediction
+              </Typography>
+              <Typography
+                sx={{ color: "#10B981", fontSize: 13, fontWeight: 800 }}
+              >
+                Positive
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
@@ -679,7 +783,26 @@ const PriceChartsSection: React.FC<Props> = ({
 
           {!loading && !error && chartData.length > 0 && (
             <>
-              <Box sx={{ height: 420 }}>
+              <Box
+                sx={{
+                  height: 420,
+                  overflowX: chartData.length > 25 ? "auto" : "hidden",
+                  overflowY: "hidden",
+                  "&::-webkit-scrollbar": { height: 6 },
+                  "&::-webkit-scrollbar-thumb": {
+                    bgcolor: "#CBD5E1",
+                    borderRadius: 3,
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    minWidth: chartData.length > 25
+                      ? `${Math.max(chartData.length * 32, 900)}px`
+                      : "100%",
+                    height: "100%",
+                  }}
+                >
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
                     data={chartData}
@@ -687,10 +810,12 @@ const PriceChartsSection: React.FC<Props> = ({
                     style={{ overflow: "visible" }}
                   >
                     <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 11, fill: "#000000" }}
+                      dataKey="date"
                       tickLine={false}
                       axisLine={{ stroke: "#E2E8F0" }}
+                      interval={chartData.length > 60 ? Math.floor(chartData.length / 30) : 0}
+                      height={50}
+                      tick={<DayTick allDates={allDates} />}
                     />
                     <YAxis
                       yAxisId="price"
@@ -708,6 +833,7 @@ const PriceChartsSection: React.FC<Props> = ({
                       fill="transparent"
                       barSize={1}
                       legendType="none"
+                      name="close"
                     />
 
                     <Tooltip content={<CustomTooltip />} />
@@ -760,6 +886,7 @@ const PriceChartsSection: React.FC<Props> = ({
                     )}
                   </ComposedChart>
                 </ResponsiveContainer>
+                </Box>
               </Box>
 
               {/* Legend */}

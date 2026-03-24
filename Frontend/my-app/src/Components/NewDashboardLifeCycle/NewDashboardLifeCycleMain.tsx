@@ -55,7 +55,7 @@ const NewDealsLifecycleCards: React.FC = () => {
     locationViewMode === "table" ? "table" : "card"
   );
   const [liveStartDate, setLiveStartDate] = useState<Dayjs | null>(() =>
-    dayjs().subtract(30, "day")
+    dayjs().subtract(90, "day")
   );
   const [liveEndDate, setLiveEndDate] = useState<Dayjs | null>(() => dayjs());
   const [selectedRegion, setSelectedRegion] = useState<
@@ -241,7 +241,7 @@ const NewDealsLifecycleCards: React.FC = () => {
 
   // useEffect(() => {
   //   if (selectedOp === "live") {
-  //     setLiveStartDate(dayjs().subtract(30, "day"));
+  //     setLiveStartDate(dayjs().subtract(90, "day"));
   //     setLiveEndDate(dayjs());
   //   }
   // }, [selectedOp]);
