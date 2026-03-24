@@ -15,7 +15,10 @@ import {
   Tooltip,
   Typography,
   Button,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 
 interface SentimentData {
   ticker: string;
@@ -93,6 +96,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     field: "ticker",
     order: "asc",
   });
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -183,8 +187,23 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     }
   };
 
+  const filteredData = useMemo(() => {
+    if (!searchQuery.trim()) return data;
+
+    const query = searchQuery.toLowerCase();
+    return data.filter((item) => {
+      return (
+        (item.ticker && item.ticker.toLowerCase().includes(query)) ||
+        (item.sentiment_summary?.one_week_sentiment && item.sentiment_summary.one_week_sentiment.toLowerCase().includes(query)) ||
+        (item.sentiment_summary?.one_month_sentiment && item.sentiment_summary.one_month_sentiment.toLowerCase().includes(query)) ||
+        (item.trading_signal?.signal && item.trading_signal.signal.toLowerCase().includes(query)) ||
+        (item.jay_ritter?.overall_signal && item.jay_ritter.overall_signal.toLowerCase().includes(query))
+      );
+    });
+  }, [data, searchQuery]);
+
   const sortedData = useMemo(() => {
-    const sorted = [...data];
+    const sorted = [...filteredData];
 
     sorted.sort((a, b) => {
       const aValue = String(getSortableValue(a, sortConfig.field)).toLowerCase();
@@ -196,7 +215,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     });
 
     return sorted;
-  }, [data, sortConfig]);
+  }, [filteredData, sortConfig]);
 
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
@@ -228,6 +247,31 @@ const PortfolioIntegratedDataTable: React.FC = () => {
       px: 2,
       mb: 3,
     }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <TextField
+          placeholder="Search ticker, issuer..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: "#999", mr: 0.5 }} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            width: 300,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "6px",
+              backgroundColor: "#f5f5f5",
+            },
+            "& .MuiOutlinedInput-input::placeholder": {
+              opacity: 0.7,
+            },
+          }}
+        />
+      </Box>
       <Paper
         elevation={3}
         sx={{
