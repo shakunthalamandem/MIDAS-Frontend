@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Avatar,
@@ -24,6 +24,8 @@ import CreateAgentDialog from "./CreateAgentDialog";
 import { AIAgent } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
 
+const POLL_INTERVAL_MS = 15_000; // 15 seconds
+
 const Agents: React.FC = () => {
   const isAdmin = localStorage.getItem("is_superuser") === "true";
 
@@ -39,6 +41,8 @@ const Agents: React.FC = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadAgents = useCallback(async () => {
     try {
@@ -60,6 +64,25 @@ const Agents: React.FC = () => {
   useEffect(() => {
     loadAgents();
   }, [loadAgents]);
+
+  // Poll if any agent has pending/running status
+  useEffect(() => {
+    const hasInProgress = agents.some(
+      (a) => a.output_status === "pending" || a.output_status === "running"
+    );
+
+    if (hasInProgress) {
+      pollRef.current = setInterval(() => {
+        fetchAgents()
+          .then(setAgents)
+          .catch(() => {}); // silent refresh
+      }, POLL_INTERVAL_MS);
+    }
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [agents]);
 
   const handleEmailToggle = async (agent: AIAgent, enabled: boolean) => {
     // Optimistic update
@@ -123,6 +146,8 @@ const Agents: React.FC = () => {
   };
 
   const totalAgents = agents.length;
+  const activeAgents = agents.filter((a) => a.output_status === "completed" || a.agent_type === "system").length;
+  const workingAgents = agents.filter((a) => a.output_status === "pending" || a.output_status === "running").length;
 
   return (
     <Box sx={{ backgroundColor: "#edf0f7", minHeight: "100vh", p: 4 }}>
@@ -168,7 +193,13 @@ const Agents: React.FC = () => {
 
           <Stack direction="row" spacing={1} mt={2}>
             <Chip label={`${totalAgents} Agents`} color="info" />
-            <Chip label={`${totalAgents} Active`} color="success" />
+            <Chip label={`${activeAgents} Ready`} color="success" />
+            {workingAgents > 0 && (
+              <Chip
+                label={`${workingAgents} Working`}
+                sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600 }}
+              />
+            )}
           </Stack>
         </Paper>
 

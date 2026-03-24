@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
   Paper,
@@ -16,6 +17,8 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import { useNavigate } from "react-router-dom";
 import { AIAgent, SYSTEM_AGENT_ROUTES, formatSchedule } from "../types";
 
 export interface AgentCardProps {
@@ -33,9 +36,17 @@ const AgentCard: React.FC<AgentCardProps> = ({
   onDelete,
   onEdit,
 }) => {
+  const navigate = useNavigate();
   const scheduleLabel = formatSchedule(agent);
-  const route = SYSTEM_AGENT_ROUTES[agent.name];
+  const systemRoute = SYSTEM_AGENT_ROUTES[agent.name];
   const isUserCreated = agent.agent_type === "user_created";
+
+  // Determine status badge for user-created agents
+  const outputStatus = agent.output_status;
+  const isWorking = outputStatus === "pending" || outputStatus === "running";
+  const isReady = outputStatus === "completed";
+  const isFailed = outputStatus === "failed";
+  const hasNoOutput = !outputStatus;
 
   const formattedLastRun = agent.latest_run
     ? new Date(agent.latest_run).toLocaleString("en-IN", {
@@ -47,18 +58,87 @@ const AgentCard: React.FC<AgentCardProps> = ({
       })
     : "Not yet run";
 
+  const handleViewDetails = () => {
+    if (systemRoute) {
+      // System agents go to their dedicated pages
+      window.open(`${window.location.origin}${systemRoute}`, "_blank");
+    } else if (isUserCreated) {
+      // User-created agents go to the generic output view
+      navigate(`/agents/${agent.id}/output`);
+    }
+  };
+
+  // Status badge config
+  const getStatusBadge = () => {
+    if (!isUserCreated) {
+      // System agents always show "Active"
+      return {
+        bg: "#e8f5e9",
+        color: "#2e7d32",
+        dotColor: "#4caf50",
+        label: "Active",
+        pulse: true,
+      };
+    }
+
+    if (isWorking) {
+      return {
+        bg: "#fef3c7",
+        color: "#92400e",
+        dotColor: "#f59e0b",
+        label: "Work in Progress",
+        pulse: true,
+      };
+    }
+
+    if (isReady) {
+      return {
+        bg: "#e8f5e9",
+        color: "#2e7d32",
+        dotColor: "#4caf50",
+        label: "Ready",
+        pulse: false,
+      };
+    }
+
+    if (isFailed) {
+      return {
+        bg: "#fee2e2",
+        color: "#991b1b",
+        dotColor: "#ef4444",
+        label: "Failed",
+        pulse: false,
+      };
+    }
+
+    // No output yet — yellow badge
+    return {
+      bg: "#fef3c7",
+      color: "#92400e",
+      dotColor: "#f59e0b",
+      label: "Awaiting First Run",
+      pulse: true,
+    };
+  };
+
+  const statusBadge = getStatusBadge();
+
   return (
     <Paper
       elevation={0}
       sx={{
         borderRadius: 4,
         p: { xs: 3, md: 4 },
-        border: "2px solid rgba(88, 82, 243, 0.25)",
+        border: `2px solid ${
+          isUserCreated && (isWorking || hasNoOutput)
+            ? "rgba(245, 158, 11, 0.35)"
+            : "rgba(88, 82, 243, 0.25)"
+        }`,
         minHeight: 220,
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        transition: "box-shadow 0.2s",
+        transition: "box-shadow 0.2s, border-color 0.2s",
         "&:hover": {
           boxShadow: "0 4px 20px rgba(88, 82, 243, 0.12)",
         },
@@ -90,35 +170,43 @@ const AgentCard: React.FC<AgentCardProps> = ({
         </Stack>
 
         <Stack direction="row" alignItems="center" spacing={1}>
-          {/* Always Active badge */}
+          {/* Status badge */}
           <Stack
             direction="row"
             alignItems="center"
             spacing={0.5}
             sx={{
-              bgcolor: "#e8f5e9",
+              bgcolor: statusBadge.bg,
               px: 1.2,
               py: 0.4,
               borderRadius: 5,
             }}
           >
-            <FiberManualRecordIcon
-              sx={{
-                fontSize: 10,
-                color: "#4caf50",
-                animation: "pulse 2s infinite",
-                "@keyframes pulse": {
-                  "0%": { opacity: 1 },
-                  "50%": { opacity: 0.4 },
-                  "100%": { opacity: 1 },
-                },
-              }}
-            />
+            {isWorking ? (
+              <CircularProgress size={10} sx={{ color: statusBadge.dotColor }} />
+            ) : (
+              <FiberManualRecordIcon
+                sx={{
+                  fontSize: 10,
+                  color: statusBadge.dotColor,
+                  ...(statusBadge.pulse
+                    ? {
+                        animation: "pulse 2s infinite",
+                        "@keyframes pulse": {
+                          "0%": { opacity: 1 },
+                          "50%": { opacity: 0.4 },
+                          "100%": { opacity: 1 },
+                        },
+                      }
+                    : {}),
+                }}
+              />
+            )}
             <Typography
               variant="caption"
-              sx={{ color: "#2e7d32", fontWeight: 600, fontSize: "0.75rem" }}
+              sx={{ color: statusBadge.color, fontWeight: 600, fontSize: "0.75rem" }}
             >
-              Active
+              {statusBadge.label}
             </Typography>
           </Stack>
 
@@ -157,6 +245,29 @@ const AgentCard: React.FC<AgentCardProps> = ({
       >
         {agent.description}
       </Typography>
+
+      {/* Working message for user-created agents with no output */}
+      {isUserCreated && (isWorking || hasNoOutput) && (
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          sx={{
+            bgcolor: "#fef3c7",
+            px: 2,
+            py: 1,
+            borderRadius: 2,
+            border: "1px solid #fcd34d",
+          }}
+        >
+          <HourglassEmptyIcon sx={{ fontSize: 18, color: "#f59e0b" }} />
+          <Typography variant="caption" sx={{ color: "#92400e", fontWeight: 500 }}>
+            {isWorking
+              ? "Agent is working and will show you the result soon..."
+              : "Agent is scheduled. Results will appear after the first run."}
+          </Typography>
+        </Stack>
+      )}
 
       <Divider />
 
@@ -207,18 +318,22 @@ const AgentCard: React.FC<AgentCardProps> = ({
         </Stack>
       </Stack>
 
-      {/* Footer */}
-      {route && (
+      {/* Footer — View Details button */}
+      {(systemRoute || isUserCreated) && (
         <Box display="flex" justifyContent="flex-end" mt="auto">
           <Button
             variant="contained"
             size="small"
-            onClick={() =>
-              window.open(`${window.location.origin}${route}`, "_blank")
-            }
-            sx={{ textTransform: "none" }}
+            onClick={handleViewDetails}
+            sx={{
+              textTransform: "none",
+              bgcolor: isUserCreated && !isReady ? "#f59e0b" : "#5b2fff",
+              "&:hover": {
+                bgcolor: isUserCreated && !isReady ? "#d97706" : "#481f93",
+              },
+            }}
           >
-            View Output
+            {isUserCreated && !isReady ? "View Status" : "View Details"}
           </Button>
         </Box>
       )}

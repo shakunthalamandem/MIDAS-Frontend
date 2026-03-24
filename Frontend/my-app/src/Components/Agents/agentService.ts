@@ -1,4 +1,4 @@
-import { AIAgent, CreateAgentPayload } from "./types";
+import { AIAgent, AgentOutput, CreateAgentPayload } from "./types";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -76,4 +76,32 @@ export async function toggleEmailPreference(agentId: number, enabled: boolean): 
     const data = await res.json();
     throw new Error(data.error || "Failed to update email preference");
   }
+}
+
+/** Get latest output for an agent (used for polling) */
+export async function fetchLatestOutput(agentId: number): Promise<AgentOutput | null> {
+  const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/outputs/latest/`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to fetch output");
+  // API returns { status: "no_output" } if no output exists
+  if (data.status === "no_output") return null;
+  return data as AgentOutput;
+}
+
+/** Get a specific output by ID */
+export async function fetchOutputById(outputId: number): Promise<AgentOutput> {
+  const res = await fetch(`${apiUrl}/api/v2/agent-outputs/${outputId}/`, {
+    headers: authHeaders(),
+  });
+  return handleResponse<AgentOutput>(res);
+}
+
+/** Get all outputs for an agent */
+export async function fetchAgentOutputs(agentId: number): Promise<AgentOutput[]> {
+  const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/outputs/`, {
+    headers: authHeaders(),
+  });
+  return handleResponse<AgentOutput[]>(res);
 }
