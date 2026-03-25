@@ -22,15 +22,11 @@ const CATEGORY_LABELS: Record<DashboardCategory, string> = {
 
 const PNL_CARDS = [
   { title: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct", metricKey: "dtd_pnl" },
-  { title: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct", metricKey: "wtd_pnl" },
-  { title: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct", metricKey: "mtd_pnl" },
   { title: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", metricKey: "ytd_pnl" },
 ] as const;
 
 const buildMetricCards = (label: string) => [
   { title: `DTD ${label}`, valueKey: "dtd_value", pctKey: "dtd_pct", metricKey: "dtd" },
-  { title: `WTD ${label}`, valueKey: "wtd_value", pctKey: "wtd_pct", metricKey: "wtd" },
-  { title: `MTD ${label}`, valueKey: "mtd_value", pctKey: "mtd_pct", metricKey: "mtd" },
   { title: `YTD ${label}`, valueKey: "ytd_value", pctKey: "ytd_pct", metricKey: "ytd" },
 ];
 
