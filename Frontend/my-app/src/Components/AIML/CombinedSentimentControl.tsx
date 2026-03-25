@@ -31,6 +31,7 @@ type Deal = {
   fo_type?: string;
   region?: string;
   issuer_name?: string;
+  listing_status: "pre-listing" | "post-listing";
 };
 
 type CombinedRunItem = Deal & {
@@ -58,10 +59,191 @@ const buildPrompt = (
   ticker: string,
   dealType?: string,
   issuerName?: string,
+  region?: string,
+  foType?: string,
+  source: "IPO" | "FO" = "IPO",
+  listingStatus: "pre-listing" | "post-listing" = "pre-listing"
 ) => {
-  const normalizedType = (dealType || "deal").toUpperCase();
-  const issuerSuffix = issuerName ? ` of ${issuerName}` : "";
-  return `what is the investor sentiment for ${ticker} ${normalizedType}${issuerSuffix} and tell me the likely trading prospects for this ${ticker} ${normalizedType}${issuerSuffix} over the next one week and one month `;
+  const companyLabel = issuerName ? `${issuerName} (${ticker})` : ticker;
+  const regionLabel = region ? ` in the ${region} market` : "";
+  const foTypeLabel = foType ? ` (${foType})` : "";
+
+  if (source === "IPO") {
+    if (listingStatus === "pre-listing") {
+      return `You are the CIO of a hedge fund. Analyze the US IPO of ${companyLabel} focusing on retail investor sentiment (primary driver) and institutional demand (validation layer). Be concise, data-driven, and assertive (no questions, only conclusions). Provide:
+
+1. Retail Sentiment (Core)
+* Overall: bullish / neutral / bearish
+* Retail vs institutional dominance
+* Hype level: low / medium / high
+
+2. Institutional Demand (Grade + Scorecard)
+* Overall Grade: Strong / Moderate / Weak
+Breakdown (use clear labels, no question format):
+* Revenue Growth (>~25% benchmark): strong / moderate / weak + data
+* Profitability: strong / moderate / weak + data
+* Brand / Market Position: strong / moderate / weak
+* Investor Backing: strong / moderate / weak (VC/PE quality, sponsors)
+* Institutional Allocation / Anchor Demand: strong / moderate / weak
+* Use of Proceeds: positive / neutral / negative signal
+Add a 2–3 line institutional read summarizing conviction and likely subscription strength.
+
+3. Pricing
+* Valuation vs peers: cheap / fair / expensive
+
+4. Flow Impact
+* Listing-day pop probability (retail-driven)
+* Risk of post-listing sell-off (institutional weakness / exits)
+
+5. Drivers vs Risks
+* Top 3 upside triggers
+* Top 3 risks
+
+6. Comparables
+* 2 similar recent US IPOs + listing / 1-week performance
+
+7. Short-Term Outlook (Key)
+* Listing Day: expected % move
+* 1 Week: direction
+* 1 Month: sustainability
+
+8. Trade View
+* Long (listing pop) / avoid / short (post-listing fade)
+* Timing strategy
+
+Final (mandatory):
+* one_week_sentiment: bullish / neutral / bearish
+* one_month_sentiment: bullish / neutral / bearish`;
+    } else {
+      return `You are the CIO of a hedge fund. Analyze the post-listing performance of ${companyLabel} (US IPO) using recent data and credible sources (e.g., TipRanks, MarketBeat, Bloomberg, Yahoo Finance, SEC filings). Focus on retail vs institutional demand, price action, and a clear BUY / HOLD / SELL decision for the next 15–30 days. Be concise, factual, and insight-driven (no questions).
+
+1. Listing Reality Check
+* Issue price vs listing price (% gain/loss)
+* Current price vs listing price
+* Verdict: underpriced / fair / overhyped
+
+2. Demand & Ownership Trend
+* Retail vs institutional participation (use volume, filings, or commentary if available)
+* Any institutional buying/selling trends (13F, news, flows)
+* Clear takeaway: accumulation / distribution / mixed
+
+3. Volume & Price Action
+* Daily volume trend since listing (increasing / decreasing)
+* Price trend vs volume (confirming strength or weakness)
+* Insight on expected near-term price impact
+
+4. Setup Insight
+* Clear interpretation of current setup: continuation / exhaustion / downside risk
+* Based on: listing gain, demand strength, volume behavior
+
+5. Analyst Views (Name Sources)
+* List latest analyst opinions: Firm name → rating → price target → upside/downside %
+* Use TipRanks, MarketBeat, or similar
+* Then conclude: Analyst sentiment: strong / mixed / weak
+
+6. Trade Decision (Actionable)
+* Verdict: BUY / HOLD / SELL
+* 2–3 key reasons
+* Entry range (if BUY)
+* Exit / stop-loss (if HOLD/SELL)
+
+7. Forward Outlook
+* Next 1 Week: direction
+* Next 1 Month: sustain / correction / breakout
+
+Final (mandatory):
+* one_week_sentiment: bullish / neutral / bearish
+* one_month_sentiment: bullish / neutral / bearish`;
+    }
+  } else {
+    // FO
+    if (listingStatus === "pre-listing") {
+      return `You are the CIO of a hedge fund. Analyze the upcoming Follow-On Offering${foTypeLabel} of ${companyLabel}${regionLabel}, focusing on retail investor sentiment and institutional demand. Be concise, data-driven, and assertive.
+
+Provide:
+
+1. Retail Sentiment (Core)
+* Overall: bullish / neutral / bearish
+* Retail vs institutional dominance
+* Market reception: low / medium / high
+
+2. Institutional Demand (Grade + Scorecard)
+* Overall Grade: Strong / Moderate / Weak
+Breakdown:
+* Current Company Performance: strong / moderate / weak
+* Use of Proceeds: positive / neutral / negative signal
+* Dilution Impact: minimal / moderate / significant
+* Insider Participation: yes / no
+* Institutional Allocation Interest: strong / moderate / weak
+
+3. Pricing
+* Discount to current price: deep / fair / minimal
+* Valuation vs peers: appropriate / expensive
+
+4. Supply Risk & Overhang
+* Post-deal supply pressure: high / moderate / low
+* Likely absorption timeline
+
+5. Drivers vs Risks
+* Top 3 upside triggers
+* Top 3 risks (dilution, supply, weak demand, etc.)
+
+6. Comparables
+* 2 similar recent FOs + 1-week performance post-pricing
+
+7. Short-Term Outlook
+* Pricing: likely subscription strength (oversubscribed / fairly subscribed / undersubscribed)
+* 1 Week Post-Pricing: direction + expected move
+* 1 Month: stability / correction / recovery
+
+8. Trade View
+* Long / Avoid / Short
+* Timing strategy
+
+Final (mandatory):
+* one_week_sentiment: bullish / neutral / bearish
+* one_month_sentiment: bullish / neutral / bearish`;
+    } else {
+      return `You are the CIO of a hedge fund. Analyze the post-pricing performance of the Follow-On Offering${foTypeLabel} of ${companyLabel}${regionLabel}. Use recent data and credible sources. Focus on retail vs institutional demand, price action, and a BUY / HOLD / SELL decision for the next 15–30 days. Be concise, factual, and insight-driven.
+
+1. Pricing Reality Check
+* Issue price vs current price (% change)
+* Verdict: discounted / fair / premium vs current trading
+
+2. Demand & Ownership Trend
+* Retail vs institutional participation
+* Supply absorption trends
+* Clear takeaway: accumulation / distribution / mixed
+
+3. Volume & Price Action
+* Daily volume trend since pricing
+* Price trend vs volume
+* Insight on expected near-term impact
+
+4. Setup Insight
+* Current setup: continuation / exhaustion / reversal risk
+* Based on: pricing gain/loss, demand strength, volume
+
+5. Company Performance Context
+* Any recent news or developments post-FO
+* Analyst sentiment on company
+* Use of proceeds impact (if evident)
+
+6. Trade Decision (Actionable)
+* Verdict: BUY / HOLD / SELL
+* 2–3 key reasons
+* Entry range (if BUY)
+* Exit / stop-loss (if HOLD/SELL)
+
+7. Forward Outlook
+* Next 1 Week: direction
+* Next 1 Month: sustain / correction / breakout
+
+Final (mandatory):
+* one_week_sentiment: bullish / neutral / bearish
+* one_month_sentiment: bullish / neutral / bearish`;
+    }
+  }
 };
 
 const createCombinedRunItem = (
@@ -69,7 +251,7 @@ const createCombinedRunItem = (
   source: CombinedRunItem["source"],
 ): CombinedRunItem => ({
   ...deal,
-  prompt: buildPrompt(deal.ticker, deal.deal_type, deal.issuer_name),
+  prompt: buildPrompt(deal.ticker, deal.deal_type, deal.issuer_name, deal.region, deal.fo_type, source, deal.listing_status),
   status: "pending",
   source,
 });
@@ -88,6 +270,7 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
   if (!res.ok) throw new Error(data.error || "Failed to fetch IPO tickers");
   const payload = data?.data ?? data?.Data ?? [];
   const rows = Array.isArray(payload) ? payload : Object.values(payload);
+  const listingStatus: "pre-listing" | "post-listing" = "post-listing";
   return rows
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
@@ -97,6 +280,8 @@ const fetchIpoTickers = async (): Promise<Deal[]> => {
       deal_type: item.deal_type ?? "",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
+      listing_status: listingStatus,
     }))
     .filter((item: Deal) => item.ticker);
 };
@@ -115,6 +300,7 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
   if (!res.ok) throw new Error(data.error || "Failed to fetch FO tickers");
   const payload = Array.isArray(data) ? data : (data?.data ?? data?.Data ?? []);
   const rows = Array.isArray(payload) ? payload : Object.values(payload);
+  const listingStatus: "pre-listing" | "post-listing" = "post-listing";
   return rows
     .filter((item: any) => item && typeof item === "object")
     .map((item: any) => ({
@@ -125,6 +311,7 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
       issuer_name: item.issuer_name ?? undefined,
+      listing_status: listingStatus,
     }))
     .filter((item: Deal) => item.ticker);
 };
