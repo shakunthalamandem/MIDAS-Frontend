@@ -58,6 +58,7 @@ import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/
 import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
 import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
 import Agents from "../Components/Agents/Agents";
+import AgentOutputView from "../Components/Agents/AgentOutputView";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
@@ -336,6 +337,8 @@ const AppRouters: React.FC = () => {
 
         {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
         <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
+        <Route path="/agents/:agentId/output" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
+        <Route path="/agents/:agentId/output/:outputId" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/signals/board" element={<AuthGuard><SignalBoardMain /></AuthGuard>} />
 
 

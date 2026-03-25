@@ -16,19 +16,48 @@ export interface AIAgent {
   email_enabled?: boolean;
   latest_run?: string | null;
   latest_date?: string | null;
+  output_status?: "pending" | "running" | "completed" | "failed" | null;
+  latest_output_id?: number | null;
+}
+
+export type AgentOutputStatus = "pending" | "running" | "completed" | "failed";
+
+export interface AgentOutputSection {
+  title: string;
+  type: "text" | "table" | "list";
+  content?: string;
+  headers?: string[];
+  rows?: (string | number)[][];
+  items?: string[];
+}
+
+export interface AgentOutputResultJSON {
+  agent_id: number;
+  agent_name: string;
+  status: string;
+  executed_at: string;
+  summary: string;
+  sections: AgentOutputSection[];
+  metadata?: {
+    data_sources?: string[];
+    confidence?: "high" | "medium" | "low";
+    analysis_date?: string;
+    [key: string]: unknown;
+  };
 }
 
 export interface AgentOutput {
   id: number;
   agent: number;
   agent_name: string;
-  ticker: string;
-  output_data: Record<string, unknown> | null;
-  run_date: string;
-  run_timestamp: string;
-  status: "success" | "failed" | "running";
-  celery_task_id?: string | null;
+  status: AgentOutputStatus;
+  result_json: AgentOutputResultJSON | null;
+  error_message: string;
+  triggered_by: number | null;
+  triggered_by_email: string | null;
+  celery_task_id: string;
   created_at: string;
+  completed_at: string | null;
 }
 
 export interface AgentEmailPreference {
