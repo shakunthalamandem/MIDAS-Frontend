@@ -4,116 +4,73 @@ import { motion } from "framer-motion";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import SentimentSatisfiedIcon from "@mui/icons-material/SentimentSatisfied";
-import NewspaperIcon from "@mui/icons-material/Newspaper";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
 import CandlestickChartIcon from "@mui/icons-material/CandlestickChart";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import BoltIcon from "@mui/icons-material/Bolt";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
-import type { SourceStatus } from "./types";
+import type { SourceDetails } from "./types";
 
 const MotionBox = motion(Box);
 
 const BLUE_PRIMARY = "#262268";
 const BLUE_LIGHT = "#E8E8F5";
 
-interface SourceCardConfig {
-  id: string;
-  label: string;
-  activeStatus: string;
-  pendingStatus: string;
-  icon: React.ReactNode;
-  statusKey: keyof SourceStatus | "priceAction";
-}
-
-const SOURCES: SourceCardConfig[] = [
-  {
-    id: "ml-predictions",
-    label: "Factors Based Agent",
-    activeStatus: "Active",
-    pendingStatus: "Pending",
-    icon: <PsychologyIcon sx={{ fontSize: 20 }} />,
-    statusKey: "mlModel",
-  },
-  {
-    id: "ai-model",
-    label: "Deal(IPO) Agent",
-    activeStatus: "Active",
-    pendingStatus: "Pending",
-    icon: <AutoAwesomeIcon sx={{ fontSize: 20 }} />,
-    statusKey: "aiModel",
-  },
-  {
-    id: "ai-sentiment",
-    label: "Sentiment Agent",
-    activeStatus: "Active",
-    pendingStatus: "Pending",
-    icon: <SentimentSatisfiedIcon sx={{ fontSize: 20 }} />,
-    statusKey: "aiSentiment",
-  },
-  {
-    id: "market-news",
-    label: "News Agent",
-    activeStatus: "Analyzed",
-    pendingStatus: "Pending",
-    icon: <NewspaperIcon sx={{ fontSize: 20 }} />,
-    statusKey: "aiSentiment",
-  },
-  {
-    id: "price-charts",
-    label: "Technical Agent",
-    activeStatus: "Live Data",
-    pendingStatus: "Pending",
-    icon: <CandlestickChartIcon sx={{ fontSize: 20 }} />,
-    statusKey: "priceAction",
-  },
-];
-
-interface IntelligenceSourcesBarProps {
-  onSourceClick: (sectionId: string) => void;
-  sourceStatus?: SourceStatus;
-  isUpcoming?: boolean;
-  sourceDataPoints?: Record<string, string>;
-}
-
-const LINE_COLORS = ["#F59E0B", "#6366F1", "#3B82F6", "#10B981", "#EF4444"];
-
-const DATA_POINT_KEYS: Record<string, string> = {
-  "ml-predictions": "mlModel",
-  "ai-model": "aiModel",
-  "ai-sentiment": "aiSentiment",
-  "market-news": "marketNews",
-  "price-charts": "priceAction",
+/* ── Icon map for each source key ── */
+const SOURCE_ICONS: Record<string, React.ReactNode> = {
+  price_action: <TrendingUpIcon sx={{ fontSize: 20 }} />,
+  jay_ritter: <AutoAwesomeIcon sx={{ fontSize: 20 }} />,
+  fo_dynamics: <ShowChartIcon sx={{ fontSize: 20 }} />,
+  technicals: <CandlestickChartIcon sx={{ fontSize: 20 }} />,
+  ml_predictions: <PsychologyIcon sx={{ fontSize: 20 }} />,
+  sentiment_news: <SentimentSatisfiedIcon sx={{ fontSize: 20 }} />,
+  market_context: <BarChartIcon sx={{ fontSize: 20 }} />,
+  position_context: <AccountBalanceIcon sx={{ fontSize: 20 }} />,
 };
 
-function getDataPointStyle(value: string): { color: string; bg: string } {
-  const v = (value || "").toLowerCase();
-  if (v.includes("up") || v.includes("bullish"))
-    return { color: "#166534", bg: "#DCFCE7" };
-  if (v.includes("down") || v.includes("bearish"))
-    return { color: "#991B1B", bg: "#FEE2E2" };
-  if (v.includes("neutral"))
-    return { color: "#92400E", bg: "#FEF3C7" };
-  return { color: "#64748B", bg: "#F1F5F9" };
+/* ── Display order for IPO and FO ── */
+const IPO_SOURCE_ORDER = [
+  "price_action", "jay_ritter", "technicals", "ml_predictions",
+  "sentiment_news", "market_context", "position_context",
+];
+const FO_SOURCE_ORDER = [
+  "price_action", "technicals", "fo_dynamics", "ml_predictions",
+  "sentiment_news", "market_context", "position_context",
+];
+
+const LINE_COLORS = ["#F59E0B", "#6366F1", "#3B82F6", "#10B981", "#EF4444", "#8B5CF6", "#EC4899"];
+
+interface IntelligenceSourcesBarProps {
+  onSourceClick: (sourceKey: string) => void;
+  sourceDetails: SourceDetails;
+  dealType: string;
 }
 
 const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
   onSourceClick,
-  sourceStatus,
-  isUpcoming,
-  sourceDataPoints,
+  sourceDetails,
+  dealType,
 }) => {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const [cardCenters, setCardCenters] = useState<number[]>([]);
   const [svgWidth, setSvgWidth] = useState(0);
 
+  const isIPO = (dealType || "").toUpperCase().trim() === "IPO";
+  const sourceOrder = isIPO ? IPO_SOURCE_ORDER : FO_SOURCE_ORDER;
+
+  // Filter to only sources that exist in sourceDetails
+  const visibleSources = sourceOrder.filter((key) => sourceDetails[key]);
+
   const updateLines = useCallback(() => {
     const svgEl = svgContainerRef.current;
     if (!svgEl) return;
     const svgRect = svgEl.getBoundingClientRect();
     setSvgWidth(svgRect.width);
-
     const centers = cardRefs.current.map((el) => {
       if (!el) return svgRect.width / 2;
       const rect = el.getBoundingClientRect();
@@ -129,13 +86,7 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
       clearTimeout(timer);
       window.removeEventListener("resize", updateLines);
     };
-  }, [updateLines, sourceStatus]);
-
-  const getIsActive = (source: SourceCardConfig): boolean => {
-    if (!sourceStatus) return true;
-    if (source.statusKey === "priceAction") return !isUpcoming;
-    return sourceStatus[source.statusKey];
-  };
+  }, [updateLines, sourceDetails]);
 
   return (
     <MotionBox
@@ -163,26 +114,17 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box
             sx={{
-              width: 22,
-              height: 22,
-              borderRadius: 1,
-              bgcolor: BLUE_PRIMARY,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: 22, height: 22, borderRadius: 1, bgcolor: BLUE_PRIMARY,
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}
           >
             <BoltIcon sx={{ fontSize: 13, color: "#FFFFFF" }} />
           </Box>
-          <Typography
-            sx={{ fontWeight: 800, fontSize: 12.5, color: "#0F172A" }}
-          >
+          <Typography sx={{ fontWeight: 800, fontSize: 12.5, color: "#0F172A" }}>
             Intelligence Sources
           </Typography>
-          <Typography
-            sx={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}
-          >
-            Signal derived from multiple data sources
+          <Typography sx={{ fontSize: 11, color: "#94A3B8", fontWeight: 500 }}>
+            Click any source to view parameters &amp; data
           </Typography>
         </Box>
       </Box>
@@ -199,18 +141,22 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
           flexWrap: "wrap",
         }}
       >
-        {SOURCES.map((source, idx) => {
-          const isActive = getIsActive(source);
+        {visibleSources.map((sourceKey, idx) => {
+          const source = sourceDetails[sourceKey];
+          if (!source) return null;
+          const isActive = source.status === "active";
+          const weight = source.weight;
+
           return (
             <MotionBox
-              key={source.id}
+              key={sourceKey}
               ref={(el: HTMLDivElement | null) => {
                 cardRefs.current[idx] = el;
               }}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.04 }}
-              onClick={isActive ? () => onSourceClick(source.id) : undefined}
+              onClick={() => onSourceClick(sourceKey)}
               sx={{
                 flex: "1 1 110px",
                 maxWidth: 150,
@@ -224,138 +170,82 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 0.5,
-                cursor: isActive ? "pointer" : "default",
+                cursor: "pointer",
                 position: "relative",
                 opacity: isActive ? 1 : 0.6,
                 transition: "all 0.25s ease",
-                ...(isActive && {
-                  "&:hover": {
-                    borderColor: BLUE_PRIMARY,
-                    boxShadow: `0 4px 12px ${BLUE_PRIMARY}15`,
-                    transform: "translateY(-1px)",
-                  },
-                }),
+                "&:hover": {
+                  borderColor: BLUE_PRIMARY,
+                  boxShadow: `0 4px 12px ${BLUE_PRIMARY}15`,
+                  transform: "translateY(-1px)",
+                },
               }}
             >
-              {/* Checkmark / Pending indicator */}
+              {/* Status indicator */}
               {isActive ? (
                 <CheckCircleIcon
-                  sx={{
-                    position: "absolute",
-                    top: 5,
-                    right: 5,
-                    fontSize: 13,
-                    color: "#10B981",
-                  }}
+                  sx={{ position: "absolute", top: 5, right: 5, fontSize: 13, color: "#10B981" }}
                 />
               ) : (
                 <RadioButtonUncheckedIcon
-                  sx={{
-                    position: "absolute",
-                    top: 5,
-                    right: 5,
-                    fontSize: 13,
-                    color: "#CBD5E1",
-                  }}
+                  sx={{ position: "absolute", top: 5, right: 5, fontSize: 13, color: "#CBD5E1" }}
                 />
               )}
 
               {/* Icon */}
               <Box
                 sx={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 1.5,
+                  width: 34, height: 34, borderRadius: 1.5,
                   bgcolor: isActive ? BLUE_LIGHT : "#F8FAFC",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: "flex", alignItems: "center", justifyContent: "center",
                   color: isActive ? BLUE_PRIMARY : "#94A3B8",
                 }}
               >
-                {source.icon}
+                {SOURCE_ICONS[sourceKey] || <BoltIcon sx={{ fontSize: 20 }} />}
               </Box>
 
               {/* Label */}
               <Typography
                 sx={{
-                  fontWeight: 700,
-                  fontSize: 11.5,
-                  color: isActive ? "#0F172A" : "#94A3B8",
-                  textAlign: "center",
-                  lineHeight: 1.2,
+                  fontWeight: 700, fontSize: 11, color: isActive ? "#0F172A" : "#94A3B8",
+                  textAlign: "center", lineHeight: 1.2,
                 }}
               >
                 {source.label}
               </Typography>
 
-              {/* 1-Month Data Point */}
-              {(() => {
-                const key = DATA_POINT_KEYS[source.id];
-                const val = key && sourceDataPoints?.[key];
-                if (!val || val === "-") return null;
-                const dpStyle = getDataPointStyle(val);
-                return (
-                  <Box
-                    sx={{
-                      mt: 0.25,
-                      px: 0.75,
-                      py: 0.2,
-                      borderRadius: 1,
-                      bgcolor: dpStyle.bg,
-                      maxWidth: "100%",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        color: dpStyle.color,
-                        textAlign: "center",
-                        lineHeight: 1.3,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      1M: {val}
-                    </Typography>
-                  </Box>
-                );
-              })()}
+              {/* Weight badge */}
+              <Box
+                sx={{
+                  mt: 0.25, px: 1, py: 0.2, borderRadius: 1,
+                  bgcolor: weight > 0 ? "#EEF2FF" : "#F1F5F9",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 11, fontWeight: 800,
+                    color: weight > 20 ? "#4338CA" : weight > 0 ? "#6366F1" : "#94A3B8",
+                    textAlign: "center", lineHeight: 1.3,
+                  }}
+                >
+                  {weight}% weight
+                </Typography>
+              </Box>
             </MotionBox>
           );
         })}
       </Box>
 
-      {/* Curved connecting threads from each source to synthesized signal */}
-      <Box
-        ref={svgContainerRef}
-        sx={{
-          position: "relative",
-          height: 50,
-        }}
-      >
+      {/* Curved connecting lines */}
+      <Box ref={svgContainerRef} sx={{ position: "relative", height: 50 }}>
         <svg
           width="100%"
           height="100%"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            overflow: "visible",
-          }}
+          style={{ position: "absolute", top: 0, left: 0, overflow: "visible" }}
         >
           <defs>
             {LINE_COLORS.map((color, i) => (
-              <linearGradient
-                key={`grad-${i}`}
-                id={`line-grad-${i}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
+              <linearGradient key={`grad-${i}`} id={`line-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={color} stopOpacity={0.9} />
                 <stop offset="100%" stopColor={BLUE_PRIMARY} stopOpacity={0.7} />
               </linearGradient>
@@ -370,55 +260,34 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
             const isCenterCard = Math.abs(cx - midX) < centerThreshold;
             const startCtrlX = isCenterCard ? Math.max(0, cx - curveOffset) : cx;
             const endCtrlX = isCenterCard ? Math.max(0, midX - curveOffset) : midX;
-            // Cubic bezier: start vertical from card, curve to center
             const d = `M ${cx},0 C ${startCtrlX},${h * 0.55} ${endCtrlX},${h * 0.45} ${midX},${h}`;
             return (
               <React.Fragment key={i}>
-                <path
-                  d={d}
-                  stroke={`url(#line-grad-${i})`}
-                  strokeWidth={2}
-                  fill="none"
-                  strokeOpacity={0.8}
-                />
+                <path d={d} stroke={`url(#line-grad-${i})`} strokeWidth={2} fill="none" strokeOpacity={0.8} />
                 <circle cx={cx} cy={0} r={3.5} fill={color} fillOpacity={0.9} />
               </React.Fragment>
             );
           })}
           {cardCenters.length > 0 && (
-            <circle
-              cx={svgWidth / 2}
-              cy={50}
-              r={5}
-              fill={BLUE_PRIMARY}
-              fillOpacity={0.8}
-            />
+            <circle cx={svgWidth / 2} cy={50} r={5} fill={BLUE_PRIMARY} fillOpacity={0.8} />
           )}
         </svg>
       </Box>
 
-      {/* SYNTHESIZED INTO FINAL SIGNAL banner */}
+      {/* SYNTHESIZED banner */}
       <Box sx={{ px: 2, pb: 1.5, pt: 0 }}>
         <Box
           sx={{
             background: `linear-gradient(135deg, ${BLUE_PRIMARY} 0%, #3A3790 50%, ${BLUE_PRIMARY} 100%)`,
-            borderRadius: 2,
-            py: 1,
-            px: 2.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1,
+            borderRadius: 2, py: 1, px: 2.5,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 1,
           }}
         >
           <BoltIcon sx={{ fontSize: 14, color: "#F59E0B" }} />
           <Typography
             sx={{
-              fontWeight: 800,
-              fontSize: 11.5,
-              color: "#FFFFFF",
-              letterSpacing: 1.2,
-              textTransform: "uppercase",
+              fontWeight: 800, fontSize: 11.5, color: "#FFFFFF",
+              letterSpacing: 1.2, textTransform: "uppercase",
             }}
           >
             Synthesized Into Final Signal
