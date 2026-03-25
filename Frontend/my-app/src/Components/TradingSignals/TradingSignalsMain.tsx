@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Box,
   Dialog,
@@ -7,16 +7,18 @@ import {
   DialogActions,
   Button,
   Typography,
+  Chip,
+  Divider,
+  Grid,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
-import NewspaperIcon from "@mui/icons-material/Newspaper";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
 
 import IntelligenceSourcesBar from "./IntelligenceSourcesBar";
 import TradingSignalCard from "./TradingSignalCard";
-import AIMLIntelligencePanel from "./AIMLIntelligencePanel";
 import PriceChartsSection from "./PriceChartsSection";
-import type { SourceStatus } from "./types";
+import type { SourceDetail, SourceDetails, TradingSignalData } from "./types";
 
 const MotionBox = motion(Box);
 
@@ -29,6 +31,159 @@ interface Props {
   expectedDate?: string;
 }
 
+/* ── Helpers for popup data rendering ── */
+
+function formatValue(val: any): string {
+  if (val === null || val === undefined) return "N/A";
+  if (typeof val === "boolean") return val ? "Yes" : "No";
+  if (typeof val === "number") {
+    if (Math.abs(val) >= 1_000_000) return `$${(val / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(val) >= 1_000) return `$${(val / 1_000).toFixed(1)}K`;
+    return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+  if (Array.isArray(val)) return val.map((v) => formatValue(v)).join(", ");
+  return String(val);
+}
+
+function formatLabel(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace("Pct", "%")
+    .replace("Snp", "S&P")
+    .replace("Dma", "DMA")
+    .replace("Rsi", "RSI")
+    .replace("Macd", "MACD")
+    .replace("Dmi", "DMI")
+    .replace("Fo ", "FO ")
+    .replace("Ml ", "ML ")
+    .replace("Spy", "SPY")
+    .replace("Ytd", "YTD")
+    .replace("Mtd", "MTD")
+    .replace("Qtd", "QTD");
+}
+
+function getValueColor(key: string, val: any): string {
+  if (val === null || val === undefined) return "#94A3B8";
+
+  const k = key.toLowerCase();
+  const v = typeof val === "string" ? val.toLowerCase() : "";
+
+  // Signal/sentiment values
+  if (v === "buy" || v === "long" || v === "positive" || v === "bullish" || v === "up")
+    return "#059669";
+  if (v === "sell" || v === "short" || v === "negative" || v === "bearish" || v === "down")
+    return "#DC2626";
+  if (v === "hold" || v === "avoid" || v === "neutral") return "#D97706";
+
+  // Numeric returns / changes
+  if (typeof val === "number" && (k.includes("return") || k.includes("change") || k.includes("pnl"))) {
+    if (val > 0) return "#059669";
+    if (val < 0) return "#DC2626";
+  }
+
+  // Boolean expired
+  if (k === "expired" && val === true) return "#D97706";
+
+  return "#0F172A";
+}
+
+/* ── Renders a nested data object (e.g. ML prediction horizons) ── */
+function renderDataRows(data: Record<string, any>, depth = 0): React.ReactNode {
+  if (!data || typeof data !== "object") return null;
+
+  return Object.entries(data).map(([key, val]) => {
+    // Skip internal keys
+    if (key === "label" || key === "weight" || key === "status") return null;
+
+    // Nested object (e.g., t1d: {prediction, confidence, actual_return})
+    if (val && typeof val === "object" && !Array.isArray(val)) {
+      return (
+        <Box key={key} sx={{ mb: 1.5 }}>
+          <Typography
+            sx={{
+              fontWeight: 700, fontSize: 12, color: "#334155",
+              textTransform: "uppercase", letterSpacing: 0.5,
+              mb: 0.5, pl: depth * 2,
+            }}
+          >
+            {formatLabel(key)}
+          </Typography>
+          <Box sx={{ pl: 1, borderLeft: "2px solid #E2E8F0" }}>
+            {renderDataRows(val, depth + 1)}
+          </Box>
+        </Box>
+      );
+    }
+
+    // Array of objects (e.g., eodhd_news, recent_closes)
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+      return (
+        <Box key={key} sx={{ mb: 1.5 }}>
+          <Typography
+            sx={{ fontWeight: 700, fontSize: 12, color: "#334155", mb: 0.5 }}
+          >
+            {formatLabel(key)}
+          </Typography>
+          {val.slice(0, 5).map((item: any, idx: number) => (
+            <Box
+              key={idx}
+              sx={{
+                p: 1, mb: 0.5, bgcolor: "#F8FAFC", borderRadius: 1,
+                border: "1px solid #F1F5F9",
+              }}
+            >
+              {Object.entries(item).map(([ik, iv]) => (
+                <Box key={ik} sx={{ display: "flex", justifyContent: "space-between", py: 0.25 }}>
+                  <Typography sx={{ fontSize: 11.5, color: "#64748B", fontWeight: 500 }}>
+                    {formatLabel(ik)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 11.5, fontWeight: 600,
+                      color: getValueColor(ik, iv),
+                      maxWidth: "60%", textAlign: "right",
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatValue(iv)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          ))}
+        </Box>
+      );
+    }
+
+    // Simple key-value
+    return (
+      <Box
+        key={key}
+        sx={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          py: 0.6, px: depth * 2,
+          borderBottom: "1px solid #F8FAFC",
+        }}
+      >
+        <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+          {formatLabel(key)}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: 12.5, fontWeight: 700,
+            color: getValueColor(key, val),
+          }}
+        >
+          {formatValue(val)}
+        </Typography>
+      </Box>
+    );
+  });
+}
+
+/* ══════════════════════════════════════════ */
+
 const TradingSignalsMain: React.FC<Props> = ({
   ticker,
   trade_date,
@@ -37,84 +192,39 @@ const TradingSignalsMain: React.FC<Props> = ({
   issuerName,
   expectedDate,
 }) => {
-  const mlPredictionsRef = useRef<HTMLDivElement>(null);
-  const aiModelRef = useRef<HTMLDivElement>(null);
-  const aiSentimentRef = useRef<HTMLDivElement>(null);
-  const priceChartsRef = useRef<HTMLDivElement>(null);
+  const [signalData, setSignalData] = useState<TradingSignalData | null>(null);
+  const [popupSource, setPopupSource] = useState<string | null>(null);
 
-  const [sourceStatus, setSourceStatus] = useState<SourceStatus>({
-    mlModel: false,
-    aiModel: false,
-    aiSentiment: false,
-  });
-
-  const [sourceDataPoints, setSourceDataPoints] = useState<
-    Record<string, string>
-  >({});
-
-  const handleDataStatus = useCallback((status: SourceStatus) => {
-    setSourceStatus(status);
+  const handleSignalLoaded = useCallback((data: TradingSignalData | null) => {
+    setSignalData(data);
   }, []);
 
-  const handleDataPoints = useCallback(
-    (points: Record<string, string>) => {
-      setSourceDataPoints(points);
-    },
-    []
-  );
-
-  const [marketNewsOpen, setMarketNewsOpen] = useState(false);
-
-  const handleSourceClick = useCallback((sectionId: string) => {
-    if (sectionId === "market-news") {
-      setMarketNewsOpen(true);
-      return;
-    }
-
-    const refMap: Record<string, React.RefObject<HTMLDivElement>> = {
-      "ml-predictions": mlPredictionsRef,
-      "ai-model": aiModelRef,
-      "ai-sentiment": aiSentimentRef,
-      "price-charts": priceChartsRef,
-    };
-    const el = refMap[sectionId]?.current;
-    if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - 240;
-    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+  const handleSourceClick = useCallback((sourceKey: string) => {
+    setPopupSource(sourceKey);
   }, []);
+
+  const handleClosePopup = () => setPopupSource(null);
+
+  // Get source details from signal data
+  const sourceDetails: SourceDetails = signalData?.source_details || {};
+  const dealType = signalData?.deal_type || "";
+  const activeSource: SourceDetail | null = popupSource ? sourceDetails[popupSource] || null : null;
 
   return (
     <Box sx={{ maxWidth: "100%" }}>
       {/* Intelligence Sources */}
       <IntelligenceSourcesBar
         onSourceClick={handleSourceClick}
-        sourceStatus={sourceStatus}
-        isUpcoming={isUpcoming}
-        sourceDataPoints={sourceDataPoints}
+        sourceDetails={sourceDetails}
+        dealType={dealType}
       />
 
-      {/* Arrow from Synthesized Signal → Trading Signal Card */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          py: 0.5,
-        }}
-      >
+      {/* Arrow from Synthesized Signal to Trading Signal Card */}
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 0.5 }}>
+        <Box sx={{ width: 2, height: 16, bgcolor: "#262268", opacity: 0.35, borderRadius: 1 }} />
         <Box
           sx={{
-            width: 2,
-            height: 16,
-            bgcolor: "#262268",
-            opacity: 0.35,
-            borderRadius: 1,
-          }}
-        />
-        <Box
-          sx={{
-            width: 0,
-            height: 0,
+            width: 0, height: 0,
             borderLeft: "6px solid transparent",
             borderRight: "6px solid transparent",
             borderTop: "8px solid #262268",
@@ -130,32 +240,14 @@ const TradingSignalsMain: React.FC<Props> = ({
         transition={{ duration: 0.3, delay: 0.05 }}
         sx={{ mb: 2.5 }}
       >
-        <TradingSignalCard ticker={ticker} />
+        <TradingSignalCard ticker={ticker} onSignalLoaded={handleSignalLoaded} />
       </MotionBox>
 
-      {/* Section 2: AI/ML Intelligence */}
+      {/* Section 2: Price Charts (FactSet + TradingView) */}
       <MotionBox
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        sx={{ mb: 2.5 }}
-      >
-        <AIMLIntelligencePanel
-          ticker={ticker}
-          mlPredictionsRef={mlPredictionsRef}
-          aiModelRef={aiModelRef}
-          aiSentimentRef={aiSentimentRef}
-          onDataStatus={handleDataStatus}
-          onDataPoints={handleDataPoints}
-        />
-      </MotionBox>
-
-      {/* Section 3: Price Charts */}
-      <MotionBox
-        ref={priceChartsRef}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.15 }}
         sx={{ scrollMarginTop: "240px" }}
       >
         <PriceChartsSection
@@ -168,100 +260,122 @@ const TradingSignalsMain: React.FC<Props> = ({
         />
       </MotionBox>
 
-      {/* Market News Info Dialog */}
+      {/* ── Source Detail Popup Dialog ── */}
       <Dialog
-        open={marketNewsOpen}
-        onClose={() => setMarketNewsOpen(false)}
+        open={!!popupSource && !!activeSource}
+        onClose={handleClosePopup}
+        maxWidth="sm"
+        fullWidth
         PaperProps={{
           sx: {
             borderRadius: 3,
-            maxWidth: 480,
-            p: 1,
+            maxHeight: "80vh",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1.5,
-            pb: 1,
-          }}
-        >
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: 2,
-              bgcolor: "#EEF2FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <NewspaperIcon sx={{ fontSize: 22, color: "#262268" }} />
-          </Box>
-          <Typography sx={{ fontWeight: 800, fontSize: 17, color: "#0F172A" }}>
-             News Agent Intelligence
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 0 }}>
-          <Box
-            sx={{
-              bgcolor: "#F8FAFC",
-              border: "1px solid #E2E8F0",
-              borderRadius: 2,
-              p: 2.5,
-              mb: 1,
-            }}
-          >
-            <Box
+        {activeSource && (
+          <>
+            <DialogTitle
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                mb: 1.5,
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                pb: 1, pt: 2.5, px: 3,
               }}
             >
-              <TravelExploreIcon sx={{ color: "#6366F1", fontSize: 20 }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Box
+                  sx={{
+                    width: 40, height: 40, borderRadius: 2, bgcolor: "#EEF2FF",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#262268",
+                  }}
+                >
+                  {/* Re-use icon from the source key */}
+                  <Typography sx={{ fontSize: 20 }}>
+                    {popupSource === "price_action" && "📈"}
+                    {popupSource === "jay_ritter" && "🎓"}
+                    {popupSource === "fo_dynamics" && "📊"}
+                    {popupSource === "technicals" && "📉"}
+                    {popupSource === "ml_predictions" && "🧠"}
+                    {popupSource === "sentiment_news" && "💬"}
+                    {popupSource === "market_context" && "🌍"}
+                    {popupSource === "position_context" && "💼"}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 800, fontSize: 16, color: "#0F172A" }}>
+                    {activeSource.label}
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.25 }}>
+                    <Chip
+                      label={`${activeSource.weight}% Weight`}
+                      size="small"
+                      sx={{
+                        bgcolor: activeSource.weight > 20 ? "#EEF2FF" : "#F1F5F9",
+                        color: activeSource.weight > 20 ? "#4338CA" : "#64748B",
+                        fontWeight: 700, fontSize: 11, height: 22,
+                      }}
+                    />
+                    <Chip
+                      label={activeSource.status === "active" ? "Active" : "Inactive"}
+                      size="small"
+                      sx={{
+                        bgcolor: activeSource.status === "active" ? "#DCFCE7" : "#FEE2E2",
+                        color: activeSource.status === "active" ? "#166534" : "#991B1B",
+                        fontWeight: 700, fontSize: 11, height: 22,
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+              <IconButton onClick={handleClosePopup} size="small">
+                <CloseIcon sx={{ fontSize: 20, color: "#64748B" }} />
+              </IconButton>
+            </DialogTitle>
+
+            <Divider />
+
+            <DialogContent sx={{ px: 3, py: 2 }}>
               <Typography
-                sx={{ fontWeight: 700, fontSize: 13.5, color: "#334155" }}
+                sx={{
+                  fontWeight: 700, fontSize: 12, color: "#94A3B8",
+                  textTransform: "uppercase", letterSpacing: 1, mb: 1.5,
+                }}
               >
-                AI-Powered Web Search Agent
+                Parameters sent to signal generation
               </Typography>
-            </Box>
-            <Typography
-              sx={{
-                color: "#475569",
-                fontSize: 13,
-                lineHeight: 1.75,
-                fontWeight: 500,
-              }}
-            >
-              Our AI agent automatically searches and analyzes the latest market
-              news, press releases, analyst reports, and financial articles from
-              across the web. This real-time intelligence is factored into the
-              final trading signal to ensure the recommendation reflects the most
-              current market conditions and sentiment.
-            </Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setMarketNewsOpen(false)}
-            variant="contained"
-            sx={{
-              bgcolor: "#262268",
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 700,
-              px: 4,
-              "&:hover": { bgcolor: "#3A3790" },
-            }}
-          >
-            OK
-          </Button>
-        </DialogActions>
+
+              <Box
+                sx={{
+                  bgcolor: "#FAFBFC", borderRadius: 2,
+                  border: "1px solid #E2E8F0", p: 2,
+                }}
+              >
+                {activeSource.data && Object.keys(activeSource.data).length > 0 ? (
+                  renderDataRows(activeSource.data)
+                ) : (
+                  <Typography sx={{ color: "#94A3B8", fontSize: 13, fontStyle: "italic" }}>
+                    No data available for this source.
+                  </Typography>
+                )}
+              </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+              <Button
+                onClick={handleClosePopup}
+                variant="contained"
+                sx={{
+                  bgcolor: "#262268", borderRadius: 2,
+                  textTransform: "none", fontWeight: 700, px: 4,
+                  "&:hover": { bgcolor: "#3A3790" },
+                }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Box>
   );
