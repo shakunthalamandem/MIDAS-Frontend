@@ -26,6 +26,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
             ? formatPct(data[cfg.pctKey as keyof HeadlineRisksData] as number)
             : "";
           const isPctOnly = "pctOnly" in cfg && cfg.pctOnly;
+          const displayPct = isPctOnly ? pct.replace(/[()]/g, "") : pct;
           return (
             <Box key={cfg.key} className={`risk-card risk-card--${cfg.color}`}>
               {/* Top row: icon + label */}
@@ -45,7 +46,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data }) => {
                 )}
                 {pct && (
                   <Box className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}>
-                    {pct}
+                    {displayPct}
                   </Box>
                 )}
               </Box>
