@@ -368,25 +368,6 @@ const RiskDashboard: React.FC = () => {
 
       {!loading && data && isDataAvailable && (
         <>
-          {/* Category Toggle Buttons */}
-          <Box className="category-toggle-bar">
-            {([
-              { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
-              { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
-              { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
-              { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
-            ]).map((btn) => (
-              <Box
-                key={btn.key}
-                className={`category-toggle-btn${selectedCategory === btn.key ? " category-toggle-btn--active" : ""}`}
-                onClick={() => handleCategorySelect(btn.key)}
-              >
-                <span className="category-toggle-icon">{btn.icon}</span>
-                <span className="category-toggle-label">{btn.label}</span>
-              </Box>
-            ))}
-          </Box>
-
           {data.headline_risks && (
             <Box className="pdf-section" data-pdf-page="1">
               <HeadlineRisks
@@ -394,6 +375,24 @@ const RiskDashboard: React.FC = () => {
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
               />
+              {/* Category Toggle Buttons */}
+              <Box className="category-toggle-bar">
+                {([
+                  { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
+                  { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
+                  { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
+                  { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
+                ]).map((btn) => (
+                  <Box
+                    key={btn.key}
+                    className={`category-toggle-btn${selectedCategory === btn.key ? " category-toggle-btn--active" : ""}`}
+                    onClick={() => handleCategorySelect(btn.key)}
+                  >
+                    <span className="category-toggle-icon">{btn.icon}</span>
+                    <span className="category-toggle-label">{btn.label}</span>
+                  </Box>
+                ))}
+              </Box>
             </Box>
           )}
 
@@ -422,6 +421,18 @@ const RiskDashboard: React.FC = () => {
             />
           </Box>
 
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              loading={topBottomLoading}
+              category={selectedCategory}
+              metricTop10={metricTop10}
+              metricBottom10={metricBottom10}
+              metricLoading={metricTopBottomLoading}
+            />
+          </Box>
+
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison
@@ -441,18 +452,6 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
-
-          <Box className="pdf-section" data-pdf-page="1">
-            <TopBottomPnLTable
-              top10={topBottomTop}
-              bottom10={topBottomBottom}
-              loading={topBottomLoading}
-              category={selectedCategory}
-              metricTop10={metricTop10}
-              metricBottom10={metricBottom10}
-              metricLoading={metricTopBottomLoading}
-            />
-          </Box>
 
           <Box className="pdf-section attribution-interactive">
             <Attribution

@@ -23,15 +23,11 @@ export interface HeadlinePnl {
 
 export interface IndexesComparison {
   one_month_beta_sp: number;
-  three_month_beta_sp: number;
-  one_month_vol: number;
-  one_month_sp_vol: number;
-  three_month_vol: number;
-  three_month_sp_vol: number;
-  ytd_vol: number;
-  ytd_sp_vol: number;
-  drawdown: number;
-  sp_drawdown: number;
+  one_month_beta_russell: number;
+  one_month_volatility_1_sp: number;
+  six_month_volatility_1_sp: number;
+  ytd_volatility_sp: number;
+  drawdown_1_sp: number;
 }
 
 export interface DashboardData {
@@ -53,15 +49,11 @@ export interface ChartDataPoint {
 export interface IndexComparisonChartPoint {
   date: string;
   one_month_beta_sp: number;
-  three_month_beta_sp: number;
-  one_month_vol: number;
-  one_month_sp_vol: number;
-  three_month_vol: number;
-  three_month_sp_vol: number;
-  ytd_vol: number;
-  ytd_sp_vol: number;
-  drawdown: number;
-  sp_drawdown: number;
+  one_month_beta_russell: number;
+  one_month_volatility_1_sp: number;
+  six_month_volatility_1_sp: number;
+  ytd_volatility_sp: number;
+  drawdown_1_sp: number;
 }
 
 export interface PortfolioResponse {
@@ -73,8 +65,8 @@ export interface AttributionItem {
   name: string;
   dtd_pnl: number;
   dtd_pnl_pct: number;
-  mtd_pnl: number;
-  mtd_pnl_pct: number;
+  wtd_pnl: number;
+  wtd_pnl_pct: number;
   ytd_pnl: number;
   ytd_pnl_pct: number;
   net_exp: number;
@@ -141,8 +133,8 @@ export interface TickerItem {
   days_hld: number | null;
   dtd_pnl: number;
   dtd_pnl_pct: number;
-  mtd_pnl: number;
-  mtd_pnl_pct: number;
+  wtd_pnl: number;
+  wtd_pnl_pct: number;
   ytd_pnl: number;
   ytd_pnl_pct: number;
   net_exp: number;

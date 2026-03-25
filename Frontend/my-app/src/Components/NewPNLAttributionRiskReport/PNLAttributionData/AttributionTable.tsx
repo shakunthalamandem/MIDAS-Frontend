@@ -134,8 +134,8 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             : formatCurrency(row.dtd_pnl),
       },
       {
-        field: "mtd_pnl",
-        headerName: "MTD P&L",
+        field: "wtd_pnl",
+        headerName: "WTD P&L",
         flex: 1,
         minWidth: 130,
         cellClassName: "attr-datagrid-cell--pnl",
@@ -143,11 +143,11 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         align: "center",
         sortComparator: pinOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.mtd_pnl_pct : value,
+          showPct ? row.wtd_pnl_pct : value,
         renderCell: ({ row }) =>
           showPct
-            ? formatPctVal(row.mtd_pnl_pct)
-            : formatCurrency(row.mtd_pnl),
+            ? formatPctVal(row.wtd_pnl_pct)
+            : formatCurrency(row.wtd_pnl),
       },
       {
         field: "ytd_pnl",
