@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Box,
   Dialog,
@@ -184,6 +184,69 @@ function renderDataRows(data: Record<string, any>, depth = 0): React.ReactNode {
 
 /* ══════════════════════════════════════════ */
 
+/* ── Default source cards shown before signal generation ── */
+
+function buildDefaultSources(dealType: string): SourceDetails {
+  const isIPO = (dealType || "").toUpperCase().trim() === "IPO";
+
+  const base: SourceDetails = {
+    price_action: {
+      label: "Price Action & Volume",
+      weight: isIPO ? 30 : 30,
+      status: "inactive",
+      data: {},
+    },
+    technicals: {
+      label: "Technical Agent",
+      weight: isIPO ? 20 : 25,
+      status: "inactive",
+      data: {},
+    },
+    ml_predictions: {
+      label: "Factors Based Agent",
+      weight: isIPO ? 5 : 10,
+      status: "inactive",
+      data: {},
+    },
+    sentiment_news: {
+      label: "Sentiment & News Agent",
+      weight: isIPO ? 10 : 10,
+      status: "inactive",
+      data: {},
+    },
+    market_context: {
+      label: "Market Context",
+      weight: 5,
+      status: "inactive",
+      data: {},
+    },
+    position_context: {
+      label: "Position Context",
+      weight: 5,
+      status: "inactive",
+      data: { currently_held: false },
+    },
+  };
+
+  if (isIPO) {
+    base.jay_ritter = {
+      label: "Jay Ritter IPO Agent",
+      weight: 25,
+      status: "inactive",
+      data: {},
+    };
+  } else {
+    base.fo_dynamics = {
+      label: "FO Dynamics",
+      weight: 15,
+      status: "inactive",
+      data: {},
+    };
+  }
+
+  return base;
+}
+
 const TradingSignalsMain: React.FC<Props> = ({
   ticker,
   trade_date,
@@ -194,9 +257,55 @@ const TradingSignalsMain: React.FC<Props> = ({
 }) => {
   const [signalData, setSignalData] = useState<TradingSignalData | null>(null);
   const [popupSource, setPopupSource] = useState<string | null>(null);
+  const [dealType, setDealType] = useState<string>("");
+  const [defaultSources, setDefaultSources] = useState<SourceDetails>({});
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem("access_token");
+
+  // Fetch source details with real data on mount (before signal generation)
+  useEffect(() => {
+    if (!ticker || !apiUrl) return;
+
+    const fetchSourceDetails = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/trading_signal_source_details/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({ ticker }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const dt = data.deal_type || "IPO";
+          setDealType(dt);
+          // Use real source_details from backend (with actual data)
+          if (data.source_details && Object.keys(data.source_details).length > 0) {
+            setDefaultSources(data.source_details);
+          } else {
+            setDefaultSources(buildDefaultSources(dt));
+          }
+        } else {
+          // Fallback to empty default cards
+          setDealType("IPO");
+          setDefaultSources(buildDefaultSources("IPO"));
+        }
+      } catch {
+        setDealType("IPO");
+        setDefaultSources(buildDefaultSources("IPO"));
+      }
+    };
+
+    fetchSourceDetails();
+  }, [ticker, apiUrl]);
 
   const handleSignalLoaded = useCallback((data: TradingSignalData | null) => {
     setSignalData(data);
+    if (data?.deal_type) {
+      setDealType(data.deal_type);
+    }
   }, []);
 
   const handleSourceClick = useCallback((sourceKey: string) => {
@@ -205,9 +314,13 @@ const TradingSignalsMain: React.FC<Props> = ({
 
   const handleClosePopup = () => setPopupSource(null);
 
-  // Get source details from signal data
-  const sourceDetails: SourceDetails = signalData?.source_details || {};
-  const dealType = signalData?.deal_type || "";
+  // Use signal source_details if available, otherwise default cards
+  const sourceDetails: SourceDetails =
+    signalData?.source_details && Object.keys(signalData.source_details).length > 0
+      ? signalData.source_details
+      : defaultSources;
+
+  const effectiveDealType = signalData?.deal_type || dealType;
   const activeSource: SourceDetail | null = popupSource ? sourceDetails[popupSource] || null : null;
 
   return (
@@ -216,7 +329,7 @@ const TradingSignalsMain: React.FC<Props> = ({
       <IntelligenceSourcesBar
         onSourceClick={handleSourceClick}
         sourceDetails={sourceDetails}
-        dealType={dealType}
+        dealType={effectiveDealType}
       />
 
       {/* Arrow from Synthesized Signal to Trading Signal Card */}
