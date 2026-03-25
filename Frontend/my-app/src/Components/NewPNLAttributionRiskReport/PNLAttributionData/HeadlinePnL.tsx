@@ -1,20 +1,34 @@
 import React from "react";
-import { Box } from "@mui/material";
-import type { HeadlinePnl } from "./types";
-import { formatCurrencyAsK, formatFullCurrency } from "./utils";
+import { Box, CircularProgress } from "@mui/material";
+import type { HeadlinePnl, DashboardCategory, HeadlineMetricValues } from "./types";
+import { formatCurrencyAsK } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
   selectedMetric: string;
   onMetricSelect: (metric: string) => void;
+  selectedCategory: DashboardCategory;
+  onCategorySelect: (category: DashboardCategory) => void;
+  metricHeadlineData: HeadlineMetricValues | null;
+  metricHeadlineLoading: boolean;
 }
 
 const PNL_CARDS = [
   { title: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct", metricKey: "dtd_pnl" },
-  { title: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct", metricKey: "wtd_pnl" },
-  { title: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct", metricKey: "mtd_pnl" },
   { title: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", metricKey: "ytd_pnl" },
 ] as const;
+
+const buildMetricCards = (label: string) => [
+  { title: `DTD ${label}`, valueKey: "dtd_value", pctKey: "dtd_pct", metricKey: "dtd" },
+  { title: `YTD ${label}`, valueKey: "ytd_value", pctKey: "ytd_pct", metricKey: "ytd" },
+];
+
+const CATEGORY_COLORS: Record<DashboardCategory, { positive: string; negative: string }> = {
+  pnl: { positive: "#059669", negative: "#dc2626" },
+  gross_market_value: { positive: "#2563eb", negative: "#2563eb" },
+  delta_adj_net_mv: { positive: "#0891b2", negative: "#0891b2" },
+  beta_adj_net_mv: { positive: "#ea580c", negative: "#ea580c" },
+};
 
 const toNumber = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -27,72 +41,104 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
   data,
   selectedMetric,
   onMetricSelect,
+  selectedCategory,
+  onCategorySelect,
+  metricHeadlineData,
+  metricHeadlineLoading,
 }) => {
+  const isPnl = selectedCategory === "pnl";
+
+  const shortLabel: Record<DashboardCategory, string> = {
+    pnl: "P&L",
+    gross_market_value: "Gross",
+    delta_adj_net_mv: "Delta Adj",
+    beta_adj_net_mv: "Beta Adj",
+  };
+
+  const cards = isPnl
+    ? PNL_CARDS
+    : buildMetricCards(shortLabel[selectedCategory]);
+
+  const dataSource: Record<string, any> = isPnl ? data : (metricHeadlineData || {});
+  const colors = CATEGORY_COLORS[selectedCategory];
+
+  const handleCardClick = (metricKey: string) => {
+    if (isPnl) {
+      onCategorySelect("pnl");
+    }
+    onMetricSelect(metricKey);
+  };
+
   return (
-    <Box className="risk-dashboard-section">
-      <Box className="risk-dashboard-section-title">HEADLINE P&L</Box>
-      <Box className="pnl-cards-grid">
-        {PNL_CARDS.map((cfg) => {
-          const value = toNumber(data[cfg.valueKey]);
-          const pct = toNumber(data[cfg.pctKey]);
-          const isPositive = (value ?? 0) >= 0;
-          const modifier = isPositive ? "positive" : "negative";
-          const isSelected = selectedMetric === cfg.metricKey;
+    <>
+      {!isPnl && metricHeadlineLoading ? (
+        <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
+          <CircularProgress size={22} />
+        </Box>
+      ) : (
+        <Box className="pnl-cards-inline">
+          {cards.map((cfg) => {
+            const value = toNumber(dataSource[cfg.valueKey]);
+            const pct = toNumber(dataSource[cfg.pctKey]);
+            const isPositive = (value ?? 0) >= 0;
+            const isSelected = selectedMetric === cfg.metricKey;
+            const selectedBg = isPnl
+              ? (isPositive ? colors.positive : colors.negative)
+              : colors.positive;
+            const textColor = isPnl
+              ? (isPositive ? "#10b981" : "#ef4444")
+              : selectedBg;
 
-          const selectedBg = isPositive ? "#059669" : "#dc2626";
-
-          return (
-            <Box
-              key={cfg.metricKey}
-              className={`pnl-card${isSelected ? "" : ` pnl-card--${modifier}`}${isSelected ? " pnl-card--selected" : ""}`}
-              onClick={() => onMetricSelect(cfg.metricKey)}
-              sx={{
-                cursor: "pointer",
-                ...(isSelected && {
-                  background: `${selectedBg} !important`,
-                  border: `1px solid ${selectedBg} !important`,
-                  borderLeft: `4px solid ${selectedBg} !important`,
-                }),
-              }}
-            >
-              <Box className="pnl-card-header">
+            return (
+              <Box
+                key={cfg.metricKey}
+                className={`pnl-chip${isSelected ? " pnl-chip--selected" : ""}`}
+                onClick={() => handleCardClick(cfg.metricKey)}
+                sx={{
+                  cursor: "pointer",
+                  ...(isSelected && {
+                    background: `${selectedBg} !important`,
+                    borderColor: `${selectedBg} !important`,
+                  }),
+                  ...(!isSelected && {
+                    borderLeft: `3px solid ${textColor}`,
+                  }),
+                }}
+              >
                 <Box
-                  className={isSelected ? "" : "pnl-card-title"}
-                  sx={isSelected ? { fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)" } : {}}
+                  className="pnl-chip-label"
+                  sx={isSelected ? { color: "rgba(255,255,255,0.85) !important" } : {}}
                 >
                   {cfg.title}
                 </Box>
+                <Box className="pnl-chip-value-row">
+                  <Box
+                    component="span"
+                    className="pnl-chip-value"
+                    sx={isSelected
+                      ? { color: "#fff !important" }
+                      : { color: `${textColor} !important` }
+                    }
+                  >
+                    {value === null ? "--" : formatCurrencyAsK(value)}
+                  </Box>
+                  <Box
+                    component="span"
+                    className="pnl-chip-pct"
+                    sx={isSelected
+                      ? { color: "rgba(255,255,255,0.75) !important" }
+                      : { color: `${textColor} !important` }
+                    }
+                  >
+                    {pct === null ? "" : `(${pct.toFixed(2)}%)`}
+                  </Box>
+                </Box>
               </Box>
-              <Box>
-                <Box
-                  component="span"
-                  className={isSelected ? "" : `pnl-card-value pnl-card-value--${modifier}`}
-                  sx={isSelected ? { fontSize: 20, fontWeight: 700, color: "#fff" } : undefined}
-                >
-                  {value === null ? "--" : formatCurrencyAsK(value)}
-                </Box>
-                <Box
-                  component="span"
-                  className={isSelected ? "" : `pnl-card-pct pnl-card-pct--${modifier}`}
-                  sx={isSelected ? { fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)", ml: 0.75 } : undefined}
-                >
-                  {pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}
-                </Box>
-              </Box>
-
-              {/* Hover overlay (hidden when selected) */}
-              {!isSelected && (
-                <Box className={`pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`}>
-                  <Box className="pnl-card-hover-label">{cfg.title}</Box>
-                  <Box className="pnl-card-hover-value">{value === null ? "--" : formatFullCurrency(value)}</Box>
-                  <Box className="pnl-card-hover-pct">{pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}</Box>
-                </Box>
-              )}
-            </Box>
-          );
-        })}
-      </Box>
-    </Box>
+            );
+          })}
+        </Box>
+      )}
+    </>
   );
 };
 

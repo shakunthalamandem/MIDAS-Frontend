@@ -121,32 +121,33 @@ const TEMP_META: Record<string, { gradient: string; badge: string; textColor: st
 
 const METRIC_CARDS = [
   {
+    key: "market_temperature" as keyof MarketEnvironment,
+    label: "Market Temperature",
+    fmt: (v: any) => v,
+    gradient: "linear-gradient(135deg,#f57c00,#ff9800)",
+    icon: "🌡️",
+    isTemperature: true,
+  },
+  {
     key: "rolling_90d_avg_first_day_return" as keyof MarketEnvironment,
-    label: "90d Avg First-Day Return",
+    label: "180-Day Avg First-Day Return",
     fmt: (v: number) => `${v.toFixed(1)}%`,
-    gradient: "linear-gradient(135deg,#4527a0,#7c4dff)",
+    gradient: "linear-gradient(135deg,#5e35b1,#9575cd)",
     icon: "📈",
   },
   {
     key: "ipo_volume_vs_3yr_median" as keyof MarketEnvironment,
     label: "Volume vs 3yr Median",
     fmt: (v: number) => `${v.toFixed(2)}×`,
-    gradient: "linear-gradient(135deg,#00695c,#26a69a)",
+    gradient: "linear-gradient(135deg,#00897b,#4db8a8)",
     icon: "📊",
   },
   {
     key: "price_revision_above_high_pct" as keyof MarketEnvironment,
     label: "Priced Above Range",
     fmt: (v: number) => `${v.toFixed(0)}%`,
-    gradient: "linear-gradient(135deg,#ad1457,#e91e63)",
+    gradient: "linear-gradient(135deg,#c62828,#e57373)",
     icon: "💹",
-  },
-  {
-    key: "post_ipo_first_week_breadth" as keyof MarketEnvironment,
-    label: "1-Week Breadth",
-    fmt: (v: number) => `${v.toFixed(0)}%`,
-    gradient: "linear-gradient(135deg,#e65100,#ff7043)",
-    icon: "📉",
   },
 ];
 
@@ -201,30 +202,32 @@ const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   ];
 
   return (
-    <Box sx={{ px: 3, py: 2.5, bgcolor: "#f8f9ff", borderTop: "2px solid #e8e8f5" }}>
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
+    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2.5, mb: 3 }}>
         {cols.map(col => (
-          <Box key={col.title} sx={{ p: 2, bgcolor: "#fff", borderRadius: 2, border: `1px solid ${col.color}22`, boxShadow: `0 2px 8px ${col.color}11` }}>
-            <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", color: col.color, letterSpacing: 1, mb: 1.2 }}>
+          <Box key={col.title} sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${col.color}`, boxShadow: `0 4px 16px ${col.color}25` }}>
+            <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: col.color, letterSpacing: 1.3, mb: 1.5 }}>
               {col.title}
             </Typography>
             {col.rows.map(r => (
-              <Box key={r.label} sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">{r.label}</Typography>
-                <Typography variant="caption" sx={{ fontWeight: 600, textTransform: "capitalize" }}>{r.value}</Typography>
+              <Box key={r.label} sx={{ display: "flex", justifyContent: "space-between", mb: 0.8, alignItems: "center" }}>
+                <Typography sx={{ fontSize: "0.78rem", color: "#555", fontWeight: 600 }}>{r.label}</Typography>
+                <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#111", textAlign: "right", maxWidth: "50%" }}>{r.value}</Typography>
               </Box>
             ))}
             {col.note && (
-              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1, fontStyle: "italic", lineHeight: 1.5, borderTop: "1px solid #f0f0f0", pt: 1 }}>
-                {col.note}
-              </Typography>
+              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #e8e8e8" }}>
+                <Typography sx={{ fontSize: "0.73rem", color: "#555", fontStyle: "italic", lineHeight: 1.6, fontWeight: 500 }}>
+                  {col.note}
+                </Typography>
+              </Box>
             )}
           </Box>
         ))}
       </Box>
-      <Box sx={{ p: 1.5, bgcolor: "#fff", borderRadius: 1.5, border: "1px solid #e0e0e0", display: "flex", gap: 1, alignItems: "flex-start" }}>
-        <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: "#481f93", whiteSpace: "nowrap" }}>ACTION:</Typography>
-        <Typography sx={{ fontSize: "0.75rem", color: "#444", lineHeight: 1.6 }}>{ticker.action_summary}</Typography>
+      <Box sx={{ p: 2.5, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff", display: "flex", gap: 1.5, alignItems: "flex-start" }}>
+        <Typography sx={{ fontSize: "0.77rem", fontWeight: 900, color: "#481f93", whiteSpace: "nowrap", mt: 0.3 }}>RECOMMENDATION:</Typography>
+        <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.8, fontWeight: 500 }}>{ticker.action_summary}</Typography>
       </Box>
     </Box>
   );
@@ -251,20 +254,20 @@ const TickerRow: React.FC<{ ticker: TickerAnalysis; index: number }> = ({ ticker
         }}
       >
         <TableCell sx={{ py: 1, pl: 1.5, pr: 0, width: 36 }}>
-          <IconButton size="small" sx={{ p: 0.3, color: "#aaa" }}>
+          <IconButton size="small" sx={{ p: 0.3, color: "#666" }}>
             {open ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
           </IconButton>
         </TableCell>
         <TableCell sx={{ py: 1, fontWeight: 800, fontSize: "0.82rem", color: "#481f93" }}>{ticker.ticker}</TableCell>
-        <TableCell sx={{ py: 1, fontSize: "0.8rem", maxWidth: 160 }}>
+        <TableCell sx={{ py: 1, fontSize: "0.8rem", maxWidth: 160, color: "#333" }}>
           <Tooltip title={ticker.issuer_name} placement="top-start">
             <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {ticker.issuer_name}
             </span>
           </Tooltip>
         </TableCell>
-        <TableCell sx={{ py: 1, fontSize: "0.78rem", color: "#666" }}>{ticker.sector}</TableCell>
-        <TableCell sx={{ py: 1, fontSize: "0.8rem", textAlign: "center", color: "#555" }}>{ticker.days_since_ipo}d</TableCell>
+        <TableCell sx={{ py: 1, fontSize: "0.78rem", color: "#444" }}>{ticker.sector}</TableCell>
+        <TableCell sx={{ py: 1, fontSize: "0.8rem", textAlign: "center", color: "#333" }}>{ticker.days_since_ipo}d</TableCell>
         <TableCell sx={{ py: 1, textAlign: "center" }}>
           {ticker.tier_classification?.tier
             ? <Chip label={`T${ticker.tier_classification.tier}`} size="small" sx={{ fontSize: "0.7rem", height: 20, bgcolor: "#ede7f6", color: "#4527a0", fontWeight: 700 }} />
@@ -300,7 +303,7 @@ const TickerRow: React.FC<{ ticker: TickerAnalysis; index: number }> = ({ ticker
             <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#444" }}>{ticker.confidence_score}%</Typography>
           </Box>
         </TableCell>
-        <TableCell sx={{ py: 1, fontSize: "0.75rem", color: "#555", maxWidth: 200 }}>
+        <TableCell sx={{ py: 1, fontSize: "0.75rem", color: "#333", maxWidth: 200 }}>
           <Tooltip title={ticker.action_summary} placement="top-start">
             <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {ticker.action_summary}
@@ -428,15 +431,15 @@ const JayRitterIPOAnalysis: React.FC = () => {
   const PX = { xs: 2, sm: 3, md: 5, lg: 8 };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f6fa" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f8f9fc" }}>
 
       {/* ── Header (full-width dark bg, content constrained) ─────── */}
-      <Box sx={{ background: "linear-gradient(160deg,#0f0225 0%,#1a0533 55%,#0d1b4b 100%)", pb: 4 }}>
+      <Box sx={{ background: "linear-gradient(160deg,#4527a0 0%,#6a4fb8 55%,#5835a8 100%)", pb: 4 }}>
         <Box sx={{ maxWidth: 1400, mx: "auto", px: PX }}>
 
           {/* Top bar: subtitle left, dropdown right */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
-            <Typography sx={{ color: "rgba(255,255,255,0.35)", fontSize: "0.68rem", letterSpacing: 1.5, textTransform: "uppercase" }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 600 }}>
               Ritter Academic Framework · US IPOs · 180-Day Lookback
             </Typography>
             <FormControl size="small">
@@ -468,32 +471,48 @@ const JayRitterIPOAnalysis: React.FC = () => {
             </FormControl>
           </Box>
 
-          {/* Centered Title + Badge */}
+          {/* Centered Title */}
           <Box sx={{ textAlign: "center", mt: 1.5, mb: 3 }}>
             <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, mb: 0.6 }}>
               <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem" }, letterSpacing: -0.5 }}>
                 Jay Ritter IPO Analysis
               </Typography>
-              {report && (
-                <Box sx={{ px: 1.5, py: 0.35, borderRadius: 5, background: tempMeta.gradient, boxShadow: "0 2px 14px rgba(0,0,0,0.35)" }}>
-                  <Typography sx={{ color: "#fff", fontSize: "0.75rem", fontWeight: 800, letterSpacing: 0.5 }}>
-                    {tempMeta.icon} {tempMeta.label}
-                  </Typography>
-                </Box>
-              )}
             </Box>
             {report && (
-              <Typography sx={{ color: "rgba(255,255,255,0.3)", fontSize: "0.72rem" }}>
+              <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.73rem", fontWeight: 500 }}>
                 {new Date(report.report_date).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}
                 {" · "}{report.total_eligible_ipos} eligible · {report.total_analyzed} analyzed
               </Typography>
             )}
           </Box>
 
-          {/* Metric Cards — 4 equal columns */}
+          {/* Metric Cards — 4 cards including market temperature */}
           {report && (
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, gap: 2, mb: 3 }}>
               {METRIC_CARDS.map(card => {
+                if (card.isTemperature) {
+                  // Market temperature card
+                  return (
+                    <Box
+                      key={card.key}
+                      sx={{
+                        background: tempMeta.gradient,
+                        borderRadius: 3,
+                        px: 3, py: 2.2,
+                        textAlign: "center",
+                        boxShadow: "0 4px 24px rgba(0,0,0,0.28)",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: "1.8rem", lineHeight: 1 }}>{tempMeta.icon}</Typography>
+                      <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: "1.5rem", mt: 0.5, letterSpacing: -0.5 }}>
+                        {tempMeta.label}
+                      </Typography>
+                      <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.63rem", textTransform: "uppercase", letterSpacing: 0.9, mt: 0.4 }}>
+                        Market Conditions
+                      </Typography>
+                    </Box>
+                  );
+                }
                 const raw = marketEnv[card.key];
                 const val = typeof raw === "number" ? card.fmt(raw) : "—";
                 return (
@@ -534,10 +553,10 @@ const JayRitterIPOAnalysis: React.FC = () => {
               }}
             >
               <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: tempMeta.gradient }} />
-              <Typography sx={{ fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5, color: "rgba(255,255,255,0.4)", mb: 0.8 }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5, color: "rgba(255,255,255,0.95)", mb: 1 }}>
                 Market Outlook
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.82rem", lineHeight: 1.75 }}>
+              <Typography sx={{ color: "#fff", fontSize: "0.85rem", lineHeight: 1.8, fontWeight: 500 }}>
                 {marketEnv.market_commentary}
               </Typography>
             </Box>
@@ -551,8 +570,8 @@ const JayRitterIPOAnalysis: React.FC = () => {
 
         {/* Portfolio strip */}
         {report && (
-          <Box sx={{ bgcolor: "#fff", py: 1.2, borderBottom: "1px solid #ebebeb", display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap", mx: -PX as any, px: PX }}>
-            <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: "#ccc", textTransform: "uppercase", letterSpacing: 1 }}>
+          <Box sx={{ bgcolor: "#fff", py: 1.2, borderBottom: "2px solid #e8e8e8", display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap", mx: -PX as any, px: PX }}>
+            <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, color: "#666", textTransform: "uppercase", letterSpacing: 1 }}>
               Book
             </Typography>
             {(["LONG", "SHORT", "AVOID"] as FilterSignal[]).map(sig => {
@@ -564,16 +583,11 @@ const JayRitterIPOAnalysis: React.FC = () => {
                 <Box key={sig} sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: cfg.color }} />
                   <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: cfg.color }}>{sig}</Typography>
-                  <Typography sx={{ fontSize: "0.8rem", color: "#555", fontWeight: 600 }}>{count}</Typography>
+                  <Typography sx={{ fontSize: "0.8rem", color: "#333", fontWeight: 600 }}>{count}</Typography>
                 </Box>
               );
             })}
             <Box sx={{ flex: 1 }} />
-            {report.processing_time_seconds && (
-              <Typography sx={{ fontSize: "0.67rem", color: "#ccc" }}>
-                Generated in {report.processing_time_seconds.toFixed(0)}s · Claude Sonnet 4
-              </Typography>
-            )}
           </Box>
         )}
 
@@ -589,9 +603,9 @@ const JayRitterIPOAnalysis: React.FC = () => {
                 sx={{
                   px: 2, py: 0.55, borderRadius: 5, cursor: "pointer", userSelect: "none",
                   fontSize: "0.78rem", fontWeight: 700, transition: "all 0.15s",
-                  bgcolor: active ? (cfg ? cfg.bg : "#ede7f6") : "#fff",
-                  color: active ? (cfg ? cfg.color : "#481f93") : "#999",
-                  border: `1.5px solid ${active ? (cfg ? cfg.color : "#481f93") : "#e0e0e0"}`,
+                  bgcolor: active ? (cfg ? cfg.bg : "#ede7f6") : "#f5f5f5",
+                  color: active ? (cfg ? cfg.color : "#481f93") : "#555",
+                  border: `1.5px solid ${active ? (cfg ? cfg.color : "#481f93") : "#ddd"}`,
                   boxShadow: active ? `0 0 8px ${cfg?.glow ?? "transparent"}` : "none",
                 }}
               >
@@ -608,7 +622,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 16, color: "#bbb" }} />
+                  <SearchIcon sx={{ fontSize: 16, color: "#999" }} />
                 </InputAdornment>
               ),
             }}
@@ -629,44 +643,44 @@ const JayRitterIPOAnalysis: React.FC = () => {
             <TableContainer>
               <Table size="small" stickyHeader>
                 <TableHead>
-                  <TableRow sx={{ "& th": { bgcolor: "#1a0533", color: "rgba(255,255,255,0.8)", fontWeight: 700, fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.8, py: 1.3, borderBottom: "none" } }}>
-                    <TableCell sx={{ bgcolor: "#1a0533 !important", width: 36 }} />
-                    <TableCell sx={{ bgcolor: "#1a0533 !important" }}>
+                  <TableRow sx={{ "& th": { bgcolor: "#5e35b1", color: "#fff", fontWeight: 800, fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: 0.8, py: 1.3, borderBottom: "none" } }}>
+                    <TableCell sx={{ bgcolor: "#5e35b1 !important", width: 36 }} />
+                    <TableCell sx={{ bgcolor: "#5e35b1 !important" }}>
                       <TableSortLabel active={sortField === "ticker"} direction={sortDir} onClick={() => handleSort("ticker")}
-                        sx={{ color: "rgba(255,255,255,0.8) !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.4) !important" } }}>
+                        sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
                         Ticker
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ bgcolor: "#1a0533 !important" }}>Issuer</TableCell>
-                    <TableCell sx={{ bgcolor: "#1a0533 !important" }}>Sector</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>
+                    <TableCell sx={{ bgcolor: "#5e35b1 !important" }}>Issuer</TableCell>
+                    <TableCell sx={{ bgcolor: "#5e35b1 !important" }}>Sector</TableCell>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>
                       <TableSortLabel active={sortField === "days_since_ipo"} direction={sortDir} onClick={() => handleSort("days_since_ipo")}
-                        sx={{ color: "rgba(255,255,255,0.8) !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.4) !important" } }}>
+                        sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
                         Days
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>Tier</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>Score</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Tier</TableCell>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Score</TableCell>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>
                       <TableSortLabel active={sortField === "overall_signal"} direction={sortDir} onClick={() => handleSort("overall_signal")}
-                        sx={{ color: "rgba(255,255,255,0.8) !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.4) !important" } }}>
+                        sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
                         Signal
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>Technical</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#1a0533 !important" }}>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Technical</TableCell>
+                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>
                       <TableSortLabel active={sortField === "confidence_score"} direction={sortDir} onClick={() => handleSort("confidence_score")}
-                        sx={{ color: "rgba(255,255,255,0.8) !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.4) !important" } }}>
+                        sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
                         Confidence
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ bgcolor: "#1a0533 !important" }}>Action</TableCell>
+                    <TableCell sx={{ bgcolor: "#5e35b1 !important" }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {visible.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} align="center" sx={{ py: 8, color: "#ccc", fontSize: "0.9rem" }}>
+                      <TableCell colSpan={11} align="center" sx={{ py: 8, color: "#888", fontSize: "0.9rem", fontWeight: 500 }}>
                         No IPOs match the current filter.
                       </TableCell>
                     </TableRow>
@@ -679,7 +693,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
           )}
         </Paper>
 
-        <Typography sx={{ fontSize: "0.68rem", color: "#bbb", pb: 3 }}>
+        <Typography sx={{ fontSize: "0.68rem", color: "#888", pb: 3, fontWeight: 500 }}>
           Showing {visible.length} of {tickers.length} IPOs · Click any row to expand full analysis
         </Typography>
 

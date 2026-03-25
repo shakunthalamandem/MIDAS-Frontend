@@ -207,16 +207,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           showPct ? formatPctVal(row.dtd_pnl_pct) : formatCurrency(row.dtd_pnl),
       },
       {
-        field: "mtd_pnl",
-        headerName: "MTD P&L",
+        field: "wtd_pnl",
+        headerName: "WTD P&L",
         flex: 1,
         minWidth: 120,
         headerAlign: "right",
         align: "right",
         valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.mtd_pnl_pct : value,
+          showPct ? row.wtd_pnl_pct : value,
         renderCell: ({ row }) =>
-          showPct ? formatPctVal(row.mtd_pnl_pct) : formatCurrency(row.mtd_pnl),
+          showPct ? formatPctVal(row.wtd_pnl_pct) : formatCurrency(row.wtd_pnl),
       },
       {
         field: "ytd_pnl",
