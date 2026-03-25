@@ -80,7 +80,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                 )}
                 {pct && (
                   <Box className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}>
-                    {pct}
+                    {displayPct}
                   </Box>
                 )}
               </Box>
@@ -90,7 +90,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                 <Box className={`risk-card-hover-overlay risk-card-hover-overlay--${cfg.color}`}>
                   <Box className="risk-card-hover-label">{cfg.label}</Box>
                   {!isPctOnly && <Box className="risk-card-hover-value">{formatFullCurrency(value)}</Box>}
-                  {pct && <Box className={isPctOnly ? "risk-card-hover-value" : "risk-card-hover-pct"}>{pct}</Box>}
+                  {pct && <Box className={isPctOnly ? "risk-card-hover-value" : "risk-card-hover-pct"}>{displayPct}</Box>}
                 </Box>
               )}
             </Box>
