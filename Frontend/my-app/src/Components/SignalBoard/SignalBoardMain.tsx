@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,6 +11,10 @@ import {
   Tooltip,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import {
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
@@ -21,6 +25,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import SearchIcon from "@mui/icons-material/Search";
 
 import type { SignalBoardItem, SignalBoardResponse } from "./SignalBoardTypes";
 
@@ -585,6 +590,7 @@ const SignalBoardMain: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -689,11 +695,22 @@ const SignalBoardMain: React.FC = () => {
     });
   };
 
+  // Filter by search term
+  const allSignals = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return data?.signals || [];
+    return (data?.signals || []).filter(
+      (s) =>
+        s.ticker?.toLowerCase().includes(term) ||
+        s.issuer_name?.toLowerCase().includes(term)
+    );
+  }, [data?.signals, searchTerm]);
+
   // Split signals into upcoming and trading
-  const upcomingSignals = (data?.signals || []).filter((s) =>
+  const upcomingSignals = allSignals.filter((s) =>
     isUpcoming(s.deal_status)
   );
-  const tradingSignals = (data?.signals || []).filter(
+  const tradingSignals = allSignals.filter(
     (s) => !isUpcoming(s.deal_status)
   );
 
@@ -769,11 +786,39 @@ const SignalBoardMain: React.FC = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-          <AccessTimeIcon sx={{ fontSize: 16, color: "#94A3B8" }} />
-          <Typography sx={{ fontSize: 12, color: "#94A3B8", fontWeight: 600 }}>
-            Updated: {lastUpdated}
-          </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Search bar */}
+          <TextField
+            size="small"
+            placeholder="Search by ticker or company..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18, color: "#94A3B8" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              width: 280,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                bgcolor: "#FFFFFF",
+                fontSize: 13,
+                fontWeight: 500,
+                "& fieldset": { borderColor: "#E2E8F0" },
+                "&:hover fieldset": { borderColor: "#CBD5E1" },
+                "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+              },
+            }}
+          />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+            <AccessTimeIcon sx={{ fontSize: 16, color: "#94A3B8" }} />
+            <Typography sx={{ fontSize: 12, color: "#94A3B8", fontWeight: 600 }}>
+              Updated: {lastUpdated}
+            </Typography>
+          </Box>
         </Box>
       </MotionBox>
 
