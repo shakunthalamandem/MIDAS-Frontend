@@ -34,6 +34,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
             ? formatPct(data[cfg.pctKey as keyof HeadlineRisksData] as number)
             : "";
           const isPctOnly = "pctOnly" in cfg && cfg.pctOnly;
+          const displayPct = isPctOnly ? pct.replace(/[()]/g, "") : pct;
           const isClickable = cfg.clickable;
           const isSelected = isClickable && "category" in cfg && selectedCategory === cfg.category;
           const selectedBg = SELECTED_COLORS[cfg.color] || "#2563eb";
@@ -78,10 +79,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                   </Box>
                 )}
                 {pct && (
-                  <Box
-                    className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}
-                    sx={isSelected ? { color: "rgba(255,255,255,0.85) !important" } : {}}
-                  >
+                  <Box className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}>
                     {pct}
                   </Box>
                 )}
