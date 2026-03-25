@@ -1,30 +1,30 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
-  Avatar,
   Box,
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Paper,
   Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddIcon from "@mui/icons-material/Add";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import { AIAgent } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
 
-const POLL_INTERVAL_MS = 15_000; // 15 seconds
+const POLL_INTERVAL_MS = 15_000;
 
 const Agents: React.FC = () => {
   const isAdmin = localStorage.getItem("is_superuser") === "true";
@@ -51,47 +51,30 @@ const Agents: React.FC = () => {
       setAgents(data);
     } catch (err) {
       console.error("Failed to load agents:", err);
-      setSnackbar({
-        open: true,
-        message: "Failed to load agents",
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: "Failed to load agents", severity: "error" });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    loadAgents();
-  }, [loadAgents]);
+  useEffect(() => { loadAgents(); }, [loadAgents]);
 
-  // Poll if any agent has pending/running status
   useEffect(() => {
     const hasInProgress = agents.some(
       (a) => a.output_status === "pending" || a.output_status === "running"
     );
-
     if (hasInProgress) {
       pollRef.current = setInterval(() => {
-        fetchAgents()
-          .then(setAgents)
-          .catch(() => {}); // silent refresh
+        fetchAgents().then(setAgents).catch(() => {});
       }, POLL_INTERVAL_MS);
     }
-
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [agents]);
 
   const handleEmailToggle = async (agent: AIAgent, enabled: boolean) => {
-    // Optimistic update
     setAgents((prev) =>
-      prev.map((a) =>
-        a.id === agent.id ? { ...a, email_enabled: enabled } : a
-      )
+      prev.map((a) => (a.id === agent.id ? { ...a, email_enabled: enabled } : a))
     );
-
     try {
       await toggleEmailPreference(agent.id, enabled);
       setSnackbar({
@@ -102,11 +85,8 @@ const Agents: React.FC = () => {
         severity: "success",
       });
     } catch (err: any) {
-      // Revert on failure
       setAgents((prev) =>
-        prev.map((a) =>
-          a.id === agent.id ? { ...a, email_enabled: !enabled } : a
-        )
+        prev.map((a) => (a.id === agent.id ? { ...a, email_enabled: !enabled } : a))
       );
       setSnackbar({
         open: true,
@@ -126,52 +106,73 @@ const Agents: React.FC = () => {
     setDeleting(true);
     try {
       await deleteAgent(agentToDelete.id);
-      setSnackbar({
-        open: true,
-        message: `Agent "${agentToDelete.name}" deleted`,
-        severity: "success",
-      });
+      setSnackbar({ open: true, message: `Agent "${agentToDelete.name}" deleted`, severity: "success" });
       setDeleteDialogOpen(false);
       setAgentToDelete(null);
       loadAgents();
     } catch (err: any) {
-      setSnackbar({
-        open: true,
-        message: err.message || "Failed to delete agent",
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: err.message || "Failed to delete agent", severity: "error" });
     } finally {
       setDeleting(false);
     }
   };
 
   const totalAgents = agents.length;
-  const activeAgents = agents.filter((a) => a.output_status === "completed" || a.agent_type === "system").length;
-  const workingAgents = agents.filter((a) => a.output_status === "pending" || a.output_status === "running").length;
+  const activeAgents = agents.filter(
+    (a) => a.output_status === "completed" || a.agent_type === "system"
+  ).length;
+  const workingAgents = agents.filter(
+    (a) => a.output_status === "pending" || a.output_status === "running"
+  ).length;
 
   return (
-    <Box sx={{ backgroundColor: "#edf0f7", minHeight: "100vh", p: 4 }}>
-      <Box sx={{ maxWidth: 1200, mx: "auto" }}>
-        {/* Header */}
-        <Paper sx={{ p: 4, mb: 4 }}>
+    <Box sx={{ bgcolor: "#e8eaf0", minHeight: "100vh" }}>
+      {/* ── Header ── */}
+      <Box
+        sx={{
+          bgcolor: "#fff",
+          borderBottom: "1px solid #c7d2fe",
+          px: { xs: 2, md: 5 },
+          pt: { xs: 3, md: 4 },
+          pb: { xs: 4, md: 5 },
+        }}
+      >
+        <Box sx={{ maxWidth: 1320, mx: "auto" }}>
+          {/* Title row */}
           <Stack
-            direction="row"
-            spacing={2}
-            alignItems="center"
+            direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            spacing={2}
           >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar sx={{ bgcolor: "#efd4ff" }}>
-                <AutoAwesomeIcon sx={{ color: "#5b2fff" }} />
-              </Avatar>
-
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Box
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: 3,
+                  bgcolor: "#4f46e5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
+              </Box>
               <Box>
-                <Typography variant="h4" fontWeight={700}>
-                  MIDAS AI Agents
+                <Typography
+                  sx={{
+                    fontSize: { xs: "1.4rem", md: "1.65rem" },
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: "-0.025em",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  AI Agents
                 </Typography>
-                <Typography color="text.secondary">
-                  Autonomous financial AI agents that continuously analyze
-                  markets and deliver actionable insights.
+                <Typography sx={{ color: "#374151", fontSize: "0.85rem", mt: 0.3 }}>
+                  Autonomous financial agents analyzing markets around the clock.
                 </Typography>
               </Box>
             </Stack>
@@ -179,58 +180,182 @@ const Agents: React.FC = () => {
             <Button
               variant="contained"
               startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
-              onClick={() => isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)}
+              onClick={() =>
+                isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
+              }
               sx={{
                 textTransform: "none",
-                bgcolor: isAdmin ? "#5b2fff" : "#6b7280",
-                "&:hover": { bgcolor: isAdmin ? "#481f93" : "#4b5563" },
-                whiteSpace: "nowrap",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                px: 3,
+                py: 1.1,
+                borderRadius: 2.5,
+                bgcolor: isAdmin ? "#4f46e5" : "#475569",
+                boxShadow: "none",
+                "&:hover": {
+                  bgcolor: isAdmin ? "#4338ca" : "#334155",
+                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                },
               }}
             >
               Create Agent
             </Button>
           </Stack>
 
-          <Stack direction="row" spacing={1} mt={2}>
-            <Chip label={`${totalAgents} Agents`} color="info" />
-            <Chip label={`${activeAgents} Ready`} color="success" />
+          {/* Stat pills */}
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap">
+            {/* Total */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                bgcolor: "#f0f0ff",
+                border: "1px solid #e0e0f7",
+                borderRadius: 3,
+                px: 2.5,
+                py: 1.5,
+                minWidth: 170,
+              }}
+            >
+              <WidgetsOutlinedIcon sx={{ color: "#4f46e5", fontSize: 22 }} />
+              <Box>
+                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                  {totalAgents}
+                </Typography>
+                <Typography sx={{ fontSize: "0.72rem", color: "#312e81", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Total Agents
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Ready */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                bgcolor: "#ecfdf5",
+                border: "1px solid #d1fae5",
+                borderRadius: 3,
+                px: 2.5,
+                py: 1.5,
+                minWidth: 170,
+              }}
+            >
+              <CheckCircleIcon sx={{ color: "#059669", fontSize: 22 }} />
+              <Box>
+                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                  {activeAgents}
+                </Typography>
+                <Typography sx={{ fontSize: "0.72rem", color: "#064e3b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Ready
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Working */}
             {workingAgents > 0 && (
-              <Chip
-                label={`${workingAgents} Working`}
-                sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600 }}
-              />
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  bgcolor: "#fffbeb",
+                  border: "1px solid #fde68a",
+                  borderRadius: 3,
+                  px: 2.5,
+                  py: 1.5,
+                  minWidth: 170,
+                }}
+              >
+                <PendingIcon sx={{ color: "#d97706", fontSize: 22 }} />
+                <Box>
+                  <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                    {workingAgents}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.72rem", color: "#92400e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Working
+                  </Typography>
+                </Box>
+              </Box>
             )}
           </Stack>
-        </Paper>
+        </Box>
+      </Box>
 
-        {/* Agent grid */}
+      {/* ── Agent Grid ── */}
+      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, py: 4 }}>
         {loading ? (
-          <Typography textAlign="center" py={4} color="text.secondary">
-            Loading agents...
-          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  height: 340,
+                  borderRadius: 4,
+                  bgcolor: "#fff",
+                  border: "1px solid #c7d2fe",
+                  animation: "pulse 1.5s ease-in-out infinite",
+                  "@keyframes pulse": {
+                    "0%, 100%": { opacity: 1 },
+                    "50%": { opacity: 0.5 },
+                  },
+                }}
+              />
+            ))}
+          </Box>
         ) : agents.length === 0 ? (
-          <Paper sx={{ p: 6, textAlign: "center" }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 10,
+              px: 4,
+              bgcolor: "#fff",
+              borderRadius: 4,
+              border: "1px solid #c7d2fe",
+            }}
+          >
+            <SmartToyOutlinedIcon sx={{ fontSize: 56, color: "#4f46e5", mb: 2 }} />
+            <Typography sx={{ fontWeight: 700, fontSize: "1.15rem", color: "#111827", mb: 1 }}>
               No agents found
             </Typography>
-            <Typography color="text.secondary" mb={2}>
-              {isAdmin ? "Create your first AI agent to get started." : "No agents have been set up yet. Contact your admin."}
+            <Typography sx={{ color: "#374151", mb: 3, maxWidth: 380, mx: "auto" }}>
+              {isAdmin
+                ? "Create your first AI agent to get started."
+                : "No agents have been set up yet. Contact your admin."}
             </Typography>
             {isAdmin && (
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => setCreateOpen(true)}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  px: 3.5,
+                  py: 1.1,
+                  borderRadius: 2.5,
+                  bgcolor: "#4f46e5",
+                  boxShadow: "none",
+                  "&:hover": { bgcolor: "#4338ca" },
+                }}
               >
                 Create Agent
               </Button>
             )}
-          </Paper>
+          </Box>
         ) : (
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" },
               gap: 3,
             }}
           >
@@ -254,27 +379,41 @@ const Agents: React.FC = () => {
         )}
       </Box>
 
-      {/* Create Agent Dialog — admin only */}
+      {/* Create Agent Dialog */}
       <CreateAgentDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={loadAgents}
       />
 
-      {/* Admin Gate Dialog — shown to non-admin users */}
-      <Dialog open={adminGateOpen} onClose={() => setAdminGateOpen(false)}>
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <LockOutlinedIcon sx={{ color: "#6b7280" }} />
+      {/* Admin Gate Dialog */}
+      <Dialog
+        open={adminGateOpen}
+        onClose={() => setAdminGateOpen(false)}
+        PaperProps={{ sx: { borderRadius: 4, border: "1px solid #c7d2fe" } }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: 700, color: "#111827" }}>
+          <LockOutlinedIcon sx={{ color: "#4f46e5" }} />
           Admin Access Required
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Creating new agents is restricted to administrators. Please reach
-            out to your MIDAS admin to request a new agent be set up.
+          <DialogContentText sx={{ color: "#1e293b" }}>
+            Creating new agents is restricted to administrators. Please reach out to your MIDAS admin to request a new agent be set up.
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAdminGateOpen(false)} variant="contained" sx={{ bgcolor: "#5b2fff", "&:hover": { bgcolor: "#481f93" }, textTransform: "none" }}>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setAdminGateOpen(false)}
+            variant="contained"
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              borderRadius: 2.5,
+              bgcolor: "#4f46e5",
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#4338ca" },
+            }}
+          >
             Got it
           </Button>
         </DialogActions>
@@ -284,19 +423,16 @@ const Agents: React.FC = () => {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => !deleting && setDeleteDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: 4, border: "1px solid #fecaca" } }}
       >
-        <DialogTitle>Delete Agent</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700, color: "#991b1b" }}>Delete Agent</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete "{agentToDelete?.name}"? This will
-            also remove all its output history. This action cannot be undone.
+            Are you sure you want to delete "{agentToDelete?.name}"? This will also remove all its output history. This action cannot be undone.
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            disabled={deleting}
-          >
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting} sx={{ textTransform: "none", borderRadius: 2.5 }}>
             Cancel
           </Button>
           <Button
@@ -304,6 +440,7 @@ const Agents: React.FC = () => {
             color="error"
             onClick={handleConfirmDelete}
             disabled={deleting}
+            sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2.5, boxShadow: "none" }}
           >
             {deleting ? "Deleting..." : "Delete"}
           </Button>
@@ -320,6 +457,7 @@ const Agents: React.FC = () => {
         <Alert
           severity={snackbar.severity}
           onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          sx={{ borderRadius: 3 }}
         >
           {snackbar.message}
         </Alert>

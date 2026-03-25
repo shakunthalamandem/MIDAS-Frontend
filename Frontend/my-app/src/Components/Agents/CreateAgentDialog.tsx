@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -16,6 +15,8 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { CreateAgentPayload } from "./types";
 import { createAgent, runAgent } from "./agentService";
 
@@ -43,7 +44,8 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [scheduleType, setScheduleType] = useState<CreateAgentPayload["schedule_type"]>("daily");
+  const [scheduleType, setScheduleType] =
+    useState<CreateAgentPayload["schedule_type"]>("daily");
   const [time, setTime] = useState("09:00");
   const [weekday, setWeekday] = useState("1");
   const [hourInterval, setHourInterval] = useState("2");
@@ -79,18 +81,9 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
   };
 
   const handleSubmit = async (runNow: boolean) => {
-    if (!name.trim()) {
-      setError("Agent name is required");
-      return;
-    }
-    if (!description.trim()) {
-      setError("Description is required");
-      return;
-    }
-    if (!prompt.trim()) {
-      setError("Prompt is required");
-      return;
-    }
+    if (!name.trim()) { setError("Agent name is required"); return; }
+    if (!description.trim()) { setError("Description is required"); return; }
+    if (!prompt.trim()) { setError("Prompt is required"); return; }
 
     setSaving(true);
     setError(null);
@@ -109,7 +102,9 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
 
       if (runNow) {
         await runAgent(agent.id);
-        setSuccess(`Agent "${agent.name}" created and run triggered! You'll receive the output via email.`);
+        setSuccess(
+          `Agent "${agent.name}" created and run triggered! You'll receive the output via email.`
+        );
       } else {
         setSuccess(`Agent "${agent.name}" created successfully!`);
       }
@@ -132,16 +127,75 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
     onClose();
   };
 
-  return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 700, color: "#481f93" }}>
-        Create New AI Agent
-      </DialogTitle>
+  const inputSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      bgcolor: "#eef2ff",
+      "&:hover": { bgcolor: "#e0e7ff" },
+      "&.Mui-focused": {
+        bgcolor: "#fff",
+        boxShadow: "0 0 0 3px rgba(79,70,229,0.08)",
+      },
+      "& fieldset": { borderColor: "#a5b4fc" },
+      "&:hover fieldset": { borderColor: "#818cf8" },
+      "&.Mui-focused fieldset": { borderColor: "#4f46e5" },
+    },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#4f46e5" },
+  };
 
-      <DialogContent>
-        <Stack spacing={2.5} sx={{ mt: 1 }}>
-          {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="success">{success}</Alert>}
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          overflow: "hidden",
+          border: "1px solid #c7d2fe",
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          bgcolor: "#fff",
+          borderBottom: "1px solid #e8e8ef",
+          px: 3,
+          py: 2.5,
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+        }}
+      >
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            borderRadius: 2.5,
+            bgcolor: "#4f46e5",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
+        </Box>
+        <Box>
+          <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "1.05rem" }}>
+            Create New AI Agent
+          </Typography>
+          <Typography sx={{ color: "#4338ca", fontSize: "0.78rem" }}>
+            Configure your autonomous financial agent
+          </Typography>
+        </Box>
+      </Box>
+
+      <DialogContent sx={{ px: 3, pt: 3, pb: 1 }}>
+        <Stack spacing={2.5}>
+          {error && <Alert severity="error" sx={{ borderRadius: 2.5 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ borderRadius: 2.5 }}>{success}</Alert>}
 
           <TextField
             label="Agent Name"
@@ -150,6 +204,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             fullWidth
             required
             placeholder="e.g., Earnings Analysis Agent"
+            sx={inputSx}
           />
 
           <TextField
@@ -161,6 +216,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             multiline
             rows={2}
             placeholder="What does this agent do?"
+            sx={inputSx}
           />
 
           <TextField
@@ -172,9 +228,10 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             multiline
             rows={4}
             placeholder="Enter the prompt/instructions for this agent..."
+            sx={inputSx}
           />
 
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={inputSx}>
             <InputLabel>Schedule Type</InputLabel>
             <Select
               value={scheduleType}
@@ -190,7 +247,6 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             </Select>
           </FormControl>
 
-          {/* Dynamic schedule inputs */}
           {(scheduleType === "daily" || scheduleType === "weekly") && (
             <TextField
               label="Time"
@@ -198,11 +254,12 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
               value={time}
               onChange={(e) => setTime(e.target.value)}
               InputLabelProps={{ shrink: true }}
+              sx={inputSx}
             />
           )}
 
           {scheduleType === "weekly" && (
-            <FormControl fullWidth>
+            <FormControl fullWidth sx={inputSx}>
               <InputLabel>Day of Week</InputLabel>
               <Select
                 value={weekday}
@@ -225,42 +282,73 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
               value={hourInterval}
               onChange={(e) => setHourInterval(e.target.value)}
               inputProps={{ min: 1, max: 24 }}
+              sx={inputSx}
             />
           )}
 
           <Box
             sx={{
               p: 2,
-              bgcolor: "#f8f7ff",
-              borderRadius: 2,
-              border: "1px solid #e0dff7",
+              bgcolor: "#eef2ff",
+              borderRadius: 2.5,
+              border: "1px solid #a5b4fc",
             }}
           >
-            <Typography variant="caption" color="text.secondary">
-              Your agent will be always active and run according to the schedule above.
-              Toggle "Email Me" on the agent card to receive results via email.
+            <Typography sx={{ fontSize: "0.78rem", color: "#312e81", lineHeight: 1.6 }}>
+              Your agent will be always active and run according to the schedule
+              above. Toggle "Email Alerts" on the agent card to receive results
+              via email.
             </Typography>
           </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose} disabled={saving}>
+      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1, borderTop: "1px solid #c7d2fe", pt: 2 }}>
+        <Button
+          onClick={handleClose}
+          disabled={saving}
+          sx={{ textTransform: "none", borderRadius: 2.5, color: "#1e293b", fontWeight: 600 }}
+        >
           Cancel
         </Button>
         <Button
           variant="outlined"
           onClick={() => handleSubmit(false)}
           disabled={saving}
+          sx={{
+            textTransform: "none",
+            fontWeight: 700,
+            borderRadius: 2.5,
+            borderColor: "#4f46e5",
+            color: "#4f46e5",
+            px: 2.5,
+            "&:hover": { borderColor: "#4338ca", bgcolor: "#eef2ff" },
+          }}
         >
-          {saving ? <CircularProgress size={20} /> : "Create"}
+          {saving ? <CircularProgress size={18} /> : "Create"}
         </Button>
         <Button
           variant="contained"
           onClick={() => handleSubmit(true)}
           disabled={saving}
+          startIcon={
+            saving ? (
+              <CircularProgress size={16} sx={{ color: "#fff" }} />
+            ) : (
+              <RocketLaunchIcon sx={{ fontSize: 16 }} />
+            )
+          }
+          sx={{
+            textTransform: "none",
+            fontWeight: 700,
+            borderRadius: 2.5,
+            px: 2.5,
+            bgcolor: "#4f46e5",
+            boxShadow: "none",
+            "&:hover": { bgcolor: "#4338ca", boxShadow: "0 4px 12px rgba(79,70,229,0.25)" },
+          }}
         >
-          {saving ? <CircularProgress size={20} /> : "Create & Run Now"}
+          Create & Run Now
         </Button>
       </DialogActions>
     </Dialog>
