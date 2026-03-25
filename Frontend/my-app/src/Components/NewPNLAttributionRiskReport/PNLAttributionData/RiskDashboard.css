@@ -137,11 +137,76 @@
 }
 
 /* ── Category Toggle Bar ── */
-.category-toggle-bar {
+/* ── Category + PNL unified row ── */
+.category-pnl-row {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+}
+
+.category-toggle-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Inline PNL chips ── */
+.pnl-cards-inline {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.pnl-chip {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.pnl-chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.pnl-chip--selected {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.pnl-chip-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.pnl-chip-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.pnl-chip-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.pnl-chip-pct {
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .category-toggle-btn {
@@ -188,6 +253,10 @@
 }
 
 @media (max-width: 768px) {
+  .category-pnl-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .category-toggle-bar {
     gap: 8px;
   }
@@ -196,6 +265,9 @@
   }
   .category-toggle-label {
     font-size: 12px;
+  }
+  .pnl-cards-inline {
+    margin-left: 0;
   }
 }
 

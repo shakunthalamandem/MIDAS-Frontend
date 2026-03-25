@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, CircularProgress } from "@mui/material";
 import type { HeadlinePnl, DashboardCategory, HeadlineMetricValues } from "./types";
-import { formatCurrencyAsK, formatFullCurrency } from "./utils";
+import { formatCurrencyAsK } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
@@ -12,13 +12,6 @@ interface HeadlinePnLProps {
   metricHeadlineData: HeadlineMetricValues | null;
   metricHeadlineLoading: boolean;
 }
-
-const CATEGORY_LABELS: Record<DashboardCategory, string> = {
-  pnl: "P&L",
-  gross_market_value: "GROSS MARKET VALUE",
-  delta_adj_net_mv: "DELTA ADJ. NET MV",
-  beta_adj_net_mv: "BETA ADJ. NET MV",
-};
 
 const PNL_CARDS = [
   { title: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct", metricKey: "dtd_pnl" },
@@ -54,7 +47,6 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
   metricHeadlineLoading,
 }) => {
   const isPnl = selectedCategory === "pnl";
-  const sectionTitle = `HEADLINE ${CATEGORY_LABELS[selectedCategory] || "P&L"}`;
 
   const shortLabel: Record<DashboardCategory, string> = {
     pnl: "P&L",
@@ -78,22 +70,17 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
   };
 
   return (
-    <Box className="risk-dashboard-section">
-      <Box className="risk-dashboard-section-title">{sectionTitle}</Box>
-
+    <>
       {!isPnl && metricHeadlineLoading ? (
-        <Box className="risk-dashboard-loading" sx={{ minHeight: 100 }}>
-          <CircularProgress size={28} />
+        <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
+          <CircularProgress size={22} />
         </Box>
       ) : (
-        <Box className="pnl-cards-grid">
+        <Box className="pnl-cards-inline">
           {cards.map((cfg) => {
             const value = toNumber(dataSource[cfg.valueKey]);
             const pct = toNumber(dataSource[cfg.pctKey]);
             const isPositive = (value ?? 0) >= 0;
-            const modifier = isPnl
-              ? (isPositive ? "positive" : "negative")
-              : "positive"; // non-pnl always uses positive style but with category color
             const isSelected = selectedMetric === cfg.metricKey;
             const selectedBg = isPnl
               ? (isPositive ? colors.positive : colors.negative)
@@ -105,73 +92,53 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
             return (
               <Box
                 key={cfg.metricKey}
-                className={`pnl-card${isSelected ? "" : ` pnl-card--${modifier}`}${isSelected ? " pnl-card--selected" : ""}`}
+                className={`pnl-chip${isSelected ? " pnl-chip--selected" : ""}`}
                 onClick={() => handleCardClick(cfg.metricKey)}
                 sx={{
                   cursor: "pointer",
-                  ...(!isPnl && !isSelected && {
-                    borderLeft: `4px solid ${selectedBg}`,
-                  }),
                   ...(isSelected && {
                     background: `${selectedBg} !important`,
-                    border: `1px solid ${selectedBg} !important`,
-                    borderLeft: `4px solid ${selectedBg} !important`,
+                    borderColor: `${selectedBg} !important`,
+                  }),
+                  ...(!isSelected && {
+                    borderLeft: `3px solid ${textColor}`,
                   }),
                 }}
               >
-                <Box className="pnl-card-header">
-                  <Box
-                    className={isSelected ? "" : "pnl-card-title"}
-                    sx={isSelected ? { fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.9)" } : {}}
-                  >
-                    {cfg.title}
-                  </Box>
+                <Box
+                  className="pnl-chip-label"
+                  sx={isSelected ? { color: "rgba(255,255,255,0.85) !important" } : {}}
+                >
+                  {cfg.title}
                 </Box>
-                <Box>
+                <Box className="pnl-chip-value-row">
                   <Box
                     component="span"
-                    className={isSelected ? "" : undefined}
+                    className="pnl-chip-value"
                     sx={isSelected
-                      ? { fontSize: 20, fontWeight: 700, color: "#fff" }
-                      : { fontSize: 20, fontWeight: 700, color: textColor }
+                      ? { color: "#fff !important" }
+                      : { color: `${textColor} !important` }
                     }
                   >
                     {value === null ? "--" : formatCurrencyAsK(value)}
                   </Box>
                   <Box
                     component="span"
-                    className={isSelected ? "" : undefined}
+                    className="pnl-chip-pct"
                     sx={isSelected
-                      ? { fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)", ml: 0.75 }
-                      : { fontSize: 13, fontWeight: 500, color: textColor, ml: 0.75 }
+                      ? { color: "rgba(255,255,255,0.75) !important" }
+                      : { color: `${textColor} !important` }
                     }
                   >
-                    {pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}
+                    {pct === null ? "" : `(${pct.toFixed(2)}%)`}
                   </Box>
                 </Box>
-
-                {/* Hover overlay (hidden when selected) */}
-                {!isSelected && (
-                  <Box
-                    className={isPnl
-                      ? `pnl-card-hover-overlay pnl-card-hover-overlay--${modifier}`
-                      : "pnl-card-hover-overlay"
-                    }
-                    sx={!isPnl ? {
-                      background: `linear-gradient(135deg, ${selectedBg}ee, ${selectedBg}dd) !important`,
-                    } : undefined}
-                  >
-                    <Box className="pnl-card-hover-label">{cfg.title}</Box>
-                    <Box className="pnl-card-hover-value">{value === null ? "--" : formatFullCurrency(value)}</Box>
-                    <Box className="pnl-card-hover-pct">{pct === null ? "(--)" : `(${pct.toFixed(2)}%)`}</Box>
-                  </Box>
-                )}
               </Box>
             );
           })}
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 

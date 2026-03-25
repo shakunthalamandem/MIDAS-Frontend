@@ -375,38 +375,37 @@ const RiskDashboard: React.FC = () => {
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
               />
-              {/* Category Toggle Buttons */}
-              <Box className="category-toggle-bar">
-                {([
-                  { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
-                  { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
-                  { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
-                  { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
-                ]).map((btn) => (
-                  <Box
-                    key={btn.key}
-                    className={`category-toggle-btn${selectedCategory === btn.key ? " category-toggle-btn--active" : ""}`}
-                    onClick={() => handleCategorySelect(btn.key)}
-                  >
-                    <span className="category-toggle-icon">{btn.icon}</span>
-                    <span className="category-toggle-label">{btn.label}</span>
-                  </Box>
-                ))}
+              {/* Category Toggles + Headline PNL in one row */}
+              <Box className="category-pnl-row">
+                <Box className="category-toggle-bar">
+                  {([
+                    { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
+                    { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
+                    { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
+                    { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
+                  ]).map((btn) => (
+                    <Box
+                      key={btn.key}
+                      className={`category-toggle-btn${selectedCategory === btn.key ? " category-toggle-btn--active" : ""}`}
+                      onClick={() => handleCategorySelect(btn.key)}
+                    >
+                      <span className="category-toggle-icon">{btn.icon}</span>
+                      <span className="category-toggle-label">{btn.label}</span>
+                    </Box>
+                  ))}
+                </Box>
+                {(data.headline_pnl || selectedCategory !== "pnl") && (
+                  <HeadlinePnL
+                    data={data.headline_pnl}
+                    selectedMetric={selectedMetric}
+                    onMetricSelect={setSelectedMetric}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={handleCategorySelect}
+                    metricHeadlineData={metricHeadlineData}
+                    metricHeadlineLoading={metricHeadlineLoading}
+                  />
+                )}
               </Box>
-            </Box>
-          )}
-
-          {(data.headline_pnl || selectedCategory !== "pnl") && (
-            <Box className="pdf-section" data-pdf-page="1">
-              <HeadlinePnL
-                data={data.headline_pnl}
-                selectedMetric={selectedMetric}
-                onMetricSelect={setSelectedMetric}
-                selectedCategory={selectedCategory}
-                onCategorySelect={handleCategorySelect}
-                metricHeadlineData={metricHeadlineData}
-                metricHeadlineLoading={metricHeadlineLoading}
-              />
             </Box>
           )}
 
