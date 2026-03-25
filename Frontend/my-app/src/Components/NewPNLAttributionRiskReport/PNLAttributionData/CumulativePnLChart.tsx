@@ -9,13 +9,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { ChartDataPoint } from "./types";
+import type { ChartDataPoint, DashboardCategory, MetricChartDataPoint } from "./types";
 import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
 
 interface CumulativePnLChartProps {
   chartData: ChartDataPoint[];
   loading: boolean;
   period: string;
+  category?: DashboardCategory;
+  metricChartData?: MetricChartDataPoint[];
+  metricChartLoading?: boolean;
 }
 
 const PERIOD_LABELS: Record<string, string> = {
@@ -25,38 +28,68 @@ const PERIOD_LABELS: Record<string, string> = {
   ytd: "YTD",
 };
 
+const CATEGORY_LABELS: Record<string, string> = {
+  pnl: "P&L",
+  gross_market_value: "Gross Market Value",
+  delta_adj_net_mv: "Delta Adj. Net MV",
+  beta_adj_net_mv: "Beta Adj. Net MV",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  pnl: "#7c3aed",
+  gross_market_value: "#2563eb",
+  delta_adj_net_mv: "#0891b2",
+  beta_adj_net_mv: "#ea580c",
+};
+
 const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
   chartData,
   loading,
   period,
+  category = "pnl",
+  metricChartData = [],
+  metricChartLoading = false,
 }) => {
+  const isPnl = category === "pnl";
+  const activeData = isPnl ? chartData : metricChartData;
+  const activeLoading = isPnl ? loading : metricChartLoading;
+  const dataKey = isPnl ? "cumulative_pnl" : "value";
+  const color = CATEGORY_COLORS[category] || "#7c3aed";
+  const label = CATEGORY_LABELS[category] || "P&L";
+  const gradientId = `chartGradient_${category}`;
+
+  const periodLabel = PERIOD_LABELS[period] || "YTD";
+  const chartTitle = isPnl
+    ? `HISTORICAL: ${periodLabel} P&L`
+    : `HISTORICAL: ${periodLabel} ${label}`;
+
+  const legendLabel = isPnl ? "Cumulative P&L" : label;
+
   return (
     <Box className="risk-dashboard-section">
       <Box className="pnl-chart-card">
         <Box className="pnl-chart-header">
-          <Box className="pnl-chart-title">
-            HISTORICAL: {PERIOD_LABELS[period] || "YTD"} P&L
-          </Box>
+          <Box className="pnl-chart-title">{chartTitle}</Box>
           <Box className="pnl-chart-legend">
-            <Box className="pnl-chart-legend-dot" />
-            Cumulative P&L
+            <Box className="pnl-chart-legend-dot" sx={{ background: `${color} !important` }} />
+            {legendLabel}
           </Box>
         </Box>
 
-        {loading ? (
+        {activeLoading ? (
           <Box className="risk-dashboard-loading" sx={{ minHeight: 300 }}>
             <CircularProgress size={32} />
           </Box>
-        ) : chartData.length > 0 ? (
+        ) : activeData.length > 0 ? (
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart
-              data={chartData}
+              data={activeData}
               margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
             >
               <defs>
-                <linearGradient id="cumPnlGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.02} />
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -76,7 +109,7 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
                 width={70}
               />
               <Tooltip
-                formatter={(value: number) => [formatCurrency(value), "Cumulative P&L"]}
+                formatter={(value: number) => [formatCurrency(value), legendLabel]}
                 labelFormatter={(label: string) => formatDate(label)}
                 contentStyle={{
                   borderRadius: "10px",
@@ -87,12 +120,12 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
               />
               <Area
                 type="linear"
-                dataKey="cumulative_pnl"
-                stroke="#7c3aed"
+                dataKey={dataKey}
+                stroke={color}
                 strokeWidth={2.5}
-                fill="url(#cumPnlGradient)"
+                fill={`url(#${gradientId})`}
                 dot={false}
-                activeDot={{ r: 5, fill: "#7c3aed", stroke: "#fff", strokeWidth: 2 }}
+                activeDot={{ r: 5, fill: color, stroke: "#fff", strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>

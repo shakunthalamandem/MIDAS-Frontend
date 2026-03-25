@@ -2,21 +2,43 @@ import React from "react";
 import { Box, CircularProgress } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import type { TopBottomPnlTicker } from "./types";
+import type { TopBottomPnlTicker, TopBottomMetricTicker, DashboardCategory } from "./types";
 import { formatFullCurrency } from "./utils";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  pnl: "P&L (Gross)",
+  gross_market_value: "Gross Market Value",
+  delta_adj_net_mv: "Delta Adj. Net MV",
+  beta_adj_net_mv: "Beta Adj. Net MV",
+};
 
 interface TopBottomPnLTableProps {
   top10: TopBottomPnlTicker[];
   bottom10: TopBottomPnlTicker[];
   loading: boolean;
+  category?: DashboardCategory;
+  metricTop10?: TopBottomMetricTicker[];
+  metricBottom10?: TopBottomMetricTicker[];
+  metricLoading?: boolean;
 }
 
 const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
   top10,
   bottom10,
   loading,
+  category = "pnl",
+  metricTop10 = [],
+  metricBottom10 = [],
+  metricLoading = false,
 }) => {
-  if (loading) {
+  const isPnl = category === "pnl";
+  const activeTop = isPnl ? top10 : metricTop10;
+  const activeBottom = isPnl ? bottom10 : metricBottom10;
+  const activeLoading = isPnl ? loading : metricLoading;
+  const label = CATEGORY_LABELS[category] || "P&L (Gross)";
+  const valueKey = isPnl ? "pnl" : "value";
+
+  if (activeLoading) {
     return (
       <Box className="risk-dashboard-section">
         <Box className="risk-dashboard-loading" sx={{ minHeight: 200 }}>
@@ -26,7 +48,7 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
     );
   }
 
-  if (top10.length === 0 && bottom10.length === 0) {
+  if (activeTop.length === 0 && activeBottom.length === 0) {
     return null;
   }
 
@@ -37,7 +59,7 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--top">
             <TrendingUpIcon sx={{ fontSize: 20 }} />
-            <span>Top 10 P&L (Gross)</span>
+            <span>Top 10 {label}</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
             <table className="tb-pnl-table">
@@ -46,11 +68,11 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
                   <th className="tb-pnl-th tb-pnl-th--rank">#</th>
                   <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
                   <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
-                  <th className="tb-pnl-th tb-pnl-th--pnl">P&L</th>
+                  <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
                 </tr>
               </thead>
               <tbody>
-                {top10.map((item, idx) => (
+                {activeTop.map((item: any, idx: number) => (
                   <tr key={item.ticker} className="tb-pnl-row">
                     <td className="tb-pnl-td tb-pnl-td--rank">
                       <span className="tb-pnl-rank-badge tb-pnl-rank-badge--top">
@@ -60,11 +82,11 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
                     <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
                     <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
                     <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-positive">
-                      {formatFullCurrency(item.pnl)}
+                      {formatFullCurrency(item[valueKey])}
                     </td>
                   </tr>
                 ))}
-                {top10.length === 0 && (
+                {activeTop.length === 0 && (
                   <tr>
                     <td colSpan={4} className="tb-pnl-empty">No data available</td>
                   </tr>
@@ -78,7 +100,7 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--bottom">
             <TrendingDownIcon sx={{ fontSize: 20 }} />
-            <span>Bottom 10 P&L (Gross)</span>
+            <span>Bottom 10 {label}</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
             <table className="tb-pnl-table">
@@ -87,11 +109,11 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
                   <th className="tb-pnl-th tb-pnl-th--rank">#</th>
                   <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
                   <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
-                  <th className="tb-pnl-th tb-pnl-th--pnl">P&L</th>
+                  <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
                 </tr>
               </thead>
               <tbody>
-                {bottom10.map((item, idx) => (
+                {activeBottom.map((item: any, idx: number) => (
                   <tr key={item.ticker} className="tb-pnl-row">
                     <td className="tb-pnl-td tb-pnl-td--rank">
                       <span className="tb-pnl-rank-badge tb-pnl-rank-badge--bottom">
@@ -101,11 +123,11 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
                     <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
                     <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
                     <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-negative">
-                      {formatFullCurrency(item.pnl)}
+                      {formatFullCurrency(item[valueKey])}
                     </td>
                   </tr>
                 ))}
-                {bottom10.length === 0 && (
+                {activeBottom.length === 0 && (
                   <tr>
                     <td colSpan={4} className="tb-pnl-empty">No data available</td>
                   </tr>
