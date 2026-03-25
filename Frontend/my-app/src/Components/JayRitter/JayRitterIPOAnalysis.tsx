@@ -169,7 +169,15 @@ const TECH_CONFIG: Record<string, { color: string }> = {
 type SortField    = "ticker" | "days_since_ipo" | "confidence_score" | "overall_signal";
 type FilterSignal = "ALL" | "LONG" | "SHORT" | "AVOID";
 
-// ─── Expanded Row ─────────────────────────────────────────────────────
+// ─── Metric Row Helper ────────────────────────────────────────────────
+const MetricRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.6 }}>
+    <Typography sx={{ fontSize: "0.76rem", color: "#555", fontWeight: 500 }}>{label}</Typography>
+    <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "#111", textAlign: "right" }}>{value}</Typography>
+  </Box>
+);
+
+// ─── Expanded Row (3-column compact layout) ──────────────────────────
 const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   const tier = ticker.tier_classification || {};
   const am = ticker.am_opportunity || {};
@@ -179,224 +187,115 @@ const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   const techConfig = TECH_CONFIG[(tech.overall_technical_signal || "").toLowerCase()] || { color: "#666" };
 
   return (
-    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
-      {/* Header: Signal + Confidence */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mb: 3 }}>
-        <Box sx={{ p: 2.5, bgcolor: signalConfig.bg, borderRadius: 2, border: `2px solid ${signalConfig.color}` }}>
-          <Typography sx={{ fontSize: "0.7rem", fontWeight: 800, color: signalConfig.color, textTransform: "uppercase", letterSpacing: 1.2, mb: 0.8 }}>
-            Overall Signal
-          </Typography>
-          <Typography sx={{ fontSize: "1.3rem", fontWeight: 900, color: signalConfig.color }}>
-            {ticker.overall_signal}
-          </Typography>
-        </Box>
-        <Box sx={{ p: 2.5, bgcolor: "#f0f4f8", borderRadius: 2, border: "2px solid #1976d2" }}>
-          <Typography sx={{ fontSize: "0.7rem", fontWeight: 800, color: "#1976d2", textTransform: "uppercase", letterSpacing: 1.2, mb: 0.8 }}>
-            Confidence Score
-          </Typography>
-          <Typography sx={{ fontSize: "1.3rem", fontWeight: 900, color: "#1976d2" }}>
-            {ticker.confidence_score.toFixed(0)}
-          </Typography>
-        </Box>
-      </Box>
+    <Box sx={{ px: 3, py: 2.5, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
+      {/* 3-Column Cards: Tier | AM Opportunity | Technicals */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
 
-      {/* Tier Classification Section */}
-      <Box sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #4527a0", mb: 2.5, boxShadow: "0 2px 8px rgba(69,39,160,0.1)" }}>
-        <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#4527a0", letterSpacing: 1.3, mb: 1.8 }}>
-          Tier Classification
-        </Typography>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>TIER</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tier.tier != null ? `Tier ${tier.tier}` : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>WEIGHTED SCORE</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>BOOK ASSIGNMENT</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111", textTransform: "capitalize" }}>
-              {tier.book_assignment ?? "—"}
-            </Typography>
-          </Box>
-        </Box>
-        {tier.scoring_breakdown && (
-          <Box sx={{ py: 1.5, borderTop: "1px solid #e8e8e8", mb: 1.5 }}>
-            <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: "#4527a0", textTransform: "uppercase", mb: 1 }}>
-              Scoring Breakdown
-            </Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 1.2 }}>
+        {/* Tier Classification Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #4527a0", boxShadow: "0 2px 8px rgba(69,39,160,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#4527a0", letterSpacing: 1.2, mb: 1.5 }}>
+            Tier Classification
+          </Typography>
+          <MetricRow label="Tier" value={tier.tier != null ? `Tier ${tier.tier}` : "—"} />
+          <MetricRow label="Weighted Score" value={tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—"} />
+          <MetricRow label="Book" value={tier.book_assignment ?? "—"} />
+          {tier.sector_allocation_bucket && (
+            <MetricRow label="Sector Bucket" value={tier.sector_allocation_bucket} />
+          )}
+          {tier.tier1_criteria_met != null && (
+            <MetricRow
+              label="Tier 1 Criteria"
+              value={
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tier.tier1_criteria_met ? "#1b5e20" : "#b71c1c" }}>
+                  {tier.tier1_criteria_met ? "✓ Met" : "✗ Not Met"}
+                </Typography>
+              }
+            />
+          )}
+          {tier.scoring_breakdown && (
+            <Box sx={{ mt: 1.5, pt: 1.2, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "#4527a0", textTransform: "uppercase", mb: 0.8 }}>
+                Scoring Breakdown
+              </Typography>
               {Object.entries(tier.scoring_breakdown).map(([key, val]) => (
-                <Box key={key}>
-                  <Typography sx={{ fontSize: "0.62rem", color: "#888", fontWeight: 600, mb: 0.3 }}>
-                    {key.replace(/_/g, " ").toUpperCase()}
-                  </Typography>
-                  <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#333" }}>
-                    {typeof val === "number" ? val : val ? "Yes" : "No"}
-                  </Typography>
-                </Box>
+                <MetricRow
+                  key={key}
+                  label={key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                  value={typeof val === "number" ? val : val ? "Yes" : "No"}
+                />
               ))}
             </Box>
-          </Box>
-        )}
-        {(tier.sector_allocation_bucket || tier.tier1_criteria_met != null) && (
-          <Box sx={{ py: 1, borderTop: "1px solid #e8e8e8" }}>
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
-              {tier.sector_allocation_bucket && (
-                <Box>
-                  <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.3 }}>SECTOR BUCKET</Typography>
-                  <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#111" }}>
-                    {tier.sector_allocation_bucket}
-                  </Typography>
-                </Box>
-              )}
-              {tier.tier1_criteria_met != null && (
-                <Box>
-                  <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.3 }}>TIER 1 CRITERIA</Typography>
-                  <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: tier.tier1_criteria_met ? "#1b5e20" : "#b71c1c" }}>
-                    {tier.tier1_criteria_met ? "✓ Met" : "✗ Not Met"}
-                  </Typography>
-                </Box>
-              )}
+          )}
+          {tier.reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tier.reasoning}
+              </Typography>
             </Box>
-          </Box>
-        )}
-        {tier.reasoning && (
-          <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #e8e8e8" }}>
-            <Typography sx={{ fontSize: "0.73rem", color: "#333", lineHeight: 1.7, fontWeight: 500 }}>
-              {tier.reasoning}
-            </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
+
+        {/* AM Opportunity Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #00695c", boxShadow: "0 2px 8px rgba(0,105,92,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#00695c", letterSpacing: 1.2, mb: 1.5 }}>
+            AM Opportunity
+          </Typography>
+          <MetricRow label="AM Score" value={am.am_score != null ? `${am.am_score} / 5` : "—"} />
+          <MetricRow label="Time Window" value={am.current_time_window ?? "—"} />
+          <MetricRow label="Day-1 Pop" value={am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(1)}%` : "—"} />
+          <MetricRow label="Short Interest" value={am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(1)}%` : "—"} />
+          <MetricRow label="Days Above IPO Price" value={am.days_above_ipo_price ?? "—"} />
+          <MetricRow label="Volume Ratio (ex-Day1)" value={am.volume_ratio_ex_day1 != null ? am.volume_ratio_ex_day1.toFixed(2) : "—"} />
+          <MetricRow label="Analyst Coverage" value={am.analyst_coverage_count ?? "—"} />
+          {am.strategy_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {am.strategy_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Technical Signals Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${techConfig.color}`, boxShadow: `0 2px 8px ${techConfig.color}15` }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: techConfig.color, letterSpacing: 1.2, mb: 1.5 }}>
+            Technical Signals
+          </Typography>
+          <MetricRow label="MA Crossover" value={tech.ma_crossover_10_40 ?? "—"} />
+          <MetricRow label="RSI (14d)" value={tech.rsi_14d != null ? tech.rsi_14d.toFixed(1) : "—"} />
+          <MetricRow label="vs FPX ETF" value={tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(1)}%` : "—"} />
+          <MetricRow
+            label="Day-1 High Break"
+            value={
+              tech.break_above_day1_high != null ? (
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tech.break_above_day1_high ? "#1b5e20" : "#b71c1c" }}>
+                  {tech.break_above_day1_high ? "Yes ✓" : "No ✗"}
+                </Typography>
+              ) : "—"
+            }
+          />
+          <MetricRow label="Volume Breakout" value={tech.volume_breakout_ratio != null ? tech.volume_breakout_ratio.toFixed(2) : "—"} />
+          <MetricRow label="Short Interest Trend" value={tech.short_interest_trend ?? "—"} />
+          {tech.technical_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tech.technical_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
 
-      {/* AM Opportunity Section */}
-      <Box sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #00695c", mb: 2.5, boxShadow: "0 2px 8px rgba(0,105,92,0.1)" }}>
-        <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#00695c", letterSpacing: 1.3, mb: 1.8 }}>
-          AM Opportunity
-        </Typography>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 2, mb: 2 }}>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>AM SCORE</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.am_score != null ? `${am.am_score} / 5` : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>TIME WINDOW</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.current_time_window ?? "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>FIRST DAY POP</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(2)}%` : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>SHORT INTEREST</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(2)}%` : "—"}
-            </Typography>
-          </Box>
+      {/* Recommendation Bar (full width) */}
+      <Box sx={{ p: 2, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, color: "#481f93", textTransform: "uppercase", letterSpacing: 1.2, whiteSpace: "nowrap" }}>
+            Recommendation:
+          </Typography>
+          <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.7, fontWeight: 500 }}>
+            {ticker.action_summary}
+          </Typography>
         </Box>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2, pb: 1.5, borderBottom: "1px solid #e8e8e8" }}>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>DAYS ABOVE IPO PRICE</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.days_above_ipo_price != null ? am.days_above_ipo_price : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>VOLUME RATIO (EX-DAY1)</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.volume_ratio_ex_day1 != null ? am.volume_ratio_ex_day1.toFixed(2) : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>ANALYST COVERAGE</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {am.analyst_coverage_count ?? "—"}
-            </Typography>
-          </Box>
-        </Box>
-        {am.strategy_reasoning && (
-          <Box>
-            <Typography sx={{ fontSize: "0.73rem", color: "#333", lineHeight: 1.7, fontWeight: 500 }}>
-              {am.strategy_reasoning}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* Technical Signals Section */}
-      <Box sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${techConfig.color}`, mb: 2.5, boxShadow: `0 2px 8px ${techConfig.color}25` }}>
-        <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: techConfig.color, letterSpacing: 1.3, mb: 1.8 }}>
-          Technical Signals
-        </Typography>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>RSI (14D)</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tech.rsi_14d != null ? tech.rsi_14d.toFixed(2) : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>MA CROSSOVER (10/40)</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tech.ma_crossover_10_40 ?? "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>BREAK ABOVE DAY-1</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: tech.break_above_day1_high ? "#1b5e20" : "#b71c1c" }}>
-              {tech.break_above_day1_high != null ? (tech.break_above_day1_high ? "✓ Yes" : "✗ No") : "—"}
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, pb: 1.5, borderBottom: "1px solid #e8e8e8" }}>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>VOLUME BREAKOUT RATIO</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tech.volume_breakout_ratio != null ? tech.volume_breakout_ratio.toFixed(2) : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>VS IPO ETF</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>
-              {tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(2)}%` : "—"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: "0.65rem", color: "#666", fontWeight: 600, mb: 0.4 }}>SHORT INTEREST TREND</Typography>
-            <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color: "#111", textTransform: "capitalize" }}>
-              {tech.short_interest_trend ?? "—"}
-            </Typography>
-          </Box>
-        </Box>
-        {tech.technical_reasoning && (
-          <Box>
-            <Typography sx={{ fontSize: "0.73rem", color: "#333", lineHeight: 1.7, fontWeight: 500 }}>
-              {tech.technical_reasoning}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* Action Summary */}
-      <Box sx={{ p: 2.5, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff" }}>
-        <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, color: "#481f93", textTransform: "uppercase", letterSpacing: 1.3, mb: 1 }}>
-          Action Summary
-        </Typography>
-        <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.8, fontWeight: 500 }}>
-          {ticker.action_summary}
-        </Typography>
       </Box>
     </Box>
   );
