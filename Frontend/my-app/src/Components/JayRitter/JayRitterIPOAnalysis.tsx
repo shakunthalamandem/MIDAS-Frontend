@@ -25,7 +25,9 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import axios from "axios";
+import JayRitterChat from "./JayRitterChat";
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface ReportSummary {
@@ -409,6 +411,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
   const [sortField, setSortField]         = useState<SortField>("confidence_score");
   const [sortDir, setSortDir]             = useState<"asc" | "desc">("desc");
   const [criteriaOpen, setCriteriaOpen]   = useState(false);
+  const [chatOpen, setChatOpen]           = useState(false);
 
   const apiBaseUrl = process.env.REACT_APP_API_URL;
   const token      = localStorage.getItem("access_token");
@@ -545,12 +548,59 @@ const JayRitterIPOAnalysis: React.FC = () => {
             </FormControl>
           </Box>
 
-          {/* Centered Title */}
+          {/* Centered Title + Chat Button */}
           <Box sx={{ textAlign: "center", mt: 1.5, mb: 3 }}>
             <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, mb: 0.6 }}>
               <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem" }, letterSpacing: -0.5 }}>
                 Jay Ritter IPO Analysis
               </Typography>
+              <Box
+                onClick={() => setChatOpen(true)}
+                sx={{
+                  display: "inline-flex", alignItems: "center", gap: 0.8,
+                  px: 1.8, py: 0.55, borderRadius: 5,
+                  background: "linear-gradient(135deg, rgba(124,77,255,0.35), rgba(255,255,255,0.15))",
+                  border: "1px solid rgba(124,77,255,0.5)",
+                  cursor: "pointer",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 0 20px rgba(124,77,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, rgba(124,77,255,0.5), rgba(255,255,255,0.22))",
+                    boxShadow: "0 0 30px rgba(124,77,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.25s ease",
+                  // Shimmer animation
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0, left: "-100%",
+                    width: "200%", height: "100%",
+                    background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.08) 55%, transparent 100%)",
+                    animation: "shimmer 3s ease-in-out infinite",
+                  },
+                  "@keyframes shimmer": {
+                    "0%": { left: "-100%" },
+                    "100%": { left: "100%" },
+                  },
+                }}
+              >
+                <SmartToyOutlinedIcon sx={{ fontSize: 16, color: "#e0d0ff", filter: "drop-shadow(0 0 4px rgba(124,77,255,0.6))" }} />
+                <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", whiteSpace: "nowrap", letterSpacing: 0.3 }}>
+                  Ritter Analyst
+                </Typography>
+                <Box sx={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  bgcolor: "#69f0ae",
+                  boxShadow: "0 0 6px #69f0ae, 0 0 12px rgba(105,240,174,0.4)",
+                  animation: "pulse 2s ease-in-out infinite",
+                  "@keyframes pulse": {
+                    "0%, 100%": { opacity: 1, transform: "scale(1)" },
+                    "50%": { opacity: 0.6, transform: "scale(0.8)" },
+                  },
+                }} />
+              </Box>
             </Box>
             {report && (
               <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.73rem", fontWeight: 500 }}>
@@ -955,6 +1005,15 @@ const JayRitterIPOAnalysis: React.FC = () => {
         </Typography>
 
       </Box>
+
+      {/* Chat Drawer */}
+      {report && (
+        <JayRitterChat
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+          reportDate={report.report_date}
+        />
+      )}
     </Box>
   );
 };
