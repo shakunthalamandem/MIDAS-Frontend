@@ -69,17 +69,23 @@ interface TickerAnalysis {
   ticker: string;
   issuer_name: string;
   pricing_date: string;
+  trade_date?: string;
   days_since_ipo: number;
   sector: string;
   deal_size?: number;
-  overall_signal: "LONG" | "SHORT" | "AVOID";
+  market_cap?: number;
+  overall_signal: "LONG" | "SHORT" | "AVOID" | "TRIM";
   confidence_score: number;
   action_summary: string;
+  time_window_tag?: string;
   tier_classification?: {
     tier?: number;
     weighted_score?: number;
     book_assignment?: string;
     reasoning?: string;
+    scoring_breakdown?: Record<string, number>;
+    sector_allocation_bucket?: string;
+    tier1_criteria_met?: boolean;
   };
   am_opportunity?: {
     am_score?: number;
@@ -87,6 +93,8 @@ interface TickerAnalysis {
     strategy_signal?: string;
     strategy_reasoning?: string;
     first_day_pop_pct?: number;
+    volume_ratio_ex_day1?: number;
+    analyst_coverage_count?: number;
     short_interest_pct_float?: number;
     days_above_ipo_price?: number;
   };
@@ -98,6 +106,7 @@ interface TickerAnalysis {
     relative_strength_vs_ipo_etf?: number;
     break_above_day1_high?: boolean;
     volume_breakout_ratio?: number;
+    short_interest_trend?: string;
   };
 }
 
@@ -160,74 +169,133 @@ const TECH_CONFIG: Record<string, { color: string }> = {
 type SortField    = "ticker" | "days_since_ipo" | "confidence_score" | "overall_signal";
 type FilterSignal = "ALL" | "LONG" | "SHORT" | "AVOID";
 
-// ─── Expanded Row ─────────────────────────────────────────────────────
+// ─── Metric Row Helper ────────────────────────────────────────────────
+const MetricRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.6 }}>
+    <Typography sx={{ fontSize: "0.76rem", color: "#555", fontWeight: 500 }}>{label}</Typography>
+    <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "#111", textAlign: "right" }}>{value}</Typography>
+  </Box>
+);
+
+// ─── Expanded Row (3-column compact layout) ──────────────────────────
 const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   const tier = ticker.tier_classification || {};
-  const am   = ticker.am_opportunity    || {};
+  const am = ticker.am_opportunity || {};
   const tech = ticker.technical_signals || {};
 
-  const cols = [
-    {
-      title: "Tier Classification",
-      color: "#4527a0",
-      rows: [
-        { label: "Tier",          value: tier.tier != null ? `Tier ${tier.tier}` : "—" },
-        { label: "Weighted Score", value: tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—" },
-        { label: "Book",           value: tier.book_assignment ?? "—" },
-      ],
-      note: tier.reasoning,
-    },
-    {
-      title: "AM Opportunity",
-      color: "#00695c",
-      rows: [
-        { label: "AM Score",      value: am.am_score != null ? `${am.am_score} / 5` : "—" },
-        { label: "Time Window",   value: am.current_time_window ?? "—" },
-        { label: "Day-1 Pop",     value: am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(1)}%` : "—" },
-        { label: "Short Interest", value: am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(1)}%` : "—" },
-      ],
-      note: am.strategy_reasoning,
-    },
-    {
-      title: "Technical Signals",
-      color: "#ad1457",
-      rows: [
-        { label: "MA Crossover",    value: tech.ma_crossover_10_40 ?? "—" },
-        { label: "RSI (14d)",       value: tech.rsi_14d != null ? tech.rsi_14d.toFixed(1) : "—" },
-        { label: "vs FPX ETF",      value: tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(1)}%` : "—" },
-        { label: "Day-1 High Break", value: tech.break_above_day1_high != null ? (tech.break_above_day1_high ? "Yes ✓" : "No ✗") : "—" },
-      ],
-      note: tech.technical_reasoning,
-    },
-  ];
+  const signalConfig = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["AVOID"];
+  const techConfig = TECH_CONFIG[(tech.overall_technical_signal || "").toLowerCase()] || { color: "#666" };
 
   return (
-    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2.5, mb: 3 }}>
-        {cols.map(col => (
-          <Box key={col.title} sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${col.color}`, boxShadow: `0 4px 16px ${col.color}25` }}>
-            <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: col.color, letterSpacing: 1.3, mb: 1.5 }}>
-              {col.title}
-            </Typography>
-            {col.rows.map(r => (
-              <Box key={r.label} sx={{ display: "flex", justifyContent: "space-between", mb: 0.8, alignItems: "center" }}>
-                <Typography sx={{ fontSize: "0.78rem", color: "#555", fontWeight: 600 }}>{r.label}</Typography>
-                <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#111", textAlign: "right", maxWidth: "50%" }}>{r.value}</Typography>
-              </Box>
-            ))}
-            {col.note && (
-              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #e8e8e8" }}>
-                <Typography sx={{ fontSize: "0.73rem", color: "#555", fontStyle: "italic", lineHeight: 1.6, fontWeight: 500 }}>
-                  {col.note}
+    <Box sx={{ px: 3, py: 2.5, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
+      {/* 3-Column Cards: Tier | AM Opportunity | Technicals */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
+
+        {/* Tier Classification Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #4527a0", boxShadow: "0 2px 8px rgba(69,39,160,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#4527a0", letterSpacing: 1.2, mb: 1.5 }}>
+            Tier Classification
+          </Typography>
+          <MetricRow label="Tier" value={tier.tier != null ? `Tier ${tier.tier}` : "—"} />
+          <MetricRow label="Weighted Score" value={tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—"} />
+          <MetricRow label="Book" value={tier.book_assignment ?? "—"} />
+          {tier.sector_allocation_bucket && (
+            <MetricRow label="Sector Bucket" value={tier.sector_allocation_bucket} />
+          )}
+          {tier.tier1_criteria_met != null && (
+            <MetricRow
+              label="Tier 1 Criteria"
+              value={
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tier.tier1_criteria_met ? "#1b5e20" : "#b71c1c" }}>
+                  {tier.tier1_criteria_met ? "✓ Met" : "✗ Not Met"}
                 </Typography>
-              </Box>
-            )}
-          </Box>
-        ))}
+              }
+            />
+          )}
+          {tier.scoring_breakdown && (
+            <Box sx={{ mt: 1.5, pt: 1.2, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "#4527a0", textTransform: "uppercase", mb: 0.8 }}>
+                Scoring Breakdown
+              </Typography>
+              {Object.entries(tier.scoring_breakdown).map(([key, val]) => (
+                <MetricRow
+                  key={key}
+                  label={key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                  value={typeof val === "number" ? val : val ? "Yes" : "No"}
+                />
+              ))}
+            </Box>
+          )}
+          {tier.reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tier.reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* AM Opportunity Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #00695c", boxShadow: "0 2px 8px rgba(0,105,92,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#00695c", letterSpacing: 1.2, mb: 1.5 }}>
+            AM Opportunity
+          </Typography>
+          <MetricRow label="AM Score" value={am.am_score != null ? `${am.am_score} / 5` : "—"} />
+          <MetricRow label="Time Window" value={am.current_time_window ?? "—"} />
+          <MetricRow label="Day-1 Pop" value={am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(1)}%` : "—"} />
+          <MetricRow label="Short Interest" value={am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(1)}%` : "—"} />
+          <MetricRow label="Days Above IPO Price" value={am.days_above_ipo_price ?? "—"} />
+          <MetricRow label="Volume Ratio (ex-Day1)" value={am.volume_ratio_ex_day1 != null ? am.volume_ratio_ex_day1.toFixed(2) : "—"} />
+          <MetricRow label="Analyst Coverage" value={am.analyst_coverage_count ?? "—"} />
+          {am.strategy_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {am.strategy_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Technical Signals Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${techConfig.color}`, boxShadow: `0 2px 8px ${techConfig.color}15` }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: techConfig.color, letterSpacing: 1.2, mb: 1.5 }}>
+            Technical Signals
+          </Typography>
+          <MetricRow label="MA Crossover" value={tech.ma_crossover_10_40 ?? "—"} />
+          <MetricRow label="RSI (14d)" value={tech.rsi_14d != null ? tech.rsi_14d.toFixed(1) : "—"} />
+          <MetricRow label="vs FPX ETF" value={tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(1)}%` : "—"} />
+          <MetricRow
+            label="Day-1 High Break"
+            value={
+              tech.break_above_day1_high != null ? (
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tech.break_above_day1_high ? "#1b5e20" : "#b71c1c" }}>
+                  {tech.break_above_day1_high ? "Yes ✓" : "No ✗"}
+                </Typography>
+              ) : "—"
+            }
+          />
+          <MetricRow label="Volume Breakout" value={tech.volume_breakout_ratio != null ? tech.volume_breakout_ratio.toFixed(2) : "—"} />
+          <MetricRow label="Short Interest Trend" value={tech.short_interest_trend ?? "—"} />
+          {tech.technical_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tech.technical_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
-      <Box sx={{ p: 2.5, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff", display: "flex", gap: 1.5, alignItems: "flex-start" }}>
-        <Typography sx={{ fontSize: "0.77rem", fontWeight: 900, color: "#481f93", whiteSpace: "nowrap", mt: 0.3 }}>RECOMMENDATION:</Typography>
-        <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.8, fontWeight: 500 }}>{ticker.action_summary}</Typography>
+
+      {/* Recommendation Bar (full width) */}
+      <Box sx={{ p: 2, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, color: "#481f93", textTransform: "uppercase", letterSpacing: 1.2, whiteSpace: "nowrap" }}>
+            Recommendation:
+          </Typography>
+          <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.7, fontWeight: 500 }}>
+            {ticker.action_summary}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
@@ -588,6 +656,44 @@ const JayRitterIPOAnalysis: React.FC = () => {
               );
             })}
             <Box sx={{ flex: 1 }} />
+          </Box>
+        )}
+
+        {/* Overall Portfolio Summary Cards */}
+        {report && (
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr 1fr" }, gap: 2, py: 2, mb: 1.5 }}>
+            <Box sx={{ p: 2, bgcolor: SIGNAL_CONFIG.LONG.bg, borderRadius: 2, border: `2px solid ${SIGNAL_CONFIG.LONG.color}`, textAlign: "center" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: SIGNAL_CONFIG.LONG.color, textTransform: "uppercase", mb: 0.5 }}>
+                Long Positions
+              </Typography>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 900, color: SIGNAL_CONFIG.LONG.color }}>
+                {summary.long_book_count ?? counts.LONG}
+              </Typography>
+            </Box>
+            <Box sx={{ p: 2, bgcolor: SIGNAL_CONFIG.SHORT.bg, borderRadius: 2, border: `2px solid ${SIGNAL_CONFIG.SHORT.color}`, textAlign: "center" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: SIGNAL_CONFIG.SHORT.color, textTransform: "uppercase", mb: 0.5 }}>
+                Short Positions
+              </Typography>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 900, color: SIGNAL_CONFIG.SHORT.color }}>
+                {summary.short_book_count ?? counts.SHORT}
+              </Typography>
+            </Box>
+            <Box sx={{ p: 2, bgcolor: SIGNAL_CONFIG.AVOID.bg, borderRadius: 2, border: `2px solid ${SIGNAL_CONFIG.AVOID.color}`, textAlign: "center" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: SIGNAL_CONFIG.AVOID.color, textTransform: "uppercase", mb: 0.5 }}>
+                Avoid Signals
+              </Typography>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 900, color: SIGNAL_CONFIG.AVOID.color }}>
+                {summary.avoid_count ?? counts.AVOID}
+              </Typography>
+            </Box>
+            <Box sx={{ p: 2, bgcolor: "#f0f4f8", borderRadius: 2, border: "2px solid #1976d2", textAlign: "center" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "#1976d2", textTransform: "uppercase", mb: 0.5 }}>
+                Total Analyzed
+              </Typography>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 900, color: "#1976d2" }}>
+                {report.total_analyzed}
+              </Typography>
+            </Box>
           </Box>
         )}
 
