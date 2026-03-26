@@ -21,10 +21,13 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import axios from "axios";
+import JayRitterChat from "./JayRitterChat";
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface ReportSummary {
@@ -69,17 +72,23 @@ interface TickerAnalysis {
   ticker: string;
   issuer_name: string;
   pricing_date: string;
+  trade_date?: string;
   days_since_ipo: number;
   sector: string;
   deal_size?: number;
-  overall_signal: "LONG" | "SHORT" | "AVOID";
+  market_cap?: number;
+  overall_signal: "LONG" | "SHORT" | "AVOID" | "TRIM";
   confidence_score: number;
   action_summary: string;
+  time_window_tag?: string;
   tier_classification?: {
     tier?: number;
     weighted_score?: number;
     book_assignment?: string;
     reasoning?: string;
+    scoring_breakdown?: Record<string, number>;
+    sector_allocation_bucket?: string;
+    tier1_criteria_met?: boolean;
   };
   am_opportunity?: {
     am_score?: number;
@@ -87,6 +96,8 @@ interface TickerAnalysis {
     strategy_signal?: string;
     strategy_reasoning?: string;
     first_day_pop_pct?: number;
+    volume_ratio_ex_day1?: number;
+    analyst_coverage_count?: number;
     short_interest_pct_float?: number;
     days_above_ipo_price?: number;
   };
@@ -98,6 +109,7 @@ interface TickerAnalysis {
     relative_strength_vs_ipo_etf?: number;
     break_above_day1_high?: boolean;
     volume_breakout_ratio?: number;
+    short_interest_trend?: string;
   };
 }
 
@@ -123,6 +135,7 @@ const METRIC_CARDS = [
   {
     key: "market_temperature" as keyof MarketEnvironment,
     label: "Market Temperature",
+    tooltip: "Overall IPO market heat classification based on Jay Ritter's framework. HOT (>25% avg first-day return, apply strict quality screens), WARM (10-25%), COLD (<10%, relaxed entry, lean long).",
     fmt: (v: any) => v,
     gradient: "linear-gradient(135deg,#f57c00,#ff9800)",
     icon: "🌡️",
@@ -130,7 +143,8 @@ const METRIC_CARDS = [
   },
   {
     key: "rolling_90d_avg_first_day_return" as keyof MarketEnvironment,
-    label: "180-Day Avg First-Day Return",
+    label: "90-Day Avg First-Day Return",
+    tooltip: "Average first-day return across all eligible US IPOs in the last 90 days. This rolling metric reflects current market appetite for new issues. >25% = HOT, 10-25% = WARM, <10% = COLD.",
     fmt: (v: number) => `${v.toFixed(1)}%`,
     gradient: "linear-gradient(135deg,#5e35b1,#9575cd)",
     icon: "📈",
@@ -138,6 +152,7 @@ const METRIC_CARDS = [
   {
     key: "ipo_volume_vs_3yr_median" as keyof MarketEnvironment,
     label: "Volume vs 3yr Median",
+    tooltip: "Current annualized IPO volume compared to the actual 3-year rolling median of US IPOs (computed from Dealogic data). >2x median = HOT signal (high supply, increased selectivity needed). <1x = below average issuance.",
     fmt: (v: number) => `${v.toFixed(2)}×`,
     gradient: "linear-gradient(135deg,#00897b,#4db8a8)",
     icon: "📊",
@@ -145,6 +160,7 @@ const METRIC_CARDS = [
   {
     key: "price_revision_above_high_pct" as keyof MarketEnvironment,
     label: "Priced Above Range",
+    tooltip: "Percentage of recent IPOs that priced above the high end of their initial filing range. >60% = EUPHORIC (per Ritter's partial adjustment research, these periods precede the largest underperformance). 0% means no IPOs priced above their range — a cautious pricing environment.",
     fmt: (v: number) => `${v.toFixed(0)}%`,
     gradient: "linear-gradient(135deg,#c62828,#e57373)",
     icon: "💹",
@@ -160,74 +176,133 @@ const TECH_CONFIG: Record<string, { color: string }> = {
 type SortField    = "ticker" | "days_since_ipo" | "confidence_score" | "overall_signal";
 type FilterSignal = "ALL" | "LONG" | "SHORT" | "AVOID";
 
-// ─── Expanded Row ─────────────────────────────────────────────────────
+// ─── Metric Row Helper ────────────────────────────────────────────────
+const MetricRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.6 }}>
+    <Typography sx={{ fontSize: "0.76rem", color: "#555", fontWeight: 500 }}>{label}</Typography>
+    <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "#111", textAlign: "right" }}>{value}</Typography>
+  </Box>
+);
+
+// ─── Expanded Row (3-column compact layout) ──────────────────────────
 const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   const tier = ticker.tier_classification || {};
-  const am   = ticker.am_opportunity    || {};
+  const am = ticker.am_opportunity || {};
   const tech = ticker.technical_signals || {};
 
-  const cols = [
-    {
-      title: "Tier Classification",
-      color: "#4527a0",
-      rows: [
-        { label: "Tier",          value: tier.tier != null ? `Tier ${tier.tier}` : "—" },
-        { label: "Weighted Score", value: tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—" },
-        { label: "Book",           value: tier.book_assignment ?? "—" },
-      ],
-      note: tier.reasoning,
-    },
-    {
-      title: "AM Opportunity",
-      color: "#00695c",
-      rows: [
-        { label: "AM Score",      value: am.am_score != null ? `${am.am_score} / 5` : "—" },
-        { label: "Time Window",   value: am.current_time_window ?? "—" },
-        { label: "Day-1 Pop",     value: am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(1)}%` : "—" },
-        { label: "Short Interest", value: am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(1)}%` : "—" },
-      ],
-      note: am.strategy_reasoning,
-    },
-    {
-      title: "Technical Signals",
-      color: "#ad1457",
-      rows: [
-        { label: "MA Crossover",    value: tech.ma_crossover_10_40 ?? "—" },
-        { label: "RSI (14d)",       value: tech.rsi_14d != null ? tech.rsi_14d.toFixed(1) : "—" },
-        { label: "vs FPX ETF",      value: tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(1)}%` : "—" },
-        { label: "Day-1 High Break", value: tech.break_above_day1_high != null ? (tech.break_above_day1_high ? "Yes ✓" : "No ✗") : "—" },
-      ],
-      note: tech.technical_reasoning,
-    },
-  ];
+  const signalConfig = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["AVOID"];
+  const techConfig = TECH_CONFIG[(tech.overall_technical_signal || "").toLowerCase()] || { color: "#666" };
 
   return (
-    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2.5, mb: 3 }}>
-        {cols.map(col => (
-          <Box key={col.title} sx={{ p: 2.5, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${col.color}`, boxShadow: `0 4px 16px ${col.color}25` }}>
-            <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: col.color, letterSpacing: 1.3, mb: 1.5 }}>
-              {col.title}
-            </Typography>
-            {col.rows.map(r => (
-              <Box key={r.label} sx={{ display: "flex", justifyContent: "space-between", mb: 0.8, alignItems: "center" }}>
-                <Typography sx={{ fontSize: "0.78rem", color: "#555", fontWeight: 600 }}>{r.label}</Typography>
-                <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#111", textAlign: "right", maxWidth: "50%" }}>{r.value}</Typography>
-              </Box>
-            ))}
-            {col.note && (
-              <Box sx={{ mt: 1.5, pt: 1.5, borderTop: "1px solid #e8e8e8" }}>
-                <Typography sx={{ fontSize: "0.73rem", color: "#555", fontStyle: "italic", lineHeight: 1.6, fontWeight: 500 }}>
-                  {col.note}
+    <Box sx={{ px: 3, py: 2.5, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
+      {/* 3-Column Cards: Tier | AM Opportunity | Technicals */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, mb: 2 }}>
+
+        {/* Tier Classification Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #4527a0", boxShadow: "0 2px 8px rgba(69,39,160,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#4527a0", letterSpacing: 1.2, mb: 1.5 }}>
+            Tier Classification
+          </Typography>
+          <MetricRow label="Tier" value={tier.tier != null ? `Tier ${tier.tier}` : "—"} />
+          <MetricRow label="Weighted Score" value={tier.weighted_score != null ? `${tier.weighted_score} / 100` : "—"} />
+          <MetricRow label="Book" value={tier.book_assignment ?? "—"} />
+          {tier.sector_allocation_bucket && (
+            <MetricRow label="Sector Bucket" value={tier.sector_allocation_bucket} />
+          )}
+          {tier.tier1_criteria_met != null && (
+            <MetricRow
+              label="Tier 1 Criteria"
+              value={
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tier.tier1_criteria_met ? "#1b5e20" : "#b71c1c" }}>
+                  {tier.tier1_criteria_met ? "✓ Met" : "✗ Not Met"}
                 </Typography>
-              </Box>
-            )}
-          </Box>
-        ))}
+              }
+            />
+          )}
+          {tier.scoring_breakdown && (
+            <Box sx={{ mt: 1.5, pt: 1.2, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "#4527a0", textTransform: "uppercase", mb: 0.8 }}>
+                Scoring Breakdown
+              </Typography>
+              {Object.entries(tier.scoring_breakdown).map(([key, val]) => (
+                <MetricRow
+                  key={key}
+                  label={key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                  value={typeof val === "number" ? val : val ? "Yes" : "No"}
+                />
+              ))}
+            </Box>
+          )}
+          {tier.reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tier.reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* AM Opportunity Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #00695c", boxShadow: "0 2px 8px rgba(0,105,92,0.08)" }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: "#00695c", letterSpacing: 1.2, mb: 1.5 }}>
+            AM Opportunity
+          </Typography>
+          <MetricRow label="AM Score" value={am.am_score != null ? `${am.am_score} / 5` : "—"} />
+          <MetricRow label="Time Window" value={am.current_time_window ?? "—"} />
+          <MetricRow label="Day-1 Pop" value={am.first_day_pop_pct != null ? `${am.first_day_pop_pct.toFixed(1)}%` : "—"} />
+          <MetricRow label="Short Interest" value={am.short_interest_pct_float != null ? `${am.short_interest_pct_float.toFixed(1)}%` : "—"} />
+          <MetricRow label="Days Above IPO Price" value={am.days_above_ipo_price ?? "—"} />
+          <MetricRow label="Volume Ratio (ex-Day1)" value={am.volume_ratio_ex_day1 != null ? am.volume_ratio_ex_day1.toFixed(2) : "—"} />
+          <MetricRow label="Analyst Coverage" value={am.analyst_coverage_count ?? "—"} />
+          {am.strategy_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {am.strategy_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Technical Signals Card */}
+        <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: 2.5, border: `2px solid ${techConfig.color}`, boxShadow: `0 2px 8px ${techConfig.color}15` }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, textTransform: "uppercase", color: techConfig.color, letterSpacing: 1.2, mb: 1.5 }}>
+            Technical Signals
+          </Typography>
+          <MetricRow label="MA Crossover" value={tech.ma_crossover_10_40 ?? "—"} />
+          <MetricRow label="RSI (14d)" value={tech.rsi_14d != null ? tech.rsi_14d.toFixed(1) : "—"} />
+          <MetricRow label="vs FPX ETF" value={tech.relative_strength_vs_ipo_etf != null ? `${tech.relative_strength_vs_ipo_etf.toFixed(1)}%` : "—"} />
+          <MetricRow
+            label="Day-1 High Break"
+            value={
+              tech.break_above_day1_high != null ? (
+                <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: tech.break_above_day1_high ? "#1b5e20" : "#b71c1c" }}>
+                  {tech.break_above_day1_high ? "Yes ✓" : "No ✗"}
+                </Typography>
+              ) : "—"
+            }
+          />
+          <MetricRow label="Volume Breakout" value={tech.volume_breakout_ratio != null ? tech.volume_breakout_ratio.toFixed(2) : "—"} />
+          <MetricRow label="Short Interest Trend" value={tech.short_interest_trend ?? "—"} />
+          {tech.technical_reasoning && (
+            <Box sx={{ mt: 1.2, pt: 1, borderTop: "1px solid #e8e8e8" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#333", lineHeight: 1.6, fontWeight: 500, fontStyle: "italic" }}>
+                {tech.technical_reasoning}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Box>
-      <Box sx={{ p: 2.5, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff", display: "flex", gap: 1.5, alignItems: "flex-start" }}>
-        <Typography sx={{ fontSize: "0.77rem", fontWeight: 900, color: "#481f93", whiteSpace: "nowrap", mt: 0.3 }}>RECOMMENDATION:</Typography>
-        <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.8, fontWeight: 500 }}>{ticker.action_summary}</Typography>
+
+      {/* Recommendation Bar (full width) */}
+      <Box sx={{ p: 2, bgcolor: "#f0ebf8", borderRadius: 2.5, border: "2px solid #7c4dff" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Typography sx={{ fontSize: "0.72rem", fontWeight: 900, color: "#481f93", textTransform: "uppercase", letterSpacing: 1.2, whiteSpace: "nowrap" }}>
+            Recommendation:
+          </Typography>
+          <Typography sx={{ fontSize: "0.8rem", color: "#222", lineHeight: 1.7, fontWeight: 500 }}>
+            {ticker.action_summary}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
@@ -335,6 +410,8 @@ const JayRitterIPOAnalysis: React.FC = () => {
   const [search, setSearch]               = useState("");
   const [sortField, setSortField]         = useState<SortField>("confidence_score");
   const [sortDir, setSortDir]             = useState<"asc" | "desc">("desc");
+  const [criteriaOpen, setCriteriaOpen]   = useState(false);
+  const [chatOpen, setChatOpen]           = useState(false);
 
   const apiBaseUrl = process.env.REACT_APP_API_URL;
   const token      = localStorage.getItem("access_token");
@@ -471,12 +548,59 @@ const JayRitterIPOAnalysis: React.FC = () => {
             </FormControl>
           </Box>
 
-          {/* Centered Title */}
+          {/* Centered Title + Chat Button */}
           <Box sx={{ textAlign: "center", mt: 1.5, mb: 3 }}>
             <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, mb: 0.6 }}>
               <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem" }, letterSpacing: -0.5 }}>
                 Jay Ritter IPO Analysis
               </Typography>
+              <Box
+                onClick={() => setChatOpen(true)}
+                sx={{
+                  display: "inline-flex", alignItems: "center", gap: 0.8,
+                  px: 1.8, py: 0.55, borderRadius: 5,
+                  background: "linear-gradient(135deg, rgba(124,77,255,0.35), rgba(255,255,255,0.15))",
+                  border: "1px solid rgba(124,77,255,0.5)",
+                  cursor: "pointer",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 0 20px rgba(124,77,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, rgba(124,77,255,0.5), rgba(255,255,255,0.22))",
+                    boxShadow: "0 0 30px rgba(124,77,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.25s ease",
+                  // Shimmer animation
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0, left: "-100%",
+                    width: "200%", height: "100%",
+                    background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.08) 55%, transparent 100%)",
+                    animation: "shimmer 3s ease-in-out infinite",
+                  },
+                  "@keyframes shimmer": {
+                    "0%": { left: "-100%" },
+                    "100%": { left: "100%" },
+                  },
+                }}
+              >
+                <SmartToyOutlinedIcon sx={{ fontSize: 16, color: "#e0d0ff", filter: "drop-shadow(0 0 4px rgba(124,77,255,0.6))" }} />
+                <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", whiteSpace: "nowrap", letterSpacing: 0.3 }}>
+                  Ritter Analyst
+                </Typography>
+                <Box sx={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  bgcolor: "#69f0ae",
+                  boxShadow: "0 0 6px #69f0ae, 0 0 12px rgba(105,240,174,0.4)",
+                  animation: "pulse 2s ease-in-out infinite",
+                  "@keyframes pulse": {
+                    "0%, 100%": { opacity: 1, transform: "scale(1)" },
+                    "50%": { opacity: 0.6, transform: "scale(0.8)" },
+                  },
+                }} />
+              </Box>
             </Box>
             {report && (
               <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.73rem", fontWeight: 500 }}>
@@ -486,152 +610,335 @@ const JayRitterIPOAnalysis: React.FC = () => {
             )}
           </Box>
 
-          {/* Metric Cards — 4 cards including market temperature */}
+          {/* Market Outlook (left 65%) + Metric Cards 2x2 (right 35%) */}
           {report && (
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, gap: 2, mb: 3 }}>
-              {METRIC_CARDS.map(card => {
-                if (card.isTemperature) {
-                  // Market temperature card
-                  return (
-                    <Box
-                      key={card.key}
-                      sx={{
-                        background: tempMeta.gradient,
-                        borderRadius: 3,
-                        px: 3, py: 2.2,
-                        textAlign: "center",
-                        boxShadow: "0 4px 24px rgba(0,0,0,0.28)",
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "65fr 35fr" }, gap: 1.5, alignItems: "start" }}>
+
+              {/* Left: Market Outlook — compact, no overflow */}
+              <Box sx={{
+                position: "relative", px: 2.5, py: 1.8, borderRadius: 2,
+                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                overflow: "hidden",
+              }}>
+                <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: tempMeta.gradient }} />
+                <Typography sx={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: 2, color: "rgba(255,255,255,0.75)", mb: 1 }}>
+                  Market Outlook
+                </Typography>
+                <Typography sx={{ color: "#fff", fontSize: "0.9rem", lineHeight: 1.9, fontWeight: 400 }}>
+                  {marketEnv.market_commentary || "No market commentary available."}
+                </Typography>
+              </Box>
+
+              {/* Right: 4 Metric Cards in 2x2 grid — compact */}
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1 }}>
+                {METRIC_CARDS.map(card => {
+                  const infoBtn = (
+                    <Tooltip
+                      title={
+                        <Box sx={{ p: 1 }}>
+                          <Typography sx={{ fontSize: "0.8rem", fontWeight: 700, color: "#fff", mb: 0.8 }}>{card.label}</Typography>
+                          <Typography sx={{ fontSize: "0.78rem", lineHeight: 1.7, color: "rgba(255,255,255,0.9)" }}>{card.tooltip}</Typography>
+                        </Box>
+                      }
+                      arrow
+                      placement="left"
+                      componentsProps={{
+                        tooltip: { sx: { bgcolor: "#1a1a2e", maxWidth: 340, borderRadius: 2.5, py: 1.5, px: 2, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.1)" } },
+                        arrow: { sx: { color: "#1a1a2e" } },
                       }}
                     >
-                      <Typography sx={{ fontSize: "1.8rem", lineHeight: 1 }}>{tempMeta.icon}</Typography>
-                      <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: "1.5rem", mt: 0.5, letterSpacing: -0.5 }}>
-                        {tempMeta.label}
-                      </Typography>
-                      <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.63rem", textTransform: "uppercase", letterSpacing: 0.9, mt: 0.4 }}>
-                        Market Conditions
-                      </Typography>
+                      <InfoOutlinedIcon sx={{
+                        position: "absolute", top: 5, right: 5,
+                        fontSize: 13, color: "rgba(255,255,255,0.4)",
+                        cursor: "pointer",
+                        "&:hover": { color: "#fff" },
+                        transition: "color 0.15s",
+                      }} />
+                    </Tooltip>
+                  );
+
+                  if (card.isTemperature) {
+                    return (
+                      <Box key={card.key} sx={{ position: "relative", background: tempMeta.gradient, borderRadius: 2, px: 1.5, py: 1, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+                        {infoBtn}
+                        <Typography sx={{ fontSize: "1rem", lineHeight: 1 }}>{tempMeta.icon}</Typography>
+                        <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: "1.15rem", mt: 0.2, letterSpacing: -0.5 }}>{tempMeta.label}</Typography>
+                        <Typography sx={{ color: "rgba(255,255,255,0.6)", fontSize: "0.55rem", textTransform: "uppercase", letterSpacing: 0.7, mt: 0.2 }}>Market Conditions</Typography>
+                      </Box>
+                    );
+                  }
+                  const raw = marketEnv[card.key];
+                  const val = typeof raw === "number" ? card.fmt(raw) : "—";
+                  return (
+                    <Box key={card.key} sx={{ position: "relative", background: card.gradient, borderRadius: 2, px: 1.5, py: 1, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}>
+                      {infoBtn}
+                      <Typography sx={{ fontSize: "0.95rem", lineHeight: 1 }}>{card.icon}</Typography>
+                      <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: "1.15rem", mt: 0.2, letterSpacing: -0.5 }}>{val}</Typography>
+                      <Typography sx={{ color: "rgba(255,255,255,0.6)", fontSize: "0.55rem", textTransform: "uppercase", letterSpacing: 0.7, mt: 0.2 }}>{card.label}</Typography>
                     </Box>
                   );
-                }
-                const raw = marketEnv[card.key];
-                const val = typeof raw === "number" ? card.fmt(raw) : "—";
-                return (
-                  <Box
-                    key={card.key}
-                    sx={{
-                      background: card.gradient,
-                      borderRadius: 3,
-                      px: 3, py: 2.2,
-                      textAlign: "center",
-                      boxShadow: "0 4px 24px rgba(0,0,0,0.28)",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: "1.6rem", lineHeight: 1 }}>{card.icon}</Typography>
-                    <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: "1.5rem", mt: 0.5, letterSpacing: -0.5 }}>
-                      {val}
-                    </Typography>
-                    <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.63rem", textTransform: "uppercase", letterSpacing: 0.9, mt: 0.4 }}>
-                      {card.label}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </Box>
-          )}
+                })}
+              </Box>
 
-          {/* Market Commentary — full width of the content column */}
-          {marketEnv.market_commentary && (
-            <Box
-              sx={{
-                px: 2.5, py: 2,
-                borderRadius: 2.5,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                backdropFilter: "blur(8px)",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: tempMeta.gradient }} />
-              <Typography sx={{ fontSize: "0.65rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5, color: "rgba(255,255,255,0.95)", mb: 1 }}>
-                Market Outlook
-              </Typography>
-              <Typography sx={{ color: "#fff", fontSize: "0.85rem", lineHeight: 1.8, fontWeight: 500 }}>
-                {marketEnv.market_commentary}
-              </Typography>
             </Box>
           )}
 
         </Box>
       </Box>
 
-      {/* ── All content below shares the same container ──────────── */}
-      <Box sx={{ maxWidth: 1400, mx: "auto", px: PX }}>
+      {/* ── Bridge zone: pulls up into header with negative margin ── */}
+      <Box sx={{ maxWidth: 1400, mx: "auto", px: PX, mt: -2, position: "relative", zIndex: 2 }}>
 
-        {/* Portfolio strip */}
-        {report && (
-          <Box sx={{ bgcolor: "#fff", py: 1.2, borderBottom: "2px solid #e8e8e8", display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap", mx: -PX as any, px: PX }}>
-            <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, color: "#666", textTransform: "uppercase", letterSpacing: 1 }}>
-              Book
-            </Typography>
-            {(["LONG", "SHORT", "AVOID"] as FilterSignal[]).map(sig => {
-              const cfg = SIGNAL_CONFIG[sig];
-              const count = sig === "LONG" ? (summary.long_book_count ?? counts.LONG)
-                : sig === "SHORT" ? (summary.short_book_count ?? counts.SHORT)
-                : (summary.avoid_count ?? counts.AVOID);
-              return (
-                <Box key={sig} sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: cfg.color }} />
-                  <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: cfg.color }}>{sig}</Typography>
-                  <Typography sx={{ fontSize: "0.8rem", color: "#333", fontWeight: 600 }}>{count}</Typography>
-                </Box>
-              );
-            })}
-            <Box sx={{ flex: 1 }} />
-          </Box>
-        )}
-
-        {/* Filters + Search */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 2, flexWrap: "wrap" }}>
-          {(["ALL", "LONG", "SHORT", "AVOID"] as FilterSignal[]).map(sig => {
-            const active = filter === sig;
-            const cfg = SIGNAL_CONFIG[sig];
-            return (
+        {/* Unified control bar — criteria toggle + filters + search in one row */}
+        <Paper
+          elevation={0}
+          sx={{
+            borderRadius: 3,
+            border: "1px solid #e8e8e8",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            bgcolor: "#fff",
+            mb: 2,
+            p: 0,
+            overflow: "hidden",
+          }}
+        >
+          {/* Criteria left | Filters centered | Search right */}
+          <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 1.2 }}>
+            {/* Left: Criteria toggle */}
+            <Tooltip title="View the analysis criteria and scoring methodology" placement="bottom" arrow>
               <Box
-                key={sig}
-                onClick={() => setFilter(sig)}
+                onClick={() => setCriteriaOpen(!criteriaOpen)}
                 sx={{
-                  px: 2, py: 0.55, borderRadius: 5, cursor: "pointer", userSelect: "none",
-                  fontSize: "0.78rem", fontWeight: 700, transition: "all 0.15s",
-                  bgcolor: active ? (cfg ? cfg.bg : "#ede7f6") : "#f5f5f5",
-                  color: active ? (cfg ? cfg.color : "#481f93") : "#555",
-                  border: `1.5px solid ${active ? (cfg ? cfg.color : "#481f93") : "#ddd"}`,
-                  boxShadow: active ? `0 0 8px ${cfg?.glow ?? "transparent"}` : "none",
+                  display: "flex", alignItems: "center", gap: 0.8, cursor: "pointer",
+                  px: 1.5, py: 0.6, borderRadius: 1.5,
+                  bgcolor: criteriaOpen ? "#4527a0" : "#f8f6ff",
+                  border: criteriaOpen ? "1px solid #4527a0" : "1px solid #e0d6f5",
+                  "&:hover": { bgcolor: criteriaOpen ? "#5e35b1" : "#ede7f6" },
+                  transition: "all 0.2s",
                 }}
               >
-                {sig} <span style={{ opacity: 0.65 }}>({counts[sig]})</span>
+                <InfoOutlinedIcon sx={{ fontSize: 14, color: criteriaOpen ? "#fff" : "#7c4dff" }} />
+                <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: criteriaOpen ? "#fff" : "#4527a0", whiteSpace: "nowrap" }}>
+                  Analysis Criteria & Methodology
+                </Typography>
+                <KeyboardArrowDownIcon sx={{
+                  fontSize: 15, color: criteriaOpen ? "#fff" : "#7c4dff",
+                  transition: "transform 0.25s", transform: criteriaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }} />
               </Box>
-            );
-          })}
-          <Box sx={{ flex: 1 }} />
-          <TextField
-            size="small"
-            placeholder="Search ticker, issuer, sector…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 16, color: "#999" }} />
-                </InputAdornment>
-              ),
-            }}
-            sx={{
-              minWidth: 240,
-              "& .MuiOutlinedInput-root": { borderRadius: 3, fontSize: "0.8rem", bgcolor: "#fff" },
-            }}
-          />
-        </Box>
+            </Tooltip>
+
+            {/* Center: Filter chips — pushed to center with flex spacers */}
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "center", gap: 1 }}>
+              {(["ALL", "LONG", "SHORT", "AVOID"] as FilterSignal[]).map(sig => {
+                const active = filter === sig;
+                const cfg = SIGNAL_CONFIG[sig];
+                const count = counts[sig];
+                return (
+                  <Box
+                    key={sig}
+                    onClick={() => setFilter(sig)}
+                    sx={{
+                      display: "flex", alignItems: "center", gap: 0.5,
+                      px: 1.6, py: 0.45, borderRadius: 5, cursor: "pointer", userSelect: "none",
+                      transition: "all 0.15s",
+                      bgcolor: active ? (cfg ? cfg.bg : "#ede7f6") : "transparent",
+                      border: active ? `1.5px solid ${cfg ? cfg.color : "#481f93"}` : "1.5px solid transparent",
+                      "&:hover": { bgcolor: active ? undefined : "#f5f5f5" },
+                    }}
+                  >
+                    {sig !== "ALL" && <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: cfg?.color ?? "#481f93" }} />}
+                    <Typography sx={{ fontSize: "0.74rem", fontWeight: active ? 800 : 600, color: active ? (cfg?.color ?? "#481f93") : "#666" }}>
+                      {sig}
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: active ? (cfg?.color ?? "#481f93") : "#bbb" }}>
+                      {count}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Box>
+
+            {/* Right: Search */}
+            <TextField
+              size="small"
+              placeholder="Search ticker, issuer, sector..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 15, color: "#bbb" }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                width: 240,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 5, fontSize: "0.76rem", bgcolor: "#fafafa",
+                  height: 32,
+                  "& fieldset": { borderColor: "#eee" },
+                  "&:hover fieldset": { borderColor: "#ccc" },
+                  "&.Mui-focused fieldset": { borderColor: "#7c4dff" },
+                },
+              }}
+            />
+          </Box>
+
+          {/* Expanded criteria content — slides down inside the same card */}
+          <Collapse in={criteriaOpen} unmountOnExit>
+            <Box sx={{ borderTop: "1px solid #f0f0f0", background: "linear-gradient(180deg, #faf8ff 0%, #fff 100%)" }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 0 }}>
+
+                {/* Tier Classification */}
+                <Box sx={{ p: 3, borderRight: { md: "1px solid #f0edf8" } }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: "#4527a0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Typography sx={{ color: "#fff", fontSize: "0.8rem", fontWeight: 900 }}>T</Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: "0.92rem", fontWeight: 800, color: "#4527a0" }}>Tier Classification</Typography>
+                  </Box>
+
+                  <Box sx={{ bgcolor: "#f8f6ff", borderRadius: 2, p: 1.8, mb: 2, border: "1px solid #ede7f6" }}>
+                    <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#5e35b1", mb: 0.8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      Quality Gate (ALL 5 required for Tier 1)
+                    </Typography>
+                    {["Revenue Growth >25% YoY", "TAM >$5B, growing >10%", "Tier-1 VC/PE backing", "Profitability path within 24mo", ">20% public float"].map(c => (
+                      <Typography key={c} sx={{ fontSize: "0.82rem", color: "#444", lineHeight: 1.9, pl: 0.5 }}>
+                        <span style={{ color: "#7c4dff", marginRight: 8 }}>&#10003;</span>{c}
+                      </Typography>
+                    ))}
+                  </Box>
+
+                  <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#555", mb: 0.8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Weighted Scoring (0-100)
+                  </Typography>
+                  {[
+                    ["Upward Price Revision", "+25"],
+                    ["Profitability at IPO", "+20"],
+                    ["Pre-IPO Revenue >$100M", "+15"],
+                    ["Tier-1 Underwriter", "+15"],
+                    ["VC/Growth Capital Backing", "+10"],
+                    ["Firm Age >10 years", "+10"],
+                    ["Dual Class Penalty", "-5"],
+                  ].map(([label, pts]) => (
+                    <Box key={label} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.3, px: 0.5 }}>
+                      <Typography sx={{ fontSize: "0.82rem", color: "#555" }}>{label}</Typography>
+                      <Typography sx={{ fontSize: "0.82rem", fontWeight: 800, color: (pts as string).startsWith("-") ? "#c62828" : "#4527a0", fontFamily: "monospace" }}>{pts}</Typography>
+                    </Box>
+                  ))}
+
+                  <Box sx={{ display: "flex", gap: 0.8, mt: 1.8 }}>
+                    {[
+                      ["LONG", ">=70 or T1", "#1b5e20", "#e8f5e9"],
+                      ["SHORT", "<=35", "#b71c1c", "#fce4ec"],
+                      ["AVOID", "36-69", "#e65100", "#fff8e1"],
+                    ].map(([sig, rule, color, bg]) => (
+                      <Box key={sig} sx={{ flex: 1, textAlign: "center", py: 0.7, borderRadius: 1.5, bgcolor: bg, border: `1px solid ${color}22` }}>
+                        <Typography sx={{ fontSize: "0.76rem", fontWeight: 800, color: color }}>{sig}</Typography>
+                        <Typography sx={{ fontSize: "0.68rem", color: color, opacity: 0.7 }}>{rule}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+
+                {/* AM Opportunity */}
+                <Box sx={{ p: 3, borderRight: { md: "1px solid #f0edf8" } }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: "#00695c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Typography sx={{ color: "#fff", fontSize: "0.8rem", fontWeight: 900 }}>A</Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: "0.92rem", fontWeight: 800, color: "#00695c" }}>AM Opportunity</Typography>
+                    <Chip label="5pt" size="small" sx={{ height: 20, fontSize: "0.7rem", fontWeight: 800, bgcolor: "#e0f2f1", color: "#00695c" }} />
+                  </Box>
+
+                  {[
+                    "First-day pop 5-40%",
+                    "Volume >2x post-IPO (ex-Day 1)",
+                    "5+ analyst initiations in 30 days",
+                    "Short interest <15% of float",
+                    "Above IPO price 10+ days",
+                  ].map((c, i) => (
+                    <Box key={c} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.7 }}>
+                      <Box sx={{ width: 22, height: 22, borderRadius: "50%", bgcolor: "#e0f2f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: "#00695c" }}>{i + 1}</Typography>
+                      </Box>
+                      <Typography sx={{ fontSize: "0.82rem", color: "#333" }}>{c}</Typography>
+                    </Box>
+                  ))}
+
+                  <Box sx={{ mt: 1.5, mb: 2, py: 0.5, px: 1.2, bgcolor: "#e0f2f1", borderRadius: 1, display: "inline-block" }}>
+                    <Typography sx={{ fontSize: "0.76rem", fontWeight: 700, color: "#00695c" }}>
+                      Score &gt;=3 = AM Opportunity Active
+                    </Typography>
+                  </Box>
+
+                  <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#555", mb: 0.8, textTransform: "uppercase", letterSpacing: 0.5 }}>Time Windows</Typography>
+                  {[
+                    ["D1-5", "Long moderate pop for large profitable issuers"],
+                    ["D25-45", "Short low-quality on quiet period pop"],
+                    ["D150-200", "Avoid pre-lockup; Buy post-expiry"],
+                  ].map(([w, d]) => (
+                    <Box key={w} sx={{ display: "flex", gap: 1, mb: 0.5, alignItems: "baseline" }}>
+                      <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: "#fff", bgcolor: "#00695c", px: 0.8, py: 0.15, borderRadius: 0.5, whiteSpace: "nowrap" }}>{w}</Typography>
+                      <Typography sx={{ fontSize: "0.8rem", color: "#444" }}>{d}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* Technical Signals */}
+                <Box sx={{ p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1.5, bgcolor: "#2e7d32", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Typography sx={{ color: "#fff", fontSize: "0.8rem", fontWeight: 900 }}>S</Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: "0.92rem", fontWeight: 800, color: "#2e7d32" }}>Technical Signals</Typography>
+                  </Box>
+
+                  <Box sx={{ bgcolor: "#f1f8e9", borderRadius: 2, p: 1.8, mb: 2, border: "1px solid #dcedc8" }}>
+                    <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#33691e", mb: 0.6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      Short-term (Day 5-20)
+                    </Typography>
+                    {["Break above Day 1 high", "Volume 1.5x+ avg (ex-Day 1)", "Momentum after first-week volatility"].map(c => (
+                      <Typography key={c} sx={{ fontSize: "0.82rem", color: "#444", lineHeight: 1.9, pl: 0.5 }}>
+                        <span style={{ color: "#4caf50", marginRight: 8 }}>&#9679;</span>{c}
+                      </Typography>
+                    ))}
+                  </Box>
+
+                  <Typography sx={{ fontSize: "0.78rem", fontWeight: 700, color: "#555", mb: 0.8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    Longer-term
+                  </Typography>
+                  {[
+                    ["Volume", "Confirming on breakout = accumulation"],
+                    ["vs FPX ETF", "Relative strength vs IPO index"],
+                    ["Short Int.", "Rising + high insider = risk flag"],
+                    ["MA Cross", "10d > 40d for Long signal"],
+                  ].map(([label, desc]) => (
+                    <Box key={label} sx={{ display: "flex", gap: 0.8, mb: 0.5, alignItems: "baseline" }}>
+                      <Typography sx={{ fontSize: "0.78rem", fontWeight: 800, color: "#2e7d32", minWidth: 60 }}>{label}</Typography>
+                      <Typography sx={{ fontSize: "0.8rem", color: "#555" }}>{desc}</Typography>
+                    </Box>
+                  ))}
+
+                  <Box sx={{ mt: 2, py: 0.8, px: 1.2, bgcolor: "#f5f5f5", borderRadius: 1.5, border: "1px solid #eee" }}>
+                    <Typography sx={{ fontSize: "0.76rem", fontWeight: 700, color: "#444" }}>
+                      NYSE/NASDAQ | Offer &gt;=$5 | Cap &gt;=$200M
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.72rem", color: "#888", mt: 0.3 }}>
+                      Excl. SPACs, ADRs, REITs, closed-end funds
+                    </Typography>
+                  </Box>
+                </Box>
+
+              </Box>
+            </Box>
+          </Collapse>
+        </Paper>
+      </Box>
+
+      {/* ── Table area ──────────────────────────────────────────── */}
+      <Box sx={{ maxWidth: 1400, mx: "auto", px: PX }}>
 
         {/* Table */}
         <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid #e8e8e8", overflow: "hidden", mb: 3 }}>
@@ -698,6 +1005,15 @@ const JayRitterIPOAnalysis: React.FC = () => {
         </Typography>
 
       </Box>
+
+      {/* Chat Drawer */}
+      {report && (
+        <JayRitterChat
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+          reportDate={report.report_date}
+        />
+      )}
     </Box>
   );
 };
