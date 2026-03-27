@@ -111,6 +111,7 @@ import JayRitterIPOAnalysis from "../Components/JayRitter/JayRitterIPOAnalysis";
 import SentimentSummary from "../Components/AIML/SentimentSummary";
 import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
 import PortfolioSummaryTabs from "../Components/IPODashboardLLM/PortfolioSummaryTabs";
+import UploadClaudeSentiment from "../Components/AIML/UploadClaudeSentiment";
 
 
 const AppRouters: React.FC = () => {
@@ -302,6 +303,7 @@ const AppRouters: React.FC = () => {
         <Route path="/ai_sentiment_view" element={<AuthGuard><ShowUSSentimentAnalysis /></AuthGuard>} />
         <Route path="/ai_unsupervised_summary" element={<AuthGuard><UnsupervisedDealSummary /></AuthGuard>} />
         <Route path="/portfolio_summary" element={<AuthGuard><PortfolioSummaryTabs /></AuthGuard>} />
+        <Route path="/upload_claude_sentiment" element={<AuthGuard><UploadClaudeSentiment /></AuthGuard>} />
 
 
 
