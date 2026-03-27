@@ -3,14 +3,15 @@ import {
   Alert,
   Autocomplete,
   Box,
-  Button,
-  Card,
-  CardContent,
   CircularProgress,
   TextField,
   Typography,
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
+import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
@@ -33,7 +34,6 @@ const parseLooseJson = (value: string): any | null => {
     return JSON.parse(value);
   } catch {
     try {
-      // Fallback for Python-style stringified lists with single quotes
       const fn = new Function(`return ${value};`);
       return fn();
     } catch {
@@ -131,7 +131,6 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
           throw new Error(apiMsg || `Request failed with status ${res.status}`);
         }
 
-        // capture updated_at from API response
         if (data?.updated_at) {
           setLatestDate(data.updated_at);
         } else {
@@ -183,196 +182,357 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   const showPlaceholder =
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
 
+  const tabs = [
+    { label: "Overall Sentiment", icon: <InsightsRoundedIcon sx={{ fontSize: 16 }} />, show: blocks.length > 0 },
+    { label: "Social Media/Retail Sentiment", icon: <ForumRoundedIcon sx={{ fontSize: 16 }} />, show: socialMediaBlocks.length > 0 },
+  ];
+
   return (
-    <Box sx={{ py: 2 }}>
-      <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 1.5,
-              flexWrap: "wrap",
-              mb: 2,
-            }}
-          >
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="h6" fontWeight={600} color="#002060" align="center">
-                Sentiment Analysis{focusTicker ? ` for ${focusTicker}` : ""}
-              </Typography>
-              <Typography variant="body2" color="#000000" sx={{ mt: 0.5, lineHeight: 1.6 }}>
-                A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, aggregating market data, news sentiment, analyst commentary, and historical IPO performance signals to deliver consistent yet deal-specific insights on first-week and first-month performance drivers.
-              </Typography>
+    <Box>
+      {/* Header Section */}
+      <Box
+        sx={{
+          background: "#ffffff",
+          borderRadius: 3,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+          p: { xs: 2.5, md: 3 },
+          mb: 2.5,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 2.5,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Left - Title & Description */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.2, mb: 1 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 2,
+                  background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <InsightsRoundedIcon sx={{ fontSize: 20, color: "#fff" }} />
+              </Box>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "1.35rem",
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Sentiment Analysis
+                  {focusTicker && (
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: "1.35rem",
+                        fontWeight: 700,
+                        color: "#4f46e5",
+                        ml: 0.8,
+                      }}
+                    >
+                      {focusTicker}
+                    </Typography>
+                  )}
+                </Typography>
+              </Box>
             </Box>
-            <Box sx={{ minWidth: { xs: "100%", sm: 260 }, width: { xs: "100%", sm: 320 } }}>
-              <Autocomplete
-                options={tickerOptions}
-                loading={loadingTickers}
-                value={selectedTicker}
-                onChange={(_, value) => onSelectTicker?.(value)}
-                getOptionLabel={(option) =>
-                  option.pricing_date
-                    ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
-                    : option.ticker
-                }
-                isOptionEqualToValue={(opt, val) =>
-                  opt.ticker === val.ticker &&
-                  (opt.pricing_date ?? "") === (val.pricing_date ?? "")
-                }
-                renderOption={(props, option) => (
-                  <li {...props} key={option.id}>
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography sx={{ fontWeight: 900, color: "#0e0d0d" }}>
+
+            <Typography
+              sx={{
+                fontSize: "0.82rem",
+                color: "#64748b",
+                lineHeight: 1.6,
+                maxWidth: 680,
+              }}
+            >
+              A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, aggregating market data, news sentiment, analyst commentary, and historical IPO performance signals to deliver consistent yet deal-specific insights on first-week and first-month performance drivers.
+            </Typography>
+          </Box>
+
+          {/* Right - Search & Date */}
+          <Box sx={{ minWidth: { xs: "100%", sm: 280 }, width: { xs: "100%", sm: 320 } }}>
+            <Autocomplete
+              options={tickerOptions}
+              loading={loadingTickers}
+              value={selectedTicker}
+              onChange={(_, value) => onSelectTicker?.(value)}
+              getOptionLabel={(option) =>
+                option.pricing_date
+                  ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
+                  : option.ticker
+              }
+              isOptionEqualToValue={(opt, val) =>
+                opt.ticker === val.ticker &&
+                (opt.pricing_date ?? "") === (val.pricing_date ?? "")
+              }
+              renderOption={(props, option) => (
+                <li {...props} key={option.id}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.3 }}>
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 1.5,
+                        background: "#f1f5f9",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 800,
+                        fontSize: "0.7rem",
+                        color: "#4f46e5",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {option.ticker.slice(0, 2)}
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: "#0f172a" }}>
                         {option.ticker}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "#6b7280" }}>
+                      <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
                         {formatPricingDate(option.pricing_date)}
                       </Typography>
                     </Box>
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search ticker"
-                    placeholder={loadingTickers ? "Loading tickers..." : "Type to search..."}
-                    fullWidth
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <SearchOutlinedIcon sx={{ color: "#6b7280", mr: 1 }} />
-                      ),
-                      endAdornment: (
-                        <>
-                          {loadingTickers ? (
-                            <CircularProgress color="inherit" size={18} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2.5,
-                        background: "#ffffff",
-                        "& fieldset": { borderColor: "#c5cede" },
-                        "&:hover fieldset": { borderColor: "#9aa9c5" },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#002060",
-                          boxShadow: "0 0 0 2px rgba(0,32,96,0.12)",
-                        },
-                      },
-                    }}
-                  />
-                )}
-              />
-              {tickerError && (
-                <Alert severity="warning" sx={{ mt: 1 }}>
-                  {tickerError}
-                </Alert>
+                  </Box>
+                </li>
               )}
-
-              {latestDate && (
-                <Typography
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search ticker"
+                  placeholder={loadingTickers ? "Loading tickers..." : "Type to search..."}
+                  fullWidth
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <SearchOutlinedIcon sx={{ color: "#94a3b8", mr: 0.5, fontSize: 20 }} />
+                    ),
+                    endAdornment: (
+                      <>
+                        {loadingTickers ? <CircularProgress color="inherit" size={18} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
                   sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2.5,
+                      background: "#f8fafc",
+                      fontSize: "0.88rem",
+                      "& fieldset": { borderColor: "#e2e8f0" },
+                      "&:hover fieldset": { borderColor: "#cbd5e1" },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#4f46e5",
+                        borderWidth: "1.5px",
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      fontSize: "0.85rem",
+                      color: "#94a3b8",
+                      "&.Mui-focused": { color: "#4f46e5" },
+                    },
+                  }}
+                />
+              )}
+              slotProps={{
+                paper: {
+                  sx: {
+                    borderRadius: 2.5,
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
                     mt: 0.5,
-                    ml: 2.0,          // moves text to the right under search input
-                    fontSize: "11px", // smaller font size
-                    fontWeight: 500,
-                    color: "#002060",
+                    "& .MuiAutocomplete-option": {
+                      borderRadius: 1.5,
+                      mx: 0.5,
+                      "&:hover": { background: "#f1f5f9" },
+                      '&[aria-selected="true"]': { background: "#eef2ff" },
+                    },
+                  },
+                },
+              }}
+            />
+            {tickerError && (
+              <Alert severity="warning" sx={{ mt: 1, borderRadius: 2 }}>
+                {tickerError}
+              </Alert>
+            )}
+
+            {latestDate && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 1, ml: 0.5 }}>
+                <CalendarTodayRoundedIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
+                <Typography sx={{ fontSize: "0.72rem", fontWeight: 500, color: "#94a3b8" }}>
+                  Last Updated: {new Date(latestDate).toISOString().split("T")[0]}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Loading */}
+      {loading && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            py: 8,
+            gap: 2,
+          }}
+        >
+          <CircularProgress
+            size={36}
+            thickness={4}
+            sx={{
+              color: "#4f46e5",
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
+            }}
+          />
+          <Typography sx={{ fontSize: "0.85rem", color: "#94a3b8", fontWeight: 500 }}>
+            Analyzing sentiment for {focusTicker}...
+          </Typography>
+        </Box>
+      )}
+
+      {/* Status */}
+      {status && (
+        <Box
+          sx={{
+            py: 6,
+            textAlign: "center",
+            background: "#ffffff",
+            borderRadius: 3,
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <PublicRoundedIcon sx={{ fontSize: 40, color: "#cbd5e1", mb: 1.5 }} />
+          <Typography sx={{ color: "#64748b", fontWeight: 600, fontSize: "0.9rem" }}>
+            {status}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Error */}
+      {error && (
+        <Alert
+          severity="error"
+          sx={{
+            mb: 2,
+            borderRadius: 2.5,
+            border: "1px solid #fecaca",
+            "& .MuiAlert-message": { fontSize: "0.85rem" },
+          }}
+        >
+          {error}
+        </Alert>
+      )}
+
+      {/* Placeholder */}
+      {showPlaceholder && (
+        <Box
+          sx={{
+            py: 8,
+            textAlign: "center",
+            background: "#ffffff",
+            borderRadius: 3,
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <InsightsRoundedIcon sx={{ fontSize: 48, color: "#e2e8f0", mb: 1.5 }} />
+          <Typography sx={{ color: "#94a3b8", fontSize: "0.9rem" }}>
+            {focusTicker ? "Sentiment analysis will appear here once available." : "Pick a ticker to load sentiment."}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Content with Tabs */}
+      {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
+        <>
+          {/* Tab Pills */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              mb: 2.5,
+              flexWrap: "wrap",
+            }}
+          >
+            {tabs.map((tab, idx) =>
+              tab.show ? (
+                <Box
+                  key={idx}
+                  onClick={() => setActiveTab(idx)}
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.8,
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    fontSize: "0.84rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    ...(activeTab === idx
+                      ? {
+                        background: "#4f46e5",
+                        color: "#ffffff",
+                        boxShadow: "0 2px 8px rgba(79,70,229,0.3)",
+                      }
+                      : {
+                        background: "#ffffff",
+                        color: "#64748b",
+                        border: "1px solid #e2e8f0",
+                        "&:hover": {
+                          background: "#f8fafc",
+                          borderColor: "#cbd5e1",
+                          color: "#334155",
+                        },
+                      }),
                   }}
                 >
-                  Last Updated Date: {new Date(latestDate).toISOString().split("T")[0]}
-                </Typography>
-              )}
-            </Box>
+                  {tab.icon}
+                  {tab.label}
+                </Box>
+              ) : null
+            )}
           </Box>
 
-          {loading && (
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-              <CircularProgress size={22} />
-            </Box>
-          )}
-
-        {status && (
-          <Box sx={{ mb: 2 }}>
-            <Typography
-              variant="body2"
-              sx={{ color: "#002060", fontWeight: 700, textAlign: "center" }}
-            >
-              {status}
-            </Typography>
+          {/* Rendered Content */}
+          <Box
+            sx={{
+              background: "#ffffff",
+              borderRadius: 3,
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              overflow: "hidden",
+            }}
+          >
+            {activeTab === 0 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
+            {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
           </Box>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-          {showPlaceholder && (
-            <Typography variant="body2" color="#000000">
-              {focusTicker ? "Sentiment analysis will appear here once available." : "Pick a ticker to load sentiment."}
-            </Typography>
-          )}
-
-          {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
-            <>
-              <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap", justifyContent: "center" }}>
-                {blocks.length > 0 && (
-                  <Button
-                    variant={activeTab === 0 ? "contained" : "outlined"}
-                    onClick={() => setActiveTab(0)}
-                    sx={{
-                      textTransform: "none",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      px: 3,
-                      py: 1,
-                      backgroundColor: activeTab === 0 ? "#155ec5" : "transparent",
-                      color: activeTab === 0 ? "#ffffff" : "#3a4556",
-                      border: activeTab === 0 ? "none" : "1.5px solid #3a4556",
-                      "&:hover": {
-                        backgroundColor: activeTab === 0 ? "#155ec5" : "#f5f5f5",
-                      },
-                    }}
-                  >
-                    Overall Sentiment
-                  </Button>
-                )}
-                {socialMediaBlocks.length > 0 && (
-                  <Button
-                    variant={activeTab === 1 ? "contained" : "outlined"}
-                    onClick={() => setActiveTab(1)}
-                    sx={{
-                      textTransform: "none",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      px: 3,
-                      py: 1,
-                      backgroundColor: activeTab === 1 ? "#155ec5" : "transparent",
-                      color: activeTab === 1 ? "#ffffff" : "#3a4556",
-                      border: activeTab === 1 ? "none" : "1.5px solid #3a4556",
-                      "&:hover": {
-                        backgroundColor: activeTab === 1 ? "#155ec5" : "#f5f5f5",
-                      },
-                    }}
-                  >
-                    Social Media/Retail Sentiment
-                  </Button>
-                )}
-              </Box>
-
-              {activeTab === 0 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
-              {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
-            </>
-          )}
-        </CardContent>
-      </Card>
+        </>
+      )}
     </Box>
   );
 };

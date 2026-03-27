@@ -1,28 +1,80 @@
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 
 const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => {
   const normalizedContent = React.useMemo(() => String(content ?? ""), [content]);
 
   return (
-    <Card
+    <Box
       sx={{
-        backgroundColor: "#5d5df010", // light transparent white
-        // backgroundcolor:"red",
-        borderRadius: 3,
-        boxShadow: 2,
-        border: "1px solid #5d5df0a4", // subtle white border
-        color: "#0f0e0eff",
-        p: 1,
+        background: "#f8fafc",
+        borderRadius: 2.5,
+        border: "1px solid #e2e8f0",
+        p: { xs: 2, md: 2.5 },
+        width: "100%",
+        transition: "border-color 0.2s ease",
+        "&:hover": {
+          borderColor: "#cbd5e1",
+        },
+        "& p": {
+          fontSize: "0.88rem",
+          lineHeight: 1.75,
+          color: "#334155",
+          margin: 0,
+          "&:not(:last-child)": { mb: 1.5 },
+        },
+        "& h1, & h2, & h3, & h4, & h5, & h6": {
+          color: "#0f172a",
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
+          mt: 0,
+          mb: 1,
+        },
+        "& h1": { fontSize: "1.25rem" },
+        "& h2": { fontSize: "1.1rem" },
+        "& h3": { fontSize: "1rem" },
+        "& strong": { color: "#0f172a", fontWeight: 700 },
+        "& ul, & ol": {
+          pl: 2.5,
+          my: 1,
+          "& li": {
+            fontSize: "0.88rem",
+            lineHeight: 1.75,
+            color: "#334155",
+            mb: 0.5,
+            "&::marker": { color: "#94a3b8" },
+          },
+        },
+        "& a": {
+          color: "#4f46e5",
+          textDecoration: "none",
+          fontWeight: 600,
+          "&:hover": { textDecoration: "underline" },
+        },
+        "& code": {
+          background: "#e2e8f0",
+          borderRadius: 1,
+          px: 0.8,
+          py: 0.2,
+          fontSize: "0.82rem",
+          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+          color: "#4f46e5",
+        },
+        "& blockquote": {
+          borderLeft: "3px solid #4f46e5",
+          pl: 2,
+          ml: 0,
+          my: 1.5,
+          color: "#64748b",
+          fontStyle: "italic",
+        },
       }}
     >
-      <CardContent sx={{ paddingBottom: "16px !important" }}>
-        <Typography variant="body1" component="div">
-          <ReactMarkdown>{normalizedContent}</ReactMarkdown>
-        </Typography>
-      </CardContent>
-    </Card>
+      <Typography variant="body1" component="div">
+        <ReactMarkdown>{normalizedContent}</ReactMarkdown>
+      </Typography>
+    </Box>
   );
 };
 

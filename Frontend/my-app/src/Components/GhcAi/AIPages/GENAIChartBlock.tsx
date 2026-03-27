@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Typography, Box, Divider } from "@mui/material";
+import { Box, Typography, Divider } from "@mui/material";
 import {
   Pie,
   Bar,
@@ -17,7 +17,7 @@ import {
   ArcElement,
   Tooltip,
   Legend,
-  Filler, // Needed for Area Chart
+  Filler,
 } from "chart.js";
 import ReactMarkdown from "react-markdown";
 
@@ -37,7 +37,7 @@ type GENAIChartBlockProps = {
   chartType: string;
   data: any;
   title: string | number;
-  fixedHeight?: number; // height in pixels
+  fixedHeight?: number;
 };
 
 const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
@@ -53,30 +53,28 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
     pie: Pie,
     bar: Bar,
     line: Line,
-    area: Line,         // Area is a Line chart with `fill: true`
+    area: Line,
     scatter: Scatter,
     bubble: Bubble,
-    stackedbar: Bar,    // Stacked bar uses Bar with special options
+    stackedbar: Bar,
   };
 
   const ChartComponent = chartMap[type];
 
   if (!ChartComponent) {
     return (
-      <Paper
+      <Box
         sx={{
-          p: 2,
-          m: 2,
-          bgcolor: "#fff",
-          width: "100%",
-          borderRadius: 2,
-          boxShadow: 2,
+          p: 2.5,
+          borderRadius: 2.5,
+          border: "1px solid #fecaca",
+          background: "#fef2f2",
         }}
       >
-        <Typography variant="body2" sx={{ color: "#d32f2f" }}>
+        <Typography sx={{ color: "#dc2626", fontSize: "0.85rem" }}>
           Unsupported chart type: <strong>{chartType}</strong>
         </Typography>
-      </Paper>
+      </Box>
     );
   }
 
@@ -88,31 +86,60 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         {
           label: normalizedTitle,
           data,
-          backgroundColor: "#60a5fa",
+          backgroundColor: "#818cf8",
         },
       ],
     };
   }
 
-  // Set custom options
   const chartOptions: any = {
     maintainAspectRatio: false,
     responsive: true,
     plugins: {
-      legend: { display: true, position: "bottom" },
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          pointStyle: "circle",
+          padding: 16,
+          font: { size: 12, weight: "500" },
+          color: "#64748b",
+        },
+      },
+      tooltip: {
+        backgroundColor: "#0f172a",
+        titleFont: { size: 12, weight: "600" },
+        bodyFont: { size: 12 },
+        cornerRadius: 8,
+        padding: 10,
+      },
     },
+    scales: ["pie"].includes(type)
+      ? undefined
+      : {
+        x: {
+          grid: { color: "#f1f5f9", drawBorder: false },
+          ticks: { color: "#94a3b8", font: { size: 11 } },
+        },
+        y: {
+          grid: { color: "#f1f5f9", drawBorder: false },
+          ticks: { color: "#94a3b8", font: { size: 11 } },
+        },
+      },
   };
 
   if (type === "area") {
-    // Ensure all datasets in area chart have fill: true
     formattedData = {
       ...data,
       datasets: data.datasets.map((ds: any) => ({
         ...ds,
         fill: true,
-        backgroundColor: ds.backgroundColor || "rgba(96,165,250,0.4)",
-        borderColor: ds.borderColor || "#60a5fa",
-        tension: 0.3,
+        backgroundColor: ds.backgroundColor || "rgba(79,70,229,0.1)",
+        borderColor: ds.borderColor || "#4f46e5",
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: ds.borderColor || "#4f46e5",
       })),
     };
   }
@@ -121,48 +148,60 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
     chartOptions.scales = {
       x: {
         stacked: true,
+        grid: { color: "#f1f5f9", drawBorder: false },
+        ticks: { color: "#94a3b8", font: { size: 11 } },
       },
       y: {
         stacked: true,
+        grid: { color: "#f1f5f9", drawBorder: false },
+        ticks: { color: "#94a3b8", font: { size: 11 } },
       },
     };
   }
 
   return (
-    <Paper
-      elevation={2}
+    <Box
       sx={{
-        p: 2,
+        p: 2.5,
         width: "100%",
         height: fixedHeight,
-        borderRadius: 3,
-        background: "linear-gradient(135deg, #f5f7fa, #e4ecf7)",
-        boxShadow: 3,
+        borderRadius: 2.5,
+        background: "#ffffff",
+        border: "1px solid #e2e8f0",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        transition: "border-color 0.2s ease",
+        "&:hover": { borderColor: "#cbd5e1" },
       }}
     >
-      <Typography
-        variant="subtitle1"
-        fontWeight={600}
-        sx={{ color: "#2c387e", mb: 1 }}
+      <Box
+        sx={{
+          mb: 1.5,
+          "& p": {
+            margin: 0,
+            fontSize: "0.9rem",
+            fontWeight: 700,
+            color: "#0f172a",
+            letterSpacing: "-0.01em",
+          },
+        }}
       >
         <ReactMarkdown>{normalizedTitle}</ReactMarkdown>
-      </Typography>
+      </Box>
 
-      <Divider sx={{ mb: 1 }} />
+      <Divider sx={{ borderColor: "#f1f5f9", mb: 1.5 }} />
 
       <Box
         sx={{
           width: "100%",
-          height: `calc(${fixedHeight}px - 64px)`, // leave room for title & divider
+          flex: 1,
           position: "relative",
+          minHeight: 0,
         }}
       >
         <ChartComponent data={formattedData} options={chartOptions} />
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
