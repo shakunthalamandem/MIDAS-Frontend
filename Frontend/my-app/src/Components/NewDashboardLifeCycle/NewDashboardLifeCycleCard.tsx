@@ -24,6 +24,7 @@ type NewDashboardLifeCycleCardProps = {
   tags?: NewDashboardLifeCycleCardTag[];
   writeupAvailable?: boolean | null;
   mlPredAvailable?: boolean | null;
+  multipleDealStatus?: string;
   onViewDetails?: () => void;
   onActionClick?: (label: string) => void;
 };
@@ -35,9 +36,13 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
   tags,
   writeupAvailable,
   mlPredAvailable,
+  multipleDealStatus,
   onViewDetails,
   onActionClick,
 }) => {
+  const isMultipleDeal =
+    multipleDealStatus?.trim().toLowerCase() === "yes";
+
   const pickMeta = (pattern: RegExp, fallbackLabel: string) =>
     meta.find((item) => pattern.test(item.label)) ?? {
       label: fallbackLabel,
@@ -153,7 +158,22 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
           p: { xs: 2, sm: 2.2 },
         }}
       >
-        <Box sx={{ minWidth: 0, pt: 0.8 }}>
+        <Box sx={{ minWidth: 0, pt: 0.8, position: "relative" }}>
+          {isMultipleDeal && (
+            <Typography
+              sx={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                fontSize: "0.68rem",
+                fontWeight: 700,
+                color: "#e67e22",
+                lineHeight: 1,
+              }}
+            >
+              After Market
+            </Typography>
+          )}
           <Typography
             variant="h6"
             sx={{
