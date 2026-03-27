@@ -174,41 +174,43 @@ const UploadClaudeSentiment: React.FC = () => {
     loadTickers();
   }, []);
 
-  const handleUpload = async () => {
-    if (!selectedTicker) {
-      setError("Please select a ticker");
-      return;
-    }
-    if (!sentiment.trim()) {
-      setError("Please enter sentiment data");
-      return;
-    }
-    if (!socialMediaSentiment.trim()) {
-      setError("Please enter social media sentiment data");
-      return;
-    }
+const handleUpload = async () => {
+  if (!selectedTicker) {
+    setError("Please select a ticker");
+    return;
+  }
 
-    setUploading(true);
-    setError(null);
-    setSuccess(null);
+  const trimmedSentiment = sentiment.trim();
+  const trimmedSocialMediaSentiment = socialMediaSentiment.trim();
 
-    try {
-      await uploadSentiment(
-        selectedTicker.ticker,
-        selectedTicker.unique_deal_id,
-        sentiment,
-        socialMediaSentiment
-      );
-      setSuccess(`Successfully uploaded sentiment for ${selectedTicker.ticker}`);
-      setSentiment("");
-      setSocialMediaSentiment("");
-      setSelectedTicker(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to upload sentiment");
-    } finally {
-      setUploading(false);
-    }
-  };
+  if (!trimmedSentiment && !trimmedSocialMediaSentiment) {
+    setError("Please enter at least one sentiment field");
+    return;
+  }
+
+  setUploading(true);
+  setError(null);
+  setSuccess(null);
+
+  try {
+    await uploadSentiment(
+      selectedTicker.ticker,
+      selectedTicker.unique_deal_id,
+      trimmedSentiment,
+      trimmedSocialMediaSentiment
+    );
+
+    setSuccess(`Successfully uploaded sentiment for ${selectedTicker.ticker}`);
+    setSentiment("");
+    setSocialMediaSentiment("");
+    setSelectedTicker(null);
+    setTickerSearchValue("");
+  } catch (err: any) {
+    setError(err.message || "Failed to upload sentiment");
+  } finally {
+    setUploading(false);
+  }
+};
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
