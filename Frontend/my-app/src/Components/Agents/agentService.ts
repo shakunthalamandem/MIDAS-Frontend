@@ -1,4 +1,4 @@
-import { AIAgent, AgentOutput, CreateAgentPayload } from "./types";
+import { AIAgent, AgentOutput, ChatMessage, ChatResponse, CreateAgentPayload } from "./types";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -104,4 +104,19 @@ export async function fetchAgentOutputs(agentId: number): Promise<AgentOutput[]>
     headers: authHeaders(),
   });
   return handleResponse<AgentOutput[]>(res);
+}
+
+/** Send a follow-up chat message for an agent output */
+export async function chatWithOutput(
+  outputId: number,
+  message: string,
+  history: ChatMessage[],
+): Promise<string> {
+  const res = await fetch(`${apiUrl}/api/v2/agent-outputs/${outputId}/chat/`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ message, history }),
+  });
+  const data = await handleResponse<ChatResponse>(res);
+  return data.response;
 }
