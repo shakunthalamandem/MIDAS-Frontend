@@ -136,6 +136,141 @@
   min-width: 200px;
 }
 
+/* ── Category Toggle Bar ── */
+/* ── Category + PNL unified row ── */
+.category-pnl-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.category-toggle-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Inline PNL chips ── */
+.pnl-cards-inline {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.pnl-chip {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.pnl-chip:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.pnl-chip--selected {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.pnl-chip-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.pnl-chip-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.pnl-chip-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.pnl-chip-pct {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.category-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.category-toggle-btn:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.category-toggle-btn--active {
+  background: linear-gradient(135deg, #002060 0%, #003494 100%);
+  border-color: #002060;
+  box-shadow: 0 4px 16px rgba(0, 32, 96, 0.3);
+}
+
+.category-toggle-btn--active .category-toggle-label {
+  color: #fff;
+  font-weight: 700;
+}
+
+.category-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.category-toggle-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.2px;
+}
+
+@media (max-width: 768px) {
+  .category-pnl-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .category-toggle-bar {
+    gap: 8px;
+  }
+  .category-toggle-btn {
+    padding: 8px 16px;
+  }
+  .category-toggle-label {
+    font-size: 12px;
+  }
+  .pnl-cards-inline {
+    margin-left: 0;
+  }
+}
+
 /* ── Sections ── */
 .risk-dashboard-section {
   margin-bottom: 28px;
@@ -367,6 +502,16 @@
   font-size: 15px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Risk Card Selected State ── */
+.risk-card--selected {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.risk-card--selected .risk-card-hover-overlay {
+  display: none;
 }
 
 /* ── P&L Cards Grid ── */

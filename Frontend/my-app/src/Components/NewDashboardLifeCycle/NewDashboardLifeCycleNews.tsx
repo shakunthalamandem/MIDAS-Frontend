@@ -24,6 +24,7 @@ import StarsRoundedIcon from "@mui/icons-material/StarsRounded";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "react-router-dom";
+import DashboardStateCard from "./DashboardStateCard";
 
 interface NewsArticle {
   id: number;
@@ -380,42 +381,23 @@ const NewDashboardLifeCycleNews: React.FC<StockTickerNewsProps> = ({ ticker }) =
       )}
 
       {!loading && error && (
-        <Paper
-          elevation={0}
-          sx={(theme) => ({
-            borderRadius: 3,
-            border: `1px solid ${alpha(theme.palette.error.main, 0.35)}`,
-            backgroundColor: alpha(theme.palette.error.main, 0.06),
-            p: 2,
-          })}
-        >
-          <Typography color="error" sx={{ fontWeight: 600 }}>
-            Something went wrong
-          </Typography>
-          <Typography variant="body2" color="#000000">
-            {error}
-          </Typography>
-        </Paper>
+        <DashboardStateCard
+          variant="error"
+          title="News feed unavailable"
+          message={error}
+          context={initialTicker ? [{ label: "Ticker", value: initialTicker }] : undefined}
+          onRetry={() => window.location.reload()}
+        />
       )}
 
       {/* No news state */}
       {isNoNews && (
-        <Paper
-          elevation={0}
-          sx={(theme) => ({
-            borderRadius: 3,
-            border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
-            backgroundColor: alpha(theme.palette.info.main, 0.04),
-            p: 2,
-          })}
-        >
-          <Typography sx={{ fontWeight: 600 }}>
-            {noNewsMessage}
-          </Typography>
-          <Typography variant="body2" color="#000000" sx={{ mt: 0.5 }}>
-            Check back later for new updates.
-          </Typography>
-        </Paper>
+        <DashboardStateCard
+          variant="empty"
+          title="No news articles found"
+          message={noNewsMessage || "There are no news articles available for this ticker at the moment. Check back later for new updates."}
+          context={initialTicker ? [{ label: "Ticker", value: initialTicker }] : undefined}
+        />
       )}
 
       {/* Main layout */}

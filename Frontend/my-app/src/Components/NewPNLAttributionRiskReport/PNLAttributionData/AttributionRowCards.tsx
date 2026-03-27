@@ -13,7 +13,7 @@ interface MetricCard {
 
 const METRIC_CARDS: MetricCard[] = [
   { key: "dtd_pnl", label: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct" },
-  { key: "mtd_pnl", label: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct" },
+  { key: "wtd_pnl", label: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct" },
   { key: "ytd_pnl", label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct" },
   { key: "net_exp", label: "Net Exp", valueKey: "net_exp", pctKey: "net_exp_pct" },
   { key: "beta_adj_net", label: "Beta Adj Net", valueKey: "beta_adj_net", pctKey: "beta_adj_net_pct" },

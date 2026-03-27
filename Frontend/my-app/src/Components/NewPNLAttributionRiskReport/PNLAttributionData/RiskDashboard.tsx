@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Alert, Container, Typography, Button } from "@mui/material";
-import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker } from "./types";
+import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker, DashboardCategory, MetricChartDataPoint, TopBottomMetricTicker, HeadlineMetricValues } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
@@ -34,12 +34,20 @@ const RiskDashboard: React.FC = () => {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("ytd_pnl");
+  const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>("pnl");
   const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>("one_month_beta_sp");
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [indexChartLoading, setIndexChartLoading] = useState(false);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
   const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
   const [topBottomLoading, setTopBottomLoading] = useState(false);
+  const [metricChartData, setMetricChartData] = useState<MetricChartDataPoint[]>([]);
+  const [metricChartLoading, setMetricChartLoading] = useState(false);
+  const [metricTop10, setMetricTop10] = useState<TopBottomMetricTicker[]>([]);
+  const [metricBottom10, setMetricBottom10] = useState<TopBottomMetricTicker[]>([]);
+  const [metricTopBottomLoading, setMetricTopBottomLoading] = useState(false);
+  const [metricHeadlineData, setMetricHeadlineData] = useState<HeadlineMetricValues | null>(null);
+  const [metricHeadlineLoading, setMetricHeadlineLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -147,6 +155,107 @@ const RiskDashboard: React.FC = () => {
   useEffect(() => {
     fetchTopBottomPnl();
   }, [fetchTopBottomPnl]);
+
+  // Fetch metric chart data (for Gross MV, Delta Adj, Beta Adj)
+  const fetchMetricChartData = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
+    setMetricChartLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/portfolio_metric_chart/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({
+          date: selectedDate,
+          fund: selectedFunds,
+          metric: selectedCategory,
+          period: selectedMetric, // dtd, wtd, mtd, ytd
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch metric chart data");
+      const result = await res.json();
+      setMetricChartData(result.chart_data || []);
+    } catch {
+      setMetricChartData([]);
+    } finally {
+      setMetricChartLoading(false);
+    }
+  }, [selectedFunds, selectedDate, selectedCategory, selectedMetric]);
+
+  useEffect(() => {
+    if (selectedCategory !== "pnl") fetchMetricChartData();
+  }, [fetchMetricChartData, selectedCategory]);
+
+  // Fetch top/bottom tickers for selected metric (Gross MV, Delta Adj, Beta Adj)
+  const fetchMetricTopBottom = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
+    setMetricTopBottomLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/portfolio_metric_top_bottom/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({
+          date: selectedDate,
+          fund: selectedFunds,
+          metric: selectedCategory,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch metric top/bottom");
+      const result = await res.json();
+      setMetricTop10(result.top_10 || []);
+      setMetricBottom10(result.bottom_10 || []);
+    } catch {
+      setMetricTop10([]);
+      setMetricBottom10([]);
+    } finally {
+      setMetricTopBottomLoading(false);
+    }
+  }, [selectedFunds, selectedDate, selectedCategory]);
+
+  useEffect(() => {
+    if (selectedCategory !== "pnl") fetchMetricTopBottom();
+  }, [fetchMetricTopBottom, selectedCategory]);
+
+  // Fetch metric headline values (DTD/WTD/MTD/YTD for Gross MV, Delta Adj, Beta Adj)
+  const fetchMetricHeadline = useCallback(async () => {
+    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
+    setMetricHeadlineLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/portfolio_metric_headline/`, {
+        method: "POST",
+        headers: getAuthHeaders("application/json"),
+        body: JSON.stringify({
+          date: selectedDate,
+          fund: selectedFunds,
+          metric: selectedCategory,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to fetch metric headline");
+      const result = await res.json();
+      setMetricHeadlineData(result.headline_data || null);
+    } catch {
+      setMetricHeadlineData(null);
+    } finally {
+      setMetricHeadlineLoading(false);
+    }
+  }, [selectedFunds, selectedDate, selectedCategory]);
+
+  useEffect(() => {
+    if (selectedCategory !== "pnl") {
+      fetchMetricHeadline();
+    } else {
+      setMetricHeadlineData(null);
+    }
+  }, [fetchMetricHeadline, selectedCategory]);
+
+  const handleCategorySelect = (category: DashboardCategory) => {
+    setSelectedCategory(category);
+    // Reset selected metric to YTD equivalent when switching categories
+    if (category === "pnl") {
+      setSelectedMetric("ytd_pnl");
+    } else {
+      setSelectedMetric("ytd");
+    }
+  };
 
   // Fetch index comparison chart data
   const fetchIndexChartData = useCallback(async () => {
@@ -261,17 +370,42 @@ const RiskDashboard: React.FC = () => {
         <>
           {data.headline_risks && (
             <Box className="pdf-section" data-pdf-page="1">
-              <HeadlineRisks data={data.headline_risks} />
-            </Box>
-          )}
-
-          {data.headline_pnl && (
-            <Box className="pdf-section" data-pdf-page="1">
-              <HeadlinePnL
-                data={data.headline_pnl}
-                selectedMetric={selectedMetric}
-                onMetricSelect={setSelectedMetric}
+              <HeadlineRisks
+                data={data.headline_risks}
+                selectedCategory={selectedCategory}
+                onCategorySelect={handleCategorySelect}
               />
+              {/* Category Toggles + Headline PNL in one row */}
+              <Box className="category-pnl-row">
+                <Box className="category-toggle-bar">
+                  {([
+                    { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
+                    { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
+                    { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
+                    { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
+                  ]).map((btn) => (
+                    <Box
+                      key={btn.key}
+                      className={`category-toggle-btn${selectedCategory === btn.key ? " category-toggle-btn--active" : ""}`}
+                      onClick={() => handleCategorySelect(btn.key)}
+                    >
+                      <span className="category-toggle-icon">{btn.icon}</span>
+                      <span className="category-toggle-label">{btn.label}</span>
+                    </Box>
+                  ))}
+                </Box>
+                {(data.headline_pnl || selectedCategory !== "pnl") && (
+                  <HeadlinePnL
+                    data={data.headline_pnl}
+                    selectedMetric={selectedMetric}
+                    onMetricSelect={setSelectedMetric}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={handleCategorySelect}
+                    metricHeadlineData={metricHeadlineData}
+                    metricHeadlineLoading={metricHeadlineLoading}
+                  />
+                )}
+              </Box>
             </Box>
           )}
 
@@ -280,6 +414,21 @@ const RiskDashboard: React.FC = () => {
               chartData={chartData}
               loading={chartLoading}
               period={metricToPeriod(selectedMetric)}
+              category={selectedCategory}
+              metricChartData={metricChartData}
+              metricChartLoading={metricChartLoading}
+            />
+          </Box>
+
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              loading={topBottomLoading}
+              category={selectedCategory}
+              metricTop10={metricTop10}
+              metricBottom10={metricBottom10}
+              metricLoading={metricTopBottomLoading}
             />
           </Box>
 
@@ -302,14 +451,6 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
-
-          <Box className="pdf-section" data-pdf-page="1">
-            <TopBottomPnLTable
-              top10={topBottomTop}
-              bottom10={topBottomBottom}
-              loading={topBottomLoading}
-            />
-          </Box>
 
           <Box className="pdf-section attribution-interactive">
             <Attribution

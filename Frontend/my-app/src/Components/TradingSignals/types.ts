@@ -1,3 +1,32 @@
+// ── Source detail data types ──
+
+export interface SourceDetail {
+  label: string;
+  weight: number;
+  status: "active" | "inactive";
+  data: Record<string, any>;
+}
+
+export type SourceWeights = Record<string, number>;
+export type SourceDetails = Record<string, SourceDetail>;
+
+// ── Main trading signal response ──
+
+export interface TradingSignalData {
+  signal: "BUY" | "SELL" | "HOLD";
+  confidence: number;
+  insight: string;
+  reasoning: string[];
+  signal_date: string;
+  generated_at: string | null;
+  deal_type: string;
+  days_since_listing: number;
+  source_weights: SourceWeights;
+  source_details: SourceDetails;
+}
+
+// ── Legacy types kept for backward compatibility ──
+
 export interface FewShotFinalOutlook {
   one_week_sentiment: string;
   one_month_sentiment: string;
@@ -8,7 +37,6 @@ export interface FewShotFinalOutlook {
 export interface SentimentSummary {
   one_week?: string;
   one_month?: string;
-  // Handle legacy nested format
   sentiment_summary?: {
     one_week?: string;
     one_month?: string;
@@ -24,8 +52,6 @@ export interface TradingSignalIntelligence {
   issue_price: number | string | null;
   sector: string;
   region: string;
-
-  // ML Predictions
   t1d_pred: string;
   t1d_confidence: number | string;
   t1d_actual_return: number | string;
@@ -38,13 +64,9 @@ export interface TradingSignalIntelligence {
   t1m_pred: string;
   t1m_confidence: number | string;
   t1m_actual_return: number | string;
-
-  // Sentiment
   one_week_sentiment: string;
   one_month_sentiment: string;
   sentiment_summary: SentimentSummary | null;
-
-  // Few-shot
   few_shot_executive_summary: string;
   few_shot_final_outlook: FewShotFinalOutlook;
 }
@@ -53,13 +75,4 @@ export interface SourceStatus {
   mlModel: boolean;
   aiModel: boolean;
   aiSentiment: boolean;
-}
-
-export interface TradingSignalData {
-  signal: "BUY" | "SELL" | "HOLD";
-  confidence: number;
-  insight: string;
-  reasoning: string[];
-  signal_date: string;
-  generated_at: string | null;
 }

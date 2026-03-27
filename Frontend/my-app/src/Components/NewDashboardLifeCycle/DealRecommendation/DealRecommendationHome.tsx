@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Grid, TextField, Button, Stack } from "@mui/material";
+import { Grid, TextField, Button, Stack, Box, CircularProgress } from "@mui/material";
 import { AIMLPredictions } from "./AIMLPredictions";
 import { ValuationCard } from "./ValuationCard";
 import { AIModelCard } from "./AIModelCard";
@@ -7,6 +7,7 @@ import { MarketSentimentCard } from "./MarketSentimentCard";
 import { PastDealsCard } from "./PastDealsCard";
 import { IOICard } from "./IOICard";
 import { AMOutputCard } from "./AMOutputCard";
+import DashboardStateCard from "../DashboardStateCard";
 
 export type DealType = "IPO" | "M&A" | "BLOCK" | string;
 
@@ -367,10 +368,36 @@ const DealRecommendationHome: React.FC<DashboardProps> = ({
     savingAM,
   ]);
 
-  if (loading) return <div>Loading...</div>;
-  if (errorMsg)
-    return <div style={{ color: "crimson" }}>Error: {errorMsg}</div>;
-  if (!data) return <div>No data</div>;
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 320 }}>
+        <CircularProgress size={36} />
+      </Box>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <DashboardStateCard
+        variant="error"
+        title="Deal Recommendation unavailable"
+        message={errorMsg}
+        context={ticker ? [{ label: "Ticker", value: ticker }] : undefined}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (!data) {
+    return (
+      <DashboardStateCard
+        variant="empty"
+        title="No deal recommendation data"
+        message="There is no recommendation data available for this deal yet. Data will appear once the analysis is completed."
+        context={ticker ? [{ label: "Ticker", value: ticker }] : undefined}
+      />
+    );
+  }
 
   return <>{cards}</>;
 };

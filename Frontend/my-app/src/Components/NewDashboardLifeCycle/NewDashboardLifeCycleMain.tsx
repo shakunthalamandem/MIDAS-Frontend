@@ -261,6 +261,12 @@ const NewDealsLifecycleCards: React.FC = () => {
     }
   }, [disablePipelineFo, selectedDealType]);
 
+  useEffect(() => {
+    if (selectedOp === "pipeline" && selectedRegion === "Non-US America") {
+      setSelectedRegion("US");
+    }
+  }, [selectedOp, selectedRegion]);
+
 
 
   const filteredRows = useMemo(() => {
@@ -459,16 +465,23 @@ const NewDealsLifecycleCards: React.FC = () => {
     </Box>
   );
 
-  const regionTabs = [
-    { label: "US", value: "US", icon: <BusinessOutlinedIcon fontSize="small" /> },
-    { label: "EMEA", value: "EMEA", icon: <Diversity3Icon fontSize="small" /> },
-    { label: "APAC", value: "APAC", icon: <RocketLaunchIcon fontSize="small" /> },
-    // {
-    //   label: "Non-US America",
-    //   value: "Non-US America",
-    //   icon: <CategoryOutlinedIcon fontSize="small" />,
-    // },
-  ] as const;
+  const regionTabs = useMemo(() => {
+    const baseTabs = [
+      { label: "US", value: "US", icon: <BusinessOutlinedIcon fontSize="small" /> },
+      { label: "EMEA", value: "EMEA", icon: <Diversity3Icon fontSize="small" /> },
+      { label: "APAC", value: "APAC", icon: <RocketLaunchIcon fontSize="small" /> },
+      {
+        label: "Non-US America",
+        value: "Non-US America",
+        icon: <BusinessOutlinedIcon fontSize="small" />,
+      },
+    ] as const;
+
+    if (selectedOp === "pipeline") {
+      return baseTabs.filter((tab) => tab.value !== "Non-US America");
+    }
+    return baseTabs;
+  }, [selectedOp]);
 
   return (
     <>

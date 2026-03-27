@@ -638,16 +638,58 @@ const SignalBoardMain: React.FC = () => {
     });
   };
 
-  const handleTickerClick = (item: SignalBoardItem) => {
+  const handleTickerClick = async (item: SignalBoardItem) => {
     const dealType = (item.deal_type || "").toLowerCase();
 
     const targetPath = dealType.includes("ipo")
       ? "/deals/new_dashboard/details"
       : "/deals/new_dashboard/fo_details";
 
+    let payload: Record<string, any> = item;
+
+    try {
+      const operation = isUpcoming(item.deal_status) ? "Upcoming Deals" : "Issued";
+      const response = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          operation,
+          region: "US",
+          deal_type: item.deal_type || "IPO",
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const rows = Array.isArray(result?.data)
+          ? result.data
+          : Array.isArray(result?.Data)
+          ? result.Data
+          : [];
+
+        const matchedRow = rows.find((row: any) => {
+          const rowTicker = String(row?.ticker ?? "").trim().toUpperCase();
+          const itemTicker = String(item?.ticker ?? "").trim().toUpperCase();
+          const rowPricingDate = row?.pricing_date ?? null;
+          const itemPricingDate = item?.pricing_date ?? null;
+
+          return rowTicker === itemTicker && rowPricingDate === itemPricingDate;
+        });
+
+        if (matchedRow) {
+          payload = { ...matchedRow, ...item };
+        }
+      }
+    } catch (error) {
+      console.error("Unable to enrich signal board payload", error);
+    }
+
     navigate(targetPath, {
       state: {
-        payload: item,
+        payload,
         targetTabLabel: "Trading Dynamics",
       },
     });

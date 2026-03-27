@@ -16,11 +16,8 @@ import { formatDate, formatChartXAxis } from "./utils";
 interface MetricConfig {
   label: string;
   dataKey: keyof IndexComparisonChartPoint;
-  subKey?: keyof IndexComparisonChartPoint;
-  subLabel?: string;
   format: "beta" | "pct";
   color: string;
-  subColor?: string;
 }
 
 const METRIC_MAP: Record<string, MetricConfig> = {
@@ -30,47 +27,35 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     format: "beta",
     color: "#2563eb",
   },
-  three_month_beta_sp: {
-    label: "3m Beta S&P",
-    dataKey: "three_month_beta_sp",
+  one_month_beta_russell: {
+    label: "1m Beta Russell",
+    dataKey: "one_month_beta_russell",
     format: "beta",
     color: "#2563eb",
   },
-  one_month_vol: {
-    label: "1m Fund Vol",
-    dataKey: "one_month_vol",
-    subKey: "one_month_sp_vol",
-    subLabel: "1m S&P Vol",
+  one_month_volatility_1_sp: {
+    label: "1m Volatility / 1 S&P",
+    dataKey: "one_month_volatility_1_sp",
     format: "pct",
     color: "#0891b2",
-    subColor: "#94a3b8",
   },
-  three_month_vol: {
-    label: "3m Fund Vol",
-    dataKey: "three_month_vol",
-    subKey: "three_month_sp_vol",
-    subLabel: "3m S&P Vol",
+  six_month_volatility_1_sp: {
+    label: "6m Volatility / 1 S&P",
+    dataKey: "six_month_volatility_1_sp",
     format: "pct",
     color: "#ea580c",
-    subColor: "#94a3b8",
   },
-  ytd_vol: {
-    label: "YTD Fund Vol",
-    dataKey: "ytd_vol",
-    subKey: "ytd_sp_vol",
-    subLabel: "YTD S&P Vol",
+  ytd_volatility_sp: {
+    label: "YTD Volatility / S&P",
+    dataKey: "ytd_volatility_sp",
     format: "pct",
     color: "#db2777",
-    subColor: "#94a3b8",
   },
-  drawdown: {
-    label: "Fund Drawdown",
-    dataKey: "drawdown",
-    subKey: "sp_drawdown",
-    subLabel: "S&P Drawdown",
+  drawdown_1_sp: {
+    label: "Drawdown / 1 S&P",
+    dataKey: "drawdown_1_sp",
     format: "pct",
     color: "#b91c1c",
-    subColor: "#94a3b8",
   },
 };
 
@@ -91,57 +76,31 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
   const cfg = METRIC_MAP[selectedMetric];
   if (!cfg) return null;
 
-  const hasDualLines = !!cfg.subKey;
-
   return (
     <Box className="risk-dashboard-section">
       <Box className="pnl-chart-card">
         <Box className="pnl-chart-header">
           <Box className="pnl-chart-title">
             HISTORICAL: {cfg.label}
-            {cfg.subLabel ? ` / ${cfg.subLabel}` : ""}
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  background: cfg.color,
-                }}
-              />
-              <Box
-                sx={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: cfg.color,
-                }}
-              >
-                {cfg.label}
-              </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: cfg.color,
+              }}
+            />
+            <Box
+              sx={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: cfg.color,
+              }}
+            >
+              {cfg.label}
             </Box>
-            {hasDualLines && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background: cfg.subColor,
-                  }}
-                />
-                <Box
-                  sx={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: cfg.subColor,
-                  }}
-                >
-                  {cfg.subLabel}
-                </Box>
-              </Box>
-            )}
           </Box>
         </Box>
 
@@ -202,23 +161,6 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
                   strokeWidth: 2,
                 }}
               />
-              {hasDualLines && cfg.subKey && (
-                <Line
-                  type="linear"
-                  dataKey={cfg.subKey}
-                  name={cfg.subLabel}
-                  stroke={cfg.subColor}
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  dot={false}
-                  activeDot={{
-                    r: 4,
-                    fill: cfg.subColor,
-                    stroke: "#fff",
-                    strokeWidth: 2,
-                  }}
-                />
-              )}
             </LineChart>
           </ResponsiveContainer>
         ) : (

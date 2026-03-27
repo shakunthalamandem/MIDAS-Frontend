@@ -1,414 +1,467 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
-  Avatar,
   Box,
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Paper,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import AddIcon from "@mui/icons-material/Add";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 
-import ActiveAgentCard, {
-  AgentConfig,
-  ActiveAgentCardProps,
-} from "./AgentCards/ActiveAgentCard";
+import AgentCard from "./AgentCards/AgentCard";
+import CreateAgentDialog from "./CreateAgentDialog";
+import { AIAgent } from "./types";
+import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
 
-import AIPortfolioReviewAgent from "./AgentCards/AIPortfolioReviewAgent";
-import Last30DaysIPORankingAgent from "./AgentCards/Last30DaysIPORankingAgent";
-import AIUnsupervisedMarketInsightsAgent from "./AgentCards/AIUnsupervisedMarketInsightsAgent";
-import PortfolioAnalysisAgent from "./AgentCards/PortfolioAnalysisAgent";
-import AISentimentAnalysisAgent from "./AgentCards/AISentimentAnalysisAgent";
-
-const apiUrl = process.env.REACT_APP_API_URL;
-
-const activeAgents: AgentConfig[] = [
-  {
-    title: "Portfolio CIO Agent",
-    description:
-      "AI-powered decision engine for portfolio oversight. Identifies emerging risks, prioritizes actions, and supports faster capital allocation and investment decisions.",
-    schedule: "Every Monday",
-    route: "/ai_portfolio_review",
-  },
-  {
-    title: "Risk Agent",
-    description:
-      "Continuously analyzes portfolio exposures to detect potential risks early.",
-    schedule: "Every Monday",
-    route: "/ai_risk_review",
-  },
-  {
-    title: "IPO Ranking Agent",
-    description:
-      "Ranking of the most promising IPOs from the last 30 days based on data and market signals using AI-tools.",
-    schedule: "Every Monday",
-    route: "/last_30_days_ai_ranking",
-  },
-  {
-    title: "Deal(IPO) Agent",
-    description:
-      "Analyzes a company’s pre-listing fundamentals by comparing them with similar past IPO deals.Deal agent runs using AI Unsupervised.",
-    schedule: "One Time for each IPO",
-    route: "/ai_fewshot_analysis",
-  },
-  {
-    title: "Sentiment Agent",
-    description:
-      "Run sentiment analysis for selected stocks every day to generate updated market sentiment.",
-    schedule: "Run Daily",
-    route: "/ai_sentiment_view",
-  },
-];
-
-const agentComponentMap: Record<
-  string,
-  React.ComponentType<ActiveAgentCardProps>
-> = {
-  "AI Portfolio Review": AIPortfolioReviewAgent,
-  "Last 30 Days IPO AI Ranking": Last30DaysIPORankingAgent,
-  "AI Unsupervised Market Insights": AIUnsupervisedMarketInsightsAgent,
-  "Portfolio Analysis": PortfolioAnalysisAgent,
-  "Sentiment Agent": AISentimentAnalysisAgent,
-};
-
-const scheduleMap: Record<string, number> = {
-  "Mon - Fri": 0,
-  "Every Monday": 1,
-  "Every Tuesday": 2,
-  "Every Wednesday": 3,
-  "Every Thursday": 4,
-  "Every Friday": 5,
-};
-
-
-const reverseScheduleMap: Record<number, string> = {
-  0: "Mon - Fri",
-  1: "Every Monday",
-  2: "Every Tuesday",
-  3: "Every Wednesday",
-  4: "Every Thursday",
-  5: "Every Friday",
-};
-
-type AgentLatestUpdatedDates = Record<
-  string,
-  {
-    updated_at?: string;
-  }
->;
+const POLL_INTERVAL_MS = 15_000;
 
 const Agents: React.FC = () => {
-  const [activations, setActivations] = useState(
-    activeAgents.reduce(
-      (acc, agent) => ({
-        ...acc,
-        [agent.title]: { enabled: false, email: true },
-      }),
-      {} as Record<string, { enabled: boolean; email: boolean }>
-    )
-  );
+  const isAdmin = localStorage.getItem("is_superuser") === "true";
 
-  const [runSchedules, setRunSchedules] = useState<Record<string, string>>({});
-  const [latestUpdatedDates, setLatestUpdatedDates] =
-    useState<AgentLatestUpdatedDates>({});
+  const [agents, setAgents] = useState<AIAgent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [adminGateOpen, setAdminGateOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [agentToDelete, setAgentToDelete] = useState<AIAgent | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [pendingAgent, setPendingAgent] = useState<any>(null);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const totalAgents = activeAgents.length;
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
 
-  const activeCount = useMemo(
-    () => Object.values(activations).filter((a) => a.enabled).length,
-    [activations]
-  );
-
-  const handleRunScheduleChange = async (
-    agent: AgentConfig,
-    agentIndex: number,
-    value: string
-  ) => {
-    setRunSchedules((prev) => ({
-      ...prev,
-      [agent.title]: value,
-    }));
-
+  const loadAgents = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-
-      await fetch(`${apiUrl}/api/update_agent_schedule/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          agent_number: `agent${String(agentIndex + 1).padStart(2, "0")}`,
-          schedule: scheduleMap[value],
-        }),
-      });
+      setLoading(true);
+      const data = await fetchAgents();
+      setAgents(data);
     } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    const loadMembership = async () => {
-      const token = localStorage.getItem("access_token");
-
-      try {
-        const res = await fetch(`${apiUrl}/api/agent_membership/`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        const data = await res.json();
-
-        const agentSet = new Set<string>(data?.agentnumbers ?? []);
-        const schedulesFromApi = data?.schedules ?? {};
-
-        const newSchedules: Record<string, string> = {};
-
-        setActivations((prev) => {
-          const next = { ...prev };
-
-          activeAgents.forEach((agent, index) => {
-            const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
-
-            if (agentSet.has(agentNumber)) {
-              next[agent.title] = { ...next[agent.title], enabled: true };
-            }
-
-            const scheduleValue = schedulesFromApi[agentNumber];
-            if (scheduleValue) {
-              newSchedules[agent.title] =
-                reverseScheduleMap[Number(scheduleValue)];
-            }
-          });
-
-          return next;
-        });
-
-        setRunSchedules(newSchedules);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    loadMembership();
-  }, []);
-
-  useEffect(() => {
-    const loadLatestUpdatedDates = async () => {
-      const token = localStorage.getItem("access_token");
-
-      try {
-        const res = await fetch(`${apiUrl}/api/agents_latest_updated_dates/`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-
-        const data = await res.json();
-        setLatestUpdatedDates(data || {});
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    loadLatestUpdatedDates();
-  }, []);
-
-  const handleAgentRequest = (
-    agent: AgentConfig,
-    index: number,
-    action: "add" | "remove"
-  ) => {
-    setSaveError(null);
-
-    setPendingAgent({
-      agent,
-      index,
-      action,
-    });
-
-    setDialogOpen(true);
-  };
-  const handleConfirmSave = async () => {
-    if (!pendingAgent) return;
-
-    setSaving(true);
-    setSaveError(null);
-
-    try {
-      const token = localStorage.getItem("access_token");
-
-      const res = await fetch(`${apiUrl}/api/update_agent_data/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify({
-          agentnumber: `agent${String(pendingAgent.index).padStart(2, "0")}`,
-          action: pendingAgent.action,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error);
-
-      setActivations((prev) => ({
-        ...prev,
-        [pendingAgent.agent.title]: {
-          ...prev[pendingAgent.agent.title],
-          enabled: pendingAgent.action === "add",
-        },
-      }));
-
-      setDialogOpen(false);
-    } catch (err: any) {
-      setSaveError(err.message || "Failed to update agent.");
+      console.error("Failed to load agents:", err);
+      setSnackbar({ open: true, message: "Failed to load agents", severity: "error" });
     } finally {
-      setSaving(false);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadAgents(); }, [loadAgents]);
+
+  useEffect(() => {
+    const hasInProgress = agents.some(
+      (a) => a.output_status === "pending" || a.output_status === "running"
+    );
+    if (hasInProgress) {
+      pollRef.current = setInterval(() => {
+        fetchAgents().then(setAgents).catch(() => {});
+      }, POLL_INTERVAL_MS);
+    }
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [agents]);
+
+  const handleEmailToggle = async (agent: AIAgent, enabled: boolean) => {
+    setAgents((prev) =>
+      prev.map((a) => (a.id === agent.id ? { ...a, email_enabled: enabled } : a))
+    );
+    try {
+      await toggleEmailPreference(agent.id, enabled);
+      setSnackbar({
+        open: true,
+        message: enabled
+          ? `Email notifications enabled for ${agent.name}`
+          : `Email notifications disabled for ${agent.name}`,
+        severity: "success",
+      });
+    } catch (err: any) {
+      setAgents((prev) =>
+        prev.map((a) => (a.id === agent.id ? { ...a, email_enabled: !enabled } : a))
+      );
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to update email preference",
+        severity: "error",
+      });
     }
   };
-  const handleDialogClose = () => {
-    if (saving) return;
-    setDialogOpen(false);
-    setPendingAgent(null);
+
+  const handleDeleteRequest = (agent: AIAgent) => {
+    setAgentToDelete(agent);
+    setDeleteDialogOpen(true);
   };
+
+  const handleConfirmDelete = async () => {
+    if (!agentToDelete) return;
+    setDeleting(true);
+    try {
+      await deleteAgent(agentToDelete.id);
+      setSnackbar({ open: true, message: `Agent "${agentToDelete.name}" deleted`, severity: "success" });
+      setDeleteDialogOpen(false);
+      setAgentToDelete(null);
+      loadAgents();
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || "Failed to delete agent", severity: "error" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const totalAgents = agents.length;
+  const activeAgents = agents.filter(
+    (a) => a.output_status === "completed" || a.agent_type === "system"
+  ).length;
+  const workingAgents = agents.filter(
+    (a) => a.output_status === "pending" || a.output_status === "running"
+  ).length;
+
   return (
-    <Box sx={{ backgroundColor: "#edf0f7", minHeight: "100vh", p: 4 }}>
-      <Box sx={{ maxWidth: 1200, mx: "auto" }}>
-        <Paper sx={{ p: 4, mb: 4 }}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar sx={{ bgcolor: "#efd4ff" }}>
-              <AutoAwesomeIcon sx={{ color: "#5b2fff" }} />
-            </Avatar>
-
-            <Box flex={1}>
-              <Typography variant="h4" fontWeight={700}>
-                MIDAS AI Agents
-              </Typography>
-
-              <Typography>
-                Autonomous financial AI agents that continuously analyze markets
-                and deliver actionable insights.
-              </Typography>
-            </Box>
-          </Stack>
-
-          <Stack direction="row" spacing={1} mt={2}>
-            <Chip label={`${totalAgents} Agents`} color="info" />
-            <Chip label={`${activeCount} Active`} color="success" />
-          </Stack>
-        </Paper>
-
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "repeat(2,1fr)" },
-            gap: 3,
-          }}
-        >
-          {activeAgents.map((agent, index) => {
-            const state = activations[agent.title];
-
-            const Component =
-              agentComponentMap[agent.title] ?? ActiveAgentCard;
-
-            const agentNumber = `agent${String(index + 1).padStart(2, "0")}`;
-
-            const lastUpdatedAt =
-              latestUpdatedDates?.[agentNumber]?.updated_at ?? null;
-
-            return (
-              <Component
-                key={agent.title}
-                agent={agent}
-                state={state}
-                agentIndex={index + 1}
-                lastUpdatedAt={lastUpdatedAt}
-                runSchedule={runSchedules[agent.title]}
-                onRunScheduleChange={(ag, value) =>
-                  handleRunScheduleChange(ag, index, value)
-                }
-                onToggle={(ag, key, checked) => {
-                  if (key === "enabled") {
-                    handleAgentRequest(
-                      ag,
-                      index + 1,
-                      checked ? "add" : "remove"
-                    );
-                  }
+    <Box sx={{ bgcolor: "#e8eaf0", minHeight: "100vh" }}>
+      {/* ── Header ── */}
+      <Box
+        sx={{
+          bgcolor: "#fff",
+          borderBottom: "1px solid #c7d2fe",
+          px: { xs: 2, md: 5 },
+          pt: { xs: 3, md: 4 },
+          pb: { xs: 4, md: 5 },
+        }}
+      >
+        <Box sx={{ maxWidth: 1320, mx: "auto" }}>
+          {/* Title row */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            spacing={2}
+          >
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Box
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: 3,
+                  bgcolor: "#4f46e5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                footerAction={
-                  agent.route && (
-                    <Button
-                      variant="contained"
-                      onClick={() =>
-                        window.open(
-                          `${window.location.origin}${agent.route}`,
-                          "_blank"
-                        )
-                      }
-                    >
-                      Output
-                    </Button>
-                  )
-                }
-              />
-            );
-          })}
+              >
+                <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
+              </Box>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: { xs: "1.4rem", md: "1.65rem" },
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: "-0.025em",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  AI Agents
+                </Typography>
+                <Typography sx={{ color: "#374151", fontSize: "0.85rem", mt: 0.3 }}>
+                  Autonomous financial agents analyzing markets around the clock.
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Button
+              variant="contained"
+              startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
+              onClick={() =>
+                isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
+              }
+              sx={{
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                px: 3,
+                py: 1.1,
+                borderRadius: 2.5,
+                bgcolor: isAdmin ? "#4f46e5" : "#475569",
+                boxShadow: "none",
+                "&:hover": {
+                  bgcolor: isAdmin ? "#4338ca" : "#334155",
+                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                },
+              }}
+            >
+              Create Agent
+            </Button>
+          </Stack>
+
+          {/* Stat pills */}
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap">
+            {/* Total */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                bgcolor: "#f0f0ff",
+                border: "1px solid #e0e0f7",
+                borderRadius: 3,
+                px: 2.5,
+                py: 1.5,
+                minWidth: 170,
+              }}
+            >
+              <WidgetsOutlinedIcon sx={{ color: "#4f46e5", fontSize: 22 }} />
+              <Box>
+                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                  {totalAgents}
+                </Typography>
+                <Typography sx={{ fontSize: "0.72rem", color: "#312e81", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Total Agents
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Ready */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                bgcolor: "#ecfdf5",
+                border: "1px solid #d1fae5",
+                borderRadius: 3,
+                px: 2.5,
+                py: 1.5,
+                minWidth: 170,
+              }}
+            >
+              <CheckCircleIcon sx={{ color: "#059669", fontSize: 22 }} />
+              <Box>
+                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                  {activeAgents}
+                </Typography>
+                <Typography sx={{ fontSize: "0.72rem", color: "#064e3b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Ready
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Working */}
+            {workingAgents > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  bgcolor: "#fffbeb",
+                  border: "1px solid #fde68a",
+                  borderRadius: 3,
+                  px: 2.5,
+                  py: 1.5,
+                  minWidth: 170,
+                }}
+              >
+                <PendingIcon sx={{ color: "#d97706", fontSize: 22 }} />
+                <Box>
+                  <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
+                    {workingAgents}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.72rem", color: "#92400e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Working
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+          </Stack>
         </Box>
       </Box>
 
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>
-          {pendingAgent?.action === "add"
-            ? "Enable this agent?"
-            : "Disable this agent?"}
+      {/* ── Agent Grid ── */}
+      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, py: 4 }}>
+        {loading ? (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  height: 340,
+                  borderRadius: 4,
+                  bgcolor: "#fff",
+                  border: "1px solid #c7d2fe",
+                  animation: "pulse 1.5s ease-in-out infinite",
+                  "@keyframes pulse": {
+                    "0%, 100%": { opacity: 1 },
+                    "50%": { opacity: 0.5 },
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        ) : agents.length === 0 ? (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 10,
+              px: 4,
+              bgcolor: "#fff",
+              borderRadius: 4,
+              border: "1px solid #c7d2fe",
+            }}
+          >
+            <SmartToyOutlinedIcon sx={{ fontSize: 56, color: "#4f46e5", mb: 2 }} />
+            <Typography sx={{ fontWeight: 700, fontSize: "1.15rem", color: "#111827", mb: 1 }}>
+              No agents found
+            </Typography>
+            <Typography sx={{ color: "#374151", mb: 3, maxWidth: 380, mx: "auto" }}>
+              {isAdmin
+                ? "Create your first AI agent to get started."
+                : "No agents have been set up yet. Contact your admin."}
+            </Typography>
+            {isAdmin && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setCreateOpen(true)}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  px: 3.5,
+                  py: 1.1,
+                  borderRadius: 2.5,
+                  bgcolor: "#4f46e5",
+                  boxShadow: "none",
+                  "&:hover": { bgcolor: "#4338ca" },
+                }}
+              >
+                Create Agent
+              </Button>
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" },
+              gap: 3,
+            }}
+          >
+            {agents.map((agent, index) => (
+              <AgentCard
+                key={agent.id}
+                agent={agent}
+                index={index + 1}
+                onEmailToggle={handleEmailToggle}
+                onDelete={handleDeleteRequest}
+                onEdit={() => {
+                  setSnackbar({
+                    open: true,
+                    message: "Edit functionality coming soon",
+                    severity: "success",
+                  });
+                }}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      {/* Create Agent Dialog */}
+      <CreateAgentDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={loadAgents}
+      />
+
+      {/* Admin Gate Dialog */}
+      <Dialog
+        open={adminGateOpen}
+        onClose={() => setAdminGateOpen(false)}
+        PaperProps={{ sx: { borderRadius: 4, border: "1px solid #c7d2fe" } }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: 700, color: "#111827" }}>
+          <LockOutlinedIcon sx={{ color: "#4f46e5" }} />
+          Admin Access Required
         </DialogTitle>
-
         <DialogContent>
-          {saveError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {saveError}
-            </Alert>
-          )}
-
-          <DialogContentText>
-            {pendingAgent?.action === "add"
-              ? `Enable ${pendingAgent?.agent.title} and get the latest updates.`
-              : `Disable ${pendingAgent?.agent.title} and stop receiving updates.`}
+          <DialogContentText sx={{ color: "#1e293b" }}>
+            Creating new agents is restricted to administrators. Please reach out to your MIDAS admin to request a new agent be set up.
           </DialogContentText>
         </DialogContent>
-
-        <DialogActions>
-          <Button onClick={handleDialogClose} disabled={saving}>
-            Cancel
-          </Button>
-
+        <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button
+            onClick={() => setAdminGateOpen(false)}
             variant="contained"
-            color={pendingAgent?.action === "remove" ? "error" : "primary"}
-            onClick={handleConfirmSave}
-            disabled={saving}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              borderRadius: 2.5,
+              bgcolor: "#4f46e5",
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#4338ca" },
+            }}
           >
-            {saving ? "Saving…" : "Confirm"}
+            Got it
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => !deleting && setDeleteDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: 4, border: "1px solid #fecaca" } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, color: "#991b1b" }}>Delete Agent</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete "{agentToDelete?.name}"? This will also remove all its output history. This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting} sx={{ textTransform: "none", borderRadius: 2.5 }}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDelete}
+            disabled={deleting}
+            sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2.5, boxShadow: "none" }}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          sx={{ borderRadius: 3 }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

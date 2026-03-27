@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -12,6 +13,7 @@ import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 type DashboardSentimentAnalysisProps = {
   focusTicker: string | null;
+  pricingDate?: string | null;
   region?: string | null;
 };
 
@@ -47,23 +49,28 @@ const normalizeBlocks = (val: any): Block[] => {
 
 const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   focusTicker,
+  pricingDate,
   region,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
+  const [socialMediaBlocks, setSocialMediaBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [latestDate, setLatestDate] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(0);
 
   useEffect(() => {
     let cancelled = false;
 
     if (!focusTicker) {
       setBlocks([]);
+      setSocialMediaBlocks([]);
       setError(null);
       setStatus(null);
       setLoading(false);
+      setActiveTab(0);
       return;
     }
 
@@ -90,7 +97,10 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: focusTicker }),
+          body: JSON.stringify({
+            ticker: focusTicker,
+            pricing_date: pricingDate ?? null,
+          }),
         });
 
         const text = await res.text();
@@ -109,6 +119,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
           if (isNotFound || mentionsNoSentiment) {
             setStatus(friendly);
             setBlocks([]);
+            setSocialMediaBlocks([]);
             return;
           }
           throw new Error(apiMsg || `Request failed with status ${res.status}`);
@@ -122,11 +133,17 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
 
         const raw = data?.sentiment ?? data?.answer ?? data;
         const parsedBlocks = normalizeBlocks(raw);
-        if (!parsedBlocks.length) {
+
+        const socialMediaRaw = data?.socialmedia_retail_sentiment;
+        const parsedSocialMediaBlocks = socialMediaRaw ? normalizeBlocks(socialMediaRaw) : [];
+
+        if (!parsedBlocks.length && !parsedSocialMediaBlocks.length) {
           setStatus("Data will update soon for this ticker.");
           setBlocks([]);
+          setSocialMediaBlocks([]);
         } else {
           setBlocks(parsedBlocks);
+          setSocialMediaBlocks(parsedSocialMediaBlocks);
         }
       } catch (err: any) {
         if (!cancelled) {
@@ -140,6 +157,8 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
             setError(msg || "Unable to load sentiment analysis.");
           }
           setBlocks([]);
+          setSocialMediaBlocks([]);
+          setActiveTab(0);
         }
       } finally {
         if (!cancelled) {
@@ -152,10 +171,10 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusTicker, region]);
+  }, [apiUrl, focusTicker, pricingDate, region]);
 
   const showPlaceholder =
-    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length);
+    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
 
   return (
     <Box sx={{ py: 2 }}>
@@ -226,7 +245,59 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
             </Typography>
           )}
 
-          {!loading && !error && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
+          {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
+            <>
+              <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap", justifyContent: "center" }}>
+                {blocks.length > 0 && (
+                  <Button
+                    variant={activeTab === 0 ? "contained" : "outlined"}
+                    onClick={() => setActiveTab(0)}
+                    sx={{
+                      textTransform: "none",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                      backgroundColor: activeTab === 0 ? "#155ec5" : "transparent",
+                      color: activeTab === 0 ? "#ffffff" : "#3a4556",
+                      border: activeTab === 0 ? "none" : "1.5px solid #3a4556",
+                      "&:hover": {
+                        backgroundColor: activeTab === 0 ? "#155ec5" : "#f5f5f5",
+                      },
+                    }}
+                  >
+                    Overall Sentiment 
+                  </Button>
+                )}
+                {socialMediaBlocks.length > 0 && (
+                  <Button
+                    variant={activeTab === 1 ? "contained" : "outlined"}
+                    onClick={() => setActiveTab(1)}
+                    sx={{
+                      textTransform: "none",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                      backgroundColor: activeTab === 1 ? "#155ec5" : "transparent",
+                      color: activeTab === 1 ? "#ffffff" : "#3a4556",
+                      border: activeTab === 1 ? "none" : "1.5px solid #3a4556",
+                      "&:hover": {
+                        backgroundColor: activeTab === 1 ? "#155ec5" : "#f5f5f5",
+                      },
+                    }}
+                  >
+                    Social Media/Retail Sentiment
+                  </Button>
+                )}
+              </Box>
+
+              {activeTab === 0 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
+              {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+            </>
+          )}
         </CardContent>
       </Card>
     </Box>

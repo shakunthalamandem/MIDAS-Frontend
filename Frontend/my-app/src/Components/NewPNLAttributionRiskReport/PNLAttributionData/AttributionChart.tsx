@@ -21,7 +21,7 @@ interface ChartPoint {
 
 const METRIC_LABELS: Record<string, string> = {
   dtd_pnl: "DTD P&L",
-  mtd_pnl: "MTD P&L",
+  wtd_pnl: "WTD P&L",
   ytd_pnl: "YTD P&L",
   net_exp: "Net Exp",
   beta_adj_net: "Beta Adj Net",

@@ -29,7 +29,7 @@ export const formatDealSize = (value: any): string => {
   const num = Number(value);
   if (Number.isNaN(num)) return String(value);
   const millions = num / 1_000_000;
-  return `$${millions.toFixed(1)}M`;
+  return `$${millions.toFixed(0)}M`;
 };
 
 export const formatPriceValue = (row: any): string => {
