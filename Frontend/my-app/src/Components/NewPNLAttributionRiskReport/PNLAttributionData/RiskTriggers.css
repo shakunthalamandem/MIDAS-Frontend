@@ -462,13 +462,6 @@
   border: 1.5px solid #fca5a5;
   border-radius: 12px;
   padding: 4px 14px;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.15);
-  animation: guidelinePulse 2s ease-in-out infinite;
-}
-
-@keyframes guidelinePulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.15); }
-  50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.3); }
 }
 
 /* ── Table Styles ── */
