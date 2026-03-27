@@ -42,7 +42,7 @@ interface ReportSummary {
 
 interface MarketEnvironment {
   market_temperature?: string;
-  rolling_90d_avg_first_day_return?: number;
+  rolling_180d_avg_first_day_return?: number;
   ipo_volume_vs_3yr_median?: number;
   price_revision_above_high_pct?: number;
   post_ipo_first_week_breadth?: number;
@@ -142,9 +142,9 @@ const METRIC_CARDS = [
     isTemperature: true,
   },
   {
-    key: "rolling_90d_avg_first_day_return" as keyof MarketEnvironment,
-    label: "90-Day Avg First-Day Return",
-    tooltip: "Average first-day return across all eligible US IPOs in the last 90 days. This rolling metric reflects current market appetite for new issues. >25% = HOT, 10-25% = WARM, <10% = COLD.",
+    key: "rolling_180d_avg_first_day_return" as keyof MarketEnvironment,
+    label: "180-Day Avg First-Day Return",
+    tooltip: "Average first-day return across all eligible US IPOs in the last 180 days. This rolling metric reflects current market appetite for new issues. >25% = HOT, 10-25% = WARM, <10% = COLD.",
     fmt: (v: number) => `${v.toFixed(1)}%`,
     gradient: "linear-gradient(135deg,#5e35b1,#9575cd)",
     icon: "📈",
