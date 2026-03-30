@@ -79,11 +79,9 @@ interface SentimentData {
   unique_deal_id: string;
   one_week_sentiment: string | null;
   one_month_sentiment: string | null;
-  sentiment_summary?: {
-    one_week?: string;
-    one_month?: string;
-  };
+  sentiment_summary?: string;
   updated_at?: string;
+  created_at?: string;
 }
 
 type SentimentType = "bullish" | "bearish" | "neutral";
@@ -249,15 +247,7 @@ const SentimentSummary: React.FC = () => {
         const result = await res.json();
         const arr = Array.isArray(result) ? result : result.data || [];
 
-        const mapped = arr.map((item: any) => ({
-          ...item,
-          sentiment_summary:
-            typeof item.sentiment_summary === "string"
-              ? JSON.parse(item.sentiment_summary)
-              : item.sentiment_summary,
-        }));
-
-        setData(mapped);
+        setData(arr);
       } catch (err: any) {
         setError(err.message || "Failed to fetch data");
       } finally {
@@ -317,7 +307,7 @@ const SentimentSummary: React.FC = () => {
   const getComparableValue = (row: SentimentData, column: keyof SentimentData | "summary") => {
     switch (column) {
       case "summary":
-        return row.sentiment_summary?.one_week || "";
+        return row.sentiment_summary || "";
       case "pricing_date":
         return row.pricing_date ? new Date(row.pricing_date).getTime() : 0;
       case "one_week_sentiment":
@@ -782,7 +772,7 @@ const SentimentSummary: React.FC = () => {
                               lineHeight: 1.65,
                             }}
                           >
-                            {preview(row.sentiment_summary?.one_week)}
+                            {preview(row.sentiment_summary)}
                           </Typography>
                           <Typography
                             component="span"
@@ -951,7 +941,7 @@ const SentimentSummary: React.FC = () => {
               <Typography
                 sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem" }}
               >
-                {selectedSummary?.sentiment_summary?.one_week || "N/A"}
+                {selectedSummary?.one_week_sentiment || "N/A"}
               </Typography>
             </Box>
 
@@ -973,7 +963,7 @@ const SentimentSummary: React.FC = () => {
               <Typography
                 sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem" }}
               >
-                {selectedSummary?.sentiment_summary?.one_month || "N/A"}
+                {selectedSummary?.one_month_sentiment || "N/A"}
               </Typography>
             </Box>
           </DialogContent>
