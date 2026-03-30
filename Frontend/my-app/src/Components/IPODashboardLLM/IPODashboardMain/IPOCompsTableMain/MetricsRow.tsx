@@ -27,9 +27,11 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
   formatValue,
   showActions = true,
 }) => {
+  const normalize = (s: string) => s.replace(/-/g, " ").trim().toLowerCase();
   const isFirstRow =
     idx === 0 &&
-    (row.ticker === row.competitor || row.competitor.startsWith(row.ticker));
+    (normalize(row.ticker) === normalize(row.competitor) ||
+      normalize(row.competitor).startsWith(normalize(row.ticker)));
   const bodyCellSx = {
     fontSize: "0.75rem",
     padding: "6px 8px",
