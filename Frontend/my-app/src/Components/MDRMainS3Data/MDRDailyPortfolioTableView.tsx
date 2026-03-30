@@ -520,7 +520,7 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
               loading={loading}
               getRowId={(row) => row.id}
               disableRowSelectionOnClick
-              disableColumnMenu
+              
               columnHeaderHeight={50}
               rowHeight={45}
               autoHeight={false}
