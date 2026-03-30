@@ -61,6 +61,7 @@ const NewDealsLifecycleCards: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<
     "US" | "EMEA" | "APAC" | "Non-US America"
   >(initialRegion);
+  const previousSelectedOpRef = React.useRef(selectedOp);
    
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -238,6 +239,19 @@ const NewDealsLifecycleCards: React.FC = () => {
       setViewMode("table");
     }
   }, [selectedOp, viewMode]);
+
+  useEffect(() => {
+    const previousSelectedOp = previousSelectedOpRef.current;
+
+    if (
+      previousSelectedOp === "pipeline" &&
+      (selectedOp === "upcoming" || selectedOp === "live")
+    ) {
+      setViewMode("card");
+    }
+
+    previousSelectedOpRef.current = selectedOp;
+  }, [selectedOp]);
 
   // useEffect(() => {
   //   if (selectedOp === "live") {
