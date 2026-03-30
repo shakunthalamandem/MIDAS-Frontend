@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
@@ -6,6 +6,8 @@ import {
   Button,
   Chip,
   CircularProgress,
+  IconButton,
+  InputAdornment,
   Stack,
   Table,
   TableBody,
@@ -13,16 +15,19 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SendIcon from "@mui/icons-material/Send";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
-import { AgentOutput, AgentOutputSection } from "./types";
-import { fetchLatestOutput, fetchOutputById } from "./agentService";
+import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
+import { fetchLatestOutput, fetchOutputById, chatWithOutput } from "./agentService";
 
 const POLL_INTERVAL_MS = 10_000;
 
@@ -36,6 +41,13 @@ const AgentOutputView: React.FC = () => {
   const [output, setOutput] = useState<AgentOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Follow-up chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const loadOutput = useCallback(async () => {
     try {
@@ -59,6 +71,38 @@ const AgentOutputView: React.FC = () => {
     const interval = setInterval(loadOutput, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [output, loadOutput]);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages, chatLoading]);
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim() || chatLoading || !output) return;
+
+    const userMsg: ChatMessage = { role: "user", content: chatInput.trim() };
+    const history = [...chatMessages];
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+    setChatLoading(true);
+    setChatError(null);
+
+    try {
+      const response = await chatWithOutput(output.id, userMsg.content, history);
+      setChatMessages((prev) => [...prev, { role: "assistant", content: response }]);
+    } catch (err: any) {
+      setChatError(err.message || "Failed to get response");
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleChatKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleChatSend();
+    }
+  };
 
   const statusConfig: Record<
     string,
@@ -455,6 +499,170 @@ const AgentOutputView: React.FC = () => {
                 </Stack>
               </Box>
             )}
+
+            {/* Follow-up Chat */}
+            <Box
+              sx={{
+                p: 3,
+                bgcolor: "#fff",
+                borderRadius: 4,
+                border: "1px solid #c7d2fe",
+              }}
+            >
+              {/* Chat Header */}
+              <Stack direction="row" alignItems="center" spacing={1.5} mb={2}>
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 2,
+                    bgcolor: "#eef2ff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ChatBubbleOutlineIcon sx={{ fontSize: 18, color: "#4f46e5" }} />
+                </Box>
+                <Typography sx={{ fontWeight: 700, fontSize: "1rem", color: "#111827" }}>
+                  Ask Follow-up Questions
+                </Typography>
+              </Stack>
+              <Box sx={{ height: 1, bgcolor: "#c7d2fe", mb: 2 }} />
+
+              {/* Chat Messages */}
+              {chatMessages.length > 0 && (
+                <Box
+                  sx={{
+                    maxHeight: 400,
+                    overflowY: "auto",
+                    mb: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1.5,
+                    px: 0.5,
+                  }}
+                >
+                  {chatMessages.map((msg, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        display: "flex",
+                        justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          maxWidth: "80%",
+                          p: 2,
+                          borderRadius: 3,
+                          ...(msg.role === "user"
+                            ? {
+                                bgcolor: "#4f46e5",
+                                color: "#fff",
+                                borderBottomRightRadius: 0.5,
+                              }
+                            : {
+                                bgcolor: "#f8fafc",
+                                color: "#1e293b",
+                                borderLeft: "3px solid #4f46e5",
+                                borderBottomLeftRadius: 0.5,
+                              }),
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: "0.88rem",
+                            lineHeight: 1.7,
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {msg.content}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+
+                  {/* Loading indicator */}
+                  {chatLoading && (
+                    <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                      <Box
+                        sx={{
+                          p: 2,
+                          borderRadius: 3,
+                          bgcolor: "#f8fafc",
+                          borderLeft: "3px solid #4f46e5",
+                          borderBottomLeftRadius: 0.5,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                        }}
+                      >
+                        <CircularProgress size={16} sx={{ color: "#4f46e5" }} />
+                        <Typography sx={{ fontSize: "0.85rem", color: "#64748b" }}>
+                          Thinking...
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  <div ref={chatEndRef} />
+                </Box>
+              )}
+
+              {/* Chat Error */}
+              {chatError && (
+                <Alert
+                  severity="error"
+                  sx={{ borderRadius: 2, mb: 2, fontSize: "0.85rem" }}
+                  onClose={() => setChatError(null)}
+                >
+                  {chatError}
+                </Alert>
+              )}
+
+              {/* Chat Input */}
+              <TextField
+                fullWidth
+                multiline
+                maxRows={3}
+                placeholder="Ask a follow-up question about this analysis..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={handleChatKeyDown}
+                disabled={chatLoading}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 3,
+                    bgcolor: "#f8fafc",
+                    fontSize: "0.88rem",
+                    "& fieldset": { borderColor: "#c7d2fe" },
+                    "&:hover fieldset": { borderColor: "#a5b4fc" },
+                    "&.Mui-focused fieldset": { borderColor: "#4f46e5" },
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleChatSend}
+                        disabled={!chatInput.trim() || chatLoading}
+                        sx={{
+                          color: chatInput.trim() && !chatLoading ? "#4f46e5" : "#94a3b8",
+                          "&:hover": { bgcolor: "#eef2ff" },
+                        }}
+                      >
+                        <SendIcon sx={{ fontSize: 20 }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", mt: 0.8, ml: 0.5 }}>
+                Press Enter to send, Shift+Enter for new line
+              </Typography>
+            </Box>
           </Stack>
         )}
       </Box>

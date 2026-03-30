@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button } from "@mui/material";
+import { Box, Container, IconButton, Typography } from "@mui/material";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
+
 type SentimentTickerOption = {
   id: string;
   ticker: string;
@@ -15,10 +17,9 @@ const ShowUSSentimentAnalysis: React.FC = () => {
   const [sentimentTicker, setSentimentTicker] = useState<SentimentTickerOption | null>(null);
   const [sentimentLoading, setSentimentLoading] = useState(false);
   const [sentimentErr, setSentimentErr] = useState<string | null>(null);
-  const navigate = useNavigate();  // Get query parameters from URL
+  const navigate = useNavigate();
+
   const queryTicker = searchParams.get("ticker");
-  const queryUniqueDealId = searchParams.get("unique_deal_id");
-  const queryPricingDate = searchParams.get("pricing_date");
 
   useEffect(() => {
     const loadSentimentTickers = async () => {
@@ -54,7 +55,6 @@ const ShowUSSentimentAnalysis: React.FC = () => {
           : [];
         setSentimentOptions(items);
 
-        // If URL has query parameters, find and select that ticker
         if (queryTicker) {
           const selectedItem = items.find((item) => item.ticker === queryTicker);
           setSentimentTicker(selectedItem || items[0] || null);
@@ -72,31 +72,41 @@ const ShowUSSentimentAnalysis: React.FC = () => {
   }, [apiUrl, queryTicker]);
 
   return (
-    <Container maxWidth={false} disableGutters>
-      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Box sx={{ width: { xs: "96%", sm: "90%", md: "80%" }, mt: { xs: 1.5, md: 2.5 } }}>
-
-          <Box sx={{ mb: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate(-1)}
-              sx={{ textTransform: "none" }}
-            >
-              ← Back
-            </Button>
-          </Box>
-
-          <ShowSentimentAnalysis
-            focusTicker={sentimentTicker?.ticker ?? null}
-            tickerOptions={sentimentOptions}
-            selectedTicker={sentimentTicker}
-            onSelectTicker={setSentimentTicker}
-            loadingTickers={sentimentLoading}
-            tickerError={sentimentErr}
-          />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0f9ff 100%)",
+      }}
+    >
+      <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
+        {/* Back button */}
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.5,
+            mb: 2,
+            cursor: "pointer",
+            color: "#64748b",
+            transition: "all 0.2s ease",
+            "&:hover": { color: "#4f46e5" },
+          }}
+          onClick={() => navigate(-1)}
+        >
+          <ArrowBackRoundedIcon sx={{ fontSize: 20 }} />
+          <Typography sx={{ fontSize: "0.85rem", fontWeight: 600 }}>Back</Typography>
         </Box>
-      </Box>
-    </Container>
+
+        <ShowSentimentAnalysis
+          focusTicker={sentimentTicker?.ticker ?? null}
+          tickerOptions={sentimentOptions}
+          selectedTicker={sentimentTicker}
+          onSelectTicker={setSentimentTicker}
+          loadingTickers={sentimentLoading}
+          tickerError={sentimentErr}
+        />
+      </Container>
+    </Box>
   );
 };
 
