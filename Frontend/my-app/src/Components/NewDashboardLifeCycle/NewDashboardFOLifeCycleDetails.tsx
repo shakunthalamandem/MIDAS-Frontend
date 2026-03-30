@@ -307,6 +307,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
                 dealStatus={status}
                 issuerName={activePayload.issuer_name || activePayload.company_name || ""}
                 expectedDate={activePayload.pricing_date || ""}
+                region={activePayload.region}
               />
             ) : tabItems[tabValue]?.label === "Write Up Old" ? (
               isIpo ? (

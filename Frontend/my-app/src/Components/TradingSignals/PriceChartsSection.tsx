@@ -396,6 +396,7 @@ interface Props {
   dealStatus?: string;
   issuerName?: string;
   expectedDate?: string;
+  region?: string | null;
 }
 
 const PriceChartsSection: React.FC<Props> = ({
@@ -405,6 +406,7 @@ const PriceChartsSection: React.FC<Props> = ({
   dealStatus,
   issuerName,
   expectedDate,
+  region,
 }) => {
   const [chartData, setChartData] = useState<DealPoint[]>([]);
   const [issuePrice, setIssuePrice] = useState<number | null>(null);
@@ -537,6 +539,9 @@ const PriceChartsSection: React.FC<Props> = ({
     stopLoss != null ? stopLoss - stopLossOffset : undefined;
 
   const cleanedTicker = ticker?.replace(/\s+US$/i, "") || ticker;
+  const normalizedRegion = (region || "").trim().toUpperCase();
+  const showLiveTradingChart =
+    normalizedRegion !== "EMEA" && normalizedRegion !== "APAC";
 
   /* ── Upcoming deals: show placeholders ── */
   if (isUpcoming) {
@@ -589,57 +594,58 @@ const PriceChartsSection: React.FC<Props> = ({
           />
         </Box>
 
-        {/* TradingView placeholder */}
-        <Box
-          sx={{
-            borderRadius: 3,
-            overflow: "hidden",
-            border: "1px solid #E2E8F0",
-          }}
-        >
+        {showLiveTradingChart && (
           <Box
             sx={{
-              background:
-                "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-              px: 3,
-              py: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              borderRadius: 3,
+              overflow: "hidden",
+              border: "1px solid #E2E8F0",
             }}
           >
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-            >
-              <CandlestickChartIcon
-                sx={{ color: "#38BDF8", fontSize: 22 }}
-              />
-              <Typography
-                sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: 15 }}
-              >
-                Live Trading Chart
-              </Typography>
-            </Box>
-            <Chip
-              label={dealStatus || "Price Range"}
-              size="small"
               sx={{
-                bgcolor: "rgba(255,255,255,0.1)",
-                color: "#94A3B8",
-                fontWeight: 700,
-                fontSize: 11,
-                height: 24,
-                border: "1px solid rgba(255,255,255,0.15)",
+                background:
+                  "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+                px: 3,
+                py: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
+            >
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+              >
+                <CandlestickChartIcon
+                  sx={{ color: "#38BDF8", fontSize: 22 }}
+                />
+                <Typography
+                  sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: 15 }}
+                >
+                  Live Trading Chart
+                </Typography>
+              </Box>
+              <Chip
+                label={dealStatus || "Price Range"}
+                size="small"
+                sx={{
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  color: "#94A3B8",
+                  fontWeight: 700,
+                  fontSize: 11,
+                  height: 24,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
+              />
+            </Box>
+            <ChartPlaceholder
+              title="Chart Available Once Listed"
+              subtitle={`The live trading chart for ${issuerName || ticker} will appear here once the ticker begins trading.`}
+              dealStatus={dealStatus}
+              expectedDate={expectedDate}
             />
           </Box>
-          <ChartPlaceholder
-            title="Chart Available Once Listed"
-            subtitle={`The live trading chart for ${issuerName || ticker} will appear here once the ticker begins trading.`}
-            dealStatus={dealStatus}
-            expectedDate={expectedDate}
-          />
-        </Box>
+        )}
       </Box>
     );
   }
@@ -1016,7 +1022,7 @@ const PriceChartsSection: React.FC<Props> = ({
       </Box>
 
       {/* ── TradingView Widget ── */}
-      {ticker && (
+      {ticker && showLiveTradingChart && (
         <Box
           sx={{
             borderRadius: 3,

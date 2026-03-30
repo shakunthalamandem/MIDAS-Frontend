@@ -333,6 +333,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                       dealStatus={status}
                       issuerName={activePayload.issuer_name || activePayload.company_name || ""}
                       expectedDate={activePayload.pricing_date || ""}
+                      region={region}
                     />
                   </TabErrorBoundary>
                 );
