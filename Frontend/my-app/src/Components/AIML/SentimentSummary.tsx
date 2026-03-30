@@ -400,7 +400,7 @@ const SentimentSummary: React.FC = () => {
     { label: "Ticker", key: "ticker", width: "9%" },
     { label: "Issuer Name", key: "issuer_name", width: "18%" },
     { label: "Pricing Date", key: "pricing_date", width: "10%" },
-    { label: "Last Updated", key: "updated_at", width: "11%" },
+    { label: "Sentiment Run Date", key: "updated_at", width: "11%" },
     { label: "1-Week", key: "one_week_sentiment", width: "8%" },
     { label: "1-Month", key: "one_month_sentiment", width: "8%" },
     { label: "Summary", key: "summary", width: "28%" },
