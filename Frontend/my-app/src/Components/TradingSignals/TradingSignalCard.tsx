@@ -64,7 +64,7 @@ function formatDate(isoString: string | null): string {
   try {
     const d = new Date(isoString);
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+  
     return new Intl.DateTimeFormat("en-US", {
       timeZone: userTimeZone,
       month: "short", day: "2-digit", year: "numeric",
