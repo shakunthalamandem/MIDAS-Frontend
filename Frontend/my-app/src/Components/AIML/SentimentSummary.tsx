@@ -83,6 +83,7 @@ interface SentimentData {
     one_week?: string;
     one_month?: string;
   };
+  updated_at?: string;
 }
 
 type SentimentType = "bullish" | "bearish" | "neutral";
@@ -229,7 +230,7 @@ const SentimentSummary: React.FC = () => {
   const [selectedSummary, setSelectedSummary] = useState<SentimentData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const [orderBy, setOrderBy] = useState<keyof SentimentData | "summary">("ticker");
+  const [orderBy, setOrderBy] = useState<keyof SentimentData | "summary" | null>(null);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
   const [page, setPage] = useState(0);
@@ -304,9 +305,13 @@ const SentimentSummary: React.FC = () => {
   }, [data]);
 
   const handleSort = (column: keyof SentimentData | "summary") => {
-    const isAsc = orderBy === column && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(column);
+    if (orderBy === column) {
+      const isAsc = order === "asc";
+      setOrder(isAsc ? "desc" : "asc");
+    } else {
+      setOrderBy(column);
+      setOrder("asc");
+    }
   };
 
   const getComparableValue = (row: SentimentData, column: keyof SentimentData | "summary") => {
@@ -324,14 +329,16 @@ const SentimentSummary: React.FC = () => {
   };
 
   const sortedData = useMemo(
-    () =>
-      [...filteredData].sort((a, b) => {
+    () => {
+      if (!orderBy) return filteredData;
+      return [...filteredData].sort((a, b) => {
         const valA = getComparableValue(a, orderBy);
         const valB = getComparableValue(b, orderBy);
         if (valA < valB) return order === "asc" ? -1 : 1;
         if (valA > valB) return order === "asc" ? 1 : -1;
         return 0;
-      }),
+      });
+    },
     [filteredData, orderBy, order]
   );
 
@@ -390,12 +397,13 @@ const SentimentSummary: React.FC = () => {
   }
 
   const columns = [
-    { label: "Ticker", key: "ticker", width: "10%" },
-    { label: "Issuer", key: "issuer_name", width: "20%" },
-    { label: "Pricing Date", key: "pricing_date", width: "11%" },
-    { label: "1-Week", key: "one_week_sentiment", width: "9%" },
-    { label: "1-Month", key: "one_month_sentiment", width: "9%" },
-    { label: "Summary", key: "summary", width: "33%" },
+    { label: "Ticker", key: "ticker", width: "9%" },
+    { label: "Issuer Name", key: "issuer_name", width: "18%" },
+    { label: "Pricing Date", key: "pricing_date", width: "10%" },
+    { label: "Last Updated", key: "updated_at", width: "11%" },
+    { label: "1-Week", key: "one_week_sentiment", width: "8%" },
+    { label: "1-Month", key: "one_month_sentiment", width: "8%" },
+    { label: "Summary", key: "summary", width: "28%" },
     { label: "", key: "action", width: "8%" },
   ];
 
@@ -616,20 +624,21 @@ const SentimentSummary: React.FC = () => {
                         key={col.label || "action"}
                         sx={{
                           fontWeight: 600,
-                          fontSize: "0.7rem",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.08em",
+                          fontSize: "0.9rem",
+                          // textTransform: "uppercase",
+                          // letterSpacing: "0.08em",
                           color: C.textMuted,
                           backgroundColor: C.tableHeaderBg,
                           borderBottom: `1px solid ${C.border}`,
                           py: 1.6,
                           px: 2,
                           width: col.width,
+                          alignContent:"center"
                         }}
                       >
                         {col.key !== "action" ? (
                           <TableSortLabel
-                            active={orderBy === col.key}
+                            active={orderBy === col.key && orderBy !== null}
                             direction={orderBy === col.key ? order : "asc"}
                             onClick={() =>
                               handleSort(col.key as keyof SentimentData | "summary")
@@ -658,7 +667,7 @@ const SentimentSummary: React.FC = () => {
                   {paginatedData.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={7}
+                        colSpan={8}
                         sx={{
                           textAlign: "center",
                           py: 8,
@@ -722,10 +731,34 @@ const SentimentSummary: React.FC = () => {
                               fontSize: "0.82rem",
                               color: C.textMuted,
                               fontWeight: 500,
-                              fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+                              // fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
                             }}
                           >
-                            {row.pricing_date || "TBA"}
+                            {row.pricing_date
+                              ? new Date(row.pricing_date).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : "N/A"}                          </Typography>
+                        </TableCell>
+
+                        <TableCell>
+                          <Typography
+                            sx={{
+                              fontSize: "0.82rem",
+                              color: C.textMuted,
+                              fontWeight: 500,
+                              // fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+                            }}
+                          >
+                            {row.updated_at
+                              ? new Date(row.updated_at).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : "N/A"}
                           </Typography>
                         </TableCell>
 
