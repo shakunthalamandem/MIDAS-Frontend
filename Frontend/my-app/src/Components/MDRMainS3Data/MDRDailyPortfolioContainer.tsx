@@ -67,7 +67,7 @@ export const MDRDailyPortfolioContainer: React.FC<
   const [dealTypeFilter, setDealTypeFilter] = useState<string[]>([]);
   const [regionFilter, setRegionFilter] = useState<string[]>([]);
   const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
-  const regionOptions = ["US", "EMEA", "APAC", "NON US-America"];
+  const regionOptions = ["US", "EMEA", "APAC", "Non-US America"];
 
   const apiUrl = process.env.REACT_APP_API_URL ?? "";
   const getToken = () => localStorage.getItem("access_token") || "";
