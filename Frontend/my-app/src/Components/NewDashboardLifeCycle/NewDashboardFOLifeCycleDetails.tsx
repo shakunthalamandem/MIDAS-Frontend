@@ -31,6 +31,10 @@ import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashb
 import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
 import DealBot from "./DealBot";
 
+const REGION_DISABLED_AGENT_TABS = new Set(["Factors Based Agent","Technical Analysis"]);
+
+const REGION_DISABLED_VALUES = new Set(["EMEA", "APAC"]);
+
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,6 +51,9 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const writeupEnabled =
     (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
     (activePayload?.writeup_available || "").toUpperCase() === "YES";
+  const normalizedRegion = (activePayload?.region || "").toUpperCase();
+  const disableUnavailableAgentTabs =
+    REGION_DISABLED_VALUES.has(normalizedRegion);
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
@@ -254,7 +261,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
             }}
           >
             {tabItems.map((item) => {
-              const isDisabled = item.requiresWriteup && !writeupEnabled;
+              const isRegionDisabled =
+                disableUnavailableAgentTabs &&
+                REGION_DISABLED_AGENT_TABS.has(item.label);
+              const isDisabled =
+                (item.requiresWriteup && !writeupEnabled) || isRegionDisabled;
               return (
                 <Tab
                   key={item.label}

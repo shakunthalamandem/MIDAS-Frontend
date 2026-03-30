@@ -33,6 +33,13 @@ import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 import TabErrorBoundary from "./TabErrorBoundary";
 import DashboardStateCard from "./DashboardStateCard";
 
+const REGION_DISABLED_AGENT_TABS = new Set([
+  " Deal(IPO) Agent",
+  "Factors Based Agent",
+]);
+
+const REGION_DISABLED_VALUES = new Set(["EMEA", "APAC"]);
+
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,6 +55,9 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const writeupEnabled =
   (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
   (activePayload?.writeup_available || "").toUpperCase() === "YES" ;
+  const normalizedRegion = (activePayload?.region || "").toUpperCase();
+  const disableUnavailableAgentTabs =
+    REGION_DISABLED_VALUES.has(normalizedRegion);
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
@@ -229,7 +239,11 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
             }}
           >
             {tabItems.map((item) => {
-              const isDisabled = item.requiresWriteup && !writeupEnabled;
+              const isRegionDisabled =
+                disableUnavailableAgentTabs &&
+                REGION_DISABLED_AGENT_TABS.has(item.label);
+              const isDisabled =
+                (item.requiresWriteup && !writeupEnabled) || isRegionDisabled;
               return (
                 <Tab
                   key={item.label}
