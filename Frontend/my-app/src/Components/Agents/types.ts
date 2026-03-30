@@ -79,6 +79,15 @@ export interface CreateAgentPayload {
   schedule_value: string;
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatResponse {
+  response: string;
+}
+
 // Route map for system agents (preserved from existing routes)
 export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
   "Portfolio CIO Agent": "/ai_portfolio_review",

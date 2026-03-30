@@ -1,48 +1,21 @@
 import React from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
+  Box,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
   Typography,
-  Box,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
-
-const COLOR_THEMES = [
-  {
-    headerColor: "#1E3A8A",
-    rowHover: "rgba(30, 58, 138, 0.08)",
-  },
-  {
-    headerColor: "#B91C1C",
-    rowHover: "rgba(185, 28, 28, 0.08)",
-  },
-  {
-    headerColor: "#0F766E",
-    rowHover: "rgba(15, 118, 110, 0.08)",
-  },
-  {
-    headerColor: "#6D28D9",
-    rowHover: "rgba(109, 40, 217, 0.08)",
-  },
-];
-
-const getRandomTheme = () =>
-  COLOR_THEMES[Math.floor(Math.random() * COLOR_THEMES.length)];
 
 const GENATableBlock: React.FC<{
   headers: (string | number)[];
   rows: (string | number)[][];
   title?: string;
 }> = ({ headers, rows, title }) => {
-  const theme = React.useMemo(() => getRandomTheme(), []);
-
   const normalizedHeaders = React.useMemo(
     () => headers.map((h) => String(h)),
     [headers]
@@ -55,74 +28,109 @@ const GENATableBlock: React.FC<{
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       style={{ width: "100%" }}
     >
-      <Card
-        elevation={4}
+      <Box
         sx={{
-          borderRadius: 3,
-          bgcolor: "#f9fafa",
+          borderRadius: 2.5,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          overflow: "hidden",
           width: "100%",
-          boxSizing: "border-box",
         }}
       >
         {title && (
-          <CardHeader
-            title={
-              <Typography variant="h6" sx={{ color: theme.headerColor }}>
-                {title}
-              </Typography>
-            }
-            sx={{ pb: 0 }}
-          />
-        )}
-
-        <CardContent sx={{ pt: title ? 1 : 2 }}>
-          <Box sx={{ width: "100%", overflowX: "auto" }}>
-            <Table
-              size="small"
+          <Box
+            sx={{
+              px: 2.5,
+              py: 1.5,
+              borderBottom: "1px solid #e2e8f0",
+              background: "#f8fafc",
+            }}
+          >
+            <Typography
               sx={{
-                width: "100%",
-                tableLayout: "auto",
-                wordBreak: "break-word",
+                fontSize: "0.9rem",
+                fontWeight: 700,
+                color: "#0f172a",
+                letterSpacing: "-0.01em",
               }}
             >
-              <TableHead>
-                <TableRow sx={{ backgroundColor: `${theme.headerColor}20` }}>
-                  {normalizedHeaders.map((h, i) => (
-                    <TableCell key={i}>
-                      <ReactMarkdown>{h}</ReactMarkdown>
+              {title}
+            </Typography>
+          </Box>
+        )}
+
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
+          <Table
+            size="small"
+            sx={{
+              width: "100%",
+              tableLayout: "auto",
+              wordBreak: "break-word",
+            }}
+          >
+            <TableHead>
+              <TableRow>
+                {normalizedHeaders.map((h, i) => (
+                  <TableCell
+                    key={i}
+                    sx={{
+                      background: "#f1f5f9",
+                      borderBottom: "1px solid #e2e8f0",
+                      fontWeight: 700,
+                      fontSize: "0.75rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "#475569",
+                      py: 1.4,
+                      px: 2,
+                      whiteSpace: "nowrap",
+                      "& p": { margin: 0, fontSize: "0.75rem", fontWeight: 700 },
+                    }}
+                  >
+                    <ReactMarkdown>{h}</ReactMarkdown>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {normalizedRows.map((row, i) => (
+                <TableRow
+                  key={i}
+                  sx={{
+                    transition: "background-color 0.15s ease",
+                    background: i % 2 === 0 ? "transparent" : "#fafbfc",
+                    "&:hover": {
+                      background: "#f0f4ff",
+                    },
+                    "& td": {
+                      borderBottom: "1px solid #f1f5f9",
+                      py: 1.3,
+                      px: 2,
+                      fontSize: "0.84rem",
+                      color: "#334155",
+                      lineHeight: 1.6,
+                      "& p": { margin: 0, fontSize: "0.84rem", lineHeight: 1.6 },
+                      "& strong": { color: "#0f172a", fontWeight: 700 },
+                    },
+                  }}
+                >
+                  {row.map((cell, j) => (
+                    <TableCell key={j}>
+                      <ReactMarkdown>{cell}</ReactMarkdown>
                     </TableCell>
                   ))}
                 </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {normalizedRows.map((row, i) => (
-                  <TableRow
-                    key={i}
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: theme.rowHover,
-                        transition: "background-color 0.3s ease",
-                      },
-                    }}
-                  >
-                    {row.map((cell, j) => (
-                      <TableCell key={j}>
-                        <ReactMarkdown>{cell}</ReactMarkdown>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-        </CardContent>
-      </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      </Box>
     </motion.div>
   );
 };

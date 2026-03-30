@@ -1,53 +1,30 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-  Avatar,
-  Box,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
-
-const COLOR_PALETTES = [
-  {
-    titleColor: "#C0392B",       // bold red
-    textColor: "#2C2C2C",        // dark neutral
-    subtitleColor: "#7F8C8D",    // cool gray
-  },
-  {
-    titleColor: "#117864",       // dark teal
-    textColor: "#212121",        // charcoal
-    subtitleColor: "#5D6D7E",    // steel blue-gray
-  },
-  {
-    titleColor: "#B7950B",       // gold
-    textColor: "#333333",        // near black
-    subtitleColor: "#7D6608",    // soft brownish-gold
-  },
-  {
-    titleColor: "#1A5276",       // navy
-    textColor: "#1C2833",        // very dark slate
-    subtitleColor: "#5DADE2",    // lighter blue
-  },
-  {
-    titleColor: "#6C3483",       // violet
-    textColor: "#2E2E2E",        // rich gray
-    subtitleColor: "#A569BD",    // lavender
-  },
+const ACCENT_PALETTES = [
+  { accent: "#4f46e5", accentBg: "#eef2ff", accentBorder: "#c7d2fe" },
+  { accent: "#0891b2", accentBg: "#ecfeff", accentBorder: "#a5f3fc" },
+  { accent: "#059669", accentBg: "#ecfdf5", accentBorder: "#a7f3d0" },
+  { accent: "#d97706", accentBg: "#fffbeb", accentBorder: "#fde68a" },
+  { accent: "#dc2626", accentBg: "#fef2f2", accentBorder: "#fecaca" },
+  { accent: "#7c3aed", accentBg: "#f5f3ff", accentBorder: "#ddd6fe" },
 ];
 
-// Utility to randomly pick one color palette
-const getRandomPalette = () =>
-  COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
+const getPalette = (title: string) => {
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return ACCENT_PALETTES[Math.abs(hash) % ACCENT_PALETTES.length];
+};
 
 interface GENAICardBlockProps {
   title: string | number;
   subtitle?: string | number;
-  description: string | number; // supports markdown
-  icon?: string; // Optional: emoji or icon name
+  description: string | number;
+  icon?: string;
 }
 
 const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
@@ -65,57 +42,102 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
     () => String(description ?? ""),
     [description]
   );
-  const palette = React.useMemo(() => getRandomPalette(), []);
+  const palette = React.useMemo(() => getPalette(normalizedTitle), [normalizedTitle]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      whileHover={{ scale: 1.03 }}
-      style={{ height: "100%", display: "flex" }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      style={{ height: "100%", display: "flex", width: "100%" }}
     >
-      <Card
+      <Box
         sx={{
           flexGrow: 1,
-          // bgcolor: palette.background,
-          color: palette.textColor,
-          borderRadius: 3,
-          boxShadow: 3,
-          borderLeft: `5px solid ${palette.titleColor}`, // 👉 highlight border
-          transition: "all 0.3s ease",
           display: "flex",
           flexDirection: "column",
+          borderRadius: 2.5,
+          border: `1px solid ${palette.accentBorder}`,
+          background: palette.accentBg,
+          overflow: "hidden",
+          transition: "all 0.2s ease",
           "&:hover": {
-            boxShadow: 6,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+            transform: "translateY(-1px)",
           },
         }}
       >
-        <CardHeader
-          titleTypographyProps={{
-            variant: "h6",
-            sx: { color: palette.titleColor, display: "flex", alignItems: "center", gap: 0.5 },
+        {/* Header strip */}
+        <Box
+          sx={{
+            height: 3,
+            background: palette.accent,
+            flexShrink: 0,
           }}
-          subheaderTypographyProps={{
-            sx: { color: palette.subtitleColor, display: "flex", alignItems: "center", gap: 0.5 },
-          }}
-          title={<ReactMarkdown>{normalizedTitle}</ReactMarkdown>}
-          subheader={
-            subtitle ? <ReactMarkdown>{normalizedSubtitle}</ReactMarkdown> : undefined
-          }
-          sx={{ pb: 0 }}
         />
 
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{ color: palette.textColor }}
+        <Box sx={{ p: { xs: 2, md: 2.5 }, flex: 1 }}>
+          {/* Title */}
+          <Box
+            sx={{
+              mb: 1,
+              "& p": { margin: 0 },
+              "& h1, & h2, & h3, & h4, & h5, & h6": { margin: 0 },
+            }}
           >
-            <ReactMarkdown>{normalizedDescription}</ReactMarkdown>
-          </Typography>
-        </CardContent>
-      </Card>
+            <Typography
+              component="div"
+              sx={{
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                color: palette.accent,
+                lineHeight: 1.3,
+              }}
+            >
+              <ReactMarkdown>{normalizedTitle}</ReactMarkdown>
+            </Typography>
+          </Box>
+
+          {/* Subtitle */}
+          {normalizedSubtitle && (
+            <Box sx={{ mb: 1, "& p": { margin: 0 } }}>
+              <Typography
+                component="div"
+                sx={{ fontSize: "0.78rem", color: "#64748b", fontWeight: 500 }}
+              >
+                <ReactMarkdown>{normalizedSubtitle}</ReactMarkdown>
+              </Typography>
+            </Box>
+          )}
+
+          {/* Description */}
+          <Box
+            sx={{
+              "& p": {
+                margin: 0,
+                fontSize: "0.84rem",
+                lineHeight: 1.7,
+                color: "#334155",
+              },
+              "& strong": { color: "#0f172a", fontWeight: 700 },
+              "& ul, & ol": {
+                pl: 2,
+                my: 0.5,
+                "& li": {
+                  fontSize: "0.84rem",
+                  lineHeight: 1.7,
+                  color: "#334155",
+                  mb: 0.3,
+                },
+              },
+            }}
+          >
+            <Typography variant="body2" component="div">
+              <ReactMarkdown>{normalizedDescription}</ReactMarkdown>
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </motion.div>
   );
 };

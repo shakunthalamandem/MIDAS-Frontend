@@ -361,27 +361,27 @@ const askPerplexity = async (
   return blocks;
 };
 
-const postSentiment = async (
-  ticker: string,
-  unique_deal_id: string,
-  region: string | undefined,
-  sentimentBlocks: Block[],
-) => {
-  const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ticker,
-      unique_deal_id,
-      region,
-      sentiment: sentimentBlocks,
-      sentiment_blocks: sentimentBlocks,
-    }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to save sentiment");
-  return data;
-};
+// const postSentiment = async (
+//   ticker: string,
+//   unique_deal_id: string,
+//   region: string | undefined,
+//   sentimentBlocks: Block[],
+// ) => {
+//   const res = await fetch(`${apiUrl}/api/deal_sentiment/`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       ticker,
+//       unique_deal_id,
+//       region,
+//       sentiment: sentimentBlocks,
+//       sentiment_blocks: sentimentBlocks,
+//     }),
+//   });
+//   const data = await res.json();
+//   if (!res.ok) throw new Error(data.error || "Failed to save sentiment");
+//   return data;
+// };
 
 // const postSentimentPdf = async (ticker: string, unique_deal_id: string, sentimentPdf: RenderedPdf) => {
 //   const formData = new FormData();
@@ -588,12 +588,12 @@ const CombinedSentimentControl: React.FC = () => {
             answerBlocks,
             entry.ticker,
           );
-          await postSentiment(
-            entry.ticker,
-            entry.unique_deal_id,
-            entry.region,
-            answerBlocks,
-          );
+          // await postSentiment(
+          //   entry.ticker,
+          //   entry.unique_deal_id,
+          //   entry.region,
+          //   answerBlocks,
+          // );
           // await postSentimentPdf(entry.ticker, entry.unique_deal_id, sentimentPdf);
           updateStatus(statusIndex, "completed");
         } catch (err: any) {

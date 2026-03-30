@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Card,Box,CardContent } from "@mui/material";
+import { Grid, Box } from "@mui/material";
 import { motion } from "framer-motion";
 
 import GENAITextBlock from "./GENAITextBlock";
@@ -46,7 +46,6 @@ const BLOCK_RENDERERS: Record<BlockType, (block: any, setQuestion?: (q: string) 
           setQuestion(selected);
           handleSubmit();
           window.scrollTo({ top: 0, behavior: "smooth" });
-
         }
       }}
     />
@@ -105,9 +104,14 @@ const GENAIRenderer: React.FC<{
   const sortedRows = Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b));
 
   return (
-    <CardContent sx={{ paddingBottom: "0 !important" }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       {sortedRows.map(([rowKey, rowBlocks]) => (
-        <Grid container spacing={1.8} key={`row-${rowKey}`} sx={{ mb: 1, alignItems: "stretch" }}>
+        <Grid
+          container
+          spacing={2}
+          key={`row-${rowKey}`}
+          sx={{ mb: 2, alignItems: "stretch" }}
+        >
           {rowBlocks.map((block, idx) => {
             const Renderer = BLOCK_RENDERERS[block.type];
             if (!Renderer) return null;
@@ -131,11 +135,11 @@ const GENAIRenderer: React.FC<{
                   </Box>
                 ) : (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      delay: idx * 0.05,
-                      duration: 0.4,
+                      delay: idx * 0.04,
+                      duration: 0.35,
                       ease: "easeOut",
                     }}
                     style={{ flexGrow: 1, display: "flex" }}
@@ -148,13 +152,7 @@ const GENAIRenderer: React.FC<{
           })}
         </Grid>
       ))}
-
-      {/* {suggestedBlock && (
-        <Box mt={2}>
-          {BLOCK_RENDERERS.suggested_questions(suggestedBlock, setQuestion, handleSubmit)}
-        </Box>
-      )} */}
-    </CardContent>
+    </Box>
   );
 };
 

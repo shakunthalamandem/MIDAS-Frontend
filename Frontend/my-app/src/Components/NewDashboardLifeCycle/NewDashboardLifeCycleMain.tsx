@@ -446,6 +446,7 @@ const NewDealsLifecycleCards: React.FC = () => {
               subtitle={row.issuer_name || row.company_name || "Unknown issuer"}
               writeupAvailable={writeupAvailable}
               mlPredAvailable={mlPredAvailable}
+              multipleDealStatus={row.multiple_deal_status}
               meta={meta}
               tags={[
                 { label: row.sector || "Sector N/A", bg: "#e6efff", color: "#1e3a8a" },
