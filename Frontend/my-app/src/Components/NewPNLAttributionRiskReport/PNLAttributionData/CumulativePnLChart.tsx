@@ -31,8 +31,8 @@ const PERIOD_LABELS: Record<string, string> = {
 const CATEGORY_LABELS: Record<string, string> = {
   pnl: "P&L",
   gross_market_value: "Gross Market Value",
-  delta_adj_net_mv: "Delta Adj. Net MV",
-  beta_adj_net_mv: "Beta Adj. Net MV",
+  delta_adj_net_mv: "Delta Adj. Net Exposure",
+  beta_adj_net_mv: "Beta Adj. Net Exposure",
 };
 
 const CATEGORY_COLORS: Record<string, string> = {

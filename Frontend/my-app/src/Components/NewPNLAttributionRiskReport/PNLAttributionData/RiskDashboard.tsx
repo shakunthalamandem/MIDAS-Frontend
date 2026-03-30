@@ -381,8 +381,8 @@ const RiskDashboard: React.FC = () => {
                   {([
                     { key: "pnl" as DashboardCategory, label: "P&L", icon: "💰" },
                     { key: "gross_market_value" as DashboardCategory, label: "Gross Market Value", icon: "📊" },
-                    { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net MV", icon: "📈" },
-                    { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net MV", icon: "📉" },
+                    { key: "delta_adj_net_mv" as DashboardCategory, label: "Delta Adj. Net Exposure", icon: "📈" },
+                    { key: "beta_adj_net_mv" as DashboardCategory, label: "Beta Adj. Net Exposure", icon: "📉" },
                   ]).map((btn) => (
                     <Box
                       key={btn.key}
