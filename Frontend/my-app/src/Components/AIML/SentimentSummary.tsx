@@ -740,7 +740,7 @@ const SentimentSummary: React.FC = () => {
                                   month: "short",
                                   day: "numeric",
                                 })
-                              : "N/A"}                          </Typography>
+                              : "Upcoming"}                          </Typography>
                         </TableCell>
 
                         <TableCell>
