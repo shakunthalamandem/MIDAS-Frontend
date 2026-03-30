@@ -334,8 +334,29 @@ const SentimentSummary: React.FC = () => {
 
   const paginatedData = sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  const preview = (text?: string) =>
-    text ? `${text.split(" ").slice(0, 18).join(" ")}...` : "N/A";
+  const parseSummary = (text?: string) => {
+    if (!text) return null;
+    try {
+      return JSON.parse(text) as {
+        ticker?: string;
+        company?: string;
+        one_week?: string;
+        one_month?: string;
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const preview = (text?: string) => {
+    const parsed = parseSummary(text);
+    if (parsed) {
+      const combined = parsed.one_week || parsed.one_month || "";
+      const firstLine = combined.split("\n")[0];
+      return firstLine.length > 120 ? `${firstLine.slice(0, 120)}...` : firstLine;
+    }
+    return text ? `${text.split(" ").slice(0, 18).join(" ")}...` : "N/A";
+  };
 
   const handleOpenDialog = (row: SentimentData) => {
     setSelectedSummary(row);
@@ -922,50 +943,72 @@ const SentimentSummary: React.FC = () => {
           </DialogTitle>
 
           <DialogContent sx={{ px: 3, py: 3 }}>
-            {/* 1-Week */}
-            <Box
-              sx={{
-                mb: 2.5,
-                p: 2.5,
-                borderRadius: 2.5,
-                background: C.accentBg,
-                border: `1px solid #c7d2fe`,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
-                <TrendingUpIcon sx={{ fontSize: 16, color: C.accent }} />
-                <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: C.accent }}>
-                  1-Week Outlook
-                </Typography>
-              </Box>
-              <Typography
-                sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem" }}
-              >
-                {selectedSummary?.one_week_sentiment || "N/A"}
-              </Typography>
-            </Box>
+            {(() => {
+              const parsed = parseSummary(selectedSummary?.sentiment_summary);
+              const oneWeekText = parsed?.one_week || selectedSummary?.one_week_sentiment || "N/A";
+              const oneMonthText = parsed?.one_month || selectedSummary?.one_month_sentiment || "N/A";
 
-            {/* 1-Month */}
-            <Box
-              sx={{
-                p: 2.5,
-                borderRadius: 2.5,
-                background: C.neutralBg,
-                border: `1px solid ${C.neutralBorder}`,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
-                <TrendingFlatIcon sx={{ fontSize: 16, color: C.neutralColor }} />
-                <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: C.neutralColor }}>
-                  1-Month Outlook
-                </Typography>
-              </Box>
-              <Typography
-                sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem" }}
-              >
-                {selectedSummary?.one_month_sentiment || "N/A"}
-              </Typography>
-            </Box>
+              return (
+                <>
+                  {/* 1-Week */}
+                  <Box
+                    sx={{
+                      mb: 2.5,
+                      p: 2.5,
+                      borderRadius: 2.5,
+                      background: C.accentBg,
+                      border: `1px solid #c7d2fe`,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
+                      <TrendingUpIcon sx={{ fontSize: 16, color: C.accent }} />
+                      <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: C.accent }}>
+                        1-Week Outlook
+                      </Typography>
+                      <Box sx={{ ml: "auto" }}>
+                        <SentimentBadge sentiment={selectedSummary?.one_week_sentiment || null} />
+                      </Box>
+                    </Box>
+                    {oneWeekText.split("\n").map((line: string, idx: number) => (
+                      <Typography
+                        key={idx}
+                        sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem", mb: 0.5 }}
+                      >
+                        {line}
+                      </Typography>
+                    ))}
+                  </Box>
+
+                  {/* 1-Month */}
+                  <Box
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2.5,
+                      background: C.neutralBg,
+                      border: `1px solid ${C.neutralBorder}`,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.2 }}>
+                      <TrendingFlatIcon sx={{ fontSize: 16, color: C.neutralColor }} />
+                      <Typography sx={{ fontWeight: 700, fontSize: "0.88rem", color: C.neutralColor }}>
+                        1-Month Outlook
+                      </Typography>
+                      <Box sx={{ ml: "auto" }}>
+                        <SentimentBadge sentiment={selectedSummary?.one_month_sentiment || null} />
+                      </Box>
+                    </Box>
+                    {oneMonthText.split("\n").map((line: string, idx: number) => (
+                      <Typography
+                        key={idx}
+                        sx={{ lineHeight: 1.8, color: C.textSecondary, fontSize: "0.88rem", mb: 0.5 }}
+                      >
+                        {line}
+                      </Typography>
+                    ))}
+                  </Box>
+                </>
+              );
+            })()}
           </DialogContent>
 
           <Divider sx={{ borderColor: C.border }} />
