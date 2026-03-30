@@ -64,6 +64,10 @@ export const MDRDailyPortfolioContainer: React.FC<
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tradeDate, setTradeDate] = useState<string>("");
+  const [dealTypeFilter, setDealTypeFilter] = useState<string[]>([]);
+  const [regionFilter, setRegionFilter] = useState<string[]>([]);
+  const [dealTypeOptions, setDealTypeOptions] = useState<string[]>([]);
+  const regionOptions = ["US", "EMEA", "APAC", "NON US-America"];
 
   const apiUrl = process.env.REACT_APP_API_URL ?? "";
   const getToken = () => localStorage.getItem("access_token") || "";
@@ -86,7 +90,10 @@ export const MDRDailyPortfolioContainer: React.FC<
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          ...(dealTypeFilter.length > 0 && { deal_type: dealTypeFilter }),
+          ...(regionFilter.length > 0 && { region: regionFilter }),
+        }),
       });
 
       if (!response.ok) {
@@ -111,7 +118,16 @@ export const MDRDailyPortfolioContainer: React.FC<
       }
 
       setTradeDate(apiTradeDate || "");
-      setRows(rawRows.map((row, index) => normalizeRow(row, index)));
+      const normalized = rawRows.map((row, index) => normalizeRow(row, index));
+      setRows(normalized);
+
+      // Only populate deal type options on initial unfiltered load
+      if (dealTypeFilter.length === 0 && regionFilter.length === 0) {
+        const dealTypes = Array.from(
+          new Set(rawRows.map((r: any) => r.deal_type ?? r.type ?? "").filter(Boolean))
+        ).sort();
+        setDealTypeOptions(dealTypes);
+      }
     } catch (err: any) {
       console.error(err);
       setError(err.message || "An error occurred");
@@ -120,7 +136,7 @@ export const MDRDailyPortfolioContainer: React.FC<
     } finally {
       setLoading(false);
     }
-  }, [apiUrl]);
+  }, [apiUrl, dealTypeFilter, regionFilter]);
 
   useEffect(() => {
     fetchPortfolio();
@@ -136,6 +152,12 @@ export const MDRDailyPortfolioContainer: React.FC<
         tradeDate={tradeDate}
         pdfMode={pdfMode}
         actionsSlot={actionsSlot}
+        dealTypeFilter={dealTypeFilter}
+        onDealTypeFilterChange={setDealTypeFilter}
+        dealTypeOptions={dealTypeOptions}
+        regionFilter={regionFilter}
+        onRegionFilterChange={setRegionFilter}
+        regionOptions={regionOptions}
       />
     </Box>
   );

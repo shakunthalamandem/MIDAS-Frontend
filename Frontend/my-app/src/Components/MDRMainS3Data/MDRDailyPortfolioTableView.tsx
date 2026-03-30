@@ -5,7 +5,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Container,
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -305,6 +311,12 @@ interface MDRDailyPortfolioTableViewProps {
   onExport: () => void;
   pdfMode?: boolean;
   actionsSlot?: React.ReactNode;
+  dealTypeFilter: string[];
+  onDealTypeFilterChange: (value: string[]) => void;
+  dealTypeOptions: string[];
+  regionFilter: string[];
+  onRegionFilterChange: (value: string[]) => void;
+  regionOptions: string[];
 }
 
 /* ========= Presentational component ========= */
@@ -321,6 +333,12 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
   onExport,
   pdfMode = false,
   actionsSlot,
+  dealTypeFilter,
+  onDealTypeFilterChange,
+  dealTypeOptions,
+  regionFilter,
+  onRegionFilterChange,
+  regionOptions,
 }) => {
   return (
     <Container maxWidth="xl">
@@ -354,6 +372,70 @@ const MDRDailyPortfolioTableView: React.FC<MDRDailyPortfolioTableViewProps> = ({
                 />
               )}
             />
+
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Deal Type</InputLabel>
+              <Select
+                multiple
+                value={dealTypeFilter}
+                label="Deal Type"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onDealTypeFilterChange(
+                    typeof val === "string" ? val.split(",") : val
+                  );
+                }}
+                renderValue={(selected) =>
+                  selected.length === 0
+                    ? "All"
+                    : selected.length === 1
+                      ? selected[0]
+                      : `${selected[0]} +${selected.length - 1}`
+                }
+              >
+                {dealTypeOptions.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    <Checkbox
+                      size="small"
+                      checked={dealTypeFilter.includes(opt)}
+                    />
+                    <ListItemText primary={opt} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Region</InputLabel>
+              <Select
+                multiple
+                value={regionFilter}
+                label="Region"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onRegionFilterChange(
+                    typeof val === "string" ? val.split(",") : val
+                  );
+                }}
+                renderValue={(selected) =>
+                  selected.length === 0
+                    ? "All"
+                    : selected.length === 1
+                      ? selected[0]
+                      : `${selected[0]} +${selected.length - 1}`
+                }
+              >
+                {regionOptions.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    <Checkbox
+                      size="small"
+                      checked={regionFilter.includes(opt)}
+                    />
+                    <ListItemText primary={opt} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <Button
               variant="contained"
