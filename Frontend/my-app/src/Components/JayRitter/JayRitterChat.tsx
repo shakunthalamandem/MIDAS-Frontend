@@ -273,7 +273,7 @@ const JayRitterChat: React.FC<JayRitterChatProps> = ({ open, onClose, reportDate
         <Box sx={{ flex: 1, zIndex: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
             <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "1rem", letterSpacing: "0.02em" }}>
-              Ritter Analyst
+              Gator Analyst
             </Typography>
             <Box sx={{
               px: 0.8, py: 0.15,
@@ -328,7 +328,7 @@ const JayRitterChat: React.FC<JayRitterChatProps> = ({ open, onClose, reportDate
                 How can I help you today?
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "#999", mt: 0.3 }}>
-                Ask me anything about the Jay Ritter IPO Analysis report
+                Ask me anything about the Gator IPO Analysis report
               </Typography>
             </Box>
             <Box sx={{

@@ -61,6 +61,7 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
           background: palette.accentBg,
           overflow: "hidden",
           transition: "all 0.2s ease",
+          fontFamily: "'Inter', sans-serif",
           "&:hover": {
             boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
             transform: "translateY(-1px)",
@@ -88,10 +89,11 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
             <Typography
               component="div"
               sx={{
-                fontSize: "0.95rem",
-                fontWeight: 700,
+                fontSize: "1.1rem",
+                fontWeight: 600,
                 color: palette.accent,
-                lineHeight: 1.3,
+                lineHeight: 1.4,
+                fontFamily: "'Inter', sans-serif",
               }}
             >
               <ReactMarkdown>{normalizedTitle}</ReactMarkdown>
@@ -103,7 +105,7 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
             <Box sx={{ mb: 1, "& p": { margin: 0 } }}>
               <Typography
                 component="div"
-                sx={{ fontSize: "0.78rem", color: "#64748b", fontWeight: 500 }}
+                sx={{ fontSize: "0.85rem", color: "#374151", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}
               >
                 <ReactMarkdown>{normalizedSubtitle}</ReactMarkdown>
               </Typography>
@@ -113,26 +115,29 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
           {/* Description */}
           <Box
             sx={{
+              fontFamily: "'Inter', sans-serif",
               "& p": {
                 margin: 0,
-                fontSize: "0.84rem",
-                lineHeight: 1.7,
-                color: "#334155",
+                fontSize: "0.9rem",
+                lineHeight: 1.8,
+                color: "#374151",
+                fontWeight: 300,
               },
-              "& strong": { color: "#0f172a", fontWeight: 700 },
+              "& strong": { color: "#0f172a", fontWeight: 500, fontFamily: "'Inter', sans-serif" },
               "& ul, & ol": {
                 pl: 2,
                 my: 0.5,
                 "& li": {
-                  fontSize: "0.84rem",
-                  lineHeight: 1.7,
-                  color: "#334155",
+                  fontSize: "0.9rem",
+                  lineHeight: 1.8,
+                  color: "#374151",
+                  fontWeight: 300,
                   mb: 0.3,
                 },
               },
             }}
           >
-            <Typography variant="body2" component="div">
+            <Typography variant="body2" component="div" sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}>
               <ReactMarkdown>{normalizedDescription}</ReactMarkdown>
             </Typography>
           </Box>
