@@ -11,6 +11,21 @@ import {
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 
+// Header color palette - one color per table
+const HEADER_COLORS = [
+  { bg: "#eef2ff", color: "#4f46e5", border: "#c7d2fe" },
+  { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
+  { bg: "#ecfeff", color: "#0891b2", border: "#a5f3fc" },
+  { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
+  { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+  { bg: "#f5f3ff", color: "#7c3aed", border: "#ddd6fe" },
+];
+
+const getTableHeaderColor = (title?: string) => {
+  const seed = title ? title.charCodeAt(0) : Math.floor(Math.random() * HEADER_COLORS.length);
+  return HEADER_COLORS[seed % HEADER_COLORS.length];
+};
+
 const GENATableBlock: React.FC<{
   headers: (string | number)[];
   rows: (string | number)[][];
@@ -24,6 +39,11 @@ const GENATableBlock: React.FC<{
   const normalizedRows = React.useMemo(
     () => rows.map((row) => row.map((cell) => String(cell))),
     [rows]
+  );
+
+  const tableHeaderColor = React.useMemo(
+    () => getTableHeaderColor(title),
+    [title]
   );
 
   return (
@@ -79,17 +99,23 @@ const GENATableBlock: React.FC<{
                   <TableCell
                     key={i}
                     sx={{
-                      background: "#f1f5f9",
-                      borderBottom: "1px solid #e2e8f0",
+                      background: tableHeaderColor.bg,
+                      borderBottom: `2px solid ${tableHeaderColor.border}`,
                       fontWeight: 700,
                       fontSize: "0.75rem",
                       textTransform: "uppercase",
                       letterSpacing: "0.06em",
-                      color: "#000000",
-                      py: 1.4,
-                      px: 2,
+                      color: tableHeaderColor.color,
+                      py: 1.6,
+                      px: 2.5,
                       whiteSpace: "nowrap",
+                      transition: "all 0.2s ease",
                       "& p": { margin: 0, fontSize: "0.75rem", fontWeight: 700 },
+                      "&:hover": {
+                        background: tableHeaderColor.border,
+                        color: "#ffffff",
+                        boxShadow: `inset 0 0 0 1px ${tableHeaderColor.color}`,
+                      },
                     }}
                   >
                     <ReactMarkdown>{h}</ReactMarkdown>
