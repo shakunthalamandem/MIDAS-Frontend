@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
@@ -21,7 +20,7 @@ type S1QueryBotProps = {
   ticker?: string;
 };
 
-type S1Phase = "loading" | "not_uploaded" | "no_vectors" | "ready";
+type S1Phase = "loading" | "not_uploaded" | "ready";
 
 const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
   const [phase, setPhase] = React.useState<S1Phase>("loading");
@@ -30,8 +29,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [s1Link, setS1Link] = React.useState<string | null>(null);
-  const [generating, setGenerating] = React.useState(false);
-  const [genError, setGenError] = React.useState<string | null>(null);
 
   const apiUrl = React.useMemo(() => process.env.REACT_APP_API_URL, []);
 
@@ -50,7 +47,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
     setError(null);
     setQuestion("");
     setS1Link(null);
-    setGenError(null);
   }, [ticker]);
 
   // Fetch S1 status on mount / ticker change
@@ -75,8 +71,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
 
         if (!data.s1_uploaded) {
           setPhase("not_uploaded");
-        } else if (!data.vectors_generated) {
-          setPhase("no_vectors");
         } else {
           setPhase("ready");
         }
@@ -87,28 +81,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
 
     fetchStatus();
   }, [apiUrl, ticker, getAuthHeaders]);
-
-  const handleGenerate = async () => {
-    if (!ticker || !apiUrl || generating) return;
-    setGenerating(true);
-    setGenError(null);
-    try {
-      const res = await fetch(`${apiUrl}/api/s1_generate_vectors/`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ ticker }),
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.error || `Failed with status ${res.status}`);
-      }
-      setPhase("ready");
-    } catch (e: any) {
-      setGenError(e?.message || "Failed to generate vectors.");
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   const toBlocks = (data: any): Block[] => {
     if (Array.isArray(data)) {
@@ -180,7 +152,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
     }
   };
 
-  // ── Status cards for "not_uploaded" and "no_vectors" ──
+  // ── Status card for "not_uploaded" ──
   const renderStatusCard = () => {
     if (phase === "not_uploaded") {
       return (
@@ -208,65 +180,6 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
             <strong>{ticker}</strong>. Please contact the team to upload the S1
             document.
           </Typography>
-        </Box>
-      );
-    }
-
-    if (phase === "no_vectors") {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            py: 6,
-            px: 3,
-            gap: 2,
-          }}
-        >
-          <AutoFixHighIcon sx={{ fontSize: 56, color: "#2f81c0" }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, textAlign: "center" }}>
-            Vector Index Not Generated
-          </Typography>
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ textAlign: "center", maxWidth: 500 }}
-          >
-            The S1 document is uploaded for <strong>{ticker}</strong>, but the
-            vector index has not been generated yet. Click below to generate it.
-          </Typography>
-
-          {genError && (
-            <Alert severity="error" sx={{ maxWidth: 500, width: "100%" }}>
-              {genError}
-            </Alert>
-          )}
-
-          <Button
-            variant="contained"
-            onClick={handleGenerate}
-            disabled={generating}
-            startIcon={
-              generating ? (
-                <CircularProgress size={18} color="inherit" />
-              ) : (
-                <AutoFixHighIcon />
-              )
-            }
-            sx={{
-              textTransform: "none",
-              fontWeight: 700,
-              borderRadius: 999,
-              px: 4,
-              py: 1.2,
-              backgroundColor: "#2f81c0",
-              "&:hover": { backgroundColor: "#256aa0" },
-            }}
-          >
-            {generating ? "Generating Vectors..." : "Generate Vectors"}
-          </Button>
         </Box>
       );
     }
@@ -353,8 +266,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
         )}
 
         {/* Status cards */}
-        {(phase === "not_uploaded" || phase === "no_vectors") &&
-          renderStatusCard()}
+        {phase === "not_uploaded" && renderStatusCard()}
 
         {/* Ready: show chat interface */}
         {phase === "ready" && (
@@ -372,7 +284,7 @@ const S1QueryBot: React.FC<S1QueryBotProps> = ({ ticker }) => {
                 sx={{ fontSize: 16, color: "#27ae60" }}
               />
               <Typography variant="caption" color="#27ae60" fontWeight={600}>
-                S1 Document & Vectors Ready
+                S1 Document Ready
               </Typography>
             </Box>
 

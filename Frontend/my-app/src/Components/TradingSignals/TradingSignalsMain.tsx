@@ -29,6 +29,7 @@ interface Props {
   dealStatus?: string;
   issuerName?: string;
   expectedDate?: string;
+  region?: string | null;
 }
 
 /* ── Helpers for popup data rendering ── */
@@ -254,6 +255,7 @@ const TradingSignalsMain: React.FC<Props> = ({
   dealStatus,
   issuerName,
   expectedDate,
+  region,
 }) => {
   const [signalData, setSignalData] = useState<TradingSignalData | null>(null);
   const [popupSource, setPopupSource] = useState<string | null>(null);
@@ -370,6 +372,7 @@ const TradingSignalsMain: React.FC<Props> = ({
           dealStatus={dealStatus}
           issuerName={issuerName}
           expectedDate={expectedDate}
+          region={region}
         />
       </MotionBox>
 

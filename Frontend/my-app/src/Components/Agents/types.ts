@@ -116,15 +116,40 @@ export const WEEKDAY_MAP: Record<string, string> = {
   "6": "Saturday",
 };
 
+function formatScheduleTime(time?: string): string {
+  if (!time) {
+    return "";
+  }
+
+  const normalizedTime = time.trim();
+  const timeMatch = normalizedTime.match(/^(\d{1,2}):(\d{2})$/);
+
+  if (!timeMatch) {
+    return normalizedTime;
+  }
+
+  const hours = Number(timeMatch[1]);
+  const minutes = timeMatch[2];
+
+  if (Number.isNaN(hours) || hours < 0 || hours > 23) {
+    return normalizedTime;
+  }
+
+  const meridiem = hours >= 12 ? "PM" : "AM";
+  const twelveHour = hours % 12 || 12;
+
+  return `${twelveHour}:${minutes} ${meridiem}`;
+}
+
 export function formatSchedule(agent: AIAgent): string {
   const { schedule_type, schedule_value } = agent;
   if (schedule_type === "daily" && schedule_value) {
-    return `Every day at ${schedule_value}`;
+    return `Every day at ${formatScheduleTime(schedule_value)}`;
   }
   if (schedule_type === "weekly" && schedule_value) {
     const [day, time] = schedule_value.split(",");
     const dayName = WEEKDAY_MAP[day] || `Day ${day}`;
-    return `Every ${dayName}${time ? ` at ${time}` : ""}`;
+    return `Every ${dayName}${time ? ` at ${formatScheduleTime(time)}` : ""}`;
   }
   if (schedule_type === "hourly" && schedule_value) {
     return `Every ${schedule_value} hour(s)`;
@@ -135,7 +160,7 @@ export function formatSchedule(agent: AIAgent): string {
   if (schedule_type === "cron") {
     // Friendly label for known cron patterns
     if (schedule_value === "0 10 1-7 * 1") {
-      return "1st Monday of each month at 10:00";
+      return `1st Monday of each month at ${formatScheduleTime("10:00")}`;
     }
     return `Cron: ${schedule_value}`;
   }
