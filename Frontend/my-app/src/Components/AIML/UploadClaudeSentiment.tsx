@@ -50,7 +50,7 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
       unique_deal_id: item.unique_deal_id ?? item.ticker ?? "",
-      deal_type: item.deal_type ?? "FO",
+      deal_type: item.deal_type ?? "IPO",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
       issuer_name: item.issuer_name ?? undefined,
@@ -128,7 +128,7 @@ const UploadClaudeSentiment: React.FC = () => {
         const foTickers = await fetchFoTickers();
         const combined: TickerOption[] = foTickers.map((deal, idx) => ({
           ...deal,
-          id: `fo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
+          id: `IPO-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
           label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
         }));
         setTickers(combined);
