@@ -358,13 +358,14 @@
 /* Value pills */
 .trig-pill {
   display: inline-block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  padding: 4px 14px;
+  padding: 4px 12px;
   border-radius: 20px;
-  min-width: 60px;
+  min-width: 56px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .trig-pill--breach { color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; }
@@ -667,7 +668,7 @@
 
 .trig-card-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -675,11 +676,12 @@
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  min-height: 48px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -695,11 +697,13 @@
 
 .trig-ticker-card-name {
   font-size: 13px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
   color: #0f172a !important;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Empty ── */
@@ -714,20 +718,20 @@
 /* ── Responsive ── */
 @media (max-width: 1200px) {
   .trig-summary-row { grid-template-columns: repeat(3, 1fr); }
-  .trig-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .trig-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 768px) {
   .trig-header { flex-direction: column; gap: 12px; padding: 14px 16px; }
   .trig-header-right { flex-wrap: wrap; justify-content: center; gap: 10px; }
   .trig-summary-row { grid-template-columns: repeat(2, 1fr); }
-  .trig-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .trig-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .trig-scard-value { font-size: 22px !important; }
   .trig-guidelines-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 520px) {
   .trig-summary-row { grid-template-columns: 1fr; }
-  .trig-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trig-card-grid { grid-template-columns: 1fr; }
   .trig-guidelines-grid { grid-template-columns: 1fr; }
 }

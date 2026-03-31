@@ -43,13 +43,12 @@ interface GuidelineField { key: string; label: string; defaultValue: number; }
 
 const GUIDELINE_FIELDS: GuidelineField[] = [
   { key: "delta_gross_exposure", label: "Delta Gross Exposure (%)", defaultValue: 175 },
-  { key: "equity_delta_net_exposure", label: "Equity Delta Net Exposure (%)", defaultValue: 50 },
-  { key: "equity_beta_net_exposure", label: "Equity Beta Adj Net Exposure (%)", defaultValue: 20 },
+  { key: "equity_delta_net_exposure", label: "Delta Net Exposure (%)", defaultValue: 50 },
+  { key: "equity_beta_net_exposure", label: "Beta Adj Net Exposure (%)", defaultValue: 20 },
   { key: "drawdown", label: "Drawdown (%)", defaultValue: 8 },
   { key: "var_99", label: "VaR 99% (%)", defaultValue: 2 },
-  { key: "top_10_issuer_threshold", label: "Top 10 Issuer Threshold (%)", defaultValue: 25 },
   { key: "top_10_issuer_guideline", label: "Top 10 Issuer Guideline (%)", defaultValue: 35 },
-  { key: "issuer_delta_net_exposure", label: "Issuer Delta Net Exposure (%)", defaultValue: 10 },
+  { key: "issuer_delta_net_exposure", label: "Single Issuer Limit (%)", defaultValue: 10 },
   { key: "liquidity_days", label: "Liquidity Days (%)", defaultValue: 95 },
 ];
 
@@ -489,6 +488,8 @@ const RiskTriggers: React.FC = () => {
               const totalRow = rows.find((r) => r[cfg.firstColKey] === "Total");
               const maxVal = Math.max(...nonTotal.map((r) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
 
+              const top10Guideline = getActiveGuidelines().top_10_issuer_guideline;
+
               return (
                 <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
                   <Box className="trig-panel-head">
@@ -496,7 +497,10 @@ const RiskTriggers: React.FC = () => {
                       <span className="trig-issuer-dot trig-issuer-dot--red" />
                       <Typography className="trig-panel-title">{section.title}</Typography>
                     </Box>
-                    {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {top10Guideline && <span className="trig-guideline-tag">Top 10 Guideline: {top10Guideline}%</span>}
+                      {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
+                    </Box>
                   </Box>
                   <Box className="trig-table-wrap">
                     <table className="trig-table">
@@ -547,6 +551,7 @@ const RiskTriggers: React.FC = () => {
               const rows = section.data || [];
               const nonTotal = rows.filter((r) => r[cfg.firstColKey] !== "Total");
               const totalRow = rows.find((r) => r[cfg.firstColKey] === "Total");
+              const issuerGuideline = getActiveGuidelines().issuer_delta_net_exposure;
               const needle = issuerSearch.trim().toUpperCase();
               const filtered = needle ? nonTotal.filter((r) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : nonTotal;
 
@@ -558,6 +563,7 @@ const RiskTriggers: React.FC = () => {
                       <Typography className="trig-panel-title">All {section.title}</Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {issuerGuideline && <span className="trig-guideline-tag">Single Issuer Limit: {issuerGuideline}%</span>}
                       {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
                       <span className="trig-panel-badge trig-panel-badge--green">{nonTotal.length} Issuers</span>
                     </Box>
@@ -578,10 +584,11 @@ const RiskTriggers: React.FC = () => {
                           const absNum = Math.abs(num);
                           const isNeg = num < 0;
                           const isBreach = breachedIssuers.has((row[cfg.firstColKey] || "").trim().toLowerCase());
-                          const pillClass = isBreach || isNeg ? "trig-pill--breach" : absNum > 3 ? "trig-pill--warning" : "trig-pill--safe";
+                          const overLimit = issuerGuideline ? absNum >= issuerGuideline : false;
+                          const pillClass = isBreach || isNeg || overLimit ? "trig-pill--breach" : absNum > 3 ? "trig-pill--warning" : "trig-pill--safe";
                           return (
-                            <Box key={`${sectionKey}-${idx}`} className={`trig-ticker-card ${isBreach ? "trig-ticker-card--breach" : ""}`}>
-                              <Typography className="trig-ticker-card-name">{row[cfg.firstColKey]}</Typography>
+                            <Box key={`${sectionKey}-${idx}`} className={`trig-ticker-card ${isBreach || overLimit ? "trig-ticker-card--breach" : ""}`}>
+                              <Typography className="trig-ticker-card-name" title={row[cfg.firstColKey]}>{row[cfg.firstColKey]}</Typography>
                               <span className={`trig-pill ${pillClass}`}>{raw}</span>
                             </Box>
                           );
