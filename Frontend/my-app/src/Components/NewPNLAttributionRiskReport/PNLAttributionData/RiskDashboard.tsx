@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, CircularProgress, Alert, Container, Typography, Button } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { Box, CircularProgress, Alert, Container } from "@mui/material";
 import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker, DashboardCategory, MetricChartDataPoint, TopBottomMetricTicker, HeadlineMetricValues } from "./types";
 import DashboardHeader from "./DashboardHeader";
 import HeadlineRisks from "./HeadlineRisks";
@@ -26,7 +25,6 @@ const getAuthHeaders = (contentType?: string) => {
 };
 
 const RiskDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const [portfolios, setPortfolios] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
@@ -37,10 +35,8 @@ const RiskDashboard: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>("pnl");
   const [selectedIndexMetric, setSelectedIndexMetric] = useState<string | null>("one_month_beta_sp");
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
-  const [indexChartLoading, setIndexChartLoading] = useState(false);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
   const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
-  const [topBottomLoading, setTopBottomLoading] = useState(false);
   const [metricChartData, setMetricChartData] = useState<MetricChartDataPoint[]>([]);
   const [metricChartLoading, setMetricChartLoading] = useState(false);
   const [metricTop10, setMetricTop10] = useState<TopBottomMetricTicker[]>([]);
@@ -51,7 +47,17 @@ const RiskDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch portfolio list on mount
+  // AbortController refs to cancel stale requests
+  const abortRefs = useRef<Record<string, AbortController>>({});
+
+  const getSignal = (key: string) => {
+    if (abortRefs.current[key]) abortRefs.current[key].abort();
+    const controller = new AbortController();
+    abortRefs.current[key] = controller;
+    return controller.signal;
+  };
+
+  // Fetch portfolio list on mount, then trigger all data fetches in one batch
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
@@ -61,9 +67,11 @@ const RiskDashboard: React.FC = () => {
         );
         if (!res.ok) throw new Error("Failed to fetch portfolios");
         const result: PortfolioResponse = await res.json();
-        setPortfolios(result.portfolios || []);
-        if (result.max_position_date) setSelectedDate(result.max_position_date);
-        if (result.portfolios?.length > 0) setSelectedFunds(result.portfolios);
+        const portfolioList = result.portfolios || [];
+        const date = result.max_position_date || "";
+        setPortfolios(portfolioList);
+        if (date) setSelectedDate(date);
+        if (portfolioList.length > 0) setSelectedFunds(portfolioList);
       } catch (err: any) {
         setError(err.message || "Failed to load portfolios");
       }
@@ -71,181 +79,231 @@ const RiskDashboard: React.FC = () => {
     fetchPortfolios();
   }, []);
 
-  // Fetch dashboard data
-  const fetchDashboard = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate) return;
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_risk_dashboard/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Failed to fetch dashboard data");
-      }
-      setData(await res.json());
-    } catch (err: any) {
-      setError(err.message || "Failed to load dashboard data");
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedFunds, selectedDate]);
-
-  useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
-
   // Map metric key to API period param
   const metricToPeriod = (metric: string) => metric.replace("_pnl", "");
 
-  // Fetch chart data
-  const fetchChartData = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate) return;
-    setChartLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({
-          date: selectedDate,
-          fund: selectedFunds,
-          period: metricToPeriod(selectedMetric),
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch chart data");
-      const result = await res.json();
-      setChartData(result.chart_data || []);
-    } catch {
-      setChartData([]);
-    } finally {
-      setChartLoading(false);
-    }
-  }, [selectedFunds, selectedDate, selectedMetric]);
-
+  // Single effect that fetches all PNL-category data when funds/date/metric change
   useEffect(() => {
-    fetchChartData();
-  }, [fetchChartData]);
-
-  // Fetch top/bottom PNL tickers
-  const fetchTopBottomPnl = useCallback(async () => {
     if (selectedFunds.length === 0 || !selectedDate) return;
-    setTopBottomLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch top/bottom PNL");
-      const result = await res.json();
-      setTopBottomTop(result.top_10 || []);
-      setTopBottomBottom(result.bottom_10 || []);
-    } catch {
-      setTopBottomTop([]);
-      setTopBottomBottom([]);
-    } finally {
-      setTopBottomLoading(false);
-    }
+
+    const signal = getSignal("pnlData");
+
+    const fetchAllPnlData = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [dashboardRes, chartRes, topBottomRes, indexChartRes] = await Promise.all([
+          fetch(`${apiUrl}/api/portfolio_risk_dashboard/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+            signal,
+          }),
+          fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({
+              date: selectedDate,
+              fund: selectedFunds,
+              period: metricToPeriod(selectedMetric),
+            }),
+            signal,
+          }),
+          fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+            signal,
+          }),
+          fetch(`${apiUrl}/api/portfolio_index_comparison_chart/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+            signal,
+          }),
+        ]);
+
+        if (signal.aborted) return;
+
+        // Process dashboard
+        if (dashboardRes.ok) {
+          setData(await dashboardRes.json());
+        } else {
+          const errData = await dashboardRes.json().catch(() => ({}));
+          setError(errData.error || "Failed to fetch dashboard data");
+          setData(null);
+        }
+
+        // Process chart
+        if (chartRes.ok) {
+          const chartResult = await chartRes.json();
+          setChartData(chartResult.chart_data || []);
+        } else {
+          setChartData([]);
+        }
+
+        // Process top/bottom
+        if (topBottomRes.ok) {
+          const tbResult = await topBottomRes.json();
+          setTopBottomTop(tbResult.top_10 || []);
+          setTopBottomBottom(tbResult.bottom_10 || []);
+        } else {
+          setTopBottomTop([]);
+          setTopBottomBottom([]);
+        }
+
+        // Process index chart
+        if (indexChartRes.ok) {
+          const indexResult = await indexChartRes.json();
+          setIndexChartData(indexResult.chart_data || []);
+        } else {
+          setIndexChartData([]);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to load dashboard data");
+        setData(null);
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    };
+
+    fetchAllPnlData();
+
+    return () => { if (abortRefs.current["pnlData"]) abortRefs.current["pnlData"].abort(); };
   }, [selectedFunds, selectedDate]);
 
+  // Separate effect for chart data when only metric changes (not funds/date)
   useEffect(() => {
-    fetchTopBottomPnl();
-  }, [fetchTopBottomPnl]);
+    if (selectedFunds.length === 0 || !selectedDate) return;
 
-  // Fetch metric chart data (for Gross MV, Delta Adj, Beta Adj)
-  const fetchMetricChartData = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
+    const signal = getSignal("chartMetric");
+    setChartLoading(true);
+
+    const fetchChart = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
+          method: "POST",
+          headers: getAuthHeaders("application/json"),
+          body: JSON.stringify({
+            date: selectedDate,
+            fund: selectedFunds,
+            period: metricToPeriod(selectedMetric),
+          }),
+          signal,
+        });
+        if (signal.aborted) return;
+        if (res.ok) {
+          const result = await res.json();
+          setChartData(result.chart_data || []);
+        } else {
+          setChartData([]);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setChartData([]);
+      } finally {
+        if (!signal.aborted) setChartLoading(false);
+      }
+    };
+
+    fetchChart();
+
+    return () => { if (abortRefs.current["chartMetric"]) abortRefs.current["chartMetric"].abort(); };
+  }, [selectedMetric]);
+
+  // Fetch metric-specific data (Gross MV, Delta Adj, Beta Adj) - only when category is not "pnl"
+  useEffect(() => {
+    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") {
+      if (selectedCategory === "pnl") setMetricHeadlineData(null);
+      return;
+    }
+
+    const signal = getSignal("metricData");
     setMetricChartLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_metric_chart/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({
-          date: selectedDate,
-          fund: selectedFunds,
-          metric: selectedCategory,
-          period: selectedMetric, // dtd, wtd, mtd, ytd
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch metric chart data");
-      const result = await res.json();
-      setMetricChartData(result.chart_data || []);
-    } catch {
-      setMetricChartData([]);
-    } finally {
-      setMetricChartLoading(false);
-    }
-  }, [selectedFunds, selectedDate, selectedCategory, selectedMetric]);
-
-  useEffect(() => {
-    if (selectedCategory !== "pnl") fetchMetricChartData();
-  }, [fetchMetricChartData, selectedCategory]);
-
-  // Fetch top/bottom tickers for selected metric (Gross MV, Delta Adj, Beta Adj)
-  const fetchMetricTopBottom = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
     setMetricTopBottomLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_metric_top_bottom/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({
-          date: selectedDate,
-          fund: selectedFunds,
-          metric: selectedCategory,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch metric top/bottom");
-      const result = await res.json();
-      setMetricTop10(result.top_10 || []);
-      setMetricBottom10(result.bottom_10 || []);
-    } catch {
-      setMetricTop10([]);
-      setMetricBottom10([]);
-    } finally {
-      setMetricTopBottomLoading(false);
-    }
-  }, [selectedFunds, selectedDate, selectedCategory]);
-
-  useEffect(() => {
-    if (selectedCategory !== "pnl") fetchMetricTopBottom();
-  }, [fetchMetricTopBottom, selectedCategory]);
-
-  // Fetch metric headline values (DTD/WTD/MTD/YTD for Gross MV, Delta Adj, Beta Adj)
-  const fetchMetricHeadline = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate || selectedCategory === "pnl") return;
     setMetricHeadlineLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_metric_headline/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({
-          date: selectedDate,
-          fund: selectedFunds,
-          metric: selectedCategory,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch metric headline");
-      const result = await res.json();
-      setMetricHeadlineData(result.headline_data || null);
-    } catch {
-      setMetricHeadlineData(null);
-    } finally {
-      setMetricHeadlineLoading(false);
-    }
-  }, [selectedFunds, selectedDate, selectedCategory]);
 
-  useEffect(() => {
-    if (selectedCategory !== "pnl") {
-      fetchMetricHeadline();
-    } else {
-      setMetricHeadlineData(null);
-    }
-  }, [fetchMetricHeadline, selectedCategory]);
+    const fetchAllMetricData = async () => {
+      try {
+        const [chartRes, topBottomRes, headlineRes] = await Promise.all([
+          fetch(`${apiUrl}/api/portfolio_metric_chart/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({
+              date: selectedDate,
+              fund: selectedFunds,
+              metric: selectedCategory,
+              period: selectedMetric,
+            }),
+            signal,
+          }),
+          fetch(`${apiUrl}/api/portfolio_metric_top_bottom/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({
+              date: selectedDate,
+              fund: selectedFunds,
+              metric: selectedCategory,
+            }),
+            signal,
+          }),
+          fetch(`${apiUrl}/api/portfolio_metric_headline/`, {
+            method: "POST",
+            headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({
+              date: selectedDate,
+              fund: selectedFunds,
+              metric: selectedCategory,
+            }),
+            signal,
+          }),
+        ]);
+
+        if (signal.aborted) return;
+
+        if (chartRes.ok) {
+          const result = await chartRes.json();
+          setMetricChartData(result.chart_data || []);
+        } else {
+          setMetricChartData([]);
+        }
+
+        if (topBottomRes.ok) {
+          const result = await topBottomRes.json();
+          setMetricTop10(result.top_10 || []);
+          setMetricBottom10(result.bottom_10 || []);
+        } else {
+          setMetricTop10([]);
+          setMetricBottom10([]);
+        }
+
+        if (headlineRes.ok) {
+          const result = await headlineRes.json();
+          setMetricHeadlineData(result.headline_data || null);
+        } else {
+          setMetricHeadlineData(null);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setMetricChartData([]);
+        setMetricTop10([]);
+        setMetricBottom10([]);
+        setMetricHeadlineData(null);
+      } finally {
+        if (!signal.aborted) {
+          setMetricChartLoading(false);
+          setMetricTopBottomLoading(false);
+          setMetricHeadlineLoading(false);
+        }
+      }
+    };
+
+    fetchAllMetricData();
+
+    return () => { if (abortRefs.current["metricData"]) abortRefs.current["metricData"].abort(); };
+  }, [selectedFunds, selectedDate, selectedCategory, selectedMetric]);
 
   const handleCategorySelect = (category: DashboardCategory) => {
     setSelectedCategory(category);
@@ -256,33 +314,6 @@ const RiskDashboard: React.FC = () => {
       setSelectedMetric("ytd");
     }
   };
-
-  // Fetch index comparison chart data
-  const fetchIndexChartData = useCallback(async () => {
-    if (selectedFunds.length === 0 || !selectedDate || !selectedIndexMetric) return;
-    setIndexChartLoading(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/portfolio_index_comparison_chart/`, {
-        method: "POST",
-        headers: getAuthHeaders("application/json"),
-        body: JSON.stringify({
-          date: selectedDate,
-          fund: selectedFunds,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to fetch index chart data");
-      const result = await res.json();
-      setIndexChartData(result.chart_data || []);
-    } catch {
-      setIndexChartData([]);
-    } finally {
-      setIndexChartLoading(false);
-    }
-  }, [selectedFunds, selectedDate, selectedIndexMetric]);
-
-  useEffect(() => {
-    if (selectedIndexMetric) fetchIndexChartData();
-  }, [fetchIndexChartData, selectedIndexMetric]);
 
   const handleIndexMetricSelect = (metricKey: string) => {
     setSelectedIndexMetric((prev) => (prev === metricKey ? null : metricKey));
@@ -295,7 +326,23 @@ const RiskDashboard: React.FC = () => {
       ? selectedFunds[0]
       : `${selectedFunds.length} Funds`;
 
-  const allDataReady = !loading && !chartLoading && !indexChartLoading && !topBottomLoading && !!data;
+  const [showPdfTabs, setShowPdfTabs] = useState(false);
+  const attributionAllTabsRef = useRef<{ fetchAllData: () => Promise<void> } | null>(null);
+
+  const handleBeforePdfExport = async () => {
+    setShowPdfTabs(true);
+    // Wait a tick for the component to mount, then trigger data fetch
+    await new Promise<void>((resolve) => setTimeout(resolve, 100));
+    if (attributionAllTabsRef.current) {
+      await attributionAllTabsRef.current.fetchAllData();
+    }
+  };
+
+  const handleAfterPdfExport = () => {
+    setShowPdfTabs(false);
+  };
+
+  const allDataReady = !loading && !chartLoading && !!data;
   const isDataAvailable = data?.data_available !== false;
 
   return (
@@ -342,6 +389,8 @@ const RiskDashboard: React.FC = () => {
                 headerTitle="Risk & PNL Attribution Dashboard"
                 fundName={fundLabel}
                 reportDate={selectedDate}
+                onBeforeExport={handleBeforePdfExport}
+                onAfterExport={handleAfterPdfExport}
               />
             ) : undefined
           }
@@ -424,7 +473,7 @@ const RiskDashboard: React.FC = () => {
             <TopBottomPnLTable
               top10={topBottomTop}
               bottom10={topBottomBottom}
-              loading={topBottomLoading}
+              loading={loading}
               category={selectedCategory}
               metricTop10={metricTop10}
               metricBottom10={metricBottom10}
@@ -446,7 +495,7 @@ const RiskDashboard: React.FC = () => {
             <Box className="pdf-section" data-pdf-page="1">
               <IndexComparisonChart
                 chartData={indexChartData}
-                loading={indexChartLoading}
+                loading={loading}
                 selectedMetric={selectedIndexMetric}
               />
             </Box>
@@ -459,13 +508,16 @@ const RiskDashboard: React.FC = () => {
             />
           </Box>
 
-          {/* All 5 attribution tabs for PDF export (hidden on screen) */}
-          <Box className="attribution-all-tabs-pdf">
-            <AttributionAllTabs
-              selectedFunds={selectedFunds}
-              selectedDate={selectedDate}
-            />
-          </Box>
+          {/* All 5 attribution tabs for PDF export (only mounted during export) */}
+          {showPdfTabs && (
+            <Box className="attribution-all-tabs-pdf">
+              <AttributionAllTabs
+                ref={attributionAllTabsRef}
+                selectedFunds={selectedFunds}
+                selectedDate={selectedDate}
+              />
+            </Box>
+          )}
         </>
       )}
     </Box>

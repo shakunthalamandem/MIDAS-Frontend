@@ -18,6 +18,8 @@ interface RiskDashboardPDFExporterProps {
   headerTitle?: string;
   fundName?: string;
   reportDate?: string;
+  onBeforeExport?: () => Promise<void>;
+  onAfterExport?: () => void;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -33,6 +35,8 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
   headerTitle = "Risk & PNL Attribution Dashboard",
   fundName = "",
   reportDate = "",
+  onBeforeExport,
+  onAfterExport,
 }) => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -47,11 +51,15 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
     setStatusText("Preparing report layout...");
 
     try {
-      container.classList.add("pdf-export-mode");
+      // Load attribution data for PDF before switching to export mode
+      if (onBeforeExport) {
+        setStatusText("Loading attribution tables...");
+        await onBeforeExport();
+        await waitForRender();
+      }
 
-      setStatusText("Loading attribution tables...");
+      container.classList.add("pdf-export-mode");
       await waitForRender();
-      await wait(1000);
 
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -277,6 +285,7 @@ const RiskDashboardPDFExporter: React.FC<RiskDashboardPDFExporterProps> = ({
       console.error("PDF generation error:", error);
     } finally {
       container.classList.remove("pdf-export-mode");
+      if (onAfterExport) onAfterExport();
       setLoading(false);
       setProgress(0);
       setStatusText("");
