@@ -255,6 +255,47 @@ const UploadClaudeSentiment: React.FC = () => {
                 />
               )}
             />
+
+            {/* Selected Ticker Display */}
+            {selectedTicker && (
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  background: "#eef2ff",
+                  border: "1px solid #c7d2fe",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 1,
+                    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {selectedTicker.ticker.slice(0, 2)}
+                </Box>
+                <Box>
+                  <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#000000" }}>
+                    {selectedTicker.ticker}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.75rem", color: "#4f46e5", fontWeight: 500 }}>
+                    {selectedTicker.deal_type} • {selectedTicker.unique_deal_id}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
             {/* Sentiment Field */}
             <TextField
               label="Sentiment Analysis"
@@ -281,6 +322,19 @@ const UploadClaudeSentiment: React.FC = () => {
               disabled={uploading}
             />
 
+            {/* Sentiment Summary Field */}
+            <TextField
+              label="Sentiment Summary"
+              placeholder="Enter sentiment summary..."
+              value={sentimentSummary}
+              onChange={(e) => setSentimentSummary(e.target.value)}
+              multiline
+              rows={4}
+              fullWidth
+              variant="outlined"
+              disabled={uploading}
+            />
+
             {/* One Week Sentiment Field */}
             <TextField
               label="One Week Sentiment"
@@ -300,19 +354,6 @@ const UploadClaudeSentiment: React.FC = () => {
               placeholder="Enter one month sentiment analysis..."
               value={oneMonthSentiment}
               onChange={(e) => setOneMonthSentiment(e.target.value)}
-              multiline
-              rows={4}
-              fullWidth
-              variant="outlined"
-              disabled={uploading}
-            />
-
-            {/* Sentiment Summary Field */}
-            <TextField
-              label="Sentiment Summary"
-              placeholder="Enter sentiment summary..."
-              value={sentimentSummary}
-              onChange={(e) => setSentimentSummary(e.target.value)}
               multiline
               rows={4}
               fullWidth
