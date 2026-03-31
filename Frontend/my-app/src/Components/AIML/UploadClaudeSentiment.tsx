@@ -90,6 +90,66 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
     .filter((item: Deal) => item.ticker);
 };
 
+const fetchUpcomingIpoTickers = async (): Promise<Deal[]> => {
+  const token = localStorage.getItem("access_token");
+  const res = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({ operation: "Upcoming Deals", deal_type: "IPO" }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to fetch upcoming IPO tickers");
+  const payload = data?.data ?? data?.Data ?? [];
+  const rows = Array.isArray(payload) ? payload : Object.values(payload);
+  const listingStatus: "pre-listing" | "post-listing" = "pre-listing";
+  return rows
+    .filter((item: any) => item && typeof item === "object")
+    .map((item: any) => ({
+      ticker: String(item.ticker ?? "").trim(),
+      unique_deal_id:
+        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      deal_type: item.deal_type ?? "",
+      fo_type: item.fo_type ?? undefined,
+      region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
+      listing_status: listingStatus,
+    }))
+    .filter((item: Deal) => item.ticker);
+};
+
+const fetchUpcomingFoTickers = async (): Promise<Deal[]> => {
+  const token = localStorage.getItem("access_token");
+  const res = await fetch(`${apiUrl}/api/unified_upcoming_recent/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({ operation: "Upcoming Deals", deal_type: "FO" }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to fetch upcoming FO tickers");
+  const payload = Array.isArray(data) ? data : (data?.data ?? data?.Data ?? []);
+  const rows = Array.isArray(payload) ? payload : Object.values(payload);
+  const listingStatus: "pre-listing" | "post-listing" = "pre-listing";
+  return rows
+    .filter((item: any) => item && typeof item === "object")
+    .map((item: any) => ({
+      ticker: String(item.ticker ?? "").trim(),
+      unique_deal_id:
+        item.unique_deal_id ?? item.deal_id ?? item.id ?? item.ticker ?? "",
+      deal_type: item.deal_type ?? "",
+      fo_type: item.fo_type ?? undefined,
+      region: item.region ?? undefined,
+      issuer_name: item.issuer_name ?? undefined,
+      listing_status: listingStatus,
+    }))
+    .filter((item: Deal) => item.ticker);
+};
+
 const uploadSentiment = async (
   ticker: string,
   uniqueDealId: string,
@@ -147,9 +207,11 @@ const UploadClaudeSentiment: React.FC = () => {
       setLoadingTickers(true);
       setError(null);
       try {
-        const [ipoTickers, foTickers] = await Promise.all([
+        const [ipoTickers, foTickers, upcomingIpoTickers, upcomingFoTickers] = await Promise.all([
           fetchIpoTickers(),
           fetchFoTickers(),
+          fetchUpcomingIpoTickers(),
+          fetchUpcomingFoTickers(),
         ]);
         const combined: TickerOption[] = [
           ...ipoTickers.map((deal, idx) => ({
@@ -157,9 +219,19 @@ const UploadClaudeSentiment: React.FC = () => {
             id: `ipo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
             label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
           })),
+          ...upcomingIpoTickers.map((deal, idx) => ({
+            ...deal,
+            id: `upcoming-ipo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
+            label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
+          })),
           ...foTickers.map((deal, idx) => ({
             ...deal,
             id: `fo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
+            label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
+          })),
+          ...upcomingFoTickers.map((deal, idx) => ({
+            ...deal,
+            id: `upcoming-fo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
             label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
           })),
         ];
