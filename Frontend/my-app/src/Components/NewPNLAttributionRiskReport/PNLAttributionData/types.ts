@@ -123,6 +123,26 @@ export type AttributionGroupBy =
   | "holding_period"
   | "issuer";
 
+export interface AttributionAreaDataPoint {
+  date: string;
+  value: number;
+  value_pct: number;
+}
+
+export interface AttributionAreaSeries {
+  name: string;
+  data: AttributionAreaDataPoint[];
+}
+
+export interface AttributionAreaChartResponse {
+  date: string;
+  fund: string[];
+  group_by: AttributionGroupBy;
+  ytd_pnl: AttributionAreaSeries[];
+  net_exp: AttributionAreaSeries[];
+  beta_adj_net: AttributionAreaSeries[];
+}
+
 export interface TickerItem {
   ticker: string;
   issuer: string;
