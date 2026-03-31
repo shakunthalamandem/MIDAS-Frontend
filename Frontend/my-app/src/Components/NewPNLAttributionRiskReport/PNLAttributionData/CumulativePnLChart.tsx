@@ -53,7 +53,7 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
   const isPnl = category === "pnl";
   const activeData = isPnl ? chartData : metricChartData;
   const activeLoading = isPnl ? loading : metricChartLoading;
-  const dataKey = isPnl ? "cumulative_pnl" : "value";
+  const dataKey = isPnl ? (period === "dtd" ? "daily_pnl" : "cumulative_pnl") : "value";
   const color = CATEGORY_COLORS[category] || "#7c3aed";
   const label = CATEGORY_LABELS[category] || "P&L";
   const gradientId = `chartGradient_${category}`;
@@ -63,7 +63,7 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
     ? `HISTORICAL: ${periodLabel} P&L`
     : `HISTORICAL: ${periodLabel} ${label}`;
 
-  const legendLabel = isPnl ? "Cumulative P&L" : label;
+  const legendLabel = isPnl ? (period === "dtd" ? "Daily P&L" : "Cumulative P&L") : label;
 
   return (
     <Box className="risk-dashboard-section">

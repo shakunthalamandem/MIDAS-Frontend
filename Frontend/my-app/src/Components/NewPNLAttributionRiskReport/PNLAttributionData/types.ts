@@ -42,8 +42,8 @@ export interface DashboardData {
 
 export interface ChartDataPoint {
   date: string;
-  daily_pnl: number;
-  cumulative_pnl: number;
+  daily_pnl?: number;
+  cumulative_pnl?: number;
 }
 
 export interface IndexComparisonChartPoint {
