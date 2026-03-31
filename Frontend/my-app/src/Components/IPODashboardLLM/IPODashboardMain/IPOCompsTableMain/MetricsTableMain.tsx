@@ -88,8 +88,11 @@ const MetricsTableMain: React.FC<Props> = ({
 
   useEffect(() => {
     const allRows = data[ticker]?.data || [];
+    const normalize = (s: string) => s.replace(/-/g, " ").trim().toLowerCase();
     const highlightRow = allRows.find(
-      (r) => r.ticker === r.competitor || r.competitor.startsWith(r.ticker)
+      (r) =>
+        normalize(r.ticker) === normalize(r.competitor) ||
+        normalize(r.competitor).startsWith(normalize(r.ticker))
     );
     const otherRows = allRows.filter(
       (r) => !highlightRow || r !== highlightRow
@@ -219,8 +222,9 @@ const MetricsTableMain: React.FC<Props> = ({
   };
 
   const handleAddCompetitor = async (competitorTicker: string) => {
+    const normalizeTicker = (s: string) => s.replace(/-/g, " ").trim().toLowerCase();
     const exists = rows.some(
-      (row) => row.competitor.toLowerCase() === competitorTicker.toLowerCase()
+      (row) => normalizeTicker(row.competitor) === normalizeTicker(competitorTicker)
     );
     if (exists) {
       setSnackbar({
