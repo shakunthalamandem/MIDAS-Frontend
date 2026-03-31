@@ -196,7 +196,9 @@ const RiskTriggers: React.FC = () => {
     if (selectedFunds.length === 0 || !selectedDate) return;
     setLoading(true); setError("");
     try {
-      const g = getActiveGuidelines();
+      // Read guidelines directly from localStorage to avoid stale state after fund change
+      const saved = loadSavedGuidelines(selectedFunds);
+      const g = { ...defaultGuidelines, ...(saved || {}) };
       const responses = await Promise.all(
         selectedFunds.map(async (fund) => {
           const res = await fetch(`${apiUrl}/api/portfolio_risk_triggers_by_fund/`, {
@@ -210,7 +212,7 @@ const RiskTriggers: React.FC = () => {
       setData(mergeResponses(responses));
     } catch (err: any) { setError(err.message || "Failed to load triggers"); setData(null); }
     finally { setLoading(false); }
-  }, [selectedFunds, selectedDate, getActiveGuidelines]);
+  }, [selectedFunds, selectedDate]);
 
   useEffect(() => { fetchTriggers(); }, [fetchTriggers]);
 
@@ -231,7 +233,7 @@ const RiskTriggers: React.FC = () => {
     const toSave: Record<string, number> = {};
     for (const [k, v] of Object.entries(editGuidelines)) { const n = parseFloat(v); if (Number.isFinite(n)) toSave[k] = n; }
     setSavingGuidelines(true);
-    try { saveGuidelinesToStorage(selectedFunds, toSave); setSavedGuidelines(toSave); setGuidelinesExpanded(false); }
+    try { saveGuidelinesToStorage(selectedFunds, toSave); setSavedGuidelines(toSave); setGuidelinesExpanded(false); await fetchTriggers(); }
     finally { setSavingGuidelines(false); }
   };
 
@@ -239,6 +241,7 @@ const RiskTriggers: React.FC = () => {
     const d: Record<string, string> = {};
     for (const f of GUIDELINE_FIELDS) d[f.key] = String(f.defaultValue);
     setEditGuidelines(d); setSavedGuidelines({}); localStorage.removeItem(getStorageKey(selectedFunds));
+    fetchTriggers();
   };
 
   /* ── Derived data ── */
