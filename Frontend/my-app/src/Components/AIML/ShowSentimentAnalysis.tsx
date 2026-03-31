@@ -22,9 +22,38 @@ const formatPricingDate = (dateStr?: string | null) => {
 
 type ShowSentimentAnalysisProps = {
   focusTicker: string | null;
-  tickerOptions?: { id: string; ticker: string; pricing_date?: string | null }[];
-  selectedTicker?: { id: string; ticker: string; pricing_date?: string | null } | null;
-  onSelectTicker?: (val: { id: string; ticker: string; pricing_date?: string | null } | null) => void;
+  tickerOptions?: {
+    id: string;
+    ticker: string;
+    unique_deal_id: string;
+    issuer_name: string;
+    pricing_date?: string | null;
+    sentiment_date: string;
+    updated_at: string;
+    created_at: string;
+  }[];
+  selectedTicker?: {
+    id: string;
+    ticker: string;
+    unique_deal_id: string;
+    issuer_name: string;
+    pricing_date?: string | null;
+    sentiment_date: string;
+    updated_at: string;
+    created_at: string;
+  } | null;
+  onSelectTicker?: (
+    val: {
+      id: string;
+      ticker: string;
+      unique_deal_id: string;
+      issuer_name: string;
+      pricing_date?: string | null;
+      sentiment_date: string;
+      updated_at: string;
+      created_at: string;
+    } | null
+  ) => void;
   loadingTickers?: boolean;
   tickerError?: string | null;
 };
@@ -78,7 +107,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   useEffect(() => {
     let cancelled = false;
 
-    if (!focusTicker) {
+    if (!focusTicker || !selectedTicker) {
       setBlocks([]);
       setSocialMediaBlocks([]);
       setError(null);
@@ -106,7 +135,12 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker: focusTicker }),
+          body: JSON.stringify({
+            ticker: focusTicker,
+            unique_deal_id: selectedTicker.unique_deal_id,
+            updated_at: selectedTicker.updated_at,
+            pricing_date: selectedTicker.pricing_date,
+          }),
         });
 
         const text = await res.text();
@@ -177,7 +211,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusTicker]);
+  }, [apiUrl, focusTicker, selectedTicker]);
 
   const showPlaceholder =
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
@@ -273,15 +307,8 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
               loading={loadingTickers}
               value={selectedTicker}
               onChange={(_, value) => onSelectTicker?.(value)}
-              getOptionLabel={(option) =>
-                option.pricing_date
-                  ? `${option.ticker} - ${formatPricingDate(option.pricing_date)}`
-                  : option.ticker
-              }
-              isOptionEqualToValue={(opt, val) =>
-                opt.ticker === val.ticker &&
-                (opt.pricing_date ?? "") === (val.pricing_date ?? "")
-              }
+              getOptionLabel={(option) => `${option.ticker}-${option.unique_deal_id}`}
+              isOptionEqualToValue={(opt, val) => opt.unique_deal_id === val.unique_deal_id}
               renderOption={(props, option) => (
                 <li {...props} key={option.id}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.3 }}>
@@ -304,10 +331,10 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
                     </Box>
                     <Box>
                       <Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: "#0f172a" }}>
-                        {option.ticker}
+                        {option.ticker}-{option.unique_deal_id}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", color: "#000000", fontWeight: 500 }}>
-                        Pricing Date: {formatPricingDate(option.pricing_date)}
+                      <Typography sx={{ fontSize: "0.72rem", color: "#64748b", fontWeight: 500 }}>
+                        Updated: {new Date(option.updated_at).toISOString().split("T")[0]}
                       </Typography>
                     </Box>
                   </Box>
