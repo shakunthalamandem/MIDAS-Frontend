@@ -14,42 +14,46 @@ const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => 
         p: { xs: 2, md: 2.5 },
         width: "100%",
         transition: "border-color 0.2s ease",
+        fontFamily: "'Inter', sans-serif",
         "&:hover": {
           borderColor: "#cbd5e1",
         },
         "& p": {
-          fontSize: "0.88rem",
-          lineHeight: 1.75,
-          color: "#000000",
+          fontSize: "0.95rem",
+          lineHeight: 1.8,
+          color: "#374151",
           margin: 0,
+          fontWeight: 300,
           "&:not(:last-child)": { mb: 1.5 },
         },
         "& h1, & h2, & h3, & h4, & h5, & h6": {
-          color: "#000000",
-          fontWeight: 700,
+          color: "#0f172a",
+          fontWeight: 500,
           letterSpacing: "-0.01em",
           mt: 0,
           mb: 1,
+          fontFamily: "'Inter', sans-serif",
         },
-        "& h1": { fontSize: "1.25rem" },
-        "& h2": { fontSize: "1.1rem" },
-        "& h3": { fontSize: "1rem" },
-        "& strong": { color: "#000000", fontWeight: 700 },
+        "& h1": { fontSize: "1.5rem", fontWeight: 600 },
+        "& h2": { fontSize: "1.25rem", fontWeight: 600 },
+        "& h3": { fontSize: "1.1rem", fontWeight: 500 },
+        "& strong": { color: "#0f172a", fontWeight: 600 },
         "& ul, & ol": {
           pl: 2.5,
           my: 1,
           "& li": {
-            fontSize: "0.88rem",
-            lineHeight: 1.75,
-            color: "#000000",
+            fontSize: "0.95rem",
+            lineHeight: 1.8,
+            color: "#374151",
+            fontWeight: 300,
             mb: 0.5,
-            "&::marker": { color: "#000000" },
+            "&::marker": { color: "#64748b" },
           },
         },
         "& a": {
           color: "#4f46e5",
           textDecoration: "none",
-          fontWeight: 600,
+          fontWeight: 500,
           "&:hover": { textDecoration: "underline" },
         },
         "& code": {
@@ -57,21 +61,23 @@ const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => 
           borderRadius: 1,
           px: 0.8,
           py: 0.2,
-          fontSize: "0.82rem",
+          fontSize: "0.85rem",
           fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           color: "#4f46e5",
+          fontWeight: 400,
         },
         "& blockquote": {
           borderLeft: "3px solid #4f46e5",
           pl: 2,
           ml: 0,
           my: 1.5,
-          color: "#000000",
+          color: "#374151",
           fontStyle: "italic",
+          fontWeight: 300,
         },
       }}
     >
-      <Typography variant="body1" component="div">
+      <Typography variant="body1" component="div" sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 300 }}>
         <ReactMarkdown>{normalizedContent}</ReactMarkdown>
       </Typography>
     </Box>

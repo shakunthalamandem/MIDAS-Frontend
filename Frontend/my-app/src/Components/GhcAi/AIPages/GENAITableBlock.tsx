@@ -60,6 +60,7 @@ const GENATableBlock: React.FC<{
           background: "#ffffff",
           overflow: "hidden",
           width: "100%",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
         {title && (
@@ -73,10 +74,11 @@ const GENATableBlock: React.FC<{
           >
             <Typography
               sx={{
-                fontSize: "0.9rem",
-                fontWeight: 700,
+                fontSize: "1rem",
+                fontWeight: 500,
                 color: "#0f172a",
                 letterSpacing: "-0.01em",
+                fontFamily: "'Inter', sans-serif",
               }}
             >
               {title}
@@ -101,16 +103,17 @@ const GENATableBlock: React.FC<{
                     sx={{
                       background: tableHeaderColor.bg,
                       borderBottom: `2px solid ${tableHeaderColor.border}`,
-                      fontWeight: 700,
-                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      fontSize: "0.8rem",
                       textTransform: "uppercase",
-                      letterSpacing: "0.06em",
+                      letterSpacing: "0.05em",
                       color: tableHeaderColor.color,
                       py: 1.6,
                       px: 2.5,
                       whiteSpace: "nowrap",
                       transition: "all 0.2s ease",
-                      "& p": { margin: 0, fontSize: "0.75rem", fontWeight: 700 },
+                      fontFamily: "'Inter', sans-serif",
+                      "& p": { margin: 0, fontSize: "0.8rem", fontWeight: 500, fontFamily: "'Inter', sans-serif" },
                       "&:hover": {
                         background: tableHeaderColor.border,
                         color: "#ffffff",
@@ -138,11 +141,13 @@ const GENATableBlock: React.FC<{
                       borderBottom: "1px solid #f1f5f9",
                       py: 1.3,
                       px: 2,
-                      fontSize: "0.84rem",
-                      color: "#000000",
-                      lineHeight: 1.6,
-                      "& p": { margin: 0, fontSize: "0.84rem", lineHeight: 1.6 },
-                      "& strong": { color: "#000000", fontWeight: 700 },
+                      fontSize: "0.9rem",
+                      color: "#374151",
+                      lineHeight: 1.7,
+                      fontWeight: 300,
+                      fontFamily: "'Inter', sans-serif",
+                      "& p": { margin: 0, fontSize: "0.9rem", lineHeight: 1.7, fontWeight: 300, fontFamily: "'Inter', sans-serif" },
+                      "& strong": { color: "#0f172a", fontWeight: 500, fontFamily: "'Inter', sans-serif" },
                     },
                   }}
                 >

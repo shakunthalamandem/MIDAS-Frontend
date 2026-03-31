@@ -75,7 +75,7 @@ const HeatmapChart: React.FC<{ data: number[][]; fixedHeight: number }> = ({ dat
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2, height: fixedHeight, overflow: "auto" }}>
       {/* Legend */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
-        <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, color: "#000000", minWidth: 50 }}>
+        <Typography sx={{ fontSize: "0.8rem", fontWeight: 500, color: "#374151", minWidth: 50, fontFamily: "'Inter', sans-serif" }}>
           Risk Level:
         </Typography>
         <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
@@ -90,7 +90,7 @@ const HeatmapChart: React.FC<{ data: number[][]; fixedHeight: number }> = ({ dat
                   border: "1px solid #e2e8f0",
                 }}
               />
-              <Typography sx={{ fontSize: "0.7rem", color: "#000000", fontWeight: 600 }}>
+              <Typography sx={{ fontSize: "0.75rem", color: "#374151", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
                 {step.label}
               </Typography>
             </Box>
@@ -207,6 +207,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
           display: "flex",
           flexDirection: "column",
           transition: "border-color 0.2s ease",
+          fontFamily: "'Inter', sans-serif",
           "&:hover": { borderColor: "#cbd5e1" },
         }}
       >
@@ -215,10 +216,11 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
             mb: 1.5,
             "& p": {
               margin: 0,
-              fontSize: "0.9rem",
-              fontWeight: 700,
+              fontSize: "1rem",
+              fontWeight: 500,
               color: "#0f172a",
               letterSpacing: "-0.01em",
+              fontFamily: "'Inter', sans-serif",
             },
           }}
         >
@@ -259,14 +261,14 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
           usePointStyle: true,
           pointStyle: "circle",
           padding: 16,
-          font: { size: 12, weight: "600" },
-          color: "#000000",
+          font: { size: 12, weight: "400", family: "'Inter', sans-serif" },
+          color: "#374151",
         },
       },
       tooltip: {
         backgroundColor: "#0f172a",
-        titleFont: { size: 12, weight: "600" },
-        bodyFont: { size: 12 },
+        titleFont: { size: 12, weight: "500", family: "'Inter', sans-serif" },
+        bodyFont: { size: 12, family: "'Inter', sans-serif", weight: "300" },
         cornerRadius: 8,
         padding: 10,
       },
@@ -276,11 +278,11 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
       : {
         x: {
           grid: { color: "#f1f5f9", drawBorder: false },
-          ticks: { color: "#000000", font: { size: 11, weight: 600 } },
+          ticks: { color: "#374151", font: { size: 11, weight: 400, family: "'Inter', sans-serif" } },
         },
         y: {
           grid: { color: "#f1f5f9", drawBorder: false },
-          ticks: { color: "#000000", font: { size: 11, weight: 600 } },
+          ticks: { color: "#374151", font: { size: 11, weight: 400, family: "'Inter', sans-serif" } },
         },
       },
   };
@@ -305,12 +307,12 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
       x: {
         stacked: true,
         grid: { color: "#f1f5f9", drawBorder: false },
-        ticks: { color: "#000000", font: { size: 11, weight: 600 } },
+        ticks: { color: "#374151", font: { size: 11, weight: 400, family: "'Inter', sans-serif" } },
       },
       y: {
         stacked: true,
         grid: { color: "#f1f5f9", drawBorder: false },
-        ticks: { color: "#000000", font: { size: 11, weight: 600 } },
+        ticks: { color: "#374151", font: { size: 11, weight: 400, family: "'Inter', sans-serif" } },
       },
     };
   }
@@ -327,6 +329,7 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
         display: "flex",
         flexDirection: "column",
         transition: "border-color 0.2s ease",
+        fontFamily: "'Inter', sans-serif",
         "&:hover": { borderColor: "#cbd5e1" },
       }}
     >
@@ -335,10 +338,11 @@ const GENAIChartBlock: React.FC<GENAIChartBlockProps> = ({
           mb: 1.5,
           "& p": {
             margin: 0,
-            fontSize: "0.9rem",
-            fontWeight: 700,
-            color: "#000000",
+            fontSize: "1rem",
+            fontWeight: 500,
+            color: "#0f172a",
             letterSpacing: "-0.01em",
+            fontFamily: "'Inter', sans-serif",
           },
         }}
       >
