@@ -296,8 +296,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
                 maxWidth: 680,
               }}
             >
-              A standardized, evidence-focused system prompt is dynamically populated with the current date and individual ticker symbols. Each ticker is processed independently via the Perplexity API, aggregating market data, news sentiment, analyst commentary, and historical IPO performance signals to deliver consistent yet deal-specific insights on first-week and first-month performance drivers.
-            </Typography>
+Each ticker is analyzed independently using live market data, news sentiment, and analyst commentary to generate first-week and first-month insights.            </Typography>
           </Box>
 
           {/* Right - Search & Date */}
