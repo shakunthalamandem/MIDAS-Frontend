@@ -463,46 +463,6 @@ const SentimentSummary: React.FC = () => {
           </Typography>
         </Box>
 
-        {/* Stat Cards */}
-        <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
-          <StatCard
-            label="Total Deals"
-            count={stats.total}
-            accentColor={C.accent}
-            accentBg={C.accentBg}
-            cardBgColor="#eef2ff"
-            borderColor="#c7d2fe"
-            icon={<FilterListIcon sx={{ fontSize: 20 }} />}
-          />
-          <StatCard
-            label="Bullish"
-            count={stats.bullish}
-            accentColor={C.bullishColor}
-            accentBg={C.bullishBg}
-            cardBgColor="#ecfdf5"
-            borderColor="#a7f3d0"
-            icon={<TrendingUpIcon sx={{ fontSize: 20 }} />}
-          />
-          <StatCard
-            label="Bearish"
-            count={stats.bearish}
-            accentColor={C.bearishColor}
-            accentBg={C.bearishBg}
-            cardBgColor="#fef2f2"
-            borderColor="#fecaca"
-            icon={<TrendingDownIcon sx={{ fontSize: 20 }} />}
-          />
-          <StatCard
-            label="Neutral"
-            count={stats.neutral}
-            accentColor={C.neutralColor}
-            accentBg={C.neutralBg}
-            cardBgColor="#fffbeb"
-            borderColor="#fde68a"
-            icon={<TrendingFlatIcon sx={{ fontSize: 20 }} />}
-          />
-        </Box>
-
         {error && (
           <Alert
             severity="error"
