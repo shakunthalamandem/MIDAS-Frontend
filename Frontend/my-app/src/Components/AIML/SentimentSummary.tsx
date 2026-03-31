@@ -82,6 +82,7 @@ interface SentimentData {
   sentiment_summary?: string;
   updated_at?: string;
   created_at?: string;
+  status?: string;
 }
 
 type SentimentType = "bullish" | "bearish" | "neutral";
@@ -224,6 +225,7 @@ const SentimentSummary: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sentimentFilter, setSentimentFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("active");
 
   const [selectedSummary, setSelectedSummary] = useState<SentimentData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -271,9 +273,13 @@ const SentimentSummary: React.FC = () => {
         d.one_week_sentiment?.toLowerCase() === sentimentFilter ||
         d.one_month_sentiment?.toLowerCase() === sentimentFilter;
 
-      return matchesSearch && matchesSentiment;
+      const matchesStatus =
+        statusFilter === "all" ||
+        d.status?.toLowerCase() === statusFilter;
+
+      return matchesSearch && matchesSentiment && matchesStatus;
     });
-  }, [searchTerm, sentimentFilter, data]);
+  }, [searchTerm, sentimentFilter, statusFilter, data]);
 
   const stats = useMemo(() => {
     const bullish = data.filter(
@@ -448,19 +454,49 @@ const SentimentSummary: React.FC = () => {
               AI-driven IPO sentiment insights
             </Typography>
           </Box>
-          <Typography
-            sx={{
-              fontSize: "0.78rem",
-              color: C.textMuted,
-              background: C.cardBg,
-              border: `1px solid ${C.border}`,
-              borderRadius: 2,
-              px: 2,
-              py: 0.8,
-            }}
-          >
-            {stats.total} deals tracked
-          </Typography>
+          <FormControl size="small">
+            <Select
+              value={statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                setPage(0);
+              }}
+              displayEmpty
+              sx={{
+                borderRadius: 2,
+                backgroundColor: C.cardBg,
+                color: C.textPrimary,
+                fontSize: "0.85rem",
+                minWidth: 135,
+                border: `1px solid ${C.border}`,
+                "&:hover": { borderColor: C.textMuted },
+                "& .MuiSelect-select": { py: 0.9 },
+                "& fieldset": { border: "none" },
+                "& .MuiSvgIcon-root": { color: C.textMuted },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    background: C.cardBg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 2,
+                    mt: 0.5,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                    "& .MuiMenuItem-root": {
+                      color: C.textSecondary,
+                      fontSize: "0.85rem",
+                      "&:hover": { background: C.accentBg },
+                      "&.Mui-selected": { background: C.accentBg, color: C.accent },
+                    },
+                  },
+                },
+              }}
+            >
+              <MenuItem value="all">All Status</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="archived">Archived</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
         {error && (
