@@ -270,7 +270,7 @@ const RiskTriggers: React.FC = () => {
       const ratio = guideline ? maxAbs / guideline : 0;
 
       return {
-        key, label: section.title || cfg.summaryLabel || key, subtitle: cfg.valueLabel,
+        key, label: (section.title || cfg.summaryLabel || key).replace(/\s*\(def\.\s*\d+\)/gi, ""), subtitle: cfg.valueLabel,
         status: overallStatus, ratio, pct: Math.round(Math.min(ratio, 1) * 100),
         limit: guideline ? `${guideline.toFixed(1)}%` : undefined, funds,
       };
@@ -404,78 +404,30 @@ const RiskTriggers: React.FC = () => {
             {/* ════ SUMMARY CARDS ════ */}
             {summaryCards.length > 0 && (
               <Box className="trig-summary-row">
-                {summaryCards.map((c) => (
-                  <Box key={c.key} className={`trig-scard trig-scard--${c.status}`}>
-                    <Box className="trig-scard-top">
-                      <Box>
+                {summaryCards.map((c) => {
+                  const topFund = c.funds[0];
+                  return (
+                    <Box key={c.key} className={`trig-scard trig-scard--${c.status}`}>
+                      <Box className="trig-scard-top">
                         <Typography className="trig-scard-label">{c.label}</Typography>
-                        <Typography className="trig-scard-subtitle">{c.subtitle}</Typography>
+                        <CircularGauge ratio={c.ratio} status={c.status} label={`${c.pct}%`} />
                       </Box>
-                      <CircularGauge ratio={c.ratio} status={c.status} label={`${c.pct}%`} />
-                    </Box>
-                    {c.funds.map((f, idx) => (
-                      <Box key={idx} sx={{ mt: idx === 0 ? 1 : 0.5 }}>
-                        <Typography className="trig-scard-fund">{f.name}</Typography>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <Typography className={`trig-scard-value trig-scard-value--${f.status}`}>{f.value}</Typography>
-                          {renderTrendIcon(f.status)}
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                        <Typography className={`trig-scard-value trig-scard-value--${topFund?.status || c.status}`}>
+                          {topFund?.value || "N/A"}
+                        </Typography>
+                        {topFund && renderTrendIcon(topFund.status)}
+                      </Box>
+                      <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        {c.limit && <Typography className="trig-scard-limit">Limit: {c.limit}</Typography>}
+                        <Box className={`trig-scard-status trig-scard-status--${c.status}`}>
+                          <span className="trig-scard-status-dot" />
+                          {c.status === "breach" ? "Above limit" : c.status === "warning" ? "Elevated" : `Within ${c.limit || "limit"}`}
                         </Box>
                       </Box>
-                    ))}
-                    <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      {c.limit && <Typography className="trig-scard-limit">Limit: {c.limit}</Typography>}
-                      <Box className={`trig-scard-status trig-scard-status--${c.status}`}>
-                        <span className="trig-scard-status-dot" />
-                        {c.status === "breach" ? "Above limit" : c.status === "warning" ? "Elevated" : `Within ${c.limit || "limit"}`}
-                      </Box>
                     </Box>
-                  </Box>
-                ))}
-              </Box>
-            )}
-
-            {/* ════ ALERTS & INSIGHTS ROW ════ */}
-            {(alerts.length > 0 || insights.length > 0) && (
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
-                <Box className="trig-side-card">
-                  <Box className="trig-side-head">
-                    <Typography className="trig-side-title">
-                      <span style={{ color: "#d97706" }}>&#9888;</span> Alerts
-                      {alerts.length > 0 && <span className="trig-side-badge trig-side-badge--red">{alerts.length}</span>}
-                    </Typography>
-                  </Box>
-                  {alerts.length === 0 ? (
-                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No active alerts</Typography>
-                  ) : (
-                    alerts.map((a, i) => (
-                      <Box key={i} className="trig-alert-item">
-                        <Box className={`trig-alert-icon trig-alert-icon--${a.status}`}>{a.status === "breach" ? "\u26A0" : "\u25B2"}</Box>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography className="trig-alert-name">{a.name}</Typography>
-                          <Typography className="trig-alert-desc">{a.desc}</Typography>
-                        </Box>
-                        <span className="trig-alert-chevron">&#8250;</span>
-                      </Box>
-                    ))
-                  )}
-                </Box>
-                <Box className="trig-side-card">
-                  <Box className="trig-side-head">
-                    <Typography className="trig-side-title">
-                      <span style={{ color: "#7c3aed" }}>&#128161;</span> Insights
-                    </Typography>
-                  </Box>
-                  {insights.length === 0 ? (
-                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No insights</Typography>
-                  ) : (
-                    insights.map((ins, i) => (
-                      <Box key={i} className="trig-insight-item">
-                        <span className="trig-insight-icon">{ins.icon}</span>
-                        <Typography className="trig-insight-text">{ins.text}</Typography>
-                      </Box>
-                    ))
-                  )}
-                </Box>
+                  );
+                })}
               </Box>
             )}
 
@@ -648,6 +600,51 @@ const RiskTriggers: React.FC = () => {
                 </Box>
               );
             })()}
+
+            {/* ════ ALERTS & INSIGHTS ROW (after tables) ════ */}
+            {(alerts.length > 0 || insights.length > 0) && (
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
+                <Box className="trig-side-card">
+                  <Box className="trig-side-head">
+                    <Typography className="trig-side-title">
+                      <span style={{ color: "#d97706" }}>&#9888;</span> Alerts
+                      {alerts.length > 0 && <span className="trig-side-badge trig-side-badge--red">{alerts.length}</span>}
+                    </Typography>
+                  </Box>
+                  {alerts.length === 0 ? (
+                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No active alerts</Typography>
+                  ) : (
+                    alerts.map((a, i) => (
+                      <Box key={i} className="trig-alert-item">
+                        <Box className={`trig-alert-icon trig-alert-icon--${a.status}`}>{a.status === "breach" ? "\u26A0" : "\u25B2"}</Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography className="trig-alert-name">{a.name}</Typography>
+                          <Typography className="trig-alert-desc">{a.desc}</Typography>
+                        </Box>
+                        <span className="trig-alert-chevron">&#8250;</span>
+                      </Box>
+                    ))
+                  )}
+                </Box>
+                <Box className="trig-side-card">
+                  <Box className="trig-side-head">
+                    <Typography className="trig-side-title">
+                      <span style={{ color: "#7c3aed" }}>&#128161;</span> Insights
+                    </Typography>
+                  </Box>
+                  {insights.length === 0 ? (
+                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No insights</Typography>
+                  ) : (
+                    insights.map((ins, i) => (
+                      <Box key={i} className="trig-insight-item">
+                        <span className="trig-insight-icon">{ins.icon}</span>
+                        <Typography className="trig-insight-text">{ins.text}</Typography>
+                      </Box>
+                    ))
+                  )}
+                </Box>
+              </Box>
+            )}
           </>
         )}
       </Container>
