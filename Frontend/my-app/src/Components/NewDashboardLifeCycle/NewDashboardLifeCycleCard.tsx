@@ -171,7 +171,7 @@ const NewDashboardLifeCycleCard: React.FC<NewDashboardLifeCycleCardProps> = ({
                 lineHeight: 1,
               }}
             >
-              After Market
+              Post IPO Repeat Purchase
             </Typography>
           )}
           <Typography
