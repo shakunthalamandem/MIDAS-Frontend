@@ -27,43 +27,19 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 const getAuthHeaders = (contentType?: string) => {
   const token = localStorage.getItem("access_token");
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
-  };
+  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
   if (contentType) headers["Content-Type"] = contentType;
   return headers;
 };
 
 /* ── Types ── */
-
-interface LimitRow {
-  top_10_issuers: string;
-  delta_adjusted_net_exposure: string;
-}
-
-interface LimitSectionData {
-  title: string;
-  data: LimitRow[];
-}
-
-interface SectionData {
-  title: string;
-  guideline?: number;
-  data: Record<string, any>[];
-}
-
-interface TriggersResponse {
-  limits: Record<string, LimitSectionData>;
-  current_levels: Record<string, SectionData>;
-}
+interface LimitRow { top_10_issuers: string; delta_adjusted_net_exposure: string; }
+interface LimitSectionData { title: string; data: LimitRow[]; }
+interface SectionData { title: string; guideline?: number; data: Record<string, any>[]; }
+interface TriggersResponse { limits: Record<string, LimitSectionData>; current_levels: Record<string, SectionData>; }
 
 /* ── Guideline config ── */
-
-interface GuidelineField {
-  key: string;
-  label: string;
-  defaultValue: number;
-}
+interface GuidelineField { key: string; label: string; defaultValue: number; }
 
 const GUIDELINE_FIELDS: GuidelineField[] = [
   { key: "delta_gross_exposure", label: "Delta Gross Exposure (%)", defaultValue: 175 },
@@ -77,93 +53,34 @@ const GUIDELINE_FIELDS: GuidelineField[] = [
   { key: "liquidity_days", label: "Liquidity Days (%)", defaultValue: 95 },
 ];
 
-/** Build a storage key for persisting guidelines per fund combo */
-const getStorageKey = (funds: string[]) =>
-  `risk_guidelines_${[...funds].sort().join("_")}`;
-
-/** Load saved guidelines from localStorage */
+const getStorageKey = (funds: string[]) => `risk_guidelines_${[...funds].sort().join("_")}`;
 const loadSavedGuidelines = (funds: string[]): Record<string, number> | null => {
-  try {
-    const raw = localStorage.getItem(getStorageKey(funds));
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  try { const raw = localStorage.getItem(getStorageKey(funds)); return raw ? JSON.parse(raw) : null; } catch { return null; }
 };
-
-/** Save guidelines to localStorage */
 const saveGuidelinesToStorage = (funds: string[], guidelines: Record<string, number>) => {
   localStorage.setItem(getStorageKey(funds), JSON.stringify(guidelines));
 };
 
 /* ── Section config ── */
-
-interface SectionConfig {
-  firstColKey: string;
-  firstColLabel: string;
-  valueKey: string;
-  valueLabel: string;
-  summaryLabel?: string;
-}
+interface SectionConfig { firstColKey: string; firstColLabel: string; valueKey: string; valueLabel: string; summaryLabel?: string; }
 
 const SECTION_CONFIG: Record<string, SectionConfig> = {
-  delta_gross_exposure: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "delta_adjusted_gross_exposure", valueLabel: "Delta Adjusted Gross Exposure",
-    summaryLabel: "Delta Gross Exposure",
-  },
-  equity_delta_net_exposure: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure",
-    summaryLabel: "Delta Net Exposure",
-  },
-  equity_beta_net_exposure: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "beta_net_exposure", valueLabel: "Beta Net Exposure",
-    summaryLabel: "Beta Adj Net Exposure",
-  },
-  drawdown: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "drawdown", valueLabel: "Drawdown",
-    summaryLabel: "Drawdown",
-  },
-  var_99: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "var", valueLabel: "VaR",
-    summaryLabel: "VaR (99%)",
-  },
-  top_10_issuer_delta_net_exposure: {
-    firstColKey: "issuer", firstColLabel: "Issuer",
-    valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure",
-  },
-  issuer_delta_net_exposure: {
-    firstColKey: "issuer", firstColLabel: "Issuer",
-    valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure",
-  },
-  liquidity: {
-    firstColKey: "fund", firstColLabel: "Fund",
-    valueKey: "liquidity_waterfall", valueLabel: "Liquidity (Waterfall)",
-  },
+  delta_gross_exposure: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "delta_adjusted_gross_exposure", valueLabel: "Delta Adjusted Gross Exposure", summaryLabel: "Delta Gross Exposure" },
+  equity_delta_net_exposure: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure", summaryLabel: "Delta Net Exposure" },
+  equity_beta_net_exposure: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "beta_net_exposure", valueLabel: "Beta Net Exposure", summaryLabel: "Beta Adj Net Exposure" },
+  drawdown: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "drawdown", valueLabel: "Drawdown", summaryLabel: "Drawdown" },
+  var_99: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "var", valueLabel: "VaR", summaryLabel: "VaR (99%)" },
+  top_10_issuer_delta_net_exposure: { firstColKey: "issuer", firstColLabel: "Issuer", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
+  issuer_delta_net_exposure: { firstColKey: "issuer", firstColLabel: "Issuer", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
+  liquidity: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "liquidity_waterfall", valueLabel: "Liquidity (Waterfall)" },
 };
-
-const SECTION_CARD_THEME: Record<string, { accent: string; soft: string; icon: string }> = {
-  delta_gross_exposure: { accent: "#b91c1c", soft: "#fff5f5", icon: "DG" },
-  equity_delta_net_exposure: { accent: "#0f766e", soft: "#f0fdfa", icon: "EN" },
-  equity_beta_net_exposure: { accent: "#1d4ed8", soft: "#eff6ff", icon: "BN" },
-  drawdown: { accent: "#b45309", soft: "#fff7ed", icon: "DD" },
-  var_99: { accent: "#14532d", soft: "#f0fdf4", icon: "VR" },
-};
-
-const DEFAULT_CARD_THEME = { accent: "#475569", soft: "#f8fafc", icon: "??" };
 
 /* ── Helpers ── */
-
 const parseNumericValue = (val: string | number | undefined): number => {
   if (val == null) return 0;
   if (typeof val === "number") return val;
   return parseFloat(val.replace("%", "")) || 0;
 };
-
 const parseSignedNumericValue = (val: string | number | undefined): number => {
   if (val == null) return 0;
   if (typeof val === "number") return val;
@@ -180,775 +97,554 @@ const getStatus = (value: number, guideline: number | undefined): Status => {
   return "safe";
 };
 
-const STATUS_COLORS: Record<Status, string> = {
-  breach: "#dc2626",
-  warning: "#f39c12",
-  safe: "#14532d",
-};
-
 const shiftDate = (dateStr: string, days: number): string => {
   const d = new Date(dateStr);
   d.setDate(d.getDate() + days);
   return d.toISOString().split("T")[0];
 };
 
-const SUMMARY_ELIGIBLE_KEYS = [
-  "delta_gross_exposure",
-  "equity_delta_net_exposure",
-  "equity_beta_net_exposure",
-  "drawdown",
-  "var_99",
-];
-
-const EXPOSURE_BAR_KEYS = new Set([
-  "top_10_issuer_delta_net_exposure",
-  "issuer_delta_net_exposure",
-]);
+const SUMMARY_KEYS = ["delta_gross_exposure", "equity_delta_net_exposure", "equity_beta_net_exposure", "drawdown", "var_99"];
+const EXPOSURE_KEYS = new Set(["top_10_issuer_delta_net_exposure", "issuer_delta_net_exposure"]);
 
 /* ── Merge helpers ── */
-
 const mergeResponses = (responses: TriggersResponse[]): TriggersResponse => {
   const merged: TriggersResponse = { limits: {}, current_levels: {} };
-
   for (const resp of responses) {
     for (const [key, section] of Object.entries(resp.limits || {})) {
-      if (!merged.limits[key]) {
-        merged.limits[key] = { title: section.title, data: [...(section.data || [])] };
-      } else {
-        merged.limits[key].data = [...merged.limits[key].data, ...(section.data || [])];
-      }
+      if (!merged.limits[key]) merged.limits[key] = { title: section.title, data: [...(section.data || [])] };
+      else merged.limits[key].data = [...merged.limits[key].data, ...(section.data || [])];
     }
-
     for (const [key, section] of Object.entries(resp.current_levels || {})) {
       if (!merged.current_levels[key]) {
-        merged.current_levels[key] = {
-          title: section.title,
-          guideline: section.guideline,
-          data: [...(section.data || [])],
-        };
+        merged.current_levels[key] = { title: section.title, guideline: section.guideline, data: [...(section.data || [])] };
       } else {
-        if (section.guideline != null) {
-          merged.current_levels[key].guideline = Math.max(
-            merged.current_levels[key].guideline ?? 0,
-            section.guideline
-          );
-        }
-        merged.current_levels[key].data = [
-          ...merged.current_levels[key].data,
-          ...(section.data || []),
-        ];
+        if (section.guideline != null) merged.current_levels[key].guideline = Math.max(merged.current_levels[key].guideline ?? 0, section.guideline);
+        merged.current_levels[key].data = [...merged.current_levels[key].data, ...(section.data || [])];
       }
     }
   }
-
   return merged;
 };
 
-/* ── Component ── */
+/* ── Circular Gauge SVG ── */
+const CircularGauge: React.FC<{ ratio: number; status: Status; label: string }> = ({ ratio, status, label }) => {
+  const r = 18;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - Math.min(ratio, 1));
+  return (
+    <Box className="trig-gauge">
+      <svg width="44" height="44" viewBox="0 0 44 44">
+        <circle cx="22" cy="22" r={r} className="trig-gauge-bg" />
+        <circle cx="22" cy="22" r={r} className={`trig-gauge-fill trig-gauge-fill--${status}`} strokeDasharray={circ} strokeDashoffset={offset} />
+      </svg>
+      <span className="trig-gauge-text">{label}</span>
+    </Box>
+  );
+};
 
+/* ── Component ── */
 const RiskTriggers: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   const initialFund = searchParams.get("fund") || "";
   const initialDate = searchParams.get("date") || "";
 
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  const [selectedFunds, setSelectedFunds] = useState<string[]>(
-    initialFund ? [initialFund] : ["BHM"]
-  );
+  const [selectedFunds, setSelectedFunds] = useState<string[]>(initialFund ? [initialFund] : ["BHM"]);
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [data, setData] = useState<TriggersResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Guidelines state
   const [guidelinesExpanded, setGuidelinesExpanded] = useState(false);
   const [editGuidelines, setEditGuidelines] = useState<Record<string, string>>({});
   const [savedGuidelines, setSavedGuidelines] = useState<Record<string, number>>({});
   const [savingGuidelines, setSavingGuidelines] = useState(false);
+  const [issuerSearch, setIssuerSearch] = useState("");
+  const [liqSearch, setLiqSearch] = useState("");
 
-  // Build the default guidelines map
-  const defaultGuidelines = GUIDELINE_FIELDS.reduce<Record<string, number>>((acc, f) => {
-    acc[f.key] = f.defaultValue;
-    return acc;
-  }, {});
+  const defaultGuidelines = GUIDELINE_FIELDS.reduce<Record<string, number>>((acc, f) => { acc[f.key] = f.defaultValue; return acc; }, {});
 
-  // Load saved guidelines when funds change
   useEffect(() => {
     if (selectedFunds.length === 0) return;
     const saved = loadSavedGuidelines(selectedFunds);
     if (saved) {
       setSavedGuidelines(saved);
-      // Convert saved numbers to string map for edit fields
-      const asStrings: Record<string, string> = {};
-      for (const [k, v] of Object.entries(saved)) asStrings[k] = String(v);
-      setEditGuidelines(asStrings);
-    } else {
-      setSavedGuidelines({});
-      setEditGuidelines({});
-    }
+      const s: Record<string, string> = {};
+      for (const [k, v] of Object.entries(saved)) s[k] = String(v);
+      setEditGuidelines(s);
+    } else { setSavedGuidelines({}); setEditGuidelines({}); }
   }, [selectedFunds.join(",")]);
 
-  /** Get the active guidelines (saved overrides merged with defaults) */
-  const getActiveGuidelines = useCallback((): Record<string, number> => {
-    return { ...defaultGuidelines, ...savedGuidelines };
-  }, [savedGuidelines]);
+  const getActiveGuidelines = useCallback((): Record<string, number> => ({ ...defaultGuidelines, ...savedGuidelines }), [savedGuidelines]);
 
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        const res = await fetch(`${apiUrl}/api/distinct_portfolio_positions/`, {
-          headers: getAuthHeaders(),
-        });
+        const res = await fetch(`${apiUrl}/api/distinct_portfolio_positions/`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error("Failed to fetch portfolios");
         const result = await res.json();
         setPortfolios(result.portfolios || []);
         if (!selectedDate && result.max_position_date) setSelectedDate(result.max_position_date);
         if (selectedFunds.length === 0 && result.portfolios?.length > 0) {
-          const hasBHM = result.portfolios.includes("BHM");
-          setSelectedFunds(hasBHM ? ["BHM"] : [result.portfolios[0]]);
+          setSelectedFunds(result.portfolios.includes("BHM") ? ["BHM"] : [result.portfolios[0]]);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to load portfolios");
-      }
+      } catch (err: any) { setError(err.message || "Failed to load portfolios"); }
     };
     fetchPortfolios();
   }, []);
 
   const fetchTriggers = useCallback(async () => {
     if (selectedFunds.length === 0 || !selectedDate) return;
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
-      const activeGuidelines = getActiveGuidelines();
+      const g = getActiveGuidelines();
       const responses = await Promise.all(
         selectedFunds.map(async (fund) => {
           const res = await fetch(`${apiUrl}/api/portfolio_risk_triggers_by_fund/`, {
-            method: "POST",
-            headers: getAuthHeaders("application/json"),
-            body: JSON.stringify({
-              date: selectedDate,
-              fund: [fund],
-              guidelines: activeGuidelines,
-            }),
+            method: "POST", headers: getAuthHeaders("application/json"),
+            body: JSON.stringify({ date: selectedDate, fund: [fund], guidelines: g }),
           });
-          if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || `Failed to fetch triggers for ${fund}`);
-          }
+          if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || `Failed for ${fund}`); }
           return (await res.json()) as TriggersResponse;
         })
       );
-      const merged = mergeResponses(responses);
-      setData(merged);
-    } catch (err: any) {
-      setError(err.message || "Failed to load triggers");
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
+      setData(mergeResponses(responses));
+    } catch (err: any) { setError(err.message || "Failed to load triggers"); setData(null); }
+    finally { setLoading(false); }
   }, [selectedFunds, selectedDate, getActiveGuidelines]);
 
   useEffect(() => { fetchTriggers(); }, [fetchTriggers]);
 
-  /** Get the effective guideline for a section from API data */
-  const getGuideline = (sectionKey: string): number | undefined => {
-    return data?.current_levels?.[sectionKey]?.guideline;
+  const getGuideline = (k: string): number | undefined => {
+    const section = data?.current_levels?.[k];
+    if (!section) return undefined;
+    // Check section-level guideline first
+    if (section.guideline != null) return section.guideline;
+    // Fall back to row-level guideline (API returns guideline inside each data row)
+    const rows = section.data || [];
+    for (const row of rows) {
+      if (row.guideline != null) return row.guideline;
+    }
+    return undefined;
   };
 
-  /** Handle editing a guideline field */
-  const handleEditGuidelineChange = (key: string, value: string) => {
-    setEditGuidelines((prev) => ({ ...prev, [key]: value }));
-  };
-
-  /** Save guidelines — persist to localStorage and re-fetch with new values */
   const handleSaveGuidelines = async () => {
-    // Convert string values to numbers, skipping empty fields (use defaults)
     const toSave: Record<string, number> = {};
-    for (const [k, v] of Object.entries(editGuidelines)) {
-      const num = parseFloat(v);
-      if (Number.isFinite(num)) toSave[k] = num;
-    }
+    for (const [k, v] of Object.entries(editGuidelines)) { const n = parseFloat(v); if (Number.isFinite(n)) toSave[k] = n; }
     setSavingGuidelines(true);
-    try {
-      saveGuidelinesToStorage(selectedFunds, toSave);
-      setSavedGuidelines(toSave);
-      setGuidelinesExpanded(false);
-    } finally {
-      setSavingGuidelines(false);
-    }
+    try { saveGuidelinesToStorage(selectedFunds, toSave); setSavedGuidelines(toSave); setGuidelinesExpanded(false); }
+    finally { setSavingGuidelines(false); }
   };
 
-  /** Reset guidelines to defaults */
   const handleResetGuidelines = () => {
-    // Reset edit fields to show default values
-    const defaults: Record<string, string> = {};
-    for (const f of GUIDELINE_FIELDS) defaults[f.key] = String(f.defaultValue);
-    setEditGuidelines(defaults);
-    setSavedGuidelines({});
-    localStorage.removeItem(getStorageKey(selectedFunds));
+    const d: Record<string, string> = {};
+    for (const f of GUIDELINE_FIELDS) d[f.key] = String(f.defaultValue);
+    setEditGuidelines(d); setSavedGuidelines({}); localStorage.removeItem(getStorageKey(selectedFunds));
   };
 
-  /* ── Summary cards ── */
-  const getSummaryCards = () => {
-    if (!data?.current_levels) return [];
-    return SUMMARY_ELIGIBLE_KEYS
-      .filter((key) => data.current_levels[key])
-      .map((key) => {
-        const section = data.current_levels[key];
-        const cfg = SECTION_CONFIG[key];
-        if (!cfg) return null;
-        const allRows = section.data || [];
-        if (allRows.length === 0) return null;
-        const numVals = allRows.map((r) => parseNumericValue(r[cfg.valueKey]));
-        const maxAbsVal = Math.max(...numVals.map(Math.abs));
-        const maxRow = allRows[numVals.indexOf(maxAbsVal)] || allRows[0];
-        const rawVal = maxRow[cfg.valueKey];
-        const guideline = getGuideline(key);
-        const status = getStatus(maxAbsVal, guideline);
-        return {
-          key,
-          label: cfg.summaryLabel || key,
-          value: typeof rawVal === "string" ? rawVal : `${rawVal}%`,
-          limit: guideline ? `${guideline.toFixed(1)}%` : undefined,
-          status,
-          ratio: guideline ? Math.min(maxAbsVal / guideline, 1) : 0,
-        };
-      })
-      .filter(Boolean) as { key: string; label: string; value: string; limit?: string; status: Status; ratio: number; }[];
-  };
-
-  const renderTrendIcon = (status: Status) => {
-    if (status === "breach" || status === "warning")
-      return <span className="trig-trend trig-trend--up">&#8599;</span>;
-    return <span className="trig-trend trig-trend--flat">&#8212;</span>;
-  };
-
-  const renderValuePill = (rawVal: any, guideline: number | undefined, isLiquidity: boolean) => {
-    const numVal = parseNumericValue(rawVal);
-    const status = isLiquidity ? "safe" as Status : getStatus(numVal, guideline);
-    const displayVal = isLiquidity ? (typeof rawVal === "number" ? rawVal.toFixed(2) : rawVal) : rawVal;
-    return (
-      <Box className="trig-val-cell">
-        {renderTrendIcon(status)}
-        <span className={`trig-pill trig-pill--${status}`}>{displayVal}</span>
-      </Box>
-    );
-  };
-
-  const renderCurrentLevelTable = (sectionKey: string, section: SectionData) => {
-    const cfg = SECTION_CONFIG[sectionKey];
-    const firstColKey = cfg?.firstColKey || "fund";
-    const firstColLabel = cfg?.firstColLabel || "Fund";
-    const valueKey = cfg?.valueKey || sectionKey;
-    const valueLabel = cfg?.valueLabel || sectionKey;
-    const isLiquidity = sectionKey === "liquidity";
-    const titleParts = section.title.split(": Guideline ");
-    const titleName = titleParts[0];
-    const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
-    const guideline = getGuideline(sectionKey);
-
-    if (isLiquidity) {
-      return (
-        <Box key={sectionKey} className="trig-metric">
-          <Box className="trig-metric-head">
-            <Typography className="trig-metric-name">{titleName}</Typography>
-            {guidelineDisplay && <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>}
-          </Box>
-          <Box className="trig-liq-scroll">
-            <Box className="trig-liq-grid">
-              {!section.data || section.data.length === 0 ? (
-                <Typography className="trig-empty">No data</Typography>
-              ) : (
-                section.data.map((row: any, i: number) => {
-                  const rawVal = row[valueKey];
-                  const isTotalRow = row[firstColKey] === "Total";
-                  return (
-                    <Box
-                      key={i}
-                      className={`trig-liq-card ${isTotalRow ? "trig-liq-card--total" : ""}`}
-                    >
-                      <Typography className="trig-liq-fund">{row[firstColKey]}</Typography>
-                      <Box className="trig-liq-value-wrap">
-                        <span className="trig-liq-value">{rawVal}</span>
-                      </Box>
-                    </Box>
-                  );
-                })
-              )}
-            </Box>
-          </Box>
-        </Box>
-      );
-    }
-
-    return (
-      <Box key={sectionKey} className="trig-metric">
-        <Box className="trig-metric-head">
-          <Typography className="trig-metric-name">{titleName}</Typography>
-          {guidelineDisplay && <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>}
-        </Box>
-        <table className="trig-table">
-          <thead>
-            <tr>
-              <th className="trig-th-l">{firstColLabel.toUpperCase()}</th>
-              <th className="trig-th-r">{valueLabel.toUpperCase()}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!section.data || section.data.length === 0 ? (
-              <tr><td colSpan={2} className="trig-empty">No data</td></tr>
-            ) : (
-              section.data.map((row: any, i: number) => {
-                const rawVal = row[valueKey];
-                const isTotalRow = row[firstColKey] === "Total";
-                return (
-                  <tr key={i} className={isTotalRow ? "trig-total-row" : ""}>
-                    <td className={`trig-td-l ${isTotalRow ? "trig-total-cell" : ""}`}>{row[firstColKey]}</td>
-                    <td className={`trig-td-r ${isTotalRow ? "trig-total-cell" : ""}`}>
-                      {isTotalRow
-                        ? <span className="trig-total-val">{rawVal}</span>
-                        : renderValuePill(rawVal, guideline, isLiquidity)}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </Box>
-    );
-  };
-
-  const renderCurrentLevelCard = (sectionKey: string, section: SectionData) => {
-    const cfg = SECTION_CONFIG[sectionKey];
-    if (!cfg || !section.data?.length) return null;
-    const guideline = getGuideline(sectionKey);
-    const theme = SECTION_CARD_THEME[sectionKey] || DEFAULT_CARD_THEME;
-    const titleParts = section.title.split(": Guideline ");
-    const titleName = titleParts[0];
-    const subtitle = cfg.valueLabel;
-
-    return (
-      <Box
-        key={sectionKey}
-        className="trig-mini-card"
-        style={
-          {
-            "--card-accent": theme.accent,
-            "--card-soft": theme.soft,
-          } as React.CSSProperties
-        }
-      >
-        <Box className="trig-mini-card-head">
-          <Box className="trig-mini-card-title-wrap">
-            <span className="trig-mini-card-icon">{theme.icon}</span>
-            <Typography className="trig-mini-card-title">{titleName}</Typography>
-          </Box>
-          {guideline != null && (
-            <span className="trig-mini-guideline">{guideline.toFixed(1)}%</span>
-          )}
-        </Box>
-        <Typography className="trig-mini-card-subtitle">{subtitle}</Typography>
-
-        {section.data.map((row, idx) => {
-          const rawVal = row[cfg.valueKey];
-          const numVal = parseNumericValue(rawVal);
-          const status = getStatus(numVal, guideline);
-          const displayValue = typeof rawVal === "string" ? rawVal : `${rawVal}`;
-          const fundName = row[cfg.firstColKey] || "Fund";
-
-          return (
-            <Box key={idx} sx={{ mt: idx === 0 ? 0.5 : 0.3 }}>
-              <Typography className="trig-mini-card-fund">{fundName}</Typography>
-              <Box className="trig-mini-card-value-row">
-                <Typography className={`trig-mini-card-value trig-mini-card-value--${status}`}>
-                  {displayValue}
-                </Typography>
-                {renderTrendIcon(status)}
-              </Box>
-            </Box>
-          );
-        })}
-      </Box>
-    );
-  };
-
-  const renderExposureBars = (sectionKey: string, section: SectionData) => {
-    const cfg = SECTION_CONFIG[sectionKey];
-    if (!cfg) return null;
-    const titleParts = section.title.split(": Guideline ");
-    const rawTitle = titleParts[0];
-    const titleName = sectionKey === "issuer_delta_net_exposure" ? `All ${rawTitle}` : rawTitle;
-    const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
-    const dataRows = section.data || [];
-    const nonTotalRows = dataRows.filter((row) => row[cfg.firstColKey] !== "Total");
-    const totalRow = dataRows.find((row) => row[cfg.firstColKey] === "Total");
-
-    return (
-      <Box key={sectionKey} className={`trig-bar-section trig-bar-section--${sectionKey}`}>
-        <Box className="trig-bar-section-head">
-          <Box className="trig-bar-section-title-wrap">
-            <span className="trig-bar-section-dot" />
-            <Typography className="trig-bar-section-title">{titleName}</Typography>
-          </Box>
-          {guidelineDisplay && (
-            <span className="trig-guideline-tag">Guideline {guidelineDisplay}</span>
-          )}
-        </Box>
-
-        <Box className="trig-exp-card-scroll">
-          <Box className="trig-exp-card-grid">
-            {nonTotalRows.length === 0 ? (
-              <Typography className="trig-empty">No data</Typography>
-            ) : (
-              nonTotalRows.map((row, idx) => {
-                const rawVal = row[cfg.valueKey];
-                const numVal = parseSignedNumericValue(rawVal);
-                const isNegative = numVal < 0;
-                const label = row[cfg.firstColKey];
-                const isBreach = breachedIssuers.has((label || "").trim().toLowerCase());
-                return (
-                  <Box
-                    key={`${sectionKey}-${idx}-${label}`}
-                    className={`trig-exp-card ${isNegative ? "trig-exp-card--neg" : ""}`}
-                    sx={isBreach ? {
-                      borderColor: "#dc2626 !important",
-                      borderWidth: "2px !important",
-                      backgroundColor: "#fef2f2",
-                      position: "relative",
-                    } : {}}
-                  >
-                    {isBreach && (
-                      <Box sx={{
-                        position: "absolute",
-                        top: -8,
-                        right: 8,
-                        fontSize: 9,
-                        fontWeight: 700,
-                        color: "#fff",
-                        backgroundColor: "#dc2626",
-                        borderRadius: "4px",
-                        px: 0.6,
-                        py: 0.1,
-                        lineHeight: 1.4,
-                        letterSpacing: 0.3,
-                      }}>
-                        BREACH
-                      </Box>
-                    )}
-                    <Typography className="trig-exp-card-label">{label}</Typography>
-                    <Box className="trig-exp-card-value-wrap">
-                      <span className={`trig-exp-card-value ${isBreach ? "trig-exp-card-value--neg" : isNegative ? "trig-exp-card-value--neg" : "trig-exp-card-value--pos"}`}>
-                        {rawVal}
-                      </span>
-                    </Box>
-                  </Box>
-                );
-              })
-            )}
-          </Box>
-        </Box>
-
-        {totalRow && (
-          <Box className="trig-bar-total">
-            <Typography className="trig-bar-total-label">Total</Typography>
-            <Typography className="trig-bar-total-value">{totalRow[cfg.valueKey]}</Typography>
-          </Box>
-        )}
-      </Box>
-    );
-  };
-
-  /* ── Derive display groups ── */
-  const summaryCards = data ? getSummaryCards() : [];
-  const currentLevelEntries = data?.current_levels ? Object.entries(data.current_levels) : [];
-  const liquidityEntry = currentLevelEntries.find(([k]) => k === "liquidity");
-  const exposureEntries = currentLevelEntries.filter(([k]) => EXPOSURE_BAR_KEYS.has(k));
-  const cardEntries = currentLevelEntries.filter(([k]) =>
-    k !== "liquidity" && !EXPOSURE_BAR_KEYS.has(k)
-  );
-  const metricsCount = cardEntries.length;
-
-  // Build set of breached issuer names from limits data
-  const breachedIssuers = new Set<string>();
-  if (data?.limits) {
-    for (const limitSection of Object.values(data.limits)) {
-      for (const row of limitSection.data || []) {
-        if (row.top_10_issuers) {
-          breachedIssuers.add(row.top_10_issuers.trim().toLowerCase());
-        }
-      }
-    }
+  /* ── Derived data ── */
+  interface SummaryCard {
+    key: string; label: string; subtitle: string; status: Status; ratio: number; pct: number;
+    limit?: string;
+    funds: { name: string; value: string; status: Status }[];
   }
 
-  const fundsLabel =
-    selectedFunds.length === 0
-      ? "Fund"
-      : selectedFunds.length === 1
-        ? selectedFunds[0]
-        : selectedFunds.length === portfolios.length
-          ? "All Funds"
-          : `${selectedFunds[0]} +${selectedFunds.length - 1}`;
+  const getSummaryCards = (): SummaryCard[] => {
+    if (!data?.current_levels) return [];
+    return SUMMARY_KEYS.filter((k) => data.current_levels[k]).map((key) => {
+      const section = data.current_levels[key];
+      const cfg = SECTION_CONFIG[key];
+      if (!cfg) return null;
+      const rows = section.data || [];
+      if (!rows.length) return null;
+      const guideline = getGuideline(key);
 
-  // Compare edit values (as numbers) to saved values
-  const hasGuidelineChanges = (() => {
-    const editAsNumbers: Record<string, number> = {};
-    for (const [k, v] of Object.entries(editGuidelines)) {
-      const num = parseFloat(v);
-      if (Number.isFinite(num)) editAsNumbers[k] = num;
+      const funds = rows.map((row) => {
+        const raw = row[cfg.valueKey];
+        const num = parseNumericValue(raw);
+        const st = getStatus(num, guideline);
+        return { name: row[cfg.firstColKey] || "Fund", value: typeof raw === "string" ? raw : `${raw}%`, status: st };
+      });
+
+      const maxAbs = Math.max(...funds.map((f) => parseNumericValue(f.value)));
+      const overallStatus = getStatus(maxAbs, guideline);
+      const ratio = guideline ? maxAbs / guideline : 0;
+
+      return {
+        key, label: section.title || cfg.summaryLabel || key, subtitle: cfg.valueLabel,
+        status: overallStatus, ratio, pct: Math.round(Math.min(ratio, 1) * 100),
+        limit: guideline ? `${guideline.toFixed(1)}%` : undefined, funds,
+      };
+    }).filter(Boolean) as SummaryCard[];
+  };
+
+  const summaryCards = data ? getSummaryCards() : [];
+  const entries = data?.current_levels ? Object.entries(data.current_levels) : [];
+  const liquidityEntry = entries.find(([k]) => k === "liquidity");
+  const exposureEntries = entries.filter(([k]) => EXPOSURE_KEYS.has(k));
+
+  const breachedIssuers = new Set<string>();
+  if (data?.limits) {
+    for (const s of Object.values(data.limits)) for (const r of s.data || []) if (r.top_10_issuers) breachedIssuers.add(r.top_10_issuers.trim().toLowerCase());
+  }
+
+  // Alerts
+  const alerts: { name: string; desc: string; status: Status }[] = [];
+  if (data) {
+    for (const c of summaryCards) {
+      const topVal = c.funds[0]?.value || "N/A";
+      if (c.status === "breach") alerts.push({ name: `${c.label} breach`, desc: `Current: ${topVal} | Limit: ${c.limit || "N/A"}`, status: "breach" });
+      else if (c.status === "warning") alerts.push({ name: `${c.label} elevated`, desc: `Approaching: ${topVal} vs ${c.limit || "N/A"}`, status: "warning" });
     }
-    return JSON.stringify(editAsNumbers) !== JSON.stringify(savedGuidelines);
+    if (breachedIssuers.size > 0) alerts.push({ name: "Concentration risk", desc: `Top issuers: ${Array.from(breachedIssuers).slice(0, 3).join(", ")}`, status: "warning" });
+  }
+
+  // Insights
+  const insights: { icon: string; text: string }[] = [];
+  if (data && summaryCards.length > 0) {
+    const bc = summaryCards.filter((c) => c.status === "breach").length;
+    const wc = summaryCards.filter((c) => c.status === "warning").length;
+    if (bc === 0 && wc === 0) insights.push({ icon: "\u2713", text: "All metrics within tolerance levels." });
+    if (bc > 0) insights.push({ icon: "\u26A0", text: `${bc} metric${bc > 1 ? "s" : ""} breaching guidelines.` });
+    if (wc > 0) insights.push({ icon: "\u2191", text: `${wc} metric${wc > 1 ? "s" : ""} approaching limits.` });
+    if (breachedIssuers.size > 0) insights.push({ icon: "\u25CF", text: `Issuer concentration: ${breachedIssuers.size} issuer${breachedIssuers.size > 1 ? "s" : ""} flagged.` });
+  }
+
+  const fundsLabel = selectedFunds.length === 0 ? "Fund" : selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds.length === portfolios.length ? "All Funds" : `${selectedFunds[0]} +${selectedFunds.length - 1}`;
+
+  const hasGuidelineChanges = (() => {
+    const nums: Record<string, number> = {};
+    for (const [k, v] of Object.entries(editGuidelines)) { const n = parseFloat(v); if (Number.isFinite(n)) nums[k] = n; }
+    return JSON.stringify(nums) !== JSON.stringify(savedGuidelines);
   })();
 
-  return (
-    <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
-      {/* ════ HEADER BAR ════ */}
-      <Box className="trig-header">
-        <Box className="trig-header-left">
-          <IconButton onClick={() => navigate(-1)} sx={{ color: "#fff" }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography className="trig-header-title">
-            {fundsLabel} Limits and Alerts
-          </Typography>
-        </Box>
-        <Box className="trig-header-right">
-          <FormControl size="small" sx={{ minWidth: 140 }}>
-            <Select
-              value={
-                selectedFunds.length === portfolios.length && portfolios.length > 0
-                  ? "__ALL__"
-                  : selectedFunds.length === 1
-                    ? selectedFunds[0]
-                    : "__ALL__"
-              }
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === "__ALL__") {
-                  setSelectedFunds([...portfolios]);
-                } else {
-                  setSelectedFunds([val]);
-                }
-              }}
-              sx={{
-                color: "#fff",
-                ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.5)" },
-                ".MuiSvgIcon-root": { color: "#fff" },
-                fontSize: 13,
-                borderRadius: "8px",
-                backgroundColor: "rgba(255,255,255,0.1)",
-              }}
-              renderValue={(selected) =>
-                selected === "__ALL__" ? "All Funds" : selected
-              }
-            >
-              <MenuItem value="__ALL__">All Funds</MenuItem>
-              {portfolios.map((p) => (
-                <MenuItem key={p} value={p}>{p}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+  const inputSx = {
+    "& .MuiOutlinedInput-root": { borderRadius: "8px", backgroundColor: "#f8fafc", "& fieldset": { borderColor: "#e2e8f0" }, "&:hover fieldset": { borderColor: "#94a3b8" }, "&.Mui-focused fieldset": { borderColor: "#002060" } },
+    "& .MuiInputBase-input": { color: "#1e293b", fontSize: 13 },
+  };
 
-          <Box className="trig-header-date-nav">
-            <IconButton
-              size="small"
-              onClick={() => setSelectedDate(shiftDate(selectedDate, -1))}
-              sx={{ color: "rgba(255,255,255,0.6)", "&:hover": { color: "#fff" } }}
-            >
-              <ChevronLeftIcon fontSize="small" />
-            </IconButton>
-            <TextField
-              type="date"
-              size="small"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="trig-header-date"
-            />
-            <IconButton
-              size="small"
-              onClick={() => setSelectedDate(shiftDate(selectedDate, 1))}
-              sx={{ color: "rgba(255,255,255,0.6)", "&:hover": { color: "#fff" } }}
-            >
-              <ChevronRightIcon fontSize="small" />
-            </IconButton>
+  const renderTrendIcon = (status: Status) => (
+    status === "breach" || status === "warning"
+      ? <span className="trig-trend trig-trend--up">&#8599;</span>
+      : <span className="trig-trend trig-trend--flat">&#8212;</span>
+  );
+
+  return (
+    <Box className="trig-page">
+      <Container maxWidth="lg" disableGutters sx={{ px: 3 }}>
+        {/* ════ HEADER ════ */}
+        <Box className="trig-header">
+          <Box className="trig-header-left">
+            <IconButton onClick={() => navigate(-1)} sx={{ color: "rgba(255,255,255,0.6)", "&:hover": { color: "#fff" } }}><ArrowBackIcon /></IconButton>
+            <Typography className="trig-header-title">{fundsLabel} Limits and Alerts</Typography>
+          </Box>
+          <Box className="trig-header-right">
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={selectedFunds.length === portfolios.length && portfolios.length > 0 ? "__ALL__" : selectedFunds.length === 1 ? selectedFunds[0] : "__ALL__"}
+                onChange={(e) => { const v = e.target.value; setSelectedFunds(v === "__ALL__" ? [...portfolios] : [v]); }}
+                sx={{ color: "#fff", ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.25)" }, "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.4)" }, ".MuiSvgIcon-root": { color: "rgba(255,255,255,0.6)" }, fontSize: 13, fontWeight: 600, borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.1)" }}
+                renderValue={(s) => s === "__ALL__" ? "All Funds" : s}
+              >
+                <MenuItem value="__ALL__">All Funds</MenuItem>
+                {portfolios.map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
+              </Select>
+            </FormControl>
+
+            <Box className="trig-header-date-nav">
+              <IconButton size="small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#fff" } }}><ChevronLeftIcon fontSize="small" /></IconButton>
+              <TextField type="date" size="small" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="trig-header-date" />
+              <IconButton size="small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#fff" } }}><ChevronRightIcon fontSize="small" /></IconButton>
+            </Box>
           </Box>
         </Box>
-      </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>
-      )}
+        {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
+        {loading && <Box className="trig-loading"><CircularProgress sx={{ color: "#002060" }} /></Box>}
 
-      {/* ════ EDIT GUIDELINES PANEL ════ */}
-      <Box
-        sx={{
-          mt: 2,
-          borderRadius: 2,
-          border: "1px solid #e2e8f0",
-          backgroundColor: "#fff",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          onClick={() => setGuidelinesExpanded((prev) => !prev)}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 2.5,
-            py: 1.5,
-            cursor: "pointer",
-            backgroundColor: guidelinesExpanded ? "#f8fafc" : "#fff",
-            "&:hover": { backgroundColor: "#f8fafc" },
-            transition: "background-color 0.2s",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <EditIcon sx={{ fontSize: 18, color: "#002060" }} />
-            <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#002060" }}>
-              Edit Guidelines
-            </Typography>
-            {Object.keys(savedGuidelines).length > 0 && (
-              <Box
-                sx={{
-                  ml: 1,
-                  px: 1,
-                  py: 0.2,
-                  borderRadius: "10px",
-                  backgroundColor: "#dbeafe",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "#1d4ed8",
-                }}
-              >
-                Custom
+        {!loading && data && (
+          <>
+            {/* ════ GUIDELINES PANEL (TOP) ════ */}
+            <Box className="trig-guidelines-panel">
+              <Box className="trig-guidelines-toggle" onClick={() => setGuidelinesExpanded((p) => !p)}>
+                <Box className="trig-guidelines-toggle-left">
+                  <EditIcon sx={{ fontSize: 18, color: "#002060" }} />
+                  <Typography className="trig-guidelines-toggle-title">Edit Guidelines</Typography>
+                  {Object.keys(savedGuidelines).length > 0 && <span className="trig-guidelines-custom-badge">Custom</span>}
+                </Box>
+                {guidelinesExpanded ? <ExpandLessIcon sx={{ color: "#64748b" }} /> : <ExpandMoreIcon sx={{ color: "#64748b" }} />}
+              </Box>
+              <Collapse in={guidelinesExpanded}>
+                <Box className="trig-guidelines-content">
+                  <Box className="trig-guidelines-grid">
+                    {GUIDELINE_FIELDS.map((f) => (
+                      <Box key={f.key} sx={{ display: "flex", flexDirection: "column" }}>
+                        <Typography className="trig-guidelines-field-label">{f.label}</Typography>
+                        <TextField size="small" type="number" value={f.key in editGuidelines ? editGuidelines[f.key] : String(defaultGuidelines[f.key])}
+                          onChange={(e) => setEditGuidelines((p) => ({ ...p, [f.key]: e.target.value }))}
+                          inputProps={{ style: { fontSize: 13, padding: "8px 12px" }, step: "0.1" }}
+                          sx={inputSx} />
+                      </Box>
+                    ))}
+                  </Box>
+                  <Box className="trig-guidelines-actions">
+                    <Button variant="outlined" size="small" onClick={handleResetGuidelines}
+                      sx={{ textTransform: "none", borderRadius: "8px", color: "#64748b", borderColor: "#e2e8f0", fontSize: 13, px: 2.5, "&:hover": { borderColor: "#94a3b8", backgroundColor: "#f1f5f9" } }}>
+                      Reset to Defaults
+                    </Button>
+                    <Button variant="contained" size="small" onClick={handleSaveGuidelines} disabled={savingGuidelines || !hasGuidelineChanges}
+                      startIcon={savingGuidelines ? <CircularProgress size={14} color="inherit" /> : <SaveIcon sx={{ fontSize: 16 }} />}
+                      sx={{ textTransform: "none", borderRadius: "8px", backgroundColor: "#002060", fontSize: 13, px: 2.5, "&:hover": { backgroundColor: "#001540" }, "&.Mui-disabled": { backgroundColor: "#94a3b8", color: "#fff" } }}>
+                      Save & Apply
+                    </Button>
+                  </Box>
+                </Box>
+              </Collapse>
+            </Box>
+
+            {/* ════ SUMMARY CARDS ════ */}
+            {summaryCards.length > 0 && (
+              <Box className="trig-summary-row">
+                {summaryCards.map((c) => (
+                  <Box key={c.key} className={`trig-scard trig-scard--${c.status}`}>
+                    <Box className="trig-scard-top">
+                      <Box>
+                        <Typography className="trig-scard-label">{c.label}</Typography>
+                        <Typography className="trig-scard-subtitle">{c.subtitle}</Typography>
+                      </Box>
+                      <CircularGauge ratio={c.ratio} status={c.status} label={`${c.pct}%`} />
+                    </Box>
+                    {c.funds.map((f, idx) => (
+                      <Box key={idx} sx={{ mt: idx === 0 ? 1 : 0.5 }}>
+                        <Typography className="trig-scard-fund">{f.name}</Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Typography className={`trig-scard-value trig-scard-value--${f.status}`}>{f.value}</Typography>
+                          {renderTrendIcon(f.status)}
+                        </Box>
+                      </Box>
+                    ))}
+                    <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      {c.limit && <Typography className="trig-scard-limit">Limit: {c.limit}</Typography>}
+                      <Box className={`trig-scard-status trig-scard-status--${c.status}`}>
+                        <span className="trig-scard-status-dot" />
+                        {c.status === "breach" ? "Above limit" : c.status === "warning" ? "Elevated" : `Within ${c.limit || "limit"}`}
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
               </Box>
             )}
-          </Box>
-          {guidelinesExpanded ? (
-            <ExpandLessIcon sx={{ color: "#64748b" }} />
-          ) : (
-            <ExpandMoreIcon sx={{ color: "#64748b" }} />
-          )}
-        </Box>
 
-        <Collapse in={guidelinesExpanded}>
-          <Box
-            sx={{
-              px: 2.5,
-              py: 2,
-              borderTop: "1px solid #e2e8f0",
-              backgroundColor: "#f8fafc",
-            }}
-          >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-                gap: 2,
-              }}
-            >
-              {GUIDELINE_FIELDS.map((field) => {
-                const currentVal = field.key in editGuidelines
-                  ? editGuidelines[field.key]
-                  : String(defaultGuidelines[field.key]);
-                return (
-                  <Box key={field.key} sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#475569" }}>
-                      {field.label}
+            {/* ════ ALERTS & INSIGHTS ROW ════ */}
+            {(alerts.length > 0 || insights.length > 0) && (
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, mb: 3 }}>
+                <Box className="trig-side-card">
+                  <Box className="trig-side-head">
+                    <Typography className="trig-side-title">
+                      <span style={{ color: "#d97706" }}>&#9888;</span> Alerts
+                      {alerts.length > 0 && <span className="trig-side-badge trig-side-badge--red">{alerts.length}</span>}
                     </Typography>
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={currentVal}
-                      onChange={(e) => handleEditGuidelineChange(field.key, e.target.value)}
-                      inputProps={{
-                        style: { fontSize: 13, padding: "8px 12px" },
-                        step: "0.1",
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: "8px",
-                          backgroundColor: "#fff",
-                          "& fieldset": { borderColor: "#cbd5e1" },
-                          "&:hover fieldset": { borderColor: "#94a3b8" },
-                          "&.Mui-focused fieldset": { borderColor: "#002060" },
-                        },
-                      }}
-                    />
                   </Box>
-                );
-              })}
-            </Box>
+                  {alerts.length === 0 ? (
+                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No active alerts</Typography>
+                  ) : (
+                    alerts.map((a, i) => (
+                      <Box key={i} className="trig-alert-item">
+                        <Box className={`trig-alert-icon trig-alert-icon--${a.status}`}>{a.status === "breach" ? "\u26A0" : "\u25B2"}</Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography className="trig-alert-name">{a.name}</Typography>
+                          <Typography className="trig-alert-desc">{a.desc}</Typography>
+                        </Box>
+                        <span className="trig-alert-chevron">&#8250;</span>
+                      </Box>
+                    ))
+                  )}
+                </Box>
+                <Box className="trig-side-card">
+                  <Box className="trig-side-head">
+                    <Typography className="trig-side-title">
+                      <span style={{ color: "#7c3aed" }}>&#128161;</span> Insights
+                    </Typography>
+                  </Box>
+                  {insights.length === 0 ? (
+                    <Typography sx={{ fontSize: 13, color: "#94a3b8", textAlign: "center", py: 2, fontStyle: "italic" }}>No insights</Typography>
+                  ) : (
+                    insights.map((ins, i) => (
+                      <Box key={i} className="trig-insight-item">
+                        <span className="trig-insight-icon">{ins.icon}</span>
+                        <Typography className="trig-insight-text">{ins.text}</Typography>
+                      </Box>
+                    ))
+                  )}
+                </Box>
+              </Box>
+            )}
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, mt: 2.5, pt: 2, borderTop: "1px solid #e2e8f0" }}>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={handleResetGuidelines}
-                sx={{
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  color: "#64748b",
-                  borderColor: "#cbd5e1",
-                  fontSize: 13,
-                  px: 2.5,
-                  "&:hover": { borderColor: "#94a3b8", backgroundColor: "#f1f5f9" },
-                }}
-              >
-                Reset to Defaults
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                onClick={handleSaveGuidelines}
-                disabled={savingGuidelines || !hasGuidelineChanges}
-                startIcon={savingGuidelines ? <CircularProgress size={14} color="inherit" /> : <SaveIcon sx={{ fontSize: 16 }} />}
-                sx={{
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#002060",
-                  fontSize: 13,
-                  px: 2.5,
-                  "&:hover": { backgroundColor: "#001540" },
-                  "&.Mui-disabled": { backgroundColor: "#94a3b8", color: "#fff" },
-                }}
-              >
-                Save & Apply
-              </Button>
-            </Box>
-          </Box>
-        </Collapse>
-      </Box>
+            {/* ════ TOP 10 ISSUER TABLE (with exposure bars) ════ */}
+            {exposureEntries.filter(([k]) => k === "top_10_issuer_delta_net_exposure").map(([sectionKey, section]) => {
+              const cfg = SECTION_CONFIG[sectionKey];
+              if (!cfg) return null;
+              const rows = section.data || [];
+              const nonTotal = rows.filter((r) => r[cfg.firstColKey] !== "Total");
+              const totalRow = rows.find((r) => r[cfg.firstColKey] === "Total");
+              const maxVal = Math.max(...nonTotal.map((r) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
 
-      {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-          <CircularProgress sx={{ color: "#002060" }} />
-        </Box>
-      )}
+              return (
+                <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
+                  <Box className="trig-panel-head">
+                    <Box className="trig-panel-head-left">
+                      <span className="trig-issuer-dot trig-issuer-dot--red" />
+                      <Typography className="trig-panel-title">{section.title}</Typography>
+                    </Box>
+                    {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
+                  </Box>
+                  <Box className="trig-table-wrap">
+                    <table className="trig-table">
+                      <thead>
+                        <tr>
+                          <th className="trig-th-l" style={{ width: 40 }}>#</th>
+                          <th className="trig-th-l">ISSUER</th>
+                          <th className="trig-th-l" style={{ width: 220 }}>EXPOSURE</th>
+                          <th className="trig-th-r" style={{ width: 130 }}>NET EXPOSURE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {nonTotal.map((row, idx) => {
+                          const raw = row[cfg.valueKey];
+                          const num = parseSignedNumericValue(raw);
+                          const absNum = Math.abs(num);
+                          const isNeg = num < 0;
+                          const barWidth = Math.min((absNum / maxVal) * 100, 100);
+                          const barColor = absNum > 4 ? "#2563eb" : absNum > 2 ? "#0f766e" : "#16a34a";
+                          return (
+                            <tr key={idx}>
+                              <td className="trig-td-rank">{idx + 1}</td>
+                              <td className="trig-td-l">{row[cfg.firstColKey]}</td>
+                              <td>
+                                <Box className="trig-bar-cell">
+                                  <Box className="trig-bar-track">
+                                    <Box className="trig-bar-fill" style={{ width: `${barWidth}%`, background: barColor }} />
+                                  </Box>
+                                </Box>
+                              </td>
+                              <td className="trig-td-r">
+                                <span className={`trig-pill ${isNeg ? "trig-pill--breach" : absNum > 3 ? "trig-pill--warning" : "trig-pill--safe"}`}>{raw}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </Box>
+                </Box>
+              );
+            })}
 
-      {!loading && data && (
-        <>
-          {/* ════ METRIC CARDS ════ */}
-          {cardEntries.length > 0 && (
-            <Box className="trig-mini-grid" sx={{ mt: 2 }}>
-              {cardEntries.map(([k, s]) => renderCurrentLevelCard(k, s))}
-            </Box>
-          )}
+            {/* ════ ALL ISSUER — CARD GRID ════ */}
+            {exposureEntries.filter(([k]) => k === "issuer_delta_net_exposure").map(([sectionKey, section]) => {
+              const cfg = SECTION_CONFIG[sectionKey];
+              if (!cfg) return null;
+              const rows = section.data || [];
+              const nonTotal = rows.filter((r) => r[cfg.firstColKey] !== "Total");
+              const totalRow = rows.find((r) => r[cfg.firstColKey] === "Total");
+              const needle = issuerSearch.trim().toUpperCase();
+              const filtered = needle ? nonTotal.filter((r) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : nonTotal;
 
-          {exposureEntries.map(([k, s]) => renderExposureBars(k, s))}
+              return (
+                <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
+                  <Box className="trig-panel-head">
+                    <Box className="trig-panel-head-left">
+                      <span className="trig-issuer-dot trig-issuer-dot--green" />
+                      <Typography className="trig-panel-title">All {section.title}</Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
+                      <span className="trig-panel-badge trig-panel-badge--green">{nonTotal.length} Issuers</span>
+                    </Box>
+                  </Box>
+                  <TextField
+                    size="small" placeholder="Search issuers..." value={issuerSearch}
+                    onChange={(e) => setIssuerSearch(e.target.value)}
+                    sx={{ mb: 2, width: 280, ...inputSx }}
+                  />
+                  <Box className="trig-card-grid-scroll">
+                    <Box className="trig-card-grid">
+                      {filtered.length === 0 ? (
+                        <Typography className="trig-empty">No issuers found</Typography>
+                      ) : (
+                        filtered.map((row, idx) => {
+                          const raw = row[cfg.valueKey];
+                          const num = parseSignedNumericValue(raw);
+                          const absNum = Math.abs(num);
+                          const isNeg = num < 0;
+                          const isBreach = breachedIssuers.has((row[cfg.firstColKey] || "").trim().toLowerCase());
+                          const pillClass = isBreach || isNeg ? "trig-pill--breach" : absNum > 3 ? "trig-pill--warning" : "trig-pill--safe";
+                          return (
+                            <Box key={`${sectionKey}-${idx}`} className={`trig-ticker-card ${isBreach ? "trig-ticker-card--breach" : ""}`}>
+                              <Typography className="trig-ticker-card-name">{row[cfg.firstColKey]}</Typography>
+                              <span className={`trig-pill ${pillClass}`}>{raw}</span>
+                            </Box>
+                          );
+                        })
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              );
+            })}
 
-          {liquidityEntry && (
-            <Box className="trig-section">
-              {renderCurrentLevelTable(liquidityEntry[0], liquidityEntry[1])}
-            </Box>
-          )}
-        </>
-      )}
-    </Container>
+            {/* ════ LIQUIDITY — FULL WIDTH CARD GRID ════ */}
+            {liquidityEntry && (() => {
+              const [, section] = liquidityEntry;
+              const cfg = SECTION_CONFIG["liquidity"];
+              const titleParts = section.title.split(": Guideline ");
+              const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
+              const rows = section.data || [];
+              const needle = liqSearch.trim().toUpperCase();
+              const filtered = needle ? rows.filter((r: any) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : rows;
+
+              return (
+                <Box className="trig-panel" sx={{ mb: 3 }}>
+                  <Box className="trig-panel-head">
+                    <Box className="trig-panel-head-left">
+                      <Box className="trig-panel-icon trig-panel-icon--green">&#9900;</Box>
+                      <Typography className="trig-panel-title">{titleParts[0]}</Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {guidelineDisplay && <span className="trig-panel-badge trig-panel-badge--green">Guideline {guidelineDisplay}</span>}
+                      <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Positions</span>
+                    </Box>
+                  </Box>
+                  <TextField
+                    size="small" placeholder="Search tickers..." value={liqSearch}
+                    onChange={(e) => setLiqSearch(e.target.value)}
+                    sx={{ mb: 2, width: 280, ...inputSx }}
+                  />
+                  <Box className="trig-card-grid-scroll">
+                    <Box className="trig-card-grid">
+                      {filtered.length === 0 ? (
+                        <Typography className="trig-empty">No tickers found</Typography>
+                      ) : (
+                        filtered.map((row: any, i: number) => {
+                          const val = parseNumericValue(row[cfg.valueKey]);
+                          const pillClass = val > 5 ? "trig-pill--breach" : val > 1 ? "trig-pill--warning" : "trig-pill--safe";
+                          return (
+                            <Box key={i} className="trig-ticker-card">
+                              <Typography className="trig-ticker-card-name">{row[cfg.firstColKey]}</Typography>
+                              <span className={`trig-pill ${pillClass}`}>{row[cfg.valueKey]}</span>
+                            </Box>
+                          );
+                        })
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              );
+            })()}
+          </>
+        )}
+      </Container>
+    </Box>
   );
 };
 
