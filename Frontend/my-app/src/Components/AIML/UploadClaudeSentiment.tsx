@@ -186,11 +186,11 @@ const UploadClaudeSentiment: React.FC = () => {
       setError(null);
       try {
         const [ipoTickers, foTickers] = await Promise.all([
-          fetchIpoTickers(),
+          fetchUpcomingIpoTickers(),
           fetchFoTickers(),
         ]);
         const combined: TickerOption[] = [
-          ...ipoTickers.map((deal, idx) => ({
+          ...ipoTickers.map((deal: Deal, idx: number) => ({
             ...deal,
             id: `ipo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
             label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
