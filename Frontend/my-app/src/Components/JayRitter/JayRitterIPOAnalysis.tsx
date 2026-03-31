@@ -766,7 +766,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
           {/* Top bar: subtitle left, dropdown right */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
             <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 600 }}>
-              Ritter Academic Framework · US IPOs · 180-Day Lookback
+              Gator Academic Framework · US IPOs · 180-Day Lookback
             </Typography>
             <FormControl size="small">
               <Select
@@ -801,7 +801,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
           <Box sx={{ textAlign: "center", mt: 1.5, mb: 3 }}>
             <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.5, mb: 0.6 }}>
               <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem" }, letterSpacing: -0.5 }}>
-                Jay Ritter IPO Analysis
+                Gator IPO Analysis
               </Typography>
               <Box
                 onClick={() => setChatOpen(true)}
@@ -837,7 +837,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
               >
                 <SmartToyOutlinedIcon sx={{ fontSize: 16, color: "#e0d0ff", filter: "drop-shadow(0 0 4px rgba(124,77,255,0.6))" }} />
                 <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", whiteSpace: "nowrap", letterSpacing: 0.3 }}>
-                  Ritter Analyst
+                  Gator Analyst
                 </Typography>
                 <Box sx={{
                   width: 6, height: 6, borderRadius: "50%",

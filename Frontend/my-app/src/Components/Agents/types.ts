@@ -95,7 +95,7 @@ export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
   "IPO Ranking Agent": "/last_30_days_ai_ranking",
   "Deal(IPO) Agent": "/ai_unsupervised_summary",
   "Sentiment Agent": "/ai_sentiment_summary",
-  "Jay Ritter IPO Agent": "/jay_ritter_ipo_analysis",
+  "Gator IPO Agent": "/gator_ipo_analysis",
 };
 
 export const SCHEDULE_LABELS: Record<string, string> = {
