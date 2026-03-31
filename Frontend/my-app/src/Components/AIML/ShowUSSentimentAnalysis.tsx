@@ -7,7 +7,12 @@ import ShowSentimentAnalysis from "./ShowSentimentAnalysis";
 type SentimentTickerOption = {
   id: string;
   ticker: string;
+  unique_deal_id: string;
+  issuer_name: string;
   pricing_date?: string | null;
+  sentiment_date: string;
+  updated_at: string;
+  created_at: string;
 };
 
 const ShowUSSentimentAnalysis: React.FC = () => {
@@ -47,10 +52,15 @@ const ShowUSSentimentAnalysis: React.FC = () => {
         }
 
         const items = Array.isArray(data?.tickers)
-          ? (data.tickers as { ticker: string; pricing_date?: string | null }[]).map((t, idx) => ({
-            id: `${t.ticker}-${t.pricing_date ?? idx}`,
+          ? (data.tickers as any[]).map((t) => ({
+            id: t.unique_deal_id,
             ticker: t.ticker,
+            unique_deal_id: t.unique_deal_id,
+            issuer_name: t.issuer_name,
             pricing_date: t.pricing_date ?? null,
+            sentiment_date: t.sentiment_date,
+            updated_at: t.updated_at,
+            created_at: t.created_at,
           }))
           : [];
         setSentimentOptions(items);

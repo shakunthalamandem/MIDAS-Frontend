@@ -50,7 +50,7 @@ const fetchFoTickers = async (): Promise<Deal[]> => {
     .map((item: any) => ({
       ticker: String(item.ticker ?? "").trim(),
       unique_deal_id: item.unique_deal_id ?? item.ticker ?? "",
-      deal_type: item.deal_type ?? "FO",
+      deal_type: item.deal_type ?? "IPO",
       fo_type: item.fo_type ?? undefined,
       region: item.region ?? undefined,
       issuer_name: item.issuer_name ?? undefined,
@@ -185,22 +185,12 @@ const UploadClaudeSentiment: React.FC = () => {
       setLoadingTickers(true);
       setError(null);
       try {
-        const [ipoTickers, foTickers] = await Promise.all([
-          fetchUpcomingIpoTickers(),
-          fetchFoTickers(),
-        ]);
-        const combined: TickerOption[] = [
-          ...ipoTickers.map((deal: Deal, idx: number) => ({
-            ...deal,
-            id: `ipo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
-            label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
-          })),
-          ...foTickers.map((deal, idx) => ({
-            ...deal,
-            id: `fo-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
-            label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
-          })),
-        ];
+        const foTickers = await fetchFoTickers();
+        const combined: TickerOption[] = foTickers.map((deal, idx) => ({
+          ...deal,
+          id: `IPO-${idx}-${deal.ticker}-${deal.unique_deal_id}`,
+          label: `${deal.ticker} (${deal.deal_type})${deal.region ? ` - ${deal.region}` : ""}`,
+        }));
         setTickers(combined);
       } catch (err: any) {
         setError(err.message || "Failed to load tickers");
@@ -325,6 +315,47 @@ const UploadClaudeSentiment: React.FC = () => {
                 />
               )}
             />
+
+            {/* Selected Ticker Display */}
+            {selectedTicker && (
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  background: "#eef2ff",
+                  border: "1px solid #c7d2fe",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 1,
+                    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {selectedTicker.ticker.slice(0, 2)}
+                </Box>
+                <Box>
+                  <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#000000" }}>
+                    {selectedTicker.ticker}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.75rem", color: "#4f46e5", fontWeight: 500 }}>
+                    {selectedTicker.deal_type} • {selectedTicker.unique_deal_id}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
             {/* Sentiment Field */}
             <TextField
               label="Sentiment Analysis"
@@ -351,6 +382,19 @@ const UploadClaudeSentiment: React.FC = () => {
               disabled={uploading}
             />
 
+            {/* Sentiment Summary Field */}
+            <TextField
+              label="Sentiment Summary"
+              placeholder="Enter sentiment summary..."
+              value={sentimentSummary}
+              onChange={(e) => setSentimentSummary(e.target.value)}
+              multiline
+              rows={4}
+              fullWidth
+              variant="outlined"
+              disabled={uploading}
+            />
+
             {/* One Week Sentiment Field */}
             <TextField
               label="One Week Sentiment"
@@ -370,19 +414,6 @@ const UploadClaudeSentiment: React.FC = () => {
               placeholder="Enter one month sentiment analysis..."
               value={oneMonthSentiment}
               onChange={(e) => setOneMonthSentiment(e.target.value)}
-              multiline
-              rows={4}
-              fullWidth
-              variant="outlined"
-              disabled={uploading}
-            />
-
-            {/* Sentiment Summary Field */}
-            <TextField
-              label="Sentiment Summary"
-              placeholder="Enter sentiment summary..."
-              value={sentimentSummary}
-              onChange={(e) => setSentimentSummary(e.target.value)}
               multiline
               rows={4}
               fullWidth
