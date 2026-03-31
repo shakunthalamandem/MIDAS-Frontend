@@ -103,7 +103,7 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
             <Box sx={{ mb: 1, "& p": { margin: 0 } }}>
               <Typography
                 component="div"
-                sx={{ fontSize: "0.78rem", color: "#64748b", fontWeight: 500 }}
+                sx={{ fontSize: "0.78rem", color: "#000000", fontWeight: 600 }}
               >
                 <ReactMarkdown>{normalizedSubtitle}</ReactMarkdown>
               </Typography>
@@ -117,16 +117,16 @@ const GENAICardBlock: React.FC<GENAICardBlockProps> = ({
                 margin: 0,
                 fontSize: "0.84rem",
                 lineHeight: 1.7,
-                color: "#334155",
+                color: "#000000",
               },
-              "& strong": { color: "#0f172a", fontWeight: 700 },
+              "& strong": { color: "#000000", fontWeight: 700 },
               "& ul, & ol": {
                 pl: 2,
                 my: 0.5,
                 "& li": {
                   fontSize: "0.84rem",
                   lineHeight: 1.7,
-                  color: "#334155",
+                  color: "#000000",
                   mb: 0.3,
                 },
               },

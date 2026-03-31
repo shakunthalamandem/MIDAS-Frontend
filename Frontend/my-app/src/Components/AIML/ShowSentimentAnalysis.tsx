@@ -306,8 +306,8 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
                       <Typography sx={{ fontWeight: 700, fontSize: "0.85rem", color: "#0f172a" }}>
                         {option.ticker}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-                        {formatPricingDate(option.pricing_date)}
+                      <Typography sx={{ fontSize: "0.72rem", color: "#000000", fontWeight: 500 }}>
+                        Pricing Date: {formatPricingDate(option.pricing_date)}
                       </Typography>
                     </Box>
                   </Box>
@@ -375,10 +375,10 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
             )}
 
             {latestDate && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 1, ml: 0.5 }}>
-                <CalendarTodayRoundedIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
-                <Typography sx={{ fontSize: "0.72rem", fontWeight: 500, color: "#94a3b8" }}>
-                  Last Updated: {new Date(latestDate).toISOString().split("T")[0]}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, mt: 1.5, ml: 0.5 }}>
+                <CalendarTodayRoundedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
+                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#000000" }}>
+                  Last Updated: <strong>{new Date(latestDate).toISOString().split("T")[0]}</strong>
                 </Typography>
               </Box>
             )}
@@ -475,6 +475,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
               gap: 1,
               mb: 2.5,
               flexWrap: "wrap",
+              justifyContent: "center",
             }}
           >
             {tabs.map((tab, idx) =>

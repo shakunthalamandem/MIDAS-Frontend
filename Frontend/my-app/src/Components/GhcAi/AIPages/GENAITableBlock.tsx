@@ -85,7 +85,7 @@ const GENATableBlock: React.FC<{
                       fontSize: "0.75rem",
                       textTransform: "uppercase",
                       letterSpacing: "0.06em",
-                      color: "#475569",
+                      color: "#000000",
                       py: 1.4,
                       px: 2,
                       whiteSpace: "nowrap",
@@ -113,10 +113,10 @@ const GENATableBlock: React.FC<{
                       py: 1.3,
                       px: 2,
                       fontSize: "0.84rem",
-                      color: "#334155",
+                      color: "#000000",
                       lineHeight: 1.6,
                       "& p": { margin: 0, fontSize: "0.84rem", lineHeight: 1.6 },
-                      "& strong": { color: "#0f172a", fontWeight: 700 },
+                      "& strong": { color: "#000000", fontWeight: 700 },
                     },
                   }}
                 >

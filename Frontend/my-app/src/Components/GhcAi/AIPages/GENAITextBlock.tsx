@@ -20,12 +20,12 @@ const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => 
         "& p": {
           fontSize: "0.88rem",
           lineHeight: 1.75,
-          color: "#334155",
+          color: "#000000",
           margin: 0,
           "&:not(:last-child)": { mb: 1.5 },
         },
         "& h1, & h2, & h3, & h4, & h5, & h6": {
-          color: "#0f172a",
+          color: "#000000",
           fontWeight: 700,
           letterSpacing: "-0.01em",
           mt: 0,
@@ -34,16 +34,16 @@ const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => 
         "& h1": { fontSize: "1.25rem" },
         "& h2": { fontSize: "1.1rem" },
         "& h3": { fontSize: "1rem" },
-        "& strong": { color: "#0f172a", fontWeight: 700 },
+        "& strong": { color: "#000000", fontWeight: 700 },
         "& ul, & ol": {
           pl: 2.5,
           my: 1,
           "& li": {
             fontSize: "0.88rem",
             lineHeight: 1.75,
-            color: "#334155",
+            color: "#000000",
             mb: 0.5,
-            "&::marker": { color: "#94a3b8" },
+            "&::marker": { color: "#000000" },
           },
         },
         "& a": {
@@ -66,7 +66,7 @@ const GENAITextBlock: React.FC<{ content: string | number }> = ({ content }) => 
           pl: 2,
           ml: 0,
           my: 1.5,
-          color: "#64748b",
+          color: "#000000",
           fontStyle: "italic",
         },
       }}
