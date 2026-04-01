@@ -2,7 +2,7 @@ import React from "react";
 import { Box, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { AttributionItem } from "./types";
-import { formatCurrency } from "./utils";
+import { formatCurrency, formatFullCurrency } from "./utils";
 
 interface MetricCard {
   key: string;
@@ -85,6 +85,18 @@ const AttributionRowCards: React.FC<AttributionRowCardsProps> = ({
               >
                 {pct.toFixed(2)}%
               </Box>
+
+              {/* Hover overlay with full value */}
+              {!isSelected && (
+                <Box
+                  className="attr-row-card-hover-overlay"
+                  sx={{ background: `linear-gradient(135deg, ${accentColor}ee, ${accentColor}cc)` }}
+                >
+                  <Box className="attr-row-card-hover-label">{card.label}</Box>
+                  <Box className="attr-row-card-hover-value">{formatFullCurrency(value)}</Box>
+                  <Box className="attr-row-card-hover-pct">{pct.toFixed(2)}%</Box>
+                </Box>
+              )}
             </Box>
           );
         })}
