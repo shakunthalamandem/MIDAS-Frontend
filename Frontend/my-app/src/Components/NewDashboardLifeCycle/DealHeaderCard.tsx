@@ -72,10 +72,10 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
         <Box sx={{ textAlign: "center", minWidth: 0 }}>
           <Box
             sx={{
-              display: "flex",
+              display: "grid",
               alignItems: "center",
               justifyContent: "center",
-              flexWrap: { xs: "wrap", md: "nowrap" },
+              gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1fr) auto" },
               gap: { xs: 1.2, md: 1.6 },
               width: "100%",
             }}
@@ -88,10 +88,12 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                 color: "#600e79ff",
                 fontSize: { xs: "1.5rem", md: "1.95rem" },
                 maxWidth: "100%",
-                whiteSpace: { xs: "normal", md: "nowrap" },
+                minWidth: 0,
+                whiteSpace: "normal",
                 overflow: "visible",
                 textOverflow: "clip",
-                wordBreak: "normal",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
                 textAlign: "center",
               }}
               title={titleLabel}
@@ -107,6 +109,7 @@ const DealHeaderCard: React.FC<DealHeaderCardProps> = ({
                   ml: { xs: 0, md: 0.8 },
                   mt: { xs: 0.35, md: 0 },
                   flexShrink: 0,
+                  justifySelf: { xs: "center", md: "start" },
                   borderRadius: 999,
                   textTransform: "none",
                   fontWeight: 800,

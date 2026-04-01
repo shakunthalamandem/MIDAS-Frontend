@@ -36,11 +36,11 @@ const GROUP_BY_LABELS: Record<AttributionGroupBy, string> = {
 
 /* Sub-filters available for each main groupBy tab */
 const SUB_FILTERS: Record<AttributionGroupBy, AttributionGroupBy[]> = {
-  analyst: ["sector", "industry", "holding_period"],
-  sector: ["analyst", "industry", "holding_period"],
-  industry: ["analyst", "sector", "holding_period"],
+  analyst: ["sector", "industry"],
+  sector: ["analyst", "industry"],
+  industry: ["analyst", "sector"],
   holding_period: ["analyst", "sector", "industry"],
-  issuer: ["analyst", "sector", "industry", "holding_period"],
+  issuer: ["analyst", "sector", "industry"],
 };
 
 interface TabTheme {
@@ -184,15 +184,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         flex: 1.4,
         minWidth: 160,
         cellClassName: "attr-detail-cell--name",
-      },
-      {
-        field: "days_hld",
-        headerName: "Days Held",
-        flex: 0.7,
-        minWidth: 90,
-        headerAlign: "right",
-        align: "right",
-        renderCell: ({ value }) => (value != null ? Math.round(value) : "—"),
       },
       {
         field: "dtd_pnl",
