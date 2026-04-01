@@ -231,13 +231,15 @@ const Attribution: React.FC<AttributionProps> = ({
               onRowClick={handleRowClick}
             />
 
-            {/* Area charts in the middle */}
-            <AttributionAreaCharts
-              selectedFunds={selectedFunds}
-              selectedDate={selectedDate}
-              groupBy={groupBy}
-              accentColor={activeTheme.activeTab}
-            />
+            {/* Area charts - only for analyst and sector group_by */}
+            {(groupBy === "analyst" || groupBy === "sector") && (
+              <AttributionAreaCharts
+                selectedFunds={selectedFunds}
+                selectedDate={selectedDate}
+                groupBy={groupBy}
+                accentColor={activeTheme.activeTab}
+              />
+            )}
 
             {/* Metric cards for expanded row */}
             {expandedRow && expandedRowData && (
