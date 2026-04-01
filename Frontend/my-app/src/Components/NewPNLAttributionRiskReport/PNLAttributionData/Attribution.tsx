@@ -231,6 +231,14 @@ const Attribution: React.FC<AttributionProps> = ({
               onRowClick={handleRowClick}
             />
 
+            {/* Area charts in the middle */}
+            <AttributionAreaCharts
+              selectedFunds={selectedFunds}
+              selectedDate={selectedDate}
+              groupBy={groupBy}
+              accentColor={activeTheme.activeTab}
+            />
+
             {/* Metric cards for expanded row */}
             {expandedRow && expandedRowData && (
               <AttributionRowCards
@@ -271,14 +279,6 @@ const Attribution: React.FC<AttributionProps> = ({
                 }}
               />
             )}
-
-            {/* Area charts for all groups */}
-            <AttributionAreaCharts
-              selectedFunds={selectedFunds}
-              selectedDate={selectedDate}
-              groupBy={groupBy}
-              accentColor={activeTheme.activeTab}
-            />
           </>
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
