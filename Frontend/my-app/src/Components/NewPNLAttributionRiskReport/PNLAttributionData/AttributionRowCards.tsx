@@ -57,7 +57,7 @@ const AttributionRowCards: React.FC<AttributionRowCardsProps> = ({
               className={`attr-row-card${isSelected ? " attr-row-card--selected" : ""}`}
               sx={{
                 borderColor: isSelected ? accentColor : undefined,
-                background: isSelected ? accentColor : undefined,
+                background: isSelected ? `${accentColor} !important` : undefined,
               }}
               onClick={() => onCardClick(card.key)}
             >
