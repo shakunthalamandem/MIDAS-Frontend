@@ -454,7 +454,17 @@ const RiskTriggers: React.FC = () => {
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       {top10Guideline && <span className="trig-guideline-tag">Top 10 Guideline: {top10Guideline}%</span>}
-                      {totalRow && <span className="trig-panel-badge trig-panel-badge--blue">Total: {totalRow[cfg.valueKey]}</span>}
+                      {totalRow && (() => {
+                        const totalVal = parseSignedNumericValue(totalRow[cfg.valueKey]);
+                        const guidelineVal = top10Guideline ? parseFloat(String(top10Guideline)) : null;
+                        const isAbove = guidelineVal !== null && totalVal > guidelineVal;
+                        return (
+                          <span className={`trig-panel-badge ${isAbove ? "trig-panel-badge--red" : "trig-panel-badge--green"}`}>
+                            Total: {totalRow[cfg.valueKey]}
+                            {isAbove && <span className="trig-warning-dot" />}
+                          </span>
+                        );
+                      })()}
                     </Box>
                   </Box>
                   <Box className="trig-table-wrap">
