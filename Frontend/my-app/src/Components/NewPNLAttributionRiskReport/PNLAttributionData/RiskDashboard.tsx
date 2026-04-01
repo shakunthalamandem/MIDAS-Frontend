@@ -71,7 +71,9 @@ const RiskDashboard: React.FC = () => {
         const date = result.max_position_date || "";
         setPortfolios(portfolioList);
         if (date) setSelectedDate(date);
-        if (portfolioList.length > 0) setSelectedFunds(portfolioList);
+        if (portfolioList.length > 0) {
+          setSelectedFunds(portfolioList.includes("BHM") ? ["BHM"] : [portfolioList[0]]);
+        }
       } catch (err: any) {
         setError(err.message || "Failed to load portfolios");
       }
