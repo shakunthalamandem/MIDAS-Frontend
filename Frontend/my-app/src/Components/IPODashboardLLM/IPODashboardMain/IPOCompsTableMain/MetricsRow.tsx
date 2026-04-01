@@ -39,6 +39,23 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
     whiteSpace: "nowrap",
   };
 
+  const formatCompetitorText = (text: string) => {
+    if (!text) return text;
+
+    // apply ONLY for single word
+    if (!text.includes(" ") && text.length > 7) {
+      return (
+        <>
+          {text.slice(0, 7)}
+          <br />
+          {text.slice(7)}
+        </>
+      );
+    }
+
+    return text;
+  };
+
   return (
     <TableRow sx={{ backgroundColor: isFirstRow ? "#f2e1d9ff" : "inherit" }}>
       {columns.map((col) => (
@@ -48,11 +65,9 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
           sx={
             col.key === "competitor"
               ? {
-                  ...bodyCellSx,
-                  whiteSpace: "normal",
-                  overflowWrap: "anywhere",
-                  wordBreak: "break-word",
-                }
+                ...bodyCellSx,
+                whiteSpace: "normal",
+              }
               : bodyCellSx
           }
         >
@@ -66,7 +81,9 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
               }}
             />
           ) : (
-            formatValue(col.key, row[col.key])
+            col.key === "competitor"
+              ? formatCompetitorText(row[col.key])
+              : formatValue(col.key, row[col.key])
           )}
         </TableCell>
       ))}
