@@ -69,19 +69,6 @@ const GROUP_BY_TABS: TabTheme[] = [
     exportBg: "#7b1fa2",
   },
   {
-    key: "holding_period",
-    label: "Holding Period",
-    headerBg: "#a5d6a7",
-    activeTab: "#2e7d32",
-    activeTabHover: "#1b5e20",
-    evenRow: "#e8f5e9",
-    hoverRow: "#c8e6c9",
-    pnlColor: "#1b5e20",
-    expColor: "#4a148c",
-    toolbarBg: "#e8f5e9",
-    exportBg: "#2e7d32",
-  },
-  {
     key: "issuer",
     label: "Issuer",
     headerBg: "#9fa8da",
@@ -231,13 +218,15 @@ const Attribution: React.FC<AttributionProps> = ({
               onRowClick={handleRowClick}
             />
 
-            {/* Area charts in the middle */}
-            <AttributionAreaCharts
-              selectedFunds={selectedFunds}
-              selectedDate={selectedDate}
-              groupBy={groupBy}
-              accentColor={activeTheme.activeTab}
-            />
+            {/* Area charts - only for analyst and sector group_by */}
+            {(groupBy === "analyst" || groupBy === "sector") && (
+              <AttributionAreaCharts
+                selectedFunds={selectedFunds}
+                selectedDate={selectedDate}
+                groupBy={groupBy}
+                accentColor={activeTheme.activeTab}
+              />
+            )}
 
             {/* Metric cards for expanded row */}
             {expandedRow && expandedRowData && (

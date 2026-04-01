@@ -78,10 +78,18 @@
 }
 
 .attr-row-card--selected {
-  color: #fff;
-  border-color: transparent;
+  color: #fff !important;
+  border-color: transparent !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
+}
+
+.attr-row-card--selected .attr-row-card-label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.attr-row-card--selected .attr-row-card-value {
+  color: #fff !important;
 }
 
 .attr-row-card-label {
