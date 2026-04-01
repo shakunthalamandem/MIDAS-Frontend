@@ -171,6 +171,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 140px;
+  position: relative;
+  overflow: hidden;
 }
 
 .pnl-chip:hover {
@@ -182,6 +184,52 @@
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
+}
+
+/* ── PnL Chip Hover Overlay ── */
+.pnl-chip-hover-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.pnl-chip:hover .pnl-chip-hover-overlay {
+  opacity: 1;
+}
+
+.pnl-chip--selected .pnl-chip-hover-overlay {
+  display: none;
+}
+
+.pnl-chip-hover-overlay-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.pnl-chip-hover-overlay-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.pnl-chip-hover-overlay-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
 .pnl-chip-label {
