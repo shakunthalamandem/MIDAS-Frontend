@@ -12,8 +12,8 @@ interface HeadlineRisksProps {
 const RISK_CARDS_CONFIG = [
   { key: "aum", label: "AUM", color: "green", icon: "$", showPct: false, clickable: false },
   { key: "gross_market_value", label: "Gross Market Value", color: "blue", icon: "\u{1F4CA}", showPct: true, pctKey: "gross_market_value_pct", clickable: true, category: "gross_market_value" as DashboardCategory },
-  { key: "delta_adj_net_mv", label: "Delta Adj. Net MV", color: "cyan", icon: "\u{1F4C8}", showPct: true, pctKey: "delta_adj_net_mv_pct", clickable: true, category: "delta_adj_net_mv" as DashboardCategory },
-  { key: "beta_adj_net_mv", label: "Beta Adj. Net MV", color: "orange", icon: "\u{1F4C9}", showPct: true, pctKey: "beta_adj_net_mv_pct", clickable: true, category: "beta_adj_net_mv" as DashboardCategory },
+  { key: "delta_adj_net_mv", label: "Delta Adj. Net Exposure", color: "cyan", icon: "\u{1F4C8}", showPct: true, pctKey: "delta_adj_net_mv_pct", clickable: true, category: "delta_adj_net_mv" as DashboardCategory },
+  { key: "beta_adj_net_mv", label: "Beta Adj. Net Exposure", color: "orange", icon: "\u{1F4C9}", showPct: true, pctKey: "beta_adj_net_mv_pct", clickable: true, category: "beta_adj_net_mv" as DashboardCategory },
   { key: "one_yr_1pct_var", label: "1Y 1% VaR", color: "pink", icon: "\u2298", showPct: true, pctOnly: true, pctKey: "one_yr_1pct_var_pct", clickable: false },
 ] as const;
 
