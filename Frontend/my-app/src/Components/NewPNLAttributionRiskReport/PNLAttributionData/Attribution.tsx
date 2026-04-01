@@ -5,6 +5,7 @@ import AttributionTable from "./AttributionTable";
 import AttributionDetail from "./AttributionDetail";
 import AttributionRowCards from "./AttributionRowCards";
 import AttributionChart from "./AttributionChart";
+import AttributionAreaCharts from "./AttributionAreaCharts";
 import "./Attribution.css";
 import "./AttributionRowCards.css";
 
@@ -270,6 +271,14 @@ const Attribution: React.FC<AttributionProps> = ({
                 }}
               />
             )}
+
+            {/* Area charts for all groups */}
+            <AttributionAreaCharts
+              selectedFunds={selectedFunds}
+              selectedDate={selectedDate}
+              groupBy={groupBy}
+              accentColor={activeTheme.activeTab}
+            />
           </>
         ) : (
           <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>

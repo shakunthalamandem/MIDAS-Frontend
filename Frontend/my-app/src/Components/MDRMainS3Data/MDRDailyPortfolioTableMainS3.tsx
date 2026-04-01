@@ -14,6 +14,12 @@ interface MDRDailyPortfolioTableMainS3Props {
   tradeDate?: string;
   pdfMode?: boolean;
   actionsSlot?: React.ReactNode;
+  dealTypeFilter: string[];
+  onDealTypeFilterChange: (value: string[]) => void;
+  dealTypeOptions: string[];
+  regionFilter: string[];
+  onRegionFilterChange: (value: string[]) => void;
+  regionOptions: string[];
 }
 
 /* ========= Helpers used by container ========= */
@@ -79,6 +85,12 @@ const MDRDailyPortfolioTableMainS3: React.FC<
   tradeDate,
   pdfMode = false,
   actionsSlot,
+  dealTypeFilter,
+  onDealTypeFilterChange,
+  dealTypeOptions,
+  regionFilter,
+  onRegionFilterChange,
+  regionOptions,
 }) => {
   const [searchText, setSearchText] = useState<string>("");
 
@@ -129,6 +141,12 @@ const MDRDailyPortfolioTableMainS3: React.FC<
       onExport={exportToExcel}
       pdfMode={pdfMode}
       actionsSlot={actionsSlot}
+      dealTypeFilter={dealTypeFilter}
+      onDealTypeFilterChange={onDealTypeFilterChange}
+      dealTypeOptions={dealTypeOptions}
+      regionFilter={regionFilter}
+      onRegionFilterChange={onRegionFilterChange}
+      regionOptions={regionOptions}
     />
   );
 };

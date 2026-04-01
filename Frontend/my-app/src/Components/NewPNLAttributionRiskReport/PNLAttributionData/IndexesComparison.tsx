@@ -80,7 +80,7 @@ const IndexesComparison: React.FC<IndexesComparisonProps> = ({
                 {value === null
                   ? "--"
                   : cfg.format === "beta"
-                  ? value.toFixed(2)
+                  ? value.toFixed(3)
                   : `${value.toFixed(2)}%`}
               </Box>
             </Box>

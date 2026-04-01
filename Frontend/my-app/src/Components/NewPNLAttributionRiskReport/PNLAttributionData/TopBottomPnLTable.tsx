@@ -8,8 +8,8 @@ import { formatFullCurrency } from "./utils";
 const CATEGORY_LABELS: Record<string, string> = {
   pnl: "P&L (Gross)",
   gross_market_value: "Gross Market Value",
-  delta_adj_net_mv: "Delta Adj. Net MV",
-  beta_adj_net_mv: "Beta Adj. Net MV",
+  delta_adj_net_mv: "Delta Adj. Net Exposure",
+  beta_adj_net_mv: "Beta Adj. Net Exposure",
 };
 
 interface TopBottomPnLTableProps {

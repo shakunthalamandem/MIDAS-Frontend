@@ -42,8 +42,8 @@ export interface DashboardData {
 
 export interface ChartDataPoint {
   date: string;
-  daily_pnl: number;
-  cumulative_pnl: number;
+  daily_pnl?: number;
+  cumulative_pnl?: number;
 }
 
 export interface IndexComparisonChartPoint {
@@ -122,6 +122,26 @@ export type AttributionGroupBy =
   | "industry"
   | "holding_period"
   | "issuer";
+
+export interface AttributionAreaDataPoint {
+  date: string;
+  value: number;
+  value_pct: number;
+}
+
+export interface AttributionAreaSeries {
+  name: string;
+  data: AttributionAreaDataPoint[];
+}
+
+export interface AttributionAreaChartResponse {
+  date: string;
+  fund: string[];
+  group_by: AttributionGroupBy;
+  ytd_pnl: AttributionAreaSeries[];
+  net_exp: AttributionAreaSeries[];
+  beta_adj_net: AttributionAreaSeries[];
+}
 
 export interface TickerItem {
   ticker: string;

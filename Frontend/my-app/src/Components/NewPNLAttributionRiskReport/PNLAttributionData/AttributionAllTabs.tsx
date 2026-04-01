@@ -153,10 +153,7 @@ const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTa
       fetchAllData: fetchAll,
     }), [fetchAll]);
 
-    // Also fetch on mount so data is ready
-    useEffect(() => {
-      fetchAll();
-    }, [fetchAll]);
+    // Only fetch when explicitly triggered via ref (for PDF export), not on mount
 
     if (loading) {
       return (
