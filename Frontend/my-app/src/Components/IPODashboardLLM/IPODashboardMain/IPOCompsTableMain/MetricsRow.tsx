@@ -42,7 +42,20 @@ const MetricsRow: React.FC<MetricsRowProps> = ({
   return (
     <TableRow sx={{ backgroundColor: isFirstRow ? "#f2e1d9ff" : "inherit" }}>
       {columns.map((col) => (
-        <TableCell key={col.key} align="center" sx={bodyCellSx}>
+        <TableCell
+          key={col.key}
+          align="center"
+          sx={
+            col.key === "competitor"
+              ? {
+                  ...bodyCellSx,
+                  whiteSpace: "normal",
+                  overflowWrap: "anywhere",
+                  wordBreak: "break-word",
+                }
+              : bodyCellSx
+          }
+        >
           {isFirstRow && editIndex === idx && col.key !== "competitor" ? (
             <TextField
               size="small"
