@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Table,
@@ -22,8 +23,12 @@ import { Search as SearchIcon } from "@mui/icons-material";
 
 interface SentimentData {
   ticker: string;
+  issuer_name?: string;
+  pricing_date: string;
   one_week_sentiment: string | null;
   one_month_sentiment: string | null;
+  sentiment_score?: number;
+  socialmedia_retail_sentiment_score?: number;
 }
 
 interface VolatilityOutlook {
@@ -76,17 +81,19 @@ interface PortfolioItem {
 
 type SortField =
   | "ticker"
+  | "pricing_date"
   | "sentiment_week"
   | "sentiment_month"
+  | "deal_agent"
   | "ml_prediction"
-  | "ipo_action"
-  | "trading_signal"
   | "jay_ritter";
 
 type SortOrder = "asc" | "desc";
 
 const PortfolioIntegratedDataTable: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<PortfolioItem[]>([]);
+  const [maxTradeDate, setMaxTradeDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -97,6 +104,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     order: "asc",
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 100;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +127,24 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         }
 
         const jsonData = await response.json();
-        setData(Array.isArray(jsonData) ? jsonData : []);
+
+        // Extract max_trade_date and portfolio data
+        if (jsonData && typeof jsonData === 'object') {
+          const maxDate = jsonData.max_trade_date || null;
+          setMaxTradeDate(maxDate);
+
+          // Map portfolio data - handle both array and nested structure
+          const portfolioData = Array.isArray(jsonData)
+            ? jsonData
+            : Array.isArray(jsonData.data)
+            ? jsonData.data
+            : Array.isArray(jsonData.tickers)
+            ? jsonData.tickers
+            : [];
+          setData(portfolioData);
+        } else {
+          setData(Array.isArray(jsonData) ? jsonData : []);
+        }
         setError(null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch portfolio data");
@@ -170,16 +196,17 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     switch (field) {
       case "ticker":
         return item.ticker || "";
+      case "pricing_date":
+        return item.sentiment_summary?.pricing_date || "";
       case "sentiment_week":
         return item.sentiment_summary?.one_week_sentiment || "";
       case "sentiment_month":
         return item.sentiment_summary?.one_month_sentiment || "";
+      case "deal_agent":
+        const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
+        return volatilityOutlook?.["1-Week Sentiment"] || "";
       case "ml_prediction":
         return item.ml_results?.t1w_pred || "";
-      case "ipo_action":
-        return item.ipo_ranking?.decision?.action || "";
-      case "trading_signal":
-        return item.trading_signal?.signal || "";
       case "jay_ritter":
         return item.jay_ritter?.overall_signal || "";
       default:
@@ -196,7 +223,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         (item.ticker && item.ticker.toLowerCase().includes(query)) ||
         (item.sentiment_summary?.one_week_sentiment && item.sentiment_summary.one_week_sentiment.toLowerCase().includes(query)) ||
         (item.sentiment_summary?.one_month_sentiment && item.sentiment_summary.one_month_sentiment.toLowerCase().includes(query)) ||
-        (item.trading_signal?.signal && item.trading_signal.signal.toLowerCase().includes(query)) ||
         (item.jay_ritter?.overall_signal && item.jay_ritter.overall_signal.toLowerCase().includes(query))
       );
     });
@@ -219,11 +245,42 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     return sorted;
   }, [filteredData, sortConfig]);
 
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
       field,
       order: prev.field === field && prev.order === "asc" ? "desc" : "asc",
     }));
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const handleTickerClick = (item: PortfolioItem) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append("ticker", item.ticker);
+    queryParams.append("pricing_date", item.sentiment_summary?.pricing_date || "");
+    queryParams.append("issuer_name", item.sentiment_summary?.issuer_name || "");
+
+    window.open(`/deals/new_dashboard/details?${queryParams.toString()}`, "_blank");
   };
 
   if (loading) {
@@ -249,7 +306,21 @@ const PortfolioIntegratedDataTable: React.FC = () => {
       px: 2,
       mb: 3,
     }}>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Box>
+          {maxTradeDate && (
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600,
+                color: "#555",
+                fontSize: "0.95rem",
+              }}
+            >
+              Data As of: <span style={{ fontWeight: 700, color: "#1a237e" }}>{maxTradeDate}</span>
+            </Typography>
+          )}
+        </Box>
         <TextField
           placeholder="Search ticker, issuer..."
           value={searchQuery}
@@ -329,6 +400,23 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     backgroundColor: "#cfe3f1",
                     fontWeight: 700,
                     py: 2.2,
+                    minWidth: 140,
+                  }}
+                >
+                  <TableSortLabel
+                    active={sortConfig.field === "pricing_date"}
+                    direction={sortConfig.field === "pricing_date" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("pricing_date")}
+                  >
+                    Pricing Date
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
                     minWidth: 210,
                   }}
                 >
@@ -339,7 +427,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("sentiment_week")}
                   >
-                    Sentiment
+                    Sentiment Agent
                   </TableSortLabel>
                 </TableCell>
 
@@ -351,7 +439,13 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     minWidth: 250,
                   }}
                 >
-                  Unsupervised Analysis
+                  <TableSortLabel
+                    active={sortConfig.field === "deal_agent"}
+                    direction={sortConfig.field === "deal_agent" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("deal_agent")}
+                  >
+                    Deal (IPO) Agent
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell
@@ -369,24 +463,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("ml_prediction")}
                   >
-                    ML Predictions
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
-                    minWidth: 190,
-                  }}
-                >
-                  <TableSortLabel
-                    active={sortConfig.field === "ipo_action"}
-                    direction={sortConfig.field === "ipo_action" ? sortConfig.order : "asc"}
-                    onClick={() => handleSort("ipo_action")}
-                  >
-                    IPO Ranking
+                  Factors Based Agent
                   </TableSortLabel>
                 </TableCell>
 
@@ -403,31 +480,14 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     direction={sortConfig.field === "jay_ritter" ? sortConfig.order : "asc"}
                     onClick={() => handleSort("jay_ritter")}
                   >
-                    Jay Ritter Signal
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
-                    minWidth: 180,
-                  }}
-                >
-                  <TableSortLabel
-                    active={sortConfig.field === "trading_signal"}
-                    direction={sortConfig.field === "trading_signal" ? sortConfig.order : "asc"}
-                    onClick={() => handleSort("trading_signal")}
-                  >
-                    Trading Signal
+                    Gator Signal
                   </TableSortLabel>
                 </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {sortedData.map((item, index) => {
+              {paginatedData.map((item, index) => {
                 const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
 
                 return (
@@ -443,10 +503,33 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                       },
                     }}
                   >
-                    <TableCell sx={{ fontWeight: 700 }}>{item.ticker}</TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        color: "#1a237e",
+                        "&:hover": {
+                          textDecoration: "underline",
+                          color: "#0d1b5f",
+                        }
+                      }}
+                      onClick={() => handleTickerClick(item)}
+                    >
+                      {item.ticker}
+                    </TableCell>
+
+                    <TableCell>{item.sentiment_summary?.pricing_date || "N/A"}</TableCell>
 
                     <TableCell>
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
+                        <Tooltip title="Social Media & Retail Sentiment Score">
+                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#1a237e", fontSize: "0.75rem" }}>
+                            {item.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined && item.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                              ? `Score: ${item.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                              : "Score: N/A"}
+                          </Typography>
+                        </Tooltip>
+
                         {item.sentiment_summary?.one_week_sentiment && (
                           <Chip
                             label={`1W: ${item.sentiment_summary.one_week_sentiment}`}
@@ -547,46 +630,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     </TableCell>
 
                     <TableCell>
-                      {item.ipo_ranking?.decision?.action ? (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <Tooltip
-                            title={`Confidence: ${item.ipo_ranking.decision.confidence_level}`}
-                          >
-                            <Chip
-                              label={item.ipo_ranking.decision.action}
-                              size="small"
-                              color={
-                                item.ipo_ranking.decision.action.toLowerCase().includes("buy")
-                                  ? "success"
-                                  : item.ipo_ranking.decision.action
-                                    .toLowerCase()
-                                    .includes("sell")
-                                    ? "error"
-                                    : "warning"
-                              }
-                              sx={{ fontWeight: 700, width: "fit-content" }}
-                            />
-                          </Tooltip>
-                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                              Confidence:
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {item.ipo_ranking.decision.confidence_level}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              ★ {item.ipo_ranking.decision.conviction_rating}/5
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
                       {item.jay_ritter?.overall_signal ? (
                         <Tooltip title={`Confidence: ${item.jay_ritter.confidence_score}%`}>
                           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
@@ -613,34 +656,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                         </Typography>
                       )}
                     </TableCell>
-
-                    <TableCell>
-                      {item.trading_signal?.signal ? (
-                        <Tooltip title={`Confidence: ${item.trading_signal.confidence}%`}>
-                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                            <Chip
-                              label={item.trading_signal.signal}
-                              size="small"
-                              color={
-                                item.trading_signal.signal.toLowerCase() === "buy"
-                                  ? "success"
-                                  : item.trading_signal.signal.toLowerCase() === "sell"
-                                  ? "error"
-                                  : "warning"
-                              }
-                              sx={{ fontWeight: 700, width: "fit-content" }}
-                            />
-                            <Typography variant="caption" color="text.secondary">
-                              {item.trading_signal.confidence}% confidence
-                            </Typography>
-                          </Box>
-                        </Tooltip>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
-                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -648,6 +663,29 @@ const PortfolioIntegratedDataTable: React.FC = () => {
           </Table>
         </TableContainer>
       </Paper>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 2, gap: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          {startIndex + 1}–{endIndex} of {sortedData.length}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+          >
+            ‹
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            ›
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 };

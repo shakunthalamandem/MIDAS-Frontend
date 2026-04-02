@@ -329,7 +329,7 @@ const PortfolioFODataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("sentiment_week")}
                   >
-                    Sentiment
+                    Sentiment Agent
                   </TableSortLabel>
                 </TableCell>
 
@@ -348,7 +348,7 @@ const PortfolioFODataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("ml_prediction")}
                   >
-                    ML Predictions
+                    Factors Based Agent
                   </TableSortLabel>
                 </TableCell>
 

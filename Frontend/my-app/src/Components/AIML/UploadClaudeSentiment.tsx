@@ -126,24 +126,33 @@ const uploadSentiment = async (
   socialMediaSentiment: string,
   oneWeekSentiment: string,
   oneMonthSentiment: string,
-  sentimentSummary: string
+  sentimentSummary: string,
+  sentimentScore: string,
+  socialMediaSentimentScore: string
 ) => {
   const token = localStorage.getItem("access_token");
+
+  // Build payload with only non-empty fields
+  const payload: any = {
+    ticker,
+    unique_deal_id: uniqueDealId,
+  };
+
+  if (sentiment.trim()) payload.sentiment = sentiment;
+  if (socialMediaSentiment.trim()) payload.socialmedia_retail_sentiment = socialMediaSentiment;
+  if (oneWeekSentiment.trim()) payload.one_week_sentiment = oneWeekSentiment;
+  if (oneMonthSentiment.trim()) payload.one_month_sentiment = oneMonthSentiment;
+  if (sentimentSummary.trim()) payload.sentiment_summary = sentimentSummary;
+  if (sentimentScore.trim()) payload.sentiment_score = sentimentScore;
+  if (socialMediaSentimentScore.trim()) payload.socialmedia_sentiment_score = socialMediaSentimentScore;
+
   const res = await fetch(`${apiUrl}/api/upload_claude_sentiment/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: token ? `Bearer ${token}` : "",
     },
-    body: JSON.stringify({
-      ticker,
-      unique_deal_id: uniqueDealId,
-      sentiment,
-      socialmedia_retail_sentiment: socialMediaSentiment,
-      one_week_sentiment: oneWeekSentiment,
-      one_month_sentiment: oneMonthSentiment,
-      sentiment_summary: sentimentSummary,
-    }),
+    body: JSON.stringify(payload),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Failed to upload sentiment");
@@ -158,6 +167,8 @@ const UploadClaudeSentiment: React.FC = () => {
   const [oneWeekSentiment, setOneWeekSentiment] = useState("");
   const [oneMonthSentiment, setOneMonthSentiment] = useState("");
   const [sentimentSummary, setSentimentSummary] = useState("");
+  const [sentimentScore, setSentimentScore] = useState("");
+  const [socialMediaSentimentScore, setSocialMediaSentimentScore] = useState("");
   const [loadingTickers, setLoadingTickers] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -213,8 +224,10 @@ const UploadClaudeSentiment: React.FC = () => {
     const trimmedOneWeekSentiment = oneWeekSentiment.trim();
     const trimmedOneMonthSentiment = oneMonthSentiment.trim();
     const trimmedSentimentSummary = sentimentSummary.trim();
+    const trimmedSentimentScore = sentimentScore.trim();
+    const trimmedSocialMediaSentimentScore = socialMediaSentimentScore.trim();
 
-    if (!trimmedSentiment && !trimmedSocialMediaSentiment && !trimmedOneWeekSentiment && !trimmedOneMonthSentiment && !trimmedSentimentSummary) {
+    if (!trimmedSentiment && !trimmedSocialMediaSentiment && !trimmedOneWeekSentiment && !trimmedOneMonthSentiment && !trimmedSentimentSummary && !trimmedSentimentScore && !trimmedSocialMediaSentimentScore) {
       setError("Please enter at least one sentiment field");
       return;
     }
@@ -231,7 +244,9 @@ const UploadClaudeSentiment: React.FC = () => {
         trimmedSocialMediaSentiment,
         trimmedOneWeekSentiment,
         trimmedOneMonthSentiment,
-        trimmedSentimentSummary
+        trimmedSentimentSummary,
+        trimmedSentimentScore,
+        trimmedSocialMediaSentimentScore
       );
 
       setSuccess(`Successfully uploaded sentiment for ${selectedTicker.ticker}`);
@@ -240,6 +255,8 @@ const UploadClaudeSentiment: React.FC = () => {
       setOneWeekSentiment("");
       setOneMonthSentiment("");
       setSentimentSummary("");
+      setSentimentScore("");
+      setSocialMediaSentimentScore("");
       setSelectedTicker(null);
       setTickerSearchValue("");
     } catch (err: any) {
@@ -416,6 +433,28 @@ const UploadClaudeSentiment: React.FC = () => {
               onChange={(e) => setOneMonthSentiment(e.target.value)}
               multiline
               rows={4}
+              fullWidth
+              variant="outlined"
+              disabled={uploading}
+            />
+
+            {/* Sentiment Score Field */}
+            <TextField
+              label="Sentiment Score"
+              placeholder="Enter sentiment score (e.g., 0-100)..."
+              value={sentimentScore}
+              onChange={(e) => setSentimentScore(e.target.value)}
+              fullWidth
+              variant="outlined"
+              disabled={uploading}
+            />
+
+            {/* Social Media Sentiment Score Field */}
+            <TextField
+              label="Social Media Sentiment Score"
+              placeholder="Enter social media sentiment score (e.g., 0-100)..."
+              value={socialMediaSentimentScore}
+              onChange={(e) => setSocialMediaSentimentScore(e.target.value)}
               fullWidth
               variant="outlined"
               disabled={uploading}

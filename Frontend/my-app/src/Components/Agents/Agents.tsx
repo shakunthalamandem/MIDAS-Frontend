@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -27,6 +28,7 @@ import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService"
 const POLL_INTERVAL_MS = 15_000;
 
 const Agents: React.FC = () => {
+  const navigate = useNavigate();
   const isAdmin = localStorage.getItem("is_superuser") === "true";
 
   const [agents, setAgents] = useState<AIAgent[]>([]);
@@ -281,6 +283,51 @@ const Agents: React.FC = () => {
               </Box>
             )}
           </Stack>
+        </Box>
+      </Box>
+
+      {/* ── Portfolio Summary Banner ── */}
+      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, pt: 4, pb: 2 }}>
+        <Box
+          onClick={() => window.open("/portfolio_summary", "_blank")}
+          sx={{
+            bgcolor: "#fff",
+            border: "1px solid #c7d2fe",
+            borderRadius: 4,
+            p: 3.5,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: "0 10px 25px rgba(79, 70, 229, 0.15)",
+              borderColor: "#4f46e5",
+              transform: "translateY(-2px)",
+            },
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: { xs: "1rem", md: "1.25rem" },
+              fontWeight: 700,
+              color: "#111827",
+              letterSpacing: "-0.025em",
+            }}
+          >
+            US Current Portfolio (IPO) Summary Dashboard
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "1.5rem",
+              color: "#4f46e5",
+              fontWeight: 700,
+              ml: 2,
+              flexShrink: 0,
+            }}
+          >
+            →
+          </Typography>
         </Box>
       </Box>
 

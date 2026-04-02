@@ -8,7 +8,7 @@ import {
   Tab,
   Typography,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
@@ -43,6 +43,7 @@ const REGION_DISABLED_VALUES = new Set(["EMEA", "APAC"]);
 const NewDashboardLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const payload = (location.state as { payload?: any } | null)?.payload;
   const viewMode = (location.state as { viewMode?: "card" | "table" } | null)?.viewMode;
   const targetTabLabel = (location.state as { targetTabLabel?: string } | null)?.targetTabLabel;
@@ -50,6 +51,23 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const [showDealBot, setShowDealBot] = React.useState(false);
   const appliedTabRef = React.useRef<string | null>(null);
+
+  // Read query parameters for auto-fill
+  React.useEffect(() => {
+    const ticker = searchParams.get("ticker");
+    const pricingDate = searchParams.get("pricing_date");
+    const issuerName = searchParams.get("issuer_name");
+
+    if (ticker && pricingDate) {
+      // Store the search criteria in selectedOption to trigger search
+      // The NewDashbaordIPOTickerList component will handle the search
+      setSelectedOption({
+        ticker: ticker,
+        pricing_date: pricingDate,
+        issuer_name: issuerName,
+      });
+    }
+  }, [searchParams]);
 
   const activePayload = selectedOption || payload;
   const writeupEnabled =
@@ -72,7 +90,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: "Sentiment Agent" },
       { label: " Deal(IPO) Agent" },
       { label: "Factors Based Agent" },
-     
+
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
@@ -111,7 +129,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     }
   }, [targetTabLabel, tabItems, writeupEnabled]);
 
-  if (!payload) {
+  // Only show "no details" if there's no activePayload AND no search is in progress (no selectedOption from query params)
+  if (!activePayload && !selectedOption && !payload) {
     return (
       <Container maxWidth="md" sx={{ mt: 6 }}>
         <Paper sx={{ p: 3, borderRadius: 3 }}>
