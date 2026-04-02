@@ -391,7 +391,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("sentiment_week")}
                   >
-                    Sentiment
+                    Sentiment Agent
                   </TableSortLabel>
                 </TableCell>
 
@@ -403,7 +403,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     minWidth: 250,
                   }}
                 >
-                  Unsupervised Analysis
+                  Deal (IPO) Agent
                 </TableCell>
 
                 <TableCell
@@ -421,7 +421,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     }
                     onClick={() => handleSort("ml_prediction")}
                   >
-                    ML Predictions
+                  Factors Based Agent
                   </TableSortLabel>
                 </TableCell>
 
@@ -438,7 +438,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     direction={sortConfig.field === "jay_ritter" ? sortConfig.order : "asc"}
                     onClick={() => handleSort("jay_ritter")}
                   >
-                    Jay Ritter Signal
+                    Gator Signal
                   </TableSortLabel>
                 </TableCell>
               </TableRow>
