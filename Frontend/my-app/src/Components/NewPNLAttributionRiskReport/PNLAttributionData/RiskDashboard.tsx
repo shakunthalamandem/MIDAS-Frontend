@@ -445,7 +445,7 @@ const RiskDashboard: React.FC = () => {
                     </Box>
                   ))}
                 </Box>
-                {(data.headline_pnl || selectedCategory !== "pnl") && (
+                {/* {(data.headline_pnl || selectedCategory !== "pnl") && (
                   <HeadlinePnL
                     data={data.headline_pnl}
                     selectedMetric={selectedMetric}
@@ -455,7 +455,7 @@ const RiskDashboard: React.FC = () => {
                     metricHeadlineData={metricHeadlineData}
                     metricHeadlineLoading={metricHeadlineLoading}
                   />
-                )}
+                )} */}
               </Box>
             </Box>
           )}

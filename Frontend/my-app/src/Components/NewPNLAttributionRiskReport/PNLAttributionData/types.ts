@@ -24,9 +24,17 @@ export interface HeadlinePnl {
 export interface IndexesComparison {
   one_month_beta_sp: number;
   one_month_beta_russell: number;
+  one_month_volatility_portfolio: number;
+  one_month_volatility_sp: number;
   one_month_volatility_1_sp: number;
+  six_month_volatility_portfolio: number;
+  six_month_volatility_sp: number;
   six_month_volatility_1_sp: number;
+  ytd_volatility_portfolio: number;
+  ytd_volatility_sp_value: number;
   ytd_volatility_sp: number;
+  drawdown_portfolio: number;
+  drawdown_sp: number;
   drawdown_1_sp: number;
 }
 
@@ -50,9 +58,17 @@ export interface IndexComparisonChartPoint {
   date: string;
   one_month_beta_sp: number;
   one_month_beta_russell: number;
+  one_month_volatility_portfolio: number;
+  one_month_volatility_sp: number;
   one_month_volatility_1_sp: number;
+  six_month_volatility_portfolio: number;
+  six_month_volatility_sp: number;
   six_month_volatility_1_sp: number;
+  ytd_volatility_portfolio: number;
+  ytd_volatility_sp_value: number;
   ytd_volatility_sp: number;
+  drawdown_portfolio: number;
+  drawdown_sp: number;
   drawdown_1_sp: number;
 }
 
