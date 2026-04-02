@@ -114,7 +114,7 @@ const SectorwiseTable: React.FC = () => {
 
         const data: ApiResponse = await response.json();
 
-        // Handle nested structure: Sectorwise: { "2025 H1": { ... }, ... }
+        // Handle nested structure: Sectorwise: { "2026 Q1": { ... }, ... }
         let sectorObj: Record<string, SectorMetrics> = {};
 
         if (
@@ -123,10 +123,10 @@ const SectorwiseTable: React.FC = () => {
           !Array.isArray(Object.values(data.Sectorwise)[0])
         ) {
           // Nested by period
-          if ((data.Sectorwise as Record<string, any>)["2025 H1"]) {
-            sectorObj = (data.Sectorwise as Record<string, any>)["2025 H1"];
+          if ((data.Sectorwise as Record<string, any>)["2026 Q1"]) {
+            sectorObj = (data.Sectorwise as Record<string, any>)["2026 Q1"];
           } else {
-            // fallback: pick the latest period if "2025 H1" not found
+            // fallback: pick the latest period if "2026 Q1" not found
             const periods = Object.keys(data.Sectorwise);
             const latest = periods.sort().reverse()[0];
             sectorObj = (data.Sectorwise as Record<string, any>)[latest] || {};
@@ -177,7 +177,7 @@ const SectorwiseTable: React.FC = () => {
               p: 1.5,
             }}
           >
-            Sector-wise Skew Table for 2025  –{" "}
+            Sector-wise Skew Table for 2026  –{" "}
             <span style={{ color: "red" }}>Highlighted Key Sectors</span>
           </Typography>
         </Box>

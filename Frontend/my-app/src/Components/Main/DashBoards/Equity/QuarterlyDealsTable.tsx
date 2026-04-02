@@ -77,7 +77,7 @@ const QuarterlyDealsTable = () => {
 
       const payload = {
         filters: {
-          year_range: [2023, 2025],
+          year_range: [2023, 2026],
           region: ["Non-US America", "US", "EMEA", "APAC"],
           year_period: "Yearly",
         },
@@ -105,7 +105,7 @@ const QuarterlyDealsTable = () => {
       };
 
       const processData = (yearwise: { [key: string]: QuarterData }) => {
-        const labels = ["2023", "2024", "2025"];
+        const labels = ["2023", "2024", "2025", "2026"];
 
         return labels
           .map((label) => {
@@ -167,7 +167,7 @@ const QuarterlyDealsTable = () => {
               p: 1.5,
             }}
           >
-            Skew Table - IPO and FO Deals from 2023 to 2025 
+            Skew Table - IPO and FO Deals from 2023 to 2026 
           </Typography>
 
           {/* <style>

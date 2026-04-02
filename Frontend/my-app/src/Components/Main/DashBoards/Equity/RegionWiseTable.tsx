@@ -86,7 +86,7 @@ useEffect(() => {
 
       const result: ApiRegionResponse = await response.json();
 
-      // --- MINIMAL CHANGE: Extract "2025 H1" or latest period if nested ---
+      // --- MINIMAL CHANGE: Extract "2026 Q1" or latest period if nested ---
       let ipo = result.Regionwise_IPO;
       let fo = result.Regionwise_FO;
 
@@ -95,14 +95,14 @@ useEffect(() => {
         typeof Object.values(ipo)[0] === "object" &&
         !Array.isArray(Object.values(ipo)[0])
       ) {
-        ipo = (ipo as any)["2025 H1"] || ipo[Object.keys(ipo).sort().reverse()[0]] || {};
+        ipo = (ipo as any)["2026 Q1"] || ipo[Object.keys(ipo).sort().reverse()[0]] || {};
       }
       if (
         fo &&
         typeof Object.values(fo)[0] === "object" &&
         !Array.isArray(Object.values(fo)[0])
       ) {
-        fo = (fo as any)["2025 H1"] || fo[Object.keys(fo).sort().reverse()[0]] || {};
+        fo = (fo as any)["2026 Q1"] || fo[Object.keys(fo).sort().reverse()[0]] || {};
       }
 
       // Force type to satisfy TypeScript
@@ -162,7 +162,7 @@ useEffect(() => {
               cursor: "pointer",
             }}
           >
-            Region-wise Skew Table - IPO and FO Deals for 2025 with Top Highlights{" "}
+            Region-wise Skew Table - IPO and FO Deals for 2026 with Top Highlights{" "}
             <span style={{ color: "red" }}>Top</span> Highlights
           </Typography>
         </Box>

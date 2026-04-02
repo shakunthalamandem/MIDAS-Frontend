@@ -68,7 +68,7 @@ const FooterMain: React.FC = () => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options); // e.g., "March 17, 2025"
+    return date.toLocaleDateString('en-US', options); 
   };
 
   return (

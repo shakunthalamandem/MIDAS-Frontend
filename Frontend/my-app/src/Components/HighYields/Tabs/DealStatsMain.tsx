@@ -33,7 +33,7 @@ const DealStatsMain = () => {
     year_period: string;
   }>({
     start_year: 2012,
-    end_year: 2025,
+    end_year: 2026,
     sector: [],  // This should be an array
     snp_rating: [],
     year_period: 'Yearly',
@@ -46,7 +46,7 @@ const DealStatsMain = () => {
     year_period: string;
   }>({
     start_year: 2012,
-    end_year: 2025,
+    end_year: 2026,
     sector: [],
     snp_rating: [],
     year_period: 'Yearly',
@@ -111,13 +111,13 @@ const DealStatsMain = () => {
 
   const handleReset = () => {
     setSelectedFilters({ start_year: 2012,
-      end_year: 2025,
+      end_year: 2026,
       sector: [],
       snp_rating: [],
       year_period: 'Yearly',});
     setAppliedFilters({
       start_year: 2012,
-      end_year: 2025,
+      end_year: 2026,
       sector: [],
       snp_rating: [],
       year_period: 'Yearly',

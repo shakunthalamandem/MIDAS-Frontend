@@ -60,7 +60,7 @@ const CountryBasedTable: React.FC = () => {
   const [noDataPopupOpen, setNoDataPopupOpen] = useState<boolean>(false);
 
   const [startYear, setStartYear] = useState<number>(2001);
-  const [endYear, setEndYear] = useState<number | string>(2025);
+  const [endYear, setEndYear] = useState<number | string>(2026);
   const [dealType, setDealType] = useState<string>('All');
   const [region, setRegion] = useState<string>('All');
   const [sector, setSector] = useState<string>('All');
@@ -175,7 +175,7 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
   const handleClosePopup = () => {
     setNoDataPopupOpen(false);
     setStartYear(2001);
-    setEndYear(2025);
+    setEndYear(2026);
     setDealType("All");
     setRegion("All");
     setSector("All");
