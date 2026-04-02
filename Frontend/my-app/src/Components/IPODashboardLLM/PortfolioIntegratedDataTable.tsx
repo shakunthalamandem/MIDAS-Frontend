@@ -22,6 +22,7 @@ import { Search as SearchIcon } from "@mui/icons-material";
 
 interface SentimentData {
   ticker: string;
+  pricing_date: string;
   one_week_sentiment: string | null;
   one_month_sentiment: string | null;
 }
@@ -79,8 +80,6 @@ type SortField =
   | "sentiment_week"
   | "sentiment_month"
   | "ml_prediction"
-  | "ipo_action"
-  | "trading_signal"
   | "jay_ritter";
 
 type SortOrder = "asc" | "desc";
@@ -97,6 +96,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     order: "asc",
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 100;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,10 +177,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         return item.sentiment_summary?.one_month_sentiment || "";
       case "ml_prediction":
         return item.ml_results?.t1w_pred || "";
-      case "ipo_action":
-        return item.ipo_ranking?.decision?.action || "";
-      case "trading_signal":
-        return item.trading_signal?.signal || "";
       case "jay_ritter":
         return item.jay_ritter?.overall_signal || "";
       default:
@@ -196,7 +193,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         (item.ticker && item.ticker.toLowerCase().includes(query)) ||
         (item.sentiment_summary?.one_week_sentiment && item.sentiment_summary.one_week_sentiment.toLowerCase().includes(query)) ||
         (item.sentiment_summary?.one_month_sentiment && item.sentiment_summary.one_month_sentiment.toLowerCase().includes(query)) ||
-        (item.trading_signal?.signal && item.trading_signal.signal.toLowerCase().includes(query)) ||
         (item.jay_ritter?.overall_signal && item.jay_ritter.overall_signal.toLowerCase().includes(query))
       );
     });
@@ -219,12 +215,34 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     return sorted;
   }, [filteredData, sortConfig]);
 
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   const handleSort = (field: SortField) => {
     setSortConfig((prev) => ({
       field,
       order: prev.field === field && prev.order === "asc" ? "desc" : "asc",
     }));
+    setCurrentPage(1);
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   if (loading) {
     return (
@@ -329,6 +347,17 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     backgroundColor: "#cfe3f1",
                     fontWeight: 700,
                     py: 2.2,
+                    minWidth: 140,
+                  }}
+                >
+                  Pricing Date
+                </TableCell>
+
+                <TableCell
+                  sx={{
+                    backgroundColor: "#cfe3f1",
+                    fontWeight: 700,
+                    py: 2.2,
                     minWidth: 210,
                   }}
                 >
@@ -378,23 +407,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     backgroundColor: "#cfe3f1",
                     fontWeight: 700,
                     py: 2.2,
-                    minWidth: 190,
-                  }}
-                >
-                  <TableSortLabel
-                    active={sortConfig.field === "ipo_action"}
-                    direction={sortConfig.field === "ipo_action" ? sortConfig.order : "asc"}
-                    onClick={() => handleSort("ipo_action")}
-                  >
-                    IPO Ranking
-                  </TableSortLabel>
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
                     minWidth: 180,
                   }}
                 >
@@ -406,28 +418,11 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     Jay Ritter Signal
                   </TableSortLabel>
                 </TableCell>
-
-                <TableCell
-                  sx={{
-                    backgroundColor: "#cfe3f1",
-                    fontWeight: 700,
-                    py: 2.2,
-                    minWidth: 180,
-                  }}
-                >
-                  <TableSortLabel
-                    active={sortConfig.field === "trading_signal"}
-                    direction={sortConfig.field === "trading_signal" ? sortConfig.order : "asc"}
-                    onClick={() => handleSort("trading_signal")}
-                  >
-                    Trading Signal
-                  </TableSortLabel>
-                </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {sortedData.map((item, index) => {
+              {paginatedData.map((item, index) => {
                 const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
 
                 return (
@@ -444,6 +439,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     }}
                   >
                     <TableCell sx={{ fontWeight: 700 }}>{item.ticker}</TableCell>
+
+                    <TableCell>{item.sentiment_summary?.pricing_date || "N/A"}</TableCell>
 
                     <TableCell>
                       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -547,46 +544,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     </TableCell>
 
                     <TableCell>
-                      {item.ipo_ranking?.decision?.action ? (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                          <Tooltip
-                            title={`Confidence: ${item.ipo_ranking.decision.confidence_level}`}
-                          >
-                            <Chip
-                              label={item.ipo_ranking.decision.action}
-                              size="small"
-                              color={
-                                item.ipo_ranking.decision.action.toLowerCase().includes("buy")
-                                  ? "success"
-                                  : item.ipo_ranking.decision.action
-                                    .toLowerCase()
-                                    .includes("sell")
-                                    ? "error"
-                                    : "warning"
-                              }
-                              sx={{ fontWeight: 700, width: "fit-content" }}
-                            />
-                          </Tooltip>
-                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                              Confidence:
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {item.ipo_ranking.decision.confidence_level}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              ★ {item.ipo_ranking.decision.conviction_rating}/5
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
                       {item.jay_ritter?.overall_signal ? (
                         <Tooltip title={`Confidence: ${item.jay_ritter.confidence_score}%`}>
                           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
@@ -613,34 +570,6 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                         </Typography>
                       )}
                     </TableCell>
-
-                    <TableCell>
-                      {item.trading_signal?.signal ? (
-                        <Tooltip title={`Confidence: ${item.trading_signal.confidence}%`}>
-                          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                            <Chip
-                              label={item.trading_signal.signal}
-                              size="small"
-                              color={
-                                item.trading_signal.signal.toLowerCase() === "buy"
-                                  ? "success"
-                                  : item.trading_signal.signal.toLowerCase() === "sell"
-                                  ? "error"
-                                  : "warning"
-                              }
-                              sx={{ fontWeight: 700, width: "fit-content" }}
-                            />
-                            <Typography variant="caption" color="text.secondary">
-                              {item.trading_signal.confidence}% confidence
-                            </Typography>
-                          </Box>
-                        </Tooltip>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      )}
-                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -648,6 +577,29 @@ const PortfolioIntegratedDataTable: React.FC = () => {
           </Table>
         </TableContainer>
       </Paper>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 2, gap: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          {startIndex + 1}–{endIndex} of {sortedData.length}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+          >
+            ‹
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            ›
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 };
