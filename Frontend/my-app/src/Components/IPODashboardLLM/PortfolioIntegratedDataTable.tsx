@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Table,
@@ -22,6 +23,7 @@ import { Search as SearchIcon } from "@mui/icons-material";
 
 interface SentimentData {
   ticker: string;
+  issuer_name?: string;
   pricing_date: string;
   one_week_sentiment: string | null;
   one_month_sentiment: string | null;
@@ -87,6 +89,7 @@ type SortField =
 type SortOrder = "asc" | "desc";
 
 const PortfolioIntegratedDataTable: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -245,6 +248,15 @@ const PortfolioIntegratedDataTable: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
+
+  const handleTickerClick = (item: PortfolioItem) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append("ticker", item.ticker);
+    queryParams.append("pricing_date", item.sentiment_summary?.pricing_date || "");
+    queryParams.append("issuer_name", item.sentiment_summary?.issuer_name || "");
+
+    window.open(`/deals/new_dashboard/details?${queryParams.toString()}`, "_blank");
+  };
 
   if (loading) {
     return (
@@ -440,7 +452,20 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                       },
                     }}
                   >
-                    <TableCell sx={{ fontWeight: 700 }}>{item.ticker}</TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        color: "#1a237e",
+                        "&:hover": {
+                          textDecoration: "underline",
+                          color: "#0d1b5f",
+                        }
+                      }}
+                      onClick={() => handleTickerClick(item)}
+                    >
+                      {item.ticker}
+                    </TableCell>
 
                     <TableCell>{item.sentiment_summary?.pricing_date || "N/A"}</TableCell>
 
