@@ -81,6 +81,7 @@ interface PortfolioItem {
 
 type SortField =
   | "ticker"
+  | "pricing_date"
   | "sentiment_week"
   | "sentiment_month"
   | "ml_prediction"
@@ -176,6 +177,8 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     switch (field) {
       case "ticker":
         return item.ticker || "";
+      case "pricing_date":
+        return item.sentiment_summary?.pricing_date || "";
       case "sentiment_week":
         return item.sentiment_summary?.one_week_sentiment || "";
       case "sentiment_month":
@@ -364,7 +367,13 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     minWidth: 140,
                   }}
                 >
-                  Pricing Date
+                  <TableSortLabel
+                    active={sortConfig.field === "pricing_date"}
+                    direction={sortConfig.field === "pricing_date" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("pricing_date")}
+                  >
+                    Pricing Date
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell
