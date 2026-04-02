@@ -25,6 +25,8 @@ interface SentimentData {
   pricing_date: string;
   one_week_sentiment: string | null;
   one_month_sentiment: string | null;
+  sentiment_score?: number;
+  socialmedia_retail_sentiment_score?: number;
 }
 
 interface VolatilityOutlook {
@@ -443,7 +445,15 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     <TableCell>{item.sentiment_summary?.pricing_date || "N/A"}</TableCell>
 
                     <TableCell>
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
+                        <Tooltip title="Social Media & Retail Sentiment Score">
+                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#1a237e", fontSize: "0.75rem" }}>
+                            {item.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined && item.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                              ? `Score: ${item.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                              : "Score: N/A"}
+                          </Typography>
+                        </Tooltip>
+
                         {item.sentiment_summary?.one_week_sentiment && (
                           <Chip
                             label={`1W: ${item.sentiment_summary.one_week_sentiment}`}
