@@ -84,6 +84,7 @@ type SortField =
   | "pricing_date"
   | "sentiment_week"
   | "sentiment_month"
+  | "deal_agent"
   | "ml_prediction"
   | "jay_ritter";
 
@@ -92,6 +93,7 @@ type SortOrder = "asc" | "desc";
 const PortfolioIntegratedDataTable: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<PortfolioItem[]>([]);
+  const [maxTradeDate, setMaxTradeDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -125,7 +127,24 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         }
 
         const jsonData = await response.json();
-        setData(Array.isArray(jsonData) ? jsonData : []);
+
+        // Extract max_trade_date and portfolio data
+        if (jsonData && typeof jsonData === 'object') {
+          const maxDate = jsonData.max_trade_date || null;
+          setMaxTradeDate(maxDate);
+
+          // Map portfolio data - handle both array and nested structure
+          const portfolioData = Array.isArray(jsonData)
+            ? jsonData
+            : Array.isArray(jsonData.data)
+            ? jsonData.data
+            : Array.isArray(jsonData.tickers)
+            ? jsonData.tickers
+            : [];
+          setData(portfolioData);
+        } else {
+          setData(Array.isArray(jsonData) ? jsonData : []);
+        }
         setError(null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch portfolio data");
@@ -183,6 +202,9 @@ const PortfolioIntegratedDataTable: React.FC = () => {
         return item.sentiment_summary?.one_week_sentiment || "";
       case "sentiment_month":
         return item.sentiment_summary?.one_month_sentiment || "";
+      case "deal_agent":
+        const volatilityOutlook = parseVolatilityOutlook(item.unsupervised_summary);
+        return volatilityOutlook?.["1-Week Sentiment"] || "";
       case "ml_prediction":
         return item.ml_results?.t1w_pred || "";
       case "jay_ritter":
@@ -284,7 +306,21 @@ const PortfolioIntegratedDataTable: React.FC = () => {
       px: 2,
       mb: 3,
     }}>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Box>
+          {maxTradeDate && (
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600,
+                color: "#555",
+                fontSize: "0.95rem",
+              }}
+            >
+              Data As of: <span style={{ fontWeight: 700, color: "#1a237e" }}>{maxTradeDate}</span>
+            </Typography>
+          )}
+        </Box>
         <TextField
           placeholder="Search ticker, issuer..."
           value={searchQuery}
@@ -403,7 +439,13 @@ const PortfolioIntegratedDataTable: React.FC = () => {
                     minWidth: 250,
                   }}
                 >
-                  Deal (IPO) Agent
+                  <TableSortLabel
+                    active={sortConfig.field === "deal_agent"}
+                    direction={sortConfig.field === "deal_agent" ? sortConfig.order : "asc"}
+                    onClick={() => handleSort("deal_agent")}
+                  >
+                    Deal (IPO) Agent
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell
