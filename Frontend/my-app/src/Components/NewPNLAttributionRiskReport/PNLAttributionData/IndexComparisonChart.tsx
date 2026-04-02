@@ -34,13 +34,13 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     color: "#2563eb",
   },
   one_month_volatility_1_sp: {
-    label: "1m Volatility / 1 S&P",
+    label: "1m Volatility / S&P",
     dataKey: "one_month_volatility_1_sp",
     format: "pct",
     color: "#0891b2",
   },
   six_month_volatility_1_sp: {
-    label: "6m Volatility / 1 S&P",
+    label: "6m Volatility / 1S&P",
     dataKey: "six_month_volatility_1_sp",
     format: "pct",
     color: "#ea580c",
@@ -52,7 +52,7 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     color: "#db2777",
   },
   drawdown_1_sp: {
-    label: "Drawdown / 1 S&P",
+    label: "Drawdown /  S&P",
     dataKey: "drawdown_1_sp",
     format: "pct",
     color: "#b91c1c",
