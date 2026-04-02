@@ -16,46 +16,68 @@ import { formatDate, formatChartXAxis } from "./utils";
 interface MetricConfig {
   label: string;
   dataKey: keyof IndexComparisonChartPoint;
+  secondDataKey?: keyof IndexComparisonChartPoint;
+  dataLabel: string;
+  secondDataLabel?: string;
   format: "beta" | "pct";
   color: string;
+  secondColor?: string;
 }
 
 const METRIC_MAP: Record<string, MetricConfig> = {
   one_month_beta_sp: {
     label: "1m Beta S&P",
     dataKey: "one_month_beta_sp",
+    dataLabel: "1m Beta S&P",
     format: "beta",
     color: "#2563eb",
   },
   one_month_beta_russell: {
     label: "1m Beta Russell",
     dataKey: "one_month_beta_russell",
+    dataLabel: "1m Beta Russell",
     format: "beta",
     color: "#2563eb",
   },
   one_month_volatility_1_sp: {
-    label: "1m Volatility / S&P",
-    dataKey: "one_month_volatility_1_sp",
+    label: "1m Volatility (Portfolio vs S&P)",
+    dataKey: "one_month_volatility_portfolio",
+    secondDataKey: "one_month_volatility_sp",
+    dataLabel: "Portfolio",
+    secondDataLabel: "S&P",
     format: "pct",
     color: "#0891b2",
+    secondColor: "#94a3b8",
   },
   six_month_volatility_1_sp: {
-    label: "6m Volatility / 1S&P",
-    dataKey: "six_month_volatility_1_sp",
+    label: "6m Volatility (Portfolio vs S&P)",
+    dataKey: "six_month_volatility_portfolio",
+    secondDataKey: "six_month_volatility_sp",
+    dataLabel: "Portfolio",
+    secondDataLabel: "S&P",
     format: "pct",
     color: "#ea580c",
+    secondColor: "#94a3b8",
   },
   ytd_volatility_sp: {
-    label: "YTD Volatility / S&P",
-    dataKey: "ytd_volatility_sp",
+    label: "YTD Volatility (Portfolio vs S&P)",
+    dataKey: "ytd_volatility_portfolio",
+    secondDataKey: "ytd_volatility_sp_value",
+    dataLabel: "Portfolio",
+    secondDataLabel: "S&P",
     format: "pct",
     color: "#db2777",
+    secondColor: "#94a3b8",
   },
   drawdown_1_sp: {
-    label: "Drawdown /  S&P",
-    dataKey: "drawdown_1_sp",
+    label: "Drawdown (Portfolio vs S&P)",
+    dataKey: "drawdown_portfolio",
+    secondDataKey: "drawdown_sp",
+    dataLabel: "Portfolio",
+    secondDataLabel: "S&P",
     format: "pct",
     color: "#b91c1c",
+    secondColor: "#94a3b8",
   },
 };
 
@@ -81,26 +103,37 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
       <Box className="pnl-chart-card">
         <Box className="pnl-chart-header">
           <Box className="pnl-chart-title">
-            HISTORICAL: {cfg.label}
+            HISTORICAL: {cfg.label.toUpperCase()}
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                background: cfg.color,
-              }}
-            />
-            <Box
-              sx={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: cfg.color,
-              }}
-            >
-              {cfg.label}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: cfg.color,
+                }}
+              />
+              <Box sx={{ fontSize: 13, fontWeight: 600, color: cfg.color }}>
+                {cfg.dataLabel}
+              </Box>
             </Box>
+            {cfg.secondDataKey && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    background: cfg.secondColor,
+                  }}
+                />
+                <Box sx={{ fontSize: 13, fontWeight: 600, color: cfg.secondColor }}>
+                  {cfg.secondDataLabel}
+                </Box>
+              </Box>
+            )}
           </Box>
         </Box>
 
@@ -147,20 +180,34 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
                   fontSize: "13px",
                 }}
               />
+              {cfg.secondDataKey && (
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  wrapperStyle={{ fontSize: 12, paddingBottom: 8 }}
+                />
+              )}
               <Line
                 type="linear"
                 dataKey={cfg.dataKey}
-                name={cfg.label}
+                name={cfg.dataLabel}
                 stroke={cfg.color}
                 strokeWidth={2.5}
                 dot={false}
-                activeDot={{
-                  r: 5,
-                  fill: cfg.color,
-                  stroke: "#fff",
-                  strokeWidth: 2,
-                }}
+                activeDot={{ r: 5, fill: cfg.color, stroke: "#fff", strokeWidth: 2 }}
               />
+              {cfg.secondDataKey && (
+                <Line
+                  type="linear"
+                  dataKey={cfg.secondDataKey}
+                  name={cfg.secondDataLabel}
+                  stroke={cfg.secondColor}
+                  strokeWidth={2.5}
+                  strokeDasharray="5 3"
+                  dot={false}
+                  activeDot={{ r: 5, fill: cfg.secondColor, stroke: "#fff", strokeWidth: 2 }}
+                />
+              )}
             </LineChart>
           </ResponsiveContainer>
         ) : (
