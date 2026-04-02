@@ -57,6 +57,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     const ticker = searchParams.get("ticker");
     const pricingDate = searchParams.get("pricing_date");
     const issuerName = searchParams.get("issuer_name");
+    const flagForWriteup = searchParams.get("flag_for_writeup");
 
     if (ticker && pricingDate) {
       // Store the search criteria in selectedOption to trigger search
@@ -65,6 +66,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         ticker: ticker,
         pricing_date: pricingDate,
         issuer_name: issuerName,
+        flag_for_writeup: flagForWriteup,
       });
     }
   }, [searchParams]);
