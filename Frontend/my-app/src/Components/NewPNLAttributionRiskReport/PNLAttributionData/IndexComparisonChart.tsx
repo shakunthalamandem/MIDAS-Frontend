@@ -47,7 +47,7 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     secondDataLabel: "S&P",
     format: "pct",
     color: "#0891b2",
-    secondColor: "#94a3b8",
+    secondColor: "#225253",
   },
   six_month_volatility_1_sp: {
     label: "6m Volatility (Portfolio vs S&P)",
@@ -57,7 +57,7 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     secondDataLabel: "S&P",
     format: "pct",
     color: "#ea580c",
-    secondColor: "#94a3b8",
+    secondColor: "#225253",
   },
   ytd_volatility_sp: {
     label: "YTD Volatility (Portfolio vs S&P)",
@@ -67,7 +67,7 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     secondDataLabel: "S&P",
     format: "pct",
     color: "#db2777",
-    secondColor: "#94a3b8",
+    secondColor: "#225253",
   },
   drawdown_1_sp: {
     label: "Drawdown (Portfolio vs S&P)",
@@ -77,7 +77,7 @@ const METRIC_MAP: Record<string, MetricConfig> = {
     secondDataLabel: "S&P",
     format: "pct",
     color: "#b91c1c",
-    secondColor: "#94a3b8",
+    secondColor: "#225253",
   },
 };
 
@@ -215,7 +215,7 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
             sx={{
               textAlign: "center",
               py: 6,
-              color: "#94a3b8",
+              color: "#225253",
               fontSize: 14,
             }}
           >
