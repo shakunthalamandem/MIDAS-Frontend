@@ -289,7 +289,7 @@ const Agents: React.FC = () => {
       {/* ── Portfolio Summary Banner ── */}
       <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, pt: 4, pb: 2 }}>
         <Box
-          onClick={() => navigate("/portfolio_summary")}
+          onClick={() => window.open("/portfolio_summary", "_blank")}
           sx={{
             bgcolor: "#fff",
             border: "1px solid #c7d2fe",
