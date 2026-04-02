@@ -90,6 +90,50 @@ interface IndexComparisonChartProps {
 const formatValue = (value: number, format: "beta" | "pct") =>
   format === "beta" ? value.toFixed(2) : `${value.toFixed(2)}%`;
 
+const CustomTooltip = ({ active, payload, label, cfg }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{
+      background: "#fff",
+      border: "1px solid #e2e8f0",
+      borderRadius: "10px",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+      padding: "10px 14px",
+      minWidth: 180,
+      fontFamily: "Inter, sans-serif",
+    }}>
+      <div style={{
+        fontSize: 10,
+        fontWeight: 700,
+        color: "#092d5f",
+        textTransform: "uppercase",
+        letterSpacing: "0.8px",
+        marginBottom: 6,
+        borderBottom: "1px solid #f1f5f9",
+        paddingBottom: 5,
+      }}>
+        {cfg.label}
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#475569", marginBottom: 7 }}>
+        {formatDate(label)}
+      </div>
+      {payload.map((entry: any, i: number) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: i < payload.length - 1 ? 4 : 0 }}>
+          <div style={{
+            width: 8, height: 8, borderRadius: "50%",
+            background: entry.color || (i === 0 ? cfg.color : cfg.secondColor),
+            flexShrink: 0,
+          }} />
+          <span style={{ fontSize: 12, color: "#64748b", flex: 1 }}>{entry.name} :</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: entry.color || (i === 0 ? cfg.color : cfg.secondColor) }}>
+            {formatValue(entry.value, cfg.format)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
   chartData,
   loading,
@@ -167,19 +211,7 @@ const IndexComparisonChart: React.FC<IndexComparisonChartProps> = ({
                 tickLine={false}
                 width={70}
               />
-              <Tooltip
-                formatter={(value: number, name: string) => [
-                  formatValue(value, cfg.format),
-                  name,
-                ]}
-                labelFormatter={(label: string) => formatDate(label)}
-                contentStyle={{
-                  borderRadius: "10px",
-                  border: "1px solid #e2e8f0",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                  fontSize: "13px",
-                }}
-              />
+              <Tooltip content={<CustomTooltip cfg={cfg} />} />
               {cfg.secondDataKey && (
                 <Legend
                   verticalAlign="top"
