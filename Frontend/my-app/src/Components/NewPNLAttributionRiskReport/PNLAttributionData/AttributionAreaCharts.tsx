@@ -8,7 +8,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import type { AttributionGroupBy, AttributionAreaSeries } from "./types";
 import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
@@ -59,7 +58,17 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<MetricKey>("ytd_pnl");
+  const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const abortRef = useRef<AbortController | null>(null);
+
+  const toggleSeries = (name: string) => {
+    setHiddenSeries((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (selectedFunds.length === 0 || !selectedDate) return;
@@ -108,6 +117,11 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   }, [selectedFunds, selectedDate, groupBy]);
 
   const activeSeries = data[selectedMetric];
+
+  // Reset hidden series when metric or groupBy changes
+  React.useEffect(() => {
+    setHiddenSeries(new Set());
+  }, [selectedMetric, groupBy]);
 
   // Transform series data into recharts-friendly format: array of { date, [name1]: value, [name2]: value, ... }
   const chartData = React.useMemo(() => {
@@ -230,24 +244,88 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
                   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
                 }}
               />
-              <Legend
-                wrapperStyle={{ fontSize: "12px", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
-              />
-              {seriesNames.map((name, i) => (
-                <Area
-                  key={name}
-                  type="monotone"
-                  dataKey={name}
-                  stackId="1"
-                  stroke={SERIES_COLORS[i % SERIES_COLORS.length]}
-                  strokeWidth={1.5}
-                  fill={`url(#areaGrad-${groupBy}-${i})`}
-                  dot={false}
-                  activeDot={{ r: 4, strokeWidth: 1.5 }}
-                />
-              ))}
+              {seriesNames.map((name, i) => {
+                const hidden = hiddenSeries.has(name);
+                return (
+                  <Area
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    stackId="1"
+                    stroke={hidden ? "transparent" : SERIES_COLORS[i % SERIES_COLORS.length]}
+                    strokeWidth={1.5}
+                    fill={hidden ? "transparent" : `url(#areaGrad-${groupBy}-${i})`}
+                    dot={false}
+                    activeDot={hidden ? false : { r: 4, strokeWidth: 1.5 }}
+                    hide={hidden}
+                  />
+                );
+              })}
             </AreaChart>
           </ResponsiveContainer>
+
+          {/* Custom clickable legend */}
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "8px 14px",
+              mt: 1.5,
+              pb: 0.5,
+            }}
+          >
+            {seriesNames.map((name, i) => {
+              const hidden = hiddenSeries.has(name);
+              const color = SERIES_COLORS[i % SERIES_COLORS.length];
+              return (
+                <Box
+                  key={name}
+                  onClick={() => toggleSeries(name)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    cursor: "pointer",
+                    opacity: hidden ? 0.35 : 1,
+                    transition: "opacity 0.2s",
+                    userSelect: "none",
+                    px: 1,
+                    py: 0.4,
+                    borderRadius: "12px",
+                    border: `1.5px solid ${hidden ? "#e2e8f0" : color + "55"}`,
+                    background: hidden ? "#f8fafc" : color + "12",
+                    "&:hover": { opacity: hidden ? 0.55 : 0.8 },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: hidden ? "#cbd5e1" : color,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: hidden ? "#94a3b8" : color,
+                      fontFamily: "Inter, sans-serif",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.4px",
+                    }}
+                  >
+                    {name}
+                  </Box>
+                  {hidden && (
+                    <Box sx={{ fontSize: 10, color: "#94a3b8", ml: 0.3 }}>●</Box>
+                  )}
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       ) : (
         <Box sx={{ textAlign: "center", py: 6, color: "#94a3b8", fontSize: 14 }}>
