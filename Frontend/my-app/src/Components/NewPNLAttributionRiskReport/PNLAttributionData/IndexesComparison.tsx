@@ -27,10 +27,10 @@ const SELECTED_BG: Record<string, string> = {
 const INDEX_CARDS_CONFIG: IndexCardConfig[] = [
   { label: "1m Beta S&P", valueKey: "one_month_beta_sp", format: "beta", color: "blue", metricKey: "one_month_beta_sp" },
   { label: "1m Beta Russell", valueKey: "one_month_beta_russell", format: "beta", color: "blue", metricKey: "one_month_beta_russell" },
-  { label: "1m Volatility / 1 S&P", valueKey: "one_month_volatility_1_sp", format: "vol", color: "cyan", metricKey: "one_month_volatility_1_sp" },
-  { label: "6m Volatility / 1 S&P", valueKey: "six_month_volatility_1_sp", format: "vol", color: "orange", metricKey: "six_month_volatility_1_sp" },
+  { label: "1m Volatility /  S&P", valueKey: "one_month_volatility_1_sp", format: "vol", color: "cyan", metricKey: "one_month_volatility_1_sp" },
+  { label: "6m Volatility /  S&P", valueKey: "six_month_volatility_1_sp", format: "vol", color: "orange", metricKey: "six_month_volatility_1_sp" },
   { label: "YTD Volatility / S&P", valueKey: "ytd_volatility_sp", format: "vol", color: "pink", metricKey: "ytd_volatility_sp" },
-  { label: "Drawdown / 1 S&P", valueKey: "drawdown_1_sp", format: "vol", color: "red", metricKey: "drawdown_1_sp" },
+  { label: "Drawdown /  S&P", valueKey: "drawdown_1_sp", format: "vol", color: "red", metricKey: "drawdown_1_sp" },
 ];
 
 const toNumber = (value: unknown): number | null => {

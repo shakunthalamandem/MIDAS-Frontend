@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, CircularProgress } from "@mui/material";
 import type { HeadlinePnl, DashboardCategory, HeadlineMetricValues } from "./types";
-import { formatCurrencyAsK } from "./utils";
+import { formatCurrencyAsK, formatFullCurrency } from "./utils";
 
 interface HeadlinePnLProps {
   data: HeadlinePnl;
@@ -133,6 +133,20 @@ const HeadlinePnL: React.FC<HeadlinePnLProps> = ({
                     {pct === null ? "" : `(${pct.toFixed(2)}%)`}
                   </Box>
                 </Box>
+
+                {/* Hover overlay with full value */}
+                {!isSelected && value !== null && (
+                  <Box
+                    className="pnl-chip-hover-overlay"
+                    sx={{ background: `linear-gradient(135deg, ${selectedBg}ee, ${selectedBg}cc)` }}
+                  >
+                    <Box className="pnl-chip-hover-overlay-label">{cfg.title}</Box>
+                    <Box className="pnl-chip-hover-overlay-value">{formatFullCurrency(value)}</Box>
+                    {pct !== null && (
+                      <Box className="pnl-chip-hover-overlay-pct">{pct.toFixed(2)}%</Box>
+                    )}
+                  </Box>
+                )}
               </Box>
             );
           })}

@@ -15,6 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   DataGrid,
   GridColDef,
+  GridSortModel,
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
@@ -83,6 +84,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
 }) => {
   const [tickerData, setTickerData] = useState<TickerItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "ytd_pnl", sort: "desc" }]);
 
   /* Active filter selections: key = sub-filter groupBy, value = selected values */
   const [activeFilters, setActiveFilters] = useState<
@@ -145,9 +147,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     return opts;
   }, [tickerData, subFilterKeys]);
 
-  /* Apply filters client-side */
+  /* Apply filters client-side, keep TOTAL pinned at bottom */
   const filteredData = useMemo(() => {
-    return tickerData.filter((item) => {
+    const nonTotal = tickerData.filter((item) => item.ticker !== "TOTAL");
+    return nonTotal.filter((item) => {
       return Object.entries(activeFilters).every(([key, selectedValues]) => {
         if (selectedValues.length === 0) return true;
         const itemValue = String(item[key as keyof TickerItem] ?? "");
@@ -156,10 +159,30 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     });
   }, [tickerData, activeFilters]);
 
-  const rows = useMemo(
-    () => filteredData.map((item, idx) => ({ id: idx, ...item })),
-    [filteredData]
+  const totalRow = useMemo(
+    () => tickerData.find((item) => item.ticker === "TOTAL") ?? null,
+    [tickerData]
   );
+
+  const rows = useMemo(() => {
+    let sorted = [...filteredData];
+    if (sortModel.length > 0) {
+      const { field, sort } = sortModel[0];
+      sorted.sort((a, b) => {
+        const aVal = (a as any)[field] ?? "";
+        const bVal = (b as any)[field] ?? "";
+        if (typeof aVal === "string" && typeof bVal === "string") {
+          return sort === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+        return sort === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+      });
+    }
+    const dataRows = sorted.map((item, idx) => ({ id: idx, ...item }));
+    if (totalRow) {
+      dataRows.push({ id: -1, ...totalRow });
+    }
+    return dataRows;
+  }, [filteredData, totalRow, sortModel]);
 
   const handleFilterChange = (filterKey: string, event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
@@ -393,11 +416,12 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             disableRowSelectionOnClick
             disableColumnMenu
             slots={{ toolbar: DetailToolbar }}
-            initialState={{
-              sorting: {
-                sortModel: [{ field: "ytd_pnl", sort: "desc" }],
-              },
-            }}
+            getRowClassName={(params) =>
+              params.row.ticker === "TOTAL" ? "attr-detail-row--total" : ""
+            }
+            sortingMode="server"
+            sortModel={sortModel}
+            onSortModelChange={(model) => setSortModel(model)}
             sx={{
               fontFamily: FONT,
               border: "none",
@@ -438,6 +462,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 fontWeight: 500,
                 color: "#1e293b",
                 textTransform: "uppercase",
+              },
+              "& .attr-detail-row--total": {
+                backgroundColor: `${theme.evenRow} !important`,
+                borderTop: `2px solid ${theme.activeTab}`,
+              },
+              "& .attr-detail-row--total .MuiDataGrid-cell": {
+                fontWeight: "800 !important",
+                color: "#1e293b !important",
+                fontSize: "13px !important",
               },
               "& .MuiDataGrid-toolbarContainer": {
                 padding: "0",
