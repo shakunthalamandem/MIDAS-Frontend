@@ -77,6 +77,8 @@ interface PortfolioItem {
   ipo_ranking: IPORankingData;
   trading_signal?: TradingSignal;
   jay_ritter?: JayRitter;
+  flag_for_writeup?: string;
+  writeup_available?: string;
 }
 
 type SortField =
@@ -279,6 +281,7 @@ const PortfolioIntegratedDataTable: React.FC = () => {
     queryParams.append("ticker", item.ticker);
     queryParams.append("pricing_date", item.sentiment_summary?.pricing_date || "");
     queryParams.append("issuer_name", item.sentiment_summary?.issuer_name || "");
+    queryParams.append("flag_for_writeup", item.flag_for_writeup || "Y");
 
     window.open(`/deals/new_dashboard/details?${queryParams.toString()}`, "_blank");
   };
