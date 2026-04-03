@@ -111,7 +111,7 @@ const QuarterlyDealsTable = () => {
           .map((label) => {
             if (yearwise[label]) {
               return {
-                quarter: label,
+                quarter: label === "2026" ? "2026(YTD)" : label,
                 data: yearwise[label],
               };
             }

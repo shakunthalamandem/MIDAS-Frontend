@@ -132,7 +132,7 @@ const NumerSummary: React.FC = () => {
       const mddMetricKey = metric === "deal_value" ? "deal_size" : metric;
 
       return {
-        year,
+        year: year === "2026" ? "2026(YTD)" : year,
         dealogic_IPO: dealogicData?.[year]?.IPO?.[metric] || 0,
         dealogic_FO: dealogicData?.[year]?.FO?.[metric] || 0,
         mdd_IPO: mddData?.[year]?.IPO?.[mddMetricKey] || 0,
