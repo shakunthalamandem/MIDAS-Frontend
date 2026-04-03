@@ -126,13 +126,13 @@ const NumerSummary: React.FC = () => {
   };
 
   const generateChartData = (metric: string) => {
-    const years = ["2023", "2024", "2025"];
+    const years = ["2023", "2024", "2025", "2026"];
 
     return years.map((year) => {
       const mddMetricKey = metric === "deal_value" ? "deal_size" : metric;
 
       return {
-        year,
+        year: year === "2026" ? "2026(YTD)" : year,
         dealogic_IPO: dealogicData?.[year]?.IPO?.[metric] || 0,
         dealogic_FO: dealogicData?.[year]?.FO?.[metric] || 0,
         mdd_IPO: mddData?.[year]?.IPO?.[mddMetricKey] || 0,
@@ -154,7 +154,7 @@ const NumerSummary: React.FC = () => {
           variant="h6"
           sx={{ fontWeight: "bold", color: "#002060", textAlign: "center" }}
         >
-          Deal Flow & Participation – IPO and FO (2023 to 2025) by (Yearly)
+          Deal Flow & Participation – IPO and FO (2023 to 2026) by (Yearly)
         </Typography>
 
       </Grid>

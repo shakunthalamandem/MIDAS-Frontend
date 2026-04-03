@@ -119,7 +119,7 @@ const handleApply = () => {
       <Container maxWidth="lg" sx={{ py: 0 }} id="details-section">
         <Card sx={{ boxShadow: 3, p: 3, mb: 2 }}>
           <Typography variant="h6" color="#002060" align="center" gutterBottom>
-            2025 Weekly Deal Filters
+            2026 Weekly Deal Filters
           </Typography>
 
           <Grid container spacing={2} justifyContent="center" alignItems="center" flexWrap="wrap">

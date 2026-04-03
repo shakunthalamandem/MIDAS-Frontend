@@ -26,7 +26,7 @@ interface SkewTableOptions {
 
 const ConvertSectorBased: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2012);
-  const [endYear, setEndYear] = useState<number>(2025);
+  const [endYear, setEndYear] = useState<number>(2026);
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);

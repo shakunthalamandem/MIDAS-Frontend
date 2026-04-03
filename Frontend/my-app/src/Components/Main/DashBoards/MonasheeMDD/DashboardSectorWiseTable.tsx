@@ -40,7 +40,7 @@ const DashboardSectorWiseTable: React.FC = () => {
 
   const fetchGapAnalysis = async (dealType: string): Promise<SectorData> => {
     const payload = {
-      years: [2025],
+      years: [2026],
       period: [],
       deal_type: [dealType],
       fo_type: [],
@@ -61,7 +61,7 @@ const DashboardSectorWiseTable: React.FC = () => {
     });
 
     const data = await response.json();
-    return data["2025"];
+    return data["2026"];
   };
 
   useEffect(() => {
@@ -164,7 +164,7 @@ const DashboardSectorWiseTable: React.FC = () => {
           textDecoration: "none",
         }}
       >
-        Sector Wise IPO and FO Data for 2025 YTD
+        Sector Wise IPO and FO Data for 2026 YTD
       </Typography>
 
       <TableContainer component={Paper}>

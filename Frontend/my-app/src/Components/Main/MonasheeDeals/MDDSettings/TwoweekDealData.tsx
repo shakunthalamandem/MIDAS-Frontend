@@ -75,7 +75,7 @@ const TwoWeekDealData: React.FC<TwoWeekDealDataProps> = ({ filters }) => {
           <>
 
             <Typography variant="h6" color="#002060" align="center" gutterBottom>
-                      2025 YTD Gap Overview
+                      2026 YTD Gap Overview
                     </Typography>
           
           <WeeklyDealTable
