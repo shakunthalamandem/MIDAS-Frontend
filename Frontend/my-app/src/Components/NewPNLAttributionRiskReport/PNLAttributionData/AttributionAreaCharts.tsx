@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -204,19 +204,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
       ) : chartData.length > 0 ? (
         <Box sx={{ mt: 2 }}>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
-              <defs>
-                {seriesNames.map((name, i) => (
-                  <linearGradient
-                    key={name}
-                    id={`areaGrad-${groupBy}-${i}`}
-                    x1="0" y1="0" x2="0" y2="1"
-                  >
-                    <stop offset="5%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0.02} />
-                  </linearGradient>
-                ))}
-              </defs>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -247,21 +235,19 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
               {seriesNames.map((name, i) => {
                 const hidden = hiddenSeries.has(name);
                 return (
-                  <Area
+                  <Line
                     key={name}
-                    type="monotone"
+                    type="linear"
                     dataKey={name}
-                    stackId="1"
                     stroke={hidden ? "transparent" : SERIES_COLORS[i % SERIES_COLORS.length]}
                     strokeWidth={1.5}
-                    fill={hidden ? "transparent" : `url(#areaGrad-${groupBy}-${i})`}
                     dot={false}
                     activeDot={hidden ? false : { r: 4, strokeWidth: 1.5 }}
                     hide={hidden}
                   />
                 );
               })}
-            </AreaChart>
+            </LineChart>
           </ResponsiveContainer>
 
           {/* Custom clickable legend */}
