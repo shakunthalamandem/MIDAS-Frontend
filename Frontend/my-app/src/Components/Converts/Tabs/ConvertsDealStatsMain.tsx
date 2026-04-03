@@ -30,7 +30,7 @@ const ConvertsDealStatsMain = () => {
     year_period: string;
   }>({
     start_year: 2012,
-    end_year: 2025,
+    end_year: 2026,
     sector: [],  // This should be an array
     year_period: 'Yearly',
   });
@@ -41,7 +41,7 @@ const ConvertsDealStatsMain = () => {
     year_period: string;
   }>({
     start_year: 2012,
-    end_year: 2025,
+    end_year: 2026,
     sector: [],
     year_period: 'Yearly',
   });
@@ -116,12 +116,12 @@ const ConvertsDealStatsMain = () => {
 
   const handleReset = () => {
     setSelectedFilters({ start_year: 2012,
-      end_year: 2025,
+      end_year: 2026,
       sector: [],
       year_period: 'Yearly',});
     setAppliedFilters({
       start_year: 2012,
-      end_year: 2025,
+      end_year: 2026,
       sector: [],
       year_period: 'Yearly',
     });

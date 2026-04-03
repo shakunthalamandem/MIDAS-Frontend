@@ -156,7 +156,7 @@ const MarketFilters: React.FC = () => {
                 key === "start_year"
                   ? "2001"
                   : key === "end_year"
-                    ? "2025"
+                    ? "2026"
                     : "Yearly";
 
               return (

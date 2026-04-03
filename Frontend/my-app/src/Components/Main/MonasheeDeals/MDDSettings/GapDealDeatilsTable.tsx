@@ -29,7 +29,7 @@ const GapDealDeatilsTable: React.FC = () => {
     // navigate("/error");  
 
   }
-  selectedFilters.years = [2025];
+  selectedFilters.years = [2026];
 
   useEffect(() => {
     if (!Object.keys(selectedFilters).length) return;

@@ -5,7 +5,7 @@ export const forecastYearKeys = [
   "one_year_later",
 ];
 
-const DEFAULT_BASE_YEAR = 2025;
+const DEFAULT_BASE_YEAR = 2026;
 
 export const getForecastYearLabels = (baseYear?: number) => {
   const parsedYear = Number(baseYear);

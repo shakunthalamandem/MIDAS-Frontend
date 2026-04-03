@@ -48,7 +48,7 @@ const SummaryGapGraph: React.FC = () => {
     const fetchData = async (region: "US" | "EMEA") => {
       const payload = {
         fo_type: ["Marketed", "Overnight", "Block"],
-        years: [2025],
+        years: [2026],
         broad_region: [region],
       };
 
@@ -66,7 +66,7 @@ const SummaryGapGraph: React.FC = () => {
         });
 
         const result = await response.json();
-        const yearData = result?.["2025"];
+        const yearData = result?.["2026"];
 
         const foSummary = yearData?.["FO"]?.["Summary"];
         const foBarData: ChartDataPoint[] = foSummary
@@ -222,7 +222,7 @@ const SummaryGapGraph: React.FC = () => {
             }}
           >
             <Typography variant="h6" fontWeight="bold" align="center">
-              US 2025
+              US 2026
             </Typography>
             <Box sx={{ display: "flex", gap: 2 }}>
 
@@ -252,7 +252,7 @@ const SummaryGapGraph: React.FC = () => {
             }}
           >
             <Typography variant="h6" fontWeight="bold" align="center">
-              EMEA 2025
+              EMEA 2026
             </Typography>
             <Box sx={{ display: "flex", gap: 2}}>
 
