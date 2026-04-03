@@ -14,6 +14,8 @@ import {
     CardContent,
     Typography,
     CircularProgress,
+    Checkbox,
+    ListItemText,
 } from '@mui/material';
 import axios from 'axios';
 import RegionTableData from './RegionTableData';
@@ -29,8 +31,8 @@ interface SkewTableOptions {
 const RegionBasedTable: React.FC = () => {
     const [startYear, setStartYear] = useState<number>(2001);
     const [endYear, setEndYear] = useState<number>(2026);
-    const [dealType, setDealType] = useState<string>('All');
-    const [sector, setSector] = useState<string>('All');
+    const [dealTypes, setDealTypes] = useState<string[]>(['All']);
+    const [sectors, setSectors] = useState<string[]>(['All']);
 
     const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
     const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -42,13 +44,7 @@ const RegionBasedTable: React.FC = () => {
     const [totals, setTotals] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const menuProps = {
-        PaperProps: {
-            style: {
-                maxHeight: 200,
-            },
-        },
-    };
+    const menuProps = { PaperProps: { style: { maxHeight: 260 } } };
 
     useEffect(() => {
         const fetchFilters = async () => {
@@ -70,17 +66,21 @@ const RegionBasedTable: React.FC = () => {
                 console.error("Error fetching filters", err);
             }
         };
-
         fetchFilters();
     }, []);
 
     useEffect(() => {
+        if (dealTypeOptions.length === 0 || sectorOptions.length === 0) return;
+
+        const effectiveDealTypes = dealTypes.includes('All') ? dealTypeOptions : dealTypes;
+        const effectiveSectors = sectors.includes('All') ? sectorOptions : sectors;
+
         const fetchData = async () => {
             const requestData = {
                 filters: {
                     year_range: [startYear, endYear],
-                    deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
-                    sector: sector === 'All' ? sectorOptions : [sector],
+                    deal_type: effectiveDealTypes,
+                    sector: effectiveSectors,
                 }
             };
 
@@ -107,60 +107,69 @@ const RegionBasedTable: React.FC = () => {
             } catch (err) {
                 setNoDataPopupOpen(true);
                 setData(null);
-            }finally {
-                setLoading(false); // <-- Set loading false after request
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData();
-    }, [startYear, endYear, dealType, sector, dealTypeOptions, sectorOptions]);
+    }, [startYear, endYear, dealTypes, sectors, dealTypeOptions, sectorOptions]);
 
-const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-  const newStartYear = Number(event.target.value);
-  setStartYear(newStartYear);
-
-  setEndYear((prevEndYear) => {
-    return prevEndYear <= newStartYear ? newStartYear + 1 : prevEndYear;
-  });
-};
-
+    const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+        const newStartYear = Number(event.target.value);
+        setStartYear(newStartYear);
+        setEndYear((prev) => prev <= newStartYear ? newStartYear + 1 : prev);
+    };
 
     const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
         setEndYear(Number(event.target.value));
     };
 
-    const handleDealTypeChange = (event: SelectChangeEvent<string>) => {
-        setDealType(event.target.value);
+    const handleDealTypesChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value as string[];
+        if (value[value.length - 1] === 'All') {
+            setDealTypes(['All']);
+        } else {
+            const filtered = value.filter(v => v !== 'All');
+            setDealTypes(filtered.length === 0 ? ['All'] : filtered);
+        }
     };
 
-    const handleSectorChange = (event: SelectChangeEvent<string>) => {
-        setSector(event.target.value);
+    const handleSectorsChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value as string[];
+        if (value[value.length - 1] === 'All') {
+            setSectors(['All']);
+        } else {
+            const filtered = value.filter(v => v !== 'All');
+            setSectors(filtered.length === 0 ? ['All'] : filtered);
+        }
     };
 
     const handleClosePopup = () => {
         setNoDataPopupOpen(false);
         setStartYear(2001);
         setEndYear(2026);
-        setDealType("All");
-        setSector("All");
+        setDealTypes(['All']);
+        setSectors(['All']);
     };
 
     const handleRowClick = (regionName: string) => {
         const filters = {
             year_range: [startYear, endYear],
-            deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
-            sector: sector === 'All' ? sectorOptions : [sector],
+            deal_type: dealTypes.includes('All') ? dealTypeOptions : dealTypes,
+            sector: sectors.includes('All') ? sectorOptions : sectors,
         };
-
-        sessionStorage.setItem(
-            'detailedRegionState',
-            JSON.stringify({ filters, broad_region: [regionName] })
-        );
-
+        sessionStorage.setItem('detailedRegionState', JSON.stringify({ filters, broad_region: [regionName] }));
         window.open('/detailed-region', '_blank');
     };
 
     const filteredEndYearOptions = endYearOptions.filter((y) => y >= startYear);
+
+    const renderStringValue = (selected: string[]) => {
+        if (selected.includes('All') || selected.length === 0) return 'All';
+        if (selected.length === 1) return selected[0];
+        return `${selected[0]} +${selected.length - 1} more`;
+    };
 
     return (
         <Container maxWidth="lg" sx={{ padding: 0, marginBottom: 4 }}>
@@ -171,6 +180,7 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                             Region Based Filtered Data
                         </Typography>
                         <Grid container spacing={2}>
+                            {/* Start Year */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>Start Year</InputLabel>
@@ -187,6 +197,8 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                                     </Select>
                                 </FormControl>
                             </Grid>
+
+                            {/* End Year */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>End Year</InputLabel>
@@ -204,36 +216,56 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                                     </Select>
                                 </FormControl>
                             </Grid>
+
+                            {/* Deal Type */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>Deal Type</InputLabel>
                                     <Select
-                                        value={dealType}
-                                        onChange={handleDealTypeChange}
+                                        multiple
+                                        value={dealTypes}
+                                        onChange={handleDealTypesChange}
                                         label="Deal Type"
                                         MenuProps={menuProps}
+                                        renderValue={renderStringValue as any}
                                         sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
                                     >
-                                        <MenuItem value="All">All</MenuItem>
+                                        <MenuItem value="All" dense>
+                                            <Checkbox checked={dealTypes.includes('All')} size="small" sx={{ py: 0 }} />
+                                            <ListItemText primary="All" primaryTypographyProps={{ fontWeight: 600 }} />
+                                        </MenuItem>
                                         {dealTypeOptions.map((type) => (
-                                            <MenuItem key={type} value={type}>{type}</MenuItem>
+                                            <MenuItem key={type} value={type} dense>
+                                                <Checkbox checked={dealTypes.includes(type)} size="small" sx={{ py: 0 }} />
+                                                <ListItemText primary={type} />
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
+
+                            {/* Sector */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth variant="outlined" size="small">
                                     <InputLabel>Sector</InputLabel>
                                     <Select
-                                        value={sector}
-                                        onChange={handleSectorChange}
+                                        multiple
+                                        value={sectors}
+                                        onChange={handleSectorsChange}
                                         label="Sector"
                                         MenuProps={menuProps}
+                                        renderValue={renderStringValue as any}
                                         sx={{ backgroundColor: '#d1c4e9', color: '#311b92' }}
                                     >
-                                        <MenuItem value="All">All</MenuItem>
+                                        <MenuItem value="All" dense>
+                                            <Checkbox checked={sectors.includes('All')} size="small" sx={{ py: 0 }} />
+                                            <ListItemText primary="All" primaryTypographyProps={{ fontWeight: 600 }} />
+                                        </MenuItem>
                                         {sectorOptions.map((sec) => (
-                                            <MenuItem key={sec} value={sec}>{sec}</MenuItem>
+                                            <MenuItem key={sec} value={sec} dense>
+                                                <Checkbox checked={sectors.includes(sec)} size="small" sx={{ py: 0 }} />
+                                                <ListItemText primary={sec} />
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
@@ -241,7 +273,7 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                         </Grid>
                     </Box>
                     {loading ? (
-                         <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+                        <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
                     ) : (
                         data && <RegionTableData data={data} totals={totals} onRowClick={handleRowClick} />
                     )}
