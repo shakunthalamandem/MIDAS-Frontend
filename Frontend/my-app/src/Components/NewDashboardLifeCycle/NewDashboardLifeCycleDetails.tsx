@@ -71,7 +71,13 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
     }
   }, [searchParams]);
 
-  const activePayload = selectedOption || payload;
+  const activePayload = useMemo(() => {
+    if (!payload && !selectedOption) return null;
+    return {
+      ...(payload ?? {}),
+      ...(selectedOption ?? {}),
+    };
+  }, [payload, selectedOption]);
   const writeupEnabled =
   (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
   (activePayload?.writeup_available || "").toUpperCase() === "YES" ;
