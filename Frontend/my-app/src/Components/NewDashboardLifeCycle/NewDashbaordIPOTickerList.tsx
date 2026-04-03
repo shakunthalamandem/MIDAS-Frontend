@@ -129,6 +129,13 @@ const NewDashbaordIPOTickerList: React.FC<
     );
   }, [selectedDeal, selectedTicker, sortedOptions]);
 
+  // Auto-select and call onSelect when a match is found via query parameters
+  useEffect(() => {
+    if (selectedValue && selectedDeal?.ticker) {
+      onSelect(selectedValue);
+    }
+  }, [selectedValue, selectedDeal?.ticker, onSelect]);
+
   return (
     <Box sx={{ width: "100%", minWidth: 0 }}>
       <Autocomplete

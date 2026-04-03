@@ -16,7 +16,7 @@ const PortfolioSummaryTabs: React.FC = () => {
     <Box sx={{ width: "100%" }}>
       <Box sx={{ mt:2,mb: 2, textAlign: "center" }}>
         <Typography variant="h4" fontWeight={700}>
-          US Portfolio Summary
+          US Current Portfolio Summary
         </Typography>
       </Box>
 
