@@ -11,13 +11,14 @@ import {
   Card,
   CardContent,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Checkbox,
+  ListItemText,
 } from '@mui/material';
 import axios from 'axios';
-import YearlyTableData from './YearlyTableData'; // Import YearlyTableData component
+import YearlyTableData from './YearlyTableData';
 import NoDataPopup from '../../../../Pages/NoDataPopup';
 import { useNavigate } from 'react-router-dom';
-
 
 interface SkewTableOptions {
   'start year': number[];
@@ -30,10 +31,8 @@ interface SkewTableOptions {
 const YearlyBasedTable: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2001);
   const [endYear, setEndYear] = useState<number>(2026);
-  const [dealType, setDealType] = useState<string>('All');
-  const [region, setRegion] = useState<string>('All');
-  const [sector, setSector] = useState<string[]>([]);
-
+  const [dealTypes, setDealTypes] = useState<string[]>(['All']);
+  const [regions, setRegions] = useState<string[]>(['All']);
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -45,7 +44,7 @@ const YearlyBasedTable: React.FC = () => {
   const [openNoDataPopup, setOpenNoDataPopup] = useState(false);
 
   const navigate = useNavigate();
-
+  const menuProps = { PaperProps: { style: { maxHeight: 260 } } };
 
   useEffect(() => {
     (async () => {
@@ -71,9 +70,12 @@ const YearlyBasedTable: React.FC = () => {
     })();
   }, []);
 
-  // Fetch data whenever filters change
   useEffect(() => {
-    if (!(dealType && region && endYear && startYear)) return;
+    if (dealTypeOptions.length === 0 || regionOptions.length === 0 || sectorOptions.length === 0) return;
+
+    const effectiveDealTypes = dealTypes.includes('All') ? dealTypeOptions : dealTypes;
+    const effectiveRegions = regions.includes('All') ? regionOptions : regions;
+
     (async () => {
       try {
         setLoading(true);
@@ -81,9 +83,9 @@ const YearlyBasedTable: React.FC = () => {
         const token = localStorage.getItem("access_token");
         const filters = {
           year_range: [startYear, endYear],
-          deal_type: dealType === 'All' ? dealTypeOptions : [dealType],
-          region: region === 'All' ? regionOptions : [region],
-          sector: sector.length > 0 ? sector : sectorOptions,
+          deal_type: effectiveDealTypes,
+          region: effectiveRegions,
+          sector: sectorOptions,
         };
         const res = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
@@ -103,50 +105,69 @@ const YearlyBasedTable: React.FC = () => {
         }
       } catch {
         setOpenNoDataPopup(true);
-      }finally {
-        setLoading(false); // <-- Set loading false after request
+      } finally {
+        setLoading(false);
       }
     })();
-  }, [startYear, endYear, dealType, region, sector, dealTypeOptions, regionOptions, sectorOptions]);
-  
-const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
-  const newStartYear = Number(event.target.value);
-  setStartYear(newStartYear);
+  }, [startYear, endYear, dealTypes, regions, dealTypeOptions, regionOptions, sectorOptions]);
 
-  setEndYear((prevEndYear) => {
-    return prevEndYear <= newStartYear ? newStartYear + 1 : prevEndYear;
-  });
-};
+  const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
+    const newStartYear = Number(event.target.value);
+    setStartYear(newStartYear);
+    setEndYear((prev) => prev <= newStartYear ? newStartYear + 1 : prev);
+  };
 
-  const handleEndYearChange = (e: SelectChangeEvent<number | string>) => setEndYear(Number(e.target.value));
-  const handleDealTypeChange = (e: SelectChangeEvent<string>) => setDealType(e.target.value);
-  const handleRegionChange = (e: SelectChangeEvent<string>) => setRegion(e.target.value);
+  const handleEndYearChange = (event: SelectChangeEvent<number | string>) => {
+    setEndYear(Number(event.target.value));
+  };
+
+  const handleDealTypesChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[];
+    if (value[value.length - 1] === 'All') {
+      setDealTypes(['All']);
+    } else {
+      const filtered = value.filter(v => v !== 'All');
+      setDealTypes(filtered.length === 0 ? ['All'] : filtered);
+    }
+  };
+
+  const handleRegionsChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[];
+    if (value[value.length - 1] === 'All') {
+      setRegions(['All']);
+    } else {
+      const filtered = value.filter(v => v !== 'All');
+      setRegions(filtered.length === 0 ? ['All'] : filtered);
+    }
+  };
 
   const filteredEndYearOptions = endYearOptions.filter(y => y >= startYear);
 
   const handleCloseNoDataPopup = () => {
     setOpenNoDataPopup(false);
-    // Reset filters
     setStartYear(2001);
-    setEndYear(2002);
-    setDealType("All");
-    setRegion("All");
-    setSector([]);
+    setEndYear(2026);
+    setDealTypes(['All']);
+    setRegions(['All']);
   };
-
 
   const handleSectorRowClick = (clickedSector: string) => {
     const filters = {
       year_range: [startYear, endYear],
-      deal_type: dealType === 'All' ? [] : [dealType],
-      broad_region: region === 'All' ? [] : [region],
+      deal_type: dealTypes.includes('All') ? [] : dealTypes,
+      broad_region: regions.includes('All') ? [] : regions,
       sector: [clickedSector],
     };
-
     const url = '/detailed-deals';
     const data = { filters, sector: clickedSector };
     sessionStorage.setItem('detailedDealsState', JSON.stringify(data));
     window.open(url, '_blank');
+  };
+
+  const renderStringValue = (selected: string[]) => {
+    if (selected.includes('All') || selected.length === 0) return 'All';
+    if (selected.length === 1) return selected[0];
+    return `${selected[0]} +${selected.length - 1} more`;
   };
 
   return (
@@ -166,24 +187,16 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                     value={startYear}
                     onChange={handleStartYearChange}
                     label="Start Year"
+                    MenuProps={menuProps}
                     sx={{ backgroundColor: '#e0f7fa', color: '#006064' }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200, // Adjust the height as needed
-                          overflow: 'auto',
-                        },
-                      },
-                    }}
                   >
                     {startYearOptions.map((year) => (
-                      <MenuItem key={year} value={year}>
-                        {year}
-                      </MenuItem>
+                      <MenuItem key={year} value={year}>{year}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
+
               {/* End Year */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
@@ -192,63 +205,83 @@ const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
                     value={endYear}
                     onChange={handleEndYearChange}
                     label="End Year"
+                    MenuProps={menuProps}
                     sx={{ backgroundColor: '#e8eaf6', color: '#1a237e' }}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200, // Adjust the height as needed
-                          overflow: 'auto',
-                        },
-                      },
-                    }}
-                    disabled={filteredEndYearOptions.length === 0} // Disable if no valid options
+                    disabled={filteredEndYearOptions.length === 0}
                   >
                     {filteredEndYearOptions.map((year) => (
-                      <MenuItem key={year} value={year}>
-                        {year}
+                      <MenuItem key={year} value={year}>{year}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Deal Type */}
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>Deal Type</InputLabel>
+                  <Select
+                    multiple
+                    value={dealTypes}
+                    onChange={handleDealTypesChange}
+                    label="Deal Type"
+                    MenuProps={menuProps}
+                    renderValue={renderStringValue as any}
+                    sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
+                  >
+                    <MenuItem value="All" dense>
+                      <Checkbox checked={dealTypes.includes('All')} size="small" sx={{ py: 0 }} />
+                      <ListItemText primary="All" primaryTypographyProps={{ fontWeight: 600 }} />
+                    </MenuItem>
+                    {dealTypeOptions.map((t) => (
+                      <MenuItem key={t} value={t} dense>
+                        <Checkbox checked={dealTypes.includes(t)} size="small" sx={{ py: 0 }} />
+                        <ListItemText primary={t} />
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-              {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth variant="outlined" size="small">
-                  <InputLabel>Deal Type</InputLabel>
-                  <Select value={dealType} onChange={handleDealTypeChange} label="Deal Type" sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}>
-                    <MenuItem value="All">All</MenuItem>
-                    {dealTypeOptions.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Grid>
+
               {/* Region */}
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
-                  <Select value={region} onChange={handleRegionChange} label="Region" sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}>
-                    <MenuItem value="All">All</MenuItem>
-                    {regionOptions.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                  <Select
+                    multiple
+                    value={regions}
+                    onChange={handleRegionsChange}
+                    label="Region"
+                    MenuProps={menuProps}
+                    renderValue={renderStringValue as any}
+                    sx={{ backgroundColor: '#ffe0b2', color: '#e65100' }}
+                  >
+                    <MenuItem value="All" dense>
+                      <Checkbox checked={regions.includes('All')} size="small" sx={{ py: 0 }} />
+                      <ListItemText primary="All" primaryTypographyProps={{ fontWeight: 600 }} />
+                    </MenuItem>
+                    {regionOptions.map((r) => (
+                      <MenuItem key={r} value={r} dense>
+                        <Checkbox checked={regions.includes(r)} size="small" sx={{ py: 0 }} />
+                        <ListItemText primary={r} />
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
             </Grid>
           </Box>
-          {/* Data Table */}
-      {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
-      ) : (
-        sectorwiseData && (
-          <YearlyTableData
-            data={sectorwiseData}
-            onRowClick={handleSectorRowClick}
-          />
-        )
-      )}
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
+          ) : (
+            sectorwiseData && (
+              <YearlyTableData data={sectorwiseData} onRowClick={handleSectorRowClick} />
+            )
+          )}
         </CardContent>
       </Card>
 
-      
-      {/* No data popup */}
       <NoDataPopup open={openNoDataPopup} onClose={handleCloseNoDataPopup} />
     </Container>
   );
