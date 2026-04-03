@@ -33,10 +33,10 @@ const EquityDealsIPOFO: React.FC = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState<"IPO" | "FO">("IPO");
   const [selectedIpoYears, setSelectedIpoYears] = useState<number[]>([
-    2024, 2025,
+    2025, 2026,
   ]);
   const [selectedFoYears, setSelectedFoYears] = useState<number[]>([
-    2024, 2025,
+    2025, 2026,
   ]);
   const [navValue, setNavValue] = useState<number>(6);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -127,7 +127,7 @@ const EquityDealsIPOFO: React.FC = () => {
       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
         Year(s):
       </Typography>
-      {[2024, 2025].map((year) => (
+      {[2025, 2026].map((year) => (
         <FormControlLabel
           key={year}
           control={

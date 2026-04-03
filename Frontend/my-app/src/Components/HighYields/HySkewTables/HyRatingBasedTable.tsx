@@ -26,7 +26,7 @@ interface SkewTableOptions {
 
 const HyRatingBasedTable: React.FC = () => {
   const [startYear, setStartYear] = useState<number>(2012);
-  const [endYear, setEndYear] = useState<number | string>(2025);
+  const [endYear, setEndYear] = useState<number | string>(2026);
   const [sector, setSector] = useState<string>('All');
   const [ratingData, setRatingData] = useState<any>(null);
 
