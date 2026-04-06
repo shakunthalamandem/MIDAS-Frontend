@@ -127,9 +127,10 @@ const MarketFilters: React.FC = () => {
         >
           <Grid
             container
-            spacing={3}
+            spacing={2}
             direction="row"
             justifyContent="space-between"
+            alignItems="flex-end"
           >
             <Grid item xs={12}>
               <Box display="flex" justifyContent="flex-end">
@@ -150,17 +151,22 @@ const MarketFilters: React.FC = () => {
                 Array.isArray(value.options) &&
                 key !== "start_year" &&
                 key !== "end_year" &&
-                key !== "year_period";
+                key !== "year_period" &&
+                key !== "spac";
 
               const placeholderValue =
                 key === "start_year"
                   ? "2001"
                   : key === "end_year"
                     ? "2026"
-                    : "Yearly";
+                    : key === "spac"
+                      ? "Any"
+                      : key === "year_period"
+                        ? "Yearly"
+                        : "";
 
               return (
-                <Grid item xs={2} key={index}>
+                <Grid item xs={12} sm={6} md key={index} sx={{ minWidth: 120 }}>
                   <Typography
                     sx={{
                       fontSize: "0.75rem",

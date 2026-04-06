@@ -247,7 +247,8 @@ Each ticker is analyzed independently using live market data, news sentiment, an
           {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
             <>
               <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap", justifyContent: "center" }}>
-                {blocks.length > 0 && (
+
+                {socialMediaBlocks.length > 0 && (
                   <Button
                     variant={activeTab === 0 ? "contained" : "outlined"}
                     onClick={() => setActiveTab(0)}
@@ -266,10 +267,10 @@ Each ticker is analyzed independently using live market data, news sentiment, an
                       },
                     }}
                   >
-                    Overall Sentiment 
+                    Social Media/Retail Sentiment
                   </Button>
                 )}
-                {socialMediaBlocks.length > 0 && (
+                                {blocks.length > 0 && (
                   <Button
                     variant={activeTab === 1 ? "contained" : "outlined"}
                     onClick={() => setActiveTab(1)}
@@ -288,13 +289,13 @@ Each ticker is analyzed independently using live market data, news sentiment, an
                       },
                     }}
                   >
-                    Social Media/Retail Sentiment
+                    Other Details
                   </Button>
                 )}
               </Box>
 
-              {activeTab === 0 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
-              {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+              {activeTab === 0 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+              {activeTab === 1 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
             </>
           )}
         </CardContent>

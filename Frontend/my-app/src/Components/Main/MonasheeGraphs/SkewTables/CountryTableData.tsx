@@ -46,7 +46,7 @@ const formatNumber = (value: number, decimals: number = 0): string => {
   if (absValue >= 1e9) formattedValue = `${(absValue / 1e9).toFixed(decimals)}B`;
   else if (absValue >= 1e6) formattedValue = `${(absValue / 1e6).toFixed(decimals)}M`;
   else if (absValue >= 1e3) formattedValue = `${(absValue / 1e3).toFixed(decimals)}K`;
-  else formattedValue = absValue.toFixed(decimals);
+  else formattedValue = decimals > 0 ? absValue.toFixed(decimals) : absValue.toString();
 
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
