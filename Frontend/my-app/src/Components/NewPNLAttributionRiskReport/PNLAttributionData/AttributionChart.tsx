@@ -25,6 +25,7 @@ const METRIC_LABELS: Record<string, string> = {
   ytd_pnl: "YTD P&L",
   net_exp: "Net Exp",
   beta_adj_net: "Beta Adj Net",
+  delta_adj_net: "Delta Adj Net",
 };
 
 interface AttributionChartProps {

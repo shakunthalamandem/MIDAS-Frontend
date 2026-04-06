@@ -35,7 +35,7 @@ interface ScreenerDataTableProps {
 }
 
 const DEFAULT_START_YEAR = 2001;
-const DEFAULT_END_YEAR = 2025;
+const DEFAULT_END_YEAR = 2026;
 
 const formatDealValue = (dealValue: number): string =>
   "$" + dealValue.toLocaleString("en-US");

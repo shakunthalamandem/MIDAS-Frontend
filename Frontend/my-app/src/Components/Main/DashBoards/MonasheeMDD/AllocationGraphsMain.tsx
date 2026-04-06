@@ -65,7 +65,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
     setLoading(true);
     try {
       const defaultFilters = {
-        years: [2025, 2024],
+        years: [2026, 2025],
         period: ["Quarterly"],
         fo_type: ["Marketed", "Overnight"],
       };
@@ -217,7 +217,7 @@ const AllocationGraphsMain: React.FC<AllocationGraphsMainProps> = ({ selectedFil
         fontWeight="bold"
         gutterBottom
         sx={{ mb: 2 }}
-      >        Quarterly Weighted Allocation Trends (2024–2025)
+      >        Quarterly Weighted Allocation Trends (2026–2026)
       </Typography>
 
       {loading ? (

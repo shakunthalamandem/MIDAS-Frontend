@@ -37,7 +37,7 @@ interface ReportSummary {
   market_temperature?: string;
   long_count?: number;
   short_count?: number;
-  avoid_count?: number;
+  neutral_count?: number;
 }
 
 interface MarketEnvironment {
@@ -52,7 +52,7 @@ interface MarketEnvironment {
 interface PortfolioSummary {
   long_book_count?: number;
   short_book_count?: number;
-  avoid_count?: number;
+  neutral_count?: number;
   sector_allocation?: Record<string, { count: number; target_pct: number }>;
 }
 
@@ -77,7 +77,7 @@ interface TickerAnalysis {
   sector: string;
   deal_size?: number;
   market_cap?: number;
-  overall_signal: "LONG" | "SHORT" | "AVOID" | "TRIM";
+  overall_signal: "LONG" | "SHORT" | "NEUTRAL" | "TRIM";
   confidence_score: number;
   action_summary: string;
   time_window_tag?: string;
@@ -122,7 +122,7 @@ interface APIResponse {
 const SIGNAL_CONFIG: Record<string, { bg: string; color: string; glow: string }> = {
   LONG:  { bg: "#e8f5e9", color: "#1b5e20", glow: "rgba(27,94,32,0.15)"  },
   SHORT: { bg: "#fce4ec", color: "#b71c1c", glow: "rgba(183,28,28,0.15)" },
-  AVOID: { bg: "#fff8e1", color: "#e65100", glow: "rgba(230,81,0,0.15)"  },
+  NEUTRAL: { bg: "#fff8e1", color: "#e65100", glow: "rgba(230,81,0,0.15)"  },
 };
 
 const TEMP_META: Record<string, { gradient: string; badge: string; textColor: string; icon: string; label: string }> = {
@@ -174,7 +174,7 @@ const TECH_CONFIG: Record<string, { color: string }> = {
 };
 
 type SortField    = "ticker" | "days_since_ipo" | "confidence_score" | "overall_signal";
-type FilterSignal = "ALL" | "LONG" | "SHORT" | "AVOID";
+type FilterSignal = "ALL" | "LONG" | "SHORT" | "NEUTRAL";
 
 // ─── Metric Row Helper ────────────────────────────────────────────────
 const MetricRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
@@ -286,7 +286,7 @@ const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
   const am = ticker.am_opportunity || {};
   const tech = ticker.technical_signals || {};
 
-  const signalConfig = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["AVOID"];
+  const signalConfig = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["NEUTRAL"];
   const techConfig = TECH_CONFIG[(tech.overall_technical_signal || "").toLowerCase()] || { color: "#666" };
   const strategyColors = getStrategyColor(am.strategy_signal || "");
 
@@ -560,7 +560,7 @@ const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
 // ─── Table Row ────────────────────────────────────────────────────────
 const TickerRow: React.FC<{ ticker: TickerAnalysis; index: number }> = ({ ticker, index }) => {
   const [open, setOpen] = useState(false);
-  const sig    = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["AVOID"];
+  const sig    = SIGNAL_CONFIG[ticker.overall_signal] || SIGNAL_CONFIG["NEUTRAL"];
   const techRaw = (ticker.technical_signals?.overall_technical_signal || "").toLowerCase();
   const techCfg = TECH_CONFIG[techRaw] || { color: "#757575" };
 
@@ -703,7 +703,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
   }, [selectedId]);
 
   const counts = useMemo(() => {
-    const c: Record<FilterSignal, number> = { ALL: tickers.length, LONG: 0, SHORT: 0, AVOID: 0 };
+    const c: Record<FilterSignal, number> = { ALL: tickers.length, LONG: 0, SHORT: 0, NEUTRAL: 0 };
     tickers.forEach(t => { const k = t.overall_signal as FilterSignal; if (k in c) c[k]++; });
     return c;
   }, [tickers]);
@@ -979,7 +979,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
 
             {/* Center: Filter chips — pushed to center with flex spacers */}
             <Box sx={{ flex: 1, display: "flex", justifyContent: "center", gap: 1 }}>
-              {(["ALL", "LONG", "SHORT", "AVOID"] as FilterSignal[]).map(sig => {
+              {(["ALL", "LONG", "SHORT", "NEUTRAL"] as FilterSignal[]).map(sig => {
                 const active = filter === sig;
                 const cfg = SIGNAL_CONFIG[sig];
                 const count = counts[sig];
@@ -1081,7 +1081,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
                     {[
                       ["LONG", ">=70 or T1", "#1b5e20", "#e8f5e9"],
                       ["SHORT", "<=35", "#b71c1c", "#fce4ec"],
-                      ["AVOID", "36-69", "#e65100", "#fff8e1"],
+                      ["NEUTRAL", "36-69", "#e65100", "#fff8e1"],
                     ].map(([sig, rule, color, bg]) => (
                       <Box key={sig} sx={{ flex: 1, textAlign: "center", py: 0.7, borderRadius: 1.5, bgcolor: bg, border: `1px solid ${color}22` }}>
                         <Typography sx={{ fontSize: "0.76rem", fontWeight: 800, color: color }}>{sig}</Typography>

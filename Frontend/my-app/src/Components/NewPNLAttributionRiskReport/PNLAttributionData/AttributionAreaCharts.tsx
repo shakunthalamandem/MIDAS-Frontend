@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,7 +14,7 @@ import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-type MetricKey = "ytd_pnl" | "net_exp" | "beta_adj_net";
+type MetricKey = "ytd_pnl" | "net_exp" | "beta_adj_net" | "delta_adj_net";
 
 interface AttributionAreaChartsProps {
   selectedFunds: string[];
@@ -26,6 +26,7 @@ interface AttributionAreaChartsProps {
 const METRIC_CONFIG: { key: MetricKey; label: string }[] = [
   { key: "ytd_pnl", label: "YTD P&L" },
   { key: "net_exp", label: "Net Exposure" },
+  { key: "delta_adj_net", label: "Delta Adj. Net Exposure" },
   { key: "beta_adj_net", label: "Beta Adj. Net Exposure" },
 ];
 
@@ -54,6 +55,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
     ytd_pnl: [],
     net_exp: [],
     beta_adj_net: [],
+    delta_adj_net: [],
   });
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
@@ -101,11 +103,12 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
             ytd_pnl: result.ytd_pnl || [],
             net_exp: result.net_exp || [],
             beta_adj_net: result.beta_adj_net || [],
+            delta_adj_net: result.delta_adj_net || [],
           });
         }
       } catch (err: any) {
         if (err.name === "AbortError") return;
-        setData({ ytd_pnl: [], net_exp: [], beta_adj_net: [] });
+        setData({ ytd_pnl: [], net_exp: [], beta_adj_net: [], delta_adj_net: [] });
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -143,7 +146,6 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   }, [activeSeries, showPct]);
 
   const seriesNames = activeSeries.map((s) => s.name);
-  const activeLabel = METRIC_CONFIG.find((m) => m.key === selectedMetric)?.label || selectedMetric;
 
   const formatValue = (value: number) => {
     if (showPct) return `${value.toFixed(2)}%`;
@@ -204,19 +206,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
       ) : chartData.length > 0 ? (
         <Box sx={{ mt: 2 }}>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
-              <defs>
-                {seriesNames.map((name, i) => (
-                  <linearGradient
-                    key={name}
-                    id={`areaGrad-${groupBy}-${i}`}
-                    x1="0" y1="0" x2="0" y2="1"
-                  >
-                    <stop offset="5%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0.02} />
-                  </linearGradient>
-                ))}
-              </defs>
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -247,21 +237,19 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
               {seriesNames.map((name, i) => {
                 const hidden = hiddenSeries.has(name);
                 return (
-                  <Area
+                  <Line
                     key={name}
-                    type="monotone"
+                    type="linear"
                     dataKey={name}
-                    stackId="1"
                     stroke={hidden ? "transparent" : SERIES_COLORS[i % SERIES_COLORS.length]}
                     strokeWidth={1.5}
-                    fill={hidden ? "transparent" : `url(#areaGrad-${groupBy}-${i})`}
                     dot={false}
                     activeDot={hidden ? false : { r: 4, strokeWidth: 1.5 }}
                     hide={hidden}
                   />
                 );
               })}
-            </AreaChart>
+            </LineChart>
           </ResponsiveContainer>
 
           {/* Custom clickable legend */}

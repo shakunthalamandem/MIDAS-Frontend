@@ -16,7 +16,7 @@ const formatDate = (dateStr: string) => {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }); // e.g., 30-Jul-2025
+  }); 
 };
 
 const formatTime = (dateStr: string) => {

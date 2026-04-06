@@ -27,7 +27,8 @@
                     2022,
                     2023,
                     2024,
-                    2025
+                    2025,
+                    2026
                   ],
                 "label": "Start Year",
                 "description": "Start Year"
@@ -36,6 +37,7 @@
         {
             "end_year": {
                 "options": [
+                    2026,
                     2025,
                         2024,
                         2023,
@@ -117,7 +119,17 @@
                 "label": "Sector",
                 "description": "Sector"
             }
+        },
+        {
+            "spac": {
+                "options": [
+                    "Any",
+                    "Y",
+                    "N"
+                ],
+                "label": "SPAC",
+                "description": "SPAC"
+            }
         }
-                
     ]
 }

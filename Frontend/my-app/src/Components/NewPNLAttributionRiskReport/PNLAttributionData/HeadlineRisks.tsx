@@ -1,5 +1,6 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import type { HeadlineRisks as HeadlineRisksData, DashboardCategory } from "./types";
 import { formatCurrency, formatFullCurrency, formatPct } from "./utils";
 
@@ -9,12 +10,43 @@ interface HeadlineRisksProps {
   onCategorySelect: (category: DashboardCategory) => void;
 }
 
+interface RiskCardInfo {
+  definition: string;
+  formula: string;
+  notes?: string;
+}
+
+const RISK_CARDS_INFO: Record<string, RiskCardInfo> = {
+  aum: {
+    definition: "Assets Under Management — the total market value of all assets held in the portfolio, measured at the beginning of the month.",
+    formula: "AUM = Σ (Position Market Value)",
+  },
+  gross_market_value: {
+    definition: "Gross Market Value = Sum of absolute position exposures (long + short), showing total portfolio size without netting.",
+    formula: "Gross Market Value = Σ | Position Exposure |",
+  },
+  delta_adj_net_mv: {
+    definition: "Measures the net exposure of the portfolio to equity movements after adjusting positions by their delta.",
+    formula: "Delta Adjusted Net Exposure = Σ(Position Exposure × Δ) / AUM",
+    notes: "Delta values are sourced on a weekly basis from B Source. Where data is unavailable, proxy assumptions are applied as follows: 0.5 for convertible bonds, 0.25 for equity calls, -0.25 for equity puts, and 1 for high yield instruments. For equities, delta is assumed to be 1.",
+  },
+  beta_adj_net_mv: {
+    definition: "Measures the portfolio's sensitivity to overall market movements after adjusting for both delta and beta, indicating how the portfolio is expected to move relative to the market.",
+    formula: "Beta Adjusted Net Exposure = Σ(Position Exposure × Δ × β) / AUM",
+    notes: "Beta values are sourced daily from B Source. The Raw overridable beta is calculated over a 1-month period from the current date, using a fixed benchmark index (SPY Equity) for both US and international securities. Beta values are capped within a range of +2.5 (maximum) and -2.5 (minimum). Where data is unavailable, a proxy beta of 0.4 is applied for convertible bonds and 0.25 for High yield instruments.",
+  },
+  one_yr_1pct_var: {
+    definition: "Estimates the maximum expected loss at a 99% confidence level, meaning there is only a 1% probability that losses will exceed this level over the specified time horizon.",
+    formula: "VaR (99%) = | PERCENTILE.INC(Returns, 0.01) | × √T\n(Where T = time horizon, e.g., 252 for 1 year)",
+  },
+};
+
 const RISK_CARDS_CONFIG = [
   { key: "aum", label: "AUM", color: "green", icon: "$", showPct: false, clickable: false },
   { key: "gross_market_value", label: "Gross Market Value", color: "blue", icon: "\u{1F4CA}", showPct: true, pctKey: "gross_market_value_pct", clickable: true, category: "gross_market_value" as DashboardCategory },
   { key: "delta_adj_net_mv", label: "Delta Adj. Net Exposure", color: "cyan", icon: "\u{1F4C8}", showPct: true, pctKey: "delta_adj_net_mv_pct", clickable: true, category: "delta_adj_net_mv" as DashboardCategory },
   { key: "beta_adj_net_mv", label: "Beta Adj. Net Exposure", color: "orange", icon: "\u{1F4C9}", showPct: true, pctKey: "beta_adj_net_mv_pct", clickable: true, category: "beta_adj_net_mv" as DashboardCategory },
-  { key: "one_yr_1pct_var", label: "1Y 1% VaR", color: "pink", icon: "\u2298", showPct: true, pctOnly: true, pctKey: "one_yr_1pct_var_pct", clickable: false },
+  { key: "one_yr_1pct_var", label: "1% VaR", color: "pink", icon: "\u2298", showPct: true, pctOnly: true, pctKey: "one_yr_1pct_var_pct", clickable: false },
 ] as const;
 
 const SELECTED_COLORS: Record<string, string> = {
@@ -45,6 +77,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
               className={`risk-card risk-card--${cfg.color}${isSelected ? " risk-card--selected" : ""}`}
               onClick={isClickable && "category" in cfg ? () => onCategorySelect(cfg.category) : undefined}
               sx={{
+                position: "relative",
                 cursor: isClickable ? "pointer" : "default",
                 ...(isSelected && {
                   background: `${selectedBg} !important`,
@@ -52,6 +85,48 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                 }),
               }}
             >
+              {/* Info icon — top right */}
+              {RISK_CARDS_INFO[cfg.key] && (
+                <Tooltip
+                  title={
+                    <Box sx={{ p: 0.5 }}>
+                      <Box sx={{ fontWeight: 700, mb: 0.5 }}>{cfg.label}</Box>
+                      <Box sx={{ mb: 0.75 }}>{RISK_CARDS_INFO[cfg.key].definition}</Box>
+                      <Box sx={{ fontWeight: 600, color: "#90caf9", mb: 0.25 }}>Formula:</Box>
+                      <Box sx={{ fontFamily: "monospace", whiteSpace: "pre-line", color: "#e0f2fe", mb: RISK_CARDS_INFO[cfg.key].notes ? 0.75 : 0 }}>
+                        {RISK_CARDS_INFO[cfg.key].formula}
+                      </Box>
+                      {RISK_CARDS_INFO[cfg.key].notes && (
+                        <Box sx={{ color: "#cbd5e1", fontSize: "11px", lineHeight: 1.5, borderTop: "1px solid rgba(255,255,255,0.1)", pt: 0.75 }}>
+                          {RISK_CARDS_INFO[cfg.key].notes}
+                        </Box>
+                      )}
+                    </Box>
+                  }
+                  placement="top"
+                  arrow
+                  slotProps={{
+                    tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 320, fontSize: "12px", lineHeight: 1.5 } },
+                    arrow: { sx: { color: "#1e293b" } },
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <InfoOutlinedIcon
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      fontSize: "15px",
+                      cursor: "help",
+                      opacity: 0.55,
+                      color: isSelected ? "#fff" : "inherit",
+                      zIndex: 1,
+                      "&:hover": { opacity: 1 },
+                    }}
+                  />
+                </Tooltip>
+              )}
+
               {/* Top row: icon + label */}
               <Box className="risk-card-top">
                 <Box

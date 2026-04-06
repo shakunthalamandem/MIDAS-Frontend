@@ -131,7 +131,7 @@ const InsightsMain = () => {
         color="#002060"
         align="center"
       >
-        AI Market Insights Overview 2025
+        AI Market Insights Overview 2026
       </Typography>
 
       {loading ? (

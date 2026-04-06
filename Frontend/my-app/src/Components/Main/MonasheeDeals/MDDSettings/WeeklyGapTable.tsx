@@ -32,7 +32,7 @@ const WeeklyGapTable: React.FC<WeeklyGapTableProps> = ({ filters }) => {
       try {
         const payload = {
           ...filters,
-          years: [2025], // Ensure the year is set
+          years: [2026], // Ensure the year is set
         };
 
         const response = await fetch(`${apiUrl}/api/detailed_gap_analysis/`, {
