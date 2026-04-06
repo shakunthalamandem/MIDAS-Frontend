@@ -159,7 +159,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
               },
             }}
           />
-          <Button
+          {/* <Button
             onClick={onClose}
             variant="outlined"
             size="small"
@@ -171,7 +171,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
             }}
           >
             Close
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
