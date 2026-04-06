@@ -174,13 +174,6 @@ const SummarySignalBoard: React.FC = () => {
           >
             Signal Board
           </Typography>
-          <Typography
-            variant="subtitle1"
-            color="textSecondary"
-            sx={{ fontSize: '1rem', fontWeight: 500 }}
-          >
-            Real-time IPO market sentiment and analysis
-          </Typography>
         </Box>
 
         {/* Cards Grid - Horizontal Layout */}

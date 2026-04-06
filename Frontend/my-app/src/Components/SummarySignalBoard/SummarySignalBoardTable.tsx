@@ -117,18 +117,18 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
           alignItems: 'flex-start',
           mb: 3,
           pb: 3,
-          borderBottom: `2px solid ${theme.palette.divider}`,
           gap: 2,
         }}
       >
         <Box>
           <Typography variant="h6" component="div" sx={{ fontWeight: 700, fontSize: '1.25rem', mb: 0.5 }}>
-            {getTableTitle()}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.9rem' }}>
-            Showing {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
+            {getTableTitle()}: {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
             {searchTicker && `(filtered from ${selectedData.length})`}
           </Typography>
+          {/* <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.9rem' }}>
+            Showing {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
+            {searchTicker && `(filtered from ${selectedData.length})`}
+          </Typography> */}
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
           <TextField
@@ -137,6 +137,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
             onChange={(e) => setSearchTicker(e.target.value)}
             size="small"
             variant="outlined"
+            autoFocus
             sx={{
               width: '100%',
               maxWidth: '350px',
@@ -197,13 +198,29 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
+              <TableRow
+                sx={{
+                  backgroundColor: '#1a237e',
+                  '& .MuiTableCell-head': {
+                    padding: '16px 14px',
+                  },
+                }}
+              >
                 <TableCell sortDirection={sortColumn === 'ticker' ? sortDirection : false}>
                   <TableSortLabel
                     active={sortColumn === 'ticker'}
                     direction={sortColumn === 'ticker' ? sortDirection : 'asc'}
                     onClick={() => handleSort('ticker')}
-                    sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                    sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                   >
                     Ticker
                   </TableSortLabel>
@@ -215,7 +232,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'pricing_date'}
                         direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
                         onClick={() => handleSort('pricing_date')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Pricing Date
                       </TableSortLabel>
@@ -225,7 +251,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'sentiment_score'}
                         direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
                         onClick={() => handleSort('sentiment_score')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Sentiment Agent
                       </TableSortLabel>
@@ -235,7 +270,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'deal_agent'}
                         direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('deal_agent')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Deal (IPO) Agent
                       </TableSortLabel>
@@ -245,7 +289,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'factors_agent'}
                         direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('factors_agent')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Factors Based Agent
                       </TableSortLabel>
@@ -255,7 +308,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'gator_signal'}
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Gator Signal
                       </TableSortLabel>
@@ -269,7 +331,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'sentiment_score'}
                         direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
                         onClick={() => handleSort('sentiment_score')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Sentiment Agent
                       </TableSortLabel>
@@ -279,7 +350,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'deal_agent'}
                         direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('deal_agent')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Deal (IPO) Agent
                       </TableSortLabel>
@@ -289,9 +369,37 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'factors_agent'}
                         direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('factors_agent')}
-                        sx={{ color: '#1565c0 !important', fontWeight: 700, fontSize: '0.9rem' }}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
                       >
                         Factors Based Agent
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 180 }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
+                      <TableSortLabel
+                        active={sortColumn === 'gator_signal'}
+                        direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('gator_signal')}
+                        sx={{
+                      color: 'white !important',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      '& .MuiTableSortLabel-icon': {
+                        color: 'white !important',
+                      },
+                    }}
+                      >
+                        Gator Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -587,6 +695,33 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 sx={{ width: 'fit-content', fontWeight: 600 }}
                               />
                             )}
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+
+                      {/* Gator Signal Column */}
+                      <TableCell>
+                        {deal.jay_ritter?.overall_signal ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Chip
+                              label={deal.jay_ritter.overall_signal}
+                              size="small"
+                              color={
+                                deal.jay_ritter.overall_signal.toLowerCase() === 'long'
+                                  ? 'success'
+                                  : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
+                                  ? 'error'
+                                  : 'warning'
+                              }
+                              sx={{ fontWeight: 700, width: 'fit-content' }}
+                            />
+                            <Typography variant="caption" color="textSecondary">
+                              {deal.jay_ritter.confidence_score}% confidence
+                            </Typography>
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
