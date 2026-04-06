@@ -146,7 +146,6 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   }, [activeSeries, showPct]);
 
   const seriesNames = activeSeries.map((s) => s.name);
-  const activeLabel = METRIC_CONFIG.find((m) => m.key === selectedMetric)?.label || selectedMetric;
 
   const formatValue = (value: number) => {
     if (showPct) return `${value.toFixed(2)}%`;
