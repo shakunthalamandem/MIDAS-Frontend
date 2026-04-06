@@ -6,61 +6,22 @@ import {
   Grid,
   Typography,
   CircularProgress,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
   useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import WorkIcon from '@mui/icons-material/Work';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-
-interface DealData {
-  ticker: string;
-  issuer_name?: string;
-  pricing_date?: string;
-  sentiment?: any;
-  ml_results?: any;
-  deal_status?: string;
-  trade_date?: string;
-  [key: string]: any;
-}
-
-interface SummaryData {
-  upcoming_deals: {
-    count: number;
-    data: DealData[];
-  };
-  current_portfolio_deals: {
-    count: number;
-    data: DealData[];
-  };
-  recently_traded_deals: {
-    count: number;
-    data: DealData[];
-  };
-}
+import SummarySignalBoardTable from './SummarySignalBoardTable';
+import { CardType, DealData, SummaryData } from './types';
 
 const SummarySignalBoard: React.FC = () => {
   const theme = useTheme();
   const [data, setData] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [selectedData, setSelectedData] = useState<DealData[]>([]);
-const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +29,6 @@ const apiUrl = process.env.REACT_APP_API_URL;
         setLoading(true);
         const token = localStorage.getItem('access_token');
 
-        // Check if token exists
         if (!token) {
           throw new Error('Authentication token not found. Please login first.');
         }
@@ -81,7 +41,6 @@ const apiUrl = process.env.REACT_APP_API_URL;
           },
         });
 
-        // Handle unauthorized response
         if (response.status === 401) {
           localStorage.removeItem('access_token');
           throw new Error('Your session has expired. Please login again.');
@@ -92,6 +51,8 @@ const apiUrl = process.env.REACT_APP_API_URL;
         }
 
         const result = await response.json();
+        console.log('Signal Board API Response:', result);
+        console.log('Upcoming Deals Sample:', result.upcoming_deals?.data?.[0]);
         setData(result);
         setError(null);
       } catch (err) {
@@ -106,7 +67,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
     fetchData();
   }, [apiUrl]);
 
-  const handleCardClick = (type: 'upcoming' | 'portfolio' | 'recent') => {
+  const handleCardClick = (type: CardType) => {
     if (!data) return;
 
     let deals: DealData[] = [];
@@ -120,11 +81,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
     setSelectedCard(type);
     setSelectedData(deals);
-    setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleCloseTable = () => {
     setSelectedCard(null);
     setSelectedData([]);
   };
@@ -161,12 +120,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
           <Typography variant="h6" color="error" sx={{ mb: 2 }}>
             Error: {error}
           </Typography>
-          <Button
-            variant="contained"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </Button>
+          <button onClick={() => window.location.reload()}>Retry</button>
         </Box>
       </Box>
     );
@@ -178,21 +132,21 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
   const cards = [
     {
-      id: 'upcoming',
-      title: 'Upcoming Deals',
+      id: 'upcoming' as const,
+      title: 'Upcoming IPOs',
       count: data.upcoming_deals.count,
       icon: TrendingUpIcon,
       color: 'primary',
     },
     {
-      id: 'portfolio',
-      title: 'Current Portfolio',
+      id: 'portfolio' as const,
+      title: 'Trading IPOs',
       count: data.current_portfolio_deals.count,
       icon: WorkIcon,
       color: 'success',
     },
     {
-      id: 'recent',
+      id: 'recent' as const,
       title: 'Recently Listed',
       count: data.recently_traded_deals.count,
       icon: ScheduleIcon,
@@ -213,88 +167,59 @@ const apiUrl = process.env.REACT_APP_API_URL;
           </Typography>
         </Box>
 
-        {/* Cards Grid */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Cards Grid - Horizontal Layout */}
+        <Grid container spacing={2} sx={{ mb: 4 }}>
           {cards.map((card) => {
             const Icon = card.icon;
             return (
-              <Grid item xs={12} sm={6} md={4} key={card.id}>
+              <Grid item xs={12} sm={6} md={3} key={card.id}>
                 <Card
-                  onClick={() => handleCardClick(card.id as 'upcoming' | 'portfolio' | 'recent')}
+                  onClick={() => handleCardClick(card.id)}
                   sx={{
                     cursor: 'pointer',
                     height: '100%',
                     transition: 'all 0.3s ease',
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: theme.shadows[12],
+                      boxShadow: theme.shadows[4],
                     },
                   }}
                 >
-                  <CardContent>
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="flex-start"
-                      mb={2}
-                    >
-                      <Box
+                  <CardContent sx={{ p: 2.5 }}>
+                    <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+                      <Icon
                         sx={{
-                          p: 1.5,
-                          borderRadius: 2,
-                          bgcolor: `${card.color}.light`,
+                          fontSize: 20,
+                          color: `${card.color}.main`,
                         }}
-                      >
-                        <Icon
-                          sx={{
-                            fontSize: 28,
-                            color: `${card.color}.main`,
-                          }}
-                        />
-                      </Box>
+                      />
                     </Box>
 
                     <Typography
-                      color="textSecondary"
-                      sx={{ fontSize: '0.875rem', mb: 1 }}
+                      variant="caption"
+                      sx={{
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.5px',
+                        color: theme.palette.text.secondary,
+                        textTransform: 'uppercase',
+                        mb: 1,
+                        display: 'block',
+                      }}
                     >
                       {card.title}
                     </Typography>
 
                     <Typography
-                      variant="h3"
+                      variant="h4"
                       sx={{
                         fontWeight: 700,
-                        mb: 0.5,
+                        fontSize: '2rem',
                       }}
                     >
                       {card.count}
                     </Typography>
-
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                    >
-                      {card.count === 1 ? 'Deal' : 'Deals'}
-                    </Typography>
-
-                    <Box
-                      sx={{
-                        mt: 2,
-                        height: 4,
-                        bgcolor: theme.palette.divider,
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          height: '100%',
-                          width: '40%',
-                          bgcolor: `${card.color}.main`,
-                        }}
-                      />
-                    </Box>
                   </CardContent>
                 </Card>
               </Grid>
@@ -302,134 +227,16 @@ const apiUrl = process.env.REACT_APP_API_URL;
           })}
         </Grid>
 
-        {/* Data Table Dialog */}
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          maxWidth="lg"
-          fullWidth
-        >
-          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h6" component="div">
-                {selectedCard === 'upcoming' && 'Upcoming Deals'}
-                {selectedCard === 'portfolio' && 'Current Portfolio'}
-                {selectedCard === 'recent' && 'Recently Listed'}
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                Showing {selectedData.length} deal{selectedData.length !== 1 ? 's' : ''}
-              </Typography>
-            </Box>
-            <IconButton onClick={handleCloseDialog} size="small">
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            {selectedData.length > 0 ? (
-              <TableContainer component={Paper} sx={{ mt: 2 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ bgcolor: theme.palette.action.hover }}>
-                      <TableCell sx={{ fontWeight: 700 }}>Ticker</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Company Name</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Pricing Date</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Sentiment</TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selectedData.map((deal, index) => (
-                      <TableRow
-                        key={index}
-                        sx={{
-                          '&:hover': {
-                            bgcolor: theme.palette.action.hover,
-                          },
-                        }}
-                      >
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          {deal.ticker}
-                        </TableCell>
-                        <TableCell>
-                          {deal.issuer_name || deal.company || 'N/A'}
-                        </TableCell>
-                        <TableCell>
-                          {deal.pricing_date || deal.trade_date || 'N/A'}
-                        </TableCell>
-                        <TableCell>
-                          <SentimentBadge
-                            sentiment={
-                              deal.sentiment?.one_week_sentiment ||
-                              deal.sentiment?.sentiment ||
-                              'N/A'
-                            }
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge deal={deal} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            ) : (
-              <Box textAlign="center" py={4}>
-                <Typography color="textSecondary">
-                  No deals found for this category.
-                </Typography>
-              </Box>
-            )}
-          </DialogContent>
-        </Dialog>
+        {/* Data Table - Inline */}
+        {selectedCard && (
+          <SummarySignalBoardTable
+            selectedCard={selectedCard}
+            selectedData={selectedData}
+            onClose={handleCloseTable}
+          />
+        )}
       </Box>
     </Box>
-  );
-};
-
-// Sentiment Badge Component
-const SentimentBadge: React.FC<{ sentiment: string }> = ({ sentiment }) => {
-  const sentimentValue = String(sentiment).toLowerCase();
-
-  let color: 'success' | 'error' | 'warning' | 'default' = 'default';
-  if (sentimentValue.includes('bullish') || sentimentValue.includes('positive')) {
-    color = 'success';
-  } else if (sentimentValue.includes('bearish') || sentimentValue.includes('negative')) {
-    color = 'error';
-  } else if (sentimentValue.includes('neutral')) {
-    color = 'warning';
-  }
-
-  return (
-    <Chip
-      label={sentiment || 'N/A'}
-      color={color}
-      variant="outlined"
-      size="small"
-    />
-  );
-};
-
-// Status Badge Component
-const StatusBadge: React.FC<{ deal: DealData }> = ({ deal }) => {
-  const status = deal.deal_status || deal.status || 'Active';
-
-  const statusColorMap: { [key: string]: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' } = {
-    issued: 'primary',
-    announced: 'info',
-    active: 'success',
-    completed: 'default',
-  };
-
-  const color = statusColorMap[status.toLowerCase()] || 'default';
-
-  return (
-    <Chip
-      label={status}
-      color={color}
-      variant="outlined"
-      size="small"
-    />
   );
 };
 
