@@ -38,8 +38,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const [searchTicker, setSearchTicker] = useState('');
-  const [sortColumn, setSortColumn] = useState<string>('ticker');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortColumn, setSortColumn] = useState<string>('trade_date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const filteredData = useMemo(() => {
     let filtered = selectedData.filter((deal) =>
@@ -58,6 +58,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       if (sortColumn === 'pricing_date') {
         aValue = a.unsupervised_summary?.pricing_date || a.pricing_date || a.trade_date || '';
         bValue = b.unsupervised_summary?.pricing_date || b.pricing_date || b.trade_date || '';
+      }
+
+      if (sortColumn === 'trade_date') {
+        aValue = a.unsupervised_summary?.trade_date || a.trade_date || '';
+        bValue = b.unsupervised_summary?.trade_date || b.trade_date || '';
       }
 
       if (sortColumn === 'deal_agent') {
@@ -248,13 +253,13 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
 
                 {selectedCard === 'portfolio' && (
                   <>
-                    <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
+                    <TableCell sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
                       <TableSortLabel
-                        active={sortColumn === 'pricing_date'}
-                        direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('pricing_date')}
+                        active={sortColumn === 'trade_date'}
+                        direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('trade_date')}
                       >
-                        Pricing Date
+                        Trade Date
                       </TableSortLabel>
                     </TableCell>
 
@@ -301,15 +306,17 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                 )}
 
                 {selectedCard === 'recent' && (
-                  <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
-                    <TableSortLabel
-                      active={sortColumn === 'pricing_date'}
-                      direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('pricing_date')}
-                    >
-                      Pricing Date
-                    </TableSortLabel>
-                  </TableCell>
+                  <>
+                    <TableCell sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
+                      <TableSortLabel
+                        active={sortColumn === 'trade_date'}
+                        direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('trade_date')}
+                      >
+                        Trade Date
+                      </TableSortLabel>
+                    </TableCell>
+                  </>
                 )}
 
                 {(selectedCard === 'upcoming' || selectedCard === 'recent') && (
@@ -381,7 +388,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       >
                         {deal.ticker}
                       </TableCell>
-                      <TableCell>{getPricingDate(deal, selectedCard)}</TableCell>
+                      <TableCell>{deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}</TableCell>
 
                       {/* Sentiment Agent Column */}
                       <TableCell>
@@ -549,7 +556,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {selectedCard === 'recent' && (
                         <TableCell>
                           <Typography sx={{ fontSize: '0.85rem', color: theme.palette.text.secondary }}>
-                            {getPricingDate(deal, selectedCard)}
+                            {deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}
                           </Typography>
                         </TableCell>
                       )}
