@@ -53,6 +53,7 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
+  spac: string[];
 }
 
 const CountryBasedTable: React.FC = () => {
@@ -66,6 +67,7 @@ const CountryBasedTable: React.FC = () => {
   const [dealTypes, setDealTypes] = useState<string[]>(['All']);
   const [regions, setRegions] = useState<string[]>(['All']);
   const [sectors, setSectors] = useState<string[]>(['All']);
+  const [spac, setSpac] = useState<string>('Any');
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -105,14 +107,16 @@ const CountryBasedTable: React.FC = () => {
 
     const fetchCountryData = async () => {
       setLoading(true);
-      const filters = {
-        filters: {
-          year_range: [startYear, endYear],
-          deal_type: effectiveDealTypes,
-          region: effectiveRegions,
-          sector: effectiveSectors,
-        }
+      const innerFilters: any = {
+        year_range: [startYear, endYear],
+        deal_type: effectiveDealTypes,
+        region: effectiveRegions,
+        sector: effectiveSectors,
       };
+      if (spac !== 'Any') {
+        innerFilters.spac = spac;
+      }
+      const filters = { filters: innerFilters };
 
       try {
         const apiUrl = process.env.REACT_APP_API_URL;
@@ -146,7 +150,7 @@ const CountryBasedTable: React.FC = () => {
     };
 
     fetchCountryData();
-  }, [startYear, endYear, dealTypes, regions, sectors, dealTypeOptions, regionOptions, sectorOptions]);
+  }, [startYear, endYear, dealTypes, regions, sectors, spac, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
@@ -195,6 +199,7 @@ const CountryBasedTable: React.FC = () => {
     setDealTypes(['All']);
     setRegions(['All']);
     setSectors(['All']);
+    setSpac('Any');
   };
 
   const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
@@ -328,6 +333,24 @@ const CountryBasedTable: React.FC = () => {
                         <ListItemText primary={s} />
                       </MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* SPAC */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>SPAC</InputLabel>
+                  <Select
+                    value={spac}
+                    onChange={(e) => setSpac(e.target.value as string)}
+                    label="SPAC"
+                    MenuProps={menuProps}
+                    sx={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}
+                  >
+                    <MenuItem value="Any">Any</MenuItem>
+                    <MenuItem value="Y">Y</MenuItem>
+                    <MenuItem value="N">N</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

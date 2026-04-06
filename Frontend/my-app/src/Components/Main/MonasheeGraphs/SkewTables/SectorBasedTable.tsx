@@ -27,6 +27,7 @@ interface SkewTableOptions {
   region: string[];
   sector: string[];
   year_period: string[];
+  spac: string[];
 }
 
 const SectorBasedTable: React.FC = () => {
@@ -36,6 +37,7 @@ const SectorBasedTable: React.FC = () => {
   const [regions, setRegions] = useState<string[]>(['All']);
   const [sectors, setSectors] = useState<string[]>(['All']);
   const [yearPeriod, setYearPeriod] = useState<string>('Yearly');
+  const [spac, setSpac] = useState<string>('Any');
   const [loading, setLoading] = useState<boolean>(false);
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -85,15 +87,17 @@ const SectorBasedTable: React.FC = () => {
     const effectiveSectors = sectors.includes('All') ? sectorOptions : sectors;
 
     const fetchData = async () => {
-      const requestData = {
-        filters: {
-          year_range: [startYear, endYear],
-          deal_type: effectiveDealTypes,
-          region: effectiveRegions,
-          sector: effectiveSectors,
-          year_period: yearPeriod,
-        },
+      const filters: any = {
+        year_range: [startYear, endYear],
+        deal_type: effectiveDealTypes,
+        region: effectiveRegions,
+        sector: effectiveSectors,
+        year_period: yearPeriod,
       };
+      if (spac !== 'Any') {
+        filters.spac = spac;
+      }
+      const requestData = { filters };
 
       try {
         setLoading(true);
@@ -127,7 +131,7 @@ const SectorBasedTable: React.FC = () => {
     };
 
     fetchData();
-  }, [startYear, endYear, dealTypes, regions, sectors, yearPeriod, dealTypeOptions, regionOptions, sectorOptions]);
+  }, [startYear, endYear, dealTypes, regions, sectors, yearPeriod, spac, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
@@ -180,6 +184,7 @@ const SectorBasedTable: React.FC = () => {
     setDealTypes(['All']);
     setRegions(['All']);
     setSectors(['All']);
+    setSpac('Any');
   };
 
   const filteredEndYearOptions = endYearOptions.filter((year) => year >= startYear);
@@ -331,6 +336,24 @@ const SectorBasedTable: React.FC = () => {
                     {yearperiodOptions.map((period: string) => (
                       <MenuItem key={period} value={period}>{period}</MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* SPAC */}
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>SPAC</InputLabel>
+                  <Select
+                    value={spac}
+                    onChange={(e) => setSpac(e.target.value as string)}
+                    label="SPAC"
+                    MenuProps={menuProps}
+                    sx={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}
+                  >
+                    <MenuItem value="Any">Any</MenuItem>
+                    <MenuItem value="Y">Y</MenuItem>
+                    <MenuItem value="N">N</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

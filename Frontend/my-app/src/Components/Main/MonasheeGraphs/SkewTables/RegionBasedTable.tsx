@@ -26,6 +26,7 @@ interface SkewTableOptions {
     'end year': number[];
     dealType: string[];
     sector: string[];
+    spac: string[];
 }
 
 const RegionBasedTable: React.FC = () => {
@@ -33,6 +34,7 @@ const RegionBasedTable: React.FC = () => {
     const [endYear, setEndYear] = useState<number>(2026);
     const [dealTypes, setDealTypes] = useState<string[]>(['All']);
     const [sectors, setSectors] = useState<string[]>(['All']);
+    const [spac, setSpac] = useState<string>('Any');
 
     const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
     const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -76,13 +78,15 @@ const RegionBasedTable: React.FC = () => {
         const effectiveSectors = sectors.includes('All') ? sectorOptions : sectors;
 
         const fetchData = async () => {
-            const requestData = {
-                filters: {
-                    year_range: [startYear, endYear],
-                    deal_type: effectiveDealTypes,
-                    sector: effectiveSectors,
-                }
+            const filters: any = {
+                year_range: [startYear, endYear],
+                deal_type: effectiveDealTypes,
+                sector: effectiveSectors,
             };
+            if (spac !== 'Any') {
+                filters.spac = spac;
+            }
+            const requestData = { filters };
 
             try {
                 setLoading(true);
@@ -113,7 +117,7 @@ const RegionBasedTable: React.FC = () => {
         };
 
         fetchData();
-    }, [startYear, endYear, dealTypes, sectors, dealTypeOptions, sectorOptions]);
+    }, [startYear, endYear, dealTypes, sectors, spac, dealTypeOptions, sectorOptions]);
 
     const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
         const newStartYear = Number(event.target.value);
@@ -151,6 +155,7 @@ const RegionBasedTable: React.FC = () => {
         setEndYear(2026);
         setDealTypes(['All']);
         setSectors(['All']);
+        setSpac('Any');
     };
 
     const handleRowClick = (regionName: string) => {
@@ -267,6 +272,24 @@ const RegionBasedTable: React.FC = () => {
                                                 <ListItemText primary={sec} />
                                             </MenuItem>
                                         ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            {/* SPAC */}
+                            <Grid item xs={12} sm={6} md={2}>
+                                <FormControl fullWidth variant="outlined" size="small">
+                                    <InputLabel>SPAC</InputLabel>
+                                    <Select
+                                        value={spac}
+                                        onChange={(e) => setSpac(e.target.value as string)}
+                                        label="SPAC"
+                                        MenuProps={menuProps}
+                                        sx={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}
+                                    >
+                                        <MenuItem value="Any">Any</MenuItem>
+                                        <MenuItem value="Y">Y</MenuItem>
+                                        <MenuItem value="N">N</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

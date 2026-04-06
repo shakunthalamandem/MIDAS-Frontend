@@ -26,13 +26,15 @@ interface FiltersResponse {
   broad_region: string[];
   week: string[];
   fo_type: string[];
+  spac: string[];
 }
 
 interface AppliedFilters {
   deal_type: string[];
   broad_region: string[];
-  week: number[]; // 🔄 Change from string[] to number[]
+  week: number[];
   fo_type: string[];
+  spac: string[];
 }
 
 const WeeklyMain: React.FC = () => {
@@ -45,12 +47,14 @@ const WeeklyMain: React.FC = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedWeeks, setSelectedWeeks] = useState<string[]>([]);
   const [selectedFoTypes, setSelectedFoTypes] = useState<string[]>([]);
+  const [selectedSpac, setSelectedSpac] = useState<string[]>([]);
 
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
     deal_type: [],
     broad_region: [],
     week: [],
     fo_type: [],
+    spac: [],
   });
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -97,6 +101,7 @@ const handleApply = () => {
     broad_region: selectedRegions,
     week: numericWeeks,
     fo_type: selectedFoTypes,
+    spac: selectedSpac,
   });
 };
 
@@ -106,11 +111,13 @@ const handleApply = () => {
     setSelectedRegions([]);
     setSelectedWeeks([]);
     setSelectedFoTypes([]);
+    setSelectedSpac([]);
     setAppliedFilters({
       deal_type: [],
       broad_region: [],
       week: [],
       fo_type: [],
+      spac: [],
     });
   };
 
@@ -202,6 +209,27 @@ const handleApply = () => {
                     <MenuItem key={foType} value={foType}>
                       <Checkbox checked={selectedFoTypes.includes(foType)} />
                       <ListItemText primary={foType} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* SPAC */}
+            <Grid item>
+              <FormControl variant="outlined" size="small" sx={{ width: 120 }}>
+                <InputLabel>SPAC</InputLabel>
+                <Select
+                  multiple
+                  value={selectedSpac}
+                  onChange={(e) => setSelectedSpac(e.target.value as string[])}
+                  input={<OutlinedInput label="SPAC" sx={{ height: 40 }} />}
+                  renderValue={formatMultiSelect}
+                >
+                  {["Y", "N"].map((val) => (
+                    <MenuItem key={val} value={val}>
+                      <Checkbox checked={selectedSpac.includes(val)} />
+                      <ListItemText primary={val} />
                     </MenuItem>
                   ))}
                 </Select>

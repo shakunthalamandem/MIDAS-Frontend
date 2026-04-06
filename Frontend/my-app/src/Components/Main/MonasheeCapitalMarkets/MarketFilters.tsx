@@ -150,7 +150,8 @@ const MarketFilters: React.FC = () => {
                 Array.isArray(value.options) &&
                 key !== "start_year" &&
                 key !== "end_year" &&
-                key !== "year_period";
+                key !== "year_period" &&
+                key !== "spac";
 
               const placeholderValue =
                 key === "start_year"
