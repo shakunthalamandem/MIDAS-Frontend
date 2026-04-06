@@ -41,13 +41,13 @@ const formatNumber = (value: number, decimals: number = 0): string => {
   let formattedValue: string;
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Format billions
+    formattedValue = `${(absValue / 1e9).toFixed(decimals)}B`; // Format billions
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Format millions
+    formattedValue = `${(absValue / 1e6).toFixed(decimals)}M`; // Format millions
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Format thousands
+    formattedValue = `${(absValue / 1e3).toFixed(decimals)}K`; // Format thousands
   } else {
-    formattedValue = absValue.toString(); // Default format
+    formattedValue = decimals > 0 ? absValue.toFixed(decimals) : absValue.toString(); // Default format
   }
 
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
