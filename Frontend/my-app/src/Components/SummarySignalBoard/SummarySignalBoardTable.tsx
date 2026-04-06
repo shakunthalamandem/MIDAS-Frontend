@@ -114,45 +114,64 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-          pb: 2,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          alignItems: 'flex-start',
+          mb: 3,
+          pb: 3,
+          borderBottom: `2px solid ${theme.palette.divider}`,
+          gap: 2,
         }}
       >
         <Box>
-          <Typography variant="h6" component="div">
+          <Typography variant="h6" component="div" sx={{ fontWeight: 700, fontSize: '1.25rem', mb: 0.5 }}>
             {getTableTitle()}
           </Typography>
-          <Typography variant="caption" color="textSecondary">
-            Showing {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''} {searchTicker && `(filtered from ${selectedData.length})`}
+          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.9rem' }}>
+            Showing {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
+            {searchTicker && `(filtered from ${selectedData.length})`}
           </Typography>
         </Box>
-        <Button
-          onClick={onClose}
-          variant="text"
-          size="small"
-          sx={{ color: theme.palette.text.secondary }}
-        >
-          Close
-        </Button>
-      </Box>
-
-      {/* Search Bar */}
-      <Box sx={{ mb: 2 }}>
-        <TextField
-          placeholder="Search by Ticker..."
-          value={searchTicker}
-          onChange={(e) => setSearchTicker(e.target.value)}
-          size="small"
-          sx={{
-            width: '100%',
-            maxWidth: '300px',
-            '& .MuiOutlinedInput-root': {
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+          <TextField
+            placeholder="🔍 Search by Ticker..."
+            value={searchTicker}
+            onChange={(e) => setSearchTicker(e.target.value)}
+            size="small"
+            variant="outlined"
+            sx={{
+              width: '100%',
+              maxWidth: '350px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: 'white',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                },
+              },
+              '& .MuiOutlinedInput-input': {
+                fontSize: '0.9rem',
+                padding: '10px 14px',
+              },
+            }}
+          />
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            size="small"
+            sx={{
               borderRadius: '8px',
-            },
-          }}
-        />
+              textTransform: 'none',
+              fontWeight: 600,
+              mt: 0.5,
+            }}
+          >
+            Close
+          </Button>
+        </Box>
       </Box>
 
       {selectedData.length > 0 ? (
