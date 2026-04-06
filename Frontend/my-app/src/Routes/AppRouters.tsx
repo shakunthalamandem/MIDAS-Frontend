@@ -112,6 +112,7 @@ import SentimentSummary from "../Components/AIML/SentimentSummary";
 import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
 import PortfolioSummaryTabs from "../Components/IPODashboardLLM/PortfolioSummaryTabs";
 import UploadClaudeSentiment from "../Components/AIML/UploadClaudeSentiment";
+import S3DataTransfer from "../Components/S3DataTransfer/S3DataTransfer";
 
 
 const AppRouters: React.FC = () => {
@@ -342,6 +343,7 @@ const AppRouters: React.FC = () => {
         <Route path="/agents/:agentId/output" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/agents/:agentId/output/:outputId" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/signals/board" element={<AuthGuard><SignalBoardMain /></AuthGuard>} />
+        <Route path="/s3" element={<AuthGuard><S3DataTransfer /></AuthGuard>} />
 
 
 

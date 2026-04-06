@@ -13,6 +13,7 @@ import {
   FormControl,
   Button,
   Collapse,
+  Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -21,6 +22,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import "./RiskTriggers.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -103,6 +105,31 @@ const shiftDate = (dateStr: string, days: number): string => {
 };
 
 const SUMMARY_KEYS = ["delta_gross_exposure", "equity_delta_net_exposure", "equity_beta_net_exposure", "drawdown", "var_99"];
+
+const SUMMARY_CARD_INFO: Record<string, { definition: string; formula: string; notes?: string }> = {
+  delta_gross_exposure: {
+    definition: "Gross Market Value = Sum of absolute position exposures (long + short), showing total portfolio size without netting.",
+    formula: "Delta Gross Exposure = Σ | Position Exposure | / AUM",
+  },
+  equity_delta_net_exposure: {
+    definition: "Measures the net exposure of the portfolio to equity movements after adjusting positions by their delta.",
+    formula: "Delta Adjusted Net Exposure = Σ(Position Exposure × Δ) / AUM",
+    notes: "Delta values are sourced on a weekly basis from B Source. Proxy assumptions: 0.5 for convertible bonds, 0.25 for equity calls, -0.25 for equity puts, and 1 for high yield instruments. For equities, delta is assumed to be 1.",
+  },
+  equity_beta_net_exposure: {
+    definition: "Measures the portfolio's sensitivity to overall market movements after adjusting for both delta and beta.",
+    formula: "Beta Adjusted Net Exposure = Σ(Position Exposure × Δ × β) / AUM",
+    notes: "Beta values are sourced daily from B Source over a 1-month period using SPY Equity as benchmark. Beta is capped at ±2.5. Proxy beta of 0.4 for convertible bonds and 0.25 for high yield instruments.",
+  },
+  drawdown: {
+    definition: "Represents the decline in portfolio value from its peak to the current level, indicating the magnitude of loss experienced.",
+    formula: "Drawdown = (Peak Value — Current Value) / Peak Value",
+  },
+  var_99: {
+    definition: "Estimates the maximum expected loss at a 99% confidence level, meaning there is only a 1% probability that losses will exceed this level over the specified time horizon.",
+    formula: "VaR (99%) = | PERCENTILE.INC(Returns, 0.01) | × √T\n(Where T = time horizon, e.g., 252 for 1 year)",
+  },
+};
 const EXPOSURE_KEYS = new Set(["top_10_issuer_delta_net_exposure", "issuer_delta_net_exposure"]);
 
 /* ── Merge helpers ── */
@@ -349,7 +376,7 @@ const RiskTriggers: React.FC = () => {
                 renderValue={(s) => s === "__ALL__" ? "All Funds" : s}
               >
                 <MenuItem value="__ALL__">All Funds</MenuItem>
-                {portfolios.map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
+                {portfolios.filter((p) => p !== "FMAP" && p !== "MMLS").map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </Select>
             </FormControl>
 
@@ -410,7 +437,46 @@ const RiskTriggers: React.FC = () => {
                 {summaryCards.map((c) => {
                   const topFund = c.funds[0];
                   return (
-                    <Box key={c.key} className={`trig-scard trig-scard--${c.status}`}>
+                    <Box key={c.key} className={`trig-scard trig-scard--${c.status}`} sx={{ position: "relative" }}>
+                      {SUMMARY_CARD_INFO[c.key] && (
+                        <Tooltip
+                          title={
+                            <Box sx={{ p: 0.5 }}>
+                              <Box sx={{ fontWeight: 700, mb: 0.5 }}>{c.label}</Box>
+                              <Box sx={{ mb: 0.75 }}>{SUMMARY_CARD_INFO[c.key].definition}</Box>
+                              <Box sx={{ fontWeight: 600, color: "#90caf9", mb: 0.25 }}>Formula:</Box>
+                              <Box sx={{ fontFamily: "monospace", whiteSpace: "pre-line", color: "#e0f2fe", mb: SUMMARY_CARD_INFO[c.key].notes ? 0.75 : 0 }}>
+                                {SUMMARY_CARD_INFO[c.key].formula}
+                              </Box>
+                              {SUMMARY_CARD_INFO[c.key].notes && (
+                                <Box sx={{ color: "#cbd5e1", fontSize: "11px", lineHeight: 1.5, borderTop: "1px solid rgba(255,255,255,0.1)", pt: 0.75 }}>
+                                  {SUMMARY_CARD_INFO[c.key].notes}
+                                </Box>
+                              )}
+                            </Box>
+                          }
+                          placement="top"
+                          arrow
+                          slotProps={{
+                            tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 320, fontSize: "12px", lineHeight: 1.5 } },
+                            arrow: { sx: { color: "#1e293b" } },
+                          }}
+                        >
+                          <InfoOutlinedIcon
+                            sx={{
+                              position: "absolute",
+                              top: 8,
+                              right: 8,
+                              fontSize: "15px",
+                              cursor: "help",
+                              opacity: 0.45,
+                              color: "inherit",
+                              zIndex: 1,
+                              "&:hover": { opacity: 1 },
+                            }}
+                          />
+                        </Tooltip>
+                      )}
                       <Box className="trig-scard-top">
                         <Typography className="trig-scard-label">{c.label}</Typography>
                         <CircularGauge ratio={c.ratio} status={c.status} label={`${c.pct}%`} />
