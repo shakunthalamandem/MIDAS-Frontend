@@ -270,6 +270,20 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             ? formatPctVal(row.beta_adj_net_pct)
             : formatCurrency(row.beta_adj_net),
       },
+      {
+        field: "delta_adj_net",
+        headerName: "Delta Adj Net",
+        flex: 1,
+        minWidth: 120,
+        headerAlign: "right",
+        align: "right",
+        valueGetter: (value: number, row: TickerItem) =>
+          showPct ? row.delta_adj_net_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.delta_adj_net_pct)
+            : formatCurrency(row.delta_adj_net),
+      },
     ],
     [showPct]
   );

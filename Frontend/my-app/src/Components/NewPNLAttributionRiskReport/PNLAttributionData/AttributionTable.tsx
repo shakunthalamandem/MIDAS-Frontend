@@ -197,6 +197,22 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             ? formatPctVal(row.beta_adj_net_pct)
             : formatCurrency(row.beta_adj_net),
       },
+      {
+        field: "delta_adj_net",
+        headerName: "Delta Adj Net",
+        flex: 1.1,
+        minWidth: 150,
+        cellClassName: "attr-datagrid-cell--exposure",
+        headerAlign: "center",
+        align: "center",
+        sortComparator: pinOtherComparator(numericCompare),
+        valueGetter: (value: number, row: AttributionItem) =>
+          showPct ? row.delta_adj_net_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.delta_adj_net_pct)
+            : formatCurrency(row.delta_adj_net),
+      },
     ],
     [showPct, groupBy]
   );
