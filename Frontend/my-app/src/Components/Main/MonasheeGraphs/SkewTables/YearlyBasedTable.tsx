@@ -184,9 +184,9 @@ const YearlyBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Sector Based Filtered Data
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center" flexWrap="nowrap">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -204,7 +204,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -223,7 +223,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -250,7 +250,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -277,7 +277,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* SPAC */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>SPAC</InputLabel>
                   <Select

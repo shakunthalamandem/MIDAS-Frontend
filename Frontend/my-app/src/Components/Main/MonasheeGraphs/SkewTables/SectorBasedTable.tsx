@@ -203,9 +203,9 @@ const SectorBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Yearly Based Filtered Data
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -223,7 +223,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -242,7 +242,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -269,7 +269,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -296,7 +296,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Sector */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
                   <Select
@@ -323,7 +323,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* Year Period — single select */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Period</InputLabel>
                   <Select
@@ -341,7 +341,7 @@ const SectorBasedTable: React.FC = () => {
               </Grid>
 
               {/* SPAC */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>SPAC</InputLabel>
                   <Select

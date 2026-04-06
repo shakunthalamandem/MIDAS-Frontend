@@ -219,9 +219,9 @@ const CountryBasedTable: React.FC = () => {
           </Typography>
 
           <Box p={3} mb={3} sx={{ backgroundColor: '#f0f4ff', borderRadius: 2 }}>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -239,7 +239,7 @@ const CountryBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -257,7 +257,7 @@ const CountryBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -284,7 +284,7 @@ const CountryBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -311,7 +311,7 @@ const CountryBasedTable: React.FC = () => {
               </Grid>
 
               {/* Sector */}
-              <Grid item xs={12} sm={6} md={2.4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>Sector</InputLabel>
                   <Select
@@ -338,7 +338,7 @@ const CountryBasedTable: React.FC = () => {
               </Grid>
 
               {/* SPAC */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth size="small">
                   <InputLabel>SPAC</InputLabel>
                   <Select

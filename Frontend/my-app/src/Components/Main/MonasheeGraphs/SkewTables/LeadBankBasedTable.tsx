@@ -204,9 +204,9 @@ const LeadBankBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Lead Bank Based Filtered Data
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -224,7 +224,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -243,7 +243,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -270,7 +270,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -297,7 +297,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Sector */}
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
                   <Select
@@ -324,7 +324,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* SPAC */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>SPAC</InputLabel>
                   <Select
