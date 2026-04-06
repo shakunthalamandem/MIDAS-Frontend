@@ -89,6 +89,8 @@ export interface AttributionItem {
   net_exp_pct: number;
   beta_adj_net: number;
   beta_adj_net_pct: number;
+  delta_adj_net: number;
+  delta_adj_net_pct: number;
 }
 
 export interface TopBottomPnlTicker {
@@ -157,6 +159,7 @@ export interface AttributionAreaChartResponse {
   ytd_pnl: AttributionAreaSeries[];
   net_exp: AttributionAreaSeries[];
   beta_adj_net: AttributionAreaSeries[];
+  delta_adj_net: AttributionAreaSeries[];
 }
 
 export interface TickerItem {
@@ -177,4 +180,6 @@ export interface TickerItem {
   net_exp_pct: number;
   beta_adj_net: number;
   beta_adj_net_pct: number;
+  delta_adj_net: number;
+  delta_adj_net_pct: number;
 }
