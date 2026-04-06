@@ -215,13 +215,24 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
             },
           }}
         >
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow
                 sx={{
-                  backgroundColor: '#1a237e',
                   '& .MuiTableCell-head': {
+                    backgroundColor: '#1a237e !important',
+                    color: 'white !important',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
                     padding: '16px 14px',
+                  },
+                  '& .MuiTableSortLabel-root': {
+                    color: 'white !important',
+                  },
+                  '& .MuiTableSortLabel-icon': {
+                    color: 'white !important',
                   },
                 }}
               >
@@ -230,20 +241,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     active={sortColumn === 'ticker'}
                     direction={sortColumn === 'ticker' ? sortDirection : 'asc'}
                     onClick={() => handleSort('ticker')}
-                    sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                   >
                     Ticker
                   </TableSortLabel>
                 </TableCell>
+
                 {selectedCard === 'portfolio' && (
                   <>
                     <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
@@ -251,193 +253,102 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         active={sortColumn === 'pricing_date'}
                         direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
                         onClick={() => handleSort('pricing_date')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Pricing Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 210 }} sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'sentiment_score'}
                         direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
                         onClick={() => handleSort('sentiment_score')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Sentiment Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 250 }} sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'deal_agent'}
                         direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('deal_agent')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Deal (IPO) Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 240 }} sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'factors_agent'}
                         direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('factors_agent')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Factors Based Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 180 }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'gator_signal'}
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Gator Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
                 )}
+
                 {selectedCard === 'recent' && (
                   <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
                     <TableSortLabel
                       active={sortColumn === 'pricing_date'}
                       direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
                       onClick={() => handleSort('pricing_date')}
-                      sx={{
-                    color: 'white !important',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    '& .MuiTableSortLabel-icon': {
-                      color: 'white !important',
-                    },
-                  }}
                     >
                       Pricing Date
                     </TableSortLabel>
                   </TableCell>
                 )}
+
                 {(selectedCard === 'upcoming' || selectedCard === 'recent') && (
                   <>
-                    <TableCell sx={{ minWidth: 210 }} sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
+                    <TableCell sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'sentiment_score'}
                         direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
                         onClick={() => handleSort('sentiment_score')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Sentiment Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 250 }} sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'deal_agent'}
                         direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('deal_agent')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Deal (IPO) Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 240 }} sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'factors_agent'}
                         direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('factors_agent')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Factors Based Agent
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ minWidth: 180 }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
+
+                    <TableCell sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'gator_signal'}
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
-                        sx={{
-                      color: 'white !important',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      '& .MuiTableSortLabel-icon': {
-                        color: 'white !important',
-                      },
-                    }}
                       >
                         Gator Signal
                       </TableSortLabel>
@@ -481,43 +392,41 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                           >
                             Score:{' '}
                             {deal.sentiment?.sentiment_score !== undefined &&
-                            deal.sentiment.sentiment_score !== null
+                              deal.sentiment.sentiment_score !== null
                               ? `${deal.sentiment.sentiment_score}/100`
                               : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
                                 undefined
-                              ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                              : 'N/A'}
+                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                : 'N/A'}
                           </Typography>
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment) && (
-                            <Chip
-                              label={`1W: ${
-                                deal.sentiment?.one_week_sentiment ||
-                                deal.sentiment_summary?.one_week_sentiment
-                              }`}
-                              size="small"
-                              color={getSentimentColor(
-                                deal.sentiment?.one_week_sentiment ||
+                              <Chip
+                                label={`1W: ${deal.sentiment?.one_week_sentiment ||
                                   deal.sentiment_summary?.one_week_sentiment
-                              )}
-                              sx={{ width: 'fit-content', fontWeight: 600 }}
-                            />
-                          )}
+                                  }`}
+                                size="small"
+                                color={getSentimentColor(
+                                  deal.sentiment?.one_week_sentiment ||
+                                  deal.sentiment_summary?.one_week_sentiment
+                                )}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                           {(deal.sentiment?.one_month_sentiment ||
                             deal.sentiment_summary?.one_month_sentiment) && (
-                            <Chip
-                              label={`1M: ${
-                                deal.sentiment?.one_month_sentiment ||
-                                deal.sentiment_summary?.one_month_sentiment
-                              }`}
-                              size="small"
-                              color={getSentimentColor(
-                                deal.sentiment?.one_month_sentiment ||
+                              <Chip
+                                label={`1M: ${deal.sentiment?.one_month_sentiment ||
                                   deal.sentiment_summary?.one_month_sentiment
-                              )}
-                              sx={{ width: 'fit-content', fontWeight: 600 }}
-                            />
-                          )}
+                                  }`}
+                                size="small"
+                                color={getSentimentColor(
+                                  deal.sentiment?.one_month_sentiment ||
+                                  deal.sentiment_summary?.one_month_sentiment
+                                )}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                         </Box>
                       </TableCell>
 
@@ -556,7 +465,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Factors Based Agent Column */}
                       <TableCell>
                         {deal.ml_results &&
-                        (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
+                          (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {deal.ml_results.t1w_pred && (
                               <Chip
@@ -593,8 +502,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 deal.jay_ritter.overall_signal.toLowerCase() === 'long'
                                   ? 'success'
                                   : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                  ? 'error'
-                                  : 'warning'
+                                    ? 'error'
+                                    : 'warning'
                               }
                               sx={{ fontWeight: 700, width: 'fit-content' }}
                             />
@@ -670,46 +579,44 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                               sx={{ fontWeight: 700, fontSize: '0.85rem' }}
                             >
                               {deal.sentiment?.sentiment_score !== undefined &&
-                              deal.sentiment.sentiment_score !== null
+                                deal.sentiment.sentiment_score !== null
                                 ? `${deal.sentiment.sentiment_score}/100`
                                 : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
                                   undefined
-                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : deal.sentiment_summary?.sentiment_score !== undefined
-                                ? `${deal.sentiment_summary.sentiment_score}/100`
-                                : 'N/A'}
+                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : deal.sentiment_summary?.sentiment_score !== undefined
+                                    ? `${deal.sentiment_summary.sentiment_score}/100`
+                                    : 'N/A'}
                             </Typography>
                           </Box>
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment) && (
-                            <Chip
-                              label={`1W: ${
-                                deal.sentiment?.one_week_sentiment ||
-                                deal.sentiment_summary?.one_week_sentiment
-                              }`}
-                              size="small"
-                              color={getSentimentColor(
-                                deal.sentiment?.one_week_sentiment ||
+                              <Chip
+                                label={`1W: ${deal.sentiment?.one_week_sentiment ||
                                   deal.sentiment_summary?.one_week_sentiment
-                              )}
-                              sx={{ width: 'fit-content', fontWeight: 600 }}
-                            />
-                          )}
+                                  }`}
+                                size="small"
+                                color={getSentimentColor(
+                                  deal.sentiment?.one_week_sentiment ||
+                                  deal.sentiment_summary?.one_week_sentiment
+                                )}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                           {(deal.sentiment?.one_month_sentiment ||
                             deal.sentiment_summary?.one_month_sentiment) && (
-                            <Chip
-                              label={`1M: ${
-                                deal.sentiment?.one_month_sentiment ||
-                                deal.sentiment_summary?.one_month_sentiment
-                              }`}
-                              size="small"
-                              color={getSentimentColor(
-                                deal.sentiment?.one_month_sentiment ||
+                              <Chip
+                                label={`1M: ${deal.sentiment?.one_month_sentiment ||
                                   deal.sentiment_summary?.one_month_sentiment
-                              )}
-                              sx={{ width: 'fit-content', fontWeight: 600 }}
-                            />
-                          )}
+                                  }`}
+                                size="small"
+                                color={getSentimentColor(
+                                  deal.sentiment?.one_month_sentiment ||
+                                  deal.sentiment_summary?.one_month_sentiment
+                                )}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                           {!deal.sentiment?.one_week_sentiment &&
                             !deal.sentiment_summary?.one_week_sentiment &&
                             !deal.sentiment?.one_month_sentiment &&
@@ -756,7 +663,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Factors Based Agent Column */}
                       <TableCell>
                         {deal.ml_results &&
-                        (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
+                          (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             {deal.ml_results.t1w_pred && (
                               <Chip
@@ -793,8 +700,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 deal.jay_ritter.overall_signal.toLowerCase() === 'long'
                                   ? 'success'
                                   : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                  ? 'error'
-                                  : 'warning'
+                                    ? 'error'
+                                    : 'warning'
                               }
                               sx={{ fontWeight: 700, width: 'fit-content' }}
                             />
