@@ -33,18 +33,18 @@ interface SectorTableDataProps {
   onRowClick?: (sector: string) => void;
 }
 
-const formatNumber = (value: number): string => {
+const formatNumber = (value: number, decimals: number = 0): string => {
   const absValue = Math.abs(value);
   let formattedValue: string;
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
+    formattedValue = `${(absValue / 1e9).toFixed(decimals)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
+    formattedValue = `${(absValue / 1e6).toFixed(decimals)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
+    formattedValue = `${(absValue / 1e3).toFixed(decimals)}K`;
   } else {
-    formattedValue = absValue.toString();
+    formattedValue = decimals > 0 ? absValue.toFixed(decimals) : absValue.toString();
   }
 
   return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
@@ -114,7 +114,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data, onRowClick }) =
                       width: '100%',
                     }}
                   >
-                    <span>{formatNumber(row.Long_Opportunity_Value)}</span>
+                    <span>{formatNumber(row.Long_Opportunity_Value, 1)}</span>
                     <Box
                       onClick={() => onRowClick?.(sector)}
                       sx={{ cursor: 'pointer', pl: 1 }}
@@ -135,7 +135,7 @@ const YearlyTableData: React.FC<SectorTableDataProps> = ({ data, onRowClick }) =
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', fontSize: '0.875rem' }}>{avgAvgT1MAbsReturnPositively.toFixed(1)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', fontSize: '0.875rem' }}>{avgAvgT1MAbsReturnNegatively.toFixed(1)}%</TableCell>
             <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', fontSize: '0.875rem' }}>{avgExpectedReturnsExcess.toFixed(1)}%</TableCell>
-            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', fontSize: '0.875rem' }}>{formatNumber(totalLongOpportunityValue)}</TableCell>
+            <TableCell sx={{ padding: '4px 8px', fontWeight: 'bold', fontSize: '0.875rem' }}>{formatNumber(totalLongOpportunityValue, 1)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

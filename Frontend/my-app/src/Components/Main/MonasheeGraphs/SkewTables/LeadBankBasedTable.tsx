@@ -26,6 +26,7 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
+  spac: string[];
 }
 
 const LeadBankBasedTable: React.FC = () => {
@@ -34,6 +35,7 @@ const LeadBankBasedTable: React.FC = () => {
   const [dealTypes, setDealTypes] = useState<string[]>(['All']);
   const [regions, setRegions] = useState<string[]>(['All']);
   const [sectors, setSectors] = useState<string[]>(['All']);
+  const [spac, setSpac] = useState<string>('Any');
   const navigate = useNavigate();
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
@@ -80,14 +82,16 @@ const LeadBankBasedTable: React.FC = () => {
     const effectiveSectors = sectors.includes('All') ? sectorOptions : sectors;
 
     const fetchData = async () => {
-      const requestData = {
-        filters: {
-          year_range: [startYear, endYear],
-          deal_type: effectiveDealTypes,
-          region: effectiveRegions,
-          sector: effectiveSectors,
-        },
+      const filters: any = {
+        year_range: [startYear, endYear],
+        deal_type: effectiveDealTypes,
+        region: effectiveRegions,
+        sector: effectiveSectors,
       };
+      if (spac !== 'Any') {
+        filters.spac = spac;
+      }
+      const requestData = { filters };
 
       try {
         setLoading(true);
@@ -121,7 +125,7 @@ const LeadBankBasedTable: React.FC = () => {
     };
 
     fetchData();
-  }, [startYear, endYear, dealTypes, regions, sectors, dealTypeOptions, regionOptions, sectorOptions]);
+  }, [startYear, endYear, dealTypes, regions, sectors, spac, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
@@ -181,6 +185,7 @@ const LeadBankBasedTable: React.FC = () => {
     setDealTypes(['All']);
     setRegions(['All']);
     setSectors(['All']);
+    setSpac('Any');
   };
 
   const filteredEndYearOptions = endYearOptions.filter(year => year >= startYear);
@@ -199,9 +204,9 @@ const LeadBankBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Lead Bank Based Filtered Data
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -219,7 +224,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -238,7 +243,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -265,7 +270,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={2}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -292,7 +297,7 @@ const LeadBankBasedTable: React.FC = () => {
               </Grid>
 
               {/* Sector */}
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Sector</InputLabel>
                   <Select
@@ -314,6 +319,24 @@ const LeadBankBasedTable: React.FC = () => {
                         <ListItemText primary={sec} />
                       </MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* SPAC */}
+              <Grid item xs={12} sm={6} md>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>SPAC</InputLabel>
+                  <Select
+                    value={spac}
+                    onChange={(e) => setSpac(e.target.value as string)}
+                    label="SPAC"
+                    MenuProps={menuProps}
+                    sx={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}
+                  >
+                    <MenuItem value="Any">Any</MenuItem>
+                    <MenuItem value="Y">Y</MenuItem>
+                    <MenuItem value="N">N</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

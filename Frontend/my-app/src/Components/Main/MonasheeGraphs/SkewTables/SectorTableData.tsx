@@ -36,21 +36,21 @@ interface SectorTableDataProps {
     };
   };
 }
-const formatNumber = (value: number): string => {
-  const absValue = Math.abs(value); // Get the absolute value for formatting
+const formatNumber = (value: number, decimals: number = 0): string => {
+  const absValue = Math.abs(value);
   let formattedValue: string;
 
   if (absValue >= 1e9) {
-    formattedValue = `${(absValue / 1e9).toFixed(0)}B`; // Format billions
+    formattedValue = `${(absValue / 1e9).toFixed(decimals)}B`;
   } else if (absValue >= 1e6) {
-    formattedValue = `${(absValue / 1e6).toFixed(0)}M`; // Format millions
+    formattedValue = `${(absValue / 1e6).toFixed(decimals)}M`;
   } else if (absValue >= 1e3) {
-    formattedValue = `${(absValue / 1e3).toFixed(0)}K`; // Format thousands
+    formattedValue = `${(absValue / 1e3).toFixed(decimals)}K`;
   } else {
-    formattedValue = absValue.toString(); // Default format
+    formattedValue = decimals > 0 ? absValue.toFixed(decimals) : absValue.toString();
   }
 
-  return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`; // Ensure dollar sign is correctly placed
+  return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
 
 const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
@@ -141,7 +141,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
                   {row.Expected_Returns_Excess.toFixed(1)}%
                 </TableCell>
                 <TableCell sx={{ padding: "4px 8px" }}>
-                  {formatNumber(row.Long_Opportunity_Value)}
+                  {formatNumber(row.Long_Opportunity_Value, 1)}
                 </TableCell>
               </TableRow>
             );
@@ -182,7 +182,7 @@ const SectorTableData: React.FC<SectorTableDataProps> = ({ data }) => {
               {avgExpectedReturnsExcess.toFixed(1)}%
             </TableCell>
             <TableCell sx={{ padding: "4px 8px", fontWeight: "bold" }}>
-              {formatNumber(totalLongOpportunityValue)}
+              {formatNumber(totalLongOpportunityValue, 1)}
             </TableCell>
           </TableRow>
         </TableBody>
