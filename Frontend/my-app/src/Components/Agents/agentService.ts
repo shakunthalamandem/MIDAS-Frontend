@@ -111,12 +111,21 @@ export async function chatWithOutput(
   outputId: number,
   message: string,
   history: ChatMessage[],
+  useWebSearch: boolean = false,
 ): Promise<string> {
   const res = await fetch(`${apiUrl}/api/v2/agent-outputs/${outputId}/chat/`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ message, history, use_web_search: useWebSearch }),
   });
   const data = await handleResponse<ChatResponse>(res);
   return data.response;
+}
+
+/** Fetch a single agent by ID */
+export async function fetchAgent(agentId: number): Promise<AIAgent> {
+  const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/`, {
+    headers: authHeaders(),
+  });
+  return handleResponse<AIAgent>(res);
 }
