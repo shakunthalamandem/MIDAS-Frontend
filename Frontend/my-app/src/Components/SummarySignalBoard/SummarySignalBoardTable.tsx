@@ -100,7 +100,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       case 'upcoming':
         return 'Upcoming IPOs';
       case 'portfolio':
-        return 'Trading IPOs';
+        return 'Current Portfolio';
       case 'recent':
         return 'Recently Listed';
       default:

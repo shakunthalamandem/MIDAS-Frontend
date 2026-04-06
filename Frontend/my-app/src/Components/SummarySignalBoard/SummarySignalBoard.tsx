@@ -140,7 +140,7 @@ const SummarySignalBoard: React.FC = () => {
     },
     {
       id: 'portfolio' as const,
-      title: 'Trading IPOs',
+      title: 'Current Portfolio IPOs',
       count: data.current_portfolio_deals.count,
       icon: WorkIcon,
       color: 'success',
@@ -190,7 +190,7 @@ const SummarySignalBoard: React.FC = () => {
             const colorMap: { [key: string]: { bg: string; gradient: string } } = {
               primary: { bg: '#e3f2fd', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
               success: { bg: '#e8f5e9', gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-              warning: { bg: '#fff3e0', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+              warning: { bg: '#ffebee', gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)' },
             };
             const colors = colorMap[card.color] || colorMap.primary;
 
