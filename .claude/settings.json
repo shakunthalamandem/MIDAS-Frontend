@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(find /c/Users/ranjith.a/Documents/MIDAS-Frontend -type f -name *attribution* -o -name *Attribution*)",
-      "Bash(grep -r \"ATTRIBUTION TRENDS BY ANALYST\\\\|Attribution Trends\" /c/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src --include=*.tsx --include=*.ts --include=*.jsx --include=*.js)",
-      "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")"
-    ]
-  }
-}
