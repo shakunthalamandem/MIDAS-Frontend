@@ -67,6 +67,14 @@ const SummarySignalBoard: React.FC = () => {
     fetchData();
   }, [apiUrl]);
 
+  // Auto-select portfolio on data load
+  useEffect(() => {
+    if (data && !selectedCard) {
+      setSelectedCard('portfolio');
+      setSelectedData(data.current_portfolio_deals.data);
+    }
+  }, [data, selectedCard]);
+
   const handleCardClick = (type: CardType) => {
     if (!data) return;
 
@@ -158,14 +166,14 @@ const SummarySignalBoard: React.FC = () => {
     <Box sx={{ p: 4, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <Box sx={{ mb: 6 }}>
+        <Box sx={{ mb: 4 }}>
           <Typography
             variant="h3"
             component="h1"
             sx={{
               fontWeight: 800,
               mb: 1,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: '#002060',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -174,10 +182,13 @@ const SummarySignalBoard: React.FC = () => {
           >
             Signal Board
           </Typography>
+          <Typography variant="subtitle1" color="textSecondary">
+            Click on a card to view detailed information about the deals in that category.
+          </Typography>
         </Box>
 
         {/* Cards Grid - Horizontal Layout */}
-        <Grid container spacing={3} sx={{ mb: 6 }}>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
           {cards.map((card) => {
             const Icon = card.icon;
             const colorMap: { [key: string]: { bg: string; gradient: string } } = {
@@ -237,7 +248,7 @@ const SummarySignalBoard: React.FC = () => {
                         fontSize: '0.8rem',
                         fontWeight: 700,
                         letterSpacing: '0.8px',
-                        color: theme.palette.text.secondary,
+                        color: "#1a1d2b",
                         textTransform: 'uppercase',
                         mb: 1.5,
                         display: 'block',

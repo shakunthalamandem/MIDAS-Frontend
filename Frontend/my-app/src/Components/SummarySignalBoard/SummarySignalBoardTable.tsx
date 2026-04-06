@@ -109,13 +109,13 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   };
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 2 }}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          mb: 3,
+          mb: 1,
           pb: 3,
           gap: 2,
         }}
@@ -324,6 +324,27 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     </TableCell>
                   </>
                 )}
+                {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
+                  <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
+                    <TableSortLabel
+                      active={sortColumn === 'pricing_date'}
+                      direction={sortColumn === 'pricing_date' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('pricing_date')}
+                      sx={{
+                    color: 'white !important',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    '& .MuiTableSortLabel-icon': {
+                      color: 'white !important',
+                    },
+                  }}
+                    >
+                      Pricing Date
+                    </TableSortLabel>
+                  </TableCell>
+                )}
                 {(selectedCard === 'upcoming' || selectedCard === 'recent') && (
                   <>
                     <TableCell sx={{ minWidth: 210 }} sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
@@ -424,7 +445,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         },
                       }}
                     >
-                      <TableCell sx={{ fontWeight: 600 }}>
+                      <TableCell sx={{ fontWeight: 600, color: '#273faa' }}>
                         {deal.ticker}
                       </TableCell>
                       <TableCell>{getPricingDate(deal, selectedCard)}</TableCell>
@@ -579,28 +600,60 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         },
                       }}
                     >
-                      <TableCell sx={{ fontWeight: 600 }}>
-                        {deal.ticker}
+                      <TableCell>
+                        <Typography
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '1rem',
+                            color: '#273faa',
+                          }}
+                        >
+                          {deal.ticker}
+                        </Typography>
                       </TableCell>
+                      {selectedCard === 'recent' && (
+                        <TableCell>
+                          <Typography sx={{ fontSize: '0.85rem', color: theme.palette.text.secondary }}>
+                            {getPricingDate(deal, selectedCard)}
+                          </Typography>
+                        </TableCell>
+                      )}
 
                       {/* Sentiment Agent Column */}
                       <TableCell>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
+                          <Box
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              padding: '6px 12px',
+                              borderRadius: '8px',
+                              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                              width: 'fit-content',
+                            }}
                           >
-                            Score:{' '}
-                            {deal.sentiment?.sentiment_score !== undefined &&
-                            deal.sentiment.sentiment_score !== null
-                              ? `${deal.sentiment.sentiment_score}/100`
-                              : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
-                                undefined
-                              ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                              : deal.sentiment_summary?.sentiment_score !== undefined
-                              ? `${deal.sentiment_summary.sentiment_score}/100`
-                              : 'N/A'}
-                          </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#667eea' }}
+                            >
+                              Score:
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 700, fontSize: '0.85rem' }}
+                            >
+                              {deal.sentiment?.sentiment_score !== undefined &&
+                              deal.sentiment.sentiment_score !== null
+                                ? `${deal.sentiment.sentiment_score}/100`
+                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
+                                  undefined
+                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                : deal.sentiment_summary?.sentiment_score !== undefined
+                                ? `${deal.sentiment_summary.sentiment_score}/100`
+                                : 'N/A'}
+                            </Typography>
+                          </Box>
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment) && (
                             <Chip
