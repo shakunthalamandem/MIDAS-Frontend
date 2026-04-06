@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -35,6 +36,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   onClose,
 }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [searchTicker, setSearchTicker] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('ticker');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -93,6 +95,23 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       setSortColumn(column);
       setSortDirection('asc');
     }
+  };
+
+  const handleTickerClick = (deal: DealData) => {
+    const ticker = deal.ticker;
+    const pricingDate = getPricingDate(deal, selectedCard);
+    const issuerName = deal.issuer_name || '';
+
+    // Format parameters with proper URL encoding (spaces become +)
+    const params = new URLSearchParams({
+      ticker: ticker,
+      pricing_date: pricingDate,
+      issuer_name: issuerName,
+      flag_for_writeup: 'Y',
+    }).toString();
+
+    // Open in new tab
+    window.open(`/deals/new_dashboard/details?${params}`, '_blank');
   };
 
   const getTableTitle = () => {
@@ -445,7 +464,10 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         },
                       }}
                     >
-                      <TableCell sx={{ fontWeight: 600, color: '#273faa' }}>
+                      <TableCell
+                        sx={{ fontWeight: 600, color: '#273faa', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                        onClick={() => handleTickerClick(deal)}
+                      >
                         {deal.ticker}
                       </TableCell>
                       <TableCell>{getPricingDate(deal, selectedCard)}</TableCell>
@@ -600,12 +622,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         },
                       }}
                     >
-                      <TableCell>
+                      <TableCell
+                        onClick={() => handleTickerClick(deal)}
+                        sx={{ cursor: 'pointer' }}
+                      >
                         <Typography
                           sx={{
                             fontWeight: 700,
                             fontSize: '1rem',
                             color: '#273faa',
+                            '&:hover': { textDecoration: 'underline' },
                           }}
                         >
                           {deal.ticker}
