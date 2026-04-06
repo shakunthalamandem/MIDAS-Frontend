@@ -39,14 +39,14 @@ interface RegionTableProps {
     onRowClick?: (region: string) => void;
 }
 
-const formatNumber = (value: number): string => {
+const formatNumber = (value: number, decimals: number = 0): string => {
     const absValue = Math.abs(value);
     let formattedValue: string;
 
-    if (absValue >= 1e9) formattedValue = `${(absValue / 1e9).toFixed(0)}B`;
-    else if (absValue >= 1e6) formattedValue = `${(absValue / 1e6).toFixed(0)}M`;
-    else if (absValue >= 1e3) formattedValue = `${(absValue / 1e3).toFixed(0)}K`;
-    else formattedValue = absValue.toString();
+    if (absValue >= 1e9) formattedValue = `${(absValue / 1e9).toFixed(decimals)}B`;
+    else if (absValue >= 1e6) formattedValue = `${(absValue / 1e6).toFixed(decimals)}M`;
+    else if (absValue >= 1e3) formattedValue = `${(absValue / 1e3).toFixed(decimals)}K`;
+    else formattedValue = absValue.toFixed(decimals);
 
     return value < 0 ? `-$${formattedValue}` : `$${formattedValue}`;
 };
@@ -131,7 +131,7 @@ const RegionTableData: React.FC<RegionTableProps> = ({ data, totals, onRowClick 
                                             justifyContent: "space-between",
                                         }}
                                     >
-                                        <span>{formatNumber(row.Long_Opportunity_Value)}</span>
+                                        <span>{formatNumber(row.Long_Opportunity_Value, 1)}</span>
                                         <Box sx={{ cursor: "pointer", pl: 1 }} onClick={() => onRowClick?.(region)}>
                                             <MoreHorizIcon fontSize="small" />
                                         </Box>
@@ -149,7 +149,7 @@ const RegionTableData: React.FC<RegionTableProps> = ({ data, totals, onRowClick 
                         <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Returns_positively.toFixed(1)}%</TableCell>
                         <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Returns_negatively.toFixed(1)}%</TableCell>
                         <TableCell sx={{ fontWeight: "bold", }}>{totals.Total_Expected_returns_excess.toFixed(1)}%</TableCell>
-                        <TableCell sx={{ fontWeight: "bold", }}>{formatNumber(totals.Total_Long_Opportunity_Value)}</TableCell>
+                        <TableCell sx={{ fontWeight: "bold", }}>{formatNumber(totals.Total_Long_Opportunity_Value, 1)}</TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
