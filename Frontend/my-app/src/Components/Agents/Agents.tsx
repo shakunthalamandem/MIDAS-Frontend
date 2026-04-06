@@ -289,7 +289,7 @@ const Agents: React.FC = () => {
       {/* ── Portfolio Summary Banner ── */}
       <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, pt: 4, pb: 2 }}>
         <Box
-          onClick={() => window.open("/portfolio_summary", "_blank")}
+          onClick={() => window.open("/summary_signal_board", "_blank")}
           sx={{
             bgcolor: "#fff",
             border: "1px solid #c7d2fe",
@@ -315,7 +315,7 @@ const Agents: React.FC = () => {
               letterSpacing: "-0.025em",
             }}
           >
-            US Current Portfolio (IPO) Summary Dashboard
+            US IPO Signal Board(upcoming, current portfolio & Recently Traded deals)
           </Typography>
           <Typography
             sx={{

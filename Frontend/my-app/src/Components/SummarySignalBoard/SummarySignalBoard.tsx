@@ -148,14 +148,14 @@ const SummarySignalBoard: React.FC = () => {
     },
     {
       id: 'portfolio' as const,
-      title: 'Current Portfolio IPOs',
+      title: 'Current Portfolio: IPOs',
       count: data.current_portfolio_deals.count,
       icon: WorkIcon,
       color: 'success',
     },
     {
       id: 'recent' as const,
-      title: 'Recently Listed',
+      title: 'Recently Traded IPOs(Last 60 Days)',
       count: data.recently_traded_deals.count,
       icon: ScheduleIcon,
       color: 'warning',
