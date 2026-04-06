@@ -190,6 +190,20 @@ const TickerDetail: React.FC = () => {
             : formatCurrency(row.net_exp),
       },
       {
+        field: "delta_adj_net",
+        headerName: "Delta Adj Net",
+        flex: 1,
+        minWidth: 130,
+        headerAlign: "right",
+        align: "right",
+        valueGetter: (value: number, row: TickerItem) =>
+          showPct ? row.delta_adj_net_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.delta_adj_net_pct)
+            : formatCurrency(row.delta_adj_net),
+      },
+      {
         field: "beta_adj_net",
         headerName: "Beta Adj Net",
         flex: 1,

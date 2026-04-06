@@ -14,7 +14,7 @@ import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-type MetricKey = "ytd_pnl" | "net_exp" | "beta_adj_net";
+type MetricKey = "ytd_pnl" | "net_exp" | "beta_adj_net" | "delta_adj_net";
 
 interface AttributionAreaChartsProps {
   selectedFunds: string[];
@@ -26,6 +26,7 @@ interface AttributionAreaChartsProps {
 const METRIC_CONFIG: { key: MetricKey; label: string }[] = [
   { key: "ytd_pnl", label: "YTD P&L" },
   { key: "net_exp", label: "Net Exposure" },
+  { key: "delta_adj_net", label: "Delta Adj. Net Exposure" },
   { key: "beta_adj_net", label: "Beta Adj. Net Exposure" },
 ];
 
@@ -54,6 +55,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
     ytd_pnl: [],
     net_exp: [],
     beta_adj_net: [],
+    delta_adj_net: [],
   });
   const [loading, setLoading] = useState(false);
   const [showPct, setShowPct] = useState(false);
@@ -101,11 +103,12 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
             ytd_pnl: result.ytd_pnl || [],
             net_exp: result.net_exp || [],
             beta_adj_net: result.beta_adj_net || [],
+            delta_adj_net: result.delta_adj_net || [],
           });
         }
       } catch (err: any) {
         if (err.name === "AbortError") return;
-        setData({ ytd_pnl: [], net_exp: [], beta_adj_net: [] });
+        setData({ ytd_pnl: [], net_exp: [], beta_adj_net: [], delta_adj_net: [] });
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -143,7 +146,6 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   }, [activeSeries, showPct]);
 
   const seriesNames = activeSeries.map((s) => s.name);
-  const activeLabel = METRIC_CONFIG.find((m) => m.key === selectedMetric)?.label || selectedMetric;
 
   const formatValue = (value: number) => {
     if (showPct) return `${value.toFixed(2)}%`;
