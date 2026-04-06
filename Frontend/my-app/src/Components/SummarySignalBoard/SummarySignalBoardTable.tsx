@@ -324,7 +324,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     </TableCell>
                   </>
                 )}
-                {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
+                {selectedCard === 'recent' && (
                   <TableCell sortDirection={sortColumn === 'pricing_date' ? sortDirection : false}>
                     <TableSortLabel
                       active={sortColumn === 'pricing_date'}
