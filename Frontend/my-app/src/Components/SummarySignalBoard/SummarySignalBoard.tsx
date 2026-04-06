@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -16,12 +17,16 @@ import { CardType, DealData, SummaryData } from './types';
 
 const SummarySignalBoard: React.FC = () => {
   const theme = useTheme();
+  const [searchParams] = useSearchParams();
   const [data, setData] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [selectedData, setSelectedData] = useState<DealData[]>([]);
   const apiUrl = process.env.REACT_APP_API_URL;
+
+  // Get initial tab from URL query parameter
+  const initialTab = searchParams.get('tab') as CardType | null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,13 +72,24 @@ const SummarySignalBoard: React.FC = () => {
     fetchData();
   }, [apiUrl]);
 
-  // Auto-select portfolio on data load
+  // Auto-select card based on URL parameter or default to portfolio
   useEffect(() => {
     if (data && !selectedCard) {
-      setSelectedCard('portfolio');
-      setSelectedData(data.current_portfolio_deals.data);
+      const cardToSelect = initialTab || 'portfolio';
+      let deals: DealData[] = [];
+
+      if (cardToSelect === 'upcoming') {
+        deals = data.upcoming_deals.data;
+      } else if (cardToSelect === 'portfolio') {
+        deals = data.current_portfolio_deals.data;
+      } else if (cardToSelect === 'recent') {
+        deals = data.recently_traded_deals.data;
+      }
+
+      setSelectedCard(cardToSelect);
+      setSelectedData(deals);
     }
-  }, [data, selectedCard]);
+  }, [data, selectedCard, initialTab]);
 
   const handleCardClick = (type: CardType) => {
     if (!data) return;
@@ -169,7 +185,7 @@ const SummarySignalBoard: React.FC = () => {
         <Box sx={{ mb: 4 }}>
           <Typography
             variant="h3"
-            component="h1"
+            component="h2"
             sx={{
               fontWeight: 800,
               mb: 1,
@@ -188,7 +204,7 @@ const SummarySignalBoard: React.FC = () => {
         </Box>
 
         {/* Cards Grid - Horizontal Layout */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={2} sx={{ mb: 3 }}>
           {cards.map((card) => {
             const Icon = card.icon;
             const colorMap: { [key: string]: { bg: string; gradient: string } } = {
@@ -221,22 +237,22 @@ const SummarySignalBoard: React.FC = () => {
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 3.5 }}>
+                  <CardContent sx={{ p: 2.5 }}>
                     <Box
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
                       sx={{
-                        width: 56,
-                        height: 56,
+                        width: 48,
+                        height: 48,
                         borderRadius: '12px',
                         background: colors.bg,
-                        mb: 2.5,
+                        mb: 1.8,
                       }}
                     >
                       <Icon
                         sx={{
-                          fontSize: 28,
+                          fontSize: 24,
                           color: `${card.color}.main`,
                         }}
                       />
@@ -250,7 +266,7 @@ const SummarySignalBoard: React.FC = () => {
                         letterSpacing: '0.8px',
                         color: "#1a1d2b",
                         textTransform: 'uppercase',
-                        mb: 1.5,
+                        mb: 1,
                         display: 'block',
                       }}
                     >
@@ -261,7 +277,7 @@ const SummarySignalBoard: React.FC = () => {
                       variant="h3"
                       sx={{
                         fontWeight: 800,
-                        fontSize: '2.5rem',
+                        fontSize: '2rem',
                         background: colors.gradient,
                         backgroundClip: 'text',
                         WebkitBackgroundClip: 'text',
