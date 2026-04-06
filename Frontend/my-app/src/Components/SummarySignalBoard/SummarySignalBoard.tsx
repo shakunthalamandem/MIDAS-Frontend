@@ -158,39 +158,81 @@ const SummarySignalBoard: React.FC = () => {
     <Box sx={{ p: 4, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
+        <Box sx={{ mb: 6 }}>
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{
+              fontWeight: 800,
+              mb: 1,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.5px',
+            }}
+          >
             Signal Board
           </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            sx={{ fontSize: '1rem', fontWeight: 500 }}
+          >
             Real-time IPO market sentiment and analysis
           </Typography>
         </Box>
 
         {/* Cards Grid - Horizontal Layout */}
-        <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 6 }}>
           {cards.map((card) => {
             const Icon = card.icon;
+            const colorMap: { [key: string]: { bg: string; gradient: string } } = {
+              primary: { bg: '#e3f2fd', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+              success: { bg: '#e8f5e9', gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+              warning: { bg: '#fff3e0', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+            };
+            const colors = colorMap[card.color] || colorMap.primary;
+
             return (
-              <Grid item xs={12} sm={6} md={3} key={card.id}>
+              <Grid item xs={12} sm={6} md={4} key={card.id}>
                 <Card
                   onClick={() => handleCardClick(card.id)}
                   sx={{
                     cursor: 'pointer',
                     height: '100%',
-                    transition: 'all 0.3s ease',
-                    border: '1px solid',
-                    borderColor: theme.palette.divider,
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: 'none',
+                    borderRadius: '16px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderLeft: '6px solid',
+                    borderLeftColor: card.color === 'primary' ? '#667eea' : card.color === 'success' ? '#11998e' : '#f5576c',
                     '&:hover': {
-                      boxShadow: theme.shadows[4],
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 2.5 }}>
-                    <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+                  <CardContent sx={{ p: 3.5 }}>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '12px',
+                        background: colors.bg,
+                        mb: 2.5,
+                      }}
+                    >
                       <Icon
                         sx={{
-                          fontSize: 20,
+                          fontSize: 28,
                           color: `${card.color}.main`,
                         }}
                       />
@@ -199,12 +241,12 @@ const SummarySignalBoard: React.FC = () => {
                     <Typography
                       variant="caption"
                       sx={{
-                        fontSize: '0.75rem',
+                        fontSize: '0.8rem',
                         fontWeight: 700,
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.8px',
                         color: theme.palette.text.secondary,
                         textTransform: 'uppercase',
-                        mb: 1,
+                        mb: 1.5,
                         display: 'block',
                       }}
                     >
@@ -212,10 +254,14 @@ const SummarySignalBoard: React.FC = () => {
                     </Typography>
 
                     <Typography
-                      variant="h4"
+                      variant="h3"
                       sx={{
-                        fontWeight: 700,
-                        fontSize: '2rem',
+                        fontWeight: 800,
+                        fontSize: '2.5rem',
+                        background: colors.gradient,
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
                       }}
                     >
                       {card.count}
