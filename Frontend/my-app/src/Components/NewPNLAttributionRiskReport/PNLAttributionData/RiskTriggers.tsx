@@ -376,7 +376,7 @@ const RiskTriggers: React.FC = () => {
                 renderValue={(s) => s === "__ALL__" ? "All Funds" : s}
               >
                 <MenuItem value="__ALL__">All Funds</MenuItem>
-                {portfolios.map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
+                {portfolios.filter((p) => p !== "FMAP" && p !== "MMLS").map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </Select>
             </FormControl>
 
