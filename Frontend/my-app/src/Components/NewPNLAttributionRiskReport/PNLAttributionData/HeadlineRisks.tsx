@@ -1,5 +1,6 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import type { HeadlineRisks as HeadlineRisksData, DashboardCategory } from "./types";
 import { formatCurrency, formatFullCurrency, formatPct } from "./utils";
 
@@ -8,6 +9,34 @@ interface HeadlineRisksProps {
   selectedCategory: DashboardCategory;
   onCategorySelect: (category: DashboardCategory) => void;
 }
+
+interface RiskCardInfo {
+  definition: string;
+  formula: string;
+}
+
+const RISK_CARDS_INFO: Record<string, RiskCardInfo> = {
+  aum: {
+    definition: "Assets Under Management — the total market value of all positions held in the portfolio.",
+    formula: "AUM = Σ (Position Market Value)",
+  },
+  gross_market_value: {
+    definition: "Total absolute market exposure across all long and short positions, regardless of direction.",
+    formula: "Gross MV = |Long MV| + |Short MV|\nGross MV % = Gross MV / AUM × 100",
+  },
+  delta_adj_net_mv: {
+    definition: "Net market exposure adjusted for option delta, reflecting true equity sensitivity for derivatives positions.",
+    formula: "Delta Adj. Net MV = Σ (Position MV × Delta)\nDelta Adj. Net % = Delta Adj. Net MV / AUM × 100",
+  },
+  beta_adj_net_mv: {
+    definition: "Net market exposure scaled by each position's beta to the benchmark, reflecting systematic market risk.",
+    formula: "Beta Adj. Net MV = Σ (Position MV × Beta)\nBeta Adj. Net % = Beta Adj. Net MV / AUM × 100",
+  },
+  one_yr_1pct_var: {
+    definition: "1-Year 1% Value at Risk — the maximum expected portfolio loss over a 1-year horizon at 99% confidence level.",
+    formula: "VaR (1Y, 1%) = Portfolio Volatility (1Y) × 2.326 × AUM\nVaR % = VaR / AUM × 100",
+  },
+};
 
 const RISK_CARDS_CONFIG = [
   { key: "aum", label: "AUM", color: "green", icon: "$", showPct: false, clickable: false },
@@ -45,6 +74,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
               className={`risk-card risk-card--${cfg.color}${isSelected ? " risk-card--selected" : ""}`}
               onClick={isClickable && "category" in cfg ? () => onCategorySelect(cfg.category) : undefined}
               sx={{
+                position: "relative",
                 cursor: isClickable ? "pointer" : "default",
                 ...(isSelected && {
                   background: `${selectedBg} !important`,
@@ -52,6 +82,43 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                 }),
               }}
             >
+              {/* Info icon — top right */}
+              {RISK_CARDS_INFO[cfg.key] && (
+                <Tooltip
+                  title={
+                    <Box sx={{ p: 0.5 }}>
+                      <Box sx={{ fontWeight: 700, mb: 0.5 }}>{cfg.label}</Box>
+                      <Box sx={{ mb: 0.75 }}>{RISK_CARDS_INFO[cfg.key].definition}</Box>
+                      <Box sx={{ fontWeight: 600, color: "#90caf9", mb: 0.25 }}>Formula:</Box>
+                      <Box sx={{ fontFamily: "monospace", whiteSpace: "pre-line", color: "#e0f2fe" }}>
+                        {RISK_CARDS_INFO[cfg.key].formula}
+                      </Box>
+                    </Box>
+                  }
+                  placement="top"
+                  arrow
+                  slotProps={{
+                    tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 320, fontSize: "12px", lineHeight: 1.5 } },
+                    arrow: { sx: { color: "#1e293b" } },
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <InfoOutlinedIcon
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      fontSize: "15px",
+                      cursor: "help",
+                      opacity: 0.55,
+                      color: isSelected ? "#fff" : "inherit",
+                      zIndex: 1,
+                      "&:hover": { opacity: 1 },
+                    }}
+                  />
+                </Tooltip>
+              )}
+
               {/* Top row: icon + label */}
               <Box className="risk-card-top">
                 <Box
