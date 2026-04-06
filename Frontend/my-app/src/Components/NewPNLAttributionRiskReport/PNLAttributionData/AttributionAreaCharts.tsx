@@ -26,8 +26,8 @@ interface AttributionAreaChartsProps {
 const METRIC_CONFIG: { key: MetricKey; label: string }[] = [
   { key: "ytd_pnl", label: "YTD P&L" },
   { key: "net_exp", label: "Net Exposure" },
-  { key: "beta_adj_net", label: "Beta Adj. Net Exposure" },
   { key: "delta_adj_net", label: "Delta Adj. Net Exposure" },
+  { key: "beta_adj_net", label: "Beta Adj. Net Exposure" },
 ];
 
 // Distinct colors for stacked areas
