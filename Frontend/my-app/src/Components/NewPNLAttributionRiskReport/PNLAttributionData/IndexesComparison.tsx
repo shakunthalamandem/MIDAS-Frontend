@@ -56,8 +56,8 @@ const INDEX_CARDS_INFO: Record<string, { definition: string; formula: string }> 
     formula: "Ratio = Vol(Portfolio, YTD) / Vol(S&P 500, YTD)\nVol = StdDev(Daily Returns) × √252",
   },
   drawdown_1_sp: {
-    definition: "Ratio of the portfolio's maximum drawdown to the S&P 500's maximum drawdown over the same period. A value < 1 indicates the portfolio lost proportionally less than the index.",
-    formula: "Ratio = MaxDrawdown(Portfolio) / MaxDrawdown(S&P 500)\nMaxDrawdown = (Peak Value − Trough Value) / Peak Value",
+    definition: "Represents the decline in portfolio value from its peak to the current level, indicating the magnitude of loss experienced. Shown as a ratio vs the S&P 500's drawdown over the same period.",
+    formula: "Drawdown = (Peak Value — Current Value) / Peak Value\nRatio = Drawdown(Portfolio) / Drawdown(S&P 500)",
   },
 };
 

@@ -13,28 +13,31 @@ interface HeadlineRisksProps {
 interface RiskCardInfo {
   definition: string;
   formula: string;
+  notes?: string;
 }
 
 const RISK_CARDS_INFO: Record<string, RiskCardInfo> = {
   aum: {
-    definition: "Assets Under Management — the total market value of all positions held in the portfolio.",
+    definition: "Assets Under Management — the total market value of all assets held in the portfolio, measured at the beginning of the month.",
     formula: "AUM = Σ (Position Market Value)",
   },
   gross_market_value: {
-    definition: "Total absolute market exposure across all long and short positions, regardless of direction.",
-    formula: "Gross MV = |Long MV| + |Short MV|\nGross MV % = Gross MV / AUM × 100",
+    definition: "Gross Market Value = Sum of absolute position exposures (long + short), showing total portfolio size without netting.",
+    formula: "Gross Market Value = Σ | Position Exposure |",
   },
   delta_adj_net_mv: {
-    definition: "Net market exposure adjusted for option delta, reflecting true equity sensitivity for derivatives positions.",
-    formula: "Delta Adj. Net MV = Σ (Position MV × Delta)\nDelta Adj. Net % = Delta Adj. Net MV / AUM × 100",
+    definition: "Measures the net exposure of the portfolio to equity movements after adjusting positions by their delta.",
+    formula: "Delta Adjusted Net Exposure = Σ(Position Exposure × Δ) / AUM",
+    notes: "Delta values are sourced on a weekly basis from B Source. Where data is unavailable, proxy assumptions are applied as follows: 0.5 for convertible bonds, 0.25 for equity calls, -0.25 for equity puts, and 1 for high yield instruments. For equities, delta is assumed to be 1.",
   },
   beta_adj_net_mv: {
-    definition: "Net market exposure scaled by each position's beta to the benchmark, reflecting systematic market risk.",
-    formula: "Beta Adj. Net MV = Σ (Position MV × Beta)\nBeta Adj. Net % = Beta Adj. Net MV / AUM × 100",
+    definition: "Measures the portfolio's sensitivity to overall market movements after adjusting for both delta and beta, indicating how the portfolio is expected to move relative to the market.",
+    formula: "Beta Adjusted Net Exposure = Σ(Position Exposure × Δ × β) / AUM",
+    notes: "Beta values are sourced daily from B Source. The Raw overridable beta is calculated over a 1-month period from the current date, using a fixed benchmark index (SPY Equity) for both US and international securities. Beta values are capped within a range of +2.5 (maximum) and -2.5 (minimum). Where data is unavailable, a proxy beta of 0.4 is applied for convertible bonds and 0.25 for High yield instruments.",
   },
   one_yr_1pct_var: {
-    definition: "1-Year 1% Value at Risk — the maximum expected portfolio loss over a 1-year horizon at 99% confidence level.",
-    formula: "VaR (1Y, 1%) = Portfolio Volatility (1Y) × 2.326 × AUM\nVaR % = VaR / AUM × 100",
+    definition: "Estimates the maximum expected loss at a 99% confidence level, meaning there is only a 1% probability that losses will exceed this level over the specified time horizon.",
+    formula: "VaR (99%) = | PERCENTILE.INC(Returns, 0.01) | × √T\n(Where T = time horizon, e.g., 252 for 1 year)",
   },
 };
 
@@ -90,9 +93,14 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
                       <Box sx={{ fontWeight: 700, mb: 0.5 }}>{cfg.label}</Box>
                       <Box sx={{ mb: 0.75 }}>{RISK_CARDS_INFO[cfg.key].definition}</Box>
                       <Box sx={{ fontWeight: 600, color: "#90caf9", mb: 0.25 }}>Formula:</Box>
-                      <Box sx={{ fontFamily: "monospace", whiteSpace: "pre-line", color: "#e0f2fe" }}>
+                      <Box sx={{ fontFamily: "monospace", whiteSpace: "pre-line", color: "#e0f2fe", mb: RISK_CARDS_INFO[cfg.key].notes ? 0.75 : 0 }}>
                         {RISK_CARDS_INFO[cfg.key].formula}
                       </Box>
+                      {RISK_CARDS_INFO[cfg.key].notes && (
+                        <Box sx={{ color: "#cbd5e1", fontSize: "11px", lineHeight: 1.5, borderTop: "1px solid rgba(255,255,255,0.1)", pt: 0.75 }}>
+                          {RISK_CARDS_INFO[cfg.key].notes}
+                        </Box>
+                      )}
                     </Box>
                   }
                   placement="top"
