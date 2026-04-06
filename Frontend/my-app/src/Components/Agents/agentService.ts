@@ -122,6 +122,15 @@ export async function chatWithOutput(
   return data.response;
 }
 
+/** Fetch saved chat history for an agent output */
+export async function fetchChatHistory(outputId: number): Promise<ChatMessage[]> {
+  const res = await fetch(`${apiUrl}/api/v2/agent-outputs/${outputId}/chat/`, {
+    headers: authHeaders(),
+  });
+  const data = await handleResponse<{ messages: ChatMessage[] }>(res);
+  return data.messages;
+}
+
 /** Fetch a single agent by ID */
 export async function fetchAgent(agentId: number): Promise<AIAgent> {
   const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/`, {

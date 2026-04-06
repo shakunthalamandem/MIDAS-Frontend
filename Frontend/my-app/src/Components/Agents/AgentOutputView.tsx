@@ -29,8 +29,9 @@ import SendIcon from "@mui/icons-material/Send";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import ReactMarkdown from "react-markdown";
 import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
-import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent } from "./agentService";
+import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory } from "./agentService";
 
 const POLL_INTERVAL_MS = 10_000;
 
@@ -84,6 +85,16 @@ const AgentOutputView: React.FC = () => {
   }, [agentId, output?.agent]);
 
   useEffect(() => { loadOutput(); }, [loadOutput]);
+
+  // Load saved chat history when output is ready
+  useEffect(() => {
+    if (!output || output.status !== "completed") return;
+    fetchChatHistory(output.id)
+      .then((msgs) => {
+        if (msgs.length > 0) setChatMessages(msgs);
+      })
+      .catch(() => {});
+  }, [output?.id, output?.status]);
 
   useEffect(() => {
     if (!output || output.status === "completed" || output.status === "failed")
@@ -657,16 +668,20 @@ const AgentOutputView: React.FC = () => {
                           }),
                     }}
                   >
-                    <Typography
-                      sx={{
-                        fontSize: "0.88rem",
-                        lineHeight: 1.7,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {msg.content}
-                    </Typography>
+                    {msg.role === "assistant" ? (
+                      <MarkdownContent content={msg.content} isLight={false} />
+                    ) : (
+                      <Typography
+                        sx={{
+                          fontSize: "0.88rem",
+                          lineHeight: 1.7,
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {msg.content}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -808,16 +823,68 @@ const AgentOutputView: React.FC = () => {
   );
 };
 
+/** Renders markdown content with proper styling */
+const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ content, isLight }) => (
+  <Box
+    sx={{
+      fontSize: "0.88rem",
+      lineHeight: 1.8,
+      color: isLight ? "#fff" : "#1e293b",
+      wordBreak: "break-word",
+      "& h1": { fontSize: "1.3rem", fontWeight: 700, mt: 2, mb: 1, color: isLight ? "#fff" : "#111827" },
+      "& h2": { fontSize: "1.1rem", fontWeight: 700, mt: 2, mb: 1, color: isLight ? "#fff" : "#111827" },
+      "& h3": { fontSize: "0.95rem", fontWeight: 700, mt: 1.5, mb: 0.8, color: isLight ? "#fff" : "#111827" },
+      "& h4": { fontSize: "0.9rem", fontWeight: 600, mt: 1, mb: 0.5 },
+      "& p": { mb: 1.2, mt: 0, lineHeight: 1.8 },
+      "& ul, & ol": { pl: 2.5, mb: 1.2, mt: 0 },
+      "& li": { mb: 0.5, "&::marker": { color: isLight ? "#c7d2fe" : "#4f46e5" } },
+      "& strong": { fontWeight: 700 },
+      "& em": { fontStyle: "italic" },
+      "& code": {
+        bgcolor: isLight ? "rgba(255,255,255,0.15)" : "#eef2ff",
+        px: 0.8,
+        py: 0.2,
+        borderRadius: 1,
+        fontSize: "0.82rem",
+        fontFamily: "monospace",
+      },
+      "& pre": {
+        bgcolor: isLight ? "rgba(0,0,0,0.2)" : "#f1f5f9",
+        p: 1.5,
+        borderRadius: 2,
+        overflow: "auto",
+        mb: 1.5,
+        "& code": { bgcolor: "transparent", p: 0 },
+      },
+      "& blockquote": {
+        borderLeft: isLight ? "3px solid rgba(255,255,255,0.4)" : "3px solid #4f46e5",
+        pl: 2,
+        ml: 0,
+        color: isLight ? "rgba(255,255,255,0.85)" : "#475569",
+        fontStyle: "italic",
+      },
+      "& a": { color: isLight ? "#a5b4fc" : "#4f46e5", textDecoration: "underline" },
+      "& hr": { border: "none", borderTop: "1px solid", borderColor: isLight ? "rgba(255,255,255,0.2)" : "#e2e8f0", my: 1.5 },
+      "& table": { borderCollapse: "collapse", width: "100%", mb: 1.5 },
+      "& th, & td": {
+        border: "1px solid",
+        borderColor: isLight ? "rgba(255,255,255,0.2)" : "#e2e8f0",
+        px: 1.5,
+        py: 0.8,
+        fontSize: "0.82rem",
+        textAlign: "left",
+      },
+      "& th": { bgcolor: isLight ? "rgba(255,255,255,0.1)" : "#eef2ff", fontWeight: 700 },
+    }}
+  >
+    <ReactMarkdown>{content}</ReactMarkdown>
+  </Box>
+);
+
 /** Renders a single section based on its type */
 const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section }) => {
   if (section.type === "text") {
-    return (
-      <Typography
-        sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8, color: "#1e293b", fontSize: "0.88rem" }}
-      >
-        {section.content}
-      </Typography>
-    );
+    return <MarkdownContent content={section.content || ""} />;
   }
 
   if (section.type === "list" && section.items) {
