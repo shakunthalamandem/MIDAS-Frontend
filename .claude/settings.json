@@ -1,9 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /c/Users/ranjith.a/Documents/MIDAS-Frontend -type f -name *attribution* -o -name *Attribution*)",
-      "Bash(grep -r \"ATTRIBUTION TRENDS BY ANALYST\\\\|Attribution Trends\" /c/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src --include=*.tsx --include=*.ts --include=*.jsx --include=*.js)",
-      "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")"
+      "Bash(grep -rn \"Opportunity\\\\|opportunity_value\\\\|formatValue\\\\|toFixed\\\\|$.*B\\\\|billion\\\\|\\\\.toLocale\" \"c:/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src/Components/Main/MonasheeGraphs/SkewTables/\" --include=\"*.tsx\" -l)",
+      "Bash(grep -n \"Opportunity\\\\|opportunity\\\\|formatValue\\\\|toFixed\\\\|$.*B\\\\|billion\\\\|toLocale\\\\|format\" \"c:/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src/Components/Main/MonasheeGraphs/SkewTables/YearlyTableData.tsx\")",
+      "Bash(head -30 grep -n \"formatNumber\\\\|Opportunity\\\\|toFixed\\(0\\)\" \"c:/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src/Components/Main/MonasheeGraphs/SkewTables/RegionTableData.tsx\")",
+      "Bash(head -30 grep -n \"formatNumber\\\\|Opportunity\\\\|toFixed\\(0\\)\" \"c:/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src/Components/Main/MonasheeGraphs/SkewTables/LeadBankTableData.tsx\")",
+      "Bash(head -30 grep -n \"formatNumber\\\\|Opportunity\\\\|toFixed\\(0\\)\" \"c:/Users/ranjith.a/Documents/MIDAS-Frontend/Frontend/my-app/src/Components/Main/MonasheeGraphs/SkewTables/CountryTableData.tsx\")"
     ]
   }
 }
