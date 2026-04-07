@@ -106,13 +106,10 @@ const PORTFOLIO_SECTIONS: TabSectionDef[] = [
 
 const RISK_SECTIONS: TabSectionDef[] = [
   { key: "executive_portfolio_overview", label: "Portfolio Overview" },
-  { key: "executive_risk_dashboard", label: "Risk Dashboard" },
+  { key: "final_prioritized_action_matrix", label: "Action Matrix" },
   { key: "base_model_discipline_scorecard", label: "Discipline Scorecard" },
+  { key: "technical_risk_overlay", label: "Technical Risk Overlay" },
   { key: "sector_peer_news_map", label: "Sector & Peer News" },
-  { key: "macro_event_risk_calendar", label: "Macro & Event Risk Calendar" },
-  // { key: "macro_regime_sector_rotation_model", label: "Macro Regime & Sector Rotation" },
-  // { key: "upcoming_week_focus", label: "Upcoming Week Focus" },
-  // { key: "upcoming_month_strategic_outlook", label: "Monthly Strategic Outlook" },
 ];
 
 // ═══════════════════════════════════════════════════════
