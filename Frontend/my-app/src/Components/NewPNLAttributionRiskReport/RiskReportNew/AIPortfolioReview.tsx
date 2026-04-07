@@ -5,13 +5,9 @@ import {
   Box,
   CircularProgress,
   Container,
-  Tab,
-  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
-import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
-import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import PortfolioReportDocumentMain from "./PortfolioReportDocumentMain";
 import AIRankingMain from "./AIRanking/AIRankingMain";
 
@@ -122,70 +118,6 @@ const AIPortfolioReview: React.FC<AIPortfolioReviewProps> = ({ mode, reviewTab =
   if (mode === "portfolioReview") {
     return (
       <Container maxWidth="xl" sx={{ mt: 1, mb: 4 }}>
-        {/* ─── Top-Level Tab Switcher ─── */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mb: 1,
-            borderBottom: "1px solid #e2e8f0",
-            backgroundColor: "#fff",
-            borderRadius: "12px 12px 0 0",
-          }}
-        >
-          <Tabs
-            value={reviewTab}
-            onChange={(_, newTab) => {
-              if (newTab === "portfolio") {
-                navigate("/ai_portfolio_review");
-              } else {
-                navigate("/ai_risk_review");
-              }
-            }}
-            sx={{
-              minHeight: 44,
-              "& .MuiTabs-indicator": {
-                height: 3,
-                borderRadius: "3px 3px 0 0",
-                backgroundColor: reviewTab === "portfolio" ? "#2563eb" : "#dc2626",
-              },
-            }}
-          >
-            <Tab
-              value="portfolio"
-              icon={<TrendingUpOutlinedIcon sx={{ fontSize: 20 }} />}
-              iconPosition="start"
-              label="Portfolio Review"
-              sx={{
-                minHeight: 44,
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: 14,
-                color: reviewTab === "portfolio" ? "#2563eb" : "#64748b",
-                "&.Mui-selected": { color: "#2563eb" },
-                gap: 0.75,
-                px: 3,
-              }}
-            />
-            <Tab
-              value="risk"
-              icon={<ShieldOutlinedIcon sx={{ fontSize: 20 }} />}
-              iconPosition="start"
-              label="Risk Review"
-              sx={{
-                minHeight: 44,
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: 14,
-                color: reviewTab === "risk" ? "#dc2626" : "#64748b",
-                "&.Mui-selected": { color: "#dc2626" },
-                gap: 0.75,
-                px: 3,
-              }}
-            />
-          </Tabs>
-        </Box>
-
         <PortfolioReportDocumentMain
           selectedReport={selectedCioReport}
           reportList={cioReports}

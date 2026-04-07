@@ -96,21 +96,23 @@ interface TabSectionDef {
 const PORTFOLIO_SECTIONS: TabSectionDef[] = [
   { key: "executive_risk_dashboard", label: "Portfolio Overview" },
   { key: "final_prioritized_action_matrix", label: "Action Matrix" },
+  { key: "base_model_discipline_scorecard", label: "Discipline Scorecard" },
   // { key: "cio_decision_brief", label: "CIO Decision Brief" },
   // { key: "immediate_decisions", label: "Immediate Decisions" },
   { key: "technical_risk_overlay", label: "Technical Risk Overlay" },
   // { key: "opportunity_engine", label: "Opportunity Engine" },
-  { key: "role_specific_action_checklists", label: "Action Checklists" },
+  { key: "sector_peer_news_map", label: "Sector & Peer News" },
 ];
 
 const RISK_SECTIONS: TabSectionDef[] = [
+  { key: "executive_portfolio_overview", label: "Portfolio Overview" },
   { key: "executive_risk_dashboard", label: "Risk Dashboard" },
   { key: "base_model_discipline_scorecard", label: "Discipline Scorecard" },
   { key: "sector_peer_news_map", label: "Sector & Peer News" },
   { key: "macro_event_risk_calendar", label: "Macro & Event Risk Calendar" },
   // { key: "macro_regime_sector_rotation_model", label: "Macro Regime & Sector Rotation" },
   // { key: "upcoming_week_focus", label: "Upcoming Week Focus" },
-  { key: "upcoming_month_strategic_outlook", label: "Monthly Strategic Outlook" },
+  // { key: "upcoming_month_strategic_outlook", label: "Monthly Strategic Outlook" },
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -118,6 +120,7 @@ const RISK_SECTIONS: TabSectionDef[] = [
 // ═══════════════════════════════════════════════════════
 
 const sectionIconMap: Record<string, React.ReactNode> = {
+  executive_portfolio_overview: <TrendingUpOutlinedIcon fontSize="small" />,
   executive_risk_dashboard: <BarChartOutlinedIcon fontSize="small" />,
   cio_decision_brief: <CampaignOutlinedIcon fontSize="small" />,
   immediate_decisions: <BoltOutlinedIcon fontSize="small" />,
@@ -134,6 +137,7 @@ const sectionIconMap: Record<string, React.ReactNode> = {
 };
 
 const sectionColors: Record<string, { bg: string; border: string; iconColor: string; textColor: string }> = {
+  executive_portfolio_overview: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
   executive_risk_dashboard: { bg: "#eff6ff", border: "#bfdbfe", iconColor: "#2563eb", textColor: "#1e40af" },
   cio_decision_brief: { bg: "#fffbeb", border: "#fde68a", iconColor: "#d97706", textColor: "#92400e" },
   immediate_decisions: { bg: "#fef2f2", border: "#fecaca", iconColor: "#dc2626", textColor: "#991b1b" },
@@ -203,8 +207,7 @@ const extractKpis = (sections: Record<string, any>): KpiItem[] => {
   const dtd = findMetric(["dtd"]);
   if (dtd) kpis.push({ label: "DTD P&L", value: dtd.value, color: String(dtd.value || "").includes("-") ? "#dc2626" : "#059669" });
 
-  const cum = findMetric(["cumulative"]);
-  if (cum) kpis.push({ label: "Cum P&L", value: cum.value, color: String(cum.value || "").includes("-") ? "#dc2626" : "#059669" });
+  // Cumulative P&L removed from header KPIs
 
   const exp = findMetric(["total long exposure", "total exposure"]);
   if (exp) kpis.push({ label: "Exposure", value: exp.value, color: "#2563eb" });
@@ -698,6 +701,8 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                 : (sectionColors[item.key] || { bg: "#f8fafc", border: "#e2e8f0", iconColor: "#64748b", textColor: "#475569" });
               const isActionMatrixSection = item.key === "final_prioritized_action_matrix";
               const isExecutiveDashboard = item.key === "executive_risk_dashboard";
+              const isPortfolioOverview = item.key === "executive_portfolio_overview";
+              const effectiveSectionData = isPortfolioOverview ? sections["executive_risk_dashboard"] : sectionData;
 
               return (
                 <Box
@@ -773,23 +778,26 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
                     }}
                   >
                     {(() => {
-                      if (sectionData == null) {
+                      if (effectiveSectionData == null) {
                         return (
                           <Typography sx={{ fontSize: 13, color: "#94a3b8", fontStyle: "italic" }}>
                             No data available for this section.
                           </Typography>
                         );
                       }
+                      if (isPortfolioOverview) {
+                        return <ExecutiveDashboard data={effectiveSectionData} variant="portfolio" />;
+                      }
                       if (isActionMatrixSection) {
-                        return <ActionMatrix data={sectionData} detailItems={immediateDecisionItems} />;
+                        return <ActionMatrix data={effectiveSectionData} detailItems={immediateDecisionItems} />;
                       }
                       if (isExecutiveDashboard) {
-                        return <ExecutiveDashboard data={sectionData} variant={activeTab} />;
+                        return <ExecutiveDashboard data={effectiveSectionData} variant={activeTab} />;
                       }
                       if (SectionComponent) {
-                        return <SectionComponent data={sectionData} />;
+                        return <SectionComponent data={effectiveSectionData} />;
                       }
-                      return <GenericDataRenderer data={sectionData} />;
+                      return <GenericDataRenderer data={effectiveSectionData} />;
                     })()}
                   </Box>
                 </Box>
