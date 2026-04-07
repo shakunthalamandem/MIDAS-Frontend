@@ -594,35 +594,49 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                               variant="caption"
                               sx={{ fontWeight: 700, fontSize: '0.85rem' }}
                             >
-                              {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
+                              {selectedCard === 'recent'
+                                ? deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
+                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
+                                  ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                  : 'N/A'
+                                : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
                                 ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
+                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
                                 : 'N/A'}
                             </Typography>
                           </Box>
                           {(deal.sentiment?.one_week_sentiment ||
-                            deal.sentiment_summary?.one_week_sentiment) && (
+                            deal.sentiment_summary?.one_week_sentiment ||
+                            (selectedCard === 'recent' && deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment)) && (
                               <Chip
                                 label={`1W: ${deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
+                                  deal.sentiment_summary?.one_week_sentiment ||
+                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment : undefined)
                                   }`}
                                 size="small"
                                 color={getSentimentColor(
                                   deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
+                                  deal.sentiment_summary?.one_week_sentiment ||
+                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment : undefined)
                                 )}
                                 sx={{ width: 'fit-content', fontWeight: 600 }}
                               />
                             )}
                           {(deal.sentiment?.one_month_sentiment ||
-                            deal.sentiment_summary?.one_month_sentiment) && (
+                            deal.sentiment_summary?.one_month_sentiment ||
+                            (selectedCard === 'recent' && deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment)) && (
                               <Chip
                                 label={`1M: ${deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
+                                  deal.sentiment_summary?.one_month_sentiment ||
+                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment : undefined)
                                   }`}
                                 size="small"
                                 color={getSentimentColor(
                                   deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
+                                  deal.sentiment_summary?.one_month_sentiment ||
+                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment : undefined)
                                 )}
                                 sx={{ width: 'fit-content', fontWeight: 600 }}
                               />
