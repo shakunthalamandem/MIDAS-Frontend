@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Autocomplete,
   Box,
@@ -234,6 +235,7 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
   onSelectReport,
   reviewMode = "portfolio",
 }) => {
+  const navigate = useNavigate();
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const activeTab: ActiveTab = reviewMode;
   const [activeSection, setActiveSection] = useState<string>("");
@@ -508,15 +510,15 @@ const PortfolioReportDocumentMain: React.FC<PortfolioReportDocumentMainProps> = 
             {sidebarOpen && (
               <Typography
                 sx={{
+                  flex: 1,
                   fontWeight: 700,
                   fontSize: 13,
-                  letterSpacing: 1.5,
+                  letterSpacing: 1,
+                  color: "#420000",
                   whiteSpace: "nowrap",
-                  flex: 1,
-                  color: "#002060",
                 }}
               >
-                {activeTab === "portfolio" ? "PORTFOLIO" : "RISK"}
+                {activeTab === "portfolio" ? "PORTFOLIO RISK" : "PORTFOLIO RISK"}
               </Typography>
             )}
             <IconButton
