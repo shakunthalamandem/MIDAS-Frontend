@@ -472,8 +472,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Factors Based Agent Column */}
                       <TableCell>
                         {deal.ml_results &&
-                          (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
+                          (deal.ml_results.t1d_pred || deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            {deal.ml_results.t1d_pred && (
+                              <Chip
+                                label={`1D: ${deal.ml_results.t1d_pred}`}
+                                size="small"
+                                color={getPredictionColor(deal.ml_results.t1d_pred)}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                             {deal.ml_results.t1w_pred && (
                               <Chip
                                 label={`1W: ${deal.ml_results.t1w_pred}`}
@@ -670,8 +678,16 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Factors Based Agent Column */}
                       <TableCell>
                         {deal.ml_results &&
-                          (deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
+                          (deal.ml_results.t1d_pred || deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            {deal.ml_results.t1d_pred && (
+                              <Chip
+                                label={`1D: ${deal.ml_results.t1d_pred}`}
+                                size="small"
+                                color={getPredictionColor(deal.ml_results.t1d_pred)}
+                                sx={{ width: 'fit-content', fontWeight: 600 }}
+                              />
+                            )}
                             {deal.ml_results.t1w_pred && (
                               <Chip
                                 label={`1W: ${deal.ml_results.t1w_pred}`}
