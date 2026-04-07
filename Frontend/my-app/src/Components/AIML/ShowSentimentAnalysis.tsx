@@ -217,8 +217,8 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
 
   const tabs = [
-    { label: "Overall Sentiment", icon: <InsightsRoundedIcon sx={{ fontSize: 16 }} />, show: blocks.length > 0 },
     { label: "Social Media/Retail Sentiment", icon: <ForumRoundedIcon sx={{ fontSize: 16 }} />, show: socialMediaBlocks.length > 0 },
+    { label: "Other Details", icon: <InsightsRoundedIcon sx={{ fontSize: 16 }} />, show: blocks.length > 0 },
   ];
 
   return (
@@ -555,8 +555,8 @@ Each ticker is analyzed independently using live market data, news sentiment, an
               overflow: "hidden",
             }}
           >
-            {activeTab === 0 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
-            {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+            {activeTab === 0 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+            {activeTab === 1 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
           </Box>
         </>
       )}

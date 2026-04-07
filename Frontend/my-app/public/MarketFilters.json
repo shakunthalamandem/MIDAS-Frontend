@@ -119,7 +119,17 @@
                 "label": "Sector",
                 "description": "Sector"
             }
+        },
+        {
+            "spac": {
+                "options": [
+                    "Any",
+                    "Y",
+                    "N"
+                ],
+                "label": "SPAC",
+                "description": "SPAC"
+            }
         }
-                
     ]
 }

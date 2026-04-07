@@ -26,6 +26,7 @@ interface SkewTableOptions {
   dealType: string[];
   region: string[];
   sector: string[];
+  spac: string[];
 }
 
 const YearlyBasedTable: React.FC = () => {
@@ -33,6 +34,7 @@ const YearlyBasedTable: React.FC = () => {
   const [endYear, setEndYear] = useState<number>(2026);
   const [dealTypes, setDealTypes] = useState<string[]>(['All']);
   const [regions, setRegions] = useState<string[]>(['All']);
+  const [spac, setSpac] = useState<string>('Any');
 
   const [startYearOptions, setStartYearOptions] = useState<number[]>([]);
   const [endYearOptions, setEndYearOptions] = useState<number[]>([]);
@@ -81,12 +83,15 @@ const YearlyBasedTable: React.FC = () => {
         setLoading(true);
         const apiUrl = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem("access_token");
-        const filters = {
+        const filters: any = {
           year_range: [startYear, endYear],
           deal_type: effectiveDealTypes,
           region: effectiveRegions,
           sector: sectorOptions,
         };
+        if (spac !== 'Any') {
+          filters.spac = spac;
+        }
         const res = await axios.post(
           `${apiUrl}/api/skewtable/calculations/`,
           { filters },
@@ -109,7 +114,7 @@ const YearlyBasedTable: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, [startYear, endYear, dealTypes, regions, dealTypeOptions, regionOptions, sectorOptions]);
+  }, [startYear, endYear, dealTypes, regions, spac, dealTypeOptions, regionOptions, sectorOptions]);
 
   const handleStartYearChange = (event: SelectChangeEvent<number | string>) => {
     const newStartYear = Number(event.target.value);
@@ -149,6 +154,7 @@ const YearlyBasedTable: React.FC = () => {
     setEndYear(2026);
     setDealTypes(['All']);
     setRegions(['All']);
+    setSpac('Any');
   };
 
   const handleSectorRowClick = (clickedSector: string) => {
@@ -178,9 +184,9 @@ const YearlyBasedTable: React.FC = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#3b3f57', fontWeight: 'bold' }}>
               Sector Based Filtered Data
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} alignItems="center" flexWrap="nowrap">
               {/* Start Year */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Start Year</InputLabel>
                   <Select
@@ -198,7 +204,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* End Year */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>End Year</InputLabel>
                   <Select
@@ -217,7 +223,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* Deal Type */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Deal Type</InputLabel>
                   <Select
@@ -244,7 +250,7 @@ const YearlyBasedTable: React.FC = () => {
               </Grid>
 
               {/* Region */}
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md>
                 <FormControl fullWidth variant="outlined" size="small">
                   <InputLabel>Region</InputLabel>
                   <Select
@@ -266,6 +272,24 @@ const YearlyBasedTable: React.FC = () => {
                         <ListItemText primary={r} />
                       </MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* SPAC */}
+              <Grid item xs={12} sm={6} md>
+                <FormControl fullWidth variant="outlined" size="small">
+                  <InputLabel>SPAC</InputLabel>
+                  <Select
+                    value={spac}
+                    onChange={(e) => setSpac(e.target.value as string)}
+                    label="SPAC"
+                    MenuProps={menuProps}
+                    sx={{ backgroundColor: '#e8f5e9', color: '#2e7d32' }}
+                  >
+                    <MenuItem value="Any">Any</MenuItem>
+                    <MenuItem value="Y">Y</MenuItem>
+                    <MenuItem value="N">N</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

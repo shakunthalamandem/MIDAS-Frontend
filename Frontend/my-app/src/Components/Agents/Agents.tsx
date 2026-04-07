@@ -286,48 +286,227 @@ const Agents: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Portfolio Summary Banner ── */}
-      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, pt: 4, pb: 2 }}>
+      {/* ── US IPO Signal Board Section ── */}
+      <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, md: 5 }, pt: 3, pb: 1 }}>
         <Box
-          onClick={() => window.open("/portfolio_summary", "_blank")}
           sx={{
             bgcolor: "#fff",
             border: "1px solid #c7d2fe",
-            borderRadius: 4,
-            p: 3.5,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            transition: "all 0.3s ease",
-            "&:hover": {
-              boxShadow: "0 10px 25px rgba(79, 70, 229, 0.15)",
-              borderColor: "#4f46e5",
-              transform: "translateY(-2px)",
-            },
+            borderRadius: 3,
+            p: 2.5,
           }}
         >
           <Typography
             sx={{
-              fontSize: { xs: "1rem", md: "1.25rem" },
+              fontSize: { xs: "0.95rem", md: "1.1rem" },
               fontWeight: 700,
               color: "#111827",
+              mb: 1.5,
               letterSpacing: "-0.025em",
             }}
           >
-            US Current Portfolio (IPO) Summary Dashboard
+            US IPO Signal Board
           </Typography>
-          <Typography
+
+          <Box
             sx={{
-              fontSize: "1.5rem",
-              color: "#4f46e5",
-              fontWeight: 700,
-              ml: 2,
-              flexShrink: 0,
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
+              gap: 1.5,
             }}
           >
-            →
-          </Typography>
+            {/* Upcoming IPOs Card */}
+            <Box
+              onClick={() => navigate("/summary_signal_board?tab=upcoming")}
+              sx={{
+                bgcolor: "#f8f9ff",
+                border: "1px solid #e0e7ff",
+                borderRadius: 2,
+                p: 1.8,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                position: "relative",
+                "&:hover": {
+                  boxShadow: "0 6px 16px rgba(79, 70, 229, 0.12)",
+                  borderColor: "#4f46e5",
+                  transform: "translateY(-1px)",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  width: 24,
+                  height: 24,
+                  borderRadius: "4px",
+                  border: "1.5px solid #4f46e5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "14px",
+                  color: "#4f46e5",
+                  opacity: 0.6,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: "#f3e8fe",
+                  },
+                }}
+              >
+                ↗
+              </Box>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 1.5,
+                  bgcolor: "#ede9fe",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ fontSize: "1.1rem" }}>📈</Typography>
+              </Box>
+              <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.85rem", mb: 0.2 }}>
+                Upcoming IPOs
+              </Typography>
+              {/* <Typography sx={{ color: "#64748b", fontSize: "0.75rem" }}>
+                Analyze opportunities
+              </Typography> */}
+            </Box>
+
+            {/* Current Portfolio Card */}
+            <Box
+              onClick={() => navigate("/summary_signal_board?tab=portfolio")}
+              sx={{
+                bgcolor: "#f0fdf4",
+                border: "1px solid #dcfce7",
+                borderRadius: 2,
+                p: 1.8,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                position: "relative",
+                "&:hover": {
+                  boxShadow: "0 6px 16px rgba(5, 150, 105, 0.12)",
+                  borderColor: "#059669",
+                  transform: "translateY(-1px)",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  width: 24,
+                  height: 24,
+                  borderRadius: "4px",
+                  border: "1.5px solid #059669",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "14px",
+                  color: "#059669",
+                  opacity: 0.6,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: "#d1fae5",
+                  },
+                }}
+              >
+                ↗
+              </Box>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 1.5,
+                  bgcolor: "#d1fae5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ fontSize: "1.1rem" }}>💼</Typography>
+              </Box>
+              <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.85rem", mb: 0.2 }}>
+                Current Portfolio: IPOs
+              </Typography>
+              {/* <Typography sx={{ color: "#64748b", fontSize: "0.75rem" }}>
+                Monitor trading IPOs
+              </Typography> */}
+            </Box>
+
+            {/* Recently Traded Card */}
+            <Box
+              onClick={() => navigate("/summary_signal_board?tab=recent")}
+              sx={{
+                bgcolor: "#fef2f2",
+                border: "1px solid #fee2e2",
+                borderRadius: 2,
+                p: 1.8,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                position: "relative",
+                "&:hover": {
+                  boxShadow: "0 6px 16px rgba(220, 38, 38, 0.12)",
+                  borderColor: "#dc2626",
+                  transform: "translateY(-1px)",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  width: 24,
+                  height: 24,
+                  borderRadius: "4px",
+                  border: "1.5px solid #dc2626",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "14px",
+                  color: "#dc2626",
+                  opacity: 0.6,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: "#fee2e2",
+                  },
+                }}
+              >
+                ↗
+              </Box>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 1.5,
+                  bgcolor: "#fee2e2",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ fontSize: "1.1rem" }}>📊</Typography>
+              </Box>
+              <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.85rem", mb: 0.2 }}>
+                Recently Traded IPOs(Last 60 days)
+              </Typography>
+              {/* <Typography sx={{ color: "#64748b", fontSize: "0.75rem" }}>
+                Review listed IPOs
+              </Typography> */}
+            </Box>
+          </Box>
         </Box>
       </Box>
 
