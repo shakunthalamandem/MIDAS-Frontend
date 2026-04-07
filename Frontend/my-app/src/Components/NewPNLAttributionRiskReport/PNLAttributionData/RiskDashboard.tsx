@@ -30,6 +30,7 @@ const RiskDashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [data, setData] = useState<DashboardData | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [exchrateLatestPnl, setExchrateLatestPnl] = useState<number | null>(null);
   const [chartLoading, setChartLoading] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("ytd_pnl");
   const [selectedCategory, setSelectedCategory] = useState<DashboardCategory>("pnl");
@@ -141,8 +142,11 @@ const RiskDashboard: React.FC = () => {
         if (chartRes.ok) {
           const chartResult = await chartRes.json();
           setChartData(chartResult.chart_data || []);
+          const exchrateData: { cumulative_pnl: number }[] = chartResult.exchrate_chart_data || [];
+          setExchrateLatestPnl(exchrateData.length > 0 ? exchrateData[exchrateData.length - 1].cumulative_pnl : null);
         } else {
           setChartData([]);
+          setExchrateLatestPnl(null);
         }
 
         // Process top/bottom
@@ -199,8 +203,11 @@ const RiskDashboard: React.FC = () => {
         if (res.ok) {
           const result = await res.json();
           setChartData(result.chart_data || []);
+          const exchrateData: { cumulative_pnl: number }[] = result.exchrate_chart_data || [];
+          setExchrateLatestPnl(exchrateData.length > 0 ? exchrateData[exchrateData.length - 1].cumulative_pnl : null);
         } else {
           setChartData([]);
+          setExchrateLatestPnl(null);
         }
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -468,6 +475,7 @@ const RiskDashboard: React.FC = () => {
               category={selectedCategory}
               metricChartData={metricChartData}
               metricChartLoading={metricChartLoading}
+              exchrateLatestPnl={exchrateLatestPnl}
             />
           </Box>
 
