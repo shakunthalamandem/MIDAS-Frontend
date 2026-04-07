@@ -50,7 +50,23 @@ const Agents: React.FC = () => {
     try {
       setLoading(true);
       const data = await fetchAgents();
-      setAgents(data);
+      // Hide IPO Ranking Agent; merge Portfolio CIO Agent + Risk Agent into one
+      let cioAgent: AIAgent | undefined;
+      const transformed: AIAgent[] = [];
+      for (const agent of data) {
+        if (agent.name === "IPO Ranking Agent") continue;
+        if (agent.name === "Portfolio CIO Agent") { cioAgent = agent; continue; }
+        if (agent.name === "Risk Agent") continue;
+        transformed.push(agent);
+      }
+      if (cioAgent) {
+        transformed.unshift({
+          ...cioAgent,
+          name: "Portfolio Risk Agent",
+          description: "AI-powered portfolio oversight combining risk and performance analysis. Monitors exposures, P&L attribution, and risk triggers to support capital allocation decisions.",
+        });
+      }
+      setAgents(transformed);
     } catch (err) {
       console.error("Failed to load agents:", err);
       setSnackbar({ open: true, message: "Failed to load agents", severity: "error" });

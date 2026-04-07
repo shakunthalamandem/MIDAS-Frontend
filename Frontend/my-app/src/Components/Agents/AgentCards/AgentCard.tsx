@@ -37,6 +37,12 @@ export interface AgentCardProps {
 
 /* ── Unique theme per agent by name, with fallback by index ── */
 const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; icon: React.ReactNode }> = {
+  "Portfolio Risk Agent": {
+    accent: "#4f46e5",
+    bg: "#eef2ff",
+    light: "#c7d2fe",
+    icon: <AccountBalanceIcon sx={{ fontSize: 22, color: "#fff" }} />,
+  },
   "Portfolio CIO Agent": {
     accent: "#4f46e5",
     bg: "#eef2ff",

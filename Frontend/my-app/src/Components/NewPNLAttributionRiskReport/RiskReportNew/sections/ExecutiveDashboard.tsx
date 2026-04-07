@@ -97,9 +97,11 @@ const metricValueColor = (value: string): string => {
 };
 
 // ── Variant filter helpers ──
-const PORTFOLIO_CARD_KEYWORDS = ["winning", "losing", "opportunity", "going well"];
-const RISK_CARD_KEYWORDS = ["hidden risk", "going wrong", "fearful"];
-const PORTFOLIO_METRIC_KEYWORDS = ["exposure", "beta", "p&l", "pnl", "dtd", "cumulative"];
+// Portfolio tab shows ALL qualitative cards (winning, losing, opportunity, hidden risk)
+const PORTFOLIO_CARD_KEYWORDS = ["winning", "losing", "opportunity", "going well", "hidden risk", "going wrong", "fearful"];
+const RISK_CARD_KEYWORDS: string[] = []; // qualitative cards shown on portfolio tab only
+// All metric cards shown on portfolio tab except Cumulative Gross P&L
+const PORTFOLIO_METRIC_KEYWORDS = ["exposure", "beta", "dtd", "capital", "sector", "concentration"];
 const RISK_METRIC_KEYWORDS = ["risk", "stop", "impact", "spx", "concentration", "sector", "gain potential"];
 
 const matchesAny = (text: string, keywords: string[]): boolean => {

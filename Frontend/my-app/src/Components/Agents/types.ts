@@ -90,6 +90,7 @@ export interface ChatResponse {
 
 // Route map for system agents (preserved from existing routes)
 export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
+  "Portfolio Risk Agent": "/ai_risk_review",
   "Portfolio CIO Agent": "/ai_portfolio_review",
   "Risk Agent": "/ai_risk_review",
   "IPO Ranking Agent": "/last_30_days_ai_ranking",
