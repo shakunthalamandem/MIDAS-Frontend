@@ -23,7 +23,6 @@ import {
 } from "recharts";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import CandlestickChartIcon from "@mui/icons-material/CandlestickChart";
-import ScheduleIcon from "@mui/icons-material/Schedule";
 import TradingViewWidget from "../Main/InvestmentStrategy/Tradingview/TradingViewWidget";
 
 /* ---------- types ---------- */
@@ -43,6 +42,9 @@ interface ApiResponse {
   stop_loss: number;
   one_month_completed?: boolean;
   trading_days_elapsed?: number;
+  t1m_pred?: string | null;
+  t1w_pred?: string | null;
+  t1d_openprice_pred?: string | null;
 }
 
 interface DealPoint {
@@ -309,84 +311,6 @@ const YAxisTopLabel: React.FC<any> = (props) => {
 
 /* ---------- Upcoming Placeholder ---------- */
 
-const ChartPlaceholder: React.FC<{
-  title: string;
-  subtitle: string;
-  dealStatus?: string;
-  expectedDate?: string;
-}> = ({ title, subtitle, dealStatus, expectedDate }) => (
-  <Box
-    sx={{
-      borderRadius: 3,
-      border: "2px dashed #CBD5E1",
-      bgcolor: "#F8FAFC",
-      p: 5,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: 320,
-      textAlign: "center",
-    }}
-  >
-    <ScheduleIcon sx={{ fontSize: 52, color: "#94A3B8", mb: 2.5 }} />
-    <Typography
-      sx={{ fontWeight: 800, fontSize: 20, color: "#334155", mb: 1 }}
-    >
-      {title}
-    </Typography>
-    <Typography
-      sx={{
-        color: "#64748B",
-        fontSize: 14,
-        fontWeight: 500,
-        maxWidth: 440,
-        mb: 2.5,
-        lineHeight: 1.6,
-      }}
-    >
-      {subtitle}
-    </Typography>
-    <Box
-      sx={{
-        display: "flex",
-        gap: 1.5,
-        flexWrap: "wrap",
-        justifyContent: "center",
-      }}
-    >
-      {dealStatus && (
-        <Chip
-          label={`Status: ${dealStatus}`}
-          size="small"
-          sx={{
-            bgcolor: "#DBEAFE",
-            color: "#1E40AF",
-            fontWeight: 700,
-            fontSize: 12,
-            height: 28,
-            borderRadius: 1.5,
-          }}
-        />
-      )}
-      {expectedDate && (
-        <Chip
-          label={`Expected: ${formatFullDate(expectedDate)}`}
-          size="small"
-          sx={{
-            bgcolor: "#F1F5F9",
-            color: "#475569",
-            fontWeight: 600,
-            fontSize: 12,
-            height: 28,
-            borderRadius: 1.5,
-          }}
-        />
-      )}
-    </Box>
-  </Box>
-);
-
 /* ---------- main component ---------- */
 
 interface Props {
@@ -415,6 +339,7 @@ const PriceChartsSection: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [oneMonthCompleted, setOneMonthCompleted] = useState(false);
   const [tradingDaysElapsed, setTradingDaysElapsed] = useState(0);
+  const [t1mPred, setT1mPred] = useState<string | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -426,6 +351,7 @@ const PriceChartsSection: React.FC<Props> = ({
     setError(null);
     setOneMonthCompleted(false);
     setTradingDaysElapsed(0);
+    setT1mPred(null);
 
     if (!ticker || !trade_date || !apiUrl || isUpcoming) return;
 
@@ -488,6 +414,7 @@ const PriceChartsSection: React.FC<Props> = ({
         setStopLoss(json.stop_loss != null ? Number(json.stop_loss) : null);
         setOneMonthCompleted(json.one_month_completed ?? false);
         setTradingDaysElapsed(json.trading_days_elapsed ?? 0);
+        setT1mPred(json.t1m_pred ?? null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
       } finally {
@@ -543,118 +470,18 @@ const PriceChartsSection: React.FC<Props> = ({
   const showLiveTradingChart =
     normalizedRegion !== "EMEA" && normalizedRegion !== "APAC";
 
-  /* ── Upcoming deals: show placeholders ── */
+  /* ── Upcoming deals: hide charts entirely ── */
   if (isUpcoming) {
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-        {/* FactSet placeholder */}
-        <Box
-          sx={{
-            borderRadius: 3,
-            overflow: "hidden",
-            border: "1px solid #E2E8F0",
-          }}
-        >
-          <Box
-            sx={{
-              background:
-                "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-              px: 3,
-              py: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-            }}
-          >
-            <ShowChartIcon sx={{ color: "#38BDF8", fontSize: 22 }} />
-            <Box>
-              <Typography
-                sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: 15 }}
-              >
-                FactSet Time Series & AI/ML Signals
-              </Typography>
-              <Typography
-                sx={{
-                  color: "#94A3B8",
-                  fontSize: 12,
-                  fontWeight: 500,
-                  mt: 0.25,
-                }}
-              >
-                Post-IPO price action with buy/sell signals from proprietary
-                models
-              </Typography>
-            </Box>
-          </Box>
-          <ChartPlaceholder
-            title="Chart Available Once Listed"
-            subtitle={`The price timeseries chart for ${issuerName || ticker} will appear here once the ticker begins trading.`}
-            dealStatus={dealStatus}
-            expectedDate={expectedDate}
-          />
-        </Box>
-
-        {showLiveTradingChart && (
-          <Box
-            sx={{
-              borderRadius: 3,
-              overflow: "hidden",
-              border: "1px solid #E2E8F0",
-            }}
-          >
-            <Box
-              sx={{
-                background:
-                  "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                px: 3,
-                py: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-              >
-                <CandlestickChartIcon
-                  sx={{ color: "#38BDF8", fontSize: 22 }}
-                />
-                <Typography
-                  sx={{ color: "#FFFFFF", fontWeight: 800, fontSize: 15 }}
-                >
-                  Live Trading Chart
-                </Typography>
-              </Box>
-              <Chip
-                label={dealStatus || "Price Range"}
-                size="small"
-                sx={{
-                  bgcolor: "rgba(255,255,255,0.1)",
-                  color: "#94A3B8",
-                  fontWeight: 700,
-                  fontSize: 11,
-                  height: 24,
-                  border: "1px solid rgba(255,255,255,0.15)",
-                }}
-              />
-            </Box>
-            <ChartPlaceholder
-              title="Chart Available Once Listed"
-              subtitle={`The live trading chart for ${issuerName || ticker} will appear here once the ticker begins trading.`}
-              dealStatus={dealStatus}
-              expectedDate={expectedDate}
-            />
-          </Box>
-        )}
-      </Box>
-    );
+    return null;
   }
 
   /* ── Listed deals: show actual charts ── */
+  const showFactSetCard = loading || (!error && chartData.length > 0);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
       {/* ── FactSet Candlestick Chart ── */}
-      <Box
+      {showFactSetCard && <Box
         sx={{
           borderRadius: 3,
           overflow: "hidden",
@@ -732,34 +559,43 @@ const PriceChartsSection: React.FC<Props> = ({
             )}
 
             {/* T+1M Prediction badge */}
-            <Box
-              sx={{
-                bgcolor: "rgba(16, 185, 129, 0.12)",
-                border: "1px solid rgba(16, 185, 129, 0.25)",
-                borderRadius: 2,
-                px: 1.5,
-                py: 0.75,
-                textAlign: "right",
-                minWidth: 100,
-              }}
-            >
-              <Typography
-                sx={{
-                  color: "#6EE7B7",
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: 0.5,
-                  textTransform: "uppercase",
-                }}
-              >
-                T+1M Prediction
-              </Typography>
-              <Typography
-                sx={{ color: "#10B981", fontSize: 13, fontWeight: 800 }}
-              >
-                Positive
-              </Typography>
-            </Box>
+            {t1mPred && (() => {
+              const isNeg = t1mPred.toLowerCase().includes("negative");
+              const accent = isNeg ? "#EF4444" : "#10B981";
+              const accentBg = isNeg ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.12)";
+              const accentBorder = isNeg ? "rgba(239,68,68,0.25)" : "rgba(16,185,129,0.25)";
+              const labelColor = isNeg ? "#FCA5A5" : "#6EE7B7";
+              return (
+                <Box
+                  sx={{
+                    bgcolor: accentBg,
+                    border: `1px solid ${accentBorder}`,
+                    borderRadius: 2,
+                    px: 1.5,
+                    py: 0.75,
+                    textAlign: "right",
+                    minWidth: 100,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: labelColor,
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      letterSpacing: 0.5,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    T+1M Prediction
+                  </Typography>
+                  <Typography
+                    sx={{ color: accent, fontSize: 13, fontWeight: 800 }}
+                  >
+                    {t1mPred}
+                  </Typography>
+                </Box>
+              );
+            })()}
           </Box>
         </Box>
 
@@ -1019,7 +855,7 @@ const PriceChartsSection: React.FC<Props> = ({
             </Alert>
           )}
         </Box>
-      </Box>
+      </Box>}
 
       {/* ── TradingView Widget ── */}
       {ticker && showLiveTradingChart && (
