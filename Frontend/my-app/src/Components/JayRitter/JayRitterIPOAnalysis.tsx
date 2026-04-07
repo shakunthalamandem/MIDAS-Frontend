@@ -28,6 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import axios from "axios";
 import JayRitterChat from "./JayRitterChat";
+import PriceChartsSection from "../TradingSignals/PriceChartsSection";
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface ReportSummary {
@@ -553,6 +554,16 @@ const ExpandedRow: React.FC<{ ticker: TickerAnalysis }> = ({ ticker }) => {
           </Box>
         </Box>
       </Box>
+
+      {/* ─── FactSet Time Series Chart ─── */}
+      {ticker.ticker && ticker.trade_date && (
+        <Box sx={{ mt: 2 }}>
+          <PriceChartsSection
+            ticker={ticker.ticker}
+            trade_date={ticker.trade_date}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

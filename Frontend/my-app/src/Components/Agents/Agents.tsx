@@ -22,6 +22,7 @@ import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
+import EditAgentDialog from "./EditAgentDialog";
 import { AIAgent } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
 
@@ -35,6 +36,8 @@ const Agents: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
   const [adminGateOpen, setAdminGateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [agentToEdit, setAgentToEdit] = useState<AIAgent | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agentToDelete, setAgentToDelete] = useState<AIAgent | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -592,12 +595,9 @@ const Agents: React.FC = () => {
                 index={index + 1}
                 onEmailToggle={handleEmailToggle}
                 onDelete={handleDeleteRequest}
-                onEdit={() => {
-                  setSnackbar({
-                    open: true,
-                    message: "Edit functionality coming soon",
-                    severity: "success",
-                  });
+                onEdit={(a) => {
+                  setAgentToEdit(a);
+                  setEditOpen(true);
                 }}
               />
             ))}
@@ -610,6 +610,14 @@ const Agents: React.FC = () => {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={loadAgents}
+      />
+
+      {/* Edit Agent Dialog */}
+      <EditAgentDialog
+        open={editOpen}
+        agent={agentToEdit}
+        onClose={() => { setEditOpen(false); setAgentToEdit(null); }}
+        onUpdated={loadAgents}
       />
 
       {/* Admin Gate Dialog */}
