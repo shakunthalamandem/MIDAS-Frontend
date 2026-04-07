@@ -176,7 +176,7 @@ const RiskTriggers: React.FC = () => {
   const initialDate = searchParams.get("date") || "";
 
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  const [selectedFunds, setSelectedFunds] = useState<string[]>(initialFund ? [initialFund] : ["BHM"]);
+  const [selectedFunds, setSelectedFunds] = useState<string[]>(initialFund ? [initialFund] : []);
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [data, setData] = useState<TriggersResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -212,7 +212,7 @@ const RiskTriggers: React.FC = () => {
         setPortfolios(result.portfolios || []);
         if (!selectedDate && result.max_position_date) setSelectedDate(result.max_position_date);
         if (selectedFunds.length === 0 && result.portfolios?.length > 0) {
-          setSelectedFunds(result.portfolios.includes("BHM") ? ["BHM"] : [result.portfolios[0]]);
+          setSelectedFunds([...result.portfolios]);
         }
       } catch (err: any) { setError(err.message || "Failed to load portfolios"); }
     };
