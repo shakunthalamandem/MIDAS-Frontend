@@ -277,14 +277,15 @@ const NavbarMain: React.FC = () => {
                 },
                 {
                   label: "Signal Board",
-                  path: "/signals/board",
+                  // path: "/signals/board",
+                  path:"/summary_signal_board",
                   icon: <AutoAwesomeIcon fontSize="small" />,
                 },
-                {
-                  label: "US Portfolio Summary",
-                  path: "/portfolio_summary",
-                  icon: <InsightsIcon fontSize="small" />,
-                },
+                // {
+                //   label: "US Portfolio Summary",
+                //   path: "/portfolio_summary",
+                //   icon: <InsightsIcon fontSize="small" />,
+                // },
                 // {
                 //   label: "AI Portfolio Review",
                 //   path: "/ai_portfolio_review",
