@@ -158,8 +158,10 @@ const NewDashbaordIPOTickerList: React.FC<
         }}
         value={selectedValue}
         onChange={(_, newValue) => {
-          onSelect(newValue);
-          setSearchText("");
+          if (newValue !== null) {
+            onSelect(newValue);
+            setSearchText("");
+          }
         }}
         inputValue={searchText}
         onInputChange={(_, newInputValue) => setSearchText(newInputValue)}
