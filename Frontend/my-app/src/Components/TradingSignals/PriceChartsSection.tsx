@@ -43,6 +43,9 @@ interface ApiResponse {
   stop_loss: number;
   one_month_completed?: boolean;
   trading_days_elapsed?: number;
+  t1m_pred?: string | null;
+  t1w_pred?: string | null;
+  t1d_openprice_pred?: string | null;
 }
 
 interface DealPoint {
@@ -415,6 +418,7 @@ const PriceChartsSection: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [oneMonthCompleted, setOneMonthCompleted] = useState(false);
   const [tradingDaysElapsed, setTradingDaysElapsed] = useState(0);
+  const [t1mPred, setT1mPred] = useState<string | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
@@ -426,6 +430,7 @@ const PriceChartsSection: React.FC<Props> = ({
     setError(null);
     setOneMonthCompleted(false);
     setTradingDaysElapsed(0);
+    setT1mPred(null);
 
     if (!ticker || !trade_date || !apiUrl || isUpcoming) return;
 
@@ -488,6 +493,7 @@ const PriceChartsSection: React.FC<Props> = ({
         setStopLoss(json.stop_loss != null ? Number(json.stop_loss) : null);
         setOneMonthCompleted(json.one_month_completed ?? false);
         setTradingDaysElapsed(json.trading_days_elapsed ?? 0);
+        setT1mPred(json.t1m_pred ?? null);
       } catch (err: any) {
         setError(err.message || "Failed to fetch price data");
       } finally {
@@ -732,34 +738,43 @@ const PriceChartsSection: React.FC<Props> = ({
             )}
 
             {/* T+1M Prediction badge */}
-            <Box
-              sx={{
-                bgcolor: "rgba(16, 185, 129, 0.12)",
-                border: "1px solid rgba(16, 185, 129, 0.25)",
-                borderRadius: 2,
-                px: 1.5,
-                py: 0.75,
-                textAlign: "right",
-                minWidth: 100,
-              }}
-            >
-              <Typography
-                sx={{
-                  color: "#6EE7B7",
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  letterSpacing: 0.5,
-                  textTransform: "uppercase",
-                }}
-              >
-                T+1M Prediction
-              </Typography>
-              <Typography
-                sx={{ color: "#10B981", fontSize: 13, fontWeight: 800 }}
-              >
-                Positive
-              </Typography>
-            </Box>
+            {t1mPred && (() => {
+              const isNeg = t1mPred.toLowerCase().includes("negative");
+              const accent = isNeg ? "#EF4444" : "#10B981";
+              const accentBg = isNeg ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.12)";
+              const accentBorder = isNeg ? "rgba(239,68,68,0.25)" : "rgba(16,185,129,0.25)";
+              const labelColor = isNeg ? "#FCA5A5" : "#6EE7B7";
+              return (
+                <Box
+                  sx={{
+                    bgcolor: accentBg,
+                    border: `1px solid ${accentBorder}`,
+                    borderRadius: 2,
+                    px: 1.5,
+                    py: 0.75,
+                    textAlign: "right",
+                    minWidth: 100,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: labelColor,
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      letterSpacing: 0.5,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    T+1M Prediction
+                  </Typography>
+                  <Typography
+                    sx={{ color: accent, fontSize: 13, fontWeight: 800 }}
+                  >
+                    {t1mPred}
+                  </Typography>
+                </Box>
+              );
+            })()}
           </Box>
         </Box>
 
