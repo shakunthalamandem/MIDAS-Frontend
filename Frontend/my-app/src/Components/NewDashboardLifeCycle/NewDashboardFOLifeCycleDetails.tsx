@@ -31,9 +31,25 @@ import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashb
 import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
 import DealBot from "./DealBot";
 
-const REGION_DISABLED_AGENT_TABS = new Set(["Factors Based Agent","Technical Analysis"]);
 
-const REGION_DISABLED_VALUES = new Set(["EMEA", "APAC"]);
+/* ── Region-aware tab visibility for FO deals ── */
+const FO_ENABLED_TABS: Record<string, Set<string>> = {
+  US: new Set([
+    "Trading Dynamics", "Write Up New", "Peer Deals Performance",
+    "Sentiment Agent", "Previous FO deals", "Factors Based Agent",
+    "Technical Analysis", "NEWS", "Meeting Notes",
+  ]),
+  // APAC & EMEA: limited tabs + Trading Dynamics/Peer Deals as "Under Development"
+  DEFAULT: new Set([
+    "Sentiment Agent", "Meeting Notes", "Previous FO deals",
+    "Trading Dynamics", "Peer Deals Performance",  // shown but render PageUnderDevelopment
+  ]),
+};
+
+/* Tabs that render "Under Development" for non-US regions */
+const FO_UNDER_DEVELOPMENT_TABS: Record<string, Set<string>> = {
+  DEFAULT: new Set(["Trading Dynamics", "Peer Deals Performance"]),
+};
 
 const NewDashboardFOLifeCycleDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -52,8 +68,8 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     (activePayload?.flag_for_writeup || "").toUpperCase() === "Y" ||
     (activePayload?.writeup_available || "").toUpperCase() === "YES";
   const normalizedRegion = (activePayload?.region || "").toUpperCase();
-  const disableUnavailableAgentTabs =
-    REGION_DISABLED_VALUES.has(normalizedRegion);
+  const enabledTabs = FO_ENABLED_TABS[normalizedRegion] || FO_ENABLED_TABS.DEFAULT;
+  const underDevTabs = FO_UNDER_DEVELOPMENT_TABS[normalizedRegion] || FO_UNDER_DEVELOPMENT_TABS.DEFAULT || new Set();
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
@@ -75,24 +91,6 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
     ],
     [isUpcoming]
   );
-
-  React.useEffect(() => {
-    const currentTab = tabItems[tabValue];
-    if (!currentTab) return;
-
-    const firstNonWriteupIndex = tabItems.findIndex(
-      (item) => !item.requiresWriteup
-    );
-
-    // CASE 1: Writeup NOT available
-    if (!writeupEnabled) {
-      if (currentTab.requiresWriteup && firstNonWriteupIndex !== -1) {
-        setTabValue(firstNonWriteupIndex);
-      }
-    }
-
-    // When writeup is available, do not auto-switch tabs.
-  }, [writeupEnabled, tabItems, tabValue]);
 
   React.useEffect(() => {
     if (!targetTabLabel) return;
@@ -260,36 +258,21 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               },
             }}
           >
-            {tabItems.map((item) => {
-              const isRegionDisabled =
-                disableUnavailableAgentTabs &&
-                REGION_DISABLED_AGENT_TABS.has(item.label);
-              const isDisabled =
-                (item.requiresWriteup && !writeupEnabled) || isRegionDisabled;
-              return (
-                <Tab
-                  key={item.label}
-                  iconPosition="start"
-                  label={item.label}
-                  disabled={isDisabled}
-                  sx={{
-                    borderRadius: 999,
-                    mr: 1,
-                    "&.Mui-selected": {
-                      color: showDealBot ? "#0f0f0fff" : "#ffff",
-                      backgroundColor: showDealBot ? "#ffffff" : "#262268ff",
-                    },
-                    "&.Mui-disabled": {
-                      color: "#a0a0a0",
-                      backgroundColor: "#e0e0e0",
-                      borderColor: "#d0d0d0",
-                      cursor: "not-allowed",
-                      pointerEvents: "auto",
-                    },
-                  }}
-                />
-              );
-            })}
+            {tabItems.map((item) => (
+              <Tab
+                key={item.label}
+                iconPosition="start"
+                label={item.label}
+                sx={{
+                  borderRadius: 999,
+                  mr: 1,
+                  "&.Mui-selected": {
+                    color: showDealBot ? "#0f0f0fff" : "#ffff",
+                    backgroundColor: showDealBot ? "#ffffff" : "#262268ff",
+                  },
+                }}
+              />
+            ))}
           </Tabs>
         </Paper>
 
@@ -299,7 +282,46 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
           </Box>
 
           <Box sx={{ display: showDealBot ? "none" : "block" }}>
-            {tabItems[tabValue]?.label === "Trading Dynamics" ? (
+            {(() => {
+              const currentLabel = tabItems[tabValue]?.label ?? "";
+
+              // Check if tab data is not available for this region
+              const isRegionUnavailable = !enabledTabs.has(currentLabel);
+              const isWriteupUnavailable = tabItems[tabValue]?.requiresWriteup && !writeupEnabled;
+
+              if (isRegionUnavailable) {
+                return (
+                  <Box sx={{ textAlign: "center", py: 8, px: 4, bgcolor: "#fff", borderRadius: 4, border: "1px solid #e2e8f0" }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: "1.1rem", color: "#111827", mb: 1 }}>
+                      No data available
+                    </Typography>
+                    <Typography sx={{ color: "#64748b", maxWidth: 420, mx: "auto", lineHeight: 1.7 }}>
+                      "{currentLabel}" is not currently available for {normalizedRegion || "this"} region deals. This feature may be added in the future.
+                    </Typography>
+                  </Box>
+                );
+              }
+
+              if (isWriteupUnavailable) {
+                return (
+                  <Box sx={{ textAlign: "center", py: 8, px: 4, bgcolor: "#fff", borderRadius: 4, border: "1px solid #e2e8f0" }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: "1.1rem", color: "#111827", mb: 1 }}>
+                      No data available
+                    </Typography>
+                    <Typography sx={{ color: "#64748b", maxWidth: 420, mx: "auto", lineHeight: 1.7 }}>
+                      Write-up data is not available for this deal yet. The "{currentLabel}" section will be accessible once the write-up is ready.
+                    </Typography>
+                  </Box>
+                );
+              }
+
+              // Check if under development for this region
+              if (underDevTabs.has(currentLabel)) {
+                return <PageUnderDevelopment />;
+              }
+
+              return null;
+            })() || (tabItems[tabValue]?.label === "Trading Dynamics" ? (
               <TradingSignalsMain
                 ticker={activePayload.ticker}
                 trade_date={activePayload.pricing_date}
@@ -328,7 +350,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               <NewDashboardLifeCyclePeerDeals
                 selectedDeal={activePayload}
               />
-            ) : tabItems[tabValue]?.label === "Write Up" ? (
+            ) : tabItems[tabValue]?.label === "Write Up New" || tabItems[tabValue]?.label === "Write Up" ? (
               <FebFOWriteUpDashboardMain
                 basicDealDetails={{
                   deal_id: activePayload.deal_id,
@@ -345,7 +367,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               />
             ) : tabItems[tabValue]?.label === "NEWS" ? (
               <NewDashboardLifeCycleNews ticker={activePayload.ticker} />
-            ) : tabItems[tabValue]?.label === "ML Model" ? (
+            ) : tabItems[tabValue]?.label === "ML Model" || tabItems[tabValue]?.label === "Factors Based Agent" ? (
               <AIMLDealDetails ticker={activePayload.ticker} />
             ) : tabItems[tabValue]?.label === "Previous FO deals" ? (
               <CombinedSelectedTicker ticker={activePayload.ticker?.split(" ")[0]} />
@@ -364,7 +386,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               />
             ) : (
               <PageUnderDevelopment />
-            )}
+            ))}
           </Box>
         </Box>
       </Paper>

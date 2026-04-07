@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,16 +17,17 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
-import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import { CreateAgentPayload } from "./types";
-import { createAgent, runAgent } from "./agentService";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import { AIAgent, CreateAgentPayload } from "./types";
+import { updateAgent, runAgent } from "./agentService";
 
-interface CreateAgentDialogProps {
+interface EditAgentDialogProps {
   open: boolean;
+  agent: AIAgent | null;
   onClose: () => void;
-  onCreated: () => void;
+  onUpdated: () => void;
 }
 
 const WEEKDAYS = [
@@ -39,10 +40,11 @@ const WEEKDAYS = [
   { value: "0", label: "Sunday" },
 ];
 
-const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
+const EditAgentDialog: React.FC<EditAgentDialogProps> = ({
   open,
+  agent,
   onClose,
-  onCreated,
+  onUpdated,
 }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -56,6 +58,30 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Populate form when agent changes
+  useEffect(() => {
+    if (agent) {
+      setName(agent.name);
+      setDescription(agent.description);
+      setPrompt(agent.prompt || "");
+      setScheduleType(agent.schedule_type);
+      setUseWebSearch(agent.use_web_search ?? false);
+      setError(null);
+      setSuccess(null);
+
+      // Parse schedule_value based on type
+      if (agent.schedule_type === "daily") {
+        setTime(agent.schedule_value || "09:00");
+      } else if (agent.schedule_type === "weekly") {
+        const parts = agent.schedule_value.split(",");
+        setWeekday(parts[0] || "1");
+        setTime(parts[1] || "09:00");
+      } else if (agent.schedule_type === "hourly") {
+        setHourInterval(agent.schedule_value || "2");
+      }
+    }
+  }, [agent]);
 
   const buildScheduleValue = (): string => {
     switch (scheduleType) {
@@ -72,20 +98,8 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
     }
   };
 
-  const resetForm = () => {
-    setName("");
-    setDescription("");
-    setPrompt("");
-    setScheduleType("daily");
-    setTime("09:00");
-    setWeekday("1");
-    setHourInterval("2");
-    setUseWebSearch(false);
-    setError(null);
-    setSuccess(null);
-  };
-
   const handleSubmit = async (runNow: boolean) => {
+    if (!agent) return;
     if (!name.trim()) { setError("Agent name is required"); return; }
     if (!description.trim()) { setError("Description is required"); return; }
     if (!prompt.trim()) { setError("Prompt is required"); return; }
@@ -95,7 +109,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
     setSuccess(null);
 
     try {
-      const payload: CreateAgentPayload = {
+      const payload: Partial<CreateAgentPayload> & { use_web_search?: boolean } = {
         name: name.trim(),
         description: description.trim(),
         prompt: prompt.trim(),
@@ -104,24 +118,21 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
         use_web_search: useWebSearch,
       };
 
-      const agent = await createAgent(payload);
+      await updateAgent(agent.id, payload);
 
       if (runNow) {
         await runAgent(agent.id);
-        setSuccess(
-          `Agent "${agent.name}" created and run triggered! You'll receive the output via email.`
-        );
+        setSuccess(`Agent "${name}" updated and run triggered!`);
       } else {
-        setSuccess(`Agent "${agent.name}" created successfully!`);
+        setSuccess(`Agent "${name}" updated successfully!`);
       }
 
       setTimeout(() => {
-        resetForm();
-        onCreated();
+        onUpdated();
         onClose();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "Failed to create agent");
+      setError(err.message || "Failed to update agent");
     } finally {
       setSaving(false);
     }
@@ -129,7 +140,8 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
 
   const handleClose = () => {
     if (saving) return;
-    resetForm();
+    setError(null);
+    setSuccess(null);
     onClose();
   };
 
@@ -148,6 +160,8 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
     },
     "& .MuiInputLabel-root.Mui-focused": { color: "#4f46e5" },
   };
+
+  if (!agent) return null;
 
   return (
     <Dialog
@@ -186,14 +200,14 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             justifyContent: "center",
           }}
         >
-          <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
+          <EditOutlinedIcon sx={{ color: "#fff", fontSize: 22 }} />
         </Box>
         <Box>
           <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "1.05rem" }}>
-            Create New AI Agent
+            Edit Agent
           </Typography>
           <Typography sx={{ color: "#4338ca", fontSize: "0.78rem" }}>
-            Configure your autonomous financial agent
+            Modify your AI agent configuration
           </Typography>
         </Box>
       </Box>
@@ -209,7 +223,6 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             onChange={(e) => setName(e.target.value)}
             fullWidth
             required
-            placeholder="e.g., Earnings Analysis Agent"
             sx={inputSx}
           />
 
@@ -221,7 +234,6 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             required
             multiline
             rows={2}
-            placeholder="What does this agent do?"
             sx={inputSx}
           />
 
@@ -233,7 +245,6 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             required
             multiline
             rows={4}
-            placeholder="Enter the prompt/instructions for this agent..."
             sx={inputSx}
           />
 
@@ -328,21 +339,6 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
               }
             />
           </Box>
-
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "#eef2ff",
-              borderRadius: 2.5,
-              border: "1px solid #a5b4fc",
-            }}
-          >
-            <Typography sx={{ fontSize: "0.78rem", color: "#312e81", lineHeight: 1.6 }}>
-              Your agent will be always active and run according to the schedule
-              above. Toggle "Email Alerts" on the agent card to receive results
-              via email.
-            </Typography>
-          </Box>
         </Stack>
       </DialogContent>
 
@@ -368,7 +364,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             "&:hover": { borderColor: "#4338ca", bgcolor: "#eef2ff" },
           }}
         >
-          {saving ? <CircularProgress size={18} /> : "Create"}
+          {saving ? <CircularProgress size={18} /> : "Save Changes"}
         </Button>
         <Button
           variant="contained"
@@ -391,11 +387,11 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
             "&:hover": { bgcolor: "#4338ca", boxShadow: "0 4px 12px rgba(79,70,229,0.25)" },
           }}
         >
-          Create & Run Now
+          Save & Run Now
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default CreateAgentDialog;
+export default EditAgentDialog;

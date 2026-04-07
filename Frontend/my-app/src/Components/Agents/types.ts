@@ -8,6 +8,7 @@ export interface AIAgent {
   schedule_type: "daily" | "weekly" | "hourly" | "one_time" | "cron";
   schedule_value: string;
   is_active: boolean;
+  use_web_search?: boolean;
   created_by?: number | null;
   created_by_email?: string | null;
   created_at: string;
@@ -50,6 +51,8 @@ export interface AgentOutput {
   id: number;
   agent: number;
   agent_name: string;
+  agent_prompt?: string;
+  agent_description?: string;
   status: AgentOutputStatus;
   result_json: AgentOutputResultJSON | null;
   error_message: string;
@@ -77,6 +80,7 @@ export interface CreateAgentPayload {
   prompt: string;
   schedule_type: AIAgent["schedule_type"];
   schedule_value: string;
+  use_web_search?: boolean;
 }
 
 export interface ChatMessage {
