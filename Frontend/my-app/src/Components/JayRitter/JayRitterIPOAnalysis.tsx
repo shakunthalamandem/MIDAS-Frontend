@@ -609,34 +609,11 @@ const TickerRow: React.FC<{ ticker: TickerAnalysis; index: number }> = ({ ticker
             : <Typography sx={{ color: "#ccc", fontSize: "0.8rem" }}>—</Typography>}
         </TableCell>
         <TableCell sx={{ py: 1, textAlign: "center" }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.8 }}>
-            <Box sx={{ width: 52, height: 5, bgcolor: "#eee", borderRadius: 3 }}>
-              <Box sx={{ width: `${ticker.tier_classification?.weighted_score ?? 0}%`, height: "100%", bgcolor: sig.color, borderRadius: 3 }} />
-            </Box>
-            <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#444", minWidth: 20 }}>
-              {ticker.tier_classification?.weighted_score ?? "—"}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell sx={{ py: 1, textAlign: "center" }}>
           <Chip
             label={ticker.overall_signal}
             size="small"
             sx={{ fontSize: "0.7rem", height: 22, fontWeight: 800, bgcolor: sig.bg, color: sig.color, border: `1.5px solid ${sig.color}44`, boxShadow: `0 0 6px ${sig.glow}` }}
           />
-        </TableCell>
-        <TableCell sx={{ py: 1, textAlign: "center" }}>
-          <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, color: techCfg.color }}>
-            ● {techRaw ? techRaw.charAt(0).toUpperCase() + techRaw.slice(1) : "—"}
-          </Typography>
-        </TableCell>
-        <TableCell sx={{ py: 1, textAlign: "center" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-            <Box sx={{ width: 38, height: 4, bgcolor: "#eee", borderRadius: 2 }}>
-              <Box sx={{ width: `${ticker.confidence_score}%`, height: "100%", bgcolor: sig.color, borderRadius: 2 }} />
-            </Box>
-            <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#444" }}>{ticker.confidence_score}%</Typography>
-          </Box>
         </TableCell>
         <TableCell sx={{ py: 1, fontSize: "0.75rem", color: "#333", maxWidth: 200 }}>
           <Tooltip title={ticker.action_summary} placement="top-start">
@@ -647,7 +624,7 @@ const TickerRow: React.FC<{ ticker: TickerAnalysis; index: number }> = ({ ticker
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={11} sx={{ p: 0, border: 0 }}>
+        <TableCell colSpan={8} sx={{ p: 0, border: 0 }}>
           <Collapse in={open} unmountOnExit>
             <ExpandedRow ticker={ticker} />
           </Collapse>
@@ -777,7 +754,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
           {/* Top bar: subtitle left, dropdown right */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
             <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 600 }}>
-              Gator Academic Framework · US IPOs · 180-Day Lookback
+              Gator Academic Framework · US IPOs · 90-Day Lookback
             </Typography>
             <FormControl size="small">
               <Select
@@ -1227,18 +1204,10 @@ const JayRitterIPOAnalysis: React.FC = () => {
                       </TableSortLabel>
                     </TableCell>
                     <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Tier</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Score</TableCell>
                     <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>
                       <TableSortLabel active={sortField === "overall_signal"} direction={sortDir} onClick={() => handleSort("overall_signal")}
                         sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
-                        Signal
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>Technical</TableCell>
-                    <TableCell align="center" sx={{ bgcolor: "#5e35b1 !important" }}>
-                      <TableSortLabel active={sortField === "confidence_score"} direction={sortDir} onClick={() => handleSort("confidence_score")}
-                        sx={{ color: "#fff !important", "& .MuiTableSortLabel-icon": { color: "rgba(255,255,255,0.6) !important" } }}>
-                        Confidence
+                        Final Signal
                       </TableSortLabel>
                     </TableCell>
                     <TableCell sx={{ bgcolor: "#5e35b1 !important" }}>Action</TableCell>
@@ -1247,7 +1216,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
                 <TableBody>
                   {visible.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} align="center" sx={{ py: 8, color: "#888", fontSize: "0.9rem", fontWeight: 500 }}>
+                      <TableCell colSpan={8} align="center" sx={{ py: 8, color: "#888", fontSize: "0.9rem", fontWeight: 500 }}>
                         No IPOs match the current filter.
                       </TableCell>
                     </TableRow>

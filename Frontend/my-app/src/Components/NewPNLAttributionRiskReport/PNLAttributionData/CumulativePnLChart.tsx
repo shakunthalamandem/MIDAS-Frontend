@@ -19,6 +19,7 @@ interface CumulativePnLChartProps {
   category?: DashboardCategory;
   metricChartData?: MetricChartDataPoint[];
   metricChartLoading?: boolean;
+  exchrateLatestPnl?: number | null;
 }
 
 const PERIOD_LABELS: Record<string, string> = {
@@ -49,6 +50,7 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
   category = "pnl",
   metricChartData = [],
   metricChartLoading = false,
+  exchrateLatestPnl,
 }) => {
   const isPnl = category === "pnl";
   const activeData = isPnl ? chartData : metricChartData;
@@ -69,7 +71,14 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
     <Box className="risk-dashboard-section">
       <Box className="pnl-chart-card">
         <Box className="pnl-chart-header">
-          <Box className="pnl-chart-title">{chartTitle}</Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <Box className="pnl-chart-title">{chartTitle}</Box>
+            {isPnl && exchrateLatestPnl != null && (
+              <Box sx={{ fontSize: "11px", color: "#64748b", fontWeight: 500, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                YTD P&L (excluding P&L values where Security Type = 'Exchrate') is {formatCurrency(exchrateLatestPnl)}
+              </Box>
+            )}
+          </Box>
           <Box className="pnl-chart-legend">
             <Box className="pnl-chart-legend-dot" sx={{ background: `${color} !important` }} />
             {legendLabel}

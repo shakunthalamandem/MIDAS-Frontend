@@ -251,6 +251,7 @@ const Attribution: React.FC<AttributionProps> = ({
                 groupValue={expandedRow}
                 metric={selectedCard}
                 accentColor={activeTheme.activeTab}
+                currentValue={expandedRowData ? (expandedRowData[selectedCard as keyof AttributionItem] as number) : undefined}
               />
             )}
 

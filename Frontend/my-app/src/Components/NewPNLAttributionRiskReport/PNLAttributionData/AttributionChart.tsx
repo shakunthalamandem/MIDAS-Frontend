@@ -35,6 +35,7 @@ interface AttributionChartProps {
   groupValue: string;
   metric: string;
   accentColor: string;
+  currentValue?: number;
 }
 
 const AttributionChart: React.FC<AttributionChartProps> = ({
@@ -44,6 +45,7 @@ const AttributionChart: React.FC<AttributionChartProps> = ({
   groupValue,
   metric,
   accentColor,
+  currentValue,
 }) => {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,7 +96,12 @@ const AttributionChart: React.FC<AttributionChartProps> = ({
         </Box>
         <Box className="attr-chart-legend">
           <Box className="attr-chart-legend-dot" sx={{ background: accentColor }} />
-          {METRIC_LABELS[metric] || metric}
+          {groupValue}
+          {currentValue !== undefined && (
+            <Box component="span" sx={{ ml: 0.5, fontWeight: 600 }}>
+              {` of ${formatCurrency(currentValue)}`}
+            </Box>
+          )}
         </Box>
       </Box>
 
