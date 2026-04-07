@@ -398,13 +398,14 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                             sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
                           >
                             Score:{' '}
-                            {deal.sentiment?.sentiment_score !== undefined &&
-                              deal.sentiment.sentiment_score !== null
-                              ? `${deal.sentiment.sentiment_score}/100`
-                              : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
-                                undefined
-                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : 'N/A'}
+                            {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
+                              ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                              : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
+                              ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                              : typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
+                              ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                              : 'N/A'}
                           </Typography>
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment) && (
@@ -593,15 +594,9 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                               variant="caption"
                               sx={{ fontWeight: 700, fontSize: '0.85rem' }}
                             >
-                              {deal.sentiment?.sentiment_score !== undefined &&
-                                deal.sentiment.sentiment_score !== null
-                                ? `${deal.sentiment.sentiment_score}/100`
-                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !==
-                                  undefined
-                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                  : deal.sentiment_summary?.sentiment_score !== undefined
-                                    ? `${deal.sentiment_summary.sentiment_score}/100`
-                                    : 'N/A'}
+                              {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
+                                ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                : 'N/A'}
                             </Typography>
                           </Box>
                           {(deal.sentiment?.one_week_sentiment ||
