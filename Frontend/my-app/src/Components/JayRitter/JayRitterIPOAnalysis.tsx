@@ -777,7 +777,7 @@ const JayRitterIPOAnalysis: React.FC = () => {
           {/* Top bar: subtitle left, dropdown right */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
             <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 600 }}>
-              Gator Academic Framework · US IPOs · 180-Day Lookback
+              Gator Academic Framework · US IPOs · 90-Day Lookback
             </Typography>
             <FormControl size="small">
               <Select
