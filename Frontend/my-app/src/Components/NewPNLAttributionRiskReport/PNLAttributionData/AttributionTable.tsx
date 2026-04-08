@@ -166,6 +166,22 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             : formatCurrency(row.ytd_pnl),
       },
       {
+        field: "market_value",
+        headerName: "Market Value",
+        flex: 1,
+        minWidth: 140,
+        cellClassName: "attr-datagrid-cell--exposure",
+        headerAlign: "center",
+        align: "center",
+        sortComparator: pinOtherComparator(numericCompare),
+        valueGetter: (value: number, row: AttributionItem) =>
+          showPct ? row.market_value_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.market_value_pct)
+            : formatCurrency(row.market_value),
+      },
+      {
         field: "net_exp",
         headerName: "Net Exp",
         flex: 1,

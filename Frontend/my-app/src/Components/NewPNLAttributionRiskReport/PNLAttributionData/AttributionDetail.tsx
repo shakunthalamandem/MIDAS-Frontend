@@ -245,6 +245,20 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           showPct ? formatPctVal(row.ytd_pnl_pct) : formatCurrency(row.ytd_pnl),
       },
       {
+        field: "market_value",
+        headerName: "Market Value",
+        flex: 1,
+        minWidth: 130,
+        headerAlign: "right",
+        align: "right",
+        valueGetter: (value: number, row: TickerItem) =>
+          showPct ? row.market_value_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.market_value_pct)
+            : formatCurrency(row.market_value),
+      },
+      {
         field: "net_exp",
         headerName: "Net Exp",
         flex: 1,
