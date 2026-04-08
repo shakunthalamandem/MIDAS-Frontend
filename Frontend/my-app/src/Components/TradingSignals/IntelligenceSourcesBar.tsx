@@ -144,7 +144,18 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
         {visibleSources.map((sourceKey, idx) => {
           const source = sourceDetails[sourceKey];
           if (!source) return null;
-          const isActive = source.status === "active";
+
+          // For ml_predictions, check if it has t1d data
+          let isActive = source.status === "active";
+          if (sourceKey === "ml_predictions") {
+            // Only active if it has t1d prediction data
+            if (source.data?.t1d?.prediction) {
+              isActive = true;
+            } else {
+              isActive = false;
+            }
+          }
+
           const weight = source.weight;
 
           return (
