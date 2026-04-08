@@ -87,6 +87,11 @@ const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; 
   },
 };
 
+/* Override display names without changing backend keys */
+const AGENT_DISPLAY_NAMES: Record<string, string> = {
+  "JRitter IPO Agent": "Gator IPO Agent-2",
+};
+
 const FALLBACK_THEMES = [
   { accent: "#6366f1", bg: "#eef2ff", light: "#c7d2fe" },
   { accent: "#ec4899", bg: "#fdf2f8", light: "#fbcfe8" },
@@ -209,7 +214,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
                   maxWidth: 190,
                 }}
               >
-                {agent.name}
+                {AGENT_DISPLAY_NAMES[agent.name] ?? agent.name}
               </Typography>
               <Typography
                 sx={{
