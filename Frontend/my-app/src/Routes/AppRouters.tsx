@@ -117,6 +117,7 @@ import UploadClaudeSentiment from "../Components/AIML/UploadClaudeSentiment";
 import SummarySignalBoard from "../Components/SummarySignalBoard/SummarySignalBoard";
 import S3DataTransfer from "../Components/S3DataTransfer/S3DataTransfer";
 import DataDump from "../Components/DataDump/DataDump";
+import JRitterAgentMain from "../Components/JRitterAgent/JRitterAgentMain";
 
 
 const AppRouters: React.FC = () => {
@@ -354,6 +355,7 @@ const AppRouters: React.FC = () => {
         <Route path="/signals/board" element={<AuthGuard><SignalBoardMain /></AuthGuard>} />
         <Route path="/s3" element={<AuthGuard><S3DataTransfer /></AuthGuard>} />
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
+        <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
 
 
 

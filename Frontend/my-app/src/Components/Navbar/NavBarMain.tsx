@@ -355,7 +355,8 @@ const NavbarMain: React.FC = () => {
                 Beta
               </span>
             </Button>
-            {/* 
+
+            {/*
             <DropdownTab
               label="AI-Agents"
               menuItems={[
