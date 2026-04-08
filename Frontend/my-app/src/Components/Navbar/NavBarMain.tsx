@@ -355,30 +355,7 @@ const NavbarMain: React.FC = () => {
                 Beta
               </span>
             </Button>
-            <Button
-              onClick={() => {
-                setSelectedTab("Ritter IPO Agent");
-                localStorage.setItem("selectedTab", "Ritter IPO Agent");
-                navigate("/jritter_agent");
-              }}
-              sx={{
-                color: "#005166",
-                fontWeight: "bold",
-                fontSize: "0.725rem",
-                mx: 1,
-                borderBottom:
-                  selectedTab === "Ritter IPO Agent"
-                    ? "3px solid #005166"
-                    : "3px solid transparent",
-                borderRadius: 0,
-                "&:hover": {
-                  borderBottom: "3px solid #005166",
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              Ritter IPO Agent
-            </Button>
+
             {/*
             <DropdownTab
               label="AI-Agents"
