@@ -60,6 +60,7 @@ import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/Versio
 import Agents from "../Components/Agents/Agents";
 import AgentOutputView from "../Components/Agents/AgentOutputView";
 import AgentTasksMain from "../Components/Agents/AgentTasksMain";
+import BetaTransferMain from "../Components/BetaTransfer/BetaTransferMain";
 import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
 import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
 import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
@@ -347,6 +348,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
         <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
         <Route path="/agents_tasks" element={<AuthGuard><AgentTasksMain /></AuthGuard>} />
+        <Route path="/beta_transfer" element={<AuthGuard><BetaTransferMain /></AuthGuard>} />
         <Route path="/agents/:agentId/output" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/agents/:agentId/output/:outputId" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/signals/board" element={<AuthGuard><SignalBoardMain /></AuthGuard>} />
