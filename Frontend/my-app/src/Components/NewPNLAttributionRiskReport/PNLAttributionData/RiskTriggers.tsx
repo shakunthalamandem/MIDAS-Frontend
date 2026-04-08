@@ -156,7 +156,7 @@ const aggregateIssuerRows = (rows: Record<string, any>[], valueKey: string, guid
     grandTotal += data.total;
     return {
       issuer: iss,
-      ticker: [...data.tickers].join(", "),
+      ticker: Array.from(data.tickers).join(", "),
       [valueKey]: `${Math.round(data.total * 100) / 100}%`,
       guideline: guideline,
     };

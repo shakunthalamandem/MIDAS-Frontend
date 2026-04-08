@@ -89,6 +89,79 @@ function getValueColor(key: string, val: any): string {
   return "#0F172A";
 }
 
+/* ── ML Predictions (Factors Based Agent) custom renderer ── */
+function renderMLPredictionsData(data: Record<string, any>): React.ReactNode {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {/* 1-Day Prediction */}
+      {data.t1d && (
+        <Box>
+          <Typography
+            sx={{
+              fontWeight: 700, fontSize: 12, color: "#334155",
+              textTransform: "uppercase", letterSpacing: 0.5,
+              mb: 1,
+            }}
+          >
+            1-Day Prediction
+          </Typography>
+          <Box sx={{ pl: 1, borderLeft: "2px solid #E2E8F0" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", py: 0.6, borderBottom: "1px solid #F8FAFC" }}>
+              <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+                Prediction
+              </Typography>
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: getValueColor("prediction", data.t1d.prediction) }}>
+                {formatValue(data.t1d.prediction)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", py: 0.6 }}>
+              <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+                Confidence
+              </Typography>
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: "#0F172A" }}>
+                {formatValue(data.t1d.confidence)}%
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      {/* 1-Day Open Prediction */}
+      {data.t1d_open && data.t1d_open.prediction && (
+        <Box>
+          <Typography
+            sx={{
+              fontWeight: 700, fontSize: 12, color: "#334155",
+              textTransform: "uppercase", letterSpacing: 0.5,
+              mb: 1,
+            }}
+          >
+            1-Day Open Prediction
+          </Typography>
+          <Box sx={{ pl: 1, borderLeft: "2px solid #E2E8F0" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", py: 0.6, borderBottom: "1px solid #F8FAFC" }}>
+              <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+                Prediction
+              </Typography>
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: getValueColor("prediction", data.t1d_open.prediction) }}>
+                {formatValue(data.t1d_open.prediction)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", py: 0.6 }}>
+              <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+                Confidence
+              </Typography>
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: "#0F172A" }}>
+                {formatValue(data.t1d_open.confidence)}%
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
 /* ── Sentiment & News Agent custom renderer ── */
 function renderSentimentNewsData(data: Record<string, any>): React.ReactNode {
   return (
@@ -371,6 +444,7 @@ const TradingSignalsMain: React.FC<Props> = ({
   const [signalData, setSignalData] = useState<TradingSignalData | null>(null);
   const [popupSource, setPopupSource] = useState<string | null>(null);
   const [dealType, setDealType] = useState<string>("");
+  const [apiSourceDetails, setApiSourceDetails] = useState<SourceDetails>({});
   const [defaultSources, setDefaultSources] = useState<SourceDetails>({});
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -397,23 +471,28 @@ const TradingSignalsMain: React.FC<Props> = ({
           setDealType(dt);
           // Use real source_details from backend (with actual data)
           if (data.source_details && Object.keys(data.source_details).length > 0) {
+            setApiSourceDetails(data.source_details);
             setDefaultSources(data.source_details);
           } else {
             setDefaultSources(buildDefaultSources(dt));
+            setApiSourceDetails({});
           }
         } else {
           // Fallback to empty default cards
           setDealType("IPO");
           setDefaultSources(buildDefaultSources("IPO"));
+          setApiSourceDetails({});
         }
-      } catch {
+      } catch (err) {
+        console.error("Error fetching source details:", err);
         setDealType("IPO");
         setDefaultSources(buildDefaultSources("IPO"));
+        setApiSourceDetails({});
       }
     };
 
     fetchSourceDetails();
-  }, [ticker, apiUrl, isUpcoming]);
+  }, [ticker, apiUrl, isUpcoming, token]);
 
   const handleSignalLoaded = useCallback((data: TradingSignalData | null) => {
     setSignalData(data);
@@ -428,9 +507,11 @@ const TradingSignalsMain: React.FC<Props> = ({
 
   const handleClosePopup = () => setPopupSource(null);
 
-  // Use signal source_details if available, otherwise default cards
+  // Use API source_details first, then signal source_details, then default cards
   const sourceDetails: SourceDetails =
-    signalData?.source_details && Object.keys(signalData.source_details).length > 0
+    apiSourceDetails && Object.keys(apiSourceDetails).length > 0
+      ? apiSourceDetails
+      : signalData?.source_details && Object.keys(signalData.source_details).length > 0
       ? signalData.source_details
       : defaultSources;
 
@@ -577,7 +658,8 @@ const TradingSignalsMain: React.FC<Props> = ({
                 {activeSource.data && Object.keys(activeSource.data).length > 0 ? (
                   <>
                     {popupSource === "sentiment_news" && renderSentimentNewsData(activeSource.data)}
-                    {popupSource !== "sentiment_news" && renderDataRows(activeSource.data)}
+                    {popupSource === "ml_predictions" && renderMLPredictionsData(activeSource.data)}
+                    {popupSource !== "sentiment_news" && popupSource !== "ml_predictions" && renderDataRows(activeSource.data)}
                   </>
                 ) : (
                   <Typography sx={{ color: "#94A3B8", fontSize: 13, fontStyle: "italic" }}>
