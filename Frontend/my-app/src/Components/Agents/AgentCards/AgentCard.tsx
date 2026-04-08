@@ -79,6 +79,12 @@ const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; 
     light: "#a5f3fc",
     icon: <InsightsIcon sx={{ fontSize: 22, color: "#fff" }} />,
   },
+  "JRitter IPO Agent": {
+    accent: "#0e7490",
+    bg: "#ecfeff",
+    light: "#a5f3fc",
+    icon: <AssessmentOutlinedIcon sx={{ fontSize: 22, color: "#fff" }} />,
+  },
 };
 
 const FALLBACK_THEMES = [
