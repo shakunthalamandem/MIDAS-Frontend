@@ -585,7 +585,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       </TableCell>
                       {selectedCard === 'recent' && (
                         <TableCell>
-                          <Typography sx={{ fontSize: '0.85rem', color: theme.palette.text.secondary }}>
+                          <Typography sx={{ fontSize: '0.85rem', color: '#000' }}>
                             {deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}
                           </Typography>
                         </TableCell>
