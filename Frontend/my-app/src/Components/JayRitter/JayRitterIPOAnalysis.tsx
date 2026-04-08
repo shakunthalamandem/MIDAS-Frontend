@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
+  Button,
   Chip,
   CircularProgress,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   IconButton,
   InputAdornment,
@@ -26,6 +31,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import axios from "axios";
 import JayRitterChat from "./JayRitterChat";
 import PriceChartsSection from "../TradingSignals/PriceChartsSection";
@@ -117,6 +123,19 @@ interface TickerAnalysis {
 interface APIResponse {
   report: Report;
   ticker_analyses: TickerAnalysis[];
+}
+
+interface SignalChange {
+  ticker: string;
+  issuer_name: string;
+  previous_signal: string;
+  current_signal: string;
+}
+
+interface SignalChangesResponse {
+  current_date: string;
+  previous_date: string | null;
+  changes: SignalChange[];
 }
 
 // ─── Constants ───────────────────────────────────────────────────────
@@ -649,6 +668,9 @@ const JayRitterIPOAnalysis: React.FC = () => {
   const [sortDir, setSortDir]             = useState<"asc" | "desc">("desc");
   const [criteriaOpen, setCriteriaOpen]   = useState(false);
   const [chatOpen, setChatOpen]           = useState(false);
+  const [signalChanges, setSignalChanges]           = useState<SignalChange[]>([]);
+  const [signalChangeDates, setSignalChangeDates]   = useState<{ current_date: string; previous_date: string } | null>(null);
+  const [signalChangeOpen, setSignalChangeOpen]     = useState(false);
 
   const apiBaseUrl = process.env.REACT_APP_API_URL;
   const token      = localStorage.getItem("access_token");
@@ -684,6 +706,23 @@ const JayRitterIPOAnalysis: React.FC = () => {
         setTickers((res.data.ticker_analyses || []).filter(t => t.overall_signal !== "TRIM" as string));
         setFilter("ALL");
         setSearch("");
+
+        // Fetch signal changes vs previous report
+        try {
+          const scRes = await axios.get<SignalChangesResponse>(
+            `${apiBaseUrl}/api/jay_ritter_signal_changes/?report_date=${chosen.report_date}`,
+            { headers }
+          );
+          setSignalChanges(scRes.data.changes || []);
+          if (scRes.data.previous_date) {
+            setSignalChangeDates({ current_date: scRes.data.current_date, previous_date: scRes.data.previous_date });
+          } else {
+            setSignalChangeDates(null);
+          }
+        } catch {
+          setSignalChanges([]);
+          setSignalChangeDates(null);
+        }
       } catch { setError("Failed to load report."); }
       finally  { setLoadingReport(false); }
     })();
@@ -994,6 +1033,33 @@ const JayRitterIPOAnalysis: React.FC = () => {
                   </Box>
                 );
               })}
+
+              {/* Signal Change chip */}
+              <Box sx={{ width: "1px", height: 18, bgcolor: "#ddd", mx: 0.5 }} />
+              <Tooltip title={signalChangeDates ? "Tickers whose signal changed from the previous report" : "No previous report available to compare"} placement="bottom" arrow>
+                <Box
+                  onClick={() => signalChangeDates && setSignalChangeOpen(true)}
+                  sx={{
+                    display: "flex", alignItems: "center", gap: 0.5,
+                    px: 1.6, py: 0.45, borderRadius: 5,
+                    cursor: signalChangeDates ? "pointer" : "default",
+                    userSelect: "none",
+                    transition: "all 0.15s",
+                    opacity: signalChangeDates ? 1 : 0.5,
+                    bgcolor: signalChanges.length > 0 ? "#ede7f6" : "transparent",
+                    border: signalChanges.length > 0 ? "1.5px solid #7c4dff" : "1.5px solid transparent",
+                    "&:hover": signalChangeDates ? { bgcolor: "#f3e8ff" } : {},
+                  }}
+                >
+                  <SwapHorizIcon sx={{ fontSize: 14, color: "#7c4dff" }} />
+                  <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#5e35b1" }}>
+                    SIGNAL CHANGE
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: signalChanges.length > 0 ? "#7c4dff" : "#bbb" }}>
+                    {signalChanges.length}
+                  </Typography>
+                </Box>
+              </Tooltip>
             </Box>
 
             {/* Right: Search */}
@@ -1234,6 +1300,103 @@ const JayRitterIPOAnalysis: React.FC = () => {
         </Typography>
 
       </Box>
+
+      {/* Signal Changes Dialog */}
+      <Dialog
+        open={signalChangeOpen}
+        onClose={() => setSignalChangeOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
+      >
+        <DialogTitle sx={{
+          background: "linear-gradient(135deg, #4527a0 0%, #7c4dff 100%)",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          py: 1.8,
+        }}>
+          <SwapHorizIcon sx={{ fontSize: 22 }} />
+          <Box>
+            <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>Signal Changes</Typography>
+            {signalChangeDates && (
+              <Typography sx={{ fontSize: "0.72rem", opacity: 0.85, fontWeight: 500 }}>
+                {signalChangeDates.previous_date} &rarr; {signalChangeDates.current_date}
+              </Typography>
+            )}
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {signalChanges.length === 0 ? (
+            <Box sx={{ py: 5, textAlign: "center" }}>
+              <Typography sx={{ color: "#999", fontSize: "0.88rem" }}>
+                No signal changes detected between reports.
+              </Typography>
+            </Box>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: "#f8f6ff" }}>
+                    <TableCell sx={{ fontWeight: 800, fontSize: "0.72rem", color: "#4527a0", textTransform: "uppercase", letterSpacing: 0.5 }}>Ticker</TableCell>
+                    <TableCell sx={{ fontWeight: 800, fontSize: "0.72rem", color: "#4527a0", textTransform: "uppercase", letterSpacing: 0.5 }}>Issuer</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: "0.72rem", color: "#4527a0", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      Previous ({signalChangeDates?.previous_date})
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: "0.72rem", color: "#4527a0", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      Current ({signalChangeDates?.current_date})
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {signalChanges.map((sc) => {
+                    const prevCfg = SIGNAL_CONFIG[sc.previous_signal];
+                    const curCfg  = SIGNAL_CONFIG[sc.current_signal];
+                    return (
+                      <TableRow key={sc.ticker} sx={{ "&:hover": { bgcolor: "#faf8ff" } }}>
+                        <TableCell sx={{ fontWeight: 700, fontSize: "0.82rem", color: "#4527a0" }}>{sc.ticker}</TableCell>
+                        <TableCell sx={{ fontSize: "0.76rem", color: "#555", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {sc.issuer_name}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={sc.previous_signal}
+                            size="small"
+                            sx={{
+                              fontWeight: 700, fontSize: "0.68rem",
+                              bgcolor: prevCfg?.bg ?? "#f5f5f5",
+                              color: prevCfg?.color ?? "#666",
+                              height: 22,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={sc.current_signal}
+                            size="small"
+                            sx={{
+                              fontWeight: 700, fontSize: "0.68rem",
+                              bgcolor: curCfg?.bg ?? "#f5f5f5",
+                              color: curCfg?.color ?? "#666",
+                              height: 22,
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: "1px solid #f0f0f0" }}>
+          <Button onClick={() => setSignalChangeOpen(false)} sx={{ color: "#4527a0", fontWeight: 600, fontSize: "0.78rem", textTransform: "none" }}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Chat Drawer */}
       {report && (
