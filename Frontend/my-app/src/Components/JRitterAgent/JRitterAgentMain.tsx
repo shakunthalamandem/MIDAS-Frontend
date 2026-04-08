@@ -174,25 +174,26 @@ const JRitterAgentMain: React.FC = () => {
   );
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f8f9fc" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f0f4f8" }}>
 
       {/* ═══ HEADER ═══ */}
-      <Box sx={{ background: "linear-gradient(160deg,#0e4f5c 0%,#0891b2 55%,#0e7490 100%)", pb: 4 }}>
+      <Box sx={{ background: "linear-gradient(160deg,#0c3d4a 0%,#0e6b85 50%,#0891b2 100%)", pb: 5 }}>
         <Box sx={{ maxWidth: 1400, mx: "auto", px: PX }}>
 
           {/* Top bar */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, pb: 1 }}>
-            <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", letterSpacing: 1.5, textTransform: "uppercase", fontWeight: 600 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2.5, pb: 1 }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.68rem", letterSpacing: 2, textTransform: "uppercase", fontWeight: 600 }}>
               Ritter Academic Framework · Claude-Generated Scorecards
             </Typography>
             <Button
               startIcon={<AddIcon />}
               onClick={() => setDialogOpen(true)}
               sx={{
-                bgcolor: "rgba(255,255,255,0.1)", color: "#fff", textTransform: "none", fontWeight: 700,
-                fontSize: "0.78rem", px: 2.5, py: 0.8, borderRadius: 2,
-                border: "1px solid rgba(255,255,255,0.2)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                bgcolor: "rgba(255,255,255,0.12)", color: "#fff", textTransform: "none", fontWeight: 700,
+                fontSize: "0.78rem", px: 2.5, py: 0.9, borderRadius: 2.5,
+                border: "1px solid rgba(255,255,255,0.25)",
+                backdropFilter: "blur(4px)",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.22)", borderColor: "rgba(255,255,255,0.4)" },
               }}
             >
               Upload New JSON
@@ -200,40 +201,42 @@ const JRitterAgentMain: React.FC = () => {
           </Box>
 
           {/* Centered Title */}
-          <Box sx={{ textAlign: "center", mt: 1.5, mb: 3 }}>
-            <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.5rem", md: "2rem" }, letterSpacing: -0.5 }}>
+          <Box sx={{ textAlign: "center", mt: 2, mb: 3.5 }}>
+            <Typography sx={{ color: "#fff", fontWeight: 900, fontSize: { xs: "1.6rem", md: "2.1rem" }, letterSpacing: -0.5 }}>
               JRitter IPO Analysis
             </Typography>
             <Box sx={{
               display: "inline-flex", alignItems: "center", gap: 0.8,
-              px: 1.8, py: 0.55, borderRadius: 5, mt: 0.8,
-              background: "linear-gradient(135deg, rgba(6,182,212,0.35), rgba(255,255,255,0.15))",
-              border: "1px solid rgba(6,182,212,0.5)",
+              px: 2, py: 0.6, borderRadius: 5, mt: 1,
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              backdropFilter: "blur(8px)",
             }}>
-              <SmartToyOutlinedIcon sx={{ fontSize: 16, color: "#e0f7fa" }} />
-              <Typography sx={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", letterSpacing: 0.3 }}>
+              <SmartToyOutlinedIcon sx={{ fontSize: 15, color: "#b2ebf2" }} />
+              <Typography sx={{ fontSize: "0.73rem", fontWeight: 700, color: "#e0f7fa", letterSpacing: 0.3 }}>
                 Ritter Analyst
               </Typography>
-              <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: "#69f0ae", boxShadow: "0 0 6px #69f0ae" }} />
+              <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: "#69f0ae", boxShadow: "0 0 8px #69f0ae" }} />
             </Box>
-            <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.73rem", fontWeight: 500, mt: 1 }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.73rem", fontWeight: 500, mt: 1.2 }}>
               {enriched.length} scored · {counts.STRONG} strong · {counts.MODERATE} moderate · {counts.WEAK} below average
             </Typography>
           </Box>
 
-          {/* Metric Cards 2x2 */}
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 1.5 }}>
+          {/* Metric Cards */}
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: 2 }}>
             {STAT_CARDS.map((card) => (
               <Box key={card.key} sx={{
-                px: 2, py: 1.5, borderRadius: 2.5, background: card.gradient,
+                px: 2.5, py: 2, borderRadius: 3, background: card.gradient,
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                border: "1px solid rgba(255,255,255,0.15)", minHeight: 75,
+                border: "1px solid rgba(255,255,255,0.18)", minHeight: 82,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
               }}>
-                <Typography sx={{ fontSize: "1.1rem", mb: 0.3 }}>{card.icon}</Typography>
-                <Typography sx={{ fontSize: "1.3rem", fontWeight: 900, color: "#fff", lineHeight: 1 }}>
+                <Typography sx={{ fontSize: "1.15rem", mb: 0.4 }}>{card.icon}</Typography>
+                <Typography sx={{ fontSize: "1.35rem", fontWeight: 900, color: "#fff", lineHeight: 1 }}>
                   {statValues[card.key]}
                 </Typography>
-                <Typography sx={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.85)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, mt: 0.3, textAlign: "center" }}>
+                <Typography sx={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.8)", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, mt: 0.4, textAlign: "center" }}>
                   {card.label}
                 </Typography>
               </Box>
@@ -243,10 +246,14 @@ const JRitterAgentMain: React.FC = () => {
       </Box>
 
       {/* ═══ CONTENT ═══ */}
-      <Box sx={{ maxWidth: 1400, mx: "auto", px: PX, mt: -1 }}>
+      <Box sx={{ maxWidth: 1400, mx: "auto", px: PX, mt: -2 }}>
 
         {/* Filter pills + Search */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2, flexWrap: "wrap" }}>
+        <Box sx={{
+          display: "flex", alignItems: "center", gap: 1.5, mb: 2.5, flexWrap: "wrap",
+          bgcolor: "#fff", px: 2.5, py: 1.5, borderRadius: 2.5,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)", border: "1px solid #e8ecf0",
+        }}>
           {(["ALL", "STRONG", "MODERATE", "WEAK"] as const).map((f) => (
             <Chip
               key={f}
@@ -254,11 +261,12 @@ const JRitterAgentMain: React.FC = () => {
               size="small"
               onClick={() => setFilter(f)}
               sx={{
-                fontWeight: 700, fontSize: "0.75rem", px: 0.5,
-                bgcolor: filter === f ? "#0891b2" : "#fff",
-                color: filter === f ? "#fff" : "#555",
-                border: filter === f ? "none" : "1px solid #e0e0e0",
-                "&:hover": { bgcolor: filter === f ? "#0891b2" : "#f5f5f5" },
+                fontWeight: 700, fontSize: "0.75rem", px: 0.5, height: 28, borderRadius: 1.5,
+                bgcolor: filter === f ? "#0891b2" : "#f1f5f9",
+                color: filter === f ? "#fff" : "#475569",
+                border: "none",
+                "&:hover": { bgcolor: filter === f ? "#0e7490" : "#e2e8f0" },
+                transition: "all 0.15s",
               }}
             />
           ))}
@@ -269,144 +277,163 @@ const JRitterAgentMain: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
-                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: "#aaa", fontSize: 18 }} /></InputAdornment>,
+                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: "#94a3b8", fontSize: 17 }} /></InputAdornment>,
               }}
               sx={{
-                width: 280,
-                "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: "#fff", fontSize: "0.82rem" },
+                width: 290,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2, bgcolor: "#f8fafc", fontSize: "0.82rem",
+                  "& fieldset": { borderColor: "#e2e8f0" },
+                  "&:hover fieldset": { borderColor: "#0891b2" },
+                },
               }}
             />
           </Box>
         </Box>
 
         {/* ═══ TABLE ═══ */}
-        <TableContainer sx={{ bgcolor: "#fff", borderRadius: 2.5, border: "2px solid #e8ecf0", mb: 4 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: "#f1f5f9" }}>
-                <TableCell sx={{ width: 40 }} />
-                <TableCell sx={thStyle}>
-                  <TableSortLabel active={sortField === "ticker"} direction={sortField === "ticker" ? sortDir : "asc"} onClick={() => handleSort("ticker")}>
-                    Ticker
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={thStyle}>Issuer</TableCell>
-                <TableCell sx={thStyle}>Sector</TableCell>
-                <TableCell sx={thStyle} align="center">
-                  <TableSortLabel active={sortField === "days"} direction={sortField === "days" ? sortDir : "asc"} onClick={() => handleSort("days")}>
-                    Days
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={thStyle} align="center">
-                  <TableSortLabel active={sortField === "composite"} direction={sortField === "composite" ? sortDir : "asc"} onClick={() => handleSort("composite")}>
-                    Score
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={thStyle} align="center">
-                  <TableSortLabel active={sortField === "verdict"} direction={sortField === "verdict" ? sortDir : "asc"} onClick={() => handleSort("verdict")}>
-                    Verdict
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={thStyle}>Action Summary</TableCell>
-                <TableCell sx={{ ...thStyle, width: 40 }} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {visible.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} sx={{ textAlign: "center", py: 6 }}>
-                    <Typography sx={{ color: "#aaa", fontWeight: 500 }}>
-                      {enriched.length === 0 ? 'No scorecards yet. Click "Upload New JSON" to start.' : "No results match your filter."}
-                    </Typography>
+        <Box sx={{ bgcolor: "#fff", borderRadius: 2.5, border: "1px solid #e2e8f0", mb: 4, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+          <TableContainer>
+            <Table size="small" sx={{ tableLayout: "fixed" }}>
+              <colgroup>
+                <col style={{ width: 44 }} />
+                <col style={{ width: 90 }} />
+                <col style={{ width: 160 }} />
+                <col style={{ width: 180 }} />
+                <col style={{ width: 70 }} />
+                <col style={{ width: 80 }} />
+                <col style={{ width: 220 }} />
+                <col />
+                <col style={{ width: 44 }} />
+              </colgroup>
+              <TableHead>
+                <TableRow sx={{ bgcolor: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                  <TableCell sx={{ py: 1.5, px: 1.5 }} />
+                  <TableCell sx={thStyle}>
+                    <TableSortLabel active={sortField === "ticker"} direction={sortField === "ticker" ? sortDir : "asc"} onClick={() => handleSort("ticker")}>
+                      Ticker
+                    </TableSortLabel>
                   </TableCell>
+                  <TableCell sx={thStyle}>Issuer</TableCell>
+                  <TableCell sx={thStyle}>Sector</TableCell>
+                  <TableCell sx={thStyle} align="center">
+                    <TableSortLabel active={sortField === "days"} direction={sortField === "days" ? sortDir : "asc"} onClick={() => handleSort("days")}>
+                      Days
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={thStyle} align="center">
+                    <TableSortLabel active={sortField === "composite"} direction={sortField === "composite" ? sortDir : "asc"} onClick={() => handleSort("composite")}>
+                      Score
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={thStyle} align="left">
+                    <TableSortLabel active={sortField === "verdict"} direction={sortField === "verdict" ? sortDir : "asc"} onClick={() => handleSort("verdict")}>
+                      Verdict
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={thStyle}>Action Summary</TableCell>
+                  <TableCell sx={{ py: 1.5, px: 1.5 }} />
                 </TableRow>
-              ) : visible.map((rec) => {
-                const isOpen = expandedId === rec.id;
-                const vc = getVerdictConfig(rec.verdict);
-                const verdictLabel = rec.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+              </TableHead>
+              <TableBody>
+                {visible.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} sx={{ textAlign: "center", py: 8 }}>
+                      <Typography sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem" }}>
+                        {enriched.length === 0 ? 'No scorecards yet. Click "Upload New JSON" to start.' : "No results match your filter."}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : visible.map((rec) => {
+                  const isOpen = expandedId === rec.id;
+                  const vc = getVerdictConfig(rec.verdict);
+                  const verdictLabel = rec.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
 
-                return (
-                  <React.Fragment key={rec.id}>
-                    <TableRow
-                      onClick={() => setExpandedId(isOpen ? null : rec.id)}
-                      sx={{
-                        cursor: "pointer",
-                        bgcolor: isOpen ? "#f0fdfa" : "#fff",
-                        "&:hover": { bgcolor: isOpen ? "#f0fdfa" : "#f8fafc" },
-                        transition: "background 0.15s",
-                      }}
-                    >
-                      <TableCell sx={{ py: 1.2, px: 1 }}>
-                        <IconButton size="small" sx={{ color: "#0891b2" }}>
-                          {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                        </IconButton>
-                      </TableCell>
-                      <TableCell sx={tdStyle}>
-                        <Typography sx={{ fontWeight: 800, color: "#0891b2", fontSize: "0.88rem" }}>
-                          {rec.ticker}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={tdStyle}>
-                        {rec.company_name || "—"}
-                      </TableCell>
-                      <TableCell sx={tdStyle}>
-                        {rec.sector}
-                      </TableCell>
-                      <TableCell sx={tdStyle} align="center">
-                        {rec.daysSince}d
-                      </TableCell>
-                      <TableCell align="center" sx={{ py: 1.2, px: 1 }}>
-                        <Chip
-                          label={`${rec.composite}`}
-                          size="small"
-                          sx={{
-                            fontWeight: 900, fontSize: "0.78rem", height: 26, minWidth: 36,
-                            bgcolor: rec.composite >= 70 ? "#ECFDF5" : rec.composite >= 50 ? "#FFFBEB" : "#FEF2F2",
-                            color: getScoreColor(rec.composite),
-                            border: `1.5px solid ${getScoreColor(rec.composite)}30`,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center" sx={{ py: 1.2, px: 1 }}>
-                        <Chip
-                          label={verdictLabel}
-                          size="small"
-                          sx={{
-                            fontWeight: 800, fontSize: "0.68rem", height: 24,
-                            bgcolor: vc.bg, color: vc.color,
-                            border: `1.5px solid ${vc.color}`,
-                            boxShadow: `0 0 8px ${vc.glow}`,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell sx={{ ...tdStyle, maxWidth: 250, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        <Typography sx={{ fontSize: "0.75rem", color: "#555" }}>
-                          {verdictLabel} &mdash; Score {rec.composite}/{rec.compositeMax}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 1.2, px: 1 }}>
-                        <Tooltip title="Delete" arrow>
-                          <IconButton size="small" onClick={(e) => handleDelete(rec.id, e)} sx={{ color: "#ccc", "&:hover": { color: "#DC2626" } }}>
-                            <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                  return (
+                    <React.Fragment key={rec.id}>
+                      <TableRow
+                        onClick={() => setExpandedId(isOpen ? null : rec.id)}
+                        sx={{
+                          cursor: "pointer",
+                          bgcolor: isOpen ? "#f0fdfa" : "#fff",
+                          borderLeft: isOpen ? "3px solid #0891b2" : "3px solid transparent",
+                          "&:hover": { bgcolor: isOpen ? "#f0fdfa" : "#f8fafc" },
+                          transition: "background 0.15s, border-color 0.15s",
+                        }}
+                      >
+                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                          <IconButton size="small" sx={{ color: "#0891b2", bgcolor: isOpen ? "#e0f7fa" : "transparent", "&:hover": { bgcolor: "#e0f7fa" } }}>
+                            {isOpen ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
                           </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell sx={tdStyle}>
+                          <Typography sx={{ fontWeight: 800, color: "#0891b2", fontSize: "0.9rem", letterSpacing: 0.2 }}>
+                            {rec.ticker}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ ...tdStyle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {rec.company_name || "—"}
+                        </TableCell>
+                        <TableCell sx={{ ...tdStyle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <Typography sx={{ fontSize: "0.78rem", color: "#64748b" }}>{rec.sector}</Typography>
+                        </TableCell>
+                        <TableCell sx={tdStyle} align="center">
+                          <Typography sx={{ fontSize: "0.82rem", color: "#64748b", fontWeight: 600 }}>{rec.daysSince}d</Typography>
+                        </TableCell>
+                        <TableCell align="center" sx={{ py: 1.5, px: 1.5 }}>
+                          <Box sx={{
+                            display: "inline-flex", alignItems: "center", justifyContent: "center",
+                            px: 1.2, py: 0.4, borderRadius: 1.5,
+                            bgcolor: rec.composite >= 70 ? "#ECFDF5" : rec.composite >= 50 ? "#FFFBEB" : "#FEF2F2",
+                            border: `1.5px solid ${getScoreColor(rec.composite)}40`,
+                            minWidth: 46,
+                          }}>
+                            <Typography sx={{ fontWeight: 900, fontSize: "0.82rem", color: getScoreColor(rec.composite) }}>
+                              {rec.composite}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                          <Chip
+                            label={verdictLabel}
+                            size="small"
+                            sx={{
+                              fontWeight: 700, fontSize: "0.68rem", height: 24, maxWidth: "100%",
+                              bgcolor: vc.bg, color: vc.color,
+                              border: `1px solid ${vc.color}50`,
+                              "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                          <Typography sx={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.4 }}>
+                            {verdictLabel} — Score {rec.composite}/{rec.compositeMax}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                          <Tooltip title="Delete" arrow>
+                            <IconButton size="small" onClick={(e) => handleDelete(rec.id, e)} sx={{ color: "#cbd5e1", "&:hover": { color: "#DC2626", bgcolor: "#fef2f2" } }}>
+                              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
 
-                    {/* ── Expanded Detail ── */}
-                    <TableRow>
-                      <TableCell colSpan={9} sx={{ py: 0, px: 0, borderBottom: isOpen ? "3px solid #e0e5f0" : "none" }}>
-                        <Collapse in={isOpen} timeout={300}>
-                          <ExpandedDetail record={rec} />
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                      {/* ── Expanded Detail ── */}
+                      <TableRow sx={{ bgcolor: "#f8fafc" }}>
+                        <TableCell colSpan={9} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
+                          <Collapse in={isOpen} timeout={300}>
+                            <ExpandedDetail record={rec} />
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
 
       <PasteJsonDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSaveSuccess={fetchRecords} />
@@ -414,7 +441,7 @@ const JRitterAgentMain: React.FC = () => {
   );
 };
 
-/* ═══ Expanded Detail (matches Gator layout) ═══ */
+/* ═══ Expanded Detail ═══ */
 const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
   const d = record.json_data;
   const scores = d?.ritter_scores || {};
@@ -425,36 +452,40 @@ const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
   const formatPrice = (v?: number) => v != null ? `$${v}` : "—";
 
   return (
-    <Box sx={{ px: 3, py: 2.5, bgcolor: "#f5f7fb", borderTop: "3px solid #e0e5f0" }}>
-
-      {/* Header: Ticker + Key Stats */}
-      <Box sx={{ mb: 2.5 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-          <Typography sx={{ fontSize: "1rem", fontWeight: 900, color: "#1E293B" }}>
+    <Box sx={{ px: 3, py: 3, bgcolor: "#f8fafc" }}>
+      {/* Header card */}
+      <Box sx={{
+        mb: 2.5, p: 2.5, bgcolor: "#fff", borderRadius: 2.5,
+        border: "1px solid #e2e8f0", boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
+      }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2, flexWrap: "wrap" }}>
+          <Typography sx={{ fontSize: "1.05rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.3 }}>
             {record.ticker}
           </Typography>
-          <Typography sx={{ fontSize: "0.82rem", color: "#64748B", fontWeight: 500 }}>
-            — {record.company_name}
+          <Typography sx={{ fontSize: "0.88rem", color: "#334155", fontWeight: 600 }}>
+            {record.company_name}
           </Typography>
-          <Typography sx={{ fontSize: "0.72rem", color: "#94A3B8" }}>
-            {record.sector} · {record.daysSince}d since IPO
+          <Typography sx={{ fontSize: "0.75rem", color: "#94A3B8", px: 1.5, py: 0.3, bgcolor: "#f1f5f9", borderRadius: 1 }}>
+            {record.sector}
+          </Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+            {record.daysSince}d since IPO
           </Typography>
           <Box sx={{ ml: "auto" }}>
             <Chip
               label={record.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
               size="small"
               sx={{
-                fontSize: "0.72rem", fontWeight: 900, height: 26,
+                fontSize: "0.73rem", fontWeight: 800, height: 28, px: 0.5,
                 bgcolor: vc.bg, color: vc.color,
-                border: `2px solid ${vc.color}`,
-                boxShadow: `0 0 12px ${vc.glow}`,
+                border: `1.5px solid ${vc.color}60`,
               }}
             />
           </Box>
         </Box>
 
         {/* Stat cards row */}
-        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 1.5 }}>
           {ipo.offer_price != null && <StatCard label="Offer Price" value={formatPrice(ipo.offer_price)} />}
           {market.market_cap_b != null && <StatCard label="Market Cap" value={`$${market.market_cap_b}B`} />}
           {ipo.first_day_return_pct != null && (
@@ -465,7 +496,7 @@ const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
               bgColor={ipo.first_day_return_pct >= 10 ? "#F0FDF4" : ipo.first_day_return_pct >= 0 ? "#FFFBEB" : "#FEF2F2"}
             />
           )}
-          <StatCard label="Composite Score" value={`${scores.composite_score ?? 0}/100`} color={getScoreColor(scores.composite_score ?? 0)} />
+          <StatCard label="Composite Score" value={`${scores.composite_score ?? 0}/100`} color={getScoreColor(scores.composite_score ?? 0)} bgColor={scores.composite_score >= 70 ? "#F0FDF4" : scores.composite_score >= 50 ? "#FFFBEB" : "#FEF2F2"} />
           {market.current_price != null && <StatCard label="Current Price" value={formatPrice(market.current_price)} />}
           {market.return_vs_ipo_pct != null && (
             <StatCard
@@ -479,20 +510,26 @@ const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
       </Box>
 
       {/* Full scorecard with tabs */}
-      <ScorecardView data={d} />
+      <Box sx={{ bgcolor: "#fff", borderRadius: 2.5, border: "1px solid #e2e8f0", p: 2.5, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+        <ScorecardView data={d} />
+      </Box>
     </Box>
   );
 };
 
-/* ═══ StatCard (matches Gator) ═══ */
+/* ═══ StatCard ═══ */
 const StatCard: React.FC<{ label: string; value: React.ReactNode; color?: string; bgColor?: string }> = ({
   label, value, color = "#1E293B", bgColor = "#F8FAFC",
 }) => (
-  <Box sx={{ p: 1.5, bgcolor: bgColor, borderRadius: 2, border: "1px solid #E2E8F0", minWidth: 100, flex: 1 }}>
-    <Typography sx={{ fontSize: "0.62rem", fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.8, mb: 0.3 }}>
+  <Box sx={{
+    p: 1.5, bgcolor: bgColor, borderRadius: 2,
+    border: "1px solid #E2E8F0",
+    borderTop: `3px solid ${color}30`,
+  }}>
+    <Typography sx={{ fontSize: "0.6rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 1, mb: 0.4 }}>
       {label}
     </Typography>
-    <Typography sx={{ fontSize: "0.9rem", fontWeight: 800, color }}>
+    <Typography sx={{ fontSize: "0.92rem", fontWeight: 800, color }}>
       {value}
     </Typography>
   </Box>
@@ -500,20 +537,19 @@ const StatCard: React.FC<{ label: string; value: React.ReactNode; color?: string
 
 /* ═══ Table styles ═══ */
 const thStyle = {
-  fontWeight: 800,
-  fontSize: "0.7rem",
-  color: "#475569",
+  fontWeight: 700,
+  fontSize: "0.68rem",
+  color: "#64748b",
   textTransform: "uppercase" as const,
-  letterSpacing: "0.06em",
-  py: 1.2,
+  letterSpacing: "0.07em",
+  py: 1.5,
   px: 1.5,
-  borderBottom: "2px solid #e2e8f0",
 };
 
 const tdStyle = {
-  fontSize: "0.82rem",
+  fontSize: "0.83rem",
   color: "#334155",
-  py: 1.2,
+  py: 1.5,
   px: 1.5,
   fontWeight: 500,
 };
