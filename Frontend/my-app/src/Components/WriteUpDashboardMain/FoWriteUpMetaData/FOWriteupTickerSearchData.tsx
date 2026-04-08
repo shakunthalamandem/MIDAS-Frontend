@@ -64,7 +64,7 @@ const FOWriteupTickerSearchData: React.FC<
           },
           body: JSON.stringify({
             deal_type: "FO",
-            flag_for_writeup: "Y",
+            // flag_for_writeup: "Y",
           }),
         });
         if (!response.ok) throw new Error("Failed to fetch tickers");

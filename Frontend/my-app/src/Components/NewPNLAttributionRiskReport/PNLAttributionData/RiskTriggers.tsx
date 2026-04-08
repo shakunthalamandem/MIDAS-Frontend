@@ -133,6 +133,43 @@ const SUMMARY_CARD_INFO: Record<string, { definition: string; formula: string; n
 const EXPOSURE_KEYS = new Set(["top_10_issuer_delta_net_exposure", "issuer_delta_net_exposure"]);
 
 /* ── Merge helpers ── */
+
+/**
+ * Aggregate issuer-keyed rows across funds: sum their numeric exposures
+ * and keep only the top 10 by absolute value, plus a Total row.
+ */
+const aggregateIssuerRows = (rows: Record<string, any>[], valueKey: string, guideline: number | undefined): Record<string, any>[] => {
+  const issuerMap: Record<string, { tickers: Set<string>; total: number }> = {};
+  for (const row of rows) {
+    const iss = (row.issuer || "").trim();
+    if (!iss || iss === "Total") continue;
+    const num = parseSignedNumericValue(row[valueKey]);
+    if (!issuerMap[iss]) issuerMap[iss] = { tickers: new Set(), total: 0 };
+    issuerMap[iss].total += num;
+    if (row.ticker) for (const t of String(row.ticker).split(",")) { const trimmed = t.trim(); if (trimmed) issuerMap[iss].tickers.add(trimmed); }
+  }
+  const sorted = Object.entries(issuerMap)
+    .sort(([, a], [, b]) => Math.abs(b.total) - Math.abs(a.total));
+  const top10 = sorted.slice(0, 10);
+  let grandTotal = 0;
+  const result = top10.map(([iss, data]) => {
+    grandTotal += data.total;
+    return {
+      issuer: iss,
+      ticker: Array.from(data.tickers).join(", "),
+      [valueKey]: `${Math.round(data.total * 100) / 100}%`,
+      guideline: guideline,
+    };
+  });
+  result.push({
+    issuer: "Total",
+    ticker: "",
+    [valueKey]: `${Math.round(grandTotal * 100) / 100}%`,
+    guideline: guideline,
+  });
+  return result;
+};
+
 const mergeResponses = (responses: TriggersResponse[]): TriggersResponse => {
   const merged: TriggersResponse = { limits: {}, current_levels: {} };
   for (const resp of responses) {
@@ -149,6 +186,18 @@ const mergeResponses = (responses: TriggersResponse[]): TriggersResponse => {
       }
     }
   }
+
+  // For multi-fund merges, aggregate issuer exposure sections to avoid duplicates
+  if (responses.length > 1) {
+    for (const key of Array.from(EXPOSURE_KEYS)) {
+      const section = merged.current_levels[key];
+      if (section && section.data.length > 0) {
+        const valueKey = SECTION_CONFIG[key]?.valueKey || "delta_adjusted_net_exposure";
+        section.data = aggregateIssuerRows(section.data, valueKey, section.data[0]?.guideline);
+      }
+    }
+  }
+
   return merged;
 };
 

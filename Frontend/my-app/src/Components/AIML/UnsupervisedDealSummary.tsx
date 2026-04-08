@@ -495,7 +495,9 @@ const Component: React.FC = () => {
                           },
                         }}
                         onClick={() =>
-                          navigate(`/ai_fewshot_analysis?ticker=${row.ticker}`)
+                          navigate(
+                            `/ai_fewshot_analysis?ticker=${row.ticker}&pricing_date=${row.pricing_date || ""}&unique_deal_id=${row.unique_deal_id || ""}`
+                          )
                         }
                       >
                         View
@@ -644,7 +646,9 @@ const Component: React.FC = () => {
             onClick={() => {
               if (selectedRow?.ticker) {
                 handleCloseDialog();
-                navigate(`/ai_fewshot_analysis?ticker=${selectedRow.ticker}`);
+                navigate(
+                  `/ai_fewshot_analysis?ticker=${selectedRow.ticker}&pricing_date=${selectedRow.pricing_date || ""}&unique_deal_id=${selectedRow.unique_deal_id || ""}`
+                );
               }
             }}
             sx={{
