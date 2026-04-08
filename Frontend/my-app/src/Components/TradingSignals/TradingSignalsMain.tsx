@@ -89,13 +89,124 @@ function getValueColor(key: string, val: any): string {
   return "#0F172A";
 }
 
+/* ── Sentiment & News Agent custom renderer ── */
+function renderSentimentNewsData(data: Record<string, any>): React.ReactNode {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {/* SENTIMENT section */}
+      <Box>
+        <Typography
+          sx={{
+            fontWeight: 700, fontSize: 12, color: "#334155",
+            textTransform: "uppercase", letterSpacing: 0.5,
+            mb: 1,
+          }}
+        >
+          Sentiment
+        </Typography>
+        <Box sx={{ pl: 1, borderLeft: "2px solid #E2E8F0" }}>
+          {/* One Week Sentiment */}
+          <Box
+            sx={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              py: 0.6, borderBottom: "1px solid #F8FAFC",
+            }}
+          >
+            <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+              One Week Sentiment
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12.5, fontWeight: 700,
+                color: getValueColor("sentiment", data.one_week_sentiment),
+              }}
+            >
+              {formatValue(data.one_week_sentiment)}
+            </Typography>
+          </Box>
+
+          {/* One Month Sentiment */}
+          <Box
+            sx={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              py: 0.6,
+            }}
+          >
+            <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+              One Month Sentiment
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 12.5, fontWeight: 700,
+                color: getValueColor("sentiment", data.one_month_sentiment),
+              }}
+            >
+              {formatValue(data.one_month_sentiment)}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* UNSUPERVISED OUTLOOK section */}
+      {data.unsupervised_outlook && typeof data.unsupervised_outlook === "object" && (
+        <Box>
+          <Typography
+            sx={{
+              fontWeight: 700, fontSize: 12, color: "#334155",
+              textTransform: "uppercase", letterSpacing: 0.5,
+              mb: 1,
+            }}
+          >
+            Unsupervised Outlook
+          </Typography>
+          <Box sx={{ pl: 1, borderLeft: "2px solid #E2E8F0" }}>
+            {Object.entries(data.unsupervised_outlook).map(([key, val]) => (
+              key !== "executive_summary" && (
+                <Box
+                  key={key}
+                  sx={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    py: 0.6, borderBottom: "1px solid #F8FAFC",
+                  }}
+                >
+                  <Typography sx={{ fontSize: 12.5, color: "#64748B", fontWeight: 500 }}>
+                    {formatLabel(key)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 12.5, fontWeight: 700,
+                      color: getValueColor(key, val),
+                    }}
+                  >
+                    {formatValue(val)}
+                  </Typography>
+                </Box>
+              )
+            ))}
+          </Box>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
 /* ── Renders a nested data object (e.g. ML prediction horizons) ── */
 function renderDataRows(data: Record<string, any>, depth = 0): React.ReactNode {
   if (!data || typeof data !== "object") return null;
 
   return Object.entries(data).map(([key, val]) => {
     // Skip internal keys
-    if (key === "label" || key === "weight" || key === "status") return null;
+    if (
+      key === "label" ||
+      key === "weight" ||
+      key === "status" ||
+      key === "reasoning" ||
+      key === "strategy_reasoning" ||
+      key === "technical_reasoning" ||
+      key === "action_summary" ||
+      key === "sentiment_summary" ||
+      key === "executive_summary"
+    ) return null;
 
     // Nested object (e.g., t1d: {prediction, confidence, actual_return})
     if (val && typeof val === "object" && !Array.isArray(val)) {
@@ -448,14 +559,14 @@ const TradingSignalsMain: React.FC<Props> = ({
             <Divider />
 
             <DialogContent sx={{ px: 3, py: 2 }}>
-              <Typography
+              {/* <Typography
                 sx={{
                   fontWeight: 700, fontSize: 12, color: "#94A3B8",
                   textTransform: "uppercase", letterSpacing: 1, mb: 1.5,
                 }}
               >
                 Parameters sent to signal generation
-              </Typography>
+              </Typography> */}
 
               <Box
                 sx={{
@@ -464,7 +575,10 @@ const TradingSignalsMain: React.FC<Props> = ({
                 }}
               >
                 {activeSource.data && Object.keys(activeSource.data).length > 0 ? (
-                  renderDataRows(activeSource.data)
+                  <>
+                    {popupSource === "sentiment_news" && renderSentimentNewsData(activeSource.data)}
+                    {popupSource !== "sentiment_news" && renderDataRows(activeSource.data)}
+                  </>
                 ) : (
                   <Typography sx={{ color: "#94A3B8", fontSize: 13, fontStyle: "italic" }}>
                     No data available for this source.
