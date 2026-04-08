@@ -55,7 +55,7 @@
     "yup": "^1.4.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env NODE_OPTIONS=--max_old_space_size=4096 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -94,6 +94,7 @@
     "@types/react-window": "^1.8.8",
     "@types/recharts": "^1.8.29",
     "@types/xlsx": "^0.0.35",
+    "cross-env": "^10.1.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5"
   }

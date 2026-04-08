@@ -4,7 +4,8 @@
       "Bash(xargs grep:*)",
       "Bash(grep -v \"^Components$\")",
       "Bash(npx tsc:*)",
-      "Bash(node -e \"const fm = require\\(''framer-motion''\\); console.log\\(Object.keys\\(fm\\).filter\\(k => k.includes\\(''motion''\\) || k.includes\\(''Motion''\\) || k === ''AnimatePresence''\\).join\\(''\\\\n''\\)\\)\")"
+      "Bash(node -e \"const fm = require\\(''framer-motion''\\); console.log\\(Object.keys\\(fm\\).filter\\(k => k.includes\\(''motion''\\) || k.includes\\(''Motion''\\) || k === ''AnimatePresence''\\).join\\(''\\\\n''\\)\\)\")",
+      "Bash(npm install:*)"
     ]
   }
 }
