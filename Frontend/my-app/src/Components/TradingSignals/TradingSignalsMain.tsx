@@ -271,13 +271,14 @@ const TradingSignalsMain: React.FC<Props> = ({
 
     const fetchSourceDetails = async () => {
       try {
+        const operation = isUpcoming ? "upcoming" : "listed";
         const res = await fetch(`${apiUrl}/api/trading_signal_source_details/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker }),
+          body: JSON.stringify({ ticker, operation }),
         });
         if (res.ok) {
           const data = await res.json();
@@ -301,7 +302,7 @@ const TradingSignalsMain: React.FC<Props> = ({
     };
 
     fetchSourceDetails();
-  }, [ticker, apiUrl]);
+  }, [ticker, apiUrl, isUpcoming]);
 
   const handleSignalLoaded = useCallback((data: TradingSignalData | null) => {
     setSignalData(data);
@@ -355,7 +356,11 @@ const TradingSignalsMain: React.FC<Props> = ({
         transition={{ duration: 0.3, delay: 0.05 }}
         sx={{ mb: 2.5 }}
       >
-        <TradingSignalCard ticker={ticker} onSignalLoaded={handleSignalLoaded} />
+        <TradingSignalCard
+          ticker={ticker}
+          onSignalLoaded={handleSignalLoaded}
+          isUpcoming={isUpcoming}
+        />
       </MotionBox>
 
       {/* Section 2: Price Charts (FactSet + TradingView) */}
@@ -423,15 +428,6 @@ const TradingSignalsMain: React.FC<Props> = ({
                     {activeSource.label}
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.25 }}>
-                    <Chip
-                      label={`${activeSource.weight}% Weight`}
-                      size="small"
-                      sx={{
-                        bgcolor: activeSource.weight > 20 ? "#EEF2FF" : "#F1F5F9",
-                        color: activeSource.weight > 20 ? "#4338CA" : "#64748B",
-                        fontWeight: 700, fontSize: 11, height: 22,
-                      }}
-                    />
                     <Chip
                       label={activeSource.status === "active" ? "Active" : "Inactive"}
                       size="small"
