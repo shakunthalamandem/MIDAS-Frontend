@@ -48,10 +48,9 @@ const TAB_COLORS: Record<string, { active: string; light: string }> = {
 };
 
 const ScorecardView: React.FC<ScorecardViewProps> = ({ normalized, data }) => {
+  const [tab, setTab] = useState<TabName>("Dimensions");
   const n = normalized || (data ? normalizeJson(data) : null);
   if (!n) return null;
-
-  const [tab, setTab] = useState<TabName>("Dimensions");
 
   const availableTabs = ALL_TABS.filter((t) => {
     if (t === "Dimensions") return n.dimensions.length > 0;
