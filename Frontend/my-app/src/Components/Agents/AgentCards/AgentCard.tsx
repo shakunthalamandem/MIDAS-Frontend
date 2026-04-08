@@ -87,9 +87,13 @@ const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; 
   },
 };
 
-/* Override display names without changing backend keys */
+/* Override display names/descriptions without changing backend keys */
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
   "JRitter IPO Agent": "Gator IPO Agent-2",
+};
+
+const AGENT_DISPLAY_DESCRIPTIONS: Record<string, string> = {
+  "JRitter IPO Agent": "Academic IPO analysis applying Jay Ritter's research framework. Analyzes pricing, underpricing, and long-term performance of US IPOs.",
 };
 
 const FALLBACK_THEMES = [
@@ -298,7 +302,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
             minHeight: 52,
           }}
         >
-          {agent.description}
+          {AGENT_DISPLAY_DESCRIPTIONS[agent.name] ?? agent.description}
         </Typography>
 
         {/* Working notice */}
