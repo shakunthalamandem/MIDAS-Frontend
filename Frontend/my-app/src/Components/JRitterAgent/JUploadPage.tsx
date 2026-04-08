@@ -32,6 +32,36 @@ const validateRitterJson = (text: string): ValidationResult => {
   }
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
     return { valid: false, message: "JSON must be an object" };
+
+  // Support both formats:
+  // New: { analysis: { ticker, company, composite_score: { score, max }, key_criteria: [...] } }
+  // Legacy: { ticker, ritter_scores: { composite_score, dimensions: [...] } }
+  const analysis = parsed.analysis;
+
+  if (analysis) {
+    // New format
+    if (!analysis.ticker) return { valid: false, message: "Missing: analysis.ticker" };
+    if (!analysis.composite_score) return { valid: false, message: "Missing: analysis.composite_score" };
+    if (!analysis.key_criteria || !Array.isArray(analysis.key_criteria))
+      return { valid: false, message: "Missing or invalid: analysis.key_criteria (must be array)" };
+    if (analysis.key_criteria.length === 0)
+      return { valid: false, message: "analysis.key_criteria is empty" };
+    for (let i = 0; i < analysis.key_criteria.length; i++) {
+      const c = analysis.key_criteria[i];
+      if (!c.name || c.score === undefined || c.max === undefined)
+        return { valid: false, message: `key_criteria #${i + 1} missing required fields (name, score, max)` };
+    }
+    return {
+      valid: true,
+      message: "Valid Ritter IPO JSON",
+      ticker: analysis.ticker,
+      company: analysis.company || "",
+      composite: analysis.composite_score.score,
+      dimensionCount: analysis.key_criteria.length,
+    };
+  }
+
+  // Legacy format
   if (!parsed.ticker) return { valid: false, message: "Missing required field: ticker" };
   if (!parsed.ritter_scores) return { valid: false, message: "Missing required field: ritter_scores" };
   if (!parsed.ritter_scores.dimensions || !Array.isArray(parsed.ritter_scores.dimensions))
@@ -45,7 +75,7 @@ const validateRitterJson = (text: string): ValidationResult => {
   }
   return {
     valid: true,
-    message: "Valid Gator IPO JSON",
+    message: "Valid Ritter IPO JSON (legacy)",
     ticker: parsed.ticker,
     company: parsed.company_name || "",
     composite: parsed.ritter_scores.composite_score,

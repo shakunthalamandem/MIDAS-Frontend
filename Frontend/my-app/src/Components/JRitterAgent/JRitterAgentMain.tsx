@@ -21,6 +21,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import ScorecardView from "./ScorecardView";
+import { normalizeJson } from "./normalizeJson";
 
 interface SavedRecord {
   id: number;
@@ -113,21 +114,23 @@ const JRitterAgentMain: React.FC = () => {
 
   useEffect(() => { fetchRecords(); }, []);
 
-  // Enriched records
+  // Enriched records — normalize both JSON formats
   const enriched = useMemo(() => records.map((r) => {
-    const s = r.json_data?.ritter_scores || {};
+    const n = normalizeJson(r.json_data);
     return {
       ...r,
-      composite: s.composite_score ?? 0,
-      compositeMax: s.composite_max ?? 100,
-      verdict: s.verdict_label || s.verdict || "",
-      sector: r.json_data?.company_fundamentals?.sector || "—",
-      daysSince: r.json_data?.days_since_ipo ?? 0,
-      exchange: r.json_data?.exchange || "",
-      price: r.json_data?.current_market?.current_price,
-      returnPct: r.json_data?.current_market?.return_vs_ipo_pct,
-      mktCap: r.json_data?.current_market?.market_cap_b,
-      ipoDate: r.json_data?.ipo_date || "",
+      normalized: n,
+      composite: n.composite_score,
+      compositeMax: n.composite_max,
+      verdict: n.verdict,
+      sector: n.sector || "—",
+      daysSince: n.days_since_ipo,
+      exchange: n.exchange,
+      price: n.key_metrics.current_price ?? n.key_metrics.current_price_apr7_2026,
+      returnPct: n.key_metrics.return_vs_ipo_pct ?? n.key_metrics.current_return_vs_ipo_pct,
+      mktCap: n.key_metrics.market_cap_b ?? n.key_metrics.market_cap_approx_usd,
+      ipoDate: n.ipo_date,
+      grade: n.composite_grade,
     };
   }), [records]);
 
@@ -463,13 +466,11 @@ const JRitterAgentMain: React.FC = () => {
 
 /* ═══ Expanded Detail ═══ */
 const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
-  const d = record.json_data;
-  const scores = d?.ritter_scores || {};
-  const market = d?.current_market || {};
-  const ipo = d?.ipo_data || {};
-  const vc = getVerdictConfig(record.verdict);
+  const n = record.normalized || normalizeJson(record.json_data);
+  const vc = getVerdictConfig(n.verdict);
+  const km = n.key_metrics;
 
-  const formatPrice = (v?: number) => v != null ? `$${v}` : "—";
+  const formatPrice = (v?: any) => v != null ? (String(v).startsWith("$") ? v : `$${v}`) : "—";
 
   return (
     <Box sx={{ px: 3, py: 3, bgcolor: "#f8fafc" }}>
@@ -479,60 +480,64 @@ const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
         border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
       }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2, flexWrap: "wrap" }}>
-          <Typography sx={{ fontSize: "1.1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.ticker}
+          <Typography sx={{ fontSize: "1.1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.5 }}>
+            {n.ticker}
           </Typography>
-          <Typography sx={{ fontSize: "0.9rem", color: "#334155", fontWeight: 600, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.company_name}
+          <Typography sx={{ fontSize: "0.9rem", color: "#334155", fontWeight: 600 }}>
+            {n.company_name}
           </Typography>
-          <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", px: 1.5, py: 0.3, bgcolor: "#f1f5f9", borderRadius: 1.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.sector}
-          </Typography>
-          <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.daysSince}d since IPO
-          </Typography>
-          <Box sx={{ ml: "auto" }}>
+          {n.sector && (
+            <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", px: 1.5, py: 0.3, bgcolor: "#f1f5f9", borderRadius: 1.5 }}>
+              {n.sector}
+            </Typography>
+          )}
+          {n.days_since_ipo > 0 && (
+            <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8" }}>
+              {n.days_since_ipo}d since IPO
+            </Typography>
+          )}
+          <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
+            {n.composite_grade && (
+              <Chip label={`Grade ${n.composite_grade}`} size="small" sx={{ fontSize: "0.73rem", fontWeight: 900, height: 28, bgcolor: getScoreBg(n.composite_score), color: getScoreColor(n.composite_score) }} />
+            )}
             <Chip
-              label={record.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+              label={n.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
               size="small"
-              sx={{
-                fontSize: "0.73rem", fontWeight: 800, height: 28, px: 0.5,
-                bgcolor: vc.bg, color: vc.color,
-                border: `1.5px solid ${vc.color}60`,
-                fontFamily: "'Inter', 'Roboto', sans-serif",
-              }}
+              sx={{ fontSize: "0.73rem", fontWeight: 800, height: 28, px: 0.5, bgcolor: vc.bg, color: vc.color, border: `1.5px solid ${vc.color}60` }}
             />
           </Box>
         </Box>
 
+        {/* Composite summary */}
+        {n.composite_summary && (
+          <Typography sx={{ fontSize: "0.78rem", color: "#475569", lineHeight: 1.6, mb: 2, fontStyle: "italic", bgcolor: "#f8fafc", p: 1.5, borderRadius: 2, border: "1px solid #e2e8f0" }}>
+            {n.composite_summary}
+          </Typography>
+        )}
+
         {/* Stat cards row */}
         <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 1.5 }}>
-          {ipo.offer_price != null && <StatCard label="Offer Price" value={formatPrice(ipo.offer_price)} />}
-          {market.market_cap_b != null && <StatCard label="Market Cap" value={`$${market.market_cap_b}B`} />}
-          {ipo.first_day_return_pct != null && (
-            <StatCard
-              label="First-Day Pop"
-              value={`${ipo.first_day_return_pct > 0 ? "+" : ""}${ipo.first_day_return_pct}%`}
-              color={ipo.first_day_return_pct >= 10 ? "#059669" : ipo.first_day_return_pct >= 0 ? "#D97706" : "#DC2626"}
-              bgColor={ipo.first_day_return_pct >= 10 ? "#F0FDF4" : ipo.first_day_return_pct >= 0 ? "#FFFBEB" : "#FEF2F2"}
-            />
-          )}
-          <StatCard label="Composite Score" value={`${scores.composite_score ?? 0}/100`} color={getScoreColor(scores.composite_score ?? 0)} bgColor={getScoreBg(scores.composite_score ?? 0)} />
-          {market.current_price != null && <StatCard label="Current Price" value={formatPrice(market.current_price)} />}
-          {market.return_vs_ipo_pct != null && (
-            <StatCard
-              label="Return vs IPO"
-              value={`${market.return_vs_ipo_pct > 0 ? "+" : ""}${market.return_vs_ipo_pct}%`}
-              color={market.return_vs_ipo_pct >= 0 ? "#059669" : "#DC2626"}
-              bgColor={market.return_vs_ipo_pct >= 0 ? "#F0FDF4" : "#FEF2F2"}
-            />
-          )}
+          {n.ipo_data.offer_price != null && <StatCard label="Offer Price" value={formatPrice(n.ipo_data.offer_price)} />}
+          {km.market_cap_approx_usd && <StatCard label="Market Cap" value={km.market_cap_approx_usd} />}
+          {km.market_cap_b != null && <StatCard label="Market Cap" value={`$${km.market_cap_b}B`} />}
+          {(n.ipo_data.first_day_return_pct ?? km.day1_return_pct) != null && (() => {
+            const v = n.ipo_data.first_day_return_pct ?? km.day1_return_pct;
+            return <StatCard label="First-Day Pop" value={`${v > 0 ? "+" : ""}${v}%`} color={v >= 10 ? "#059669" : v >= 0 ? "#D97706" : "#DC2626"} bgColor={v >= 10 ? "#F0FDF4" : v >= 0 ? "#FFFBEB" : "#FEF2F2"} />;
+          })()}
+          <StatCard label="Composite Score" value={`${n.composite_score}/${n.composite_max}`} color={getScoreColor(n.composite_score)} bgColor={getScoreBg(n.composite_score)} />
+          {(km.current_price ?? km.current_price_apr7_2026) != null && <StatCard label="Current Price" value={formatPrice(km.current_price ?? km.current_price_apr7_2026)} />}
+          {(km.return_vs_ipo_pct ?? km.current_return_vs_ipo_pct) != null && (() => {
+            const v = km.return_vs_ipo_pct ?? km.current_return_vs_ipo_pct;
+            return <StatCard label="Return vs IPO" value={`${v > 0 ? "+" : ""}${v}%`} color={v >= 0 ? "#059669" : "#DC2626"} bgColor={v >= 0 ? "#F0FDF4" : "#FEF2F2"} />;
+          })()}
+          {km.gross_proceeds_usd && <StatCard label="Gross Proceeds" value={km.gross_proceeds_usd} />}
+          {km.price_to_sales_multiple && <StatCard label="P/S Multiple" value={km.price_to_sales_multiple} />}
         </Box>
       </Box>
 
       {/* Full scorecard with tabs */}
       <Box sx={{ bgcolor: "#fff", borderRadius: 3, border: "1px solid #e2e8f0", p: 2.5, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-        <ScorecardView data={d} />
+        <ScorecardView normalized={n} />
       </Box>
     </Box>
   );
