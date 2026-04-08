@@ -32,13 +32,14 @@ import DealBot from "./DealBot";
 import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 import TabErrorBoundary from "./TabErrorBoundary";
 import DashboardStateCard from "./DashboardStateCard";
+import GatorSignalAnalysis from "./GatorSignalAnalysis";
 
 /* ── Region-aware tab visibility for IPO deals ── */
 const IPO_ENABLED_TABS: Record<string, Set<string>> = {
   US: new Set([
     "Trading Dynamics", "Write Up", "Peer Deals Performance",
     "Sentiment Agent", " Deal(IPO) Agent", "Factors Based Agent",
-    "S1 AI Query", "NEWS", "Meeting Notes",
+    "S1 AI Query", "Gator Signal", "NEWS", "Meeting Notes",
   ]),
   // APAC & EMEA share the same config; anything not listed here falls to DEFAULT
   DEFAULT: new Set([
@@ -105,6 +106,7 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
       { label: " Deal(IPO) Agent" },
       { label: "Factors Based Agent" },
 
+      { label: "Gator Signal" },
       { label: "S1 AI Query" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
@@ -474,6 +476,14 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                 return (
                   <TabErrorBoundary tabLabel="S1 AI Query" ticker={ticker}>
                     <S1QueryBot ticker={ticker} />
+                  </TabErrorBoundary>
+                );
+              }
+
+              if (currentLabel === "Gator Signal") {
+                return (
+                  <TabErrorBoundary tabLabel="Gator Signal" ticker={ticker}>
+                    <GatorSignalAnalysis ticker={ticker} />
                   </TabErrorBoundary>
                 );
               }
