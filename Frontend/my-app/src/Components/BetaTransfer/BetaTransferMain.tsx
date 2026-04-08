@@ -110,11 +110,20 @@ const STATUS_META: Record<
   },
 };
 
+// Normalise whatever string the API sends into our known keys
+function normaliseStatus(raw: string): TransferStatus {
+  if (raw === "running" || raw === "in_progress") return "transferring";
+  if (raw === "completed" || raw === "done") return "success";
+  if (raw === "failed") return "error";
+  if ((STATUS_META as Record<string, unknown>)[raw]) return raw as TransferStatus;
+  return "idle";
+}
+
 const StatusBadge: React.FC<{ status: TransferStatus; errorMsg?: string | null }> = ({
   status,
   errorMsg,
 }) => {
-  const m = STATUS_META[status];
+  const m = STATUS_META[status] ?? STATUS_META.idle;
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
       {/* Pulsing dot */}
@@ -210,7 +219,7 @@ const StatTile: React.FC<{
         fontFamily: value !== null && typeof value === "string" && value.includes("T") ? "monospace" : "inherit",
       }}
     >
-      {value !== null ? value.toLocaleString() : "—"}
+      {value != null ? value.toLocaleString() : "—"}
     </Typography>
   </Box>
 );
@@ -572,7 +581,16 @@ const BetaTransferMain: React.FC = () => {
         headers: authHeaders(),
       });
       if (!res.ok) throw new Error("Status fetch failed");
-      const data: StatusData = await res.json();
+      const raw = await res.json();
+      const data: StatusData = {
+        ...EMPTY_STATUS,
+        ...raw,
+        status: normaliseStatus(raw?.status ?? ""),
+        rows_deleted: raw?.rows_deleted ?? null,
+        rows_inserted: raw?.rows_inserted ?? null,
+        trading_days: raw?.trading_days ?? [],
+        logs: raw?.logs ?? [],
+      };
       setStatusData(data);
       return data;
     } catch {
