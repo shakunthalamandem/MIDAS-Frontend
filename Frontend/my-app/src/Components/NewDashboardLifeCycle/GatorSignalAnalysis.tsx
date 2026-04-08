@@ -18,11 +18,32 @@ type GatorSignalAnalysisProps = {
   ticker: string;
 };
 
+interface ScoringBreakdown {
+  vc_backing: number;
+  tier1_underwriter: number;
+  dual_class_penalty: number;
+  firm_age_above_10yr: number;
+  profitability_at_ipo: number;
+  upward_price_revision: number;
+  pre_ipo_revenue_above_100m: number;
+}
+
+interface TierClassification {
+  tier: number;
+  reasoning: string;
+  weighted_score: number;
+  book_assignment: string;
+  scoring_breakdown: ScoringBreakdown;
+  tier1_criteria_met: boolean;
+  sector_allocation_bucket: string;
+}
+
 interface GatorSignalResponse {
   overall_signal: string;
   days_held: number;
   confidence_score: number;
   recommendation: string;
+  tier_classification: TierClassification;
   last_run: string;
 }
 
@@ -182,6 +203,177 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
         </Grid>
 
       </Grid>
+
+      {/* Tier Classification Card */}
+      <Card
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          transition: "transform 0.2s, boxShadow 0.2s",
+          backgroundColor: "#f5f3ff",
+          borderLeft: "4px solid #8b5cf6",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.12)",
+          },
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 600,
+              color: "#000",
+              fontSize: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              display: "block",
+              mb: 2,
+            }}
+          >
+            Tier Classification
+          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {/* Tier and Reasoning */}
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: "#666",
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  display: "block",
+                  mb: 0.5,
+                }}
+              >
+                Tier
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#000",
+                  fontWeight: 700,
+                  fontSize: "1.1rem",
+                }}
+              >
+                Tier {signal.tier_classification.tier}
+              </Typography>
+            </Box>
+
+            {/* Reasoning */}
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: "#666",
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  display: "block",
+                  mb: 0.5,
+                }}
+              >
+                Reasoning
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#374151",
+                  lineHeight: 1.6,
+                  fontSize: "0.9rem",
+                }}
+              >
+                {signal.tier_classification.reasoning}
+              </Typography>
+            </Box>
+
+            {/* Weighted Score */}
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: "#666",
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  display: "block",
+                  mb: 0.5,
+                }}
+              >
+                Weighted Score
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#000",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                }}
+              >
+                {signal.tier_classification.weighted_score.toFixed(2)}
+              </Typography>
+            </Box>
+
+            {/* Book Assignment and Sector Allocation */}
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  Book Assignment
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#374151",
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  {signal.tier_classification.book_assignment}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  Sector Bucket
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#374151",
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  {signal.tier_classification.sector_allocation_bucket}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* Recommendation and Last Run Section */}
       <Paper
