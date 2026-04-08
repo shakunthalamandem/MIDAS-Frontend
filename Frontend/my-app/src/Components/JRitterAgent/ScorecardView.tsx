@@ -51,31 +51,43 @@ const ScorecardView: React.FC<ScorecardViewProps> = ({ data }) => {
     return true;
   });
 
+  const TAB_COLORS: Record<string, { active: string; light: string }> = {
+    Dimensions:   { active: "#0891b2", light: "#ecfeff" },
+    "IPO Data":   { active: "#4f46e5", light: "#eef2ff" },
+    Fundamentals: { active: "#7c3aed", light: "#f5f3ff" },
+    Underwriters: { active: "#0f766e", light: "#f0fdfa" },
+  };
+
   return (
     <Box>
-      {/* Tab bar */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 2.5, borderBottom: "2px solid #e2e8f0" }}>
-        {availableTabs.map((t) => (
-          <Box
-            key={t}
-            onClick={() => setTab(t)}
-            sx={{
-              px: 2.5, py: 1.2,
-              cursor: "pointer",
-              fontSize: "0.8rem",
-              fontWeight: tab === t ? 800 : 500,
-              color: tab === t ? "#0891b2" : "#64748b",
-              borderBottom: tab === t ? "3px solid #0891b2" : "3px solid transparent",
-              mb: "-2px",
-              transition: "all 0.15s",
-              borderRadius: "4px 4px 0 0",
-              bgcolor: tab === t ? "#f0fdff" : "transparent",
-              "&:hover": { color: "#0891b2", bgcolor: "#f0fdff" },
-            }}
-          >
-            {t}{t === "Dimensions" && ` (${dims.length})`}
-          </Box>
-        ))}
+      {/* Tab bar — pill style */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2.5, flexWrap: "wrap" }}>
+        {availableTabs.map((t) => {
+          const tc = TAB_COLORS[t] || { active: "#0891b2", light: "#ecfeff" };
+          const isActive = tab === t;
+          return (
+            <Box
+              key={t}
+              onClick={() => setTab(t)}
+              sx={{
+                px: 2.2, py: 0.75,
+                cursor: "pointer",
+                fontSize: "0.78rem",
+                fontWeight: isActive ? 800 : 600,
+                color: isActive ? tc.active : "#64748b",
+                borderRadius: 5,
+                bgcolor: isActive ? tc.light : "transparent",
+                border: isActive ? `1.5px solid ${tc.active}40` : "1.5px solid transparent",
+                transition: "all 0.18s",
+                fontFamily: "'Inter', 'Roboto', sans-serif",
+                letterSpacing: 0.2,
+                "&:hover": { color: tc.active, bgcolor: tc.light },
+              }}
+            >
+              {t}{t === "Dimensions" && ` (${dims.length})`}
+            </Box>
+          );
+        })}
       </Box>
 
       {/* Tab content */}

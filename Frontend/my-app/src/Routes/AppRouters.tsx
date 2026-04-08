@@ -118,6 +118,7 @@ import SummarySignalBoard from "../Components/SummarySignalBoard/SummarySignalBo
 import S3DataTransfer from "../Components/S3DataTransfer/S3DataTransfer";
 import DataDump from "../Components/DataDump/DataDump";
 import JRitterAgentMain from "../Components/JRitterAgent/JRitterAgentMain";
+import JUploadPage from "../Components/JRitterAgent/JUploadPage";
 
 
 const AppRouters: React.FC = () => {
@@ -356,6 +357,7 @@ const AppRouters: React.FC = () => {
         <Route path="/s3" element={<AuthGuard><S3DataTransfer /></AuthGuard>} />
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
         <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
+        <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
 
 
 
