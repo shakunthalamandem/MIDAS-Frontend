@@ -21,6 +21,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import ScorecardView from "./ScorecardView";
+import { normalizeJson } from "./normalizeJson";
 
 interface SavedRecord {
   id: number;
@@ -113,21 +114,23 @@ const JRitterAgentMain: React.FC = () => {
 
   useEffect(() => { fetchRecords(); }, []);
 
-  // Enriched records
+  // Enriched records — normalize both JSON formats
   const enriched = useMemo(() => records.map((r) => {
-    const s = r.json_data?.ritter_scores || {};
+    const n = normalizeJson(r.json_data);
     return {
       ...r,
-      composite: s.composite_score ?? 0,
-      compositeMax: s.composite_max ?? 100,
-      verdict: s.verdict_label || s.verdict || "",
-      sector: r.json_data?.company_fundamentals?.sector || "—",
-      daysSince: r.json_data?.days_since_ipo ?? 0,
-      exchange: r.json_data?.exchange || "",
-      price: r.json_data?.current_market?.current_price,
-      returnPct: r.json_data?.current_market?.return_vs_ipo_pct,
-      mktCap: r.json_data?.current_market?.market_cap_b,
-      ipoDate: r.json_data?.ipo_date || "",
+      normalized: n,
+      composite: n.composite_score,
+      compositeMax: n.composite_max,
+      verdict: n.verdict,
+      sector: n.sector || "—",
+      daysSince: n.days_since_ipo,
+      exchange: n.exchange,
+      price: n.key_metrics.current_price ?? n.key_metrics.current_price_apr7_2026,
+      returnPct: n.key_metrics.return_vs_ipo_pct ?? n.key_metrics.current_return_vs_ipo_pct,
+      mktCap: n.key_metrics.market_cap_b ?? n.key_metrics.market_cap_approx_usd,
+      ipoDate: n.ipo_date,
+      grade: n.composite_grade,
     };
   }), [records]);
 
@@ -327,12 +330,11 @@ const JRitterAgentMain: React.FC = () => {
             <Table size="small" sx={{ tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: 44 }} />
-                <col style={{ width: 90 }} />
-                <col style={{ width: 160 }} />
-                <col style={{ width: 180 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 190 }} />
+                <col style={{ width: 200 }} />
                 <col style={{ width: 70 }} />
-                <col style={{ width: 80 }} />
-                <col style={{ width: 220 }} />
+                <col style={{ width: 90 }} />
                 <col />
               </colgroup>
               <TableHead>
@@ -360,13 +362,12 @@ const JRitterAgentMain: React.FC = () => {
                       Verdict
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle}>Action Summary</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} sx={{ textAlign: "center", py: 10 }}>
+                    <TableCell colSpan={7} sx={{ textAlign: "center", py: 10 }}>
                       <Typography sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
                         {enriched.length === 0 ? 'No scorecards yet. Go to Upload JSON to start.' : "No results match your filter."}
                       </Typography>
@@ -434,16 +435,11 @@ const JRitterAgentMain: React.FC = () => {
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
-                          <Typography sx={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-                            {verdictLabel} — Score {rec.composite}/{rec.compositeMax}
-                          </Typography>
-                        </TableCell>
                       </TableRow>
 
                       {/* ── Expanded Detail ── */}
                       <TableRow sx={{ bgcolor: "#f8fafc" }}>
-                        <TableCell colSpan={8} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
+                        <TableCell colSpan={7} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
                           <Collapse in={isOpen} timeout={300}>
                             <ExpandedDetail record={rec} />
                           </Collapse>
@@ -463,99 +459,56 @@ const JRitterAgentMain: React.FC = () => {
 
 /* ═══ Expanded Detail ═══ */
 const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
-  const d = record.json_data;
-  const scores = d?.ritter_scores || {};
-  const market = d?.current_market || {};
-  const ipo = d?.ipo_data || {};
-  const vc = getVerdictConfig(record.verdict);
-
-  const formatPrice = (v?: number) => v != null ? `$${v}` : "—";
+  const n = record.normalized || normalizeJson(record.json_data);
 
   return (
-    <Box sx={{ px: 3, py: 3, bgcolor: "#f8fafc" }}>
+    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fa" }}>
       {/* Header card */}
       <Box sx={{
-        mb: 2.5, p: 2.5, bgcolor: "#fff", borderRadius: 3,
-        border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        mb: 2, px: 2.5, py: 1.8, bgcolor: "#fff", borderRadius: 2.5,
+        border: "1px solid #e8ecf0", boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
+        display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap",
       }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2, flexWrap: "wrap" }}>
-          <Typography sx={{ fontSize: "1.1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.ticker}
+        <Typography sx={{ fontSize: "1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.4 }}>
+          {n.ticker}
+        </Typography>
+        <Typography sx={{ fontSize: "0.88rem", color: "#334155", fontWeight: 600 }}>
+          {n.company_name}
+        </Typography>
+        {n.sector && (
+          <Box sx={{ px: 1.2, py: 0.25, bgcolor: "#f1f5f9", borderRadius: 1.5, border: "1px solid #e2e8f0" }}>
+            <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 500 }}>{n.sector}</Typography>
+          </Box>
+        )}
+        {n.days_since_ipo > 0 && (
+          <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+            {n.days_since_ipo}d since IPO
           </Typography>
-          <Typography sx={{ fontSize: "0.9rem", color: "#334155", fontWeight: 600, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.company_name}
-          </Typography>
-          <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", px: 1.5, py: 0.3, bgcolor: "#f1f5f9", borderRadius: 1.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.sector}
-          </Typography>
-          <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-            {record.daysSince}d since IPO
-          </Typography>
+        )}
+        {n.composite_grade && (
           <Box sx={{ ml: "auto" }}>
             <Chip
-              label={record.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+              label={`Grade ${n.composite_grade}`}
               size="small"
               sx={{
-                fontSize: "0.73rem", fontWeight: 800, height: 28, px: 0.5,
-                bgcolor: vc.bg, color: vc.color,
-                border: `1.5px solid ${vc.color}60`,
-                fontFamily: "'Inter', 'Roboto', sans-serif",
+                fontSize: "0.72rem", fontWeight: 900, height: 26,
+                bgcolor: getScoreBg(n.composite_score),
+                color: getScoreColor(n.composite_score),
+                border: `1.5px solid ${getScoreColor(n.composite_score)}40`,
               }}
             />
           </Box>
-        </Box>
-
-        {/* Stat cards row */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 1.5 }}>
-          {ipo.offer_price != null && <StatCard label="Offer Price" value={formatPrice(ipo.offer_price)} />}
-          {market.market_cap_b != null && <StatCard label="Market Cap" value={`$${market.market_cap_b}B`} />}
-          {ipo.first_day_return_pct != null && (
-            <StatCard
-              label="First-Day Pop"
-              value={`${ipo.first_day_return_pct > 0 ? "+" : ""}${ipo.first_day_return_pct}%`}
-              color={ipo.first_day_return_pct >= 10 ? "#059669" : ipo.first_day_return_pct >= 0 ? "#D97706" : "#DC2626"}
-              bgColor={ipo.first_day_return_pct >= 10 ? "#F0FDF4" : ipo.first_day_return_pct >= 0 ? "#FFFBEB" : "#FEF2F2"}
-            />
-          )}
-          <StatCard label="Composite Score" value={`${scores.composite_score ?? 0}/100`} color={getScoreColor(scores.composite_score ?? 0)} bgColor={getScoreBg(scores.composite_score ?? 0)} />
-          {market.current_price != null && <StatCard label="Current Price" value={formatPrice(market.current_price)} />}
-          {market.return_vs_ipo_pct != null && (
-            <StatCard
-              label="Return vs IPO"
-              value={`${market.return_vs_ipo_pct > 0 ? "+" : ""}${market.return_vs_ipo_pct}%`}
-              color={market.return_vs_ipo_pct >= 0 ? "#059669" : "#DC2626"}
-              bgColor={market.return_vs_ipo_pct >= 0 ? "#F0FDF4" : "#FEF2F2"}
-            />
-          )}
-        </Box>
+        )}
       </Box>
 
-      {/* Full scorecard with tabs */}
-      <Box sx={{ bgcolor: "#fff", borderRadius: 3, border: "1px solid #e2e8f0", p: 2.5, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-        <ScorecardView data={d} />
+      {/* Scorecard */}
+      <Box sx={{ bgcolor: "#fff", borderRadius: 2.5, border: "1px solid #e8ecf0", p: 2.5, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+        <ScorecardView normalized={n} />
       </Box>
     </Box>
   );
 };
 
-/* ═══ StatCard ═══ */
-const StatCard: React.FC<{ label: string; value: React.ReactNode; color?: string; bgColor?: string }> = ({
-  label, value, color = "#1E293B", bgColor = "#F8FAFC",
-}) => (
-  <Box sx={{
-    p: 1.5, bgcolor: bgColor, borderRadius: 2.5,
-    border: "1px solid #E2E8F0",
-    borderTop: `3px solid ${color}`,
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-  }}>
-    <Typography sx={{ fontSize: "0.58rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 1, mb: 0.4, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-      {label}
-    </Typography>
-    <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-      {value}
-    </Typography>
-  </Box>
-);
 
 /* ═══ Table styles ═══ */
 const thStyle = {

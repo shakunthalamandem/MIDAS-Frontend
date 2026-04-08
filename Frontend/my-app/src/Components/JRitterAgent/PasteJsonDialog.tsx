@@ -36,31 +36,33 @@ interface ValidationResult {
 const validateRitterJson = (text: string): ValidationResult => {
   if (!text.trim()) return { valid: false, message: "" };
   let parsed: any;
-  try {
-    parsed = JSON.parse(text);
-  } catch (e: any) {
+  try { parsed = JSON.parse(text); } catch (e: any) {
     return { valid: false, message: `JSON parse error: ${e.message}` };
   }
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
     return { valid: false, message: "JSON must be an object" };
-  if (!parsed.ticker)
-    return { valid: false, message: "Missing required field: ticker" };
-  if (!parsed.ritter_scores)
-    return { valid: false, message: "Missing required field: ritter_scores" };
-  if (!parsed.ritter_scores.dimensions || !Array.isArray(parsed.ritter_scores.dimensions))
-    return { valid: false, message: "Missing or invalid: ritter_scores.dimensions" };
-  if (parsed.ritter_scores.dimensions.length === 0)
-    return { valid: false, message: "ritter_scores.dimensions is empty" };
-  for (let i = 0; i < parsed.ritter_scores.dimensions.length; i++) {
-    const d = parsed.ritter_scores.dimensions[i];
-    if (!d.id || !d.label || d.score === undefined || d.max_score === undefined)
-      return { valid: false, message: `Dimension #${i + 1} missing required fields` };
+
+  const analysis = parsed.analysis;
+  if (analysis) {
+    if (!analysis.ticker) return { valid: false, message: "Missing: analysis.ticker" };
+    if (!analysis.composite_score) return { valid: false, message: "Missing: analysis.composite_score" };
+    if (!analysis.key_criteria || !Array.isArray(analysis.key_criteria))
+      return { valid: false, message: "Missing: analysis.key_criteria" };
+    return {
+      valid: true, message: "Valid Ritter IPO JSON",
+      ticker: analysis.ticker, company: analysis.company || "",
+      composite: analysis.composite_score.score,
+      dimensionCount: analysis.key_criteria.length,
+    };
   }
+
+  // Legacy
+  if (!parsed.ticker) return { valid: false, message: "Missing: ticker" };
+  if (!parsed.ritter_scores?.dimensions?.length)
+    return { valid: false, message: "Missing: ritter_scores.dimensions" };
   return {
-    valid: true,
-    message: "Valid Ritter IPO JSON",
-    ticker: parsed.ticker,
-    company: parsed.company_name || "",
+    valid: true, message: "Valid Ritter IPO JSON (legacy)",
+    ticker: parsed.ticker, company: parsed.company_name || "",
     composite: parsed.ritter_scores.composite_score,
     dimensionCount: parsed.ritter_scores.dimensions.length,
   };
