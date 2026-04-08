@@ -165,6 +165,10 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
 
   const companyName = selectedTicker?.ticker ?? "the selected company";
 
+  // Determine if deal is upcoming or listed based on pricing_date
+  const isUpcoming = !selectedTicker?.pricing_date ||
+    new Date(selectedTicker.pricing_date) > new Date();
+
   return (
     <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 4 }, mb: 4, mt: 2 }}>
       <Card
@@ -299,11 +303,12 @@ const AIFewshotAnalysis: React.FC<AIFewshotAnalysisProps> = ({ prefillTicker }) 
             </CardContent>
           </Card>
 
-          {/* 🔥 PASS ALL 3 VALUES */}
+          {/* 🔥 PASS ALL VALUES */}
           <AiAnalysis
             ticker={selectedTicker?.ticker ?? null}
             pricingDate={selectedTicker?.pricing_date ?? null}
             uniqueDealId={selectedTicker?.unique_deal_id ?? null}
+            isUpcoming={isUpcoming}
           />
         </CardContent>
       </Card>

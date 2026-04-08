@@ -184,6 +184,12 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
         } else {
           setBlocks(parsedBlocks);
           setSocialMediaBlocks(parsedSocialMediaBlocks);
+          // Auto-activate the appropriate tab based on available data
+          if (parsedSocialMediaBlocks.length > 0) {
+            setActiveTab(0);
+          } else if (parsedBlocks.length > 0) {
+            setActiveTab(1);
+          }
         }
       } catch (err: any) {
         if (!cancelled) {

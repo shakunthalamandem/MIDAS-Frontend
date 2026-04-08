@@ -80,9 +80,10 @@ function formatDate(isoString: string | null): string {
 interface Props {
   ticker: string;
   onSignalLoaded?: (data: TradingSignalData | null) => void;
+  isUpcoming?: boolean;
 }
 
-const TradingSignalCard: React.FC<Props> = ({ ticker, onSignalLoaded }) => {
+const TradingSignalCard: React.FC<Props> = ({ ticker, onSignalLoaded, isUpcoming = false }) => {
   const [signal, setSignal] = useState<TradingSignalData | null>(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -104,10 +105,11 @@ const TradingSignalCard: React.FC<Props> = ({ ticker, onSignalLoaded }) => {
       setLoading(true);
       setError(null);
 
+      const operation = isUpcoming ? "upcoming" : "listed";
       const res = await fetch(`${apiUrl}/api/get_trading_signal/`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ ticker }),
+        body: JSON.stringify({ ticker, operation }),
       });
 
       if (res.status === 404) {
@@ -128,7 +130,7 @@ const TradingSignalCard: React.FC<Props> = ({ ticker, onSignalLoaded }) => {
     } finally {
       setLoading(false);
     }
-  }, [ticker, apiUrl]);
+  }, [ticker, apiUrl, isUpcoming]);
 
   useEffect(() => {
     fetchSignal();
@@ -141,10 +143,11 @@ const TradingSignalCard: React.FC<Props> = ({ ticker, onSignalLoaded }) => {
       setGenerating(true);
       setError(null);
 
+      const operation = isUpcoming ? "upcoming" : "listed";
       const res = await fetch(`${apiUrl}/api/generate_trading_signal/`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ ticker }),
+        body: JSON.stringify({ ticker, operation }),
       });
 
       if (!res.ok) {

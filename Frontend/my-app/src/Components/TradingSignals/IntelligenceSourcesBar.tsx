@@ -213,24 +213,6 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
               >
                 {source.label}
               </Typography>
-
-              {/* Weight badge */}
-              <Box
-                sx={{
-                  mt: 0.25, px: 1, py: 0.2, borderRadius: 1,
-                  bgcolor: weight > 0 ? "#EEF2FF" : "#F1F5F9",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: 11, fontWeight: 800,
-                    color: weight > 20 ? "#4338CA" : weight > 0 ? "#6366F1" : "#94A3B8",
-                    textAlign: "center", lineHeight: 1.3,
-                  }}
-                >
-                  {weight}% weight
-                </Typography>
-              </Box>
             </MotionBox>
           );
         })}
