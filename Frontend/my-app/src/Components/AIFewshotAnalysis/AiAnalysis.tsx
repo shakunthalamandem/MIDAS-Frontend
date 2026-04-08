@@ -23,6 +23,7 @@ type AiAnalysisProps = {
   ticker: string | null;
   pricingDate?: string | null;
   uniqueDealId?: string | null;
+  isUpcoming?: boolean;
 };
 
 type AiAnalysisRecord = {
