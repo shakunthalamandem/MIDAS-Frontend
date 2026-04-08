@@ -259,7 +259,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
                         onClick={() => handleSort('trade_date')}
                       >
-                        Trade Date
+                       First Trade Date
                       </TableSortLabel>
                     </TableCell>
 
@@ -313,7 +313,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
                         onClick={() => handleSort('trade_date')}
                       >
-                        Trade Date
+                       First Trade Date
                       </TableSortLabel>
                     </TableCell>
                   </>
