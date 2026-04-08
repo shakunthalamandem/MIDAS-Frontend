@@ -124,8 +124,7 @@ const JUploadPage: React.FC = () => {
               Upload Scorecard JSON
             </Typography>
             <Typography sx={{ color: "rgba(255,255,255,0.65)", fontSize: "0.8rem", mt: 1, fontWeight: 400 }}>
-              Paste your Claude-generated Gator IPO scorecard below to save it to the database
-            </Typography>
+Academic IPO analysis applying Jay Ritter's research framework. Analyzes pricing, underpricing, and long-term performance of US IPOs.            </Typography>
           </Box>
         </Box>
       </Box>
