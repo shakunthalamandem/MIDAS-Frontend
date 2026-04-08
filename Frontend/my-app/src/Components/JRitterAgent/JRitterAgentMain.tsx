@@ -330,12 +330,11 @@ const JRitterAgentMain: React.FC = () => {
             <Table size="small" sx={{ tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: 44 }} />
-                <col style={{ width: 90 }} />
-                <col style={{ width: 160 }} />
-                <col style={{ width: 180 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 190 }} />
+                <col style={{ width: 200 }} />
                 <col style={{ width: 70 }} />
-                <col style={{ width: 80 }} />
-                <col style={{ width: 220 }} />
+                <col style={{ width: 90 }} />
                 <col />
               </colgroup>
               <TableHead>
@@ -363,13 +362,12 @@ const JRitterAgentMain: React.FC = () => {
                       Verdict
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle}>Action Summary</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} sx={{ textAlign: "center", py: 10 }}>
+                    <TableCell colSpan={7} sx={{ textAlign: "center", py: 10 }}>
                       <Typography sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
                         {enriched.length === 0 ? 'No scorecards yet. Go to Upload JSON to start.' : "No results match your filter."}
                       </Typography>
@@ -437,16 +435,11 @@ const JRitterAgentMain: React.FC = () => {
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
-                          <Typography sx={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.5, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-                            {verdictLabel} — Score {rec.composite}/{rec.compositeMax}
-                          </Typography>
-                        </TableCell>
                       </TableRow>
 
                       {/* ── Expanded Detail ── */}
                       <TableRow sx={{ bgcolor: "#f8fafc" }}>
-                        <TableCell colSpan={8} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
+                        <TableCell colSpan={7} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
                           <Collapse in={isOpen} timeout={300}>
                             <ExpandedDetail record={rec} />
                           </Collapse>
@@ -467,100 +460,55 @@ const JRitterAgentMain: React.FC = () => {
 /* ═══ Expanded Detail ═══ */
 const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
   const n = record.normalized || normalizeJson(record.json_data);
-  const vc = getVerdictConfig(n.verdict);
-  const km = n.key_metrics;
-
-  const formatPrice = (v?: any) => v != null ? (String(v).startsWith("$") ? v : `$${v}`) : "—";
 
   return (
-    <Box sx={{ px: 3, py: 3, bgcolor: "#f8fafc" }}>
+    <Box sx={{ px: 3, py: 3, bgcolor: "#f5f7fa" }}>
       {/* Header card */}
       <Box sx={{
-        mb: 2.5, p: 2.5, bgcolor: "#fff", borderRadius: 3,
-        border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        mb: 2, px: 2.5, py: 1.8, bgcolor: "#fff", borderRadius: 2.5,
+        border: "1px solid #e8ecf0", boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
+        display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap",
       }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2, flexWrap: "wrap" }}>
-          <Typography sx={{ fontSize: "1.1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.5 }}>
-            {n.ticker}
-          </Typography>
-          <Typography sx={{ fontSize: "0.9rem", color: "#334155", fontWeight: 600 }}>
-            {n.company_name}
-          </Typography>
-          {n.sector && (
-            <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8", px: 1.5, py: 0.3, bgcolor: "#f1f5f9", borderRadius: 1.5 }}>
-              {n.sector}
-            </Typography>
-          )}
-          {n.days_since_ipo > 0 && (
-            <Typography sx={{ fontSize: "0.73rem", color: "#94A3B8" }}>
-              {n.days_since_ipo}d since IPO
-            </Typography>
-          )}
-          <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
-            {n.composite_grade && (
-              <Chip label={`Grade ${n.composite_grade}`} size="small" sx={{ fontSize: "0.73rem", fontWeight: 900, height: 28, bgcolor: getScoreBg(n.composite_score), color: getScoreColor(n.composite_score) }} />
-            )}
-            <Chip
-              label={n.verdict.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
-              size="small"
-              sx={{ fontSize: "0.73rem", fontWeight: 800, height: 28, px: 0.5, bgcolor: vc.bg, color: vc.color, border: `1.5px solid ${vc.color}60` }}
-            />
+        <Typography sx={{ fontSize: "1rem", fontWeight: 900, color: "#0891b2", letterSpacing: 0.4 }}>
+          {n.ticker}
+        </Typography>
+        <Typography sx={{ fontSize: "0.88rem", color: "#334155", fontWeight: 600 }}>
+          {n.company_name}
+        </Typography>
+        {n.sector && (
+          <Box sx={{ px: 1.2, py: 0.25, bgcolor: "#f1f5f9", borderRadius: 1.5, border: "1px solid #e2e8f0" }}>
+            <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 500 }}>{n.sector}</Typography>
           </Box>
-        </Box>
-
-        {/* Composite summary */}
-        {n.composite_summary && (
-          <Typography sx={{ fontSize: "0.78rem", color: "#475569", lineHeight: 1.6, mb: 2, fontStyle: "italic", bgcolor: "#f8fafc", p: 1.5, borderRadius: 2, border: "1px solid #e2e8f0" }}>
-            {n.composite_summary}
+        )}
+        {n.days_since_ipo > 0 && (
+          <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+            {n.days_since_ipo}d since IPO
           </Typography>
         )}
-
-        {/* Stat cards row */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 1.5 }}>
-          {n.ipo_data.offer_price != null && <StatCard label="Offer Price" value={formatPrice(n.ipo_data.offer_price)} />}
-          {km.market_cap_approx_usd && <StatCard label="Market Cap" value={km.market_cap_approx_usd} />}
-          {km.market_cap_b != null && <StatCard label="Market Cap" value={`$${km.market_cap_b}B`} />}
-          {(n.ipo_data.first_day_return_pct ?? km.day1_return_pct) != null && (() => {
-            const v = n.ipo_data.first_day_return_pct ?? km.day1_return_pct;
-            return <StatCard label="First-Day Pop" value={`${v > 0 ? "+" : ""}${v}%`} color={v >= 10 ? "#059669" : v >= 0 ? "#D97706" : "#DC2626"} bgColor={v >= 10 ? "#F0FDF4" : v >= 0 ? "#FFFBEB" : "#FEF2F2"} />;
-          })()}
-          <StatCard label="Composite Score" value={`${n.composite_score}/${n.composite_max}`} color={getScoreColor(n.composite_score)} bgColor={getScoreBg(n.composite_score)} />
-          {(km.current_price ?? km.current_price_apr7_2026) != null && <StatCard label="Current Price" value={formatPrice(km.current_price ?? km.current_price_apr7_2026)} />}
-          {(km.return_vs_ipo_pct ?? km.current_return_vs_ipo_pct) != null && (() => {
-            const v = km.return_vs_ipo_pct ?? km.current_return_vs_ipo_pct;
-            return <StatCard label="Return vs IPO" value={`${v > 0 ? "+" : ""}${v}%`} color={v >= 0 ? "#059669" : "#DC2626"} bgColor={v >= 0 ? "#F0FDF4" : "#FEF2F2"} />;
-          })()}
-          {km.gross_proceeds_usd && <StatCard label="Gross Proceeds" value={km.gross_proceeds_usd} />}
-          {km.price_to_sales_multiple && <StatCard label="P/S Multiple" value={km.price_to_sales_multiple} />}
-        </Box>
+        {n.composite_grade && (
+          <Box sx={{ ml: "auto" }}>
+            <Chip
+              label={`Grade ${n.composite_grade}`}
+              size="small"
+              sx={{
+                fontSize: "0.72rem", fontWeight: 900, height: 26,
+                bgcolor: getScoreBg(n.composite_score),
+                color: getScoreColor(n.composite_score),
+                border: `1.5px solid ${getScoreColor(n.composite_score)}40`,
+              }}
+            />
+          </Box>
+        )}
       </Box>
 
-      {/* Full scorecard with tabs */}
-      <Box sx={{ bgcolor: "#fff", borderRadius: 3, border: "1px solid #e2e8f0", p: 2.5, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+      {/* Scorecard */}
+      <Box sx={{ bgcolor: "#fff", borderRadius: 2.5, border: "1px solid #e8ecf0", p: 2.5, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
         <ScorecardView normalized={n} />
       </Box>
     </Box>
   );
 };
 
-/* ═══ StatCard ═══ */
-const StatCard: React.FC<{ label: string; value: React.ReactNode; color?: string; bgColor?: string }> = ({
-  label, value, color = "#1E293B", bgColor = "#F8FAFC",
-}) => (
-  <Box sx={{
-    p: 1.5, bgcolor: bgColor, borderRadius: 2.5,
-    border: "1px solid #E2E8F0",
-    borderTop: `3px solid ${color}`,
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-  }}>
-    <Typography sx={{ fontSize: "0.58rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 1, mb: 0.4, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-      {label}
-    </Typography>
-    <Typography sx={{ fontSize: "0.95rem", fontWeight: 800, color, fontFamily: "'Inter', 'Roboto', sans-serif" }}>
-      {value}
-    </Typography>
-  </Box>
-);
 
 /* ═══ Table styles ═══ */
 const thStyle = {
