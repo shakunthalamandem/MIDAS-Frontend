@@ -120,6 +120,7 @@ import DataDump from "../Components/DataDump/DataDump";
 import JRitterAgentMain from "../Components/JRitterAgent/JRitterAgentMain";
 import JUploadPage from "../Components/JRitterAgent/JUploadPage";
 import DatabaseExplorer from "../Components/DatabaseExplorer/DatabaseExplorer";
+import CIOPortfolioReviewWizard from "../Components/CIOPortfolioReview/CIOPortfolioReviewWizard";
 
 
 const AppRouters: React.FC = () => {
@@ -359,7 +360,6 @@ const AppRouters: React.FC = () => {
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
         <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
-        <Route path="/db_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
 
 
 

@@ -9,9 +9,11 @@ import {
   MenuItem,
   Chip,
   OutlinedInput,
+  Tooltip,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   DataGrid,
   GridColDef,
@@ -246,11 +248,33 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       },
       {
         field: "market_value",
-        headerName: "Market Value",
+        headerName: "Net Market Value",
         flex: 1,
         minWidth: 130,
         headerAlign: "right",
         align: "right",
+        renderHeader: () => (
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>NMV (Net Market Value)</Box>
+                <Box>Σ Price × Quantity × Multiplier</Box>
+                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses premium price for options</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 600 }}>Net Market Value</span>
+              <InfoOutlinedIcon
+                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Box>
+          </Tooltip>
+        ),
         valueGetter: (value: number, row: TickerItem) =>
           showPct ? row.market_value_pct : value,
         renderCell: ({ row }) =>
@@ -265,6 +289,29 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         minWidth: 120,
         headerAlign: "right",
         align: "right",
+        renderHeader: () => (
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
+                <Box>Total Long Exposure + Total Short Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier)</Box>
+                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses underlying price for options</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 600 }}>Net Exp</span>
+              <InfoOutlinedIcon
+                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Box>
+          </Tooltip>
+        ),
         valueGetter: (value: number, row: TickerItem) =>
           showPct ? row.net_exp_pct : value,
         renderCell: ({ row }) =>
@@ -277,6 +324,27 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         minWidth: 120,
         headerAlign: "right",
         align: "right",
+        renderHeader: () => (
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier × Delta)</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 600 }}>Delta Adj Net</span>
+              <InfoOutlinedIcon
+                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Box>
+          </Tooltip>
+        ),
         valueGetter: (value: number, row: TickerItem) =>
           showPct ? row.delta_adj_net_pct : value,
         renderCell: ({ row }) =>
@@ -291,6 +359,27 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         minWidth: 120,
         headerAlign: "right",
         align: "right",
+        renderHeader: () => (
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier × Delta × Beta)</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 600 }}>Beta Adj Net</span>
+              <InfoOutlinedIcon
+                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Box>
+          </Tooltip>
+        ),
         valueGetter: (value: number, row: TickerItem) =>
           showPct ? row.beta_adj_net_pct : value,
         renderCell: ({ row }) =>
