@@ -139,9 +139,9 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
   if (error) {
     return (
       <DashboardStateCard
-        variant="missing-field"
-        title="Error Loading Gator Signal"
-        message={error}
+        variant="no-data"
+        title="Data Not Available"
+        message="Data is not available for this ticker. Will update soon."
         context={[{ label: "Ticker", value: ticker }]}
       />
     );
