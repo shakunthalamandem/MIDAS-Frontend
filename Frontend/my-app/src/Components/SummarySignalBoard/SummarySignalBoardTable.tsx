@@ -78,8 +78,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       }
 
       if (sortColumn === 'gator_signal') {
-        aValue = a.jay_ritter?.overall_signal || '';
-        bValue = b.jay_ritter?.overall_signal || '';
+        aValue = a.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
+        bValue = b.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
       }
 
       if (typeof aValue === 'string') aValue = aValue.toLowerCase();
@@ -299,7 +299,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
                       >
-                        Gator Signal
+                        Jay Ritter Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -357,7 +357,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
                       >
-                        Gator Signal
+                        Jay Ritter Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -393,20 +393,31 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Sentiment Agent Column */}
                       <TableCell>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
-                          >
-                            Score:{' '}
-                            {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
-                              ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                              : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
-                              ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                              : typeof deal.sentiment?.sentiment_summary === 'object' &&
-                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
-                              ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                              : 'N/A'}
-                          </Typography>
+                          {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                            deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                            (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                            (typeof deal.sentiment?.sentiment_summary === 'object' &&
+                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null)) && (
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
+                            >
+                              Score:{' '}
+                              {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment?.socialmedia_retail_sentiment_score !== null
+                                ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                  deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                : typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                : null}
+                            </Typography>
+                          )}
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment) && (
                               <Chip
@@ -435,6 +446,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 sx={{ width: 'fit-content', fontWeight: 600 }}
                               />
                             )}
+                          {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
+                            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                              Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
+                            </Typography>
+                          )}
                         </Box>
                       </TableCell>
 
@@ -507,24 +523,29 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         )}
                       </TableCell>
 
-                      {/* Gator Signal Column */}
+                      {/* Jay Ritter Signal Column */}
                       <TableCell>
-                        {deal.jay_ritter?.overall_signal ? (
+                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Chip
-                              label={deal.jay_ritter.overall_signal}
-                              size="small"
-                              color={
-                                deal.jay_ritter.overall_signal.toLowerCase() === 'long'
-                                  ? 'success'
-                                  : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                    ? 'error'
-                                    : 'warning'
-                              }
-                              sx={{ fontWeight: 700, width: 'fit-content' }}
-                            />
+                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                              <Chip
+                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
+                                size="small"
+                                color={
+                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
+                                    ? 'success'
+                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
+                                      ? 'error'
+                                      : 'warning'
+                                }
+                                sx={{ fontWeight: 700 }}
+                              />
+                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
+                              </Typography>
+                            </Box>
                             <Typography variant="caption" color="textSecondary">
-                              {deal.jay_ritter.confidence_score}% confidence
+                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
                             </Typography>
                           </Box>
                         ) : (
@@ -564,7 +585,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       </TableCell>
                       {selectedCard === 'recent' && (
                         <TableCell>
-                          <Typography sx={{ fontSize: '0.85rem', color: theme.palette.text.secondary }}>
+                          <Typography sx={{ fontSize: '0.85rem', color: '#000' }}>
                             {deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}
                           </Typography>
                         </TableCell>
@@ -573,40 +594,55 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       {/* Sentiment Agent Column */}
                       <TableCell>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          <Box
-                            sx={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              padding: '6px 12px',
-                              borderRadius: '8px',
-                              backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                              width: 'fit-content',
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#667eea' }}
+                          {((selectedCard === 'recent' &&
+                            ((deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                              (deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment?.socialmedia_retail_sentiment_score !== null))) ||
+                            (selectedCard !== 'recent' &&
+                              ((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                                (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                  deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null)))) && (
+                            <Box
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                padding: '6px 12px',
+                                borderRadius: '8px',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                width: 'fit-content',
+                              }}
                             >
-                              Score:
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{ fontWeight: 700, fontSize: '0.85rem' }}
-                            >
-                              {selectedCard === 'recent'
-                                ? deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
-                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                  : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#667eea' }}
+                              >
+                                Score:
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 700, fontSize: '0.85rem' }}
+                              >
+                                {selectedCard === 'recent'
+                                  ? deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                    ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                    : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                      deal.sentiment?.socialmedia_retail_sentiment_score !== null
+                                    ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                    : null
+                                  : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment?.socialmedia_retail_sentiment_score !== null
                                   ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                                  : 'N/A'
-                                : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined
-                                ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined
-                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : 'N/A'}
-                            </Typography>
-                          </Box>
+                                  : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : null}
+                              </Typography>
+                            </Box>
+                          )}
                           {(deal.sentiment?.one_week_sentiment ||
                             deal.sentiment_summary?.one_week_sentiment ||
                             (selectedCard === 'recent' && deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment)) && (
@@ -649,6 +685,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 N/A
                               </Typography>
                             )}
+                          {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
+                            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                              Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
+                            </Typography>
+                          )}
                         </Box>
                       </TableCell>
 
@@ -721,24 +762,29 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         )}
                       </TableCell>
 
-                      {/* Gator Signal Column */}
+                      {/* Jay Ritter Signal Column */}
                       <TableCell>
-                        {deal.jay_ritter?.overall_signal ? (
+                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Chip
-                              label={deal.jay_ritter.overall_signal}
-                              size="small"
-                              color={
-                                deal.jay_ritter.overall_signal.toLowerCase() === 'long'
-                                  ? 'success'
-                                  : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                    ? 'error'
-                                    : 'warning'
-                              }
-                              sx={{ fontWeight: 700, width: 'fit-content' }}
-                            />
+                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                              <Chip
+                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
+                                size="small"
+                                color={
+                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
+                                    ? 'success'
+                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
+                                      ? 'error'
+                                      : 'warning'
+                                }
+                                sx={{ fontWeight: 700 }}
+                              />
+                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
+                              </Typography>
+                            </Box>
                             <Typography variant="caption" color="textSecondary">
-                              {deal.jay_ritter.confidence_score}% confidence
+                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
                             </Typography>
                           </Box>
                         ) : (
