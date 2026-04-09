@@ -23,7 +23,7 @@ const RISK_CARDS_INFO: Record<string, RiskCardInfo> = {
   },
   gross_market_value: {
     definition: "Gross Market Value = Sum of absolute position exposures (long + short), showing total portfolio size without netting.",
-    formula: "Gross Market Value = Σ | Position Exposure |",
+    formula: "Gross Market Value = Σ | Market Value |",
   },
   delta_adj_net_mv: {
     definition: "Measures the net exposure of the portfolio to equity movements after adjusting positions by their delta.",
