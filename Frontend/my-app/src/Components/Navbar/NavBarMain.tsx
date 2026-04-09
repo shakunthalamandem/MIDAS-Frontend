@@ -355,6 +355,30 @@ const NavbarMain: React.FC = () => {
                 Beta
               </span>
             </Button>
+            <Button
+              onClick={() => {
+                setSelectedTab("DB Explorer");
+                localStorage.setItem("selectedTab", "DB Explorer");
+                navigate("/db_explorer");
+              }}
+              sx={{
+                color: "#005166",
+                fontWeight: "bold",
+                fontSize: "0.725rem",
+                mx: 1,
+                borderBottom:
+                  selectedTab === "DB Explorer"
+                    ? "3px solid #005166"
+                    : "3px solid transparent",
+                borderRadius: 0,
+                "&:hover": {
+                  borderBottom: "3px solid #005166",
+                  backgroundColor: "transparent",
+                },
+              }}
+            >
+              DB Explorer
+            </Button>
 
             {/*
             <DropdownTab
