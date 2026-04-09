@@ -16,7 +16,7 @@ import KeyIcon from "@mui/icons-material/Key";
 const API_URL = process.env.REACT_APP_API_URL;
 
 const getHeaders = () => {
-  const token = localStorage.getItem("access");
+  const token = localStorage.getItem("access_token");
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -50,7 +50,7 @@ const ColumnStatsPanel: React.FC<ColumnStatsPanelProps> = ({ table, column, onCl
       setLoading(true);
       try {
         const res = await fetch(
-          `${API_URL}/api/db_explorer/stats/?table=${table}&column=${column}`,
+          `${API_URL}/api/db_explorer_stats/?table=${table}&column=${column}`,
           { headers: getHeaders() }
         );
         if (res.ok) {

@@ -45,7 +45,7 @@ import ColumnStatsPanel from "./ColumnStatsPanel";
 const API_URL = process.env.REACT_APP_API_URL;
 
 const getHeaders = () => {
-  const token = localStorage.getItem("access");
+  const token = localStorage.getItem("access_token");
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -132,7 +132,7 @@ const DatabaseExplorer: React.FC = () => {
   const fetchTables = useCallback(async () => {
     setTablesLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/db_explorer/tables/`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/api/db_explorer_tables/`, { headers: getHeaders() });
       if (res.ok) {
         const data = await res.json();
         setTables(data);
@@ -153,7 +153,7 @@ const DatabaseExplorer: React.FC = () => {
     if (!table) return;
     setColumnsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/db_explorer/columns/?table=${table}`, { headers: getHeaders() });
+      const res = await fetch(`${API_URL}/api/db_explorer_columns/?table=${table}`, { headers: getHeaders() });
       if (res.ok) {
         const data = await res.json();
         setColumns(data.columns || []);
@@ -195,7 +195,7 @@ const DatabaseExplorer: React.FC = () => {
         body.sort_by = sortModel[0].field;
         body.sort_dir = sortModel[0].sort?.toUpperCase() || "ASC";
       }
-      const res = await fetch(`${API_URL}/api/db_explorer/query/`, {
+      const res = await fetch(`${API_URL}/api/db_explorer_query/`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(body),
@@ -227,7 +227,7 @@ const DatabaseExplorer: React.FC = () => {
         body.sort_by = sortModel[0].field;
         body.sort_dir = sortModel[0].sort?.toUpperCase() || "ASC";
       }
-      const res = await fetch(`${API_URL}/api/db_explorer/export/`, {
+      const res = await fetch(`${API_URL}/api/db_explorer_export/`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(body),
