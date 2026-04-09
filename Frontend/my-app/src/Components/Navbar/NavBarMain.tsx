@@ -275,12 +275,12 @@ const NavbarMain: React.FC = () => {
                   path: "/equity/ai_ml_results",
                   icon: <InsightsIcon fontSize="small" />,
                 },
-                {
-                  label: "Signal Board",
-                  // path: "/signals/board",
-                  path:"/summary_signal_board",
-                  icon: <AutoAwesomeIcon fontSize="small" />,
-                },
+                // {
+                //   label: "Signal Board",
+                //   // path: "/signals/board",
+                //   path:"/summary_signal_board",
+                //   icon: <AutoAwesomeIcon fontSize="small" />,
+                // },
                 // {
                 //   label: "US Portfolio Summary",
                 //   path: "/portfolio_summary",
