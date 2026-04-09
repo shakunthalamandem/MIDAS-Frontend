@@ -360,6 +360,8 @@ const AppRouters: React.FC = () => {
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
         <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
+        <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
+        <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 
 
 
