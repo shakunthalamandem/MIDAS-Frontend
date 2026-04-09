@@ -214,27 +214,27 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         align: "center",
         sortComparator: pinOtherComparator(numericCompare),
         renderHeader: () => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <span style={{ fontWeight: 700 }}>Net Exp</span>
-            <Tooltip
-              placement="top"
-              arrow
-              title={
-                <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                  <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
-                  <Box>Total Long Exposure + Total Short Exposure</Box>
-                  <Box>Σ (Price × Quantity × Multiplier)</Box>
-                  <Box sx={{ mt: 0.5, color: "#5f6875" }}>Uses underlying price for options</Box>
-                </Box>
-              }
-              slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
-            >
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
+                <Box>Total Long Exposure + Total Short Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier)</Box>
+                <Box sx={{ mt: 0.5, color: "#5f6875" }}>Uses underlying price for options</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 700 }}>Net Exp</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", cursor: "pointer", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
                 onClick={(e) => e.stopPropagation()}
               />
-            </Tooltip>
-          </Box>
+            </Box>
+          </Tooltip>
         ),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.net_exp_pct : value,
@@ -253,25 +253,25 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         align: "center",
         sortComparator: pinOtherComparator(numericCompare),
         renderHeader: () => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <span style={{ fontWeight: 700 }}>Delta Adj Net</span>
-            <Tooltip
-              placement="top"
-              arrow
-              title={
-                <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                  <Box sx={{ fontWeight: 700, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
-                  <Box>Σ (Price × Quantity × Multiplier × Delta)</Box>
-                </Box>
-              }
-              slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
-            >
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier × Delta)</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 700 }}>Delta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", cursor: "pointer", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
                 onClick={(e) => e.stopPropagation()}
               />
-            </Tooltip>
-          </Box>
+            </Box>
+          </Tooltip>
         ),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.delta_adj_net_pct : value,
@@ -290,25 +290,25 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         align: "center",
         sortComparator: pinOtherComparator(numericCompare),
         renderHeader: () => (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <span style={{ fontWeight: 700 }}>Beta Adj Net</span>
-            <Tooltip
-              placement="top"
-              arrow
-              title={
-                <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                  <Box sx={{ fontWeight: 700, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
-                  <Box>Σ (Price × Quantity × Multiplier × Delta × Beta)</Box>
-                </Box>
-              }
-              slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
-            >
+          <Tooltip
+            placement="top"
+            arrow
+            title={
+              <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
+                <Box>Σ (Price × Quantity × Multiplier × Delta × Beta)</Box>
+              </Box>
+            }
+            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
+              <span style={{ fontWeight: 700 }}>Beta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", cursor: "pointer", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
                 onClick={(e) => e.stopPropagation()}
               />
-            </Tooltip>
-          </Box>
+            </Box>
+          </Tooltip>
         ),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.beta_adj_net_pct : value,
