@@ -212,7 +212,7 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
                     mb: 1,
                   }}
                 >
-                  Composite Score (Ritter Framework)
+                  Gator Composite Score
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 2 }}>
                   <Typography
@@ -531,7 +531,7 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
               mb: 2,
             }}
           >
-            Ritter Framework - Key Criteria Breakdown
+            Gator Framework - Key Criteria Breakdown
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {analysis.key_criteria.map((criteria) => (
@@ -679,7 +679,7 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
                 mb: 1,
               }}
             >
-              Ritter Framework Caveat
+              Gator Framework 
             </Typography>
             <Typography
               variant="body2"
