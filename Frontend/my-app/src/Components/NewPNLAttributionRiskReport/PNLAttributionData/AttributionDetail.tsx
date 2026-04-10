@@ -525,8 +525,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     // Sort
     list.sort((a, b) => {
       switch (exitedSort) {
-        case "ytd_desc": return Math.abs(b.ytd_pnl) - Math.abs(a.ytd_pnl);
-        case "ytd_asc": return Math.abs(a.ytd_pnl) - Math.abs(b.ytd_pnl);
+        case "ytd_desc": return b.ytd_pnl - a.ytd_pnl;
+        case "ytd_asc": return a.ytd_pnl - b.ytd_pnl;
         case "ticker_asc": return a.ticker.localeCompare(b.ticker);
         case "ticker_desc": return b.ticker.localeCompare(a.ticker);
         default: return 0;
@@ -730,10 +730,11 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           ) : (
             <Box
               sx={{
-                maxHeight: 280,
+                maxHeight: 260,
                 overflowY: "auto",
-                p: 1.5,
-                bgcolor: "#f8fafc",
+                px: 1,
+                py: 0.8,
+                bgcolor: "#fafbfc",
                 ...scrollbarSx,
               }}
             >
@@ -741,86 +742,68 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 sx={{
                   display: "grid",
                   gridTemplateColumns: {
-                    xs: "1fr 1fr",
-                    sm: "1fr 1fr 1fr",
-                    md: "1fr 1fr 1fr 1fr 1fr 1fr",
+                    xs: "1fr 1fr 1fr",
+                    sm: "1fr 1fr 1fr 1fr 1fr",
+                    md: "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
                   },
-                  gap: 1,
+                  gap: "6px",
                 }}
               >
                 {processedClosedTickers.map((deal) => {
                   const isPositive = deal.ytd_pnl > 0;
                   const isNegative = deal.ytd_pnl < 0;
-                  // Badge colors
-                  const badgeBg = isPositive
-                    ? "linear-gradient(135deg, #dcfce7, #bbf7d0)"
-                    : isNegative
-                    ? "linear-gradient(135deg, #fee2e2, #fecaca)"
-                    : "linear-gradient(135deg, #f1f5f9, #e2e8f0)";
-                  const badgeColor = isPositive
-                    ? "#15803d"
-                    : isNegative
-                    ? "#dc2626"
-                    : "#64748b";
-                  const borderColor = isPositive
-                    ? "#bbf7d0"
-                    : isNegative
-                    ? "#fecaca"
-                    : "#e2e8f0";
+                  const badgeBg = isPositive ? "#dcfce7" : isNegative ? "#fee2e2" : "#f1f5f9";
+                  const badgeColor = isPositive ? "#15803d" : isNegative ? "#dc2626" : "#64748b";
+                  const cardBorder = isPositive ? "#d1fae5" : isNegative ? "#fecaca" : "#e5e7eb";
 
                   return (
                     <Box
                       key={deal.ticker}
                       sx={{
-                        border: `1px solid ${borderColor}`,
-                        borderRadius: "8px",
-                        p: 1,
+                        border: `1px solid ${cardBorder}`,
+                        borderRadius: "6px",
+                        px: 1,
+                        py: 0.6,
                         bgcolor: "#fff",
-                        transition: "all 0.15s ease",
-                        cursor: "default",
-                        "&:hover": {
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                          transform: "translateY(-1px)",
-                        },
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                        transition: "box-shadow 0.12s",
+                        "&:hover": { boxShadow: "0 1px 6px rgba(0,0,0,0.07)" },
                       }}
                     >
-                      {/* Ticker Name */}
                       <Typography
                         sx={{
-                          fontSize: "13px",
+                          fontSize: "12px",
                           fontWeight: 700,
                           fontFamily: FONT,
                           color: "#1e293b",
                           textTransform: "uppercase",
-                          mb: 0.5,
-                          lineHeight: 1.2,
+                          lineHeight: 1,
                         }}
                       >
                         {deal.ticker}
                       </Typography>
-                      {/* P&L Badge */}
                       <Box
                         sx={{
                           display: "inline-flex",
-                          alignItems: "center",
-                          px: 1,
-                          py: 0.3,
-                          borderRadius: "12px",
-                          background: badgeBg,
-                          border: `1px solid ${borderColor}`,
+                          alignSelf: "flex-start",
+                          px: 0.8,
+                          py: "1px",
+                          borderRadius: "10px",
+                          bgcolor: badgeBg,
                         }}
                       >
                         <Typography
                           sx={{
-                            fontSize: "12px",
+                            fontSize: "11px",
                             fontWeight: 700,
                             fontFamily: FONT,
                             color: badgeColor,
+                            lineHeight: 1.4,
                           }}
                         >
-                          {showPct
-                            ? formatPctVal(deal.ytd_pnl_pct)
-                            : formatCurrency(deal.ytd_pnl)}
+                          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
                         </Typography>
                       </Box>
                     </Box>
