@@ -7,6 +7,11 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -29,9 +34,11 @@ import SendIcon from "@mui/icons-material/Send";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import CheckIcon from "@mui/icons-material/Check";
 import ReactMarkdown from "react-markdown";
 import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
-import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory } from "./agentService";
+import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, saveAgentFinalPrompt } from "./agentService";
 
 const POLL_INTERVAL_MS = 10_000;
 
@@ -57,6 +64,14 @@ const AgentOutputView: React.FC = () => {
   const [useWebSearch, setUseWebSearch] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Prompt save state
+  const [hasUnsavedPromptChanges, setHasUnsavedPromptChanges] = useState(false);
+  const [promptSaving, setPromptSaving] = useState(false);
+  const [promptSaved, setPromptSaved] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [agentData, setAgentData] = useState<{ id: number; prompt?: string; final_prompt?: string } | null>(null);
+
   const loadOutput = useCallback(async () => {
     try {
       let data: AgentOutput | null = null;
@@ -79,6 +94,7 @@ const AgentOutputView: React.FC = () => {
         .then((a) => {
           setAgentWebSearch(a.use_web_search ?? false);
           setUseWebSearch(a.use_web_search ?? false);
+          setAgentData({ id: a.id, prompt: a.prompt, final_prompt: a.final_prompt });
         })
         .catch(() => {});
     }
@@ -117,6 +133,8 @@ const AgentOutputView: React.FC = () => {
     setChatInput("");
     setChatLoading(true);
     setChatError(null);
+    setHasUnsavedPromptChanges(true);
+    setPromptSaved(false);
 
     try {
       const response = await chatWithOutput(output.id, userMsg.content, history, useWebSearch);
@@ -133,6 +151,67 @@ const AgentOutputView: React.FC = () => {
       e.preventDefault();
       handleChatSend();
     }
+  };
+
+  // Save final prompt handler — sends original + follow-ups to backend,
+  // which uses Claude to intelligently refine them into one clean prompt
+  const handleSavePrompt = async () => {
+    const targetId = agentData?.id || (agentId ? Number(agentId) : null);
+    if (!targetId) return;
+
+    const originalPrompt = agentData?.prompt || output?.agent_prompt || "";
+    const userFollowUps = chatMessages
+      .filter((m) => m.role === "user")
+      .map((m) => m.content)
+      .filter((c) => c.trim().length > 0);
+
+    if (!originalPrompt || userFollowUps.length === 0) return;
+
+    setPromptSaving(true);
+    try {
+      const result = await saveAgentFinalPrompt(targetId, originalPrompt, userFollowUps);
+      const refined = result.refined_prompt || result.final_prompt || "";
+      setHasUnsavedPromptChanges(false);
+      setPromptSaved(true);
+      setAgentData((prev) => prev ? { ...prev, final_prompt: refined } : prev);
+      setTimeout(() => setPromptSaved(false), 3000);
+    } catch {
+      setChatError("Failed to save prompt. Please try again.");
+    } finally {
+      setPromptSaving(false);
+    }
+  };
+
+  // beforeunload guard for unsaved changes
+  useEffect(() => {
+    if (!hasUnsavedPromptChanges) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasUnsavedPromptChanges]);
+
+  // Navigation guard
+  const handleNavigateBack = (path: string) => {
+    if (hasUnsavedPromptChanges) {
+      setPendingNavigation(path);
+      setShowExitDialog(true);
+    } else {
+      navigate(path);
+    }
+  };
+
+  const handleExitWithoutSaving = () => {
+    setShowExitDialog(false);
+    setHasUnsavedPromptChanges(false);
+    if (pendingNavigation) navigate(pendingNavigation);
+  };
+
+  const handleSaveAndExit = async () => {
+    await handleSavePrompt();
+    setShowExitDialog(false);
+    if (pendingNavigation) navigate(pendingNavigation);
   };
 
   const statusConfig: Record<
@@ -194,7 +273,7 @@ const AgentOutputView: React.FC = () => {
           <Alert severity="error" sx={{ borderRadius: 3, mb: 2 }}>{error}</Alert>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/agents/dashboard")}
+            onClick={() => handleNavigateBack("/agents/dashboard")}
             sx={{ textTransform: "none", fontWeight: 600 }}
           >
             Back to Agents
@@ -234,7 +313,7 @@ const AgentOutputView: React.FC = () => {
           </Typography>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/agents/dashboard")}
+            onClick={() => handleNavigateBack("/agents/dashboard")}
             sx={{ textTransform: "none", fontWeight: 600, color: "#4f46e5" }}
           >
             Back to Agents
@@ -246,6 +325,7 @@ const AgentOutputView: React.FC = () => {
 
   const statusInfo = statusConfig[output.status] || statusConfig.pending;
   const resultJson = output.result_json;
+  // Always show the original prompt the user initially asked
   const agentPrompt = output.agent_prompt || output.agent_description || "";
 
   return (
@@ -269,7 +349,7 @@ const AgentOutputView: React.FC = () => {
             <Stack direction="row" alignItems="center" spacing={2}>
               <Button
                 startIcon={<ArrowBackIcon />}
-                onClick={() => navigate("/agents/dashboard")}
+                onClick={() => handleNavigateBack("/agents/dashboard")}
                 sx={{
                   textTransform: "none",
                   color: "#1e293b",
@@ -742,37 +822,73 @@ const AgentOutputView: React.FC = () => {
 
               {/* Web Search Toggle */}
               <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={useWebSearch}
-                      onChange={(e) => setUseWebSearch(e.target.checked)}
-                      sx={{
-                        color: "#94a3b8",
-                        "&.Mui-checked": { color: "#059669" },
-                        p: 0.5,
-                      }}
-                    />
-                  }
-                  label={
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <TravelExploreIcon
-                        sx={{ fontSize: 16, color: useWebSearch ? "#059669" : "#94a3b8" }}
-                      />
-                      <Typography
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={useWebSearch}
+                        onChange={(e) => setUseWebSearch(e.target.checked)}
                         sx={{
-                          fontSize: "0.75rem",
-                          color: useWebSearch ? "#059669" : "#94a3b8",
-                          fontWeight: 600,
+                          color: "#94a3b8",
+                          "&.Mui-checked": { color: "#059669" },
+                          p: 0.5,
                         }}
-                      >
-                        Web Search
-                      </Typography>
-                    </Stack>
-                  }
-                  sx={{ ml: 0, mr: 0 }}
-                />
+                      />
+                    }
+                    label={
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <TravelExploreIcon
+                          sx={{ fontSize: 16, color: useWebSearch ? "#059669" : "#94a3b8" }}
+                        />
+                        <Typography
+                          sx={{
+                            fontSize: "0.75rem",
+                            color: useWebSearch ? "#059669" : "#94a3b8",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Web Search
+                        </Typography>
+                      </Stack>
+                    }
+                    sx={{ ml: 0, mr: 0 }}
+                  />
+                  <Button
+                    size="small"
+                    onClick={handleSavePrompt}
+                    disabled={!hasUnsavedPromptChanges || promptSaving}
+                    startIcon={
+                      promptSaving ? (
+                        <CircularProgress size={12} sx={{ color: "#4f46e5" }} />
+                      ) : promptSaved ? (
+                        <CheckIcon sx={{ fontSize: 14 }} />
+                      ) : (
+                        <SaveOutlinedIcon sx={{ fontSize: 14 }} />
+                      )
+                    }
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "0.75rem",
+                      borderRadius: 2,
+                      px: 1.5,
+                      py: 0.3,
+                      color: promptSaved ? "#059669" : hasUnsavedPromptChanges ? "#4f46e5" : "#94a3b8",
+                      bgcolor: promptSaved ? "#ecfdf5" : hasUnsavedPromptChanges ? "#eef2ff" : "transparent",
+                      border: `1px solid ${promptSaved ? "#a7f3d0" : hasUnsavedPromptChanges ? "#c7d2fe" : "#e2e8f0"}`,
+                      "&:hover": {
+                        bgcolor: promptSaved ? "#ecfdf5" : "#e0e7ff",
+                      },
+                      "&.Mui-disabled": {
+                        color: "#94a3b8",
+                        borderColor: "#e2e8f0",
+                      },
+                    }}
+                  >
+                    {promptSaving ? "Saving..." : promptSaved ? "Prompt Saved" : "Save Prompt"}
+                  </Button>
+                </Stack>
                 <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
                   Press Enter to send, Shift+Enter for new line
                 </Typography>
@@ -819,6 +935,59 @@ const AgentOutputView: React.FC = () => {
           )}
         </Box>
       </Box>
+
+      {/* Exit Confirmation Dialog */}
+      <Dialog
+        open={showExitDialog}
+        onClose={() => setShowExitDialog(false)}
+        PaperProps={{
+          sx: { borderRadius: 3, border: "1px solid #c7d2fe", maxWidth: 420 },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: "1rem", color: "#111827" }}>
+          Unsaved Prompt Changes
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontSize: "0.88rem", color: "#475569" }}>
+            You have follow-up prompts that haven't been saved. Do you want to save
+            the combined prompt before leaving?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+          <Button
+            onClick={handleExitWithoutSaving}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#64748b",
+              borderRadius: 2,
+            }}
+          >
+            Leave Without Saving
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveAndExit}
+            disabled={promptSaving}
+            startIcon={
+              promptSaving ? (
+                <CircularProgress size={14} sx={{ color: "#fff" }} />
+              ) : (
+                <SaveOutlinedIcon sx={{ fontSize: 16 }} />
+              )
+            }
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              borderRadius: 2,
+              bgcolor: "#4f46e5",
+              "&:hover": { bgcolor: "#4338ca" },
+            }}
+          >
+            Save & Leave
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

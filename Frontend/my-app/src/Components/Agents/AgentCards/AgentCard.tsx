@@ -305,6 +305,45 @@ const AgentCard: React.FC<AgentCardProps> = ({
           {AGENT_DISPLAY_DESCRIPTIONS[agent.name] ?? agent.description}
         </Typography>
 
+        {/* Prompt preview for user-created agents */}
+        {isUserCreated && (agent.final_prompt || agent.prompt) && (
+          <Box
+            sx={{
+              bgcolor: "#f8fafc",
+              borderRadius: 2,
+              border: "1px solid #e2e8f0",
+              px: 1.5,
+              py: 1,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "0.65rem",
+                fontWeight: 700,
+                color: "#4f46e5",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                mb: 0.3,
+              }}
+            >
+              Prompt
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.75rem",
+                color: "#475569",
+                lineHeight: 1.5,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {agent.final_prompt || agent.prompt}
+            </Typography>
+          </Box>
+        )}
+
         {/* Working notice */}
         {isUserCreated && (isWorking || hasNoOutput) && (
           <Box

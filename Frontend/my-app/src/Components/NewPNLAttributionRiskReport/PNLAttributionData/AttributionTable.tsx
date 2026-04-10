@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { Box, Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   DataGrid,
   GridColDef,
@@ -16,10 +18,12 @@ interface TabTheme {
   headerBg: string;
   evenRow: string;
   hoverRow: string;
+  selectedRow?: string;
   pnlColor: string;
   expColor: string;
   toolbarBg: string;
   exportBg: string;
+  activeTab?: string;
 }
 
 interface AttributionTableProps {
@@ -117,6 +121,22 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         sortComparator: pinOtherComparator(
           groupBy === "holding_period" ? holdingPeriodCompare : stringCompare
         ),
+        renderCell: ({ row }) => {
+          const isExpanded = expandedRow === row.name;
+          const isOther = row.name?.toUpperCase() === "OTHER";
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%" }}>
+              {!isOther && (
+                isExpanded
+                  ? <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "inherit", flexShrink: 0 }} />
+                  : <KeyboardArrowRightIcon sx={{ fontSize: 18, color: "#94a3b8", flexShrink: 0 }} />
+              )}
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {row.name}
+              </span>
+            </Box>
+          );
+        },
       },
       {
         field: "dtd_pnl",
@@ -181,17 +201,17 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5 }}>NMV (Net Market Value)</Box>
-                <Box>Σ Price × Quantity × PT Value</Box>
-                <Box sx={{ mt: 0.5, color: "#5f6875" }}>Uses premium price for options</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>NMV (Net Market Value)</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ Price × Quantity × PT Value</Box>
+                <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses premium price for options</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 700 }}>Net Market Value</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -206,7 +226,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "net_exp",
-        headerName: "Net Exp",
+        headerName: "Notional Exp",
         flex: 1,
         minWidth: 130,
         cellClassName: "attr-datagrid-cell--exposure",
@@ -222,15 +242,15 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
                 <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
-                <Box sx={{ mt: 0.5, color: "#5f6875" }}>Uses underlying price for options</Box>
+                <Box sx={{ mt: 0.5, color: "#ff8902" }}>Uses underlying price for options</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Net Exp</span>
+              <span style={{ fontWeight: 700 }}>Notional Exp</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -258,16 +278,16 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × PT Value × Delta)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Delta Adjusted Net Exposure</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value × Delta)</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 700 }}>Delta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -295,16 +315,16 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × PT Value × Delta × Beta)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Beta Adjusted Net Exposure</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value × Delta × Beta)</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 700 }}>Beta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#5f6875", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -326,6 +346,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       <DataGrid
         rows={rows}
         columns={columns}
+        autoHeight
         density="compact"
         rowHeight={42}
         disableRowSelectionOnClick
@@ -340,6 +361,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           if (name?.toUpperCase() === "OTHER") return;
           onRowClick(name);
         }}
+        sortingOrder={["asc", "desc"]}
         initialState={{
           sorting: {
             sortModel: [
@@ -391,8 +413,13 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             cursor: selectedFunds && selectedDate && onRowClick ? "pointer" : "default",
           },
           "& .MuiDataGrid-row.attr-row--expanded": {
-            backgroundColor: `${theme.hoverRow} !important`,
+            backgroundColor: `${theme.selectedRow ?? theme.hoverRow} !important`,
             fontWeight: 700,
+            boxShadow: `inset 5px 0 0 ${theme.activeTab ?? "#1565c0"}`,
+          },
+          "& .MuiDataGrid-row.attr-row--expanded .attr-datagrid-cell--name": {
+            color: theme.activeTab ?? "#1565c0",
+            fontWeight: 800,
           },
           "& .MuiDataGrid-row:hover": {
             backgroundColor: `${theme.hoverRow} !important`,

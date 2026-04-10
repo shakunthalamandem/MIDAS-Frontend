@@ -40,7 +40,7 @@ function useDebounce<T>(value: T, delay = 300) {
 }
 
 type ApiResponse = {
-  tickers: TickerOption[];
+  tickers: ApiTickerData[];
   default_ticker?: string;
   total_deal_colour_yes?: number;
   total_deal_colour_no?: number;
@@ -50,6 +50,22 @@ type TickerOption = {
   ticker: string;
   pricing_date: string;
   deal_colour_present: "Yes" | "No" | string;
+  uniquedealid?: string;
+};
+
+type ApiTickerData = {
+  ticker: string;
+  pricing_date: string;
+  deal_colour_present: "Yes" | "No" | string;
+  unique_deal_id?: string;
+  deal_captain?: string | null;
+  deal_type?: string;
+  region?: string;
+  issuer_name?: string;
+  deal_id?: string;
+  exchange?: string | null;
+  flag_for_writeup?: string | null;
+  allocation_as_percentage_of_deal_size?: string | null;
 };
 
 
@@ -87,9 +103,16 @@ const EquityNewDealFormMain: React.FC = () => {
       const tickers = response.data.tickers || [];
 
       const uniqueMap = new Map<string, TickerOption>();
-      for (const t of tickers) {
+      for (const t of tickers as ApiTickerData[]) {
         const key = `${t.ticker}||${t.pricing_date}`;
-        if (!uniqueMap.has(key)) uniqueMap.set(key, t);
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, {
+            ticker: t.ticker,
+            pricing_date: t.pricing_date,
+            deal_colour_present: t.deal_colour_present,
+            uniquedealid: t.unique_deal_id,
+          });
+        }
       }
       const uniqueTickers = Array.from(uniqueMap.values());
 
@@ -105,7 +128,7 @@ const EquityNewDealFormMain: React.FC = () => {
           );
           if (!defaultDeal)
             defaultDeal = uniqueTickers.find((t) => t.ticker === "CTRI");
-          if (defaultDeal) setSelectedOption({ ...defaultDeal, create: false });
+          if (defaultDeal) setSelectedOption({ ticker: defaultDeal.ticker, pricing_date: defaultDeal.pricing_date, deal_colour_present: defaultDeal.deal_colour_present, uniquedealid: defaultDeal.uniquedealid, create: false });
         }
       }
     } catch (err) {
@@ -134,6 +157,7 @@ const EquityNewDealFormMain: React.FC = () => {
             ticker: selectedOption.ticker,
             pricing_date: selectedOption.pricing_date,
             deal_colour_present: selectedOption.deal_colour_present ?? "No",
+            uniquedealid: selectedOption.uniquedealid,
           },
           ...prev,
         ]);

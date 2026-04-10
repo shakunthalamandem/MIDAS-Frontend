@@ -397,8 +397,16 @@ const RiskTriggers: React.FC = () => {
   })();
 
   const inputSx = {
-    "& .MuiOutlinedInput-root": { borderRadius: "8px", backgroundColor: "#f8fafc", "& fieldset": { borderColor: "#e2e8f0" }, "&:hover fieldset": { borderColor: "#94a3b8" }, "&.Mui-focused fieldset": { borderColor: "#002060" } },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "8px",
+      backgroundColor: "#f8fafc",
+      "& fieldset": { borderColor: "#e2e8f0" },
+      "&:hover fieldset": { borderColor: "#818cf8" },
+      "&.Mui-focused": { backgroundColor: "#f0f4ff" },
+      "&.Mui-focused fieldset": { borderColor: "#6366f1", borderWidth: "2px" },
+    },
     "& .MuiInputBase-input": { color: "#1e293b", fontSize: 13 },
+    "& .MuiInputBase-input:focus": { color: "#3730a3" },
   };
 
   const renderTrendIcon = (status: Status) => (
@@ -685,6 +693,10 @@ const RiskTriggers: React.FC = () => {
               const [, section] = liquidityEntry;
               const cfg = SECTION_CONFIG["liquidity"];
               const titleParts = section.title.split(": Guideline ");
+              const activeLiqDays = getActiveGuidelines().liquidity_days;
+              const displayTitle = activeLiqDays !== undefined
+                ? titleParts[0].replace(/\d+(\.\d+)?%/, `${activeLiqDays}%`)
+                : titleParts[0];
               const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
               const rows = section.data || [];
               const needle = liqSearch.trim().toUpperCase();
@@ -695,7 +707,7 @@ const RiskTriggers: React.FC = () => {
                   <Box className="trig-panel-head">
                     <Box className="trig-panel-head-left">
                       <Box className="trig-panel-icon trig-panel-icon--green">&#9900;</Box>
-                      <Typography className="trig-panel-title">{titleParts[0]}</Typography>
+                      <Typography className="trig-panel-title">{displayTitle}</Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       {guidelineDisplay && <span className="trig-panel-badge trig-panel-badge--green">Guideline {guidelineDisplay}</span>}

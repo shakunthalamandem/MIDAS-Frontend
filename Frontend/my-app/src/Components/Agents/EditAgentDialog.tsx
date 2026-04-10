@@ -64,7 +64,8 @@ const EditAgentDialog: React.FC<EditAgentDialogProps> = ({
     if (agent) {
       setName(agent.name);
       setDescription(agent.description);
-      setPrompt(agent.prompt || "");
+      // Show the refined prompt if available, otherwise the original
+      setPrompt(agent.final_prompt?.trim() ? agent.final_prompt : agent.prompt || "");
       setScheduleType(agent.schedule_type);
       setUseWebSearch(agent.use_web_search ?? false);
       setError(null);
@@ -109,10 +110,12 @@ const EditAgentDialog: React.FC<EditAgentDialogProps> = ({
     setSuccess(null);
 
     try {
-      const payload: Partial<CreateAgentPayload> & { use_web_search?: boolean } = {
+      const payload: Partial<CreateAgentPayload> & { use_web_search?: boolean; final_prompt?: string } = {
         name: name.trim(),
         description: description.trim(),
         prompt: prompt.trim(),
+        // Save the same value as final_prompt so the agent uses whatever user sees in this field
+        final_prompt: prompt.trim(),
         schedule_type: scheduleType,
         schedule_value: buildScheduleValue(),
         use_web_search: useWebSearch,
@@ -247,6 +250,7 @@ const EditAgentDialog: React.FC<EditAgentDialogProps> = ({
             rows={4}
             sx={inputSx}
           />
+
 
           <FormControl fullWidth sx={inputSx}>
             <InputLabel>Schedule Type</InputLabel>
