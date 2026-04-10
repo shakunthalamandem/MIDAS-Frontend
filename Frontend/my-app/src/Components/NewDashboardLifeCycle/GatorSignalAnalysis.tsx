@@ -8,49 +8,69 @@ import {
   Card,
   CardContent,
   Grid,
+  Collapse,
+  IconButton,
+  Alert,
 } from "@mui/material";
 import DashboardStateCard from "./DashboardStateCard";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 
 type GatorSignalAnalysisProps = {
   ticker: string;
 };
 
-interface ScoringBreakdown {
-  vc_backing: number;
-  tier1_underwriter: number;
-  dual_class_penalty: number;
-  firm_age_above_10yr: number;
-  profitability_at_ipo: number;
-  upward_price_revision: number;
-  pre_ipo_revenue_above_100m: number;
+interface KeyCriteria {
+  id: number;
+  max: number;
+  name: string;
+  score: number;
+  rating: string;
+  signal: string;
+  finding: string;
+  ritter_reference: string;
 }
 
-interface TierClassification {
-  tier: number;
-  reasoning: string;
-  weighted_score: number;
-  book_assignment: string;
-  scoring_breakdown: ScoringBreakdown;
-  tier1_criteria_met: boolean;
-  sector_allocation_bucket: string;
+interface CompositeScore {
+  max: number;
+  grade: string;
+  score: number;
+  summary: string;
+}
+
+interface Analysis {
+  sector: string;
+  ticker: string;
+  company: string;
+  concerns: string[];
+  exchange: string;
+  ipo_date: string;
+  strengths: string[];
+  disclaimer: string;
+  methodology: string;
+  key_criteria: KeyCriteria[];
+  scored_as_of: string;
+  final_verdict: string;
+  ritter_caveat: string;
+  days_since_ipo: number;
+  composite_score: CompositeScore;
 }
 
 interface GatorSignalResponse {
-  overall_signal: string;
-  days_held: number;
-  confidence_score: number;
-  recommendation: string;
-  tier_classification: TierClassification;
-  last_run: string;
+  ticker: string;
+  company_name: string;
+  json_data: {
+    analysis: Analysis;
+  };
+  updated_at: string;
+  created_at: string;
 }
 
 const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => {
   const [signal, setSignal] = useState<GatorSignalResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedCriteria, setExpandedCriteria] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,7 +81,7 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
 
       try {
         const token = localStorage.getItem("access_token");
-        const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:8000";
+        const apiUrl = process.env.REACT_APP_API_URL ;
 
         const response = await fetch(`${apiUrl}/api/summary_signal_board/`, {
           method: "POST",
@@ -119,9 +139,9 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
   if (error) {
     return (
       <DashboardStateCard
-        variant="missing-field"
-        title="Error Loading Gator Signal"
-        message={error}
+        variant="no-data"
+        title="Data Not Available"
+        message="Data is not available for this ticker. Will update soon."
         context={[{ label: "Ticker", value: ticker }]}
       />
     );
@@ -138,16 +158,19 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
     );
   }
 
-  const getSignalColor = (
-    signalValue: string
-  ): "success" | "error" | "warning" => {
-    const normalized = signalValue.toLowerCase();
-    if (normalized === "long") return "success";
-    if (normalized === "short") return "error";
+  const getGradeColor = (grade: string): "success" | "error" | "warning" => {
+    if (grade === "A" || grade === "B") return "success";
+    if (grade === "F" || grade === "D") return "error";
     return "warning";
   };
 
-  const formatLastRun = (dateString: string): string => {
+  const getRatingColor = (rating: string): "success" | "error" | "warning" => {
+    if (rating === "strong" || rating === "good") return "success";
+    if (rating === "concern" || rating === "weak") return "error";
+    return "warning";
+  };
+
+  const formatDate = (dateString: string): string => {
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -156,23 +179,244 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
     }
   };
 
+  const toggleCriteria = (id: number) => {
+    setExpandedCriteria(expandedCriteria === id ? null : id);
+  };
+
+  const analysis = signal.json_data.analysis;
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      {/* Metrics Cards Row */}
+      {/* Composite Score Card */}
+      <Card
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          backgroundColor: "#fef3c7",
+          borderLeft: "4px solid #f59e0b",
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={6}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#000",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 1,
+                  }}
+                >
+                  Gator Composite Score
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "baseline", gap: 2 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      color: "#000",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {analysis.composite_score.score}
+                  </Typography>
+                  <Chip
+                    label={`Grade: ${analysis.composite_score.grade}`}
+                    color={getGradeColor(analysis.composite_score.grade)}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#374151",
+                  lineHeight: 1.6,
+                  fontSize: "0.9rem",
+                }}
+              >
+                {analysis.composite_score.summary}
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Final Verdict */}
+      <Alert severity="info" sx={{ borderRadius: 2 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            fontWeight: 700,
+            mb: 1,
+            color: "#1e40af",
+          }}
+        >
+          Final Verdict
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "#374151",
+            lineHeight: 1.6,
+          }}
+        >
+          {analysis.final_verdict}
+        </Typography>
+      </Alert>
+
+      {/* Header Card */}
+      <Card
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          backgroundColor: "#f8fafc",
+          borderLeft: "4px solid #3b82f6",
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  Company
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: "#000",
+                    fontWeight: 700,
+                  }}
+                >
+                  {signal.company_name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#666",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {analysis.sector}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  Exchange
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#000",
+                    fontWeight: 600,
+                  }}
+                >
+                  {analysis.exchange}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  IPO Date
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#000",
+                    fontWeight: 600,
+                  }}
+                >
+                  {formatDate(analysis.ipo_date)}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#666",
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    display: "block",
+                    mb: 0.5,
+                  }}
+                >
+                  Days Since IPO
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#000",
+                    fontWeight: 600,
+                  }}
+                >
+                  {analysis.days_since_ipo} days
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Strengths and Concerns */}
       <Grid container spacing={2}>
-        {/* Signal Card */}
-        <Grid item xs={12} sm={6} md={4}>
+        {/* Strengths */}
+        <Grid item xs={12} md={6}>
           <Card
             sx={{
               borderRadius: 2,
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-              transition: "transform 0.2s, boxShadow 0.2s",
-              backgroundColor: "#fffbeb",
-              borderLeft: "4px solid #f59e0b",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: "0 8px 16px rgba(0, 0, 0, 0.12)",
-              },
+              backgroundColor: "#ecfdf5",
+              borderLeft: "4px solid #10b981",
+              height: "100%",
             }}
           >
             <CardContent sx={{ p: 2 }}>
@@ -184,38 +428,94 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
                   fontSize: "0.75rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
+                  display: "block",
+                  mb: 1.5,
                 }}
               >
-                Signal
+                Strengths
               </Typography>
-              <Box sx={{ mt: 1 }}>
-                <Chip
-                  label={signal.overall_signal}
-                  color={getSignalColor(signal.overall_signal)}
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "0.9rem",
-                  }}
-                />
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {analysis.strengths.map((strength, idx) => (
+                  <Typography
+                    key={idx}
+                    variant="body2"
+                    sx={{
+                      color: "#374151",
+                      fontSize: "0.85rem",
+                      lineHeight: 1.5,
+                      "&:before": {
+                        content: '"• "',
+                        marginRight: "0.5rem",
+                        color: "#10b981",
+                        fontWeight: 700,
+                      },
+                    }}
+                  >
+                    {strength}
+                  </Typography>
+                ))}
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
+        {/* Concerns */}
+        <Grid item xs={12} md={6}>
+          <Card
+            sx={{
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+              backgroundColor: "#fef2f2",
+              borderLeft: "4px solid #ef4444",
+              height: "100%",
+            }}
+          >
+            <CardContent sx={{ p: 2 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: "#000",
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  display: "block",
+                  mb: 1.5,
+                }}
+              >
+                Concerns
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {analysis.concerns.map((concern, idx) => (
+                  <Typography
+                    key={idx}
+                    variant="body2"
+                    sx={{
+                      color: "#374151",
+                      fontSize: "0.85rem",
+                      lineHeight: 1.5,
+                      "&:before": {
+                        content: '"⚠ "',
+                        marginRight: "0.5rem",
+                        color: "#ef4444",
+                        fontWeight: 700,
+                      },
+                    }}
+                  >
+                    {concern}
+                  </Typography>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
-      {/* Tier Classification Card */}
+      {/* Key Criteria Breakdown */}
       <Card
         sx={{
           borderRadius: 2,
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-          transition: "transform 0.2s, boxShadow 0.2s",
-          backgroundColor: "#f5f3ff",
-          borderLeft: "4px solid #8b5cf6",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.12)",
-          },
         }}
       >
         <CardContent sx={{ p: 3 }}>
@@ -231,162 +531,114 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
               mb: 2,
             }}
           >
-            Tier Classification
+            Gator Framework - Key Criteria Breakdown
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Tier and Reasoning */}
-            <Box>
-              <Typography
-                variant="caption"
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {analysis.key_criteria.map((criteria) => (
+              <Box
+                key={criteria.id}
                 sx={{
-                  fontWeight: 600,
-                  color: "#666",
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  display: "block",
-                  mb: 0.5,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 1,
+                  overflow: "hidden",
                 }}
               >
-                Tier
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#000",
-                  fontWeight: 700,
-                  fontSize: "1.1rem",
-                }}
-              >
-                Tier {signal.tier_classification.tier}
-              </Typography>
-            </Box>
-
-            {/* Reasoning */}
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 600,
-                  color: "#666",
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  display: "block",
-                  mb: 0.5,
-                }}
-              >
-                Reasoning
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#374151",
-                  lineHeight: 1.6,
-                  fontSize: "0.9rem",
-                }}
-              >
-                {signal.tier_classification.reasoning}
-              </Typography>
-            </Box>
-
-            {/* Weighted Score */}
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 600,
-                  color: "#666",
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  display: "block",
-                  mb: 0.5,
-                }}
-              >
-                Weighted Score
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#000",
-                  fontWeight: 600,
-                  fontSize: "0.95rem",
-                }}
-              >
-                {signal.tier_classification.weighted_score.toFixed(2)}
-              </Typography>
-            </Box>
-
-            {/* Book Assignment and Sector Allocation */}
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-              <Box>
-                <Typography
-                  variant="caption"
+                <Box
                   sx={{
-                    fontWeight: 600,
-                    color: "#666",
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    display: "block",
-                    mb: 0.5,
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    backgroundColor: "#f9fafb",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#f3f4f6",
+                    },
                   }}
+                  onClick={() => toggleCriteria(criteria.id)}
                 >
-                  Book Assignment
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {signal.tier_classification.book_assignment}
-                </Typography>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        color: "#000",
+                      }}
+                    >
+                      {criteria.id}. {criteria.name}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Chip
+                      label={`${criteria.score}/${criteria.max}`}
+                      color={getRatingColor(criteria.rating)}
+                      variant="outlined"
+                      sx={{ fontSize: "0.75rem" }}
+                    />
+                    <IconButton
+                      size="small"
+                      sx={{
+                        transform:
+                          expandedCriteria === criteria.id
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
+                        transition: "transform 0.3s",
+                      }}
+                    >
+                      <ExpandMoreIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Collapse in={expandedCriteria === criteria.id}>
+                  <Box sx={{ p: 2, backgroundColor: "#ffffff", borderTop: "1px solid #e5e7eb" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#374151",
+                        lineHeight: 1.6,
+                        mb: 1.5,
+                      }}
+                    >
+                      {criteria.finding}
+                    </Typography>
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        backgroundColor: "#f0f9ff",
+                        borderLeft: "3px solid #0284c7",
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "#0c4a6e",
+                          fontStyle: "italic",
+                          fontSize: "0.8rem",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <strong>Reference:</strong> {criteria.ritter_reference}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Collapse>
               </Box>
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 600,
-                    color: "#666",
-                    fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    display: "block",
-                    mb: 0.5,
-                  }}
-                >
-                  Sector Bucket
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "#374151",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {signal.tier_classification.sector_allocation_bucket}
-                </Typography>
-              </Box>
-            </Box>
+            ))}
           </Box>
         </CardContent>
       </Card>
 
-      {/* Recommendation and Last Run Section */}
+      {/* Ritter Caveat and Updated Date */}
       <Paper
         sx={{
           p: 3,
           borderRadius: 2,
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fafafa",
           border: "1px solid #e5e7eb",
-          borderLeft: "4px solid #3b82f6",
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {/* Recommendation */}
           <Box>
             <Typography
               variant="caption"
@@ -400,21 +652,47 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
                 mb: 1,
               }}
             >
-              Recommendation
+              Methodology Note
             </Typography>
             <Typography
               variant="body2"
               sx={{
                 color: "#374151",
-                lineHeight: 1.7,
-                fontSize: "0.9rem",
+                lineHeight: 1.6,
+                fontSize: "0.85rem",
               }}
             >
-              {signal.recommendation}
+              {analysis.disclaimer}
             </Typography>
           </Box>
 
-          {/* Last Run */}
+          <Box>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: "#000",
+                fontSize: "0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                display: "block",
+                mb: 1,
+              }}
+            >
+              Gator Framework 
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#374151",
+                lineHeight: 1.6,
+                fontSize: "0.85rem",
+              }}
+            >
+              {analysis.ritter_caveat}
+            </Typography>
+          </Box>
+
           <Box
             sx={{
               display: "flex",
@@ -433,7 +711,7 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
                 fontSize: "0.8rem",
               }}
             >
-              Last run {formatLastRun(signal.last_run)}
+              Updated {formatDate(signal.updated_at)}
             </Typography>
           </Box>
         </Box>

@@ -119,6 +119,8 @@ import S3DataTransfer from "../Components/S3DataTransfer/S3DataTransfer";
 import DataDump from "../Components/DataDump/DataDump";
 import JRitterAgentMain from "../Components/JRitterAgent/JRitterAgentMain";
 import JUploadPage from "../Components/JRitterAgent/JUploadPage";
+import DatabaseExplorer from "../Components/DatabaseExplorer/DatabaseExplorer";
+import CIOPortfolioReviewWizard from "../Components/CIOPortfolioReview/CIOPortfolioReviewWizard";
 
 
 const AppRouters: React.FC = () => {
@@ -358,6 +360,8 @@ const AppRouters: React.FC = () => {
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
         <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
+        <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
+        <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 
 
 

@@ -42,8 +42,13 @@ interface ErrorPopupProps {
 }
 
 const ErrorPopup: React.FC<ErrorPopupProps> = ({ message, onClose }) => {
+  const handleOkay = () => {
+    onClose();
+    window.location.href = '/';
+  };
+
   return (
-    <Dialog open={true} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={true} onClose={handleOkay} maxWidth="sm" fullWidth>
       <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold', color: '#d32f2f' }}>
         No Data Available
       </DialogTitle>
@@ -51,7 +56,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({ message, onClose }) => {
         {message}
       </DialogContent>
       <DialogActions style={{ justifyContent: 'center' }}>
-        <Button variant="contained" color="primary" onClick={onClose}>
+        <Button variant="contained" color="primary" onClick={handleOkay}>
           Okay
         </Button>
       </DialogActions>

@@ -78,8 +78,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       }
 
       if (sortColumn === 'gator_signal') {
-        aValue = a.jay_ritter?.overall_signal || '';
-        bValue = b.jay_ritter?.overall_signal || '';
+        aValue = a.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
+        bValue = b.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
       }
 
       if (typeof aValue === 'string') aValue = aValue.toLowerCase();
@@ -299,7 +299,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
                       >
-                        Gator Signal
+                        Jay Ritter Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -357,7 +357,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                         onClick={() => handleSort('gator_signal')}
                       >
-                        Gator Signal
+                        Jay Ritter Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -523,30 +523,30 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         )}
                       </TableCell>
 
-                      {/* Gator Signal Column */}
+                      {/* Jay Ritter Signal Column */}
                       <TableCell>
-                        {deal.jay_ritter?.overall_signal ? (
+                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Chip
-                              label={deal.jay_ritter.overall_signal}
-                              size="small"
-                              color={
-                                deal.jay_ritter.overall_signal.toLowerCase() === 'long'
-                                  ? 'success'
-                                  : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                    ? 'error'
-                                    : 'warning'
-                              }
-                              sx={{ fontWeight: 700, width: 'fit-content' }}
-                            />
-                            <Typography variant="caption" color="textSecondary">
-                              {deal.jay_ritter.confidence_score}% confidence
-                            </Typography>
-                            {deal.jay_ritter?.last_run && (
-                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                Last run: {new Date(deal.jay_ritter.last_run).toLocaleDateString()}
+                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                              <Chip
+                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
+                                size="small"
+                                color={
+                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
+                                    ? 'success'
+                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
+                                      ? 'error'
+                                      : 'warning'
+                                }
+                                sx={{ fontWeight: 700 }}
+                              />
+                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
                               </Typography>
-                            )}
+                            </Box>
+                            <Typography variant="caption" color="textSecondary">
+                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
+                            </Typography>
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
@@ -762,30 +762,30 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         )}
                       </TableCell>
 
-                      {/* Gator Signal Column */}
+                      {/* Jay Ritter Signal Column */}
                       <TableCell>
-                        {deal.jay_ritter?.overall_signal ? (
+                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Chip
-                              label={deal.jay_ritter.overall_signal}
-                              size="small"
-                              color={
-                                deal.jay_ritter.overall_signal.toLowerCase() === 'long'
-                                  ? 'success'
-                                  : deal.jay_ritter.overall_signal.toLowerCase() === 'short'
-                                    ? 'error'
-                                    : 'warning'
-                              }
-                              sx={{ fontWeight: 700, width: 'fit-content' }}
-                            />
-                            <Typography variant="caption" color="textSecondary">
-                              {deal.jay_ritter.confidence_score}% confidence
-                            </Typography>
-                            {deal.jay_ritter?.last_run && (
-                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                Last run: {new Date(deal.jay_ritter.last_run).toLocaleDateString()}
+                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                              <Chip
+                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
+                                size="small"
+                                color={
+                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
+                                    ? 'success'
+                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
+                                      ? 'error'
+                                      : 'warning'
+                                }
+                                sx={{ fontWeight: 700 }}
+                              />
+                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
+                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
                               </Typography>
-                            )}
+                            </Box>
+                            <Typography variant="caption" color="textSecondary">
+                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
+                            </Typography>
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
