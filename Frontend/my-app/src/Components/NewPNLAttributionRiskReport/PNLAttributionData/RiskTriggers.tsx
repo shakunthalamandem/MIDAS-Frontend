@@ -397,8 +397,16 @@ const RiskTriggers: React.FC = () => {
   })();
 
   const inputSx = {
-    "& .MuiOutlinedInput-root": { borderRadius: "8px", backgroundColor: "#f8fafc", "& fieldset": { borderColor: "#e2e8f0" }, "&:hover fieldset": { borderColor: "#94a3b8" }, "&.Mui-focused fieldset": { borderColor: "#002060" } },
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "8px",
+      backgroundColor: "#f8fafc",
+      "& fieldset": { borderColor: "#e2e8f0" },
+      "&:hover fieldset": { borderColor: "#818cf8" },
+      "&.Mui-focused": { backgroundColor: "#f0f4ff" },
+      "&.Mui-focused fieldset": { borderColor: "#6366f1", borderWidth: "2px" },
+    },
     "& .MuiInputBase-input": { color: "#1e293b", fontSize: 13 },
+    "& .MuiInputBase-input:focus": { color: "#3730a3" },
   };
 
   const renderTrendIcon = (status: Status) => (
