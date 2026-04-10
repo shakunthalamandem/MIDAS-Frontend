@@ -191,10 +191,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     return opts;
   }, [tickerData, subFilterKeys]);
 
-  /* Apply filters client-side, keep TOTAL pinned at bottom */
+  /* Apply filters client-side; separate TOTAL and TRADED/EXITED to pin at bottom */
   const filteredData = useMemo(() => {
-    const nonTotal = tickerData.filter((item) => item.ticker !== "TOTAL");
-    return nonTotal.filter((item) => {
+    return tickerData.filter((item) => {
+      if (item.ticker === "TOTAL" || item.ticker === "TRADED / EXITED") return false;
       return Object.entries(activeFilters).every(([key, selectedValues]) => {
         if (selectedValues.length === 0) return true;
         const itemValue = String(item[key as keyof TickerItem] ?? "");
@@ -202,6 +202,11 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       });
     });
   }, [tickerData, activeFilters]);
+
+  const exitedRow = useMemo(
+    () => tickerData.find((item) => item.ticker === "TRADED / EXITED") ?? null,
+    [tickerData]
+  );
 
   const totalRow = useMemo(
     () => tickerData.find((item) => item.ticker === "TOTAL") ?? null,
@@ -222,11 +227,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       });
     }
     const dataRows = sorted.map((item, idx) => ({ id: idx, ...item }));
+    // Pin TRADED/EXITED just above TOTAL — always at bottom regardless of sort
+    if (exitedRow) {
+      dataRows.push({ id: -2, ...exitedRow });
+    }
     if (totalRow) {
       dataRows.push({ id: -1, ...totalRow });
     }
     return dataRows;
-  }, [filteredData, totalRow, sortModel]);
+  }, [filteredData, exitedRow, totalRow, sortModel]);
 
   const handleFilterChange = (filterKey: string, event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
@@ -412,7 +421,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
-                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses underlying price for options</Box>
+                <Box sx={{ mt: 0.5, color: "#fd8700" }}>Uses underlying price for options</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
@@ -516,8 +525,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     // Sort
     list.sort((a, b) => {
       switch (exitedSort) {
-        case "ytd_desc": return Math.abs(b.ytd_pnl) - Math.abs(a.ytd_pnl);
-        case "ytd_asc": return Math.abs(a.ytd_pnl) - Math.abs(b.ytd_pnl);
+        case "ytd_desc": return b.ytd_pnl - a.ytd_pnl;
+        case "ytd_asc": return a.ytd_pnl - b.ytd_pnl;
         case "ticker_asc": return a.ticker.localeCompare(b.ticker);
         case "ticker_desc": return b.ticker.localeCompare(a.ticker);
         default: return 0;
@@ -525,15 +534,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     });
     return list;
   }, [closedTickerDetails, exitedSearch, exitedSort]);
-
-  /* Split into 3 columns for compact display */
-  const closedColumns = useMemo(() => {
-    const cols: ClosedTickerDetail[][] = [[], [], []];
-    processedClosedTickers.forEach((item, idx) => {
-      cols[idx % 3].push(item);
-    });
-    return cols;
-  }, [processedClosedTickers]);
 
   /* Sort button helper */
   const SortBtn = ({
@@ -550,8 +550,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         size="small"
         onClick={() => setExitedSort(sortKey)}
         sx={{
-          height: 22,
-          fontSize: "10px",
+          height: 26,
+          fontSize: "11px",
           fontWeight: active ? 700 : 500,
           bgcolor: active ? `${theme.activeTab}15` : "#f8fafc",
           color: active ? theme.activeTab : "#64748b",
@@ -564,59 +564,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     );
   };
 
-  /* Compact deal row renderer */
-  const renderDealRow = (deal: ClosedTickerDetail) => {
-    const pnlVal = showPct ? deal.ytd_pnl_pct : deal.ytd_pnl;
-    const isPositive = deal.ytd_pnl > 0;
-    const isNegative = deal.ytd_pnl < 0;
-    return (
-      <Box
-        key={deal.ticker}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          py: 0.5,
-          px: 1,
-          borderRadius: "4px",
-          transition: "background 0.12s",
-          "&:hover": { bgcolor: theme.hoverRow },
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          {isPositive ? (
-            <TrendingUpIcon sx={{ fontSize: 11, color: "#059669" }} />
-          ) : isNegative ? (
-            <TrendingDownIcon sx={{ fontSize: 11, color: "#dc2626" }} />
-          ) : (
-            <RemoveIcon sx={{ fontSize: 11, color: "#94a3b8" }} />
-          )}
-          <Typography
-            sx={{
-              fontSize: "11px",
-              fontWeight: 600,
-              fontFamily: FONT,
-              color: "#1e293b",
-              textTransform: "uppercase",
-            }}
-          >
-            {deal.ticker}
-          </Typography>
-        </Box>
-        <Typography
-          sx={{
-            fontSize: "11px",
-            fontWeight: 700,
-            fontFamily: FONT,
-            color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#94a3b8",
-          }}
-        >
-          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
-        </Typography>
-      </Box>
-    );
-  };
-
   /* --- Inline Expanded Section for TRADED / EXITED --- */
   const renderExitedExpansion = () => {
     if (!expandedExited || closedTickerDetails.length === 0) return null;
@@ -624,6 +571,24 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     const posCount = closedTickerDetails.filter((d) => d.ytd_pnl > 0).length;
     const negCount = closedTickerDetails.filter((d) => d.ytd_pnl < 0).length;
     const totalYtd = closedTickerDetails.reduce((s, d) => s + d.ytd_pnl, 0);
+
+    /* Custom scrollbar CSS */
+    const scrollbarSx = {
+      "&::-webkit-scrollbar": {
+        width: "6px",
+      },
+      "&::-webkit-scrollbar-track": {
+        bgcolor: "#f1f5f9",
+        borderRadius: "3px",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        bgcolor: "#cbd5e1",
+        borderRadius: "3px",
+        "&:hover": { bgcolor: "#94a3b8" },
+      },
+      scrollbarWidth: "thin" as const,
+      scrollbarColor: "#cbd5e1 #f1f5f9",
+    };
 
     return (
       <Collapse in={expandedExited} timeout={300}>
@@ -653,10 +618,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           >
             {/* Left: Title + stats */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <SwapVertIcon sx={{ fontSize: 14, color: theme.activeTab }} />
+              <SwapVertIcon sx={{ fontSize: 16, color: theme.activeTab }} />
               <Typography
                 sx={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   fontWeight: 700,
                   fontFamily: FONT,
                   color: "#1e293b",
@@ -670,8 +635,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 label={`${processedClosedTickers.length}${exitedSearch ? ` / ${closedTickerDetails.length}` : ""}`}
                 size="small"
                 sx={{
-                  height: 18,
-                  fontSize: "9px",
+                  height: 22,
+                  fontSize: "11px",
                   fontWeight: 700,
                   bgcolor: `${theme.activeTab}12`,
                   color: theme.activeTab,
@@ -680,16 +645,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
               <Chip
                 label={`${posCount} ▲`}
                 size="small"
-                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
+                sx={{ height: 22, fontSize: "11px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
               />
               <Chip
                 label={`${negCount} ▼`}
                 size="small"
-                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
+                sx={{ height: 22, fontSize: "11px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
               />
               <Typography
                 sx={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   fontWeight: 800,
                   fontFamily: FONT,
                   color: totalYtd >= 0 ? "#059669" : "#dc2626",
@@ -710,15 +675,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
+                      <SearchIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
-                  width: 140,
+                  width: 160,
                   "& .MuiOutlinedInput-root": {
-                    height: 26,
-                    fontSize: "11px",
+                    height: 30,
+                    fontSize: "12px",
                     fontFamily: FONT,
                     borderRadius: "6px",
                     bgcolor: "#fff",
@@ -749,14 +714,14 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             </Box>
           </Box>
 
-          {/* 3-Column Compact Grid */}
+          {/* Card Grid with fixed height + scrollbar */}
           {processedClosedTickers.length === 0 ? (
             <Box
               sx={{
-                py: 2,
+                py: 3,
                 textAlign: "center",
                 color: "#94a3b8",
-                fontSize: "11px",
+                fontSize: "12px",
                 fontFamily: FONT,
               }}
             >
@@ -765,59 +730,86 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           ) : (
             <Box
               sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-                gap: 0,
-                p: 1,
+                maxHeight: 260,
+                overflowY: "auto",
+                px: 1,
+                py: 0.8,
+                bgcolor: "#fafbfc",
+                ...scrollbarSx,
               }}
             >
-              {closedColumns.map((col, colIdx) => (
-                <Box
-                  key={colIdx}
-                  sx={{
-                    borderRight: colIdx < 2 ? "1px solid #f1f5f9" : "none",
-                    px: 0.5,
-                  }}
-                >
-                  {/* Column header */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      px: 1,
-                      py: 0.3,
-                      borderBottom: "1px solid #f1f5f9",
-                      mb: 0.3,
-                    }}
-                  >
-                    <Typography
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr 1fr 1fr",
+                    sm: "1fr 1fr 1fr 1fr 1fr",
+                    md: "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
+                  },
+                  gap: "6px",
+                }}
+              >
+                {processedClosedTickers.map((deal) => {
+                  const isPositive = deal.ytd_pnl > 0;
+                  const isNegative = deal.ytd_pnl < 0;
+                  const badgeBg = isPositive ? "#dcfce7" : isNegative ? "#fee2e2" : "#f1f5f9";
+                  const badgeColor = isPositive ? "#15803d" : isNegative ? "#dc2626" : "#64748b";
+                  const cardBorder = isPositive ? "#d1fae5" : isNegative ? "#fecaca" : "#e5e7eb";
+
+                  return (
+                    <Box
+                      key={deal.ticker}
                       sx={{
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        color: "#94a3b8",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                        fontFamily: FONT,
+                        border: `1px solid ${cardBorder}`,
+                        borderRadius: "6px",
+                        px: 1,
+                        py: 0.6,
+                        bgcolor: "#fff",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                        transition: "box-shadow 0.12s",
+                        "&:hover": { boxShadow: "0 1px 6px rgba(0,0,0,0.07)" },
                       }}
                     >
-                      Ticker
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        color: "#94a3b8",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                        fontFamily: FONT,
-                      }}
-                    >
-                      YTD P&L
-                    </Typography>
-                  </Box>
-                  {col.map((deal) => renderDealRow(deal))}
-                </Box>
-              ))}
+                      <Typography
+                        sx={{
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          fontFamily: FONT,
+                          color: "#1e293b",
+                          textTransform: "uppercase",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {deal.ticker}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          alignSelf: "flex-start",
+                          px: 0.8,
+                          py: "1px",
+                          borderRadius: "10px",
+                          bgcolor: badgeBg,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            fontFamily: FONT,
+                            color: badgeColor,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
           )}
         </Box>

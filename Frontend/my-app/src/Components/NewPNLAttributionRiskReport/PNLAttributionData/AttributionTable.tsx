@@ -242,7 +242,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
                 <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
-                <Box sx={{ mt: 0.5, color: "#5f6875" }}>Uses underlying price for options</Box>
+                <Box sx={{ mt: 0.5, color: "#ff8902" }}>Uses underlying price for options</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
