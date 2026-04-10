@@ -36,9 +36,10 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CheckIcon from "@mui/icons-material/Check";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ReactMarkdown from "react-markdown";
 import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
-import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, saveAgentFinalPrompt } from "./agentService";
+import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, saveAgentFinalPrompt, runAgent } from "./agentService";
 
 const POLL_INTERVAL_MS = 10_000;
 
@@ -72,6 +73,12 @@ const AgentOutputView: React.FC = () => {
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [agentData, setAgentData] = useState<{ id: number; prompt?: string; final_prompt?: string } | null>(null);
 
+  // Prompt tabs state
+  const [promptTab, setPromptTab] = useState<"refined" | "original">("refined");
+  const [runLoading, setRunLoading] = useState(false);
+  // Track if user clicked Run in this session — results only show in Refined tab after Run
+  const [hasRunInSession, setHasRunInSession] = useState(false);
+
   const loadOutput = useCallback(async () => {
     try {
       let data: AgentOutput | null = null;
@@ -102,15 +109,19 @@ const AgentOutputView: React.FC = () => {
 
   useEffect(() => { loadOutput(); }, [loadOutput]);
 
-  // Load saved chat history when output is ready
+  // Load saved chat history from DB when output loads or after save clears messages
   useEffect(() => {
     if (!output || output.status !== "completed") return;
-    fetchChatHistory(output.id)
-      .then((msgs) => {
-        if (msgs.length > 0) setChatMessages(msgs);
-      })
-      .catch(() => {});
-  }, [output?.id, output?.status]);
+    // Only load from DB when chatMessages is empty (initial load or after save cleared them)
+    if (chatMessages.length === 0) {
+      fetchChatHistory(output.id)
+        .then((msgs) => {
+          if (msgs.length > 0) setChatMessages(msgs);
+        })
+        .catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [output?.id, output?.status, promptTab]);
 
   useEffect(() => {
     if (!output || output.status === "completed" || output.status === "failed")
@@ -174,6 +185,10 @@ const AgentOutputView: React.FC = () => {
       setHasUnsavedPromptChanges(false);
       setPromptSaved(true);
       setAgentData((prev) => prev ? { ...prev, final_prompt: refined } : prev);
+      // Clear chat from Refined Prompt view — chats are saved in DB
+      // and will load in Previous Chat tab from chat history
+      setChatMessages([]);
+      setPromptTab("refined");
       setTimeout(() => setPromptSaved(false), 3000);
     } catch {
       setChatError("Failed to save prompt. Please try again.");
@@ -191,6 +206,27 @@ const AgentOutputView: React.FC = () => {
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsavedPromptChanges]);
+
+  // Run agent handler
+  const handleRunAgent = async () => {
+    const targetId = agentData?.id || (agentId ? Number(agentId) : null);
+    if (!targetId) return;
+    setRunLoading(true);
+    setHasRunInSession(true);
+    // Clear old output so stale results don't show while new run processes
+    setOutput((prev) => prev ? { ...prev, status: "pending" as const, result_json: null, error_message: "" } : prev);
+    try {
+      await runAgent(targetId);
+      // Reload output after a short delay to let the backend create the output
+      setTimeout(() => {
+        loadOutput();
+        setRunLoading(false);
+      }, 2000);
+    } catch {
+      setChatError("Failed to run agent. Please try again.");
+      setRunLoading(false);
+    }
+  };
 
   // Navigation guard
   const handleNavigateBack = (path: string) => {
@@ -438,370 +474,561 @@ const AgentOutputView: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Continuous Conversation Flow ── */}
-      <Box sx={{ maxWidth: 1000, mx: "auto", px: { xs: 2, md: 5 }, py: 4 }}>
-        <Box
-          sx={{
-            bgcolor: "#fff",
-            borderRadius: 4,
-            border: "1px solid #c7d2fe",
-            overflow: "hidden",
-          }}
-        >
-          {/* Conversation Container */}
-          <Box
+      {/* ── Tabs Section ── */}
+      <Box sx={{ maxWidth: 1000, mx: "auto", px: { xs: 2, md: 5 }, pt: 3, pb: 3 }}>
+        {/* Tab Bar */}
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          <Button
+            size="small"
+            onClick={() => setPromptTab("refined")}
             sx={{
-              maxHeight: "calc(100vh - 300px)",
-              overflowY: "auto",
-              p: { xs: 2, md: 3 },
-              display: "flex",
-              flexDirection: "column",
-              gap: 2.5,
+              textTransform: "none",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              borderRadius: 2.5,
+              px: 2.5,
+              py: 0.8,
+              ...(promptTab === "refined"
+                ? { bgcolor: "#4f46e5", color: "#fff", "&:hover": { bgcolor: "#4338ca" } }
+                : { bgcolor: "#fff", color: "#4f46e5", border: "1px solid #c7d2fe", "&:hover": { bgcolor: "#eef2ff" } }),
             }}
           >
-            {/* ── 1. Original Prompt (User Message) ── */}
-            {agentPrompt && (
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Box sx={{ maxWidth: "85%" }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5} justifyContent="flex-end">
-                    <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
-                      Your Prompt
-                    </Typography>
-                    <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
-                  </Stack>
-                  <Box
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 3,
-                      bgcolor: "#4f46e5",
-                      color: "#fff",
-                      borderBottomRightRadius: 4,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: "0.88rem",
-                        lineHeight: 1.7,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {agentPrompt}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            )}
+            Refined Prompt
+          </Button>
+          <Button
+            size="small"
+            onClick={() => setPromptTab("original")}
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              borderRadius: 2.5,
+              px: 2.5,
+              py: 0.8,
+              ...(promptTab === "original"
+                ? { bgcolor: "#4f46e5", color: "#fff", "&:hover": { bgcolor: "#4338ca" } }
+                : { bgcolor: "#fff", color: "#4f46e5", border: "1px solid #c7d2fe", "&:hover": { bgcolor: "#eef2ff" } }),
+            }}
+          >
+            Previous Chat
+          </Button>
+        </Stack>
 
-            {/* ── 2. Agent Response ── */}
-            {/* Pending / Running */}
-            {(output.status === "pending" || output.status === "running") && (
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                <Box sx={{ maxWidth: "85%" }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                    <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                    <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
-                      {output.agent_name}
-                    </Typography>
-                  </Stack>
-                  <Box
-                    sx={{
-                      p: 3,
-                      borderRadius: 3,
-                      bgcolor: "#f8fafc",
-                      borderLeft: "3px solid #4f46e5",
-                      borderBottomLeftRadius: 4,
-                      textAlign: "center",
-                    }}
-                  >
-                    <CircularProgress size={24} sx={{ color: "#d97706", mb: 1.5 }} />
-                    <Typography sx={{ fontWeight: 600, color: "#111827", fontSize: "0.92rem" }}>
-                      Agent is working on your request...
-                    </Typography>
-                    <Typography sx={{ color: "#64748b", fontSize: "0.82rem", mt: 0.5 }}>
-                      Results will appear here automatically.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            {/* Failed */}
-            {output.status === "failed" && (
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                <Box sx={{ maxWidth: "85%" }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                    <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#dc2626" }} />
-                    <Typography sx={{ fontSize: "0.7rem", color: "#dc2626", fontWeight: 600 }}>
-                      {output.agent_name}
-                    </Typography>
-                  </Stack>
-                  <Box
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 3,
-                      bgcolor: "#fef2f2",
-                      borderLeft: "3px solid #dc2626",
-                    }}
-                  >
-                    <Alert severity="error" sx={{ borderRadius: 2, mb: 1 }}>
-                      Agent execution failed
-                    </Alert>
-                    {output.error_message && (
-                      <Typography
-                        sx={{
-                          fontFamily: "monospace",
-                          whiteSpace: "pre-wrap",
-                          fontSize: "0.82rem",
-                          color: "#1e293b",
-                          p: 1.5,
-                          bgcolor: "#fff",
-                          borderRadius: 2,
-                          border: "1px solid #fecaca",
-                        }}
-                      >
-                        {output.error_message}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            {/* Completed - Agent Response with structured content */}
-            {output.status === "completed" && resultJson && (
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                <Box sx={{ maxWidth: "90%", width: "100%" }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                    <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                    <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
-                      {output.agent_name}
-                    </Typography>
-                    {output.completed_at && (
-                      <Typography sx={{ fontSize: "0.65rem", color: "#94a3b8" }}>
-                        {new Date(output.completed_at).toLocaleString("en-IN")}
-                      </Typography>
-                    )}
-                  </Stack>
-                  <Box
-                    sx={{
-                      borderRadius: 3,
-                      bgcolor: "#f8fafc",
-                      borderLeft: "3px solid #4f46e5",
-                      borderBottomLeftRadius: 4,
-                      overflow: "hidden",
-                    }}
-                  >
-                    {/* Summary */}
-                    {resultJson.summary && (
-                      <Box
-                        sx={{
-                          p: 2.5,
-                          borderBottom: "1px solid #e2e8f0",
-                          bgcolor: "#eef2ff",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            fontSize: "0.7rem",
-                            color: "#4f46e5",
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                            mb: 0.8,
-                          }}
-                        >
-                          Executive Summary
-                        </Typography>
-                        <Typography
-                          sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}
-                        >
-                          {resultJson.summary}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {/* Sections */}
-                    {resultJson.sections?.map((section, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          p: 2.5,
-                          borderBottom: idx < (resultJson.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none",
-                        }}
-                      >
-                        <Typography
-                          sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}
-                        >
-                          {section.title}
-                        </Typography>
-                        <SectionRenderer section={section} />
-                      </Box>
-                    ))}
-
-                    {/* Metadata */}
-                    {resultJson.metadata && (
-                      <Box
-                        sx={{
-                          p: 2,
-                          bgcolor: "#eef2ff",
-                          borderTop: "1px solid #e2e8f0",
-                        }}
-                      >
-                        <Stack direction="row" spacing={1} flexWrap="wrap">
-                          {resultJson.metadata.confidence && (
-                            <Chip
-                              label={`Confidence: ${resultJson.metadata.confidence}`}
-                              size="small"
-                              sx={{
-                                fontWeight: 700,
-                                borderRadius: 2,
-                                fontSize: "0.7rem",
-                                bgcolor:
-                                  resultJson.metadata.confidence === "high"
-                                    ? "#ecfdf5"
-                                    : resultJson.metadata.confidence === "medium"
-                                    ? "#fffbeb"
-                                    : "#fef2f2",
-                                color:
-                                  resultJson.metadata.confidence === "high"
-                                    ? "#059669"
-                                    : resultJson.metadata.confidence === "medium"
-                                    ? "#d97706"
-                                    : "#dc2626",
-                              }}
-                            />
-                          )}
-                          {resultJson.metadata.analysis_date && (
-                            <Chip
-                              label={`Analysis: ${resultJson.metadata.analysis_date}`}
-                              size="small"
-                              variant="outlined"
-                              sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }}
-                            />
-                          )}
-                          {resultJson.metadata.data_sources?.map((src, i) => (
-                            <Chip
-                              key={i}
-                              label={src}
-                              size="small"
-                              variant="outlined"
-                              sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }}
-                            />
-                          ))}
-                        </Stack>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            {/* ── 3. Follow-up Chat Messages (continuous flow) ── */}
-            {chatMessages.map((msg, idx) => (
+        {/* ══════════ REFINED PROMPT TAB ══════════ */}
+        {promptTab === "refined" && (
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 4,
+              border: "1px solid #c7d2fe",
+              overflow: "hidden",
+            }}
+          >
+            {/* Prompt Display */}
+            <Box sx={{ p: { xs: 2, md: 3 } }}>
               <Box
-                key={`chat-${idx}`}
                 sx={{
-                  display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  p: 2.5,
+                  bgcolor: "#eef2ff",
+                  borderRadius: 3,
+                  border: "1px solid #c7d2fe",
                 }}
               >
-                <Box sx={{ maxWidth: "85%" }}>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={1}
-                    mb={0.5}
-                    justifyContent={msg.role === "user" ? "flex-end" : "flex-start"}
-                  >
-                    {msg.role === "user" ? (
-                      <>
-                        <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
-                          Follow-up
-                        </Typography>
-                        <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
-                      </>
-                    ) : (
-                      <>
-                        <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                        <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
-                          {output?.agent_name}
-                        </Typography>
-                      </>
-                    )}
-                  </Stack>
-                  <Box
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 3,
-                      ...(msg.role === "user"
-                        ? {
-                            bgcolor: "#4f46e5",
-                            color: "#fff",
-                            borderBottomRightRadius: 4,
-                          }
-                        : {
-                            bgcolor: "#f8fafc",
-                            color: "#1e293b",
-                            borderLeft: "3px solid #4f46e5",
-                            borderBottomLeftRadius: 4,
-                          }),
-                    }}
-                  >
-                    {msg.role === "assistant" ? (
-                      <MarkdownContent content={msg.content} isLight={false} />
-                    ) : (
-                      <Typography
-                        sx={{
-                          fontSize: "0.88rem",
-                          lineHeight: 1.7,
-                          whiteSpace: "pre-wrap",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {msg.content}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
+                <Typography
+                  sx={{
+                    fontSize: "0.7rem",
+                    color: "#4f46e5",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    mb: 1,
+                  }}
+                >
+                  {agentData?.final_prompt?.trim() ? "Updated Prompt" : "Current Prompt"}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.92rem",
+                    lineHeight: 1.7,
+                    color: "#1e293b",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {agentData?.final_prompt?.trim() || agentPrompt}
+                </Typography>
               </Box>
-            ))}
+              <Stack direction="row" justifyContent="flex-end" mt={2}>
+                <Button
+                  variant="contained"
+                  onClick={handleRunAgent}
+                  disabled={runLoading}
+                  startIcon={
+                    runLoading ? (
+                      <CircularProgress size={14} sx={{ color: "#fff" }} />
+                    ) : (
+                      <RocketLaunchIcon sx={{ fontSize: 16 }} />
+                    )
+                  }
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    borderRadius: 2.5,
+                    px: 3,
+                    py: 1,
+                    bgcolor: "#4f46e5",
+                    boxShadow: "none",
+                    "&:hover": { bgcolor: "#4338ca", boxShadow: "0 4px 12px rgba(79,70,229,0.25)" },
+                  }}
+                >
+                  {runLoading ? "Running..." : "Run Agent"}
+                </Button>
+              </Stack>
+            </Box>
 
-            {/* Loading indicator */}
-            {chatLoading && (
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                <Box sx={{ maxWidth: "85%" }}>
-                  <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                    <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                    <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
-                      {output?.agent_name}
-                    </Typography>
-                  </Stack>
-                  <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: 3,
-                      bgcolor: "#f8fafc",
-                      borderLeft: "3px solid #4f46e5",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    <CircularProgress size={16} sx={{ color: "#4f46e5" }} />
-                    <Typography sx={{ fontSize: "0.85rem", color: "#64748b" }}>
-                      {useWebSearch ? "Searching the web and thinking..." : "Thinking..."}
-                    </Typography>
-                  </Box>
+            {/* Agent Results (only shown after user clicks Run in this session) */}
+            {hasRunInSession && (output.status === "pending" || output.status === "running") && (
+              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: "#f8fafc",
+                    borderLeft: "3px solid #4f46e5",
+                    textAlign: "center",
+                  }}
+                >
+                  <CircularProgress size={24} sx={{ color: "#d97706", mb: 1.5 }} />
+                  <Typography sx={{ fontWeight: 600, color: "#111827", fontSize: "0.92rem" }}>
+                    Agent is working on your request...
+                  </Typography>
+                  <Typography sx={{ color: "#64748b", fontSize: "0.82rem", mt: 0.5 }}>
+                    Results will appear here automatically.
+                  </Typography>
                 </Box>
               </Box>
             )}
 
-            <div ref={chatEndRef} />
-          </Box>
+            {hasRunInSession && output.status === "failed" && (
+              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
+                <Box
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    bgcolor: "#fef2f2",
+                    borderLeft: "3px solid #dc2626",
+                  }}
+                >
+                  <Alert severity="error" sx={{ borderRadius: 2, mb: 1 }}>
+                    Agent execution failed
+                  </Alert>
+                  {output.error_message && (
+                    <Typography
+                      sx={{
+                        fontFamily: "monospace",
+                        whiteSpace: "pre-wrap",
+                        fontSize: "0.82rem",
+                        color: "#1e293b",
+                        p: 1.5,
+                        bgcolor: "#fff",
+                        borderRadius: 2,
+                        border: "1px solid #fecaca",
+                      }}
+                    >
+                      {output.error_message}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            )}
 
-          {/* ── Chat Input Area (only for completed outputs) ── */}
-          {output.status === "completed" && (
+            {hasRunInSession && output.status === "completed" && resultJson && (
+              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
+                <Box
+                  sx={{
+                    borderRadius: 3,
+                    bgcolor: "#f8fafc",
+                    borderLeft: "3px solid #4f46e5",
+                    overflow: "hidden",
+                  }}
+                >
+                  {resultJson.summary && (
+                    <Box sx={{ p: 2.5, borderBottom: "1px solid #e2e8f0", bgcolor: "#eef2ff" }}>
+                      <Typography
+                        sx={{
+                          fontSize: "0.7rem",
+                          color: "#4f46e5",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          mb: 0.8,
+                        }}
+                      >
+                        Executive Summary
+                      </Typography>
+                      <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
+                        {resultJson.summary}
+                      </Typography>
+                    </Box>
+                  )}
+                  {resultJson.sections?.map((section, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        p: 2.5,
+                        borderBottom: idx < (resultJson.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none",
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
+                        {section.title}
+                      </Typography>
+                      <SectionRenderer section={section} />
+                    </Box>
+                  ))}
+                  {resultJson.metadata && (
+                    <Box sx={{ p: 2, bgcolor: "#eef2ff", borderTop: "1px solid #e2e8f0" }}>
+                      <Stack direction="row" spacing={1} flexWrap="wrap">
+                        {resultJson.metadata.confidence && (
+                          <Chip
+                            label={`Confidence: ${resultJson.metadata.confidence}`}
+                            size="small"
+                            sx={{
+                              fontWeight: 700,
+                              borderRadius: 2,
+                              fontSize: "0.7rem",
+                              bgcolor: resultJson.metadata.confidence === "high" ? "#ecfdf5" : resultJson.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
+                              color: resultJson.metadata.confidence === "high" ? "#059669" : resultJson.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
+                            }}
+                          />
+                        )}
+                        {resultJson.metadata.analysis_date && (
+                          <Chip label={`Analysis: ${resultJson.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
+                        )}
+                        {resultJson.metadata.data_sources?.map((src, i) => (
+                          <Chip key={i} label={src} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {/* Follow-up input in Refined tab (only after user runs in this session) */}
+            {hasRunInSession && output.status === "completed" && (
+              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
+                {/* Loading indicator */}
+                {chatLoading && (
+                  <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
+                    <Box sx={{ maxWidth: "85%" }}>
+                      <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
+                        <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
+                        <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>{output?.agent_name}</Typography>
+                      </Stack>
+                      <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f8fafc", borderLeft: "3px solid #4f46e5", display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <CircularProgress size={16} sx={{ color: "#4f46e5" }} />
+                        <Typography sx={{ fontSize: "0.85rem", color: "#64748b" }}>
+                          {useWebSearch ? "Searching the web and thinking..." : "Thinking..."}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Chat Error */}
+                {chatError && (
+                  <Alert severity="error" sx={{ borderRadius: 2, mb: 1.5, fontSize: "0.85rem" }} onClose={() => setChatError(null)}>
+                    {chatError}
+                  </Alert>
+                )}
+
+                {/* Controls row */}
+                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={useWebSearch}
+                        onChange={(e) => setUseWebSearch(e.target.checked)}
+                        sx={{ color: "#94a3b8", "&.Mui-checked": { color: "#059669" }, p: 0.5 }}
+                      />
+                    }
+                    label={
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <TravelExploreIcon sx={{ fontSize: 16, color: useWebSearch ? "#059669" : "#94a3b8" }} />
+                        <Typography sx={{ fontSize: "0.75rem", color: useWebSearch ? "#059669" : "#94a3b8", fontWeight: 600 }}>Web Search</Typography>
+                      </Stack>
+                    }
+                    sx={{ ml: 0, mr: 0 }}
+                  />
+                  <Button
+                    size="small"
+                    onClick={handleSavePrompt}
+                    disabled={!hasUnsavedPromptChanges || promptSaving}
+                    startIcon={
+                      promptSaving ? <CircularProgress size={12} sx={{ color: "#4f46e5" }} />
+                        : promptSaved ? <CheckIcon sx={{ fontSize: 14 }} />
+                        : <SaveOutlinedIcon sx={{ fontSize: 14 }} />
+                    }
+                    sx={{
+                      textTransform: "none", fontWeight: 600, fontSize: "0.75rem", borderRadius: 2, px: 1.5, py: 0.3,
+                      color: promptSaved ? "#059669" : hasUnsavedPromptChanges ? "#4f46e5" : "#94a3b8",
+                      bgcolor: promptSaved ? "#ecfdf5" : hasUnsavedPromptChanges ? "#eef2ff" : "transparent",
+                      border: `1px solid ${promptSaved ? "#a7f3d0" : hasUnsavedPromptChanges ? "#c7d2fe" : "#e2e8f0"}`,
+                      "&:hover": { bgcolor: promptSaved ? "#ecfdf5" : "#e0e7ff" },
+                      "&.Mui-disabled": { color: "#94a3b8", borderColor: "#e2e8f0" },
+                    }}
+                  >
+                    {promptSaving ? "Saving..." : promptSaved ? "Prompt Saved" : "Save Prompt"}
+                  </Button>
+                </Stack>
+
+                {/* Chat Input */}
+                <TextField
+                  fullWidth
+                  multiline
+                  maxRows={3}
+                  placeholder="Ask a follow-up question about this analysis..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={handleChatKeyDown}
+                  disabled={chatLoading}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 3, bgcolor: "#fff", fontSize: "0.88rem",
+                      "& fieldset": { borderColor: "#c7d2fe" },
+                      "&:hover fieldset": { borderColor: "#a5b4fc" },
+                      "&.Mui-focused fieldset": { borderColor: "#4f46e5" },
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleChatSend}
+                          disabled={!chatInput.trim() || chatLoading}
+                          sx={{ color: chatInput.trim() && !chatLoading ? "#4f46e5" : "#94a3b8", "&:hover": { bgcolor: "#eef2ff" } }}
+                        >
+                          <SendIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+        )}
+
+        {/* ══════════ PREVIOUS CHAT TAB ══════════ */}
+        {promptTab === "original" && (
+          <Box
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 4,
+              border: "1px solid #c7d2fe",
+              overflow: "hidden",
+            }}
+          >
+            {/* Conversation Container */}
+            <Box
+              sx={{
+                maxHeight: "calc(100vh - 350px)",
+                overflowY: "auto",
+                p: { xs: 2, md: 3 },
+                display: "flex",
+                flexDirection: "column",
+                gap: 2.5,
+              }}
+            >
+              {/* Original Prompt */}
+              {agentPrompt && (
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Box sx={{ maxWidth: "85%" }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5} justifyContent="flex-end">
+                      <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
+                        Original Prompt
+                      </Typography>
+                      <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
+                    </Stack>
+                    <Box sx={{ p: 2.5, borderRadius: 3, bgcolor: "#4f46e5", color: "#fff", borderBottomRightRadius: 4 }}>
+                      <Typography sx={{ fontSize: "0.88rem", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                        {agentPrompt}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Previous Agent Response */}
+              {output.status === "completed" && resultJson && (
+                <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                  <Box sx={{ maxWidth: "90%", width: "100%" }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
+                      <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
+                      <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
+                        {output.agent_name}
+                      </Typography>
+                      {output.completed_at && (
+                        <Typography sx={{ fontSize: "0.65rem", color: "#94a3b8" }}>
+                          {new Date(output.completed_at).toLocaleString("en-IN")}
+                        </Typography>
+                      )}
+                    </Stack>
+                    <Box
+                      sx={{
+                        borderRadius: 3,
+                        bgcolor: "#f8fafc",
+                        borderLeft: "3px solid #4f46e5",
+                        borderBottomLeftRadius: 4,
+                        overflow: "hidden",
+                      }}
+                    >
+                      {resultJson.summary && (
+                        <Box sx={{ p: 2.5, borderBottom: "1px solid #e2e8f0", bgcolor: "#eef2ff" }}>
+                          <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.8 }}>
+                            Executive Summary
+                          </Typography>
+                          <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
+                            {resultJson.summary}
+                          </Typography>
+                        </Box>
+                      )}
+                      {resultJson.sections?.map((section, idx) => (
+                        <Box key={idx} sx={{ p: 2.5, borderBottom: idx < (resultJson.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none" }}>
+                          <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
+                            {section.title}
+                          </Typography>
+                          <SectionRenderer section={section} />
+                        </Box>
+                      ))}
+                      {resultJson.metadata && (
+                        <Box sx={{ p: 2, bgcolor: "#eef2ff", borderTop: "1px solid #e2e8f0" }}>
+                          <Stack direction="row" spacing={1} flexWrap="wrap">
+                            {resultJson.metadata.confidence && (
+                              <Chip
+                                label={`Confidence: ${resultJson.metadata.confidence}`}
+                                size="small"
+                                sx={{
+                                  fontWeight: 700, borderRadius: 2, fontSize: "0.7rem",
+                                  bgcolor: resultJson.metadata.confidence === "high" ? "#ecfdf5" : resultJson.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
+                                  color: resultJson.metadata.confidence === "high" ? "#059669" : resultJson.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
+                                }}
+                              />
+                            )}
+                            {resultJson.metadata.analysis_date && (
+                              <Chip label={`Analysis: ${resultJson.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
+                            )}
+                            {resultJson.metadata.data_sources?.map((src, i) => (
+                              <Chip key={i} label={src} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
+                            ))}
+                          </Stack>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Follow-up Chat Messages */}
+              {chatMessages.map((msg, idx) => (
+                <Box
+                  key={`chat-${idx}`}
+                  sx={{
+                    display: "flex",
+                    justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  }}
+                >
+                  <Box sx={{ maxWidth: "85%" }}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      mb={0.5}
+                      justifyContent={msg.role === "user" ? "flex-end" : "flex-start"}
+                    >
+                      {msg.role === "user" ? (
+                        <>
+                          <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
+                            Follow-up
+                          </Typography>
+                          <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
+                        </>
+                      ) : (
+                        <>
+                          <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
+                          <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
+                            {output?.agent_name}
+                          </Typography>
+                        </>
+                      )}
+                    </Stack>
+                    <Box
+                      sx={{
+                        p: 2.5,
+                        borderRadius: 3,
+                        ...(msg.role === "user"
+                          ? { bgcolor: "#4f46e5", color: "#fff", borderBottomRightRadius: 4 }
+                          : { bgcolor: "#f8fafc", color: "#1e293b", borderLeft: "3px solid #4f46e5", borderBottomLeftRadius: 4 }),
+                      }}
+                    >
+                      {msg.role === "assistant" ? (
+                        <MarkdownContent content={msg.content} isLight={false} />
+                      ) : (
+                        <Typography sx={{ fontSize: "0.88rem", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                          {msg.content}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+
+              {/* Loading indicator */}
+              {chatLoading && (
+                <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                  <Box sx={{ maxWidth: "85%" }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
+                      <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
+                      <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
+                        {output?.agent_name}
+                      </Typography>
+                    </Stack>
+                    <Box
+                      sx={{
+                        p: 2,
+                        borderRadius: 3,
+                        bgcolor: "#f8fafc",
+                        borderLeft: "3px solid #4f46e5",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                      }}
+                    >
+                      <CircularProgress size={16} sx={{ color: "#4f46e5" }} />
+                      <Typography sx={{ fontSize: "0.85rem", color: "#64748b" }}>
+                        {useWebSearch ? "Searching the web and thinking..." : "Thinking..."}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Empty state if no chats yet */}
+              {!agentPrompt && chatMessages.length === 0 && output.status !== "completed" && (
+                <Box sx={{ textAlign: "center", py: 4 }}>
+                  <Typography sx={{ color: "#94a3b8", fontSize: "0.88rem" }}>
+                    No previous chat history yet.
+                  </Typography>
+                </Box>
+              )}
+
+              <div ref={chatEndRef} />
+            </Box>
+
+            {/* Chat Input Area (only for completed outputs) */}
+            {output.status === "completed" && (
             <Box
               sx={{
                 borderTop: "1px solid #e2e8f0",
@@ -934,6 +1161,7 @@ const AgentOutputView: React.FC = () => {
             </Box>
           )}
         </Box>
+        )}
       </Box>
 
       {/* Exit Confirmation Dialog */}
@@ -1053,7 +1281,35 @@ const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ con
 /** Renders a single section based on its type */
 const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section }) => {
   if (section.type === "text") {
-    return <MarkdownContent content={section.content || ""} />;
+    const content = section.content || "";
+    // If text content contains embedded JSON with sections, try to render it structured
+    if (content.trim().startsWith("{") && content.includes('"sections"')) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.sections && Array.isArray(parsed.sections)) {
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {parsed.summary && (
+                <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem", mb: 1 }}>
+                  {parsed.summary}
+                </Typography>
+              )}
+              {parsed.sections.map((s: AgentOutputSection, i: number) => (
+                <Box key={i}>
+                  <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1 }}>
+                    {s.title}
+                  </Typography>
+                  <SectionRenderer section={s} />
+                </Box>
+              ))}
+            </Box>
+          );
+        }
+      } catch {
+        // Not valid JSON, render as markdown
+      }
+    }
+    return <MarkdownContent content={content} />;
   }
 
   if (section.type === "list" && section.items) {
