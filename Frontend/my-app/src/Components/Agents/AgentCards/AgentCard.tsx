@@ -326,7 +326,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
                 mb: 0.3,
               }}
             >
-              {agent.final_prompt ? "Saved Prompt" : "Original Prompt"}
+              Prompt
             </Typography>
             <Typography
               sx={{
