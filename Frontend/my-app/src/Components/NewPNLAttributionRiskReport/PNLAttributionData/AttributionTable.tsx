@@ -346,6 +346,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       <DataGrid
         rows={rows}
         columns={columns}
+        autoHeight
         density="compact"
         rowHeight={42}
         disableRowSelectionOnClick
