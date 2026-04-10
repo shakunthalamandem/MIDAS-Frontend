@@ -373,17 +373,17 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 600, mb: 0.5 }}>NMV (Net Market Value)</Box>
-                <Box>Σ Price × Quantity × PT Value</Box>
-                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses premium price for options</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>NMV (Net Market Value)</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ Price × Quantity × PT Value</Box>
+                <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses premium price for options</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 600 }}>Net Market Value</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -409,10 +409,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Notional Exposure</Box>
-                <Box sx={{ color: "#93c5fd" }}>Total Long Exposure + Total Short Exposure</Box>
-                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value)</Box>
-                <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses underlying price for options</Box>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
+                <Box>Total Long Exposure + Total Short Exposure</Box>
+                <Box>Σ (Price × Quantity × PT Value)</Box>
+                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses underlying price for options</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
@@ -444,16 +444,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × PT Value × Delta)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Delta Adjusted Net Exposure</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value × Delta)</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 600 }}>Delta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>
@@ -479,16 +479,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × PT Value × Delta × Beta)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Beta Adjusted Net Exposure</Box>
+                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value × Delta × Beta)</Box>
               </Box>
             }
-            slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
+            slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
               <span style={{ fontWeight: 600 }}>Beta Adj Net</span>
               <InfoOutlinedIcon
-                sx={{ fontSize: 14, color: "#94a3b8", "&:hover": { color: "#64748b" } }}
+                sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
               />
             </Box>

@@ -22,6 +22,7 @@ interface TabTheme {
   activeTabHover: string;
   evenRow: string;
   hoverRow: string;
+  selectedRow: string;
   pnlColor: string;
   expColor: string;
   toolbarBg: string;
@@ -37,6 +38,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     activeTabHover: "#0d47a1",
     evenRow: "#e3f2fd",
     hoverRow: "#bbdefb",
+    selectedRow: "#fed7aa",
     pnlColor: "#0d47a1",
     expColor: "#00695c",
     toolbarBg: "#e3f2fd",
@@ -50,6 +52,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     activeTabHover: "#004d40",
     evenRow: "#e0f2f1",
     hoverRow: "#b2dfdb",
+    selectedRow: "#fed7aa",
     pnlColor: "#00695c",
     expColor: "#e65100",
     toolbarBg: "#e0f2f1",
@@ -63,6 +66,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     activeTabHover: "#4a148c",
     evenRow: "#f3e5f5",
     hoverRow: "#e1bee7",
+    selectedRow: "#fed7aa",
     pnlColor: "#6a1b9a",
     expColor: "#004d40",
     toolbarBg: "#f3e5f5",
@@ -76,6 +80,7 @@ const GROUP_BY_TABS: TabTheme[] = [
     activeTabHover: "#1a237e",
     evenRow: "#e8eaf6",
     hoverRow: "#c5cae9",
+    selectedRow: "#fed7aa",
     pnlColor: "#1a237e",
     expColor: "#00695c",
     toolbarBg: "#e8eaf6",

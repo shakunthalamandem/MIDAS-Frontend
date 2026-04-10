@@ -42,6 +42,7 @@ import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
 
 
 import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
+import OperationsDashboard from "../Components/Main/DashBoards/OperationsDashboard";
 import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
 import ReportWriteUpMain from "../Components/Main/WriteUpsRecords/ReportWriteUpMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
@@ -247,6 +248,7 @@ const AppRouters: React.FC = () => {
 
 
 
+        <Route path="/operations_dashboard" element={<AuthGuard><OperationsDashboard /></AuthGuard>} />
         <Route path="/opportunity/summary" element={<AuthGuard><LandingPageMain /></AuthGuard>} />
         <Route path="/opportunity/pastdeals" element={<AuthGuard><EquityDealsIPOFO /></AuthGuard>} />
         <Route path="/opportunity/monashee_daily_report" element={<AuthGuard><MDRMainTableS3Data /></AuthGuard>} />

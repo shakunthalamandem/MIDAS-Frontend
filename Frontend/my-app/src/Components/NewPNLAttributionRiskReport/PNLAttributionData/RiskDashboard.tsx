@@ -479,18 +479,6 @@ const RiskDashboard: React.FC = () => {
             />
           </Box>
 
-          <Box className="pdf-section" data-pdf-page="1">
-            <TopBottomPnLTable
-              top10={topBottomTop}
-              bottom10={topBottomBottom}
-              loading={loading}
-              category={selectedCategory}
-              metricTop10={metricTop10}
-              metricBottom10={metricBottom10}
-              metricLoading={metricTopBottomLoading}
-            />
-          </Box>
-
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison
@@ -510,6 +498,18 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
+
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              loading={loading}
+              category={selectedCategory}
+              metricTop10={metricTop10}
+              metricBottom10={metricBottom10}
+              metricLoading={metricTopBottomLoading}
+            />
+          </Box>
 
           <Box className="pdf-section attribution-interactive">
             <Attribution

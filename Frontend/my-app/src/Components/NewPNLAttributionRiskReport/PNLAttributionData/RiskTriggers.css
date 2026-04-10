@@ -3,7 +3,7 @@
 .trig-page {
   background: #f0f2f5;
   min-height: 100vh;
-  padding: 0 0 40px;
+  padding: 28px 0 40px;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .trig-scard-label {
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
   color: #0f172a !important;
   letter-spacing: 0.5px;
@@ -222,7 +222,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
@@ -295,15 +295,15 @@
 .trig-panel-icon--purple { background: #f3e8ff; color: #7c3aed; }
 
 .trig-panel-title {
-  font-size: 16px !important;
+  font-size: 20px !important;
   font-weight: 800 !important;
   color: #0f172a !important;
 }
 
 .trig-panel-badge {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 4px 14px;
+  padding: 5px 16px;
   border-radius: 20px;
   letter-spacing: 0.3px;
 }
@@ -344,12 +344,12 @@
 /* Value pills */
 .trig-pill {
   display: inline-block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  padding: 4px 12px;
+  padding: 5px 13px;
   border-radius: 20px;
-  min-width: 56px;
+  min-width: 60px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -370,13 +370,13 @@
 .trig-issuer-dot--green { background: #16a34a; box-shadow: 0 0 0 3px #dcfce7; }
 
 .trig-guideline-tag {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: #2563eb;
   background: #eff6ff;
   border: 1px solid #bfdbfe;
   border-radius: 20px;
-  padding: 4px 14px;
+  padding: 5px 16px;
 }
 
 .trig-warning-dot {
@@ -400,14 +400,14 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .trig-table thead tr { background: #f8fafc; }
 
 .trig-table th {
-  padding: 10px 16px;
-  font-size: 10px;
+  padding: 12px 16px;
+  font-size: 11px;
   font-weight: 700;
   color: #64748b;
   letter-spacing: 0.8px;
@@ -420,8 +420,8 @@
 .trig-th-r { text-align: right !important; }
 
 .trig-table td {
-  padding: 10px 16px;
-  font-size: 13px;
+  padding: 12px 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #475569;
   border: none;
@@ -429,9 +429,9 @@
   vertical-align: middle;
 }
 
-.trig-td-l { text-align: left !important; font-weight: 600 !important; color: #0f172a !important; }
+.trig-td-l { text-align: left !important; font-size: 14px !important; font-weight: 600 !important; color: #0f172a !important; }
 .trig-td-r { text-align: right !important; }
-.trig-td-rank { text-align: center !important; font-size: 11px !important; font-weight: 700 !important; color: #94a3b8 !important; }
+.trig-td-rank { text-align: center !important; font-size: 12px !important; font-weight: 700 !important; color: #94a3b8 !important; }
 
 .trig-table tbody tr { transition: background 0.1s; }
 .trig-table tbody tr:hover { background: #f8fafc; }
