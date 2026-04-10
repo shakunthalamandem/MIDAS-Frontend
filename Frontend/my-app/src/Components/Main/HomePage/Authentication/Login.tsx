@@ -23,6 +23,7 @@ interface LoginResponse {
   access_token: string;
   user: {
     is_superuser: boolean;
+    is_staff: boolean;
     username?: string;
     email?: string;
     email_verified?: boolean;
@@ -172,7 +173,7 @@ const Login: React.FC = () => {
         password,
       });
 
-      const userData = res.data.user || { is_superuser: false };
+      const userData = res.data.user || { is_superuser: false, is_staff: false };
       const finalUsername = userData.username || username;
       const email = userData.email || "";
       let emailVerified = Boolean(userData.email_verified);
@@ -195,6 +196,10 @@ const Login: React.FC = () => {
       localStorage.setItem(
         "is_superuser",
         userData?.is_superuser ? "true" : "false"
+      );
+      localStorage.setItem(
+        "is_staff",
+        userData?.is_staff ? "true" : "false"
       );
       localStorage.setItem("user", finalUsername);
       localStorage.setItem(USER_EMAIL_KEY, email);

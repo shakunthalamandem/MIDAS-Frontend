@@ -30,7 +30,7 @@ const POLL_INTERVAL_MS = 15_000;
 
 const Agents: React.FC = () => {
   const navigate = useNavigate();
-  const isAdmin = localStorage.getItem("is_superuser") === "true";
+  const isAdmin = localStorage.getItem("is_staff") === "true";
 
   const [agents, setAgents] = useState<AIAgent[]>([]);
   const [loading, setLoading] = useState(true);
