@@ -251,33 +251,6 @@ const EditAgentDialog: React.FC<EditAgentDialogProps> = ({
             sx={inputSx}
           />
 
-          {/* Show original prompt for reference when a refined version exists */}
-          {agent && agent.final_prompt && agent.final_prompt.trim() !== "" && agent.final_prompt !== agent.prompt && agent.prompt && (
-            <Box
-              sx={{
-                bgcolor: "#f8fafc",
-                border: "1px solid #e2e8f0",
-                borderRadius: 2.5,
-                p: 2,
-              }}
-            >
-              <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", mb: 0.5 }}>
-                Original Prompt (read-only)
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "0.82rem",
-                  color: "#475569",
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                  maxHeight: 80,
-                  overflow: "auto",
-                }}
-              >
-                {agent.prompt}
-              </Typography>
-            </Box>
-          )}
 
           <FormControl fullWidth sx={inputSx}>
             <InputLabel>Schedule Type</InputLabel>
