@@ -260,7 +260,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
                 <Box sx={{ fontWeight: 600, mb: 0.5 }}>NMV (Net Market Value)</Box>
-                <Box>Σ Price × Quantity × Multiplier</Box>
+                <Box>Σ Price × Quantity × PT Value</Box>
                 <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses premium price for options</Box>
               </Box>
             }
@@ -297,7 +297,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
                 <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
-                <Box>Σ (Price × Quantity × Multiplier)</Box>
+                <Box>Σ (Price × Quantity × PT Value)</Box>
                 <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses underlying price for options</Box>
               </Box>
             }
@@ -331,7 +331,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
                 <Box sx={{ fontWeight: 600, mb: 0.5 }}>Delta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × Multiplier × Delta)</Box>
+                <Box>Σ (Price × Quantity × PT Value × Delta)</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
@@ -366,7 +366,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
                 <Box sx={{ fontWeight: 600, mb: 0.5 }}>Beta Adjusted Net Exposure</Box>
-                <Box>Σ (Price × Quantity × Multiplier × Delta × Beta)</Box>
+                <Box>Σ (Price × Quantity × PT Value × Delta × Beta)</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#1e293b" } } } }}
