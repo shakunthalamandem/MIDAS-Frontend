@@ -131,6 +131,20 @@ export async function fetchChatHistory(outputId: number): Promise<ChatMessage[]>
   return data.messages;
 }
 
+/** Save the refined final prompt for an agent (Claude merges original + follow-ups) */
+export async function saveAgentFinalPrompt(
+  agentId: number,
+  originalPrompt: string,
+  followUps: string[],
+): Promise<AIAgent & { refined_prompt?: string }> {
+  const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/save-prompt/`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ original_prompt: originalPrompt, follow_ups: followUps }),
+  });
+  return handleResponse<AIAgent & { refined_prompt?: string }>(res);
+}
+
 /** Fetch a single agent by ID */
 export async function fetchAgent(agentId: number): Promise<AIAgent> {
   const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/`, {

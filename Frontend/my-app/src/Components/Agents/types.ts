@@ -4,6 +4,8 @@ export interface AIAgent {
   description: string;
   agent_type: "system" | "user_created";
   prompt?: string;
+  final_prompt?: string;
+  prompt_updated_at?: string | null;
   api_endpoint?: string;
   schedule_type: "daily" | "weekly" | "hourly" | "one_time" | "cron";
   schedule_value: string;
@@ -52,6 +54,7 @@ export interface AgentOutput {
   agent: number;
   agent_name: string;
   agent_prompt?: string;
+  agent_final_prompt?: string;
   agent_description?: string;
   status: AgentOutputStatus;
   result_json: AgentOutputResultJSON | null;
