@@ -535,15 +535,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     return list;
   }, [closedTickerDetails, exitedSearch, exitedSort]);
 
-  /* Split into 3 columns for compact display */
-  const closedColumns = useMemo(() => {
-    const cols: ClosedTickerDetail[][] = [[], [], []];
-    processedClosedTickers.forEach((item, idx) => {
-      cols[idx % 3].push(item);
-    });
-    return cols;
-  }, [processedClosedTickers]);
-
   /* Sort button helper */
   const SortBtn = ({
     label,
@@ -573,60 +564,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     );
   };
 
-  /* Compact deal row renderer */
-  const renderDealRow = (deal: ClosedTickerDetail, idx: number) => {
-    const isPositive = deal.ytd_pnl > 0;
-    const isNegative = deal.ytd_pnl < 0;
-    const isEven = idx % 2 === 0;
-    return (
-      <Box
-        key={deal.ticker}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          py: 0.6,
-          px: 1.2,
-          borderRadius: "5px",
-          bgcolor: isEven ? "transparent" : "#f8fafc",
-          transition: "background 0.12s",
-          "&:hover": { bgcolor: theme.hoverRow },
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-          {isPositive ? (
-            <TrendingUpIcon sx={{ fontSize: 13, color: "#059669" }} />
-          ) : isNegative ? (
-            <TrendingDownIcon sx={{ fontSize: 13, color: "#dc2626" }} />
-          ) : (
-            <RemoveIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
-          )}
-          <Typography
-            sx={{
-              fontSize: "13px",
-              fontWeight: 600,
-              fontFamily: FONT,
-              color: "#1e293b",
-              textTransform: "uppercase",
-            }}
-          >
-            {deal.ticker}
-          </Typography>
-        </Box>
-        <Typography
-          sx={{
-            fontSize: "13px",
-            fontWeight: 700,
-            fontFamily: FONT,
-            color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#94a3b8",
-          }}
-        >
-          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
-        </Typography>
-      </Box>
-    );
-  };
-
   /* --- Inline Expanded Section for TRADED / EXITED --- */
   const renderExitedExpansion = () => {
     if (!expandedExited || closedTickerDetails.length === 0) return null;
@@ -634,6 +571,24 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     const posCount = closedTickerDetails.filter((d) => d.ytd_pnl > 0).length;
     const negCount = closedTickerDetails.filter((d) => d.ytd_pnl < 0).length;
     const totalYtd = closedTickerDetails.reduce((s, d) => s + d.ytd_pnl, 0);
+
+    /* Custom scrollbar CSS */
+    const scrollbarSx = {
+      "&::-webkit-scrollbar": {
+        width: "6px",
+      },
+      "&::-webkit-scrollbar-track": {
+        bgcolor: "#f1f5f9",
+        borderRadius: "3px",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        bgcolor: "#cbd5e1",
+        borderRadius: "3px",
+        "&:hover": { bgcolor: "#94a3b8" },
+      },
+      scrollbarWidth: "thin" as const,
+      scrollbarColor: "#cbd5e1 #f1f5f9",
+    };
 
     return (
       <Collapse in={expandedExited} timeout={300}>
@@ -759,14 +714,14 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             </Box>
           </Box>
 
-          {/* 3-Column Compact Grid */}
+          {/* Card Grid with fixed height + scrollbar */}
           {processedClosedTickers.length === 0 ? (
             <Box
               sx={{
-                py: 2,
+                py: 3,
                 textAlign: "center",
                 color: "#94a3b8",
-                fontSize: "11px",
+                fontSize: "12px",
                 fontFamily: FONT,
               }}
             >
@@ -775,61 +730,103 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           ) : (
             <Box
               sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-                gap: 0,
-                p: 1,
+                maxHeight: 280,
+                overflowY: "auto",
+                p: 1.5,
+                bgcolor: "#f8fafc",
+                ...scrollbarSx,
               }}
             >
-              {closedColumns.map((col, colIdx) => (
-                <Box
-                  key={colIdx}
-                  sx={{
-                    borderRight: colIdx < 2 ? "1px solid #f1f5f9" : "none",
-                    px: 0.5,
-                  }}
-                >
-                  {/* Column header */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      px: 1.2,
-                      py: 0.5,
-                      borderBottom: "2px solid #e2e8f0",
-                      mb: 0.4,
-                      bgcolor: "#f8fafc",
-                      borderRadius: "4px 4px 0 0",
-                    }}
-                  >
-                    <Typography
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr 1fr",
+                    sm: "1fr 1fr 1fr",
+                    md: "1fr 1fr 1fr 1fr 1fr 1fr",
+                  },
+                  gap: 1,
+                }}
+              >
+                {processedClosedTickers.map((deal) => {
+                  const isPositive = deal.ytd_pnl > 0;
+                  const isNegative = deal.ytd_pnl < 0;
+                  // Badge colors
+                  const badgeBg = isPositive
+                    ? "linear-gradient(135deg, #dcfce7, #bbf7d0)"
+                    : isNegative
+                    ? "linear-gradient(135deg, #fee2e2, #fecaca)"
+                    : "linear-gradient(135deg, #f1f5f9, #e2e8f0)";
+                  const badgeColor = isPositive
+                    ? "#15803d"
+                    : isNegative
+                    ? "#dc2626"
+                    : "#64748b";
+                  const borderColor = isPositive
+                    ? "#bbf7d0"
+                    : isNegative
+                    ? "#fecaca"
+                    : "#e2e8f0";
+
+                  return (
+                    <Box
+                      key={deal.ticker}
                       sx={{
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        color: "#475569",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                        fontFamily: FONT,
+                        border: `1px solid ${borderColor}`,
+                        borderRadius: "8px",
+                        p: 1,
+                        bgcolor: "#fff",
+                        transition: "all 0.15s ease",
+                        cursor: "default",
+                        "&:hover": {
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                          transform: "translateY(-1px)",
+                        },
                       }}
                     >
-                      Ticker
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        color: "#475569",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                        fontFamily: FONT,
-                      }}
-                    >
-                      YTD P&L
-                    </Typography>
-                  </Box>
-                  {col.map((deal, di) => renderDealRow(deal, di))}
-                </Box>
-              ))}
+                      {/* Ticker Name */}
+                      <Typography
+                        sx={{
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          fontFamily: FONT,
+                          color: "#1e293b",
+                          textTransform: "uppercase",
+                          mb: 0.5,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {deal.ticker}
+                      </Typography>
+                      {/* P&L Badge */}
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          px: 1,
+                          py: 0.3,
+                          borderRadius: "12px",
+                          background: badgeBg,
+                          border: `1px solid ${borderColor}`,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            fontFamily: FONT,
+                            color: badgeColor,
+                          }}
+                        >
+                          {showPct
+                            ? formatPctVal(deal.ytd_pnl_pct)
+                            : formatCurrency(deal.ytd_pnl)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
           )}
         </Box>
