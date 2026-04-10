@@ -10,10 +10,23 @@ import {
   Chip,
   OutlinedInput,
   Tooltip,
+  Collapse,
+  Typography,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import RemoveIcon from "@mui/icons-material/Remove";
 import {
   DataGrid,
   GridColDef,
@@ -55,6 +68,16 @@ interface TabTheme {
   exportBg: string;
 }
 
+interface ClosedTickerDetail {
+  ticker: string;
+  dtd_pnl: number;
+  dtd_pnl_pct: number;
+  wtd_pnl: number;
+  wtd_pnl_pct: number;
+  ytd_pnl: number;
+  ytd_pnl_pct: number;
+}
+
 interface AttributionDetailProps {
   groupBy: AttributionGroupBy;
   groupValue: string;
@@ -85,8 +108,12 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   onClose,
 }) => {
   const [tickerData, setTickerData] = useState<TickerItem[]>([]);
+  const [closedTickerDetails, setClosedTickerDetails] = useState<ClosedTickerDetail[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "ytd_pnl", sort: "desc" }]);
+  const [expandedExited, setExpandedExited] = useState(false);
+  const [exitedSearch, setExitedSearch] = useState("");
+  const [exitedSort, setExitedSort] = useState<"ytd_desc" | "ytd_asc" | "ticker_asc" | "ticker_desc">("ytd_desc");
 
   /* Active filter selections: key = sub-filter groupBy, value = selected values */
   const [activeFilters, setActiveFilters] = useState<
@@ -117,9 +144,21 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       );
       if (!res.ok) throw new Error("Failed to fetch ticker data");
       const result = await res.json();
-      setTickerData(result.tickers || []);
+      const tickers = result.tickers || [];
+      setTickerData(tickers);
+
+      // Extract closed ticker details from the TRADED/EXITED row
+      const exitedRow = tickers.find(
+        (t: any) => t.ticker === "TRADED / EXITED"
+      );
+      if (exitedRow?.closed_ticker_details) {
+        setClosedTickerDetails(exitedRow.closed_ticker_details);
+      } else {
+        setClosedTickerDetails([]);
+      }
     } catch {
       setTickerData([]);
+      setClosedTickerDetails([]);
     } finally {
       setLoading(false);
     }
@@ -132,6 +171,9 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   /* Reset filters when row changes */
   useEffect(() => {
     setActiveFilters({});
+    setExpandedExited(false);
+    setExitedSearch("");
+    setExitedSort("ytd_desc");
   }, [groupValue]);
 
   /* Compute unique values for each sub-filter from fetched data */
@@ -194,6 +236,17 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     }));
   };
 
+  /* Determine which P&L columns have non-zero values in closed ticker details */
+  const closedHasNonZero = useMemo(() => {
+    const has = { dtd: false, wtd: false, ytd: false };
+    closedTickerDetails.forEach((d) => {
+      if (d.dtd_pnl !== 0) has.dtd = true;
+      if (d.wtd_pnl !== 0) has.wtd = true;
+      if (d.ytd_pnl !== 0) has.ytd = true;
+    });
+    return has;
+  }, [closedTickerDetails]);
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -202,6 +255,67 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         flex: 1,
         minWidth: 120,
         cellClassName: "attr-detail-cell--name",
+        renderCell: ({ row }) => {
+          const isExited = row.ticker === "TRADED / EXITED";
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                width: "100%",
+                cursor: isExited && closedTickerDetails.length > 0 ? "pointer" : "default",
+              }}
+              onClick={(e) => {
+                if (isExited && closedTickerDetails.length > 0) {
+                  e.stopPropagation();
+                  setExpandedExited((prev) => !prev);
+                }
+              }}
+            >
+              {isExited && closedTickerDetails.length > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 20,
+                    height: 20,
+                    borderRadius: "5px",
+                    bgcolor: expandedExited ? theme.activeTab : "#e2e8f0",
+                    transition: "all 0.2s ease",
+                    flexShrink: 0,
+                  }}
+                >
+                  {expandedExited ? (
+                    <ExpandLessIcon sx={{ fontSize: 14, color: "#fff" }} />
+                  ) : (
+                    <ExpandMoreIcon sx={{ fontSize: 14, color: "#475569" }} />
+                  )}
+                </Box>
+              )}
+              <span>{row.ticker}</span>
+              {isExited && closedTickerDetails.length > 0 && (
+                <Chip
+                  label={`${closedTickerDetails.length} deals`}
+                  size="small"
+                  sx={{
+                    height: 18,
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    bgcolor: expandedExited
+                      ? `${theme.activeTab}20`
+                      : "#f1f5f9",
+                    color: expandedExited ? theme.activeTab : "#64748b",
+                    border: `1px solid ${expandedExited ? `${theme.activeTab}40` : "#e2e8f0"}`,
+                    ml: 0.5,
+                    transition: "all 0.2s ease",
+                  }}
+                />
+              )}
+            </Box>
+          );
+        },
       },
       {
         field: "issuer",
@@ -284,7 +398,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       },
       {
         field: "net_exp",
-        headerName: "Net Exp",
+        headerName: "Notional Exp",
         flex: 1,
         minWidth: 120,
         headerAlign: "right",
@@ -295,16 +409,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>Net Exposure</Box>
-                <Box sx={{ color: "#93c5fd" }}>Total Long Exposure + Total Short Exposure</Box>
-                <Box sx={{ color: "#93c5fd" }}>Σ (Price × Quantity × PT Value)</Box>
-                <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses underlying price for options</Box>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
+                <Box>Total Long Exposure + Total Short Exposure</Box>
+                <Box>Σ (Price × Quantity × PT Value)</Box>
+                <Box sx={{ mt: 0.5, color: "#94a3b8" }}>Uses underlying price for options</Box>
               </Box>
             }
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 600 }}>Net Exp</span>
+              <span style={{ fontWeight: 600 }}>Notional Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -388,8 +502,328 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             : formatCurrency(row.beta_adj_net),
       },
     ],
-    [showPct]
+    [showPct, closedTickerDetails, expandedExited, theme]
   );
+
+  /* --- Filtered & sorted closed ticker list --- */
+  const processedClosedTickers = useMemo(() => {
+    let list = [...closedTickerDetails];
+    // Search
+    if (exitedSearch.trim()) {
+      const q = exitedSearch.trim().toUpperCase();
+      list = list.filter((d) => d.ticker.toUpperCase().includes(q));
+    }
+    // Sort
+    list.sort((a, b) => {
+      switch (exitedSort) {
+        case "ytd_desc": return Math.abs(b.ytd_pnl) - Math.abs(a.ytd_pnl);
+        case "ytd_asc": return Math.abs(a.ytd_pnl) - Math.abs(b.ytd_pnl);
+        case "ticker_asc": return a.ticker.localeCompare(b.ticker);
+        case "ticker_desc": return b.ticker.localeCompare(a.ticker);
+        default: return 0;
+      }
+    });
+    return list;
+  }, [closedTickerDetails, exitedSearch, exitedSort]);
+
+  /* Split into 3 columns for compact display */
+  const closedColumns = useMemo(() => {
+    const cols: ClosedTickerDetail[][] = [[], [], []];
+    processedClosedTickers.forEach((item, idx) => {
+      cols[idx % 3].push(item);
+    });
+    return cols;
+  }, [processedClosedTickers]);
+
+  /* Sort button helper */
+  const SortBtn = ({
+    label,
+    sortKey,
+  }: {
+    label: string;
+    sortKey: "ytd_desc" | "ytd_asc" | "ticker_asc" | "ticker_desc";
+  }) => {
+    const active = exitedSort === sortKey;
+    return (
+      <Chip
+        label={label}
+        size="small"
+        onClick={() => setExitedSort(sortKey)}
+        sx={{
+          height: 22,
+          fontSize: "10px",
+          fontWeight: active ? 700 : 500,
+          bgcolor: active ? `${theme.activeTab}15` : "#f8fafc",
+          color: active ? theme.activeTab : "#64748b",
+          border: `1px solid ${active ? `${theme.activeTab}50` : "#e2e8f0"}`,
+          cursor: "pointer",
+          transition: "all 0.15s",
+          "&:hover": { borderColor: theme.activeTab, bgcolor: `${theme.activeTab}08` },
+        }}
+      />
+    );
+  };
+
+  /* Compact deal row renderer */
+  const renderDealRow = (deal: ClosedTickerDetail) => {
+    const pnlVal = showPct ? deal.ytd_pnl_pct : deal.ytd_pnl;
+    const isPositive = deal.ytd_pnl > 0;
+    const isNegative = deal.ytd_pnl < 0;
+    return (
+      <Box
+        key={deal.ticker}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 0.5,
+          px: 1,
+          borderRadius: "4px",
+          transition: "background 0.12s",
+          "&:hover": { bgcolor: theme.hoverRow },
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          {isPositive ? (
+            <TrendingUpIcon sx={{ fontSize: 11, color: "#059669" }} />
+          ) : isNegative ? (
+            <TrendingDownIcon sx={{ fontSize: 11, color: "#dc2626" }} />
+          ) : (
+            <RemoveIcon sx={{ fontSize: 11, color: "#94a3b8" }} />
+          )}
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 600,
+              fontFamily: FONT,
+              color: "#1e293b",
+              textTransform: "uppercase",
+            }}
+          >
+            {deal.ticker}
+          </Typography>
+        </Box>
+        <Typography
+          sx={{
+            fontSize: "11px",
+            fontWeight: 700,
+            fontFamily: FONT,
+            color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#94a3b8",
+          }}
+        >
+          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
+        </Typography>
+      </Box>
+    );
+  };
+
+  /* --- Inline Expanded Section for TRADED / EXITED --- */
+  const renderExitedExpansion = () => {
+    if (!expandedExited || closedTickerDetails.length === 0) return null;
+
+    const posCount = closedTickerDetails.filter((d) => d.ytd_pnl > 0).length;
+    const negCount = closedTickerDetails.filter((d) => d.ytd_pnl < 0).length;
+    const totalYtd = closedTickerDetails.reduce((s, d) => s + d.ytd_pnl, 0);
+
+    return (
+      <Collapse in={expandedExited} timeout={300}>
+        <Box
+          sx={{
+            mx: 2,
+            mb: 2,
+            borderRadius: "10px",
+            border: "1px solid #e2e8f0",
+            overflow: "hidden",
+            boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
+          }}
+        >
+          {/* Header Bar */}
+          <Box
+            sx={{
+              px: 1.5,
+              py: 1,
+              background: `linear-gradient(135deg, ${theme.activeTab}10, ${theme.activeTab}05)`,
+              borderBottom: "1px solid #e2e8f0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            {/* Left: Title + stats */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <SwapVertIcon sx={{ fontSize: 14, color: theme.activeTab }} />
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  fontFamily: FONT,
+                  color: "#1e293b",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.4px",
+                }}
+              >
+                Exited Deals
+              </Typography>
+              <Chip
+                label={`${processedClosedTickers.length}${exitedSearch ? ` / ${closedTickerDetails.length}` : ""}`}
+                size="small"
+                sx={{
+                  height: 18,
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  bgcolor: `${theme.activeTab}12`,
+                  color: theme.activeTab,
+                }}
+              />
+              <Chip
+                label={`${posCount} ▲`}
+                size="small"
+                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
+              />
+              <Chip
+                label={`${negCount} ▼`}
+                size="small"
+                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
+              />
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  fontFamily: FONT,
+                  color: totalYtd >= 0 ? "#059669" : "#dc2626",
+                  ml: 0.5,
+                }}
+              >
+                Net: {formatCurrency(totalYtd)}
+              </Typography>
+            </Box>
+
+            {/* Right: Search + Sort + Close */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+              <TextField
+                size="small"
+                placeholder="Search ticker..."
+                value={exitedSearch}
+                onChange={(e) => setExitedSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  width: 140,
+                  "& .MuiOutlinedInput-root": {
+                    height: 26,
+                    fontSize: "11px",
+                    fontFamily: FONT,
+                    borderRadius: "6px",
+                    bgcolor: "#fff",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#e2e8f0",
+                  },
+                }}
+              />
+              <Box sx={{ display: "flex", gap: 0.4 }}>
+                <SortBtn label="YTD ↓" sortKey="ytd_desc" />
+                <SortBtn label="YTD ↑" sortKey="ytd_asc" />
+                <SortBtn label="A→Z" sortKey="ticker_asc" />
+                <SortBtn label="Z→A" sortKey="ticker_desc" />
+              </Box>
+              <IconButton
+                size="small"
+                onClick={() => setExpandedExited(false)}
+                sx={{
+                  width: 22,
+                  height: 22,
+                  bgcolor: "#f1f5f9",
+                  "&:hover": { bgcolor: "#e2e8f0" },
+                }}
+              >
+                <ExpandLessIcon sx={{ fontSize: 13, color: "#64748b" }} />
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* 3-Column Compact Grid */}
+          {processedClosedTickers.length === 0 ? (
+            <Box
+              sx={{
+                py: 2,
+                textAlign: "center",
+                color: "#94a3b8",
+                fontSize: "11px",
+                fontFamily: FONT,
+              }}
+            >
+              No tickers match "{exitedSearch}"
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
+                gap: 0,
+                p: 1,
+              }}
+            >
+              {closedColumns.map((col, colIdx) => (
+                <Box
+                  key={colIdx}
+                  sx={{
+                    borderRight: colIdx < 2 ? "1px solid #f1f5f9" : "none",
+                    px: 0.5,
+                  }}
+                >
+                  {/* Column header */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      px: 1,
+                      py: 0.3,
+                      borderBottom: "1px solid #f1f5f9",
+                      mb: 0.3,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "9px",
+                        fontWeight: 700,
+                        color: "#94a3b8",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      Ticker
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "9px",
+                        fontWeight: 700,
+                        color: "#94a3b8",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      YTD P&L
+                    </Typography>
+                  </Box>
+                  {col.map((deal) => renderDealRow(deal))}
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      </Collapse>
+    );
+  };
 
   return (
     <Box className="attr-detail-section">
@@ -524,102 +958,132 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           <CircularProgress size={28} />
         </Box>
       ) : filteredData.length > 0 ? (
-        <Box className="attr-detail-table-wrapper">
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            density="compact"
-            rowHeight={42}
-            disableRowSelectionOnClick
-            disableColumnMenu
-            slots={{ toolbar: DetailToolbar }}
-            getRowClassName={(params) =>
-              params.row.ticker === "TOTAL" ? "attr-detail-row--total" : ""
-            }
-            sortingMode="server"
-            sortingOrder={["asc", "desc"]}
-            sortModel={sortModel}
-            onSortModelChange={(model) => {
-              if (model.length === 0) return; // never allow unsorted
-              setSortModel(model);
-            }}
-            sx={{
-              fontFamily: FONT,
-              border: "none",
-              borderRadius: "0 0 12px 12px",
-              "& .MuiDataGrid-columnHeader": {
-                backgroundColor: theme.headerBg,
-                color: "#1e293b",
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
+        <>
+          <Box className="attr-detail-table-wrapper">
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              density="compact"
+              rowHeight={42}
+              disableRowSelectionOnClick
+              disableColumnMenu
+              slots={{ toolbar: DetailToolbar }}
+              getRowClassName={(params) => {
+                if (params.row.ticker === "TOTAL") return "attr-detail-row--total";
+                if (params.row.ticker === "TRADED / EXITED")
+                  return expandedExited
+                    ? "attr-detail-row--exited attr-detail-row--exited-expanded"
+                    : "attr-detail-row--exited";
+                return "";
+              }}
+              onRowClick={(params) => {
+                if (
+                  params.row.ticker === "TRADED / EXITED" &&
+                  closedTickerDetails.length > 0
+                ) {
+                  setExpandedExited((prev) => !prev);
+                }
+              }}
+              sortingMode="server"
+              sortModel={sortModel}
+              onSortModelChange={(model) => setSortModel(model)}
+              sx={{
                 fontFamily: FONT,
-                fontWeight: 700,
-                fontSize: "12px",
-                color: "#1e293b",
-                textTransform: "uppercase",
-                letterSpacing: "0.8px",
-              },
-              "& .MuiDataGrid-sortIcon": {
-                color: "#1e293b !important",
-              },
-              "& .MuiDataGrid-columnSeparator": {
-                display: "none",
-              },
-              "& .MuiDataGrid-cell": {
-                fontFamily: FONT,
-                fontSize: "12px",
-                borderBottom: "1px solid #e8ecf1",
-              },
-              "& .MuiDataGrid-row:nth-of-type(even)": {
-                backgroundColor: theme.evenRow,
-              },
-              "& .MuiDataGrid-row:nth-of-type(odd)": {
-                backgroundColor: "#fff",
-              },
-              "& .MuiDataGrid-row:hover": {
-                backgroundColor: `${theme.hoverRow} !important`,
-              },
-              "& .attr-detail-cell--name": {
-                fontWeight: 500,
-                color: "#1e293b",
-                textTransform: "uppercase",
-              },
-              "& .attr-detail-row--total": {
-                backgroundColor: `${theme.evenRow} !important`,
-                borderTop: `2px solid ${theme.activeTab}`,
-              },
-              "& .attr-detail-row--total .MuiDataGrid-cell": {
-                fontWeight: "800 !important",
-                color: "#1e293b !important",
-                fontSize: "13px !important",
-              },
-              "& .MuiDataGrid-toolbarContainer": {
-                padding: "0",
-              },
-              "& .attr-detail-toolbar": {
-                background: theme.toolbarBg,
-              },
-              "& .attr-detail-toolbar .MuiButton-root": {
-                color: "#fff",
-                background: theme.exportBg,
-                fontWeight: 700,
-                fontSize: "11px",
-                padding: "4px 14px",
-                borderRadius: "8px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-              },
-              "& .attr-detail-toolbar .MuiButton-root:hover": {
-                background: theme.exportBg,
-                filter: "brightness(0.85)",
-                color: "#fff",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                fontFamily: FONT,
-                borderTop: "1px solid #e2e8f0",
-              },
-            }}
-          />
-        </Box>
+                border: "none",
+                borderRadius: "0 0 12px 12px",
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: theme.headerBg,
+                  color: "#1e293b",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontFamily: FONT,
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  color: "#1e293b",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                },
+                "& .MuiDataGrid-sortIcon": {
+                  color: "#1e293b !important",
+                },
+                "& .MuiDataGrid-columnSeparator": {
+                  display: "none",
+                },
+                "& .MuiDataGrid-cell": {
+                  fontFamily: FONT,
+                  fontSize: "12px",
+                  borderBottom: "1px solid #e8ecf1",
+                },
+                "& .MuiDataGrid-row:nth-of-type(even)": {
+                  backgroundColor: theme.evenRow,
+                },
+                "& .MuiDataGrid-row:nth-of-type(odd)": {
+                  backgroundColor: "#fff",
+                },
+                "& .MuiDataGrid-row:hover": {
+                  backgroundColor: `${theme.hoverRow} !important`,
+                },
+                "& .attr-detail-cell--name": {
+                  fontWeight: 500,
+                  color: "#1e293b",
+                  textTransform: "uppercase",
+                },
+                /* TRADED / EXITED row styling */
+                "& .attr-detail-row--exited": {
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                },
+                "& .attr-detail-row--exited:hover": {
+                  backgroundColor: `${theme.hoverRow} !important`,
+                },
+                "& .attr-detail-row--exited-expanded": {
+                  backgroundColor: `${theme.activeTab}08 !important`,
+                  borderLeft: `3px solid ${theme.activeTab}`,
+                },
+                "& .attr-detail-row--exited-expanded .MuiDataGrid-cell": {
+                  fontWeight: "700 !important",
+                },
+                /* TOTAL row styling */
+                "& .attr-detail-row--total": {
+                  backgroundColor: `${theme.evenRow} !important`,
+                  borderTop: `2px solid ${theme.activeTab}`,
+                },
+                "& .attr-detail-row--total .MuiDataGrid-cell": {
+                  fontWeight: "800 !important",
+                  color: "#1e293b !important",
+                  fontSize: "13px !important",
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                  padding: "0",
+                },
+                "& .attr-detail-toolbar": {
+                  background: theme.toolbarBg,
+                },
+                "& .attr-detail-toolbar .MuiButton-root": {
+                  color: "#fff",
+                  background: theme.exportBg,
+                  fontWeight: 700,
+                  fontSize: "11px",
+                  padding: "4px 14px",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                },
+                "& .attr-detail-toolbar .MuiButton-root:hover": {
+                  background: theme.exportBg,
+                  filter: "brightness(0.85)",
+                  color: "#fff",
+                },
+                "& .MuiDataGrid-footerContainer": {
+                  fontFamily: FONT,
+                  borderTop: "1px solid #e2e8f0",
+                },
+              }}
+            />
+          </Box>
+
+          {/* Inline expansion for TRADED / EXITED */}
+          {renderExitedExpansion()}
+        </>
       ) : (
         <Box
           sx={{
