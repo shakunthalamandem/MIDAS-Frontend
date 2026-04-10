@@ -12,6 +12,8 @@ import {
   Tooltip,
   Collapse,
   Typography,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,6 +21,12 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import RemoveIcon from "@mui/icons-material/Remove";
 import {
   DataGrid,
   GridColDef,
@@ -104,6 +112,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   const [loading, setLoading] = useState(false);
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "ytd_pnl", sort: "desc" }]);
   const [expandedExited, setExpandedExited] = useState(false);
+  const [exitedSearch, setExitedSearch] = useState("");
+  const [exitedSort, setExitedSort] = useState<"ytd_desc" | "ytd_asc" | "ticker_asc" | "ticker_desc">("ytd_desc");
 
   /* Active filter selections: key = sub-filter groupBy, value = selected values */
   const [activeFilters, setActiveFilters] = useState<
@@ -162,6 +172,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   useEffect(() => {
     setActiveFilters({});
     setExpandedExited(false);
+    setExitedSearch("");
+    setExitedSort("ytd_desc");
   }, [groupValue]);
 
   /* Compute unique values for each sub-filter from fetched data */
@@ -493,12 +505,128 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     [showPct, closedTickerDetails, expandedExited, theme]
   );
 
+  /* --- Filtered & sorted closed ticker list --- */
+  const processedClosedTickers = useMemo(() => {
+    let list = [...closedTickerDetails];
+    // Search
+    if (exitedSearch.trim()) {
+      const q = exitedSearch.trim().toUpperCase();
+      list = list.filter((d) => d.ticker.toUpperCase().includes(q));
+    }
+    // Sort
+    list.sort((a, b) => {
+      switch (exitedSort) {
+        case "ytd_desc": return Math.abs(b.ytd_pnl) - Math.abs(a.ytd_pnl);
+        case "ytd_asc": return Math.abs(a.ytd_pnl) - Math.abs(b.ytd_pnl);
+        case "ticker_asc": return a.ticker.localeCompare(b.ticker);
+        case "ticker_desc": return b.ticker.localeCompare(a.ticker);
+        default: return 0;
+      }
+    });
+    return list;
+  }, [closedTickerDetails, exitedSearch, exitedSort]);
+
+  /* Split into 3 columns for compact display */
+  const closedColumns = useMemo(() => {
+    const cols: ClosedTickerDetail[][] = [[], [], []];
+    processedClosedTickers.forEach((item, idx) => {
+      cols[idx % 3].push(item);
+    });
+    return cols;
+  }, [processedClosedTickers]);
+
+  /* Sort button helper */
+  const SortBtn = ({
+    label,
+    sortKey,
+  }: {
+    label: string;
+    sortKey: "ytd_desc" | "ytd_asc" | "ticker_asc" | "ticker_desc";
+  }) => {
+    const active = exitedSort === sortKey;
+    return (
+      <Chip
+        label={label}
+        size="small"
+        onClick={() => setExitedSort(sortKey)}
+        sx={{
+          height: 22,
+          fontSize: "10px",
+          fontWeight: active ? 700 : 500,
+          bgcolor: active ? `${theme.activeTab}15` : "#f8fafc",
+          color: active ? theme.activeTab : "#64748b",
+          border: `1px solid ${active ? `${theme.activeTab}50` : "#e2e8f0"}`,
+          cursor: "pointer",
+          transition: "all 0.15s",
+          "&:hover": { borderColor: theme.activeTab, bgcolor: `${theme.activeTab}08` },
+        }}
+      />
+    );
+  };
+
+  /* Compact deal row renderer */
+  const renderDealRow = (deal: ClosedTickerDetail) => {
+    const pnlVal = showPct ? deal.ytd_pnl_pct : deal.ytd_pnl;
+    const isPositive = deal.ytd_pnl > 0;
+    const isNegative = deal.ytd_pnl < 0;
+    return (
+      <Box
+        key={deal.ticker}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 0.5,
+          px: 1,
+          borderRadius: "4px",
+          transition: "background 0.12s",
+          "&:hover": { bgcolor: theme.hoverRow },
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          {isPositive ? (
+            <TrendingUpIcon sx={{ fontSize: 11, color: "#059669" }} />
+          ) : isNegative ? (
+            <TrendingDownIcon sx={{ fontSize: 11, color: "#dc2626" }} />
+          ) : (
+            <RemoveIcon sx={{ fontSize: 11, color: "#94a3b8" }} />
+          )}
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 600,
+              fontFamily: FONT,
+              color: "#1e293b",
+              textTransform: "uppercase",
+            }}
+          >
+            {deal.ticker}
+          </Typography>
+        </Box>
+        <Typography
+          sx={{
+            fontSize: "11px",
+            fontWeight: 700,
+            fontFamily: FONT,
+            color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#94a3b8",
+          }}
+        >
+          {showPct ? formatPctVal(deal.ytd_pnl_pct) : formatCurrency(deal.ytd_pnl)}
+        </Typography>
+      </Box>
+    );
+  };
+
   /* --- Inline Expanded Section for TRADED / EXITED --- */
   const renderExitedExpansion = () => {
     if (!expandedExited || closedTickerDetails.length === 0) return null;
 
+    const posCount = closedTickerDetails.filter((d) => d.ytd_pnl > 0).length;
+    const negCount = closedTickerDetails.filter((d) => d.ytd_pnl < 0).length;
+    const totalYtd = closedTickerDetails.reduce((s, d) => s + d.ytd_pnl, 0);
+
     return (
-      <Collapse in={expandedExited} timeout={350}>
+      <Collapse in={expandedExited} timeout={300}>
         <Box
           sx={{
             mx: 2,
@@ -506,239 +634,192 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             borderRadius: "10px",
             border: "1px solid #e2e8f0",
             overflow: "hidden",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            animation: "attrDetailSlideIn 0.25s ease-out",
+            boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
           }}
         >
-          {/* Expansion Header */}
+          {/* Header Bar */}
           <Box
             sx={{
-              px: 2,
-              py: 1.2,
-              background: `linear-gradient(135deg, ${theme.activeTab}15, ${theme.activeTab}08)`,
+              px: 1.5,
+              py: 1,
+              background: `linear-gradient(135deg, ${theme.activeTab}10, ${theme.activeTab}05)`,
               borderBottom: "1px solid #e2e8f0",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              gap: 1,
+              flexWrap: "wrap",
             }}
           >
+            {/* Left: Title + stats */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <SwapVertIcon
-                sx={{ fontSize: 16, color: theme.activeTab }}
-              />
+              <SwapVertIcon sx={{ fontSize: 14, color: theme.activeTab }} />
               <Typography
                 sx={{
-                  fontSize: "12px",
+                  fontSize: "11px",
                   fontWeight: 700,
                   fontFamily: FONT,
                   color: "#1e293b",
                   textTransform: "uppercase",
-                  letterSpacing: "0.5px",
+                  letterSpacing: "0.4px",
                 }}
               >
-                Traded / Exited Deal Breakdown
+                Exited Deals
               </Typography>
               <Chip
-                label={`${closedTickerDetails.length} positions`}
+                label={`${processedClosedTickers.length}${exitedSearch ? ` / ${closedTickerDetails.length}` : ""}`}
                 size="small"
                 sx={{
-                  height: 20,
-                  fontSize: "10px",
+                  height: 18,
+                  fontSize: "9px",
                   fontWeight: 700,
-                  bgcolor: `${theme.activeTab}18`,
+                  bgcolor: `${theme.activeTab}12`,
                   color: theme.activeTab,
-                  border: `1px solid ${theme.activeTab}30`,
                 }}
               />
+              <Chip
+                label={`${posCount} ▲`}
+                size="small"
+                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
+              />
+              <Chip
+                label={`${negCount} ▼`}
+                size="small"
+                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
+              />
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  fontFamily: FONT,
+                  color: totalYtd >= 0 ? "#059669" : "#dc2626",
+                  ml: 0.5,
+                }}
+              >
+                Net: {formatCurrency(totalYtd)}
+              </Typography>
             </Box>
-            <IconButton
-              size="small"
-              onClick={() => setExpandedExited(false)}
-              sx={{
-                width: 24,
-                height: 24,
-                bgcolor: "#f1f5f9",
-                "&:hover": { bgcolor: "#e2e8f0" },
-              }}
-            >
-              <ExpandLessIcon sx={{ fontSize: 14, color: "#64748b" }} />
-            </IconButton>
+
+            {/* Right: Search + Sort + Close */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+              <TextField
+                size="small"
+                placeholder="Search ticker..."
+                value={exitedSearch}
+                onChange={(e) => setExitedSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  width: 140,
+                  "& .MuiOutlinedInput-root": {
+                    height: 26,
+                    fontSize: "11px",
+                    fontFamily: FONT,
+                    borderRadius: "6px",
+                    bgcolor: "#fff",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#e2e8f0",
+                  },
+                }}
+              />
+              <Box sx={{ display: "flex", gap: 0.4 }}>
+                <SortBtn label="YTD ↓" sortKey="ytd_desc" />
+                <SortBtn label="YTD ↑" sortKey="ytd_asc" />
+                <SortBtn label="A→Z" sortKey="ticker_asc" />
+                <SortBtn label="Z→A" sortKey="ticker_desc" />
+              </Box>
+              <IconButton
+                size="small"
+                onClick={() => setExpandedExited(false)}
+                sx={{
+                  width: 22,
+                  height: 22,
+                  bgcolor: "#f1f5f9",
+                  "&:hover": { bgcolor: "#e2e8f0" },
+                }}
+              >
+                <ExpandLessIcon sx={{ fontSize: 13, color: "#64748b" }} />
+              </IconButton>
+            </Box>
           </Box>
 
-          {/* Expansion Table */}
-          <Box sx={{ overflowX: "auto" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
+          {/* 3-Column Compact Grid */}
+          {processedClosedTickers.length === 0 ? (
+            <Box
+              sx={{
+                py: 2,
+                textAlign: "center",
+                color: "#94a3b8",
+                fontSize: "11px",
                 fontFamily: FONT,
-                fontSize: "12px",
               }}
             >
-              <thead>
-                <tr
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    borderBottom: "2px solid #e2e8f0",
+              No tickers match "{exitedSearch}"
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
+                gap: 0,
+                p: 1,
+              }}
+            >
+              {closedColumns.map((col, colIdx) => (
+                <Box
+                  key={colIdx}
+                  sx={{
+                    borderRight: colIdx < 2 ? "1px solid #f1f5f9" : "none",
+                    px: 0.5,
                   }}
                 >
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 16px",
-                      fontWeight: 700,
-                      fontSize: "11px",
-                      color: "#475569",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                  {/* Column header */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      px: 1,
+                      py: 0.3,
+                      borderBottom: "1px solid #f1f5f9",
+                      mb: 0.3,
                     }}
                   >
-                    Ticker
-                  </th>
-                  {closedHasNonZero.dtd && (
-                    <th
-                      style={{
-                        textAlign: "right",
-                        padding: "10px 16px",
+                    <Typography
+                      sx={{
+                        fontSize: "9px",
                         fontWeight: 700,
-                        fontSize: "11px",
-                        color: "#475569",
+                        color: "#94a3b8",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
+                        fontFamily: FONT,
                       }}
                     >
-                      DTD P&L
-                    </th>
-                  )}
-                  {closedHasNonZero.wtd && (
-                    <th
-                      style={{
-                        textAlign: "right",
-                        padding: "10px 16px",
+                      Ticker
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "9px",
                         fontWeight: 700,
-                        fontSize: "11px",
-                        color: "#475569",
+                        color: "#94a3b8",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
-                      }}
-                    >
-                      WTD P&L
-                    </th>
-                  )}
-                  {closedHasNonZero.ytd && (
-                    <th
-                      style={{
-                        textAlign: "right",
-                        padding: "10px 16px",
-                        fontWeight: 700,
-                        fontSize: "11px",
-                        color: "#475569",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
+                        fontFamily: FONT,
                       }}
                     >
                       YTD P&L
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {closedTickerDetails.map((deal, idx) => {
-                  const isEven = idx % 2 === 0;
-                  return (
-                    <tr
-                      key={deal.ticker}
-                      style={{
-                        backgroundColor: isEven ? "#fff" : theme.evenRow,
-                        borderBottom: "1px solid #f1f5f9",
-                        transition: "background-color 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.backgroundColor =
-                          theme.hoverRow;
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.backgroundColor =
-                          isEven ? "#fff" : theme.evenRow;
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "8px 16px",
-                          fontWeight: 600,
-                          color: "#1e293b",
-                          textTransform: "uppercase",
-                          fontSize: "12px",
-                        }}
-                      >
-                        {deal.ticker}
-                      </td>
-                      {closedHasNonZero.dtd && (
-                        <td
-                          style={{
-                            textAlign: "right",
-                            padding: "8px 16px",
-                            fontWeight: 500,
-                            color:
-                              deal.dtd_pnl > 0
-                                ? "#059669"
-                                : deal.dtd_pnl < 0
-                                ? "#dc2626"
-                                : "#94a3b8",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {showPct
-                            ? formatPctVal(deal.dtd_pnl_pct)
-                            : formatCurrency(deal.dtd_pnl)}
-                        </td>
-                      )}
-                      {closedHasNonZero.wtd && (
-                        <td
-                          style={{
-                            textAlign: "right",
-                            padding: "8px 16px",
-                            fontWeight: 500,
-                            color:
-                              deal.wtd_pnl > 0
-                                ? "#059669"
-                                : deal.wtd_pnl < 0
-                                ? "#dc2626"
-                                : "#94a3b8",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {showPct
-                            ? formatPctVal(deal.wtd_pnl_pct)
-                            : formatCurrency(deal.wtd_pnl)}
-                        </td>
-                      )}
-                      {closedHasNonZero.ytd && (
-                        <td
-                          style={{
-                            textAlign: "right",
-                            padding: "8px 16px",
-                            fontWeight: 500,
-                            color:
-                              deal.ytd_pnl > 0
-                                ? "#059669"
-                                : deal.ytd_pnl < 0
-                                ? "#dc2626"
-                                : "#94a3b8",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {showPct
-                            ? formatPctVal(deal.ytd_pnl_pct)
-                            : formatCurrency(deal.ytd_pnl)}
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </Box>
+                    </Typography>
+                  </Box>
+                  {col.map((deal) => renderDealRow(deal))}
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
       </Collapse>
     );
