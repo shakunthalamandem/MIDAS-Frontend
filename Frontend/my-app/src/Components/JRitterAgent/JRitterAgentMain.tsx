@@ -89,6 +89,16 @@ const STAT_CARDS = [
 
 type SortField = "ticker" | "composite" | "days" | "verdict";
 
+const TIER_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
+  tier1: { bg: "#ecfdf5", color: "#065f46", label: "Tier 1" },
+  tier2: { bg: "#fffbeb", color: "#92400e", label: "Tier 2" },
+  tier3: { bg: "#fff1f2", color: "#9f1239", label: "Tier 3" },
+};
+const getTierConfig = (tier: string) => {
+  const key = tier.toLowerCase().replace(/[\s-]+/g, "");
+  return TIER_CONFIG[key] || { bg: "#f1f5f9", color: "#475569", label: tier || "—" };
+};
+
 const JRitterAgentMain: React.FC = () => {
   const [records, setRecords] = useState<SavedRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +141,8 @@ const JRitterAgentMain: React.FC = () => {
       mktCap: n.key_metrics.market_cap_b ?? n.key_metrics.market_cap_approx_usd,
       ipoDate: n.ipo_date,
       grade: n.composite_grade,
+      tier: n.composite_tier,
+      signal: n.composite_signal,
     };
   }), [records]);
 
@@ -330,11 +342,13 @@ const JRitterAgentMain: React.FC = () => {
             <Table size="small" sx={{ tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: 44 }} />
-                <col style={{ width: 100 }} />
-                <col style={{ width: 190 }} />
-                <col style={{ width: 200 }} />
-                <col style={{ width: 70 }} />
                 <col style={{ width: 90 }} />
+                <col style={{ width: 170 }} />
+                <col style={{ width: 170 }} />
+                <col style={{ width: 60 }} />
+                <col style={{ width: 80 }} />
+                <col style={{ width: 80 }} />
+                <col style={{ width: 120 }} />
                 <col />
               </colgroup>
               <TableHead>
@@ -357,6 +371,8 @@ const JRitterAgentMain: React.FC = () => {
                       Score
                     </TableSortLabel>
                   </TableCell>
+                  <TableCell sx={thStyle} align="center">Tier</TableCell>
+                  <TableCell sx={thStyle} align="left">Signal</TableCell>
                   <TableCell sx={thStyle} align="left">
                     <TableSortLabel active={sortField === "verdict"} direction={sortField === "verdict" ? sortDir : "asc"} onClick={() => handleSort("verdict")}>
                       Verdict
@@ -367,7 +383,7 @@ const JRitterAgentMain: React.FC = () => {
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} sx={{ textAlign: "center", py: 10 }}>
+                    <TableCell colSpan={9} sx={{ textAlign: "center", py: 10 }}>
                       <Typography sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
                         {enriched.length === 0 ? 'No scorecards yet. Go to Upload JSON to start.' : "No results match your filter."}
                       </Typography>
@@ -422,6 +438,30 @@ const JRitterAgentMain: React.FC = () => {
                             </Typography>
                           </Box>
                         </TableCell>
+                        <TableCell align="center" sx={{ py: 1.5, px: 1.5 }}>
+                          {rec.tier ? (() => {
+                            const tc = getTierConfig(rec.tier);
+                            return (
+                              <Chip
+                                label={tc.label}
+                                size="small"
+                                sx={{
+                                  fontWeight: 700, fontSize: "0.68rem", height: 24,
+                                  bgcolor: tc.bg, color: tc.color,
+                                  border: `1px solid ${tc.color}50`,
+                                  fontFamily: "'Inter', 'Roboto', sans-serif",
+                                }}
+                              />
+                            );
+                          })() : <Typography sx={{ fontSize: "0.78rem", color: "#cbd5e1" }}>—</Typography>}
+                        </TableCell>
+                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                          {rec.signal ? (
+                            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#334155", fontFamily: "'Inter', 'Roboto', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {rec.signal}
+                            </Typography>
+                          ) : <Typography sx={{ fontSize: "0.78rem", color: "#cbd5e1" }}>—</Typography>}
+                        </TableCell>
                         <TableCell sx={{ py: 1.5, px: 1.5 }}>
                           <Chip
                             label={verdictLabel}
@@ -439,7 +479,7 @@ const JRitterAgentMain: React.FC = () => {
 
                       {/* ── Expanded Detail ── */}
                       <TableRow sx={{ bgcolor: "#f8fafc" }}>
-                        <TableCell colSpan={7} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
+                        <TableCell colSpan={9} sx={{ py: 0, px: 0, borderBottom: isOpen ? "2px solid #e2e8f0" : "none", borderLeft: "3px solid #0891b2" }}>
                           <Collapse in={isOpen} timeout={300}>
                             <ExpandedDetail record={rec} />
                           </Collapse>
