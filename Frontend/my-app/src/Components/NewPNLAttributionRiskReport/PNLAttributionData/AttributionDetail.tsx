@@ -191,10 +191,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     return opts;
   }, [tickerData, subFilterKeys]);
 
-  /* Apply filters client-side, keep TOTAL pinned at bottom */
+  /* Apply filters client-side; separate TOTAL and TRADED/EXITED to pin at bottom */
   const filteredData = useMemo(() => {
-    const nonTotal = tickerData.filter((item) => item.ticker !== "TOTAL");
-    return nonTotal.filter((item) => {
+    return tickerData.filter((item) => {
+      if (item.ticker === "TOTAL" || item.ticker === "TRADED / EXITED") return false;
       return Object.entries(activeFilters).every(([key, selectedValues]) => {
         if (selectedValues.length === 0) return true;
         const itemValue = String(item[key as keyof TickerItem] ?? "");
@@ -202,6 +202,11 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       });
     });
   }, [tickerData, activeFilters]);
+
+  const exitedRow = useMemo(
+    () => tickerData.find((item) => item.ticker === "TRADED / EXITED") ?? null,
+    [tickerData]
+  );
 
   const totalRow = useMemo(
     () => tickerData.find((item) => item.ticker === "TOTAL") ?? null,
@@ -222,11 +227,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       });
     }
     const dataRows = sorted.map((item, idx) => ({ id: idx, ...item }));
+    // Pin TRADED/EXITED just above TOTAL — always at bottom regardless of sort
+    if (exitedRow) {
+      dataRows.push({ id: -2, ...exitedRow });
+    }
     if (totalRow) {
       dataRows.push({ id: -1, ...totalRow });
     }
     return dataRows;
-  }, [filteredData, totalRow, sortModel]);
+  }, [filteredData, exitedRow, totalRow, sortModel]);
 
   const handleFilterChange = (filterKey: string, event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
@@ -550,8 +559,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         size="small"
         onClick={() => setExitedSort(sortKey)}
         sx={{
-          height: 22,
-          fontSize: "10px",
+          height: 26,
+          fontSize: "11px",
           fontWeight: active ? 700 : 500,
           bgcolor: active ? `${theme.activeTab}15` : "#f8fafc",
           color: active ? theme.activeTab : "#64748b",
@@ -565,10 +574,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   };
 
   /* Compact deal row renderer */
-  const renderDealRow = (deal: ClosedTickerDetail) => {
-    const pnlVal = showPct ? deal.ytd_pnl_pct : deal.ytd_pnl;
+  const renderDealRow = (deal: ClosedTickerDetail, idx: number) => {
     const isPositive = deal.ytd_pnl > 0;
     const isNegative = deal.ytd_pnl < 0;
+    const isEven = idx % 2 === 0;
     return (
       <Box
         key={deal.ticker}
@@ -576,24 +585,25 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          py: 0.5,
-          px: 1,
-          borderRadius: "4px",
+          py: 0.6,
+          px: 1.2,
+          borderRadius: "5px",
+          bgcolor: isEven ? "transparent" : "#f8fafc",
           transition: "background 0.12s",
           "&:hover": { bgcolor: theme.hoverRow },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
           {isPositive ? (
-            <TrendingUpIcon sx={{ fontSize: 11, color: "#059669" }} />
+            <TrendingUpIcon sx={{ fontSize: 13, color: "#059669" }} />
           ) : isNegative ? (
-            <TrendingDownIcon sx={{ fontSize: 11, color: "#dc2626" }} />
+            <TrendingDownIcon sx={{ fontSize: 13, color: "#dc2626" }} />
           ) : (
-            <RemoveIcon sx={{ fontSize: 11, color: "#94a3b8" }} />
+            <RemoveIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
           )}
           <Typography
             sx={{
-              fontSize: "11px",
+              fontSize: "13px",
               fontWeight: 600,
               fontFamily: FONT,
               color: "#1e293b",
@@ -605,7 +615,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         </Box>
         <Typography
           sx={{
-            fontSize: "11px",
+            fontSize: "13px",
             fontWeight: 700,
             fontFamily: FONT,
             color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#94a3b8",
@@ -653,10 +663,10 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           >
             {/* Left: Title + stats */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <SwapVertIcon sx={{ fontSize: 14, color: theme.activeTab }} />
+              <SwapVertIcon sx={{ fontSize: 16, color: theme.activeTab }} />
               <Typography
                 sx={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   fontWeight: 700,
                   fontFamily: FONT,
                   color: "#1e293b",
@@ -670,8 +680,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 label={`${processedClosedTickers.length}${exitedSearch ? ` / ${closedTickerDetails.length}` : ""}`}
                 size="small"
                 sx={{
-                  height: 18,
-                  fontSize: "9px",
+                  height: 22,
+                  fontSize: "11px",
                   fontWeight: 700,
                   bgcolor: `${theme.activeTab}12`,
                   color: theme.activeTab,
@@ -680,16 +690,16 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
               <Chip
                 label={`${posCount} ▲`}
                 size="small"
-                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
+                sx={{ height: 22, fontSize: "11px", fontWeight: 700, bgcolor: "#f0fdf4", color: "#059669" }}
               />
               <Chip
                 label={`${negCount} ▼`}
                 size="small"
-                sx={{ height: 18, fontSize: "9px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
+                sx={{ height: 22, fontSize: "11px", fontWeight: 700, bgcolor: "#fef2f2", color: "#dc2626" }}
               />
               <Typography
                 sx={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   fontWeight: 800,
                   fontFamily: FONT,
                   color: totalYtd >= 0 ? "#059669" : "#dc2626",
@@ -710,15 +720,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
+                      <SearchIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
-                  width: 140,
+                  width: 160,
                   "& .MuiOutlinedInput-root": {
-                    height: 26,
-                    fontSize: "11px",
+                    height: 30,
+                    fontSize: "12px",
                     fontFamily: FONT,
                     borderRadius: "6px",
                     bgcolor: "#fff",
@@ -784,17 +794,19 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
-                      px: 1,
-                      py: 0.3,
-                      borderBottom: "1px solid #f1f5f9",
-                      mb: 0.3,
+                      px: 1.2,
+                      py: 0.5,
+                      borderBottom: "2px solid #e2e8f0",
+                      mb: 0.4,
+                      bgcolor: "#f8fafc",
+                      borderRadius: "4px 4px 0 0",
                     }}
                   >
                     <Typography
                       sx={{
-                        fontSize: "9px",
+                        fontSize: "11px",
                         fontWeight: 700,
-                        color: "#94a3b8",
+                        color: "#475569",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
                         fontFamily: FONT,
@@ -804,9 +816,9 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                     </Typography>
                     <Typography
                       sx={{
-                        fontSize: "9px",
+                        fontSize: "11px",
                         fontWeight: 700,
-                        color: "#94a3b8",
+                        color: "#475569",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
                         fontFamily: FONT,
@@ -815,7 +827,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                       YTD P&L
                     </Typography>
                   </Box>
-                  {col.map((deal) => renderDealRow(deal))}
+                  {col.map((deal, di) => renderDealRow(deal, di))}
                 </Box>
               ))}
             </Box>
