@@ -1,7 +1,8 @@
 export interface TickerOption {
   ticker: string;
   pricing_date: string;
-  deal_colour_present: string
+  deal_colour_present: string;
+  uniquedealid?: string;
 }
 
 
