@@ -27,6 +27,8 @@ export interface NormalizedData {
   composite_max: number;
   composite_grade: string;
   composite_summary: string;
+  composite_tier: string;
+  composite_signal: string;
   verdict: string;
   dimensions: NormalizedDimension[];
   strengths: string[];
@@ -82,6 +84,8 @@ function normalizeNewFormat(json: any): NormalizedData {
     composite_max: cs.max ?? 100,
     composite_grade: cs.grade || "",
     composite_summary: cs.summary || "",
+    composite_tier: cs.tier || "",
+    composite_signal: cs.signal || "",
     verdict: cs.grade ? `Grade ${cs.grade}` : (cs.summary || ""),
     dimensions,
     strengths: a.strengths || [],
@@ -138,6 +142,8 @@ function normalizeLegacyFormat(json: any): NormalizedData {
     composite_max: scores.composite_max ?? 100,
     composite_grade: "",
     composite_summary: scores.verdict_label || scores.verdict || "",
+    composite_tier: scores.tier || "",
+    composite_signal: scores.signal || "",
     verdict: scores.verdict_label || scores.verdict || "",
     dimensions,
     strengths: [],
@@ -161,7 +167,7 @@ function emptyNormalized(): NormalizedData {
   return {
     ticker: "", company_name: "", exchange: "", sector: "", ipo_date: "",
     days_since_ipo: 0, composite_score: 0, composite_max: 100,
-    composite_grade: "", composite_summary: "", verdict: "",
+    composite_grade: "", composite_summary: "", composite_tier: "", composite_signal: "", verdict: "",
     dimensions: [], strengths: [], concerns: [], key_metrics: {},
     ipo_data: {}, fundamentals: {}, underwriters: [],
     disclaimer: "", methodology: "", raw: {},
