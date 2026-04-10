@@ -108,6 +108,7 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
           type: 'deal_information',
           ticker: selectedOption.ticker,
           pricing_date: selectedOption.pricing_date,
+          uniquedealid: selectedOption.uniquedealid,
         }),
       })
         .then((res) => {
@@ -158,7 +159,7 @@ const DealFormSectionMainTable: React.FC<Props> = ({ selectedOption }) => {
           {error}
         </Alert>
       )}
-      <DealFormDataTabsMain formData={formData} isCreate={isCreate} selectedTicker={selectedOption.ticker} />
+      <DealFormDataTabsMain formData={formData} isCreate={isCreate} selectedTicker={selectedOption.ticker} uniquedealid={selectedOption.uniquedealid} />
     </Box>
   );
 };

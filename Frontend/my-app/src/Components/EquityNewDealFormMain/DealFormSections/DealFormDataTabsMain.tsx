@@ -34,12 +34,14 @@ interface Props {
   formData: FormData;
   isCreate: boolean;
   selectedTicker: string;
+  uniquedealid?: string;
 }
 
 const DealFormDataTabsMain: React.FC<Props> = ({
   formData,
   isCreate,
   selectedTicker,
+  uniquedealid,
 }) => {
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
@@ -92,6 +94,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
         : {
           operation: "new_deal_update",
           data: localData,
+          uniquedealid: uniquedealid,
         };
 
       const response = await axios.post(url, payload, {
