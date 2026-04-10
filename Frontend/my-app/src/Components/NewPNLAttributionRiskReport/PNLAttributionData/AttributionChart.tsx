@@ -24,7 +24,7 @@ const METRIC_LABELS: Record<string, string> = {
   wtd_pnl: "WTD P&L",
   ytd_pnl: "YTD P&L",
   market_value: "Market Value",
-  net_exp: "Net Exp",
+  net_exp: "Notional Exp",
   beta_adj_net: "Beta Adj Net",
   delta_adj_net: "Delta Adj Net",
 };
