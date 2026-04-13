@@ -87,7 +87,7 @@ const STAT_CARDS = [
   },
 ];
 
-type SortField = "ticker" | "composite" | "days" | "verdict";
+type SortField = "ticker" | "company_name" | "sector" | "days" | "composite" | "tier" | "signal" | "verdict";
 
 const TIER_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
   tier1: { bg: "#ecfdf5", color: "#065f46", label: "Tier 1" },
@@ -167,8 +167,12 @@ const JRitterAgentMain: React.FC = () => {
     return [...list].sort((a, b) => {
       let av: any, bv: any;
       if (sortField === "ticker") { av = a.ticker.toLowerCase(); bv = b.ticker.toLowerCase(); }
-      else if (sortField === "composite") { av = a.composite; bv = b.composite; }
+      else if (sortField === "company_name") { av = (a.company_name || "").toLowerCase(); bv = (b.company_name || "").toLowerCase(); }
+      else if (sortField === "sector") { av = a.sector.toLowerCase(); bv = b.sector.toLowerCase(); }
       else if (sortField === "days") { av = a.daysSince; bv = b.daysSince; }
+      else if (sortField === "composite") { av = a.composite; bv = b.composite; }
+      else if (sortField === "tier") { av = a.tier?.toLowerCase() || ""; bv = b.tier?.toLowerCase() || ""; }
+      else if (sortField === "signal") { av = a.signal?.toLowerCase() || ""; bv = b.signal?.toLowerCase() || ""; }
       else { av = a.verdict.toLowerCase(); bv = b.verdict.toLowerCase(); }
       if (av < bv) return sortDir === "asc" ? -1 : 1;
       if (av > bv) return sortDir === "asc" ? 1 : -1;
@@ -341,14 +345,14 @@ const JRitterAgentMain: React.FC = () => {
           <TableContainer>
             <Table size="small" sx={{ tableLayout: "fixed" }}>
               <colgroup>
-                <col style={{ width: 44 }} />
-                <col style={{ width: 90 }} />
-                <col style={{ width: 170 }} />
-                <col style={{ width: 170 }} />
-                <col style={{ width: 60 }} />
-                <col style={{ width: 80 }} />
-                <col style={{ width: 80 }} />
-                <col style={{ width: 120 }} />
+                <col style={{ width: 40 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 200 }} />
+                <col style={{ width: 280 }} />
+                <col style={{ width: 70 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 100 }} />
+                <col style={{ width: 200 }} />
                 <col />
               </colgroup>
               <TableHead>
@@ -359,8 +363,16 @@ const JRitterAgentMain: React.FC = () => {
                       Ticker
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle}>Issuer</TableCell>
-                  <TableCell sx={thStyle}>Sector</TableCell>
+                  <TableCell sx={thStyle}>
+                    <TableSortLabel active={sortField === "company_name"} direction={sortField === "company_name" ? sortDir : "asc"} onClick={() => handleSort("company_name")}>
+                      Issuer
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={thStyle}>
+                    <TableSortLabel active={sortField === "sector"} direction={sortField === "sector" ? sortDir : "asc"} onClick={() => handleSort("sector")}>
+                      Sector
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell sx={thStyle} align="center">
                     <TableSortLabel active={sortField === "days"} direction={sortField === "days" ? sortDir : "asc"} onClick={() => handleSort("days")}>
                       Days
@@ -371,8 +383,16 @@ const JRitterAgentMain: React.FC = () => {
                       Score
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle} align="center">Tier</TableCell>
-                  <TableCell sx={thStyle} align="left">Signal</TableCell>
+                  <TableCell sx={thStyle} align="center">
+                    <TableSortLabel active={sortField === "tier"} direction={sortField === "tier" ? sortDir : "asc"} onClick={() => handleSort("tier")}>
+                      Tier
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={thStyle} align="left">
+                    <TableSortLabel active={sortField === "signal"} direction={sortField === "signal" ? sortDir : "asc"} onClick={() => handleSort("signal")}>
+                      Signal
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell sx={thStyle} align="left">
                     <TableSortLabel active={sortField === "verdict"} direction={sortField === "verdict" ? sortDir : "asc"} onClick={() => handleSort("verdict")}>
                       Verdict
@@ -416,10 +436,10 @@ const JRitterAgentMain: React.FC = () => {
                             {rec.ticker}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ ...tdStyle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <TableCell sx={{ ...tdStyle, whiteSpace: "normal", wordBreak: "break-word" }}>
                           {rec.company_name || "—"}
                         </TableCell>
-                        <TableCell sx={{ ...tdStyle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <TableCell sx={{ ...tdStyle, whiteSpace: "normal", wordBreak: "break-word" }}>
                           <Typography sx={{ fontSize: "0.78rem", color: "#64748b", fontFamily: "'Inter', 'Roboto', sans-serif" }}>{rec.sector}</Typography>
                         </TableCell>
                         <TableCell sx={tdStyle} align="center">
@@ -455,9 +475,9 @@ const JRitterAgentMain: React.FC = () => {
                             );
                           })() : <Typography sx={{ fontSize: "0.78rem", color: "#cbd5e1" }}>—</Typography>}
                         </TableCell>
-                        <TableCell sx={{ py: 1.5, px: 1.5 }}>
+                        <TableCell sx={{ py: 1.5, px: 1.5, whiteSpace: "normal", wordBreak: "break-word" }}>
                           {rec.signal ? (
-                            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#334155", fontFamily: "'Inter', 'Roboto', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#334155", fontFamily: "'Inter', 'Roboto', sans-serif" }}>
                               {rec.signal}
                             </Typography>
                           ) : <Typography sx={{ fontSize: "0.78rem", color: "#cbd5e1" }}>—</Typography>}
@@ -553,20 +573,20 @@ const ExpandedDetail: React.FC<{ record: any }> = ({ record }) => {
 /* ═══ Table styles ═══ */
 const thStyle = {
   fontWeight: 700,
-  fontSize: "0.67rem",
-  color: "#64748b",
+  fontSize: "0.8rem",
+  color: "#002060",
   textTransform: "uppercase" as const,
   letterSpacing: "0.08em",
-  py: 1.5,
-  px: 1.5,
+  py: 2,
+  px: 2,
   fontFamily: "'Inter', 'Roboto', sans-serif",
 };
 
 const tdStyle = {
-  fontSize: "0.83rem",
+  fontSize: "0.85rem",
   color: "#334155",
-  py: 1.5,
-  px: 1.5,
+  py: 2,
+  px: 2,
   fontWeight: 500,
   fontFamily: "'Inter', 'Roboto', sans-serif",
 };
