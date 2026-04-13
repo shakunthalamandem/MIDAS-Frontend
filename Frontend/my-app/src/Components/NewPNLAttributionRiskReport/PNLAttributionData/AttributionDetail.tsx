@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   CircularProgress,
@@ -107,6 +108,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   theme,
   onClose,
 }) => {
+  const navigate = useNavigate();
   const [tickerData, setTickerData] = useState<TickerItem[]>([]);
   const [closedTickerDetails, setClosedTickerDetails] = useState<ClosedTickerDetail[]>([]);
   const [loading, setLoading] = useState(false);
@@ -266,6 +268,50 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         cellClassName: "attr-detail-cell--name",
         renderCell: ({ row }) => {
           const isExited = row.ticker === "TRADED / EXITED";
+          const isTotal = row.ticker === "TOTAL";
+          if (isTotal) {
+            return (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  width: "100%",
+                }}
+              >
+                <span style={{ fontWeight: 800 }}>{row.ticker}</span>
+                <Typography
+                  component="span"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const params = new URLSearchParams({
+                      fund: JSON.stringify(selectedFunds),
+                      date: selectedDate,
+                      groupBy,
+                      groupValue,
+                    });
+                    navigate(`/risk_report_pnl_report/ticker-detail?${params.toString()}`);
+                  }}
+                  sx={{
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    color: theme.activeTab,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    textDecorationStyle: "dotted",
+                    textUnderlineOffset: "2px",
+                    "&:hover": {
+                      color: "#1e40af",
+                      textDecorationStyle: "solid",
+                    },
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  Click here to see more details
+                </Typography>
+              </Box>
+            );
+          }
           return (
             <Box
               sx={{
@@ -487,7 +533,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             : formatCurrency(row.beta_adj_net),
       },
     ],
-    [showPct, closedTickerDetails, expandedExited, theme]
+    [showPct, closedTickerDetails, expandedExited, theme, navigate, selectedFunds, selectedDate, groupBy, groupValue]
   );
 
   /* --- Filtered & sorted closed ticker list --- */
@@ -925,7 +971,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         <Box className="attr-detail-loading">
           <CircularProgress size={28} />
         </Box>
-      ) : filteredData.length > 0 ? (
+      ) : filteredData.length > 0 || totalRow || exitedRow ? (
         <>
           <Box className="attr-detail-table-wrapper">
             <DataGrid
