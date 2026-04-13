@@ -23,8 +23,6 @@ interface CumulativePnLChartProps {
 }
 
 const PERIOD_LABELS: Record<string, string> = {
-  dtd: "DTD",
-  wtd: "WTD",
   mtd: "MTD",
   ytd: "YTD",
 };

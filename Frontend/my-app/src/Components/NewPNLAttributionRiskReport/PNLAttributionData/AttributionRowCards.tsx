@@ -12,11 +12,9 @@ interface MetricCard {
 }
 
 const METRIC_CARDS: MetricCard[] = [
-  { key: "dtd_pnl", label: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct" },
-  { key: "wtd_pnl", label: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct" },
   { key: "ytd_pnl", label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct" },
-  { key: "market_value", label: "Market Value", valueKey: "market_value", pctKey: "market_value_pct" },
-  { key: "net_exp", label: "Notional Exp", valueKey: "net_exp", pctKey: "net_exp_pct" },
+  { key: "gross_market_value", label: "Gross Market Value", valueKey: "gross_market_value", pctKey: "gross_market_value_pct" },
+  { key: "net_exp", label: "Net Notional Exposure", valueKey: "net_exp", pctKey: "net_exp_pct" },
   { key: "delta_adj_net", label: "Delta Adj Net", valueKey: "delta_adj_net", pctKey: "delta_adj_net_pct" },
   { key: "beta_adj_net", label: "Beta Adj Net", valueKey: "beta_adj_net", pctKey: "beta_adj_net_pct" },
 ];

@@ -334,30 +334,6 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         cellClassName: "attr-detail-cell--name",
       },
       {
-        field: "dtd_pnl",
-        headerName: "DTD P&L",
-        flex: 1,
-        minWidth: 120,
-        headerAlign: "right",
-        align: "right",
-        valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.dtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct ? formatPctVal(row.dtd_pnl_pct) : formatCurrency(row.dtd_pnl),
-      },
-      {
-        field: "wtd_pnl",
-        headerName: "WTD P&L",
-        flex: 1,
-        minWidth: 120,
-        headerAlign: "right",
-        align: "right",
-        valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.wtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct ? formatPctVal(row.wtd_pnl_pct) : formatCurrency(row.wtd_pnl),
-      },
-      {
         field: "ytd_pnl",
         headerName: "YTD P&L",
         flex: 1,
@@ -370,8 +346,8 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           showPct ? formatPctVal(row.ytd_pnl_pct) : formatCurrency(row.ytd_pnl),
       },
       {
-        field: "market_value",
-        headerName: "Net Market Value",
+        field: "gross_market_value",
+        headerName: "Gross Market Value",
         flex: 1,
         minWidth: 130,
         headerAlign: "right",
@@ -382,7 +358,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>NMV (Net Market Value)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>GMV (Gross Market Value)</Box>
                 <Box sx={{ color: "#93c5fd" }}>Σ Price × Quantity × PT Value</Box>
                 <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses premium price for options</Box>
               </Box>
@@ -390,7 +366,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 600 }}>Net Market Value</span>
+              <span style={{ fontWeight: 600 }}>Gross Market Value</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -399,15 +375,15 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
           </Tooltip>
         ),
         valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.market_value_pct : value,
+          showPct ? row.gross_market_value_pct : value,
         renderCell: ({ row }) =>
           showPct
-            ? formatPctVal(row.market_value_pct)
-            : formatCurrency(row.market_value),
+            ? formatPctVal(row.gross_market_value_pct)
+            : formatCurrency(row.gross_market_value),
       },
       {
         field: "net_exp",
-        headerName: "Notional Exp",
+        headerName: "Net Notional Exposure",
         flex: 1,
         minWidth: 120,
         headerAlign: "right",
@@ -418,7 +394,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Exposure</Box>
+                <Box sx={{ fontWeight: 600, mb: 0.5 }}>Net Notional Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
                 <Box sx={{ mt: 0.5, color: "#fd8700" }}>Uses underlying price for options</Box>
@@ -427,7 +403,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 600 }}>Notional Exp</span>
+              <span style={{ fontWeight: 600 }}>Net Notional Exposure</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
