@@ -121,17 +121,17 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       const isOther1 = name1 === "OTHER";
       const isOther2 = name2 === "OTHER";
 
-      // TOTAL always last
+      const sortModel = params1.api.getSortModel();
+      const isDesc = sortModel.length > 0 && sortModel[0].sort === "desc";
+
+      // TOTAL always last (compensate for DataGrid sign-flip in desc mode)
       if (isTotal1 && isTotal2) return 0;
-      if (isTotal1) return 1;
-      if (isTotal2) return -1;
+      if (isTotal1) return isDesc ? -1 : 1;
+      if (isTotal2) return isDesc ? 1 : -1;
 
       // OTHER second-to-last
       if (isOther1 && isOther2) return 0;
       if (!isOther1 && !isOther2) return defaultCompare(v1, v2);
-
-      const sortModel = params1.api.getSortModel();
-      const isDesc = sortModel.length > 0 && sortModel[0].sort === "desc";
       if (isOther1) return isDesc ? -1 : 1;
       return isDesc ? 1 : -1;
     };
