@@ -52,7 +52,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
   const [time, setTime] = useState("09:00");
   const [weekday, setWeekday] = useState("1");
   const [hourInterval, setHourInterval] = useState("2");
-  const [useWebSearch, setUseWebSearch] = useState(false);
+  const [useWebSearch, setUseWebSearch] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -80,7 +80,7 @@ const CreateAgentDialog: React.FC<CreateAgentDialogProps> = ({
     setTime("09:00");
     setWeekday("1");
     setHourInterval("2");
-    setUseWebSearch(false);
+    setUseWebSearch(true);
     setError(null);
     setSuccess(null);
   };
