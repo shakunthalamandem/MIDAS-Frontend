@@ -171,38 +171,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           );
         },
       },
-      {
-        field: "dtd_pnl",
-        headerName: "DTD P&L",
-        flex: 0.85,
-        minWidth: 110,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinTotalAndOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.dtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.dtd_pnl_pct)
-            : formatCurrency(row.dtd_pnl),
-      },
-      {
-        field: "wtd_pnl",
-        headerName: "WTD P&L",
-        flex: 0.85,
-        minWidth: 110,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinTotalAndOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.wtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.wtd_pnl_pct)
-            : formatCurrency(row.wtd_pnl),
-      },
+
       {
         field: "ytd_pnl",
         headerName: "YTD P&L",
