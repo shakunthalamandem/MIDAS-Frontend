@@ -299,6 +299,7 @@ class DocBuilder {
     p.line(MG, this.y + 2, PW - MG, this.y + 2)
     p.setTextColor(...BLACK)
     this.y += H1_AFTER + H1_SIZE * PT + 2
+    this.setFont("normal", BODY_SIZE)
   }
 
   /** Heading 2: 11.5pt Bold, #002060, space before 12pt, after 4pt */
@@ -312,6 +313,7 @@ class DocBuilder {
     p.text(title, MG, this.y)
     p.setTextColor(...BLACK)
     this.y += H2_AFTER + H2_SIZE * PT
+    this.setFont("normal", BODY_SIZE)
   }
 
   /** Body text: 10.5pt Regular, line spacing 1.15, space after 4pt */
@@ -349,6 +351,9 @@ class DocBuilder {
       const lines = this.wrap(cleaned, textW, BULLET_SIZE)
       // Ensure at least first 2 lines fit
       this.ensureSpace(Math.min(lines.length, 2) * lh + 2)
+      // Restore font/color after possible page break
+      this.setFont("normal", BULLET_SIZE)
+      p.setTextColor(...BLACK)
       // Draw solid round bullet
       p.setFillColor(...BLACK)
       const bulletY = this.y - 0.8
@@ -522,6 +527,7 @@ class DocBuilder {
     p.setTextColor(...BLACK)
     p.text(`${value}/${max}`, barX + barW + 3, this.y + 3)
     this.y += 7
+    this.setFont("normal", BODY_SIZE)
   }
 
   /* ═════════════════════════════════════════════
@@ -568,7 +574,11 @@ class DocBuilder {
     // ── Deal Information ──
     this.h1("Deal Information")
 
-    const bookStr = Array.isArray(di.bookrunners) && di.bookrunners.length > 0 ? di.bookrunners.join(", ") : "—"
+    const bookStr = Array.isArray(di.bookrunners) && di.bookrunners.length > 0
+      ? di.bookrunners.join(", ")
+      : typeof di.bookrunners === "string" && (di.bookrunners as string).trim()
+        ? (di.bookrunners as string).trim()
+        : "—"
     const priceRange = di.lower_bound != null && di.upper_bound != null ? `$${n2s(di.lower_bound)} – $${n2s(di.upper_bound)}` : "—"
 
     this.table(
