@@ -143,7 +143,7 @@
 }
 
 .legend-proxy-table th {
-  text-align: left;
+  text-align: center;
   padding: 6px 14px;
   color: #002060;
   font-weight: 700;
@@ -151,6 +151,11 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #ccd5e8;
+}
+
+.legend-proxy-table th:first-child,
+.legend-proxy-table td:first-child {
+  text-align: left;
 }
 
 .legend-proxy-table td {
@@ -168,7 +173,7 @@
 }
 
 .legend-proxy-num {
-  text-align: right !important;
+  text-align: center !important;
   font-family: "JetBrains Mono", "Fira Mono", monospace;
   color: #002060 !important;
   font-weight: 600;
