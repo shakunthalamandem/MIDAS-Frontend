@@ -165,7 +165,10 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCa
                   </Box>
                 )}
                 {pct && (
-                  <Box className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}>
+                  <Box
+                    className={isPctOnly ? `risk-card-value risk-card-value--${cfg.color}` : "risk-card-pct"}
+                    sx={isSelected ? { color: "rgba(255,255,255,0.85) !important" } : {}}
+                  >
                     {displayPct}
                   </Box>
                 )}
