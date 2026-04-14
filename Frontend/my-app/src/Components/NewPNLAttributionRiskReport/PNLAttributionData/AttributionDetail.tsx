@@ -464,9 +464,9 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       },
       {
         field: "delta_adj_net",
-        headerName: "Delta Adj Net",
+        headerName: "Delta Adjusted Net Exp",
         flex: 1,
-        minWidth: 120,
+        minWidth: 140,
         headerAlign: "right",
         align: "right",
         renderHeader: () => (
@@ -482,7 +482,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 600 }}>Delta Adj Net</span>
+              <span style={{ fontWeight: 600 }}>Delta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -499,9 +499,9 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
       },
       {
         field: "beta_adj_net",
-        headerName: "Beta Adj Net",
+        headerName: "Beta Adjusted Net Exp",
         flex: 1,
-        minWidth: 120,
+        minWidth: 140,
         headerAlign: "right",
         align: "right",
         renderHeader: () => (
@@ -517,7 +517,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 600 }}>Beta Adj Net</span>
+              <span style={{ fontWeight: 600 }}>Beta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}

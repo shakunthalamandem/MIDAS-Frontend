@@ -23,8 +23,8 @@ const METRIC_LABELS: Record<string, string> = {
   ytd_pnl: "YTD P&L",
   gross_market_value: "Gross Market Value",
   net_exp: "Net Notional Exposure",
-  beta_adj_net: "Beta Adj Net",
-  delta_adj_net: "Delta Adj Net",
+  beta_adj_net: "Beta Adjusted Net Exp",
+  delta_adj_net: "Delta Adjusted Net Exp",
 };
 
 interface AttributionChartProps {
