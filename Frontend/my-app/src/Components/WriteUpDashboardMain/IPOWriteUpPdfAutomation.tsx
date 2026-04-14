@@ -700,7 +700,8 @@ class DocBuilder {
       this.body("No comparable company data available.")
     }
 
-    // ── Valuation ──
+    // ── Valuation — always start on a fresh page ──
+    this.newPage()
     this.h1("Valuation")
     if (va.narrative?.length) {
       // Render as paragraphs, NOT bullets
