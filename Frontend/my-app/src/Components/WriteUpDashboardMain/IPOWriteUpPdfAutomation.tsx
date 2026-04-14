@@ -323,6 +323,9 @@ class DocBuilder {
     const lh = this.lineH(BODY_SIZE)
     for (const line of lines) {
       this.ensureSpace(lh + 1)
+      // Restore font after possible page break
+      this.setFont("normal", BODY_SIZE)
+      p.setTextColor(...BLACK)
       p.text(line, MG, this.y)
       this.y += lh
     }
@@ -351,6 +354,9 @@ class DocBuilder {
       // Draw text
       for (const line of lines) {
         this.ensureSpace(lh + 0.5)
+        // Restore font after possible page break
+        this.setFont("normal", BULLET_SIZE)
+        p.setTextColor(...BLACK)
         p.text(line, textX, this.y)
         this.y += lh
       }
@@ -768,6 +774,9 @@ class DocBuilder {
       const lh = DISCLAIMER_SIZE * PT * 1.05
       for (const line of lines) {
         this.ensureSpace(lh + 1)
+        // Restore font after possible page break
+        this.setFont("normal", DISCLAIMER_SIZE)
+        p.setTextColor(...DARK_GRAY)
         p.text(line, MG, this.y)
         this.y += lh
       }
