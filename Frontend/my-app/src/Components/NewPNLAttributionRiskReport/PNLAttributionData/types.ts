@@ -85,8 +85,8 @@ export interface AttributionItem {
   wtd_pnl_pct: number;
   ytd_pnl: number;
   ytd_pnl_pct: number;
-  market_value: number;
-  market_value_pct: number;
+  gross_market_value: number;
+  gross_market_value_pct: number;
   net_exp: number;
   net_exp_pct: number;
   beta_adj_net: number;
@@ -178,8 +178,8 @@ export interface TickerItem {
   wtd_pnl_pct: number;
   ytd_pnl: number;
   ytd_pnl_pct: number;
-  market_value: number;
-  market_value_pct: number;
+  gross_market_value: number;
+  gross_market_value_pct: number;
   net_exp: number;
   net_exp_pct: number;
   beta_adj_net: number;

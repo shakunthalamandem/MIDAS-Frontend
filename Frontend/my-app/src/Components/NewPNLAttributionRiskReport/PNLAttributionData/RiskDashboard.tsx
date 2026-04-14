@@ -430,6 +430,7 @@ const RiskDashboard: React.FC = () => {
             <Box className="pdf-section" data-pdf-page="1">
               <HeadlineRisks
                 data={data.headline_risks}
+                pnlData={data.headline_pnl}
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
               />

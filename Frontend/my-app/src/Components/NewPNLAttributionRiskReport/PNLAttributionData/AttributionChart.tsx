@@ -20,13 +20,11 @@ interface ChartPoint {
 }
 
 const METRIC_LABELS: Record<string, string> = {
-  dtd_pnl: "DTD P&L",
-  wtd_pnl: "WTD P&L",
   ytd_pnl: "YTD P&L",
-  market_value: "Market Value",
-  net_exp: "Notional Exp",
-  beta_adj_net: "Beta Adj Net",
-  delta_adj_net: "Delta Adj Net",
+  gross_market_value: "Gross Market Value",
+  net_exp: "Net Notional Exposure",
+  beta_adj_net: "Beta Adjusted Net Exp",
+  delta_adj_net: "Delta Adjusted Net Exp",
 };
 
 interface AttributionChartProps {
