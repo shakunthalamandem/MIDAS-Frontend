@@ -1274,7 +1274,7 @@ const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ con
       "& th": { bgcolor: isLight ? "rgba(255,255,255,0.1)" : "#eef2ff", fontWeight: 700 },
     }}
   >
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    <ReactMarkdown remarkPlugins={[remarkGfm as any]}>{content}</ReactMarkdown>
   </Box>
   );
 };
