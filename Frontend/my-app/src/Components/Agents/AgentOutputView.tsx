@@ -132,7 +132,26 @@ const AgentOutputView: React.FC = () => {
               if (typeof item === "string") parts.push(`- ${item}`);
               else if (item?.name || item?.title) parts.push(`- ${item.name || item.title}: ${item.value || item.description || ""}`);
             });
+            // Handle table sections — join rows with \n (not \n\n) for proper markdown table
+            if (s.headers && s.rows) {
+              const tableLines: string[] = [];
+              tableLines.push("| " + s.headers.join(" | ") + " |");
+              tableLines.push("| " + s.headers.map(() => "---").join(" | ") + " |");
+              s.rows.forEach((row: any[]) => {
+                tableLines.push("| " + row.map((cell: any) => String(cell)).join(" | ") + " |");
+              });
+              parts.push(tableLines.join("\n"));
+            }
           });
+          // Handle metadata
+          const meta = output.result_json.metadata;
+          if (meta) {
+            const metaParts: string[] = [];
+            if (meta.confidence) metaParts.push(`Confidence: ${meta.confidence}`);
+            if (meta.analysis_date) metaParts.push(`Analysis Date: ${meta.analysis_date}`);
+            if (meta.data_sources) metaParts.push(`Data Sources: ${meta.data_sources.join(", ")}`);
+            if (metaParts.length > 0) parts.push("---\n" + metaParts.join(" | "));
+          }
           if (parts.length > 0) msgs.push({ role: "assistant", content: parts.join("\n\n") });
         }
         return msgs;
@@ -246,6 +265,25 @@ const AgentOutputView: React.FC = () => {
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsavedPromptChanges]);
 
+  // Reload chat history from DB so Current Interaction tab updates
+  const reloadChatHistory = useCallback(() => {
+    const id = agentId || (output?.agent ? String(output.agent) : null);
+    if (!id) return;
+    fetchAgentChatHistory(Number(id))
+      .then((msgs) => {
+        if (msgs.length > 0) setChatMessages(msgs);
+      })
+      .catch(() => {
+        if (output) {
+          fetchChatHistory(output.id)
+            .then((msgs) => {
+              if (msgs.length > 0) setChatMessages(msgs);
+            })
+            .catch(() => {});
+        }
+      });
+  }, [agentId, output]);
+
   // Run agent handler — shows results temporarily in Combined Prompt tab
   const handleRunAgent = async () => {
     const targetId = agentData?.id || (agentId ? Number(agentId) : null);
@@ -265,6 +303,8 @@ const AgentOutputView: React.FC = () => {
             setCombinedRunOutput(data);
             if (data.status === "completed" || data.status === "failed") {
               setRunLoading(false);
+              // Refresh chat history so Current Interaction tab shows new data immediately
+              reloadChatHistory();
               return;
             }
           } catch {
@@ -742,7 +782,7 @@ const AgentOutputView: React.FC = () => {
                         Executive Summary
                       </Typography>
                       <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
-                        {combinedRunOutput.result_json.summary}
+                        {stripCiteTags(combinedRunOutput.result_json.summary)}
                       </Typography>
                     </Box>
                   )}
@@ -755,7 +795,7 @@ const AgentOutputView: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
-                        {section.title}
+                        {stripCiteTags(section.title)}
                       </Typography>
                       <SectionRenderer section={section} />
                     </Box>
@@ -780,7 +820,7 @@ const AgentOutputView: React.FC = () => {
                           <Chip label={`Analysis: ${combinedRunOutput.result_json.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
                         )}
                         {combinedRunOutput.result_json.metadata.data_sources?.map((src: string, i: number) => (
-                          <Chip key={i} label={src} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
+                          <Chip key={i} label={stripCiteTags(src)} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
                         ))}
                       </Stack>
                     </Box>
@@ -1119,9 +1159,13 @@ const AgentOutputView: React.FC = () => {
 const stripCiteTags = (text: string): string =>
   text.replace(/<cite\s+index="[^"]*">/gi, "").replace(/<\/cite>/gi, "");
 
+/** Fix malformed markdown bold: ** text ** → **text** (spaces inside asterisks break rendering) */
+const fixMarkdownBold = (text: string): string =>
+  text.replace(/\*\*\s+/g, "**").replace(/\s+\*\*/g, "**");
+
 /** Renders markdown content with proper styling */
 const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ content: rawContent, isLight }) => {
-  const content = stripCiteTags(rawContent);
+  const content = fixMarkdownBold(stripCiteTags(rawContent));
   return (
   <Box
     sx={{
