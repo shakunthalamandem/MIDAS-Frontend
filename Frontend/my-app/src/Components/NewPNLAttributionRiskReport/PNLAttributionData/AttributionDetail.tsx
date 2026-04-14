@@ -998,6 +998,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
                   setExpandedExited((prev) => !prev);
                 }
               }}
+              sortingOrder={["asc", "desc"]}
               sortingMode="server"
               sortModel={sortModel}
               onSortModelChange={(model) => setSortModel(model)}
