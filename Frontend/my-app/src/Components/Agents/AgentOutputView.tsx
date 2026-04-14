@@ -38,6 +38,7 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
 import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, fetchAgentChatHistory, saveAgentFinalPrompt, runAgent } from "./agentService";
 
@@ -119,40 +120,12 @@ const AgentOutputView: React.FC = () => {
     if (chatMessages.length === 0) {
       const buildFallbackMessages = (): ChatMessage[] => {
         // Fallback: if DB has no chat history, construct from output data
+        // Store result_json as JSON string so frontend renders it with structured UI
         const msgs: ChatMessage[] = [];
         const prompt = output.agent_prompt || output.agent_description || "";
         if (prompt) msgs.push({ role: "user", content: prompt });
         if (output.result_json) {
-          const parts: string[] = [];
-          if (output.result_json.summary) parts.push(output.result_json.summary);
-          output.result_json.sections?.forEach((s: any) => {
-            if (s.title) parts.push(`**${s.title}**`);
-            if (s.content) parts.push(s.content);
-            if (s.items) s.items.forEach((item: any) => {
-              if (typeof item === "string") parts.push(`- ${item}`);
-              else if (item?.name || item?.title) parts.push(`- ${item.name || item.title}: ${item.value || item.description || ""}`);
-            });
-            // Handle table sections — join rows with \n (not \n\n) for proper markdown table
-            if (s.headers && s.rows) {
-              const tableLines: string[] = [];
-              tableLines.push("| " + s.headers.join(" | ") + " |");
-              tableLines.push("| " + s.headers.map(() => "---").join(" | ") + " |");
-              s.rows.forEach((row: any[]) => {
-                tableLines.push("| " + row.map((cell: any) => String(cell)).join(" | ") + " |");
-              });
-              parts.push(tableLines.join("\n"));
-            }
-          });
-          // Handle metadata
-          const meta = output.result_json.metadata;
-          if (meta) {
-            const metaParts: string[] = [];
-            if (meta.confidence) metaParts.push(`Confidence: ${meta.confidence}`);
-            if (meta.analysis_date) metaParts.push(`Analysis Date: ${meta.analysis_date}`);
-            if (meta.data_sources) metaParts.push(`Data Sources: ${meta.data_sources.join(", ")}`);
-            if (metaParts.length > 0) parts.push("---\n" + metaParts.join(" | "));
-          }
-          if (parts.length > 0) msgs.push({ role: "assistant", content: parts.join("\n\n") });
+          msgs.push({ role: "assistant", content: JSON.stringify(output.result_json) });
         }
         return msgs;
       };
@@ -867,7 +840,21 @@ const AgentOutputView: React.FC = () => {
               )}
 
               {/* All Chat Messages (initial prompt+response + follow-ups) */}
-              {chatMessages.map((msg, idx) => (
+              {chatMessages.map((msg, idx) => {
+                // Try to parse assistant message as structured JSON result
+                let parsedResult: any = null;
+                if (msg.role === "assistant") {
+                  try {
+                    const parsed = JSON.parse(msg.content);
+                    if (parsed && parsed.sections && Array.isArray(parsed.sections)) {
+                      parsedResult = parsed;
+                    }
+                  } catch {
+                    // Not JSON — render as markdown
+                  }
+                }
+
+                return (
                 <Box
                   key={`chat-${idx}`}
                   sx={{
@@ -875,7 +862,7 @@ const AgentOutputView: React.FC = () => {
                     justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
                   }}
                 >
-                  <Box sx={{ maxWidth: "85%" }}>
+                  <Box sx={{ maxWidth: msg.role === "assistant" ? "90%" : "85%", width: msg.role === "assistant" ? "100%" : "auto" }}>
                     <Stack
                       direction="row"
                       alignItems="center"
@@ -886,7 +873,7 @@ const AgentOutputView: React.FC = () => {
                       {msg.role === "user" ? (
                         <>
                           <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
-                            Follow-up
+                            {idx === 0 ? "Original Prompt" : "Follow-up"}
                           </Typography>
                           <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
                         </>
@@ -899,26 +886,83 @@ const AgentOutputView: React.FC = () => {
                         </>
                       )}
                     </Stack>
-                    <Box
-                      sx={{
-                        p: 2.5,
-                        borderRadius: 3,
-                        ...(msg.role === "user"
-                          ? { bgcolor: "#4f46e5", color: "#fff", borderBottomRightRadius: 4 }
-                          : { bgcolor: "#f8fafc", color: "#1e293b", borderLeft: "3px solid #4f46e5", borderBottomLeftRadius: 4 }),
-                      }}
-                    >
-                      {msg.role === "assistant" ? (
-                        <MarkdownContent content={msg.content} isLight={false} />
-                      ) : (
-                        <Typography sx={{ fontSize: "0.88rem", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                          {msg.content}
-                        </Typography>
-                      )}
-                    </Box>
+
+                    {/* Structured JSON result — render with same UI as Combined Prompt tab */}
+                    {parsedResult ? (
+                      <Box
+                        sx={{
+                          borderRadius: 3,
+                          bgcolor: "#f8fafc",
+                          borderLeft: "3px solid #4f46e5",
+                          borderBottomLeftRadius: 4,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {parsedResult.summary && (
+                          <Box sx={{ p: 2.5, borderBottom: "1px solid #e2e8f0", bgcolor: "#eef2ff" }}>
+                            <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.8 }}>
+                              Executive Summary
+                            </Typography>
+                            <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
+                              {stripCiteTags(parsedResult.summary)}
+                            </Typography>
+                          </Box>
+                        )}
+                        {parsedResult.sections?.map((section: AgentOutputSection, sIdx: number) => (
+                          <Box key={sIdx} sx={{ p: 2.5, borderBottom: sIdx < (parsedResult.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none" }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
+                              {stripCiteTags(section.title)}
+                            </Typography>
+                            <SectionRenderer section={section} />
+                          </Box>
+                        ))}
+                        {parsedResult.metadata && (
+                          <Box sx={{ p: 2, bgcolor: "#eef2ff", borderTop: "1px solid #e2e8f0" }}>
+                            <Stack direction="row" spacing={1} flexWrap="wrap">
+                              {parsedResult.metadata.confidence && (
+                                <Chip
+                                  label={`Confidence: ${parsedResult.metadata.confidence}`}
+                                  size="small"
+                                  sx={{
+                                    fontWeight: 700, borderRadius: 2, fontSize: "0.7rem",
+                                    bgcolor: parsedResult.metadata.confidence === "high" ? "#ecfdf5" : parsedResult.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
+                                    color: parsedResult.metadata.confidence === "high" ? "#059669" : parsedResult.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
+                                  }}
+                                />
+                              )}
+                              {parsedResult.metadata.analysis_date && (
+                                <Chip label={`Analysis: ${parsedResult.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
+                              )}
+                              {parsedResult.metadata.data_sources?.map((src: string, i: number) => (
+                                <Chip key={i} label={stripCiteTags(src)} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
+                              ))}
+                            </Stack>
+                          </Box>
+                        )}
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          p: 2.5,
+                          borderRadius: 3,
+                          ...(msg.role === "user"
+                            ? { bgcolor: "#4f46e5", color: "#fff", borderBottomRightRadius: 4 }
+                            : { bgcolor: "#f8fafc", color: "#1e293b", borderLeft: "3px solid #4f46e5", borderBottomLeftRadius: 4 }),
+                        }}
+                      >
+                        {msg.role === "assistant" ? (
+                          <MarkdownContent content={msg.content} isLight={false} />
+                        ) : (
+                          <Typography sx={{ fontSize: "0.88rem", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                            {msg.content}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
                   </Box>
                 </Box>
-              ))}
+                );
+              })}
 
               {/* Loading indicator */}
               {chatLoading && (
@@ -1163,9 +1207,20 @@ const stripCiteTags = (text: string): string =>
 const fixMarkdownBold = (text: string): string =>
   text.replace(/\*\*\s+/g, "**").replace(/\s+\*\*/g, "**");
 
+/** Fix broken markdown tables: rows separated by blank lines → consecutive lines */
+const fixMarkdownTables = (text: string): string => {
+  const pattern = /(^\|.+\|$)\n\n(^\|.+\|$)/gm;
+  let result = text;
+  // Repeatedly collapse blank lines between table rows until stable
+  while (pattern.test(result)) {
+    result = result.replace(pattern, "$1\n$2");
+  }
+  return result;
+};
+
 /** Renders markdown content with proper styling */
 const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ content: rawContent, isLight }) => {
-  const content = fixMarkdownBold(stripCiteTags(rawContent));
+  const content = fixMarkdownTables(fixMarkdownBold(stripCiteTags(rawContent)));
   return (
   <Box
     sx={{
@@ -1219,7 +1274,7 @@ const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ con
       "& th": { bgcolor: isLight ? "rgba(255,255,255,0.1)" : "#eef2ff", fontWeight: 700 },
     }}
   >
-    <ReactMarkdown>{content}</ReactMarkdown>
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
   </Box>
   );
 };
