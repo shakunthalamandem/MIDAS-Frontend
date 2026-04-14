@@ -4,6 +4,9 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
 import jsPDF from "jspdf"
 import monasheeLogo from "../../Assets/images/monashee_logo.png"
 import introImage from "../../Assets/images/monashee_page1.png"
+import calibriNormal from "../../Assets/fonts/calibri-normal"
+import calibriBold from "../../Assets/fonts/calibri-bold"
+import calibriItalic from "../../Assets/fonts/calibri-italic"
 
 /* ═══════════════════════════════════════════════
    Types
@@ -14,70 +17,33 @@ interface PdfAutomationProps {
   exchange?: string | null
   pricingDate?: string | null
 }
-
 interface DealInfo {
-  ticker_name: string
-  exchange: string
-  company_name: string
-  pricing_date: string | null
-  filed_date: string | null
-  term_date: string | null
-  trade_date: string | null
-  deal_size: number | null
-  shares_offered: number | null
-  nosh: number | null
-  industry: string | null
-  sector: string | null
-  established_year: number | null
-  lower_bound: number | null
-  upper_bound: number | null
-  bookrunners: string[]
+  ticker_name: string; exchange: string; company_name: string
+  pricing_date: string | null; filed_date: string | null; term_date: string | null; trade_date: string | null
+  deal_size: number | null; shares_offered: number | null; nosh: number | null
+  industry: string | null; sector: string | null; established_year: number | null
+  lower_bound: number | null; upper_bound: number | null; bookrunners: string[]
 }
-
 interface FairValue {
   fair_value_estimate: string | number | null
   indication_of_interest: string | null
   after_market_threshold: string | null
 }
-
 interface CompanyOverview {
-  business_overview: string[]
-  key_highlights: string[]
-  strengths: string[]
-  concerns: string[]
-  differentiated_summary: string[]
-  use_of_proceeds: string[]
-  principal_stockholders_preipo: string[]
-  key_management_personnel: string[]
+  business_overview: string[]; key_highlights: string[]; strengths: string[]; concerns: string[]
+  differentiated_summary: string[]; use_of_proceeds: string[]
+  principal_stockholders_preipo: string[]; key_management_personnel: string[]
 }
-
 interface CompMetricRow {
-  competitor: string
-  price_usd: number | null
-  market_cap: number | null
-  ev_usd_million: number | null
-  present_year_ev_sales: number | null
-  one_year_later_ev_sales: number | null
-  present_year_price_earning: number | null
-  one_year_later_price_earning: number | null
-  present_year_ev_ebitda: number | null
-  one_year_later_ev_ebitda: number | null
-  sales_growth: number | null
-  eps_growth: number | null
-  ai_generated: boolean
+  competitor: string; price_usd: number | null; market_cap: number | null; ev_usd_million: number | null
+  present_year_ev_sales: number | null; one_year_later_ev_sales: number | null
+  present_year_price_earning: number | null; one_year_later_price_earning: number | null
+  present_year_ev_ebitda: number | null; one_year_later_ev_ebitda: number | null
+  sales_growth: number | null; eps_growth: number | null; ai_generated: boolean
 }
-
-interface RedFlagItem {
-  category: string
-  score?: number
-  observation?: string
-  impact_risk?: string
-}
-
+interface RedFlagItem { category: string; score?: number; observation?: string; impact_risk?: string }
 interface ApiResponse {
-  deal_info: DealInfo
-  fair_value: FairValue
-  company_overview: CompanyOverview
+  deal_info: DealInfo; fair_value: FairValue; company_overview: CompanyOverview
   key_metrics: Record<string, { category?: string; color?: string | null; label?: string }>
   scoring_metrics: Record<string, number | null>
   financial_highlights: Record<string, unknown>
@@ -96,30 +62,50 @@ interface ApiResponse {
 }
 
 /* ═══════════════════════════════════════════════
-   Design tokens
+   Design tokens — Word doc spec
    ═══════════════════════════════════════════════ */
-const C = {
-  navy: [0, 32, 96] as const,
-  navyDark: [0, 20, 60] as const,
-  headerBg: [230, 238, 250] as const,
-  rowAlt: [246, 249, 255] as const,
-  white: [255, 255, 255] as const,
-  border: [195, 208, 230] as const,
-  text: [33, 37, 41] as const,
-  muted: [110, 110, 110] as const,
-  green: [22, 128, 57] as const,
-  yellow: [180, 130, 0] as const,
-  red: [195, 45, 45] as const,
-  lightGreen: [232, 245, 233] as const,
-  lightYellow: [255, 249, 230] as const,
-  lightRed: [255, 235, 238] as const,
-}
+// Colors
+const BLACK: [number, number, number] = [0, 0, 0]
+const NAVY: [number, number, number] = [0, 32, 96]
+const DARK_GRAY: [number, number, number] = [100, 100, 100]
+const TABLE_HEADER_BG: [number, number, number] = [243, 244, 246]  // 5% gray
+const TABLE_ALT_ROW: [number, number, number] = [249, 250, 252]
+const TABLE_BORDER: [number, number, number] = [220, 220, 225]
+const GREEN: [number, number, number] = [22, 128, 57]
+const AMBER: [number, number, number] = [180, 130, 0]
+const RED: [number, number, number] = [195, 45, 45]
+const WHITE: [number, number, number] = [255, 255, 255]
+
+// Layout — 1 inch margins = 25.4mm
 const PW = 210
 const PH = 297
-const MX = 14
-const CW = PW - MX * 2
-const HDR = 26
-const FTR = 22
+const MG = 25.4  // 1 inch
+const CW = PW - MG * 2  // content width
+
+// Typography (pt → mm: 1pt = 0.3528mm)
+const PT = 0.3528
+const H1_SIZE = 14       // Heading 1
+const H2_SIZE = 11.5     // Heading 2
+const BODY_SIZE = 10.5   // Body text
+const TABLE_HDR_SIZE = 10
+const TABLE_BODY_SIZE = 9.5
+const FOOTER_SIZE = 8
+const DISCLAIMER_SIZE = 8.5
+const BULLET_SIZE = 10.5
+
+// Spacing
+const H1_BEFORE = 18 * PT  // 18pt before heading 1
+const H1_AFTER = 8 * PT
+const H2_BEFORE = 12 * PT
+const H2_AFTER = 4 * PT
+const BODY_AFTER = 4 * PT
+const LINE_SPACING = 1.15
+const BULLET_LIST_AFTER = 6 * PT
+const BULLET_INDENT = 6.35 // 0.25 inch
+
+// Footer area
+const FOOTER_Y = PH - 12
+const USABLE_H = FOOTER_Y - 4  // max Y for content before footer
 
 /* ═══════════════════════════════════════════════
    Utility functions
@@ -140,63 +126,67 @@ const strip = (html: string | null | undefined): string => {
     .replace(/\n{3,}/g, "\n\n")
     .trim()
 }
-
 const n2s = (v: number | string | null | undefined, dec = 2): string => {
   if (v == null || v === "") return "—"
   const n = typeof v === "string" ? parseFloat(v) : v
   if (isNaN(n)) return String(v)
   return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: dec })
 }
-
-const n2d = (v: number | string | null | undefined): string => {
-  if (v == null || v === "") return "—"
-  const n = typeof v === "string" ? parseFloat(v) : v
-  if (isNaN(n)) return String(v)
-  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-const fmtPct = (v: number | string | null | undefined): string => {
-  if (v == null || v === "") return "—"
-  const n = typeof v === "string" ? parseFloat(v) : v
-  if (isNaN(n)) return String(v)
-  return `${n.toFixed(1)}%`
-}
-
 const fDate = (v: string | null | undefined): string => {
   if (!v) return "—"
   try {
     const d = new Date(v)
     if (isNaN(d.getTime())) return v
     return `${d.getDate().toString().padStart(2, "0")} ${d.toLocaleString("default", { month: "short" })} ${d.getFullYear()}`
-  } catch {
-    return v
-  }
+  } catch { return v }
+}
+const statusLabel = (c: string | null | undefined): { text: string; color: [number, number, number] } => {
+  const lc = (c || "").toLowerCase()
+  if (lc === "green") return { text: "Positive", color: GREEN }
+  if (lc === "yellow" || lc === "amber") return { text: "Neutral", color: AMBER }
+  if (lc === "red") return { text: "Negative", color: RED }
+  return { text: c || "—", color: BLACK }
 }
 
-const statusDot = (c: string | null | undefined): { label: string; fg: readonly [number, number, number]; bg: readonly [number, number, number] } => {
-  const lc = (c || "").toLowerCase()
-  if (lc === "green") return { label: "Positive", fg: C.green, bg: C.lightGreen }
-  if (lc === "yellow" || lc === "amber") return { label: "Neutral", fg: C.yellow, bg: C.lightYellow }
-  if (lc === "red") return { label: "Negative", fg: C.red, bg: C.lightRed }
-  return { label: c || "—", fg: C.text, bg: C.white }
+/* Split concatenated person entries */
+const splitPersons = (items: string[]): string[] => {
+  const result: string[] = []
+  for (const raw of items) {
+    const cleaned = strip(raw)
+    if (!cleaned) continue
+    const bySemicolon = cleaned.split(/[;]/).map(s => s.trim()).filter(Boolean)
+    if (bySemicolon.length > 1) { result.push(...bySemicolon); continue }
+    const split = cleaned.split(/(?<=[a-z)])(?=[A-Z][a-z]+ [A-Z]\.?\s)/g)
+    if (split.length > 1) { result.push(...split.map(s => s.trim()).filter(Boolean)) }
+    else { result.push(cleaned) }
+  }
+  return result
 }
 
 /* ═══════════════════════════════════════════════
-   PDF Builder
+   DocBuilder — Word-document-style PDF
    ═══════════════════════════════════════════════ */
 class DocBuilder {
   private p: jsPDF
-  private y = MX + HDR
+  private y = MG
   private logo: HTMLImageElement | null = null
   private intro: HTMLImageElement | null = null
   private company: string
   private asOf: string
-  private pageNum = 1
+  private pgNum = 0
+  private lastHeading = ""  // track last heading for page-top repeat
 
   constructor(company: string, asOf: string) {
     this.p = new jsPDF("p", "mm", "a4")
     this.company = company
     this.asOf = asOf
+    // Register Calibri fonts
+    this.p.addFileToVFS("Calibri-Regular.ttf", calibriNormal)
+    this.p.addFileToVFS("Calibri-Bold.ttf", calibriBold)
+    this.p.addFileToVFS("Calibri-Italic.ttf", calibriItalic)
+    this.p.addFont("Calibri-Regular.ttf", "Calibri", "normal")
+    this.p.addFont("Calibri-Bold.ttf", "Calibri", "bold")
+    this.p.addFont("Calibri-Italic.ttf", "Calibri", "italic")
   }
 
   async init() {
@@ -212,248 +202,224 @@ class DocBuilder {
     this.intro = await load(introImage)
   }
 
-  private get avail() { return PH - FTR - this.y }
+  private get avail() { return USABLE_H - this.y }
 
-  private need(h: number) {
-    if (this.avail < h) this.newPage()
+  private setFont(weight: "normal" | "bold" | "italic" = "normal", size = BODY_SIZE) {
+    this.p.setFont("Calibri", weight)
+    this.p.setFontSize(size)
   }
 
+  private lineH(size = BODY_SIZE) { return size * PT * LINE_SPACING }
+
+  private wrap(text: string, width: number, size = BODY_SIZE): string[] {
+    this.setFont("normal", size)
+    return (this.p as any).splitTextToSize(text, width) as string[]
+  }
+
+  private wrapBold(text: string, width: number, size = BODY_SIZE): string[] {
+    this.setFont("bold", size)
+    return (this.p as any).splitTextToSize(text, width) as string[]
+  }
+
+  /* ── Page management ───────────────────────── */
   private newPage() {
-    this.footer()
+    if (this.pgNum > 0) this.drawFooter()
     this.p.addPage()
-    this.pageNum++
-    this.header()
-    this.y = MX + HDR
+    this.pgNum++
+    this.y = MG
+    // Draw minimal header: company name top-left, logo top-right
+    if (this.pgNum > 1) {
+      this.drawPageHeader()
+    }
   }
 
-  private header() {
+  private drawPageHeader() {
     const p = this.p
     if (this.logo) {
-      p.addImage(this.logo, "PNG", PW - MX - 40, 7, 40, 12, undefined, "FAST")
+      p.addImage(this.logo, "PNG", PW - MG - 38, MG - 4, 38, 11.4, undefined, "FAST")
     }
-    p.setFont("helvetica", "bold")
-    p.setFontSize(10.5)
-    p.setTextColor(...C.navy)
-    p.text(this.company || "IPO Write-up", MX, 14)
-    p.setDrawColor(...C.navy)
-    p.setLineWidth(0.5)
-    p.line(MX, 21, PW - MX, 21)
-    p.setTextColor(...C.text)
+    this.setFont("bold", 10)
+    p.setTextColor(...NAVY)
+    p.text(this.company, MG, MG + 4)
+    // thin line
+    p.setDrawColor(...TABLE_BORDER)
+    p.setLineWidth(0.3)
+    p.line(MG, MG + 8, PW - MG, MG + 8)
+    p.setTextColor(...BLACK)
+    this.y = MG + 14
   }
 
-  private footer() {
+  private drawFooter() {
     const p = this.p
-    const fy = PH - FTR
-    p.setDrawColor(...C.navy)
-    p.setLineWidth(0.5)
-    p.line(MX, fy, PW - MX, fy)
-    p.setFontSize(6)
-    p.setTextColor(...C.muted)
-    p.setFont("helvetica", "normal")
-    const txt = `${this.asOf ? `Data as of ${this.asOf}. ` : ""}Data from company management. The specific investment described herein does not represent all investment decisions made by Monashee Investment Management.`
-    const lines: string[] = (p as any).splitTextToSize(txt, CW)
-    p.text(lines, MX, fy + 2.5)
-    p.setFontSize(7.5)
-    p.setFont("helvetica", "bold")
-    p.setTextColor(140)
-    p.text("Do not copy. Do not distribute.", PW / 2, PH - 5, { align: "center" })
-    // Page number
-    p.setFontSize(7)
-    p.setFont("helvetica", "normal")
-    p.text(`${this.pageNum}`, PW - MX, PH - 5, { align: "right" })
-    p.setTextColor(...C.text)
+    const fy = FOOTER_Y
+    this.setFont("normal", FOOTER_SIZE)
+    p.setTextColor(...DARK_GRAY)
+    const footerLine = `${this.asOf ? `Data as of ${this.asOf}. ` : ""}Data from company management. Do not copy. Do not distribute.`
+    p.text(footerLine, MG, fy)
+    // Page number bottom right
+    p.text(`${this.pgNum}`, PW - MG, fy, { align: "right" })
+    p.setTextColor(...BLACK)
   }
 
-  /* ── Layout primitives ─────────────────────── */
-  private gap(mm = 4) { this.y += mm }
+  private ensureSpace(needed: number) {
+    if (this.avail < needed) {
+      this.newPage()
+    }
+  }
 
-  private sectionTitle(title: string) {
-    // Always ensure at least 45mm for heading + some content
-    if (this.avail < 45) this.newPage()
-    this.gap(5)
+  /* ── Typography primitives ─────────────────── */
+  /** Heading 1: 14pt Semibold, space before 18pt, after 8pt */
+  private h1(title: string) {
+    // Never start body text at top — always have heading. If < 40mm, new page.
+    if (this.avail < 40) this.newPage()
+    this.y += H1_BEFORE
+    this.lastHeading = title
     const p = this.p
-    p.setFillColor(...C.navy)
-    p.roundedRect(MX, this.y, CW, 10, 1.5, 1.5, "F")
-    p.setFont("helvetica", "bold")
-    p.setFontSize(11)
-    p.setTextColor(...C.white)
-    p.text(title.toUpperCase(), MX + 5, this.y + 7)
-    p.setTextColor(...C.text)
-    this.y += 14
+    this.setFont("bold", H1_SIZE)
+    p.setTextColor(...BLACK)
+    p.text(title, MG, this.y)
+    this.y += H1_AFTER + H1_SIZE * PT
   }
 
-  private subTitle(title: string) {
-    // Ensure heading + at least 15mm of content fits on same page
-    if (this.avail < 22) this.newPage()
+  /** Heading 2: 11.5pt Semibold, space before 12pt, after 4pt */
+  private h2(title: string) {
+    if (this.avail < 20) this.newPage()
+    this.y += H2_BEFORE
+    this.lastHeading = title
     const p = this.p
-    p.setFont("helvetica", "bold")
-    p.setFontSize(9.5)
-    p.setTextColor(...C.navyDark)
-    p.text(title, MX, this.y)
-    p.setDrawColor(...C.border)
-    p.setLineWidth(0.2)
-    p.line(MX, this.y + 2, PW - MX, this.y + 2)
-    p.setTextColor(...C.text)
-    this.y += 6
+    this.setFont("bold", H2_SIZE)
+    p.setTextColor(...BLACK)
+    p.text(title, MG, this.y)
+    this.y += H2_AFTER + H2_SIZE * PT
   }
 
-  /** Render wrapped paragraph text */
-  private para(text: string, opts?: { bold?: boolean; indent?: number; fontSize?: number; color?: readonly [number, number, number] }) {
+  /** Body text: 10.5pt Regular, line spacing 1.15, space after 4pt */
+  private body(text: string) {
     const cleaned = strip(text)
     if (!cleaned) return
     const p = this.p
-    const fs = opts?.fontSize ?? 8.5
-    const indent = opts?.indent ?? 0
-    p.setFont("helvetica", opts?.bold ? "bold" : "normal")
-    p.setFontSize(fs)
-    p.setTextColor(...(opts?.color ?? C.text))
-    const w = CW - indent
-    const lines: string[] = (p as any).splitTextToSize(cleaned, w)
-    const lh = fs * 0.38
+    this.setFont("normal", BODY_SIZE)
+    p.setTextColor(...BLACK)
+    const lines = this.wrap(cleaned, CW)
+    const lh = this.lineH(BODY_SIZE)
     for (const line of lines) {
-      this.need(lh + 1)
-      p.text(line, MX + indent, this.y)
+      this.ensureSpace(lh + 1)
+      p.text(line, MG, this.y)
       this.y += lh
     }
-    this.y += 1
+    this.y += BODY_AFTER
   }
 
-  /** Render a bullet list with proper text wrapping */
-  private bullets(items: string[], indent = 3) {
+  /** Bullet list: 10.5pt Regular, solid round bullet, 0.25" indent */
+  private bulletList(items: string[]) {
     if (!items?.length) return
     const p = this.p
-    const fs = 8.5
-    const lh = fs * 0.38
-    const bulletX = MX + indent
-    const textX = bulletX + 4
-    const textW = CW - indent - 4
-    p.setFont("helvetica", "normal")
-    p.setFontSize(fs)
-    p.setTextColor(...C.text)
+    const lh = this.lineH(BULLET_SIZE)
+    const textX = MG + BULLET_INDENT
+    const textW = CW - BULLET_INDENT
     for (const raw of items) {
       const cleaned = strip(raw)
       if (!cleaned) continue
-      const lines: string[] = (p as any).splitTextToSize(cleaned, textW)
-      const blockH = lines.length * lh + 2
-      this.need(Math.min(blockH, lh * 3))
-      p.text("\u2022", bulletX, this.y)
+      this.setFont("normal", BULLET_SIZE)
+      p.setTextColor(...BLACK)
+      const lines = this.wrap(cleaned, textW, BULLET_SIZE)
+      // Ensure at least first 2 lines fit
+      this.ensureSpace(Math.min(lines.length, 2) * lh + 2)
+      // Draw bullet
+      const bulletY = this.y - 0.8
+      p.circle(MG + 2.5, bulletY, 0.6, "F")
+      // Draw text
       for (const line of lines) {
-        this.need(lh + 0.5)
+        this.ensureSpace(lh + 0.5)
         p.text(line, textX, this.y)
         this.y += lh
       }
-      this.y += 1.5
+      this.y += 1
     }
+    this.y += BULLET_LIST_AFTER
   }
 
-  /** Key-value row */
-  private kv(label: string, value: string, lw = 50) {
-    this.need(5.5)
-    const p = this.p
-    p.setFont("helvetica", "bold")
-    p.setFontSize(8.5)
-    p.setTextColor(...C.navyDark)
-    p.text(label, MX + 2, this.y)
-    p.setFont("helvetica", "normal")
-    p.setTextColor(...C.text)
-    // Wrap value if too long
-    const valW = CW - lw - 2
-    const valLines: string[] = (p as any).splitTextToSize(strip(value), valW)
-    const lh = 3.5
-    for (const vl of valLines) {
-      p.text(vl, MX + lw, this.y)
-      this.y += lh
-    }
-    this.y += 1
-  }
-
-  /** Draw a table with text wrapping in cells */
+  /** Table with wrapping cells */
   private table(
     headers: string[],
     rows: string[][],
     colW: number[],
     opts?: {
-      fontSize?: number
-      headerBg?: readonly [number, number, number]
       boldFirstCol?: boolean
       rightAlignFrom?: number
-      rowColors?: Array<readonly [number, number, number] | null>
-      rowBgs?: Array<readonly [number, number, number] | null>
+      showHeader?: boolean
     }
   ) {
     const p = this.p
-    const fs = opts?.fontSize ?? 7.5
-    const lh = fs * 0.38
-    const cellPad = 2
-    const hdrBg = opts?.headerBg ?? C.headerBg
-    const raFrom = opts?.rightAlignFrom ?? -1
+    const fs = TABLE_BODY_SIZE
+    const hfs = TABLE_HDR_SIZE
+    const lh = this.lineH(fs)
+    const pad = 2
     const nCols = headers.length
+    const raFrom = opts?.rightAlignFrom ?? -1
+    const showHeader = opts?.showHeader !== false
 
-    // ── Header row ──
-    const hdrH = 7
-    this.need(hdrH + 6)
-    p.setFillColor(...hdrBg)
-    p.rect(MX, this.y, CW, hdrH, "F")
-    p.setFont("helvetica", "bold")
-    p.setFontSize(fs)
-    p.setTextColor(...C.navy)
-    let x = MX
-    for (let i = 0; i < nCols; i++) {
-      const align = i >= raFrom && raFrom >= 0 ? "right" : "left"
-      const tx = align === "right" ? x + colW[i] - cellPad : x + cellPad
-      p.text(headers[i], tx, this.y + hdrH - 2, { align })
-      x += colW[i]
+    // ── Header ──
+    if (showHeader) {
+      const hdrH = 6.5
+      this.ensureSpace(hdrH + lh * 2)
+      p.setFillColor(...TABLE_HEADER_BG)
+      p.rect(MG, this.y - 1, CW, hdrH, "F")
+      this.setFont("bold", hfs)
+      p.setTextColor(...BLACK)
+      let x = MG
+      for (let i = 0; i < nCols; i++) {
+        const align = i >= raFrom && raFrom >= 0 ? "right" : "left"
+        const tx = align === "right" ? x + colW[i] - pad : x + pad
+        // Handle multiline headers
+        const hLines = headers[i].split("\n")
+        let hy = this.y + 1.5
+        for (const hl of hLines) {
+          p.text(hl, tx, hy, { align })
+          hy += hfs * PT * 1.1
+        }
+        x += colW[i]
+      }
+      this.y += hdrH
+      p.setDrawColor(...TABLE_BORDER)
+      p.setLineWidth(0.4)
+      p.line(MG, this.y, PW - MG, this.y)
+      this.y += 0.3
     }
-    this.y += hdrH
-    p.setDrawColor(...C.border)
-    p.setLineWidth(0.3)
-    p.line(MX, this.y, PW - MX, this.y)
-    this.y += 0.5
 
-    // ── Data rows with wrapping ──
+    // ── Rows ──
     for (let r = 0; r < rows.length; r++) {
-      // Calculate row height based on wrapped text
-      p.setFontSize(fs)
+      // Calculate wrapped lines per cell
+      this.setFont("normal", fs)
       let maxLines = 1
       const cellLines: string[][] = []
       for (let i = 0; i < nCols; i++) {
         const cellText = strip(rows[r]?.[i] ?? "—")
-        const cellW = colW[i] - cellPad * 2
-        const wrapped: string[] = (p as any).splitTextToSize(cellText, cellW)
+        const cellW = colW[i] - pad * 2
+        const isFirst = i === 0 && opts?.boldFirstCol
+        const wrapped = isFirst ? this.wrapBold(cellText, cellW, fs) : this.wrap(cellText, cellW, fs)
         cellLines.push(wrapped)
         maxLines = Math.max(maxLines, wrapped.length)
       }
-      const rowH = Math.max(maxLines * lh + 2, 5.5)
+      const rowH = Math.max(maxLines * lh + 1.5, 5)
 
-      this.need(rowH + 1)
+      this.ensureSpace(rowH + 1)
 
       // Alt row bg
       if (r % 2 === 1) {
-        p.setFillColor(...C.rowAlt)
-        p.rect(MX, this.y, CW, rowH, "F")
+        p.setFillColor(...TABLE_ALT_ROW)
+        p.rect(MG, this.y, CW, rowH, "F")
       }
 
-      // Custom row bg
-      if (opts?.rowBgs?.[r]) {
-        p.setFillColor(...opts.rowBgs[r]!)
-        p.rect(MX, this.y, CW, rowH, "F")
-      }
-
-      x = MX
+      let x = MG
       for (let i = 0; i < nCols; i++) {
         const align = i >= raFrom && raFrom >= 0 ? "right" : "left"
-        const tx = align === "right" ? x + colW[i] - cellPad : x + cellPad
-        const isFirstCol = i === 0 && opts?.boldFirstCol
-        p.setFont("helvetica", isFirstCol ? "bold" : "normal")
+        const tx = align === "right" ? x + colW[i] - pad : x + pad
+        const isFirst = i === 0 && opts?.boldFirstCol
+        this.setFont(isFirst ? "bold" : "normal", fs)
+        p.setTextColor(...BLACK)
 
-        // Custom color per row
-        if (opts?.rowColors?.[r]) {
-          p.setTextColor(...opts.rowColors[r]!)
-        } else {
-          p.setTextColor(...C.text)
-        }
-
-        let cy = this.y + lh + 0.5
+        let cy = this.y + lh
         for (const ln of cellLines[i]) {
           p.text(ln, tx, cy, { align })
           cy += lh
@@ -462,53 +428,49 @@ class DocBuilder {
       }
       this.y += rowH
 
-      // Light row separator
-      p.setDrawColor(225, 230, 240)
+      // Row separator
+      p.setDrawColor(235, 237, 240)
       p.setLineWidth(0.1)
-      p.line(MX, this.y, PW - MX, this.y)
+      p.line(MG, this.y, PW - MG, this.y)
     }
 
     // Bottom border
-    p.setDrawColor(...C.border)
+    p.setDrawColor(...TABLE_BORDER)
     p.setLineWidth(0.3)
-    p.line(MX, this.y, PW - MX, this.y)
-    this.y += 3
-    p.setTextColor(...C.text)
+    p.line(MG, this.y, PW - MG, this.y)
+    this.y += 4
+    p.setTextColor(...BLACK)
   }
 
-  /** Rating bar */
+  /** Rating bar for investment summary */
   private ratingBar(label: string, value: number | null, max = 10) {
     if (value == null) return
-    this.need(8)
+    this.ensureSpace(8)
     const p = this.p
-    const barX = MX + 58
-    const barW = 75
-    const barH = 4.5
-    const pct = Math.min(Math.max(value / max, 0), 1)
+    const barX = MG + 55
+    const barW = 65
+    const barH = 4
 
-    p.setFont("helvetica", "normal")
-    p.setFontSize(8.5)
-    p.setTextColor(...C.text)
-    p.text(label, MX + 3, this.y + 3.5)
+    this.setFont("normal", BODY_SIZE)
+    p.setTextColor(...BLACK)
+    p.text(label, MG, this.y + 3)
 
     // Track
-    p.setFillColor(225, 230, 242)
-    p.roundedRect(barX, this.y, barW, barH, 2, 2, "F")
+    p.setFillColor(230, 232, 238)
+    p.roundedRect(barX, this.y, barW, barH, 1.5, 1.5, "F")
 
     // Fill
+    const pct = Math.min(Math.max(value / max, 0), 1)
     if (pct > 0) {
-      const [r, g, b] = pct >= 0.7 ? C.green : pct >= 0.4 ? C.yellow : C.red
+      const [r, g, b] = pct >= 0.7 ? GREEN : pct >= 0.4 ? AMBER : RED
       p.setFillColor(r, g, b)
-      p.roundedRect(barX, this.y, barW * pct, barH, 2, 2, "F")
+      p.roundedRect(barX, this.y, barW * pct, barH, 1.5, 1.5, "F")
     }
 
-    // Label
-    p.setFont("helvetica", "bold")
-    p.setFontSize(8.5)
-    p.setTextColor(...C.navy)
-    p.text(`${value}/${max}`, barX + barW + 4, this.y + 3.5)
-    p.setTextColor(...C.text)
-    this.y += 8
+    this.setFont("bold", 9)
+    p.setTextColor(...BLACK)
+    p.text(`${value}/${max}`, barX + barW + 3, this.y + 3)
+    this.y += 7
   }
 
   /* ═════════════════════════════════════════════
@@ -531,41 +493,35 @@ class DocBuilder {
     if (this.intro) {
       p.addImage(this.intro, "PNG", 0, 0, PW, PH)
     }
-    p.setFont("helvetica", "bold")
-    p.setFontSize(20)
-    p.setTextColor(...C.navy)
+    // Ticker + company on cover
+    this.setFont("bold", 22)
+    p.setTextColor(...NAVY)
     const tk = ticker.toUpperCase()
-    p.text(tk, PW - MX - p.getTextWidth(tk), 22)
+    p.text(tk, PW - MG - p.getTextWidth(tk), 24)
     if (di.company_name) {
-      p.setFontSize(13)
+      this.setFont("bold", 14)
       const cn = di.company_name.trim()
-      p.text(cn, PW - MX - p.getTextWidth(cn), 31)
+      p.text(cn, PW - MG - p.getTextWidth(cn), 34)
     }
-    const parts = [exchange || di.exchange, fDate(pricingDate || di.pricing_date)].filter(Boolean)
-    if (parts.length) {
-      p.setFontSize(10)
-      const pt = parts.join("  |  ")
-      p.text(pt, PW - MX - p.getTextWidth(pt), 39)
+    const coverParts = [exchange || di.exchange, fDate(pricingDate || di.pricing_date)].filter(Boolean)
+    if (coverParts.length) {
+      this.setFont("bold", 10.5)
+      const pt = coverParts.join("  |  ")
+      p.text(pt, PW - MG - p.getTextWidth(pt), 42)
     }
+    p.setTextColor(...BLACK)
 
-    /* ═══ PAGE 1 ═══════════════════════════════ */
-    p.addPage()
-    this.pageNum = 1
-    this.header()
-    this.y = MX + HDR
+    /* ═══ CONTENT PAGES ════════════════════════ */
+    this.newPage()
 
     // ── Deal Information ──
-    this.sectionTitle("Deal Information")
+    this.h1("Deal Information")
 
-    const bookStr = Array.isArray(di.bookrunners) && di.bookrunners.length > 0
-      ? di.bookrunners.join(", ")
-      : "—"
-    const priceRange = di.lower_bound != null && di.upper_bound != null
-      ? `$${n2s(di.lower_bound)} – $${n2s(di.upper_bound)}`
-      : "—"
+    const bookStr = Array.isArray(di.bookrunners) && di.bookrunners.length > 0 ? di.bookrunners.join(", ") : "—"
+    const priceRange = di.lower_bound != null && di.upper_bound != null ? `$${n2s(di.lower_bound)} – $${n2s(di.upper_bound)}` : "—"
 
     this.table(
-      ["", ""],
+      ["Field", "Details"],
       [
         ["Ticker", di.ticker_name || ticker],
         ["Company", di.company_name || "—"],
@@ -582,13 +538,12 @@ class DocBuilder {
         ["Established", di.established_year ? String(di.established_year) : "—"],
         ["Bookrunners", bookStr],
       ],
-      [52, CW - 52],
-      { boldFirstCol: true, fontSize: 8.5 }
+      [48, CW - 48],
+      { boldFirstCol: true }
     )
 
     // ── Fair Value ──
-    this.sectionTitle("Fair Value Estimate & Indication of Interest")
-
+    this.h1("Fair Value Estimate & Indication of Interest")
     this.table(
       ["Metric", "Value"],
       [
@@ -596,41 +551,15 @@ class DocBuilder {
         ["Indication of Interest", strip(String(fv.indication_of_interest ?? "—"))],
         ["After Market Threshold", strip(String(fv.after_market_threshold ?? "—"))],
       ],
-      [60, CW - 60],
-      { boldFirstCol: true, fontSize: 9 }
+      [55, CW - 55],
+      { boldFirstCol: true }
     )
 
     // ── Company Overview ──
-    this.sectionTitle("Company Overview")
+    this.h1("Company Overview")
 
-    // Helper: split long concatenated person entries into individual items
-    const splitPersonEntries = (items: string[]): string[] => {
-      const result: string[] = []
-      for (const raw of items) {
-        const cleaned = strip(raw)
-        if (!cleaned) continue
-        // Split on patterns like "Name: Title" when multiple people are concatenated
-        // Common patterns: "FirstName LastName: TitleOtherName" or semicolon-separated
-        const bySemicolon = cleaned.split(/[;]/).map((s) => s.trim()).filter(Boolean)
-        if (bySemicolon.length > 1) {
-          result.push(...bySemicolon)
-        } else {
-          // Try to split by detecting name/title boundaries
-          // Pattern: "Title or Role" followed immediately by uppercase name start
-          // e.g. "Chief Financial OfficerShawn G." -> split before "Shawn"
-          const split = cleaned.split(/(?<=[a-z)])(?=[A-Z][a-z]+ [A-Z]\.?\s)/g)
-          if (split.length > 1) {
-            result.push(...split.map((s) => s.trim()).filter(Boolean))
-          } else {
-            result.push(cleaned)
-          }
-        }
-      }
-      return result
-    }
-
-    const overviewSections: [string, string[], boolean][] = [
-      ["Business Overview", co.business_overview, false],
+    const sections: [string, string[], boolean][] = [
+      ["Business Description", co.business_overview, false],
       ["Differentiated Summary", co.differentiated_summary, false],
       ["Key Highlights", co.key_highlights, false],
       ["Strengths", co.strengths, false],
@@ -639,105 +568,93 @@ class DocBuilder {
       ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
       ["Key Management Personnel", co.key_management_personnel, true],
     ]
-    for (const [title, items, isPersonList] of overviewSections) {
+    for (const [title, items, isPerson] of sections) {
       if (items?.length) {
-        this.subTitle(title)
-        const processedItems = isPersonList ? splitPersonEntries(items) : items
-        this.bullets(processedItems)
-        this.gap(2)
+        this.h2(title)
+        const processed = isPerson ? splitPersons(items) : items
+        this.bulletList(processed)
       }
     }
 
     // ── Key Metrics ──
-    this.sectionTitle("Key Metrics")
-
+    this.h1("Key Metrics")
     const metricEntries = Object.entries(km)
     if (metricEntries.length > 0) {
       const metricRows: string[][] = []
       for (const [key, val] of metricEntries) {
-        // val.label = criteria name (e.g. "Customer Mix")
-        // val.category = description/notes text
-        // key = snake_case key name (fallback for criteria)
         const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
-        const st = statusDot(val?.color)
+        const st = statusLabel(val?.color)
         const notes = strip(val?.category) || "—"
-        metricRows.push([criteria, st.label, notes])
+        metricRows.push([criteria, st.text, notes])
       }
       this.table(
         ["Criteria", "Status", "Notes"],
         metricRows,
-        [38, 20, CW - 58],
-        { fontSize: 7.5, boldFirstCol: true }
+        [35, 18, CW - 53],
+        { boldFirstCol: true }
       )
     } else {
-      this.para("No key metrics data available.")
+      this.body("No key metrics data available.")
     }
 
     // ── Financial Highlights ──
-    this.sectionTitle("Financial Highlights")
+    this.h1("Financial Overview")
     this.renderFinancials(fh)
 
     // ── Comparative Multiples ──
-    this.sectionTitle("Comparative Multiples")
-
+    this.h1("Comparative Multiples")
     if (cm.data?.length) {
-      const cHeaders = [
-        "Company", "Price", "Mkt Cap", "EV ($M)",
-        "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY",
-        "Sales\nGr%", "EPS\nGr%"
-      ]
-      const rawW = [28, 13, 17, 17, 15, 15, 13, 13, 15, 15]
-      const totalRaw = rawW.reduce((a, b) => a + b, 0)
-      const cW = rawW.map((w) => (w / totalRaw) * CW)
+      const cH = ["Company", "Price", "Mkt Cap", "EV ($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "Sales\nGr%", "EPS\nGr%"]
+      const rawW = [26, 12, 16, 16, 14, 14, 12, 12, 14, 14]
+      const tot = rawW.reduce((a, b) => a + b, 0)
+      const cW = rawW.map(w => (w / tot) * CW)
 
-      const cRows = cm.data.map((row) => [
-        row.competitor || "—",
-        n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
+      const cRows = cm.data.map(row => [
+        row.competitor || "—", n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
         n2s(row.present_year_ev_sales), n2s(row.one_year_later_ev_sales),
         n2s(row.present_year_price_earning), n2s(row.one_year_later_price_earning),
         n2s(row.sales_growth), n2s(row.eps_growth),
       ])
-
       if (cm.aggregates) {
         const a = cm.aggregates
         cRows.push(
-          ["Average", "", "", "",
-            n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
+          ["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
             n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average),
             n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)],
-          ["Median", "", "", "",
-            n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
+          ["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
             n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median),
             n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)]
         )
       }
-      this.table(cHeaders, cRows, cW, { fontSize: 6.5, rightAlignFrom: 1, boldFirstCol: true })
+      this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1 })
 
       if (cm.latest_updated_at) {
-        p.setFontSize(7)
-        p.setTextColor(...C.muted)
-        p.setFont("helvetica", "italic")
-        p.text(`Source: FactSet — last updated ${fDate(cm.latest_updated_at)}`, MX + 2, this.y)
-        this.y += 4
-        p.setTextColor(...C.text)
+        this.setFont("italic", 8)
+        p.setTextColor(...DARK_GRAY)
+        p.text(`Source: FactSet — last updated ${fDate(cm.latest_updated_at)}`, MG, this.y)
+        this.y += 5
+        p.setTextColor(...BLACK)
       }
     } else {
-      this.para("No comparable company data available.")
+      this.body("No comparable company data available.")
     }
 
     // ── Valuation ──
-    this.sectionTitle("Valuation Analysis")
+    this.h1("Valuation")
     if (va.narrative?.length) {
-      this.bullets(va.narrative)
+      // Render as paragraphs, NOT bullets
+      for (const item of va.narrative) {
+        this.body(item)
+      }
     } else {
-      this.para("No valuation narrative available.")
+      this.body("No valuation narrative available.")
     }
 
     // ── Risk Assessment ──
-    this.sectionTitle("Risk Assessment")
+    this.h1("Risks")
     const rfItems = Array.isArray(ra?.data) ? ra.data : []
     if (rfItems.length > 0) {
-      const rfRows = rfItems.map((item) => [
+      const rfRows = rfItems.map(item => [
         item.category || "—",
         item.score != null ? `${item.score} / 5` : "—",
         strip(item.observation) || "—",
@@ -745,24 +662,22 @@ class DocBuilder {
       this.table(
         ["Risk Category", "Score", "Observation"],
         rfRows,
-        [38, 18, CW - 56],
-        { fontSize: 7.5, boldFirstCol: true }
+        [35, 16, CW - 51],
+        { boldFirstCol: true }
       )
     } else {
-      this.para("No risk assessment data available.")
+      this.body("No risk assessment data available.")
     }
 
     // ── Investment Summary ──
-    this.sectionTitle("Investment Summary")
+    this.h1("Investment Summary")
 
     if (inv.writeup_overall_rating != null) {
-      this.need(12)
-      p.setFont("helvetica", "bold")
-      p.setFontSize(12)
-      p.setTextColor(...C.navy)
-      p.text(`Overall Rating: ${inv.writeup_overall_rating}%`, MX + 3, this.y + 4)
-      p.setTextColor(...C.text)
-      this.y += 10
+      this.ensureSpace(10)
+      this.setFont("bold", 12)
+      p.setTextColor(...BLACK)
+      p.text(`Overall Rating: ${inv.writeup_overall_rating}%`, MG, this.y)
+      this.y += 8
     }
 
     const ratings = inv.writeup_ratings || {}
@@ -777,31 +692,26 @@ class DocBuilder {
     }
     const ratingEntries = Object.entries(ratings)
     if (ratingEntries.length > 0) {
-      this.subTitle("Section Ratings")
+      this.h2("Section Ratings")
       for (const [key, value] of ratingEntries) {
-        this.ratingBar(ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), value)
+        this.ratingBar(ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), value)
       }
-      this.gap(4)
+      this.y += 4
     }
 
     if (inv.writeup_finalverdict_summary) {
-      this.subTitle("Final Verdict")
-      this.para(inv.writeup_finalverdict_summary)
+      this.h2("Final Verdict")
+      this.body(inv.writeup_finalverdict_summary)
     }
 
     /* ═══ DISCLAIMER PAGE ═════════════════════ */
-    this.footer()
+    this.drawFooter()
     p.addPage()
-    this.pageNum++
-    this.header()
-    this.y = MX + HDR
+    this.pgNum++
+    this.drawPageHeader()
+    this.y = MG + 14
 
-    p.setFont("helvetica", "bold")
-    p.setFontSize(16)
-    p.setTextColor(...C.navy)
-    p.text("Disclaimer", MX, this.y)
-    this.y += 10
-
+    this.h1("Disclaimer")
     const disclaimers = [
       "The information contained herein has been compiled by Monashee internally and may be based on unaudited data from the relevant funds' books and records, and hypothetical information that has not been verified or reconciled by such funds' administrator. As such, the information contained herein should not serve as any kind of basis for any investment decision.",
       "This document does not constitute advice or a recommendation or offer to sell or a solicitation to deal in any security or financial product. It is provided for information purposes only and on the understanding that the recipient has sufficient knowledge and experience to be able to understand and make their own evaluation of the proposals and services described herein, any risks associated therewith and any related legal, tax, accounting or other material considerations.",
@@ -810,148 +720,117 @@ class DocBuilder {
       "This presentation is confidential, is intended only for the person to whom it has been directly provided and under no circumstances may a copy be shown, copied, transmitted or otherwise be given to any person other than the authorized recipient without the prior written consent of Monashee Investment Management.",
       "There is no guarantee that the investment objectives will be achieved. Moreover, the past performance is not a guarantee or indicator of future results.",
     ]
-    for (const para of disclaimers) {
-      this.para(para, { fontSize: 8 })
-      this.gap(3)
+    for (const text of disclaimers) {
+      const cleaned = strip(text)
+      this.setFont("normal", DISCLAIMER_SIZE)
+      p.setTextColor(...DARK_GRAY)
+      const lines = this.wrap(cleaned, CW, DISCLAIMER_SIZE)
+      const lh = DISCLAIMER_SIZE * PT * 1.05
+      for (const line of lines) {
+        this.ensureSpace(lh + 1)
+        p.text(line, MG, this.y)
+        this.y += lh
+      }
+      this.y += 3
     }
+    p.setTextColor(...BLACK)
 
-    this.footer()
+    this.drawFooter()
     return p
   }
 
-  /* ── Financial Highlights structured rendering ─ */
+  /* ── Financial Highlights — structured table ── */
   private renderFinancials(fh: Record<string, unknown>) {
     if (!fh || typeof fh !== "object" || Object.keys(fh).length === 0) {
-      this.para("No financial highlights data available.")
+      this.body("No financial highlights data available.")
       return
     }
-
-    // The data can come in two formats:
-    // FORMAT A (nested):  { "2024 A": { "Sales": 568, "EBITDA": 73 }, "2025 E": { ... } }
-    // FORMAT B (flat):    { "2024 A > Sales": 568, "2024 A > EBITDA": 73, ... }
 
     type YearData = Record<string, number | string | null>
     const yearKeysSet = new Set<string>()
     const metricNames = new Set<string>()
     const parsed: Record<string, YearData> = {}
 
-    // First try to detect FORMAT A (nested objects)
+    // Try nested format first
     let hasNested = false
     for (const [key, val] of Object.entries(fh)) {
       if (val && typeof val === "object" && !Array.isArray(val)) {
         hasNested = true
         yearKeysSet.add(key)
         parsed[key] = val as YearData
-        for (const mk of Object.keys(val as object)) {
-          metricNames.add(mk)
-        }
+        for (const mk of Object.keys(val as object)) metricNames.add(mk)
       }
     }
 
-    // If no nested objects found, try FORMAT B (flat keys with " > " separator)
+    // Try flat format: "2024 A > EBIT" = value
     if (!hasNested) {
       for (const [key, val] of Object.entries(fh)) {
         const parts = key.split(" > ")
         if (parts.length === 2) {
-          const yearKey = parts[0].trim()
-          const metric = parts[1].trim()
-          yearKeysSet.add(yearKey)
-          metricNames.add(metric)
-          if (!parsed[yearKey]) parsed[yearKey] = {}
-          parsed[yearKey][metric] = val as number | string | null
+          const yk = parts[0].trim()
+          const mk = parts[1].trim()
+          yearKeysSet.add(yk)
+          metricNames.add(mk)
+          if (!parsed[yk]) parsed[yk] = {}
+          parsed[yk][mk] = val as number | string | null
         }
       }
     }
 
-    const yearKeys = Array.from(yearKeysSet)
-
-    // Sort year keys naturally (2024 A, 2025 E, 2026 E, 2027 E ...)
-    yearKeys.sort((a, b) => {
-      const ya = parseInt(a)
-      const yb = parseInt(b)
-      if (!isNaN(ya) && !isNaN(yb)) {
-        if (ya !== yb) return ya - yb
-      }
+    const yearKeys = Array.from(yearKeysSet).sort((a, b) => {
+      const ya = parseInt(a), yb = parseInt(b)
+      if (!isNaN(ya) && !isNaN(yb) && ya !== yb) return ya - yb
       return a.localeCompare(b)
     })
 
     if (yearKeys.length === 0) {
-      // Truly flat with no recognizable structure — render as simple key-value
-      const flatPairs: string[][] = []
+      // Flat key-value fallback
+      const pairs: string[][] = []
       for (const [k, v] of Object.entries(fh)) {
-        flatPairs.push([
-          k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-          n2s(v as any)
-        ])
+        pairs.push([k.replace(/_/g, " "), n2s(v as any)])
       }
-      if (flatPairs.length > 0) {
-        this.table(["Metric", "Value"], flatPairs, [75, CW - 75], { fontSize: 8, boldFirstCol: true })
+      if (pairs.length > 0) {
+        this.table(["Metric", "Value"], pairs, [70, CW - 70], { boldFirstCol: true })
       }
       return
     }
 
-    // Build a proper financial table: Metric ($M) | 2024 A | 2025 E | 2026 E | ...
     const friendlyNames: Record<string, string> = {
-      "Sales": "Revenue",
-      "Sales Growth": "Revenue Growth",
-      "EBITDA": "EBITDA",
-      "EBITDA Margin": "EBITDA Margin",
-      "EBIT": "EBIT",
-      "EBIT Margin": "EBIT Margin",
-      "Net Income": "Net Income",
-      "Net Income Margin": "Net Income Margin",
+      "Sales": "Revenue", "Sales Growth": "Revenue Growth",
+      "EBITDA": "EBITDA", "EBITDA Margin": "EBITDA Margin",
+      "EBIT": "EBIT", "EBIT Margin": "EBIT Margin",
+      "Net Income": "Net Income", "Net Income Margin": "Net Income Margin",
     }
-
-    // Order metrics logically
-    const metricOrder = [
-      "Sales", "Sales Growth",
-      "EBITDA", "EBITDA Margin",
-      "EBIT", "EBIT Margin",
-      "Net Income", "Net Income Margin",
-    ]
-    const orderedMetrics = metricOrder.filter((m) => metricNames.has(m))
-    for (const m of metricNames) {
-      if (!orderedMetrics.includes(m)) orderedMetrics.push(m)
-    }
+    const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+    const ordered = metricOrder.filter(m => metricNames.has(m))
+    for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
 
     const headers = ["Metric ($M)", ...yearKeys]
-    const metricColW = 40
-    const yearColW = (CW - metricColW) / yearKeys.length
-    const colWidths = [metricColW, ...yearKeys.map(() => yearColW)]
+    const mColW = 38
+    const yColW = (CW - mColW) / yearKeys.length
+    const colWidths = [mColW, ...yearKeys.map(() => yColW)]
 
-    const rows: string[][] = orderedMetrics.map((metric) => {
-      const friendly = friendlyNames[metric] || metric.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-      const vals = yearKeys.map((yk) => {
+    const rows: string[][] = ordered.map(metric => {
+      const friendly = friendlyNames[metric] || metric
+      const vals = yearKeys.map(yk => {
         const v = parsed[yk]?.[metric]
         if (v == null) return "—"
         const num = typeof v === "string" ? parseFloat(v) : v as number
         if (isNaN(num)) return String(v)
-        // Margins and growth rates as percentages
-        if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) {
-          return `${num.toFixed(1)}%`
-        }
+        if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) return `${num.toFixed(1)}%`
         return n2s(num)
       })
       return [friendly, ...vals]
     })
 
-    this.table(headers, rows, colWidths, {
-      fontSize: 7.5,
-      boldFirstCol: true,
-      rightAlignFrom: 1,
-    })
+    this.table(headers, rows, colWidths, { boldFirstCol: true, rightAlignFrom: 1 })
   }
 }
 
 /* ═══════════════════════════════════════════════
    React Component
    ═══════════════════════════════════════════════ */
-const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({
-  ticker,
-  issuerName,
-  exchange,
-  pricingDate,
-}) => {
+const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate }) => {
   const [loading, setLoading] = useState(false)
 
   const handleGenerate = async () => {
@@ -959,35 +838,23 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({
     try {
       const apiUrl = process.env.REACT_APP_API_URL
       const token = localStorage.getItem("access_token")
-
       const res = await fetch(`${apiUrl}/api/ipo_writeup_pdf_data/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+        headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
         body: JSON.stringify({ ticker }),
       })
-
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         alert(`Failed to fetch PDF data: ${(err as any)?.error || res.statusText}`)
         return
       }
-
       const data: ApiResponse = await res.json()
       const companyName = data.deal_info?.company_name || issuerName || ticker
-      const dataAsOf = pricingDate
-        ? fDate(pricingDate)
-        : data.deal_info?.pricing_date
-          ? fDate(data.deal_info.pricing_date)
-          : ""
+      const dataAsOf = pricingDate ? fDate(pricingDate) : data.deal_info?.pricing_date ? fDate(data.deal_info.pricing_date) : ""
 
       const builder = new DocBuilder(companyName, dataAsOf)
       const pdf = await builder.build(data, ticker, exchange, pricingDate)
-
-      const todayStr = new Date().toISOString().slice(0, 10)
-      pdf.save(`${ticker.toUpperCase()}_WriteUp_${todayStr}.pdf`)
+      pdf.save(`${ticker.toUpperCase()}_WriteUp_${new Date().toISOString().slice(0, 10)}.pdf`)
     } catch (err) {
       console.error("PDF generation error:", err)
       alert("Failed to generate PDF. Please try again.")
@@ -1003,19 +870,10 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({
       disabled={loading}
       startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdfIcon />}
       sx={{
-        textTransform: "none",
-        fontWeight: 600,
-        fontSize: 13,
-        borderRadius: 2,
-        px: 2.5,
-        py: 1,
+        textTransform: "none", fontWeight: 600, fontSize: 13, borderRadius: 2, px: 2.5, py: 1,
         background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
-        "&:hover": {
-          background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)",
-        },
-        "&.Mui-disabled": {
-          background: "#ccc",
-        },
+        "&:hover": { background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)" },
+        "&.Mui-disabled": { background: "#ccc" },
       }}
     >
       {loading ? "Generating Document..." : "Generate Document PDF"}
