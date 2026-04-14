@@ -268,7 +268,8 @@ class DocBuilder {
   private gap(mm = 4) { this.y += mm }
 
   private sectionTitle(title: string) {
-    this.need(16)
+    // Always ensure at least 45mm for heading + some content
+    if (this.avail < 45) this.newPage()
     this.gap(5)
     const p = this.p
     p.setFillColor(...C.navy)
@@ -282,7 +283,8 @@ class DocBuilder {
   }
 
   private subTitle(title: string) {
-    this.need(10)
+    // Ensure heading + at least 15mm of content fits on same page
+    if (this.avail < 22) this.newPage()
     const p = this.p
     p.setFont("helvetica", "bold")
     p.setFontSize(9.5)
@@ -601,20 +603,47 @@ class DocBuilder {
     // ── Company Overview ──
     this.sectionTitle("Company Overview")
 
-    const overviewSections: [string, string[]][] = [
-      ["Business Overview", co.business_overview],
-      ["Differentiated Summary", co.differentiated_summary],
-      ["Key Highlights", co.key_highlights],
-      ["Strengths", co.strengths],
-      ["Concerns", co.concerns],
-      ["Use of Proceeds", co.use_of_proceeds],
-      ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo],
-      ["Key Management Personnel", co.key_management_personnel],
+    // Helper: split long concatenated person entries into individual items
+    const splitPersonEntries = (items: string[]): string[] => {
+      const result: string[] = []
+      for (const raw of items) {
+        const cleaned = strip(raw)
+        if (!cleaned) continue
+        // Split on patterns like "Name: Title" when multiple people are concatenated
+        // Common patterns: "FirstName LastName: TitleOtherName" or semicolon-separated
+        const bySemicolon = cleaned.split(/[;]/).map((s) => s.trim()).filter(Boolean)
+        if (bySemicolon.length > 1) {
+          result.push(...bySemicolon)
+        } else {
+          // Try to split by detecting name/title boundaries
+          // Pattern: "Title or Role" followed immediately by uppercase name start
+          // e.g. "Chief Financial OfficerShawn G." -> split before "Shawn"
+          const split = cleaned.split(/(?<=[a-z)])(?=[A-Z][a-z]+ [A-Z]\.?\s)/g)
+          if (split.length > 1) {
+            result.push(...split.map((s) => s.trim()).filter(Boolean))
+          } else {
+            result.push(cleaned)
+          }
+        }
+      }
+      return result
+    }
+
+    const overviewSections: [string, string[], boolean][] = [
+      ["Business Overview", co.business_overview, false],
+      ["Differentiated Summary", co.differentiated_summary, false],
+      ["Key Highlights", co.key_highlights, false],
+      ["Strengths", co.strengths, false],
+      ["Concerns", co.concerns, false],
+      ["Use of Proceeds", co.use_of_proceeds, false],
+      ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
+      ["Key Management Personnel", co.key_management_personnel, true],
     ]
-    for (const [title, items] of overviewSections) {
+    for (const [title, items, isPersonList] of overviewSections) {
       if (items?.length) {
         this.subTitle(title)
-        this.bullets(items)
+        const processedItems = isPersonList ? splitPersonEntries(items) : items
+        this.bullets(processedItems)
         this.gap(2)
       }
     }
@@ -625,20 +654,19 @@ class DocBuilder {
     const metricEntries = Object.entries(km)
     if (metricEntries.length > 0) {
       const metricRows: string[][] = []
-      const metricRowColors: Array<readonly [number, number, number] | null> = []
-      const metricRowBgs: Array<readonly [number, number, number] | null> = []
       for (const [key, val] of metricEntries) {
-        const label = val?.category || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
+        // val.label = criteria name (e.g. "Customer Mix")
+        // val.category = description/notes text
+        // key = snake_case key name (fallback for criteria)
+        const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
         const st = statusDot(val?.color)
-        const notes = strip(val?.label) || "—"
-        metricRows.push([label, st.label, notes])
-        metricRowColors.push(null)
-        metricRowBgs.push(null)
+        const notes = strip(val?.category) || "—"
+        metricRows.push([criteria, st.label, notes])
       }
       this.table(
         ["Criteria", "Status", "Notes"],
         metricRows,
-        [42, 22, CW - 64],
+        [38, 20, CW - 58],
         { fontSize: 7.5, boldFirstCol: true }
       )
     } else {
@@ -798,16 +826,21 @@ class DocBuilder {
       return
     }
 
-    // Parse the meta_data structure: typically keys like "2024 A", "2025 E" etc.
-    // Each key maps to an object with metrics like Sales, EBITDA, EBIT, etc.
+    // The data can come in two formats:
+    // FORMAT A (nested):  { "2024 A": { "Sales": 568, "EBITDA": 73 }, "2025 E": { ... } }
+    // FORMAT B (flat):    { "2024 A > Sales": 568, "2024 A > EBITDA": 73, ... }
+
     type YearData = Record<string, number | string | null>
-    const yearKeys: string[] = []
+    const yearKeysSet = new Set<string>()
     const metricNames = new Set<string>()
     const parsed: Record<string, YearData> = {}
 
+    // First try to detect FORMAT A (nested objects)
+    let hasNested = false
     for (const [key, val] of Object.entries(fh)) {
       if (val && typeof val === "object" && !Array.isArray(val)) {
-        yearKeys.push(key)
+        hasNested = true
+        yearKeysSet.add(key)
         parsed[key] = val as YearData
         for (const mk of Object.keys(val as object)) {
           metricNames.add(mk)
@@ -815,45 +848,58 @@ class DocBuilder {
       }
     }
 
-    // Sort year keys naturally
+    // If no nested objects found, try FORMAT B (flat keys with " > " separator)
+    if (!hasNested) {
+      for (const [key, val] of Object.entries(fh)) {
+        const parts = key.split(" > ")
+        if (parts.length === 2) {
+          const yearKey = parts[0].trim()
+          const metric = parts[1].trim()
+          yearKeysSet.add(yearKey)
+          metricNames.add(metric)
+          if (!parsed[yearKey]) parsed[yearKey] = {}
+          parsed[yearKey][metric] = val as number | string | null
+        }
+      }
+    }
+
+    const yearKeys = Array.from(yearKeysSet)
+
+    // Sort year keys naturally (2024 A, 2025 E, 2026 E, 2027 E ...)
     yearKeys.sort((a, b) => {
       const ya = parseInt(a)
       const yb = parseInt(b)
-      if (!isNaN(ya) && !isNaN(yb)) return ya - yb
+      if (!isNaN(ya) && !isNaN(yb)) {
+        if (ya !== yb) return ya - yb
+      }
       return a.localeCompare(b)
     })
 
     if (yearKeys.length === 0) {
-      // Flat object — render as key-value
+      // Truly flat with no recognizable structure — render as simple key-value
       const flatPairs: string[][] = []
-      const flatten = (obj: Record<string, unknown>, prefix = "") => {
-        for (const [k, v] of Object.entries(obj)) {
-          const lbl = prefix ? `${prefix} > ${k}` : k
-          if (v && typeof v === "object" && !Array.isArray(v)) {
-            flatten(v as Record<string, unknown>, lbl)
-          } else {
-            flatPairs.push([lbl.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), n2s(v as any)])
-          }
-        }
+      for (const [k, v] of Object.entries(fh)) {
+        flatPairs.push([
+          k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          n2s(v as any)
+        ])
       }
-      flatten(fh as Record<string, unknown>)
       if (flatPairs.length > 0) {
         this.table(["Metric", "Value"], flatPairs, [75, CW - 75], { fontSize: 8, boldFirstCol: true })
       }
       return
     }
 
-    // Build a proper financial table: Metric | Year1 | Year2 | ...
-    // Friendly metric names
+    // Build a proper financial table: Metric ($M) | 2024 A | 2025 E | 2026 E | ...
     const friendlyNames: Record<string, string> = {
       "Sales": "Revenue",
-      "Sales Growth": "Revenue Growth (%)",
+      "Sales Growth": "Revenue Growth",
       "EBITDA": "EBITDA",
-      "EBITDA Margin": "EBITDA Margin (%)",
+      "EBITDA Margin": "EBITDA Margin",
       "EBIT": "EBIT",
-      "EBIT Margin": "EBIT Margin (%)",
+      "EBIT Margin": "EBIT Margin",
       "Net Income": "Net Income",
-      "Net Income Margin": "Net Income Margin (%)",
+      "Net Income Margin": "Net Income Margin",
     }
 
     // Order metrics logically
@@ -864,13 +910,12 @@ class DocBuilder {
       "Net Income", "Net Income Margin",
     ]
     const orderedMetrics = metricOrder.filter((m) => metricNames.has(m))
-    // Add any remaining metrics not in our predefined order
     for (const m of metricNames) {
       if (!orderedMetrics.includes(m)) orderedMetrics.push(m)
     }
 
     const headers = ["Metric ($M)", ...yearKeys]
-    const metricColW = 38
+    const metricColW = 40
     const yearColW = (CW - metricColW) / yearKeys.length
     const colWidths = [metricColW, ...yearKeys.map(() => yearColW)]
 
