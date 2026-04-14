@@ -202,8 +202,7 @@ const extractKpis = (sections: Record<string, any>): KpiItem[] => {
       return keywords.some((kw) => label.includes(kw));
     });
 
-  const dtd = findMetric(["dtd"]);
-  if (dtd) kpis.push({ label: "DTD P&L", value: dtd.value, color: String(dtd.value || "").includes("-") ? "#dc2626" : "#059669" });
+  // DTD P&L removed from header KPIs
 
   // Cumulative P&L removed from header KPIs
 

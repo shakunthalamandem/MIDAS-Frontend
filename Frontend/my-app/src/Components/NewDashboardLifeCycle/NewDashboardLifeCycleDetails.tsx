@@ -94,25 +94,35 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
   const status = activePayload?.deal_status ?? "Announced";
   const isUpcoming = ["Announced", "Price Range"].includes(status);
 
+  const isMultipleDeal = (activePayload?.multiple_deal_status || "").toLowerCase() === "yes";
+
   const tabItems = useMemo(
-    () => [
-      { label: "Trading Dynamics" },
-      { label: "Write Up", requiresWriteup: true },
-      // { label: "Write Up Old", requiresWriteup: true },
-      // { label: "Red Flag Analysis" },
-      // { label: "Deal Recommendation" },
-      { label: "Peer Deals Performance" },
-      { label: "Sentiment Agent" },
-      { label: " Deal(IPO) Agent" },
-      { label: "Factors Based Agent" },
+    () => {
+      const tabs = [
+        { label: "Trading Dynamics" },
+        { label: "Write Up", requiresWriteup: true },
+        // { label: "Write Up Old", requiresWriteup: true },
+        // { label: "Red Flag Analysis" },
+        // { label: "Deal Recommendation" },
+        { label: "Peer Deals Performance" },
+        { label: "Sentiment Agent" },
+        { label: " Deal(IPO) Agent" },
+        { label: "Factors Based Agent" },
 
-      { label: "Gator Signal" },
-      { label: "S1 AI Query" },
-      { label: "NEWS" },
-      { label: "Meeting Notes" },
+        { label: "Gator Signal" },
+        { label: "S1 AI Query" },
+        { label: "NEWS" },
+        { label: "Meeting Notes" },
+      ];
 
-    ],
-    [isUpcoming]
+      // Hide "Deal(IPO) Agent" tab for Post IPO Repeat Purchase deals
+      if (isMultipleDeal) {
+        return tabs.filter((tab) => tab.label !== " Deal(IPO) Agent");
+      }
+
+      return tabs;
+    },
+    [isUpcoming, isMultipleDeal]
   );
 
   React.useEffect(() => {

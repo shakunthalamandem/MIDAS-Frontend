@@ -139,38 +139,6 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         },
       },
       {
-        field: "dtd_pnl",
-        headerName: "DTD P&L",
-        flex: 1,
-        minWidth: 130,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.dtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.dtd_pnl_pct)
-            : formatCurrency(row.dtd_pnl),
-      },
-      {
-        field: "wtd_pnl",
-        headerName: "WTD P&L",
-        flex: 1,
-        minWidth: 130,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.wtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.wtd_pnl_pct)
-            : formatCurrency(row.wtd_pnl),
-      },
-      {
         field: "ytd_pnl",
         headerName: "YTD P&L",
         flex: 1,
@@ -187,8 +155,8 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             : formatCurrency(row.ytd_pnl),
       },
       {
-        field: "market_value",
-        headerName: "Net Market Value",
+        field: "gross_market_value",
+        headerName: "Gross Market Value",
         flex: 1,
         minWidth: 140,
         cellClassName: "attr-datagrid-cell--exposure",
@@ -201,7 +169,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>NMV (Net Market Value)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>GMV (Gross Market Value)</Box>
                 <Box sx={{ color: "#93c5fd" }}>Σ Price × Quantity × PT Value</Box>
                 <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses premium price for options</Box>
               </Box>
@@ -209,7 +177,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Net Market Value</span>
+              <span style={{ fontWeight: 700 }}>Gross Market Value</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -218,15 +186,15 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           </Tooltip>
         ),
         valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.market_value_pct : value,
+          showPct ? row.gross_market_value_pct : value,
         renderCell: ({ row }) =>
           showPct
-            ? formatPctVal(row.market_value_pct)
-            : formatCurrency(row.market_value),
+            ? formatPctVal(row.gross_market_value_pct)
+            : formatCurrency(row.gross_market_value),
       },
       {
         field: "net_exp",
-        headerName: "Notional Exp",
+        headerName: "Net Notional Exposure",
         flex: 1,
         minWidth: 130,
         cellClassName: "attr-datagrid-cell--exposure",
@@ -239,7 +207,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Notional Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
                 <Box sx={{ mt: 0.5, color: "#ff8902" }}>Uses underlying price for options</Box>
@@ -248,7 +216,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Notional Exp</span>
+              <span style={{ fontWeight: 700 }}>Net Notional Exposure</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -265,7 +233,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "delta_adj_net",
-        headerName: "Delta Adj Net",
+        headerName: "Delta Adjusted Net Exp",
         flex: 1.1,
         minWidth: 150,
         cellClassName: "attr-datagrid-cell--exposure",
@@ -285,7 +253,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Delta Adj Net</span>
+              <span style={{ fontWeight: 700 }}>Delta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -302,7 +270,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "beta_adj_net",
-        headerName: "Beta Adj Net",
+        headerName: "Beta Adjusted Net Exp",
         flex: 1.1,
         minWidth: 150,
         cellClassName: "attr-datagrid-cell--exposure",
@@ -322,7 +290,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Beta Adj Net</span>
+              <span style={{ fontWeight: 700 }}>Beta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
