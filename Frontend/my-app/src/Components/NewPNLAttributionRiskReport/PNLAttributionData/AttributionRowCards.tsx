@@ -15,8 +15,8 @@ const METRIC_CARDS: MetricCard[] = [
   { key: "ytd_pnl", label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct" },
   { key: "gross_market_value", label: "Gross Market Value", valueKey: "gross_market_value", pctKey: "gross_market_value_pct" },
   { key: "net_exp", label: "Net Notional Exposure", valueKey: "net_exp", pctKey: "net_exp_pct" },
-  { key: "delta_adj_net", label: "Delta Adj Net", valueKey: "delta_adj_net", pctKey: "delta_adj_net_pct" },
-  { key: "beta_adj_net", label: "Beta Adj Net", valueKey: "beta_adj_net", pctKey: "beta_adj_net_pct" },
+  { key: "delta_adj_net", label: "Delta Adjusted Net Exp", valueKey: "delta_adj_net", pctKey: "delta_adj_net_pct" },
+  { key: "beta_adj_net", label: "Beta Adjusted Net Exp", valueKey: "beta_adj_net", pctKey: "beta_adj_net_pct" },
 ];
 
 interface AttributionRowCardsProps {
