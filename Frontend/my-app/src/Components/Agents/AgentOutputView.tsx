@@ -39,7 +39,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ReactMarkdown from "react-markdown";
 import { AgentOutput, AgentOutputSection, ChatMessage } from "./types";
-import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, saveAgentFinalPrompt, runAgent } from "./agentService";
+import { fetchLatestOutput, fetchOutputById, chatWithOutput, fetchAgent, fetchChatHistory, fetchAgentChatHistory, saveAgentFinalPrompt, runAgent } from "./agentService";
 
 const POLL_INTERVAL_MS = 10_000;
 
@@ -74,10 +74,11 @@ const AgentOutputView: React.FC = () => {
   const [agentData, setAgentData] = useState<{ id: number; prompt?: string; final_prompt?: string } | null>(null);
 
   // Prompt tabs state
-  const [promptTab, setPromptTab] = useState<"refined" | "original">("refined");
+  const [promptTab, setPromptTab] = useState<"refined" | "original">("original");
   const [runLoading, setRunLoading] = useState(false);
-  // Track if user clicked Run in this session — results only show in Refined tab after Run
-  const [hasRunInSession, setHasRunInSession] = useState(false);
+
+  // Temporary output for Combined Prompt tab — shown in-place, not persisted to Current Interaction
+  const [combinedRunOutput, setCombinedRunOutput] = useState<AgentOutput | null>(null);
 
   const loadOutput = useCallback(async () => {
     try {
@@ -109,19 +110,60 @@ const AgentOutputView: React.FC = () => {
 
   useEffect(() => { loadOutput(); }, [loadOutput]);
 
-  // Load saved chat history from DB when output loads or after save clears messages
+  // Load ALL chat history across ALL outputs for this agent (agent-level)
   useEffect(() => {
     if (!output || output.status !== "completed") return;
-    // Only load from DB when chatMessages is empty (initial load or after save cleared them)
+    const id = agentId || (output?.agent ? String(output.agent) : null);
+    if (!id) return;
+    // Load from DB when chatMessages is empty (initial load)
     if (chatMessages.length === 0) {
-      fetchChatHistory(output.id)
+      const buildFallbackMessages = (): ChatMessage[] => {
+        // Fallback: if DB has no chat history, construct from output data
+        const msgs: ChatMessage[] = [];
+        const prompt = output.agent_prompt || output.agent_description || "";
+        if (prompt) msgs.push({ role: "user", content: prompt });
+        if (output.result_json) {
+          const parts: string[] = [];
+          if (output.result_json.summary) parts.push(output.result_json.summary);
+          output.result_json.sections?.forEach((s: any) => {
+            if (s.title) parts.push(`**${s.title}**`);
+            if (s.content) parts.push(s.content);
+            if (s.items) s.items.forEach((item: any) => {
+              if (typeof item === "string") parts.push(`- ${item}`);
+              else if (item?.name || item?.title) parts.push(`- ${item.name || item.title}: ${item.value || item.description || ""}`);
+            });
+          });
+          if (parts.length > 0) msgs.push({ role: "assistant", content: parts.join("\n\n") });
+        }
+        return msgs;
+      };
+
+      fetchAgentChatHistory(Number(id))
         .then((msgs) => {
-          if (msgs.length > 0) setChatMessages(msgs);
+          if (msgs.length > 0) {
+            setChatMessages(msgs);
+          } else {
+            // No chat history in DB — build from output data as fallback
+            setChatMessages(buildFallbackMessages());
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Fallback to output-level chat history
+          fetchChatHistory(output.id)
+            .then((msgs) => {
+              if (msgs.length > 0) {
+                setChatMessages(msgs);
+              } else {
+                setChatMessages(buildFallbackMessages());
+              }
+            })
+            .catch(() => {
+              setChatMessages(buildFallbackMessages());
+            });
+        });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [output?.id, output?.status, promptTab]);
+  }, [output?.id, output?.status, agentId]);
 
   useEffect(() => {
     if (!output || output.status === "completed" || output.status === "failed")
@@ -185,10 +227,7 @@ const AgentOutputView: React.FC = () => {
       setHasUnsavedPromptChanges(false);
       setPromptSaved(true);
       setAgentData((prev) => prev ? { ...prev, final_prompt: refined } : prev);
-      // Clear chat from Refined Prompt view — chats are saved in DB
-      // and will load in Previous Chat tab from chat history
-      setChatMessages([]);
-      setPromptTab("refined");
+      // Stay on Current Interaction tab — user can view Combined Prompt tab when ready
       setTimeout(() => setPromptSaved(false), 3000);
     } catch {
       setChatError("Failed to save prompt. Please try again.");
@@ -207,23 +246,37 @@ const AgentOutputView: React.FC = () => {
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsavedPromptChanges]);
 
-  // Run agent handler
+  // Run agent handler — shows results temporarily in Combined Prompt tab
   const handleRunAgent = async () => {
     const targetId = agentData?.id || (agentId ? Number(agentId) : null);
     if (!targetId) return;
     setRunLoading(true);
-    setHasRunInSession(true);
-    // Clear old output so stale results don't show while new run processes
-    setOutput((prev) => prev ? { ...prev, status: "pending" as const, result_json: null, error_message: "" } : prev);
+    // Clear previous temporary results
+    setCombinedRunOutput({ status: "pending", result_json: null, error_message: "" } as any);
     try {
-      await runAgent(targetId);
-      // Reload output after a short delay to let the backend create the output
-      setTimeout(() => {
-        loadOutput();
+      const result = await runAgent(targetId);
+      const newOutputId = result.output_id;
+      // Poll for the new output to complete (separate from main output)
+      const pollForResult = async (retries = 30) => {
+        for (let i = 0; i < retries; i++) {
+          await new Promise((r) => setTimeout(r, 5000));
+          try {
+            const data = await fetchOutputById(newOutputId);
+            setCombinedRunOutput(data);
+            if (data.status === "completed" || data.status === "failed") {
+              setRunLoading(false);
+              return;
+            }
+          } catch {
+            // Keep polling
+          }
+        }
         setRunLoading(false);
-      }, 2000);
+      };
+      pollForResult();
     } catch {
       setChatError("Failed to run agent. Please try again.");
+      setCombinedRunOutput(null);
       setRunLoading(false);
     }
   };
@@ -360,8 +413,7 @@ const AgentOutputView: React.FC = () => {
   }
 
   const statusInfo = statusConfig[output.status] || statusConfig.pending;
-  const resultJson = output.result_json;
-  // Always show the original prompt the user initially asked
+  // Fallback prompt text for Combined Prompt tab
   const agentPrompt = output.agent_prompt || output.agent_description || "";
 
   return (
@@ -480,23 +532,6 @@ const AgentOutputView: React.FC = () => {
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           <Button
             size="small"
-            onClick={() => setPromptTab("refined")}
-            sx={{
-              textTransform: "none",
-              fontWeight: 700,
-              fontSize: "0.82rem",
-              borderRadius: 2.5,
-              px: 2.5,
-              py: 0.8,
-              ...(promptTab === "refined"
-                ? { bgcolor: "#4f46e5", color: "#fff", "&:hover": { bgcolor: "#4338ca" } }
-                : { bgcolor: "#fff", color: "#4f46e5", border: "1px solid #c7d2fe", "&:hover": { bgcolor: "#eef2ff" } }),
-            }}
-          >
-            Refined Prompt
-          </Button>
-          <Button
-            size="small"
             onClick={() => setPromptTab("original")}
             sx={{
               textTransform: "none",
@@ -510,11 +545,28 @@ const AgentOutputView: React.FC = () => {
                 : { bgcolor: "#fff", color: "#4f46e5", border: "1px solid #c7d2fe", "&:hover": { bgcolor: "#eef2ff" } }),
             }}
           >
-            Previous Chat
+            Current Interaction
+          </Button>
+          <Button
+            size="small"
+            onClick={() => setPromptTab("refined")}
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              borderRadius: 2.5,
+              px: 2.5,
+              py: 0.8,
+              ...(promptTab === "refined"
+                ? { bgcolor: "#4f46e5", color: "#fff", "&:hover": { bgcolor: "#4338ca" } }
+                : { bgcolor: "#fff", color: "#4f46e5", border: "1px solid #c7d2fe", "&:hover": { bgcolor: "#eef2ff" } }),
+            }}
+          >
+            Combined Prompt
           </Button>
         </Stack>
 
-        {/* ══════════ REFINED PROMPT TAB ══════════ */}
+        {/* ══════════ COMBINED PROMPT TAB ══════════ */}
         {promptTab === "refined" && (
           <Box
             sx={{
@@ -544,7 +596,7 @@ const AgentOutputView: React.FC = () => {
                     mb: 1,
                   }}
                 >
-                  {agentData?.final_prompt?.trim() ? "Updated Prompt" : "Current Prompt"}
+                  {agentData?.final_prompt?.trim() ? "Combined Prompt" : "Current Prompt"}
                 </Typography>
                 <Typography
                   sx={{
@@ -587,8 +639,8 @@ const AgentOutputView: React.FC = () => {
               </Stack>
             </Box>
 
-            {/* Agent Results (only shown after user clicks Run in this session) */}
-            {hasRunInSession && (output.status === "pending" || output.status === "running") && (
+            {/* Temporary Results from Run Agent (not stored, shown in-place) */}
+            {combinedRunOutput && combinedRunOutput.status === "pending" && (
               <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
                 <Box
                   sx={{
@@ -610,7 +662,29 @@ const AgentOutputView: React.FC = () => {
               </Box>
             )}
 
-            {hasRunInSession && output.status === "failed" && (
+            {combinedRunOutput && combinedRunOutput.status === "running" && (
+              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: "#f8fafc",
+                    borderLeft: "3px solid #4f46e5",
+                    textAlign: "center",
+                  }}
+                >
+                  <CircularProgress size={24} sx={{ color: "#d97706", mb: 1.5 }} />
+                  <Typography sx={{ fontWeight: 600, color: "#111827", fontSize: "0.92rem" }}>
+                    Agent is processing...
+                  </Typography>
+                  <Typography sx={{ color: "#64748b", fontSize: "0.82rem", mt: 0.5 }}>
+                    Results will appear here automatically.
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            {combinedRunOutput && combinedRunOutput.status === "failed" && (
               <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
                 <Box
                   sx={{
@@ -623,7 +697,7 @@ const AgentOutputView: React.FC = () => {
                   <Alert severity="error" sx={{ borderRadius: 2, mb: 1 }}>
                     Agent execution failed
                   </Alert>
-                  {output.error_message && (
+                  {combinedRunOutput.error_message && (
                     <Typography
                       sx={{
                         fontFamily: "monospace",
@@ -636,14 +710,14 @@ const AgentOutputView: React.FC = () => {
                         border: "1px solid #fecaca",
                       }}
                     >
-                      {output.error_message}
+                      {combinedRunOutput.error_message}
                     </Typography>
                   )}
                 </Box>
               </Box>
             )}
 
-            {hasRunInSession && output.status === "completed" && resultJson && (
+            {combinedRunOutput && combinedRunOutput.status === "completed" && combinedRunOutput.result_json && (
               <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
                 <Box
                   sx={{
@@ -653,7 +727,7 @@ const AgentOutputView: React.FC = () => {
                     overflow: "hidden",
                   }}
                 >
-                  {resultJson.summary && (
+                  {combinedRunOutput.result_json.summary && (
                     <Box sx={{ p: 2.5, borderBottom: "1px solid #e2e8f0", bgcolor: "#eef2ff" }}>
                       <Typography
                         sx={{
@@ -668,16 +742,16 @@ const AgentOutputView: React.FC = () => {
                         Executive Summary
                       </Typography>
                       <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
-                        {resultJson.summary}
+                        {combinedRunOutput.result_json.summary}
                       </Typography>
                     </Box>
                   )}
-                  {resultJson.sections?.map((section, idx) => (
+                  {combinedRunOutput.result_json.sections?.map((section: AgentOutputSection, idx: number) => (
                     <Box
                       key={idx}
                       sx={{
                         p: 2.5,
-                        borderBottom: idx < (resultJson.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none",
+                        borderBottom: idx < (combinedRunOutput.result_json?.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none",
                       }}
                     >
                       <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
@@ -686,26 +760,26 @@ const AgentOutputView: React.FC = () => {
                       <SectionRenderer section={section} />
                     </Box>
                   ))}
-                  {resultJson.metadata && (
+                  {combinedRunOutput.result_json.metadata && (
                     <Box sx={{ p: 2, bgcolor: "#eef2ff", borderTop: "1px solid #e2e8f0" }}>
                       <Stack direction="row" spacing={1} flexWrap="wrap">
-                        {resultJson.metadata.confidence && (
+                        {combinedRunOutput.result_json.metadata.confidence && (
                           <Chip
-                            label={`Confidence: ${resultJson.metadata.confidence}`}
+                            label={`Confidence: ${combinedRunOutput.result_json.metadata.confidence}`}
                             size="small"
                             sx={{
                               fontWeight: 700,
                               borderRadius: 2,
                               fontSize: "0.7rem",
-                              bgcolor: resultJson.metadata.confidence === "high" ? "#ecfdf5" : resultJson.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
-                              color: resultJson.metadata.confidence === "high" ? "#059669" : resultJson.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
+                              bgcolor: combinedRunOutput.result_json.metadata.confidence === "high" ? "#ecfdf5" : combinedRunOutput.result_json.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
+                              color: combinedRunOutput.result_json.metadata.confidence === "high" ? "#059669" : combinedRunOutput.result_json.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
                             }}
                           />
                         )}
-                        {resultJson.metadata.analysis_date && (
-                          <Chip label={`Analysis: ${resultJson.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
+                        {combinedRunOutput.result_json.metadata.analysis_date && (
+                          <Chip label={`Analysis: ${combinedRunOutput.result_json.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
                         )}
-                        {resultJson.metadata.data_sources?.map((src, i) => (
+                        {combinedRunOutput.result_json.metadata.data_sources?.map((src: string, i: number) => (
                           <Chip key={i} label={src} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
                         ))}
                       </Stack>
@@ -715,113 +789,10 @@ const AgentOutputView: React.FC = () => {
               </Box>
             )}
 
-            {/* Follow-up input in Refined tab (only after user runs in this session) */}
-            {hasRunInSession && output.status === "completed" && (
-              <Box sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
-                {/* Loading indicator */}
-                {chatLoading && (
-                  <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
-                    <Box sx={{ maxWidth: "85%" }}>
-                      <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                        <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                        <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>{output?.agent_name}</Typography>
-                      </Stack>
-                      <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f8fafc", borderLeft: "3px solid #4f46e5", display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <CircularProgress size={16} sx={{ color: "#4f46e5" }} />
-                        <Typography sx={{ fontSize: "0.85rem", color: "#64748b" }}>
-                          {useWebSearch ? "Searching the web and thinking..." : "Thinking..."}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                )}
-
-                {/* Chat Error */}
-                {chatError && (
-                  <Alert severity="error" sx={{ borderRadius: 2, mb: 1.5, fontSize: "0.85rem" }} onClose={() => setChatError(null)}>
-                    {chatError}
-                  </Alert>
-                )}
-
-                {/* Controls row */}
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={useWebSearch}
-                        onChange={(e) => setUseWebSearch(e.target.checked)}
-                        sx={{ color: "#94a3b8", "&.Mui-checked": { color: "#059669" }, p: 0.5 }}
-                      />
-                    }
-                    label={
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <TravelExploreIcon sx={{ fontSize: 16, color: useWebSearch ? "#059669" : "#94a3b8" }} />
-                        <Typography sx={{ fontSize: "0.75rem", color: useWebSearch ? "#059669" : "#94a3b8", fontWeight: 600 }}>Web Search</Typography>
-                      </Stack>
-                    }
-                    sx={{ ml: 0, mr: 0 }}
-                  />
-                  <Button
-                    size="small"
-                    onClick={handleSavePrompt}
-                    disabled={!hasUnsavedPromptChanges || promptSaving}
-                    startIcon={
-                      promptSaving ? <CircularProgress size={12} sx={{ color: "#4f46e5" }} />
-                        : promptSaved ? <CheckIcon sx={{ fontSize: 14 }} />
-                        : <SaveOutlinedIcon sx={{ fontSize: 14 }} />
-                    }
-                    sx={{
-                      textTransform: "none", fontWeight: 600, fontSize: "0.75rem", borderRadius: 2, px: 1.5, py: 0.3,
-                      color: promptSaved ? "#059669" : hasUnsavedPromptChanges ? "#4f46e5" : "#94a3b8",
-                      bgcolor: promptSaved ? "#ecfdf5" : hasUnsavedPromptChanges ? "#eef2ff" : "transparent",
-                      border: `1px solid ${promptSaved ? "#a7f3d0" : hasUnsavedPromptChanges ? "#c7d2fe" : "#e2e8f0"}`,
-                      "&:hover": { bgcolor: promptSaved ? "#ecfdf5" : "#e0e7ff" },
-                      "&.Mui-disabled": { color: "#94a3b8", borderColor: "#e2e8f0" },
-                    }}
-                  >
-                    {promptSaving ? "Saving..." : promptSaved ? "Prompt Saved" : "Save Prompt"}
-                  </Button>
-                </Stack>
-
-                {/* Chat Input */}
-                <TextField
-                  fullWidth
-                  multiline
-                  maxRows={3}
-                  placeholder="Ask a follow-up question about this analysis..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={handleChatKeyDown}
-                  disabled={chatLoading}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 3, bgcolor: "#fff", fontSize: "0.88rem",
-                      "& fieldset": { borderColor: "#c7d2fe" },
-                      "&:hover fieldset": { borderColor: "#a5b4fc" },
-                      "&.Mui-focused fieldset": { borderColor: "#4f46e5" },
-                    },
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={handleChatSend}
-                          disabled={!chatInput.trim() || chatLoading}
-                          sx={{ color: chatInput.trim() && !chatLoading ? "#4f46e5" : "#94a3b8", "&:hover": { bgcolor: "#eef2ff" } }}
-                        >
-                          <SendIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Box>
-            )}
           </Box>
         )}
 
-        {/* ══════════ PREVIOUS CHAT TAB ══════════ */}
+        {/* ══════════ CURRENT INTERACTION TAB ══════════ */}
         {promptTab === "original" && (
           <Box
             sx={{
@@ -831,7 +802,7 @@ const AgentOutputView: React.FC = () => {
               overflow: "hidden",
             }}
           >
-            {/* Conversation Container */}
+            {/* Conversation Container — all messages (initial + follow-ups) from DB chat history */}
             <Box
               sx={{
                 maxHeight: "calc(100vh - 350px)",
@@ -842,96 +813,20 @@ const AgentOutputView: React.FC = () => {
                 gap: 2.5,
               }}
             >
-              {/* Original Prompt */}
-              {agentPrompt && (
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Box sx={{ maxWidth: "85%" }}>
-                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5} justifyContent="flex-end">
-                      <Typography sx={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
-                        Original Prompt
-                      </Typography>
-                      <PersonOutlineIcon sx={{ fontSize: 14, color: "#64748b" }} />
-                    </Stack>
-                    <Box sx={{ p: 2.5, borderRadius: 3, bgcolor: "#4f46e5", color: "#fff", borderBottomRightRadius: 4 }}>
-                      <Typography sx={{ fontSize: "0.88rem", lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                        {agentPrompt}
-                      </Typography>
-                    </Box>
-                  </Box>
+              {/* Pending/Running state */}
+              {(output.status === "pending" || output.status === "running") && chatMessages.length === 0 && (
+                <Box sx={{ textAlign: "center", py: 4 }}>
+                  <CircularProgress size={24} sx={{ color: "#d97706", mb: 1.5 }} />
+                  <Typography sx={{ fontWeight: 600, color: "#111827", fontSize: "0.92rem" }}>
+                    Agent is working on your request...
+                  </Typography>
+                  <Typography sx={{ color: "#64748b", fontSize: "0.82rem", mt: 0.5 }}>
+                    Results will appear here automatically.
+                  </Typography>
                 </Box>
               )}
 
-              {/* Previous Agent Response */}
-              {output.status === "completed" && resultJson && (
-                <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                  <Box sx={{ maxWidth: "90%", width: "100%" }}>
-                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
-                      <SmartToyOutlinedIcon sx={{ fontSize: 14, color: "#4f46e5" }} />
-                      <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 600 }}>
-                        {output.agent_name}
-                      </Typography>
-                      {output.completed_at && (
-                        <Typography sx={{ fontSize: "0.65rem", color: "#94a3b8" }}>
-                          {new Date(output.completed_at).toLocaleString("en-IN")}
-                        </Typography>
-                      )}
-                    </Stack>
-                    <Box
-                      sx={{
-                        borderRadius: 3,
-                        bgcolor: "#f8fafc",
-                        borderLeft: "3px solid #4f46e5",
-                        borderBottomLeftRadius: 4,
-                        overflow: "hidden",
-                      }}
-                    >
-                      {resultJson.summary && (
-                        <Box sx={{ p: 2.5, borderBottom: "1px solid #e2e8f0", bgcolor: "#eef2ff" }}>
-                          <Typography sx={{ fontSize: "0.7rem", color: "#4f46e5", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", mb: 0.8 }}>
-                            Executive Summary
-                          </Typography>
-                          <Typography sx={{ fontWeight: 600, color: "#111827", lineHeight: 1.7, fontSize: "0.92rem" }}>
-                            {resultJson.summary}
-                          </Typography>
-                        </Box>
-                      )}
-                      {resultJson.sections?.map((section, idx) => (
-                        <Box key={idx} sx={{ p: 2.5, borderBottom: idx < (resultJson.sections?.length || 0) - 1 ? "1px solid #e2e8f0" : "none" }}>
-                          <Typography sx={{ fontWeight: 700, fontSize: "0.92rem", color: "#111827", mb: 1.5 }}>
-                            {section.title}
-                          </Typography>
-                          <SectionRenderer section={section} />
-                        </Box>
-                      ))}
-                      {resultJson.metadata && (
-                        <Box sx={{ p: 2, bgcolor: "#eef2ff", borderTop: "1px solid #e2e8f0" }}>
-                          <Stack direction="row" spacing={1} flexWrap="wrap">
-                            {resultJson.metadata.confidence && (
-                              <Chip
-                                label={`Confidence: ${resultJson.metadata.confidence}`}
-                                size="small"
-                                sx={{
-                                  fontWeight: 700, borderRadius: 2, fontSize: "0.7rem",
-                                  bgcolor: resultJson.metadata.confidence === "high" ? "#ecfdf5" : resultJson.metadata.confidence === "medium" ? "#fffbeb" : "#fef2f2",
-                                  color: resultJson.metadata.confidence === "high" ? "#059669" : resultJson.metadata.confidence === "medium" ? "#d97706" : "#dc2626",
-                                }}
-                              />
-                            )}
-                            {resultJson.metadata.analysis_date && (
-                              <Chip label={`Analysis: ${resultJson.metadata.analysis_date}`} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 600, fontSize: "0.7rem" }} />
-                            )}
-                            {resultJson.metadata.data_sources?.map((src, i) => (
-                              <Chip key={i} label={src} size="small" variant="outlined" sx={{ borderRadius: 2, fontWeight: 500, fontSize: "0.7rem" }} />
-                            ))}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-
-              {/* Follow-up Chat Messages */}
+              {/* All Chat Messages (initial prompt+response + follow-ups) */}
               {chatMessages.map((msg, idx) => (
                 <Box
                   key={`chat-${idx}`}
@@ -1016,10 +911,10 @@ const AgentOutputView: React.FC = () => {
               )}
 
               {/* Empty state if no chats yet */}
-              {!agentPrompt && chatMessages.length === 0 && output.status !== "completed" && (
+              {chatMessages.length === 0 && output.status === "completed" && (
                 <Box sx={{ textAlign: "center", py: 4 }}>
                   <Typography sx={{ color: "#94a3b8", fontSize: "0.88rem" }}>
-                    No previous chat history yet.
+                    No chat history yet. Ask a follow-up question below.
                   </Typography>
                 </Box>
               )}
@@ -1220,8 +1115,14 @@ const AgentOutputView: React.FC = () => {
   );
 };
 
+/** Strip <cite index="...">...</cite> tags from web search responses, keeping inner text */
+const stripCiteTags = (text: string): string =>
+  text.replace(/<cite\s+index="[^"]*">/gi, "").replace(/<\/cite>/gi, "");
+
 /** Renders markdown content with proper styling */
-const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ content, isLight }) => (
+const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ content: rawContent, isLight }) => {
+  const content = stripCiteTags(rawContent);
+  return (
   <Box
     sx={{
       fontSize: "0.88rem",
@@ -1276,7 +1177,8 @@ const MarkdownContent: React.FC<{ content: string; isLight?: boolean }> = ({ con
   >
     <ReactMarkdown>{content}</ReactMarkdown>
   </Box>
-);
+  );
+};
 
 /** Renders a single section based on its type */
 const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section }) => {
@@ -1318,7 +1220,7 @@ const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section })
         {section.items.map((item, i) => (
           <Box component="li" key={i} sx={{ mb: 0.8, "&::marker": { color: "#4f46e5" } }}>
             <Typography sx={{ fontSize: "0.88rem", color: "#1e293b", lineHeight: 1.7 }}>
-              {item}
+              {typeof item === "string" ? stripCiteTags(item) : item}
             </Typography>
           </Box>
         ))}
@@ -1348,7 +1250,7 @@ const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section })
                     borderBottom: "2px solid #e8e8ef",
                   }}
                 >
-                  {h}
+                  {stripCiteTags(h)}
                 </TableCell>
               ))}
             </TableRow>
@@ -1365,7 +1267,7 @@ const SectionRenderer: React.FC<{ section: AgentOutputSection }> = ({ section })
               >
                 {row.map((cell, j) => (
                   <TableCell key={j} sx={{ fontSize: "0.82rem", color: "#1e293b" }}>
-                    {String(cell)}
+                    {stripCiteTags(String(cell))}
                   </TableCell>
                 ))}
               </TableRow>
