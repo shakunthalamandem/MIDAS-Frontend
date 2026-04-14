@@ -53,6 +53,7 @@ const formatValue = (key: string, value: any, ipodata: Record<string, any>) => {
   if (key === "nosh") {
     return value ? `${Number(value).toLocaleString()}M` : "N/A";
   }
+  if (Array.isArray(value)) return value.join(", ") || "N/A";
   return value || "N/A";
 };
 
