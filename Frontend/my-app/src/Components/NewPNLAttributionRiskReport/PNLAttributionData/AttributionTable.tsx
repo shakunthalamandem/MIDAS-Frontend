@@ -110,6 +110,32 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
     [data]
   );
 
+  // Pin TOTAL row to the bottom regardless of sort
+  const pinTotalAndOtherComparator =
+    (defaultCompare: (a: any, b: any) => number) =>
+    (v1: any, v2: any, params1: any, params2: any) => {
+      const name1 = params1.api.getRow(params1.id)?.name?.toUpperCase();
+      const name2 = params2.api.getRow(params2.id)?.name?.toUpperCase();
+      const isTotal1 = name1 === "TOTAL";
+      const isTotal2 = name2 === "TOTAL";
+      const isOther1 = name1 === "OTHER";
+      const isOther2 = name2 === "OTHER";
+
+      const sortModel = params1.api.getSortModel();
+      const isDesc = sortModel.length > 0 && sortModel[0].sort === "desc";
+
+      // TOTAL always last (compensate for DataGrid sign-flip in desc mode)
+      if (isTotal1 && isTotal2) return 0;
+      if (isTotal1) return isDesc ? -1 : 1;
+      if (isTotal2) return isDesc ? 1 : -1;
+
+      // OTHER second-to-last
+      if (isOther1 && isOther2) return 0;
+      if (!isOther1 && !isOther2) return defaultCompare(v1, v2);
+      if (isOther1) return isDesc ? -1 : 1;
+      return isDesc ? 1 : -1;
+    };
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -117,68 +143,44 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         headerName: GROUP_BY_LABELS[groupBy],
         flex: 1.4,
         minWidth: 200,
-        cellClassName: "attr-datagrid-cell--name",
-        sortComparator: pinOtherComparator(
+        cellClassName: (params: any) => {
+          const isTotal = params.row.name?.toUpperCase() === "TOTAL";
+          return isTotal ? "attr-datagrid-cell--name attr-datagrid-cell--total" : "attr-datagrid-cell--name";
+        },
+        sortComparator: pinTotalAndOtherComparator(
           groupBy === "holding_period" ? holdingPeriodCompare : stringCompare
         ),
         renderCell: ({ row }) => {
           const isExpanded = expandedRow === row.name;
           const isOther = row.name?.toUpperCase() === "OTHER";
+          const isTotal = row.name?.toUpperCase() === "TOTAL";
           return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%" }}>
-              {!isOther && (
+              {!isOther && !isTotal && (
                 isExpanded
                   ? <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "inherit", flexShrink: 0 }} />
                   : <KeyboardArrowRightIcon sx={{ fontSize: 18, color: "#94a3b8", flexShrink: 0 }} />
               )}
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                fontWeight: isTotal ? 800 : undefined,
+              }}>
                 {row.name}
               </span>
             </Box>
           );
         },
       },
-      {
-        field: "dtd_pnl",
-        headerName: "DTD P&L",
-        flex: 1,
-        minWidth: 130,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.dtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.dtd_pnl_pct)
-            : formatCurrency(row.dtd_pnl),
-      },
-      {
-        field: "wtd_pnl",
-        headerName: "WTD P&L",
-        flex: 1,
-        minWidth: 130,
-        cellClassName: "attr-datagrid-cell--pnl",
-        headerAlign: "center",
-        align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
-        valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.wtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.wtd_pnl_pct)
-            : formatCurrency(row.wtd_pnl),
-      },
+
       {
         field: "ytd_pnl",
         headerName: "YTD P&L",
-        flex: 1,
-        minWidth: 130,
+        flex: 0.85,
+        minWidth: 110,
         cellClassName: "attr-datagrid-cell--pnl",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.ytd_pnl_pct : value,
         renderCell: ({ row }) =>
@@ -187,21 +189,21 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             : formatCurrency(row.ytd_pnl),
       },
       {
-        field: "market_value",
-        headerName: "Net Market Value",
+        field: "gross_market_value",
+        headerName: "Gross Market Value",
         flex: 1,
         minWidth: 140,
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>NMV (Net Market Value)</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5, color: "#ffffff" }}>GMV (Gross Market Value)</Box>
                 <Box sx={{ color: "#93c5fd" }}>Σ Price × Quantity × PT Value</Box>
                 <Box sx={{ mt: 0.5, color: "#fcd34d" }}>Uses premium price for options</Box>
               </Box>
@@ -209,7 +211,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Net Market Value</span>
+              <span style={{ fontWeight: 700 }}>Gross Market Value</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -218,28 +220,28 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
           </Tooltip>
         ),
         valueGetter: (value: number, row: AttributionItem) =>
-          showPct ? row.market_value_pct : value,
+          showPct ? row.gross_market_value_pct : value,
         renderCell: ({ row }) =>
           showPct
-            ? formatPctVal(row.market_value_pct)
-            : formatCurrency(row.market_value),
+            ? formatPctVal(row.gross_market_value_pct)
+            : formatCurrency(row.gross_market_value),
       },
       {
         field: "net_exp",
-        headerName: "Notional Exp",
+        headerName: "Net Notional Exposure",
         flex: 1,
         minWidth: 130,
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
             arrow
             title={
               <Box sx={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Exposure</Box>
+                <Box sx={{ fontWeight: 700, mb: 0.5 }}>Net Notional Exposure</Box>
                 <Box>Total Long Exposure + Total Short Exposure</Box>
                 <Box>Σ (Price × Quantity × PT Value)</Box>
                 <Box sx={{ mt: 0.5, color: "#ff8902" }}>Uses underlying price for options</Box>
@@ -248,7 +250,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Notional Exp</span>
+              <span style={{ fontWeight: 700 }}>Net Notional Exposure</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -265,13 +267,13 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "delta_adj_net",
-        headerName: "Delta Adj Net",
+        headerName: "Delta Adjusted Net Exp",
         flex: 1.1,
         minWidth: 150,
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -285,7 +287,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Delta Adj Net</span>
+              <span style={{ fontWeight: 700 }}>Delta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -302,13 +304,13 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
       },
       {
         field: "beta_adj_net",
-        headerName: "Beta Adj Net",
+        headerName: "Beta Adjusted Net Exp",
         flex: 1.1,
         minWidth: 150,
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -322,7 +324,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             slotProps={{ tooltip: { sx: { bgcolor: "#0f172a", border: "1px solid rgba(96,165,250,0.25)", maxWidth: 300, "& .MuiTooltip-arrow": { color: "#0f172a" } } } }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "default" }}>
-              <span style={{ fontWeight: 700 }}>Beta Adj Net</span>
+              <span style={{ fontWeight: 700 }}>Beta Adjusted Net Exp</span>
               <InfoOutlinedIcon
                 sx={{ fontSize: 14, color: "#60a5fa", "&:hover": { color: "#93c5fd" } }}
                 onClick={(e) => e.stopPropagation()}
@@ -351,15 +353,18 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         rowHeight={42}
         disableRowSelectionOnClick
         disableColumnMenu
-        getRowClassName={(params) =>
-          expandedRow && params.row.name === expandedRow ? "attr-row--expanded" : ""
-        }
         slots={{ toolbar: CustomToolbar }}
         onRowClick={(params: GridRowParams) => {
           if (!selectedFunds || !selectedDate || !onRowClick) return;
           const name = params.row.name;
-          if (name?.toUpperCase() === "OTHER") return;
+          if (name?.toUpperCase() === "OTHER" || name?.toUpperCase() === "TOTAL") return;
           onRowClick(name);
+        }}
+        getRowClassName={(params) => {
+          const name = params.row.name?.toUpperCase();
+          if (name === "TOTAL") return "attr-row--total";
+          if (expandedRow && params.row.name === expandedRow) return "attr-row--expanded";
+          return "";
         }}
         sortingOrder={["asc", "desc"]}
         initialState={{
@@ -457,6 +462,21 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             background: theme.exportBg,
             filter: "brightness(0.85)",
             color: "#fff",
+          },
+          /* ── Total row ── */
+          "& .MuiDataGrid-row.attr-row--total": {
+            backgroundColor: "#eef2f7 !important",
+            borderTop: "2px solid #1e293b",
+            fontWeight: 800,
+            cursor: "default",
+          },
+          "& .MuiDataGrid-row.attr-row--total:hover": {
+            backgroundColor: "#eef2f7 !important",
+          },
+          "& .MuiDataGrid-row.attr-row--total .MuiDataGrid-cell": {
+            fontWeight: 800,
+            color: "#0f172a",
+            fontSize: "13.5px",
           },
           /* ── Footer ── */
           "& .MuiDataGrid-footerContainer": {

@@ -14,12 +14,10 @@ interface HeadlinePnLProps {
 }
 
 const PNL_CARDS = [
-  { title: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct", metricKey: "dtd_pnl" },
   { title: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", metricKey: "ytd_pnl" },
 ] as const;
 
 const buildMetricCards = (label: string) => [
-  { title: `DTD ${label}`, valueKey: "dtd_value", pctKey: "dtd_pct", metricKey: "dtd" },
   { title: `YTD ${label}`, valueKey: "ytd_value", pctKey: "ytd_pct", metricKey: "ytd" },
 ];
 

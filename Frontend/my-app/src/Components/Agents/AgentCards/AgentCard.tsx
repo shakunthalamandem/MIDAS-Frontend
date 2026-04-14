@@ -89,7 +89,7 @@ const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; 
 
 /* Override display names/descriptions without changing backend keys */
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
-  "JRitter IPO Agent": "Gator IPO Agent-2",
+  "JRitter IPO Agent": "Gator IPO Agent",
 };
 
 const AGENT_DISPLAY_DESCRIPTIONS: Record<string, string> = {

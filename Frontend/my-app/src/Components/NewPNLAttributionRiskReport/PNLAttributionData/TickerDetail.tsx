@@ -102,10 +102,19 @@ const TickerDetail: React.FC = () => {
     fetchTickerData();
   }, [fetchTickerData]);
 
-  const rows = useMemo(
-    () => data.map((item, idx) => ({ id: idx, ...item })),
+  const totalRow = useMemo(
+    () => data.find((item) => item.ticker === "TOTAL") ?? null,
     [data]
   );
+
+  const rows = useMemo(() => {
+    const filtered = data.filter((item) => item.ticker !== "TOTAL");
+    const dataRows = filtered.map((item, idx) => ({ id: idx, ...item }));
+    if (totalRow) {
+      dataRows.push({ id: -1, ...totalRow });
+    }
+    return dataRows;
+  }, [data, totalRow]);
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -134,34 +143,6 @@ const TickerDetail: React.FC = () => {
           value != null ? Math.round(value) : "—",
       },
       {
-        field: "dtd_pnl",
-        headerName: "DTD P&L",
-        flex: 1,
-        minWidth: 130,
-        headerAlign: "right",
-        align: "right",
-        valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.dtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.dtd_pnl_pct)
-            : formatCurrency(row.dtd_pnl),
-      },
-      {
-        field: "wtd_pnl",
-        headerName: "WTD P&L",
-        flex: 1,
-        minWidth: 130,
-        headerAlign: "right",
-        align: "right",
-        valueGetter: (value: number, row: TickerItem) =>
-          showPct ? row.wtd_pnl_pct : value,
-        renderCell: ({ row }) =>
-          showPct
-            ? formatPctVal(row.wtd_pnl_pct)
-            : formatCurrency(row.wtd_pnl),
-      },
-      {
         field: "ytd_pnl",
         headerName: "YTD P&L",
         flex: 1,
@@ -174,6 +155,20 @@ const TickerDetail: React.FC = () => {
           showPct
             ? formatPctVal(row.ytd_pnl_pct)
             : formatCurrency(row.ytd_pnl),
+      },
+      {
+        field: "gross_market_value",
+        headerName: "Gross Market Value",
+        flex: 1,
+        minWidth: 130,
+        headerAlign: "right",
+        align: "right",
+        valueGetter: (value: number, row: TickerItem) =>
+          showPct ? row.gross_market_value_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.gross_market_value_pct)
+            : formatCurrency(row.gross_market_value),
       },
       {
         field: "net_exp",
@@ -287,6 +282,9 @@ const TickerDetail: React.FC = () => {
               disableRowSelectionOnClick
               disableColumnMenu
               slots={{ toolbar: CustomToolbar }}
+              getRowClassName={(params) =>
+                params.row.ticker === "TOTAL" ? "ticker-detail-row--total" : ""
+              }
               initialState={{
                 sorting: {
                   sortModel: [{ field: "ytd_pnl", sort: "desc" }],
@@ -359,6 +357,14 @@ const TickerDetail: React.FC = () => {
                 "& .MuiDataGrid-footerContainer": {
                   fontFamily: FONT,
                   borderTop: "1px solid #e2e8f0",
+                },
+                /* TOTAL row styling */
+                "& .ticker-detail-row--total": {
+                  backgroundColor: "#002060 !important",
+                },
+                "& .ticker-detail-row--total .MuiDataGrid-cell": {
+                  color: "#fff",
+                  fontWeight: 700,
                 },
               }}
             />
