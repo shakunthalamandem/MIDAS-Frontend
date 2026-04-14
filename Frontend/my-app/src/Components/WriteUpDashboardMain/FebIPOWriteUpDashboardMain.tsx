@@ -24,6 +24,7 @@ import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRe
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
 import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
 import FebIPOWriteUpPdfExporter from "./FebIPOWriteUpPdfExporter"
+import IPOWriteUpPdfAutomation from "./IPOWriteUpPdfAutomation"
 
 interface FebIPOWriteUpDashboardMainProps {
   basicDealDetails: BasicDealDetails
@@ -216,7 +217,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
           >
             IPO Write-up
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, mb: 1 }}>
             <FebIPOWriteUpPdfExporter
               targetId={pdfRootId}
               headerTitle="IPO Write-up"
@@ -229,6 +230,12 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
               issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
               exchange={writeUpData?.exchange || basicDealDetails?.exchange}
+            />
+            <IPOWriteUpPdfAutomation
+              ticker={basicDealDetails?.ticker}
+              issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
+              exchange={writeUpData?.exchange || basicDealDetails?.exchange}
+              pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
             />
           </Box>
 
