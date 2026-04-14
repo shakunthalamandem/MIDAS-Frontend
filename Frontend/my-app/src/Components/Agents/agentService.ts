@@ -131,6 +131,15 @@ export async function fetchChatHistory(outputId: number): Promise<ChatMessage[]>
   return data.messages;
 }
 
+/** Fetch ALL chat history across ALL outputs for an agent (agent-level history) */
+export async function fetchAgentChatHistory(agentId: number): Promise<ChatMessage[]> {
+  const res = await fetch(`${apiUrl}/api/v2/agents/${agentId}/chat-history/`, {
+    headers: authHeaders(),
+  });
+  const data = await handleResponse<{ messages: ChatMessage[] }>(res);
+  return data.messages;
+}
+
 /** Save the refined final prompt for an agent (Claude merges original + follow-ups) */
 export async function saveAgentFinalPrompt(
   agentId: number,
