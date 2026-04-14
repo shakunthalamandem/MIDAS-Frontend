@@ -1,11 +1,15 @@
 import React from "react";
 import { Box, Tooltip } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import type { HeadlineRisks as HeadlineRisksData, DashboardCategory } from "./types";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import RemoveIcon from "@mui/icons-material/Remove";
+import type { HeadlineRisks as HeadlineRisksData, HeadlinePnl, DashboardCategory } from "./types";
 import { formatCurrency, formatFullCurrency, formatPct } from "./utils";
 
 interface HeadlineRisksProps {
   data: HeadlineRisksData;
+  pnlData?: HeadlinePnl;
   selectedCategory: DashboardCategory;
   onCategorySelect: (category: DashboardCategory) => void;
 }
@@ -55,7 +59,14 @@ const SELECTED_COLORS: Record<string, string> = {
   orange: "#ea580c",
 };
 
-const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, onCategorySelect }) => {
+const PNL_BOXES = [
+  { label: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct" },
+  { label: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct" },
+  { label: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct" },
+  { label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct" },
+] as const;
+
+const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCategory, onCategorySelect }) => {
   return (
     <Box className="risk-dashboard-section">
       <Box className="risk-dashboard-section-title">HEADLINE RISKS</Box>
@@ -172,6 +183,47 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, selectedCategory, o
           );
         })}
       </Box>
+
+      {/* P&L Summary Boxes */}
+      {pnlData && (
+        <Box className="pnl-summary-grid">
+          {PNL_BOXES.map((cfg) => {
+            const value = pnlData[cfg.valueKey as keyof HeadlinePnl] as number;
+            const pct = pnlData[cfg.pctKey as keyof HeadlinePnl] as number;
+            const isPositive = value > 0;
+            const isNegative = value < 0;
+            const isZero = value === 0;
+
+            return (
+              <Box key={cfg.valueKey} className="pnl-summary-box">
+                <Box className="pnl-summary-box-header">
+                  <Box className="pnl-summary-box-icon">
+                    {isPositive ? (
+                      <TrendingUpIcon sx={{ fontSize: 14, color: "#059669" }} />
+                    ) : isNegative ? (
+                      <TrendingDownIcon sx={{ fontSize: 14, color: "#dc2626" }} />
+                    ) : (
+                      <RemoveIcon sx={{ fontSize: 14, color: "#94a3b8" }} />
+                    )}
+                  </Box>
+                  <span className="pnl-summary-box-label">{cfg.label}</span>
+                </Box>
+                <Box
+                  className="pnl-summary-box-value"
+                  sx={{
+                    color: isPositive ? "#059669" : isNegative ? "#dc2626" : "#64748b",
+                  }}
+                >
+                  {formatCurrency(value)}
+                </Box>
+                <Box className="pnl-summary-box-pct">
+                  {pct.toFixed(2)}%
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
     </Box>
   );
 };

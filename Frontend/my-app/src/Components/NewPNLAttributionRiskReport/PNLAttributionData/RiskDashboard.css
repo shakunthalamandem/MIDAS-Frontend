@@ -562,6 +562,80 @@
   display: none;
 }
 
+/* ── P&L Summary Boxes (DTD/WTD/MTD/YTD) ── */
+.pnl-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .pnl-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .pnl-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pnl-summary-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.pnl-summary-box:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.pnl-summary-box-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pnl-summary-box-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pnl-summary-box-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pnl-summary-box-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.pnl-summary-box-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
 /* ── P&L Cards Grid ── */
 .pnl-cards-grid {
   display: grid;
@@ -1033,6 +1107,36 @@
 
 .pdf-export-mode .risk-card-body {
   gap: 2px;
+}
+
+/* ── Compact P&L Summary Boxes ── */
+.pdf-export-mode .pnl-summary-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+
+.pdf-export-mode .pnl-summary-box {
+  padding: 10px 12px;
+  border-radius: 6px;
+  gap: 4px;
+}
+
+.pdf-export-mode .pnl-summary-box:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.pdf-export-mode .pnl-summary-box-value {
+  font-size: 16px;
+}
+
+.pdf-export-mode .pnl-summary-box-label {
+  font-size: 10px;
+}
+
+.pdf-export-mode .pnl-summary-box-pct {
+  font-size: 10px;
 }
 
 /* ── Compact P&L Cards ── */
