@@ -244,6 +244,8 @@ class DocBuilder {
     p.setDrawColor(...NAVY)
     p.setLineWidth(0.5)
     p.line(MG, 20, PW - MG, 20)
+    // Reset font to normal so callers don't inherit bold
+    this.setFont("normal", BODY_SIZE)
     p.setTextColor(...BLACK)
     this.y = 26
   }
