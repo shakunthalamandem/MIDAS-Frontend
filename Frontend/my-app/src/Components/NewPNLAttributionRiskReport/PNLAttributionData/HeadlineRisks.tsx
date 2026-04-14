@@ -60,10 +60,10 @@ const SELECTED_COLORS: Record<string, string> = {
 };
 
 const PNL_BOXES = [
-  { label: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct" },
-  { label: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct" },
-  { label: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct" },
-  { label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct" },
+  { label: "DTD P&L", valueKey: "dtd_pnl", pctKey: "dtd_pnl_pct", colorVariant: "dtd" },
+  { label: "WTD P&L", valueKey: "wtd_pnl", pctKey: "wtd_pnl_pct", colorVariant: "wtd" },
+  { label: "MTD P&L", valueKey: "mtd_pnl", pctKey: "mtd_pnl_pct", colorVariant: "mtd" },
+  { label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", colorVariant: "ytd" },
 ] as const;
 
 const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCategory, onCategorySelect }) => {
@@ -195,7 +195,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCa
             const isZero = value === 0;
 
             return (
-              <Box key={cfg.valueKey} className="pnl-summary-box">
+              <Box key={cfg.valueKey} className={`pnl-summary-box pnl-summary-box--${cfg.colorVariant}`}>
                 <Box className="pnl-summary-box-header">
                   <Box className="pnl-summary-box-icon">
                     {isPositive ? (
