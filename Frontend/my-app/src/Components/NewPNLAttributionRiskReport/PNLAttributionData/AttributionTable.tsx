@@ -110,6 +110,32 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
     [data]
   );
 
+  // Pin TOTAL row to the bottom regardless of sort
+  const pinTotalAndOtherComparator =
+    (defaultCompare: (a: any, b: any) => number) =>
+    (v1: any, v2: any, params1: any, params2: any) => {
+      const name1 = params1.api.getRow(params1.id)?.name?.toUpperCase();
+      const name2 = params2.api.getRow(params2.id)?.name?.toUpperCase();
+      const isTotal1 = name1 === "TOTAL";
+      const isTotal2 = name2 === "TOTAL";
+      const isOther1 = name1 === "OTHER";
+      const isOther2 = name2 === "OTHER";
+
+      // TOTAL always last
+      if (isTotal1 && isTotal2) return 0;
+      if (isTotal1) return 1;
+      if (isTotal2) return -1;
+
+      // OTHER second-to-last
+      if (isOther1 && isOther2) return 0;
+      if (!isOther1 && !isOther2) return defaultCompare(v1, v2);
+
+      const sortModel = params1.api.getSortModel();
+      const isDesc = sortModel.length > 0 && sortModel[0].sort === "desc";
+      if (isOther1) return isDesc ? -1 : 1;
+      return isDesc ? 1 : -1;
+    };
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -117,21 +143,28 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         headerName: GROUP_BY_LABELS[groupBy],
         flex: 1.4,
         minWidth: 200,
-        cellClassName: "attr-datagrid-cell--name",
-        sortComparator: pinOtherComparator(
+        cellClassName: (params: any) => {
+          const isTotal = params.row.name?.toUpperCase() === "TOTAL";
+          return isTotal ? "attr-datagrid-cell--name attr-datagrid-cell--total" : "attr-datagrid-cell--name";
+        },
+        sortComparator: pinTotalAndOtherComparator(
           groupBy === "holding_period" ? holdingPeriodCompare : stringCompare
         ),
         renderCell: ({ row }) => {
           const isExpanded = expandedRow === row.name;
           const isOther = row.name?.toUpperCase() === "OTHER";
+          const isTotal = row.name?.toUpperCase() === "TOTAL";
           return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%" }}>
-              {!isOther && (
+              {!isOther && !isTotal && (
                 isExpanded
                   ? <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "inherit", flexShrink: 0 }} />
                   : <KeyboardArrowRightIcon sx={{ fontSize: 18, color: "#94a3b8", flexShrink: 0 }} />
               )}
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                fontWeight: isTotal ? 800 : undefined,
+              }}>
                 {row.name}
               </span>
             </Box>
@@ -139,14 +172,46 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         },
       },
       {
-        field: "ytd_pnl",
-        headerName: "YTD P&L",
-        flex: 1,
-        minWidth: 130,
+        field: "dtd_pnl",
+        headerName: "DTD P&L",
+        flex: 0.85,
+        minWidth: 110,
         cellClassName: "attr-datagrid-cell--pnl",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
+        valueGetter: (value: number, row: AttributionItem) =>
+          showPct ? row.dtd_pnl_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.dtd_pnl_pct)
+            : formatCurrency(row.dtd_pnl),
+      },
+      {
+        field: "wtd_pnl",
+        headerName: "WTD P&L",
+        flex: 0.85,
+        minWidth: 110,
+        cellClassName: "attr-datagrid-cell--pnl",
+        headerAlign: "center",
+        align: "center",
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
+        valueGetter: (value: number, row: AttributionItem) =>
+          showPct ? row.wtd_pnl_pct : value,
+        renderCell: ({ row }) =>
+          showPct
+            ? formatPctVal(row.wtd_pnl_pct)
+            : formatCurrency(row.wtd_pnl),
+      },
+      {
+        field: "ytd_pnl",
+        headerName: "YTD P&L",
+        flex: 0.85,
+        minWidth: 110,
+        cellClassName: "attr-datagrid-cell--pnl",
+        headerAlign: "center",
+        align: "center",
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         valueGetter: (value: number, row: AttributionItem) =>
           showPct ? row.ytd_pnl_pct : value,
         renderCell: ({ row }) =>
@@ -162,7 +227,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -200,7 +265,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -239,7 +304,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -276,7 +341,7 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         cellClassName: "attr-datagrid-cell--exposure",
         headerAlign: "center",
         align: "center",
-        sortComparator: pinOtherComparator(numericCompare),
+        sortComparator: pinTotalAndOtherComparator(numericCompare),
         renderHeader: () => (
           <Tooltip
             placement="top"
@@ -319,15 +384,18 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
         rowHeight={42}
         disableRowSelectionOnClick
         disableColumnMenu
-        getRowClassName={(params) =>
-          expandedRow && params.row.name === expandedRow ? "attr-row--expanded" : ""
-        }
         slots={{ toolbar: CustomToolbar }}
         onRowClick={(params: GridRowParams) => {
           if (!selectedFunds || !selectedDate || !onRowClick) return;
           const name = params.row.name;
-          if (name?.toUpperCase() === "OTHER") return;
+          if (name?.toUpperCase() === "OTHER" || name?.toUpperCase() === "TOTAL") return;
           onRowClick(name);
+        }}
+        getRowClassName={(params) => {
+          const name = params.row.name?.toUpperCase();
+          if (name === "TOTAL") return "attr-row--total";
+          if (expandedRow && params.row.name === expandedRow) return "attr-row--expanded";
+          return "";
         }}
         sortingOrder={["asc", "desc"]}
         initialState={{
@@ -425,6 +493,21 @@ const AttributionTable: React.FC<AttributionTableProps> = ({
             background: theme.exportBg,
             filter: "brightness(0.85)",
             color: "#fff",
+          },
+          /* ── Total row ── */
+          "& .MuiDataGrid-row.attr-row--total": {
+            backgroundColor: "#eef2f7 !important",
+            borderTop: "2px solid #1e293b",
+            fontWeight: 800,
+            cursor: "default",
+          },
+          "& .MuiDataGrid-row.attr-row--total:hover": {
+            backgroundColor: "#eef2f7 !important",
+          },
+          "& .MuiDataGrid-row.attr-row--total .MuiDataGrid-cell": {
+            fontWeight: 800,
+            color: "#0f172a",
+            fontSize: "13.5px",
           },
           /* ── Footer ── */
           "& .MuiDataGrid-footerContainer": {
