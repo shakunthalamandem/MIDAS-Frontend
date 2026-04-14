@@ -223,6 +223,29 @@ const Attribution: React.FC<AttributionProps> = ({
               onRowClick={handleRowClick}
             />
 
+            {/* Data scope note */}
+            <Box sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "6px 20px",
+              mt: 1,
+              mb: 0.5,
+              px: 0.5,
+            }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#059669", flexShrink: 0 }} />
+                <Box sx={{ fontSize: "11px", color: "#475569", fontStyle: "italic" }}>
+                  <strong>YTD P&amp;L</strong> — includes Security Type = 'Exchrate'
+                </Box>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#94a3b8", flexShrink: 0 }} />
+                <Box sx={{ fontSize: "11px", color: "#475569", fontStyle: "italic" }}>
+                  <strong>Gross Market Value, Net Notional Exposure, Delta Adj. Net Exp, Beta Adj. Net Exp</strong> — excludes Security Type = 'Exchrate'
+                </Box>
+              </Box>
+            </Box>
+
             {/* Area charts - only for analyst and sector group_by */}
             {(groupBy === "analyst" || groupBy === "sector") && (
               <AttributionAreaCharts

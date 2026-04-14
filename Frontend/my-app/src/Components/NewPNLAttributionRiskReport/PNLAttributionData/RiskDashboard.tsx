@@ -410,115 +410,6 @@ const RiskDashboard: React.FC = () => {
         />
       </Box>
 
-      {/* ── Legend / Reference Panel ── */}
-      <Box className="legend-panel">
-        <Box className="legend-panel-header" onClick={() => setLegendOpen((o) => !o)}>
-          <Box className="legend-panel-header-left">
-            <InfoOutlinedIcon className="legend-panel-icon" />
-            <span className="legend-panel-title">Risk &amp; PNL Report — Definitions, Formulas &amp; Proxy Values</span>
-          </Box>
-          <Tooltip title={legendOpen ? "Collapse" : "Expand"}>
-            <IconButton size="small" className="legend-panel-toggle">
-              {legendOpen ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        <Collapse in={legendOpen}>
-          <Box className="legend-panel-body">
-
-            {/* ── Definitions ── */}
-            <Box className="legend-section">
-              <div className="legend-section-title">Definitions</div>
-              <Box className="legend-definitions-grid">
-                {[
-                  { term: "AUM", def: "Assets Under Management — total net asset value of all positions in the portfolio." },
-                  { term: "Gross Market Value (GMV)", def: "Sum of absolute market values of all long and short positions: Σ |MV|." },
-                  { term: "Net Market Value (NMV)", def: "Long market value minus short market value: Σ MV (longs) − Σ MV (shorts)." },
-                  { term: "Delta", def: "Rate of change of a derivative's price with respect to a $1 move in the underlying. Equities and futures have delta = 1; options carry a fractional delta (see Proxy Values table)." },
-                  { term: "Beta", def: "Sensitivity of a security's returns relative to the benchmark (S&P 500). A beta of 1 moves in line with the market; <1 is less volatile; >1 is more volatile." },
-                  { term: "Delta Adj. Net Exposure", def: "Net market value weighted by each position's delta proxy, capturing the effective directional exposure of the book including derivatives." },
-                  { term: "Beta Adj. Net Exposure", def: "Delta-adjusted net exposure further scaled by each position's beta proxy, normalising the portfolio's market-equivalent exposure to the benchmark." },
-                  { term: "YTD P&L", def: "Year-to-date realised and unrealised profit & loss, from 1 Jan of the current year to the selected report date." },
-                  { term: "MTD P&L", def: "Month-to-date profit & loss, from the first calendar day of the current month to the selected report date." },
-                  { term: "1D P&L", def: "One-day (overnight) profit & loss — the change in portfolio value between the prior trading day and the selected report date." },
-                  { term: "Exchrate P&L", def: "The P&L component attributable to FX / exchange-rate movements on non-base-currency positions." },
-                  { term: "Top / Bottom Contributors", def: "The 10 securities with the largest positive (Top) and largest negative (Bottom) P&L contribution over the selected period." },
-                ].map(({ term, def }) => (
-                  <Box key={term} className="legend-def-row">
-                    <span className="legend-def-term">{term}</span>
-                    <span className="legend-def-desc">{def}</span>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-
-            {/* ── Formulas ── */}
-            <Box className="legend-section">
-              <div className="legend-section-title">Formulas</div>
-              <Box className="legend-definitions-grid">
-                {[
-                  { term: "Gross MV", def: "Σ | Position MV |" },
-                  { term: "Net MV", def: "Σ (Long MV) − Σ (Short MV)" },
-                  { term: "Delta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy )" },
-                  { term: "Beta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy × Beta Proxy )" },
-                  { term: "% of AUM", def: "Metric Value ÷ AUM × 100" },
-                  { term: "Cumulative P&L", def: "Σ Daily P&L from period start date to report date" },
-                ].map(({ term, def }) => (
-                  <Box key={term} className="legend-def-row">
-                    <span className="legend-def-term">{term}</span>
-                    <code className="legend-formula">{def}</code>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-
-            {/* ── Proxy Values Table ── */}
-            <Box className="legend-section">
-              <div className="legend-section-title">Proxy Values by Security Type</div>
-              <p className="legend-proxy-note">
-                When a position does not carry an explicit delta or beta value, the following proxy values are applied in exposure calculations.
-              </p>
-              <Box className="legend-proxy-table-wrap">
-                <table className="legend-proxy-table">
-                  <thead>
-                    <tr>
-                      <th>Security Type</th>
-                      <th>Delta Proxy</th>
-                      <th>Beta Proxy</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      ["Convertible Bond",       "0.5",   "0.4"],
-                      ["Exchrate",               "1.0",   "1.0"],
-                      ["Equity Call",            "0.25",  "1.0"],
-                      ["Equity Put",             "−0.25", "1.0"],
-                      ["Equity",                 "1.0",   "1.0"],
-                      ["Equity Future",          "1.0",   "1.0"],
-                      ["Equity Investment Trust","1.0",   "1.0"],
-                      ["Corporate Bond",         "1.0",   "0.25"],
-                      ["Equity CFD",             "1.0",   "1.0"],
-                      ["Warrant",                "1.0",   "1.0"],
-                      ["Index OTC Future Put",   "1.0",   "−0.5"],
-                      ["Index OTC Future Call",  "1.0",   "0.5"],
-                      ["Equity GDR",             "1.0",   "1.0"],
-                    ].map(([sec, delta, beta]) => (
-                      <tr key={sec}>
-                        <td>{sec}</td>
-                        <td className="legend-proxy-num">{delta}</td>
-                        <td className="legend-proxy-num">{beta}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Box>
-            </Box>
-
-          </Box>
-        </Collapse>
-      </Box>
-
       {error && (
         <Alert severity="error" className="risk-dashboard-error" onClose={() => setError("")}>
           {error}
@@ -644,6 +535,116 @@ const RiskDashboard: React.FC = () => {
           )}
         </>
       )}
+
+      {/* ── Legend / Reference Panel ── */}
+      <Box className="legend-panel">
+        <Box className="legend-panel-header" onClick={() => setLegendOpen((o) => !o)}>
+          <Box className="legend-panel-header-left">
+            <InfoOutlinedIcon className="legend-panel-icon" />
+            <span className="legend-panel-title">Risk &amp; PNL Report — Definitions, Formulas &amp; Proxy Values</span>
+          </Box>
+          <Tooltip title={legendOpen ? "Collapse" : "Expand"}>
+            <IconButton size="small" className="legend-panel-toggle">
+              {legendOpen ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <Collapse in={legendOpen}>
+          <Box className="legend-panel-body">
+
+            {/* ── Definitions ── */}
+            <Box className="legend-section">
+              <div className="legend-section-title">Definitions</div>
+              <Box className="legend-definitions-grid">
+                {[
+                  { term: "AUM", def: "Assets Under Management — total net asset value of all positions in the portfolio." },
+                  { term: "Gross Market Value (GMV)", def: "Sum of absolute market values of all long and short positions: Σ |MV|." },
+                  { term: "Net Market Value (NMV)", def: "Long market value minus short market value: Σ MV (longs) − Σ MV (shorts)." },
+                  { term: "Delta", def: "Rate of change of a derivative's price with respect to a $1 move in the underlying. Equities and futures have delta = 1; options carry a fractional delta (see Proxy Values table)." },
+                  { term: "Beta", def: "Sensitivity of a security's returns relative to the benchmark (S&P 500). A beta of 1 moves in line with the market; <1 is less volatile; >1 is more volatile." },
+                  { term: "Delta Adj. Net Exposure", def: "Net market value weighted by each position's delta proxy, capturing the effective directional exposure of the book including derivatives." },
+                  { term: "Beta Adj. Net Exposure", def: "Delta-adjusted net exposure further scaled by each position's beta proxy, normalising the portfolio's market-equivalent exposure to the benchmark." },
+                  { term: "YTD P&L", def: "Year-to-date realised and unrealised profit & loss, from 1 Jan of the current year to the selected report date." },
+                  { term: "MTD P&L", def: "Month-to-date profit & loss, from the first calendar day of the current month to the selected report date." },
+                  { term: "1D P&L", def: "One-day (overnight) profit & loss — the change in portfolio value between the prior trading day and the selected report date." },
+                  { term: "Exchrate P&L", def: "The P&L component attributable to FX / exchange-rate movements on non-base-currency positions." },
+                  { term: "Top / Bottom Contributors", def: "The 10 securities with the largest positive (Top) and largest negative (Bottom) P&L contribution over the selected period." },
+                ].map(({ term, def }) => (
+                  <Box key={term} className="legend-def-row">
+                    <span className="legend-def-term">{term}</span>
+                    <span className="legend-def-desc">{def}</span>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            {/* ── Formulas ── */}
+            <Box className="legend-section">
+              <div className="legend-section-title">Formulas</div>
+              <Box className="legend-definitions-grid">
+                {[
+                  { term: "Gross MV", def: "Σ | Position MV |" },
+                  { term: "Net MV", def: "Σ (Long MV) − Σ (Short MV)" },
+                  { term: "Delta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy )" },
+                  { term: "Beta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy × Beta Proxy )" },
+                  { term: "% of AUM", def: "Metric Value ÷ AUM × 100" },
+                  { term: "Cumulative P&L", def: "Σ Daily P&L from period start date to report date" },
+                ].map(({ term, def }) => (
+                  <Box key={term} className="legend-def-row">
+                    <span className="legend-def-term">{term}</span>
+                    <code className="legend-formula">{def}</code>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            {/* ── Proxy Values Table ── */}
+            <Box className="legend-section">
+              <div className="legend-section-title">Proxy Values by Security Type</div>
+              <p className="legend-proxy-note">
+                When a position does not carry an explicit delta or beta value, the following proxy values are applied in exposure calculations.
+              </p>
+              <Box className="legend-proxy-table-wrap">
+                <table className="legend-proxy-table">
+                  <thead>
+                    <tr>
+                      <th>Security Type</th>
+                      <th>Delta Proxy</th>
+                      <th>Beta Proxy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ["Convertible Bond",       "0.5",   "0.4"],
+                      ["Exchrate",               "1.0",   "1.0"],
+                      ["Equity Call",            "0.25",  "1.0"],
+                      ["Equity Put",             "−0.25", "1.0"],
+                      ["Equity",                 "1.0",   "1.0"],
+                      ["Equity Future",          "1.0",   "1.0"],
+                      ["Equity Investment Trust","1.0",   "1.0"],
+                      ["Corporate Bond",         "1.0",   "0.25"],
+                      ["Equity CFD",             "1.0",   "1.0"],
+                      ["Warrant",                "1.0",   "1.0"],
+                      ["Index OTC Future Put",   "1.0",   "−0.5"],
+                      ["Index OTC Future Call",  "1.0",   "0.5"],
+                      ["Equity GDR",             "1.0",   "1.0"],
+                    ].map(([sec, delta, beta]) => (
+                      <tr key={sec}>
+                        <td>{sec}</td>
+                        <td className="legend-proxy-num">{delta}</td>
+                        <td className="legend-proxy-num">{beta}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Box>
+            </Box>
+
+          </Box>
+        </Collapse>
+      </Box>
+
     </Box>
     </Container>
   );

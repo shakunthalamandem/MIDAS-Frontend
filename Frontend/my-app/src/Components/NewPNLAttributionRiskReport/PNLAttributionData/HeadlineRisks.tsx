@@ -69,7 +69,12 @@ const PNL_BOXES = [
 const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCategory, onCategorySelect }) => {
   return (
     <Box className="risk-dashboard-section">
-      <Box className="risk-dashboard-section-title">HEADLINE RISKS</Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
+        <Box className="risk-dashboard-section-title" sx={{ mb: "0 !important" }}>HEADLINE RISKS</Box>
+        <Box sx={{ fontSize: "11px", color: "#343d49", fontStyle: "italic", fontWeight: 400 }}>
+          (excluding Security Type = 'Exchrate')
+        </Box>
+      </Box>
       <Box className="risk-cards-grid">
         {RISK_CARDS_CONFIG.map((cfg) => {
           const value = data[cfg.key as keyof HeadlineRisksData] as number;
@@ -189,6 +194,12 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCa
 
       {/* P&L Summary Boxes */}
       {pnlData && (
+        <>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.5, mb: 0.5, flexWrap: "wrap" }}>
+            <Box sx={{ fontSize: "11px", color: "#343d49", fontStyle: "italic", fontWeight: 400 }}>
+              P&amp;L values include Security Type = 'Exchrate'
+            </Box>
+          </Box>
         <Box className="pnl-summary-grid">
           {PNL_BOXES.map((cfg) => {
             const value = pnlData[cfg.valueKey as keyof HeadlinePnl] as number;
@@ -226,6 +237,7 @@ const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCa
             );
           })}
         </Box>
+        </>
       )}
     </Box>
   );
