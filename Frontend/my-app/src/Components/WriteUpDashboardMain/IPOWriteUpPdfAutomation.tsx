@@ -103,9 +103,10 @@ const LINE_SPACING = 1.15
 const BULLET_LIST_AFTER = 6 * PT
 const BULLET_INDENT = 6.35 // 0.25 inch
 
-// Footer area
-const FOOTER_Y = PH - 12
-const USABLE_H = FOOTER_Y - 4  // max Y for content before footer
+// Header / Footer area
+const HDR_BOTTOM = MG + 12     // header ends here (logo + line)
+const FOOTER_Y = PH - 18       // footer starts here
+const USABLE_H = FOOTER_Y - 2  // max Y for content before footer
 
 /* ═══════════════════════════════════════════════
    Utility functions
@@ -226,38 +227,50 @@ class DocBuilder {
     if (this.pgNum > 0) this.drawFooter()
     this.p.addPage()
     this.pgNum++
-    this.y = MG
-    // Draw minimal header: company name top-left, logo top-right
-    if (this.pgNum > 1) {
-      this.drawPageHeader()
-    }
+    this.drawPageHeader()
   }
 
   private drawPageHeader() {
     const p = this.p
+    // Logo top-right
     if (this.logo) {
-      p.addImage(this.logo, "PNG", PW - MG - 38, MG - 4, 38, 11.4, undefined, "FAST")
+      p.addImage(this.logo, "PNG", PW - MG - 36, 8, 36, 10.8, undefined, "FAST")
     }
-    this.setFont("bold", 10)
+    // Company name top-left
+    this.setFont("bold", 10.5)
     p.setTextColor(...NAVY)
-    p.text(this.company, MG, MG + 4)
-    // thin line
-    p.setDrawColor(...TABLE_BORDER)
-    p.setLineWidth(0.3)
-    p.line(MG, MG + 8, PW - MG, MG + 8)
+    p.text(this.company, MG, 15)
+    // Navy line under header
+    p.setDrawColor(...NAVY)
+    p.setLineWidth(0.5)
+    p.line(MG, 20, PW - MG, 20)
     p.setTextColor(...BLACK)
-    this.y = MG + 14
+    this.y = 26
   }
 
   private drawFooter() {
     const p = this.p
-    const fy = FOOTER_Y
+    // Navy line above footer
+    p.setDrawColor(...NAVY)
+    p.setLineWidth(0.4)
+    p.line(MG, FOOTER_Y, PW - MG, FOOTER_Y)
+    // Footer text
     this.setFont("normal", FOOTER_SIZE)
     p.setTextColor(...DARK_GRAY)
-    const footerLine = `${this.asOf ? `Data as of ${this.asOf}. ` : ""}Data from company management. Do not copy. Do not distribute.`
-    p.text(footerLine, MG, fy)
-    // Page number bottom right
-    p.text(`${this.pgNum}`, PW - MG, fy, { align: "right" })
+    const asOfText = this.asOf ? `Data as of ${this.asOf}. ` : ""
+    const footerLine1 = `${asOfText}Data from company management. The reader should not assume that investment decisions identified and discussed were or will be profitable.`
+    const footerLines: string[] = (p as any).splitTextToSize(footerLine1, CW - 15)
+    let fy = FOOTER_Y + 3
+    for (const fl of footerLines) {
+      p.text(fl, MG, fy)
+      fy += FOOTER_SIZE * PT * 1.1
+    }
+    // "Do not copy" + page number on last line
+    this.setFont("bold", 7.5)
+    p.setTextColor(130, 130, 130)
+    p.text("Do not copy. Do not distribute.", MG, PH - 8)
+    this.setFont("normal", 7.5)
+    p.text(`${this.pgNum}`, PW - MG, PH - 8, { align: "right" })
     p.setTextColor(...BLACK)
   }
 
@@ -268,7 +281,7 @@ class DocBuilder {
   }
 
   /* ── Typography primitives ─────────────────── */
-  /** Heading 1: 14pt Semibold, space before 18pt, after 8pt */
+  /** Heading 1: 14pt Bold, #002060, space before 18pt, after 8pt */
   private h1(title: string) {
     // Never start body text at top — always have heading. If < 40mm, new page.
     if (this.avail < 40) this.newPage()
@@ -276,20 +289,26 @@ class DocBuilder {
     this.lastHeading = title
     const p = this.p
     this.setFont("bold", H1_SIZE)
-    p.setTextColor(...BLACK)
+    p.setTextColor(...NAVY)
     p.text(title, MG, this.y)
-    this.y += H1_AFTER + H1_SIZE * PT
+    // Thin navy underline below heading
+    p.setDrawColor(...NAVY)
+    p.setLineWidth(0.3)
+    p.line(MG, this.y + 2, PW - MG, this.y + 2)
+    p.setTextColor(...BLACK)
+    this.y += H1_AFTER + H1_SIZE * PT + 2
   }
 
-  /** Heading 2: 11.5pt Semibold, space before 12pt, after 4pt */
+  /** Heading 2: 11.5pt Bold, #002060, space before 12pt, after 4pt */
   private h2(title: string) {
     if (this.avail < 20) this.newPage()
     this.y += H2_BEFORE
     this.lastHeading = title
     const p = this.p
     this.setFont("bold", H2_SIZE)
-    p.setTextColor(...BLACK)
+    p.setTextColor(...NAVY)
     p.text(title, MG, this.y)
+    p.setTextColor(...BLACK)
     this.y += H2_AFTER + H2_SIZE * PT
   }
 
@@ -325,7 +344,8 @@ class DocBuilder {
       const lines = this.wrap(cleaned, textW, BULLET_SIZE)
       // Ensure at least first 2 lines fit
       this.ensureSpace(Math.min(lines.length, 2) * lh + 2)
-      // Draw bullet
+      // Draw solid round bullet
+      p.setFillColor(...BLACK)
       const bulletY = this.y - 0.8
       p.circle(MG + 2.5, bulletY, 0.6, "F")
       // Draw text
@@ -339,7 +359,7 @@ class DocBuilder {
     this.y += BULLET_LIST_AFTER
   }
 
-  /** Table with wrapping cells */
+  /** Table with wrapping cells, vertically centered text */
   private table(
     headers: string[],
     rows: string[][],
@@ -354,40 +374,59 @@ class DocBuilder {
     const fs = TABLE_BODY_SIZE
     const hfs = TABLE_HDR_SIZE
     const lh = this.lineH(fs)
-    const pad = 2
+    const hlh = hfs * PT * LINE_SPACING
+    const pad = 2.5
     const nCols = headers.length
     const raFrom = opts?.rightAlignFrom ?? -1
     const showHeader = opts?.showHeader !== false
 
     // ── Header ──
     if (showHeader) {
-      const hdrH = 6.5
+      // Compute header height based on multiline headers
+      let maxHdrLines = 1
+      const hdrLineArrays: string[][] = []
+      for (let i = 0; i < nCols; i++) {
+        const lines = headers[i].split("\n")
+        hdrLineArrays.push(lines)
+        maxHdrLines = Math.max(maxHdrLines, lines.length)
+      }
+      const hdrH = Math.max(maxHdrLines * hlh + 3, 7)
+
       this.ensureSpace(hdrH + lh * 2)
+      // Header background
       p.setFillColor(...TABLE_HEADER_BG)
-      p.rect(MG, this.y - 1, CW, hdrH, "F")
+      p.rect(MG, this.y, CW, hdrH, "F")
+      // Top border
+      p.setDrawColor(...NAVY)
+      p.setLineWidth(0.5)
+      p.line(MG, this.y, PW - MG, this.y)
+
       this.setFont("bold", hfs)
-      p.setTextColor(...BLACK)
+      p.setTextColor(...NAVY)
       let x = MG
       for (let i = 0; i < nCols; i++) {
         const align = i >= raFrom && raFrom >= 0 ? "right" : "left"
         const tx = align === "right" ? x + colW[i] - pad : x + pad
-        // Handle multiline headers
-        const hLines = headers[i].split("\n")
-        let hy = this.y + 1.5
+        const hLines = hdrLineArrays[i]
+        // Vertically center the header text block
+        const textBlockH = hLines.length * hlh
+        const startY = this.y + (hdrH - textBlockH) / 2 + hlh * 0.75
+        let hy = startY
         for (const hl of hLines) {
           p.text(hl, tx, hy, { align })
-          hy += hfs * PT * 1.1
+          hy += hlh
         }
         x += colW[i]
       }
       this.y += hdrH
-      p.setDrawColor(...TABLE_BORDER)
+      // Bottom border of header
+      p.setDrawColor(...NAVY)
       p.setLineWidth(0.4)
       p.line(MG, this.y, PW - MG, this.y)
       this.y += 0.3
     }
 
-    // ── Rows ──
+    // ── Data rows ──
     for (let r = 0; r < rows.length; r++) {
       // Calculate wrapped lines per cell
       this.setFont("normal", fs)
@@ -401,11 +440,12 @@ class DocBuilder {
         cellLines.push(wrapped)
         maxLines = Math.max(maxLines, wrapped.length)
       }
-      const rowH = Math.max(maxLines * lh + 1.5, 5)
+      const cellPadV = 1.5
+      const rowH = Math.max(maxLines * lh + cellPadV * 2, 5.5)
 
       this.ensureSpace(rowH + 1)
 
-      // Alt row bg
+      // Alt row background
       if (r % 2 === 1) {
         p.setFillColor(...TABLE_ALT_ROW)
         p.rect(MG, this.y, CW, rowH, "F")
@@ -419,7 +459,10 @@ class DocBuilder {
         this.setFont(isFirst ? "bold" : "normal", fs)
         p.setTextColor(...BLACK)
 
-        let cy = this.y + lh
+        // Vertically center cell text within the row
+        const textBlockH = cellLines[i].length * lh
+        const startCy = this.y + (rowH - textBlockH) / 2 + lh * 0.7
+        let cy = startCy
         for (const ln of cellLines[i]) {
           p.text(ln, tx, cy, { align })
           cy += lh
@@ -428,17 +471,17 @@ class DocBuilder {
       }
       this.y += rowH
 
-      // Row separator
-      p.setDrawColor(235, 237, 240)
-      p.setLineWidth(0.1)
+      // Subtle row separator
+      p.setDrawColor(230, 232, 238)
+      p.setLineWidth(0.15)
       p.line(MG, this.y, PW - MG, this.y)
     }
 
     // Bottom border
-    p.setDrawColor(...TABLE_BORDER)
-    p.setLineWidth(0.3)
+    p.setDrawColor(...NAVY)
+    p.setLineWidth(0.4)
     p.line(MG, this.y, PW - MG, this.y)
-    this.y += 4
+    this.y += 5
     p.setTextColor(...BLACK)
   }
 
@@ -673,11 +716,12 @@ class DocBuilder {
     this.h1("Investment Summary")
 
     if (inv.writeup_overall_rating != null) {
-      this.ensureSpace(10)
-      this.setFont("bold", 12)
-      p.setTextColor(...BLACK)
+      this.ensureSpace(12)
+      this.setFont("bold", 13)
+      p.setTextColor(...NAVY)
       p.text(`Overall Rating: ${inv.writeup_overall_rating}%`, MG, this.y)
-      this.y += 8
+      p.setTextColor(...BLACK)
+      this.y += 10
     }
 
     const ratings = inv.writeup_ratings || {}
@@ -705,11 +749,7 @@ class DocBuilder {
     }
 
     /* ═══ DISCLAIMER PAGE ═════════════════════ */
-    this.drawFooter()
-    p.addPage()
-    this.pgNum++
-    this.drawPageHeader()
-    this.y = MG + 14
+    this.newPage()
 
     this.h1("Disclaimer")
     const disclaimers = [
