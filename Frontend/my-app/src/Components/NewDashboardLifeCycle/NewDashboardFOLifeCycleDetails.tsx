@@ -84,7 +84,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
       { label: "Sentiment Agent" },
       { label: "Previous FO deals" },
       { label: "Factors Based Agent" },
-     
+
       { label: "Technical Analysis" },
       { label: "NEWS" },
       { label: "Meeting Notes" },
@@ -296,8 +296,7 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
                       No data available
                     </Typography>
                     <Typography sx={{ color: "#64748b", maxWidth: 420, mx: "auto", lineHeight: 1.7 }}>
-                      "{currentLabel}" is not currently available for {normalizedRegion || "this"} region deals. This feature may be added in the future.
-                    </Typography>
+                      Write-up data is not available for this deal yet. The "Write Up" section will be accessible once the write-up is ready.                    </Typography>
                   </Box>
                 );
               }
