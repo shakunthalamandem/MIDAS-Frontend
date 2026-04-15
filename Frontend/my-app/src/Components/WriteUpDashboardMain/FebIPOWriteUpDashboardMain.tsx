@@ -3,9 +3,11 @@ import {
   Box,
   Card,
   CardContent,
+  FormControlLabel,
   List,
   ListItemButton,
   ListItemText,
+  Switch,
   Typography
 } from "@mui/material"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -113,6 +115,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
   const [activeSection, setActiveSection] = useState(sections[0].id)
   const [pdfMode, setPdfMode] = useState(false)
+  const [showOutlookInPdf, setShowOutlookInPdf] = useState(false)
   const isManualScrollRef = useRef(false)
   const manualScrollTimeoutRef = useRef<number | null>(null)
   const sectionCardSx = {
@@ -231,6 +234,25 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
               exchange={writeUpData?.exchange || basicDealDetails?.exchange}
             />
+            <FormControlLabel
+              className="pdf-hidden"
+              control={
+                <Switch
+                  size="small"
+                  checked={showOutlookInPdf}
+                  onChange={(e) => setShowOutlookInPdf(e.target.checked)}
+                  sx={{
+                    "& .MuiSwitch-switchBase.Mui-checked": { color: "#002060" },
+                    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "#002060" }
+                  }}
+                />
+              }
+              label={
+                <Typography variant="caption" sx={{ color: "#1d2b5a", fontWeight: 500 }}>
+                  Include Outlook Summary
+                </Typography>
+              }
+            />
             {/* <IPOWriteUpPdfAutomation
               ticker={basicDealDetails?.ticker}
               issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
@@ -282,6 +304,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
             sectionCardSx={sectionCardSx}
             rootId={pdfRootId}
             writeUpData={writeUpData}
+            showOutlookSummary={showOutlookInPdf}
           />
         ) : (
           <>
