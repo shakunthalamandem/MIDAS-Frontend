@@ -1,7 +1,10 @@
 import React, { useState } from "react"
-import { Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, FormGroup, Typography } from "@mui/material"
+import { Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, FormGroup, Radio, RadioGroup, Typography } from "@mui/material"
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
+import DescriptionIcon from "@mui/icons-material/Description"
+import DownloadIcon from "@mui/icons-material/Download"
 import jsPDF from "jspdf"
+import { AlignmentType, BorderStyle, Document, Footer, Header, ImageRun, Packer, Paragraph, ShadingType, SimpleField, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from "docx"
 import monasheeLogo from "../../Assets/images/monashee_logo.png"
 import introImage from "../../Assets/images/monashee_page1.png"
 import calibriNormal from "../../Assets/fonts/calibri-normal"
@@ -322,9 +325,20 @@ class DocBuilder {
 
   private drawPageHeader() {
     const p = this.p
-    // Logo top-right
+    // Logo top-right — fit within header zone (y=8 to y=19), preserve aspect ratio
     if (this.logo) {
-      p.addImage(this.logo, "PNG", PW - MG - 36, 8, 36, 10.8, undefined, "FAST")
+      const MAX_W = 42
+      const MAX_H = 11  // keeps logo above the navy line drawn at y=20
+      const ratio = this.logo.naturalWidth > 0
+        ? this.logo.naturalHeight / this.logo.naturalWidth
+        : 0.28
+      let logoW = MAX_W
+      let logoH = logoW * ratio
+      if (logoH > MAX_H) {
+        logoH = MAX_H
+        logoW = logoH / ratio
+      }
+      p.addImage(this.logo, "PNG", PW - MG - logoW, 8, logoW, logoH, undefined, "FAST")
     }
     // Company name top-left
     this.setFont("bold", 10.5)
@@ -1015,12 +1029,397 @@ class DocBuilder {
 }
 
 /* ═══════════════════════════════════════════════
+   Word Document Builder
+   ═══════════════════════════════════════════════ */
+async function buildWordDoc(
+  data: ApiResponse,
+  ticker: string,
+  exchange: string | null | undefined,
+  pricingDate: string | null | undefined,
+  sel: SectionSelection,
+  aiOutlook?: AiOutlookData,
+  issuerName?: string | null
+): Promise<Blob> {
+  const di = data.deal_info
+  const fv = data.fair_value
+  const co = data.company_overview
+  const km = data.key_metrics || {}
+  const fh = data.financial_highlights || {}
+  const cm = data.comparative_multiples
+  const va = data.valuation
+  const ra = data.risk_assessment
+  const inv = data.investment_summary
+
+  const companyName = di?.company_name || issuerName || ticker
+  const dataAsOf = pricingDate ? fDate(pricingDate) : di?.pricing_date ? fDate(di.pricing_date) : ""
+
+  let logoBuffer: ArrayBuffer | null = null
+  try {
+    const r = await fetch(monasheeLogo)
+    logoBuffer = await r.arrayBuffer()
+  } catch { /* proceed without logo */ }
+
+  const NAVY_HEX = "002060"
+  const GRAY_HEX = "646464"
+  const RED_HEX = "C32D2D"
+  const TBL_HDR = "E8EDF5"
+  const TBL_ALT = "F7F9FC"
+  const WHITE_HEX = "FFFFFF"
+
+  /* Safely coerce any API value to a string array */
+  const toArr = (v: unknown): string[] => Array.isArray(v) ? (v as string[]) : []
+
+  const borderDef = { style: BorderStyle.SINGLE, size: 4, color: "D0D5DD" }
+  const tableBorders = {
+    top: borderDef, bottom: borderDef, left: borderDef, right: borderDef,
+    insideHorizontal: borderDef, insideVertical: borderDef,
+  }
+
+  type DocChild = Paragraph | Table
+
+  /* ── Helpers ── */
+  const wH1 = (text: string, pageBreak = false): Paragraph =>
+    new Paragraph({
+      pageBreakBefore: pageBreak,
+      children: [new TextRun({ text, bold: true, size: 28, color: NAVY_HEX })],
+      spacing: { before: pageBreak ? 0 : 360, after: 160 },
+      border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: NAVY_HEX, space: 2 } },
+    })
+
+  const wH2 = (text: string): Paragraph =>
+    new Paragraph({
+      children: [new TextRun({ text, bold: true, size: 24, color: NAVY_HEX })],
+      spacing: { before: 240, after: 80 },
+    })
+
+  const wBody = (text: string, opts?: { bold?: boolean; italic?: boolean; color?: string }): Paragraph =>
+    new Paragraph({
+      children: [new TextRun({ text: text || "", size: 21, bold: opts?.bold, italics: opts?.italic, color: opts?.color })],
+      spacing: { after: 80 },
+    })
+
+  const wBullet = (text: string): Paragraph =>
+    new Paragraph({
+      children: [
+        new TextRun({ text: "\u2022  ", size: 21, color: NAVY_HEX }),
+        new TextRun({ text: text || "", size: 21 }),
+      ],
+      indent: { left: 360 },
+      spacing: { after: 60 },
+    })
+
+  const wSpacer = () => new Paragraph({ text: "", spacing: { after: 80 } })
+
+  const makeTable = (headers: string[], rows: string[][], colPcts: number[], opts?: { boldFirstCol?: boolean }): Table => {
+    const pcts = colPcts.length === headers.length ? colPcts : headers.map(() => Math.floor(100 / headers.length))
+    const headerRow = new TableRow({
+      tableHeader: true,
+      children: headers.map((h, i) => new TableCell({
+        children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, size: 19, color: NAVY_HEX })], spacing: { after: 40 } })],
+        width: { size: pcts[i], type: WidthType.PERCENTAGE },
+        shading: { type: ShadingType.CLEAR, color: "auto", fill: TBL_HDR },
+        borders: tableBorders,
+      })),
+    })
+    const dataRows = rows.map((row, ri) => new TableRow({
+      children: row.map((cell, ci) => new TableCell({
+        children: [new Paragraph({ children: [new TextRun({ text: cell || "—", size: 19, bold: !!(opts?.boldFirstCol && ci === 0) })], spacing: { after: 40 } })],
+        width: { size: pcts[ci], type: WidthType.PERCENTAGE },
+        shading: { type: ShadingType.CLEAR, color: "auto", fill: ri % 2 === 1 ? TBL_ALT : WHITE_HEX },
+        borders: tableBorders,
+      })),
+    }))
+    return new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE }, borders: tableBorders })
+  }
+
+  const children: DocChild[] = []
+  const push = (...items: DocChild[]) => children.push(...items)
+
+  /* ── Cover page ── */
+  if (logoBuffer) {
+    try {
+      push(new Paragraph({
+        children: [new ImageRun({ data: logoBuffer as ArrayBuffer, transformation: { width: 140, height: 42 }, type: "png" as any })],
+        alignment: AlignmentType.RIGHT,
+        spacing: { after: 200 },
+      }))
+    } catch { /* skip logo if ImageRun fails */ }
+  }
+  push(
+    new Paragraph({ children: [new TextRun({ text: companyName.toUpperCase(), bold: true, size: 56, color: NAVY_HEX })], alignment: AlignmentType.CENTER, spacing: { before: 400, after: 160 } }),
+    new Paragraph({ children: [new TextRun({ text: `${ticker.toUpperCase()} | ${exchange || ""} | IPO Write-Up`, size: 26, color: GRAY_HEX })], alignment: AlignmentType.CENTER, spacing: { after: 100 } }),
+    new Paragraph({ children: [new TextRun({ text: dataAsOf ? `Pricing Date: ${dataAsOf}` : "", size: 22, color: GRAY_HEX })], alignment: AlignmentType.CENTER, spacing: { after: 400 } }),
+    new Paragraph({ children: [new TextRun({ text: "CONFIDENTIAL — FOR INTERNAL USE ONLY", bold: true, size: 20, color: RED_HEX })], alignment: AlignmentType.CENTER, spacing: { after: 600 } }),
+  )
+
+  /* ── Deal Information ── */
+  if (sel.dealInfo && di) {
+    push(wH1("Deal Information", true))
+    const dealRows: string[][] = [
+      ["Company", di.company_name || "—"], ["Ticker", di.ticker_name || ticker],
+      ["Exchange", di.exchange || exchange || "—"], ["Industry", di.industry || "—"],
+      ["Established", di.established_year ? String(di.established_year) : "—"],
+      ["Pricing Date", fDate(di.pricing_date || pricingDate)], ["Filed Date", fDate(di.filed_date)],
+      ["Term Date", fDate(di.term_date)], ["Trade Date", fDate(di.trade_date)],
+      ["Price Range", (di.lower_bound != null && di.upper_bound != null) ? `$${n2s(di.lower_bound, 2)} – $${n2s(di.upper_bound, 2)}` : "—"],
+      ["Deal Size", di.deal_size != null ? `$${n2s(di.deal_size)}M` : "—"],
+      ["Shares Offered", di.shares_offered != null ? `${n2s(di.shares_offered)}M` : "—"],
+      ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh)}M` : "—"],
+    ]
+    push(makeTable(["Field", "Value"], dealRows, [35, 65], { boldFirstCol: true }))
+    const bookrunners = Array.isArray(di.bookrunners) ? di.bookrunners : (di.bookrunners ? [String(di.bookrunners)] : [])
+    if (bookrunners.length) push(wSpacer(), wBody(`Bookrunners: ${bookrunners.join(", ")}`, { bold: true }))
+  }
+
+  /* ── Fair Value ── */
+  if (sel.fairValue && fv) {
+    push(wH1("Fair Value Estimate & IOI", !sel.dealInfo))
+    push(makeTable(["Metric", "Value"], [
+      ["Fair Value Estimate", fv.fair_value_estimate != null ? `$${fv.fair_value_estimate}` : "—"],
+      ["Indication of Interest", fv.indication_of_interest || "—"],
+      ["After-Market Threshold", fv.after_market_threshold || "—"],
+    ], [45, 55], { boldFirstCol: true }))
+  }
+
+  /* ── Proprietary Model Indication ── */
+  if (sel.outlookSummary) {
+    push(wH1("Proprietary Model Indication", true))
+    if (aiOutlook) {
+      if (aiOutlook.executiveSummary) push(wH2("Executive Summary"), wBody(aiOutlook.executiveSummary))
+      push(wH2("Outlook"), makeTable(["Timeframe", "Outlook"], [
+        ["1-Week Sentiment", aiOutlook.week], ["1-Month Sentiment", aiOutlook.month],
+        ["Expected Volatility", aiOutlook.volatility], ["Confidence Level", aiOutlook.confidence],
+      ], [40, 60], { boldFirstCol: true }))
+    } else {
+      push(wBody("Proprietary Model Indication data is not available for this ticker."))
+    }
+  }
+
+  /* ── Company Overview ── */
+  if (sel.companyOverview && co) {
+    push(wH1("Company Overview", true))
+    for (const sec of [
+      { title: "Business Overview", items: toArr(co.business_overview) },
+      { title: "Key Highlights", items: toArr(co.key_highlights) },
+      { title: "Strengths", items: toArr(co.strengths) },
+      { title: "Concerns", items: toArr(co.concerns) },
+      { title: "Use of Proceeds", items: toArr(co.use_of_proceeds) },
+    ]) {
+      if (!sec.items.length) continue
+      push(wH2(sec.title))
+      for (const item of sec.items) push(wBullet(strip(item)))
+      push(wSpacer())
+    }
+    const kmp = toArr(co.key_management_personnel)
+    if (kmp.length) {
+      push(wH2("Key Management Personnel"))
+      for (const p of splitPersons(kmp)) push(wBullet(p))
+    }
+  }
+
+  /* ── Key Metrics ── */
+  if (sel.keyMetrics && Object.keys(km).length > 0) {
+    push(wH1("Key Metrics", true))
+    push(makeTable(["Category", "Value", "Status"],
+      Object.entries(km).map(([k, v]) => [k.replace(/_/g, " "), v.label || "—", statusLabel(v.color).text]),
+      [35, 40, 25]))
+  }
+
+  /* ── Financial Highlights ── */
+  if (sel.financialHighlights && fh && Object.keys(fh).length > 0) {
+    push(wH1("Financial Highlights", true))
+    const yearKeysSet = new Set<string>(); const metricNames = new Set<string>()
+    const parsedFh: Record<string, Record<string, number | string | null>> = {}
+    let hasNested = false
+    for (const [key, val] of Object.entries(fh)) {
+      if (val && typeof val === "object" && !Array.isArray(val)) {
+        hasNested = true; yearKeysSet.add(key); parsedFh[key] = val as Record<string, number | string | null>
+        for (const mk of Object.keys(val as object)) metricNames.add(mk)
+      }
+    }
+    if (!hasNested) {
+      for (const [key, val] of Object.entries(fh)) {
+        const parts = key.split(" > ")
+        if (parts.length === 2) {
+          const yk = parts[0].trim(); const mk = parts[1].trim()
+          yearKeysSet.add(yk); metricNames.add(mk)
+          if (!parsedFh[yk]) parsedFh[yk] = {}
+          parsedFh[yk][mk] = val as number | string | null
+        }
+      }
+    }
+    const yearKeys = Array.from(yearKeysSet).sort((a, b) => { const ya = parseInt(a), yb = parseInt(b); if (!isNaN(ya) && !isNaN(yb) && ya !== yb) return ya - yb; return a.localeCompare(b) })
+    if (yearKeys.length > 0) {
+      const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+      const ordered = metricOrder.filter(m => metricNames.has(m))
+      for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
+      const metColPct = 22; const yColPct = Math.floor((100 - metColPct) / yearKeys.length)
+      push(makeTable(["Metric ($M)", ...yearKeys], ordered.map(metric => {
+        const vals = yearKeys.map(yk => { const v = parsedFh[yk]?.[metric]; if (v == null) return "—"; const num = typeof v === "string" ? parseFloat(v) : v as number; if (isNaN(num)) return String(v); if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) return `${num.toFixed(1)}%`; return n2s(num) })
+        return [metric, ...vals]
+      }), [metColPct, ...yearKeys.map(() => yColPct)], { boldFirstCol: true }))
+    } else { push(wBody("No financial highlights data available.")) }
+  }
+
+  /* ── Comparative Multiples ── */
+  if (sel.comparativeMultiples && cm?.data?.length) {
+    push(wH1("Comparative Multiples", true))
+    const cH = ["Company", "Price", "Mkt Cap", "EV", "EV/Sales NTM", "EV/Sales +1", "P/E NTM", "P/E +1", "EV/EBITDA NTM", "EV/EBITDA +1", "Sales Gr.", "EPS Gr."]
+    const cRows = cm.data.map(r => [r.competitor || "—", n2s(r.price_usd), n2s(r.market_cap), n2s(r.ev_usd_million), n2s(r.present_year_ev_sales), n2s(r.one_year_later_ev_sales), n2s(r.present_year_price_earning), n2s(r.one_year_later_price_earning), n2s(r.present_year_ev_ebitda), n2s(r.one_year_later_ev_ebitda), n2s(r.sales_growth), n2s(r.eps_growth)])
+    if (cm.aggregates) {
+      const a = cm.aggregates
+      cRows.push(["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average), n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average), n2s(a.present_year_ev_ebitda?.average), n2s(a.one_year_later_ev_ebitda?.average), n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)])
+      cRows.push(["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median), n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median), n2s(a.present_year_ev_ebitda?.median), n2s(a.one_year_later_ev_ebitda?.median), n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)])
+    }
+    push(makeTable(cH, cRows, [14, 6, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6], { boldFirstCol: true }))
+  }
+
+  /* ── Valuation ── */
+  if (sel.valuation) {
+    push(wH1("Valuation", true))
+    const narrative = toArr(va?.narrative)
+    if (narrative.length) { for (const item of narrative) push(wBody(strip(item))) }
+    else push(wBody("No valuation narrative available."))
+  }
+
+  /* ── Risk Assessment ── */
+  if (sel.riskAssessment) {
+    push(wH1("Risk Assessment", !sel.valuation))
+    const rfItems = Array.isArray(ra?.data) ? ra.data : []
+    if (rfItems.length > 0) {
+      push(makeTable(["Risk Category", "Score", "Observation"], rfItems.map(item => [item.category || "—", item.score != null ? `${item.score} / 5` : "—", strip(item.observation) || "—"]), [25, 12, 63], { boldFirstCol: true }))
+    } else { push(wBody("No risk assessment data available.")) }
+  }
+
+  /* ── Investment Summary ── */
+  if (sel.investmentSummary) {
+    push(wH1("Investment Summary", true))
+    if (inv.writeup_overall_rating != null) {
+      push(new Paragraph({ children: [new TextRun({ text: `Overall Rating: ${inv.writeup_overall_rating}%`, bold: true, size: 28, color: NAVY_HEX })], spacing: { after: 160 } }))
+    }
+    const ratingLabels: Record<string, string> = { "ai_indication": "AI Indication", "business-overview": "Business Overview", "key-metrics": "Key Metrics", "financial-highlights": "Financial Highlights", "comps": "Comparative Multiples", "valuation-analysis": "Valuation Analysis", "red-flag": "Risk Assessment" }
+    const ratingEntries = Object.entries(inv.writeup_ratings || {})
+    if (ratingEntries.length > 0) {
+      push(wH2("Section Ratings"), makeTable(["Section", "Rating"], ratingEntries.map(([key, value]) => [ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), `${value}%`]), [70, 30]))
+    }
+    if (inv.writeup_finalverdict_summary) push(wH2("Final Verdict"), wBody(strip(inv.writeup_finalverdict_summary)))
+  }
+
+  /* ── Disclaimer ── */
+  push(wH1("Disclaimer", true))
+  for (const text of [
+    "The information contained herein has been compiled by Monashee internally and may be based on unaudited data from the relevant funds' books and records, and hypothetical information that has not been verified or reconciled by such funds' administrator. As such, the information contained herein should not serve as any kind of basis for any investment decision.",
+    "This document does not constitute advice or a recommendation or offer to sell or a solicitation to deal in any security or financial product. It is provided for information purposes only and on the understanding that the recipient has sufficient knowledge and experience to be able to understand and make their own evaluation of the proposals and services described herein.",
+    "Certain information contained herein has been obtained from third party sources and such information has not been independently verified by Monashee Investment Management. No representation, warranty, or undertaking, expressed or implied, is given to the accuracy or completeness of such information by Monashee Investment Management or any other person.",
+    "This presentation is confidential and intended only for the person to whom it has been directly provided. No copy may be shown, copied, transmitted or otherwise given to any person other than the authorized recipient without the prior written consent of Monashee Investment Management.",
+    "There is no guarantee that the investment objectives will be achieved. Moreover, the past performance is not a guarantee or indicator of future results.",
+  ]) { push(wBody(text, { color: GRAY_HEX }), wSpacer()) }
+
+  /* ── Shared: no-border cell borders ── */
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: "auto" }
+  const noBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideHorizontal: noBorder, insideVertical: noBorder }
+
+  /* ── Word Header: logo right, company name left, navy rule below ── */
+  const logoCell = logoBuffer
+    ? new TableCell({
+        children: [new Paragraph({
+          children: [new ImageRun({ data: logoBuffer as ArrayBuffer, transformation: { width: 90, height: 27 }, type: "png" as any })],
+          alignment: AlignmentType.RIGHT,
+        })],
+        width: { size: 38, type: WidthType.PERCENTAGE },
+        borders: noBorders,
+        verticalAlign: VerticalAlign.CENTER,
+      })
+    : new TableCell({
+        children: [new Paragraph({ children: [new TextRun({ text: "Monashee Investment Management", size: 18, color: NAVY_HEX, bold: true })], alignment: AlignmentType.RIGHT })],
+        width: { size: 38, type: WidthType.PERCENTAGE },
+        borders: noBorders,
+      })
+
+  const docHeader = new Header({
+    children: [
+      new Table({
+        rows: [new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text: companyName, bold: true, size: 20, color: NAVY_HEX })] })],
+              width: { size: 62, type: WidthType.PERCENTAGE },
+              borders: noBorders,
+              verticalAlign: VerticalAlign.CENTER,
+            }),
+            logoCell,
+          ],
+        })],
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: noBorders,
+      }),
+      new Paragraph({
+        children: [],
+        border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: NAVY_HEX, space: 2 } },
+        spacing: { before: 60, after: 80 },
+      }),
+    ],
+  })
+
+  /* ── Word Footer: disclaimer left, page number right, navy rule above ── */
+  const docFooter = new Footer({
+    children: [
+      new Paragraph({
+        children: [],
+        border: { top: { style: BorderStyle.SINGLE, size: 6, color: NAVY_HEX, space: 4 } },
+        spacing: { before: 0, after: 60 },
+      }),
+      new Table({
+        rows: [new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({
+                children: [new TextRun({ text: `Confidential — Monashee Investment Management${dataAsOf ? `. Data as of ${dataAsOf}` : ""}. Do not copy or distribute.`, size: 15, color: GRAY_HEX })],
+              })],
+              width: { size: 82, type: WidthType.PERCENTAGE },
+              borders: noBorders,
+              verticalAlign: VerticalAlign.CENTER,
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                children: [
+                  new TextRun({ text: "Page ", size: 15, color: GRAY_HEX }),
+                  new TextRun({ children: [new SimpleField("PAGE")], size: 15, color: GRAY_HEX }),
+                ],
+                alignment: AlignmentType.RIGHT,
+              })],
+              width: { size: 18, type: WidthType.PERCENTAGE },
+              borders: noBorders,
+              verticalAlign: VerticalAlign.CENTER,
+            }),
+          ],
+        })],
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: noBorders,
+      }),
+    ],
+  })
+
+  const docxDoc = new Document({
+    sections: [{
+      headers: { default: docHeader },
+      footers: { default: docFooter },
+      children,
+    }],
+  })
+  return Packer.toBlob(docxDoc)
+}
+
+/* ═══════════════════════════════════════════════
    React Component
    ═══════════════════════════════════════════════ */
+type ExportFormat = "docx" | "pdf" | "both"
+
 const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate, uniqueDealId }) => {
   const [loading, setLoading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selections, setSelections] = useState<SectionSelection>({ ...DEFAULT_SECTIONS })
+  const [format, setFormat] = useState<ExportFormat>("pdf")
 
   const handleCheckChange = (key: keyof SectionSelection, checked: boolean) =>
     setSelections(prev => ({ ...prev, [key]: checked }))
@@ -1031,6 +1430,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
     try {
       const apiUrl = process.env.REACT_APP_API_URL
       const token = localStorage.getItem("access_token")
+      const baseName = `${ticker.toUpperCase()}_WriteUp_${new Date().toISOString().slice(0, 10)}`
 
       const [res, outlookRes] = await Promise.all([
         fetch(`${apiUrl}/api/ipo_writeup_pdf_data/`, {
@@ -1049,7 +1449,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        alert(`Failed to fetch PDF data: ${(err as any)?.error || res.statusText}`)
+        alert(`Failed to fetch data: ${(err as any)?.error || res.statusText}`)
         return
       }
       const data: ApiResponse = await res.json()
@@ -1061,24 +1461,39 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
           const answer = aiJson?.answer
           const first = Array.isArray(answer) && answer.length > 0 ? answer[0] : null
           if (first) aiOutlook = parseAiOutlook(first)
-        } catch {
-          // Outlook fetch failed — proceed without it
-        }
+        } catch { /* proceed without outlook */ }
       }
 
       const companyName = data.deal_info?.company_name || issuerName || ticker
       const dataAsOf = pricingDate ? fDate(pricingDate) : data.deal_info?.pricing_date ? fDate(data.deal_info.pricing_date) : ""
 
-      const builder = new DocBuilder(companyName, dataAsOf)
-      const pdf = await builder.build(data, ticker, exchange, pricingDate, selections, aiOutlook)
-      pdf.save(`${ticker.toUpperCase()}_WriteUp_${new Date().toISOString().slice(0, 10)}.pdf`)
-    } catch (err) {
-      console.error("PDF generation error:", err)
-      alert("Failed to generate PDF. Please try again.")
+      if (format === "pdf" || format === "both") {
+        const builder = new DocBuilder(companyName, dataAsOf)
+        const pdf = await builder.build(data, ticker, exchange, pricingDate, selections, aiOutlook)
+        pdf.save(`${baseName}.pdf`)
+      }
+
+      if (format === "docx" || format === "both") {
+        const blob = await buildWordDoc(data, ticker, exchange, pricingDate, selections, aiOutlook, issuerName)
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `${baseName}.docx`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      }
+    } catch (err: any) {
+      console.error("Document generation error:", err)
+      alert(`Failed to generate document: ${err?.message || String(err)}`)
     } finally {
       setLoading(false)
     }
   }
+
+  const formatIcon = format === "pdf" ? <PictureAsPdfIcon /> : format === "both" ? <DownloadIcon /> : <DescriptionIcon />
+  const formatLabel = format === "pdf" ? "Generate PDF" : format === "both" ? "Generate PDF + DOCX" : "Generate Word Doc"
 
   return (
     <>
@@ -1090,11 +1505,29 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
         slotProps={{ paper: { sx: { borderRadius: 3 } } }}
       >
         <DialogTitle sx={{ fontWeight: 700, color: "#002060", pb: 1 }}>
-          Select Sections to Include
+          Generate Document
         </DialogTitle>
         <Divider />
         <DialogContent sx={{ pt: 2 }}>
-          <FormGroup>
+          {/* Format selector */}
+          <Typography variant="caption" sx={{ fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Export Format
+          </Typography>
+          <RadioGroup
+            value={format}
+            onChange={(e) => setFormat(e.target.value as ExportFormat)}
+            sx={{ mb: 2, mt: 0.5 }}
+          >
+            <FormControlLabel value="pdf" control={<Radio size="small" sx={{ color: "#002060", "&.Mui-checked": { color: "#002060" } }} />} label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}><PictureAsPdfIcon sx={{ fontSize: 16, color: "#c0392b" }} /><Typography variant="body2">PDF Document (.pdf) <Box component="span" sx={{ ml: 0.5, fontSize: 11, color: "#10b981", fontWeight: 600 }}>Default</Box></Typography></Box>} />
+            <FormControlLabel value="docx" control={<Radio size="small" sx={{ color: "#002060", "&.Mui-checked": { color: "#002060" } }} />} label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}><DescriptionIcon sx={{ fontSize: 16, color: "#002060" }} /><Typography variant="body2">Word Document (.docx)</Typography></Box>} />
+            <FormControlLabel value="both" control={<Radio size="small" sx={{ color: "#002060", "&.Mui-checked": { color: "#002060" } }} />} label={<Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}><DownloadIcon sx={{ fontSize: 16, color: "#6366f1" }} /><Typography variant="body2">Both (.docx + .pdf)</Typography></Box>} />
+          </RadioGroup>
+          <Divider sx={{ mb: 2 }} />
+          {/* Section selector */}
+          <Typography variant="caption" sx={{ fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Sections to Include
+          </Typography>
+          <FormGroup sx={{ mt: 0.5 }}>
             {SECTION_LABELS.map(({ key, label }) => (
               <FormControlLabel
                 key={key}
@@ -1124,23 +1557,20 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
         </DialogContent>
         <Divider />
         <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
-          <Button
-            onClick={() => setDialogOpen(false)}
-            sx={{ textTransform: "none", color: "#6b7280" }}
-          >
+          <Button onClick={() => setDialogOpen(false)} sx={{ textTransform: "none", color: "#6b7280" }}>
             Cancel
           </Button>
           <Button
             variant="contained"
             onClick={handleGenerate}
+            startIcon={formatIcon}
             sx={{
-              textTransform: "none",
-              fontWeight: 600,
+              textTransform: "none", fontWeight: 600,
               background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
               "&:hover": { background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)" },
             }}
           >
-            Generate PDF
+            {formatLabel}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1149,7 +1579,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
         variant="contained"
         onClick={() => setDialogOpen(true)}
         disabled={loading}
-        startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdfIcon />}
+        startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <DescriptionIcon />}
         sx={{
           textTransform: "none", fontWeight: 600, fontSize: 13, borderRadius: 2, px: 2.5, py: 1,
           background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
@@ -1157,7 +1587,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
           "&.Mui-disabled": { background: "#ccc" },
         }}
       >
-        {loading ? "Generating Document..." : "Generate Monashee PDF"}
+        {loading ? "Generating Document..." : "Generate Monashee Document"}
       </Button>
     </>
   )
