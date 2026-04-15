@@ -1331,7 +1331,7 @@ async function buildWordDoc(
         verticalAlign: VerticalAlign.CENTER,
       })
     : new TableCell({
-        children: [new Paragraph({ children: [new TextRun({ text: "Monashee Investment Management", size: 18, color: NAVY_HEX, bold: true })], alignment: AlignmentType.RIGHT })],
+        children: [new Paragraph({ children: [new TextRun({ text: "Monashee Investment Management", size: 18, color: "1A1A2E", bold: true })], alignment: AlignmentType.RIGHT, style: "Normal" })],
         width: { size: 38, type: WidthType.PERCENTAGE },
         borders: noBorders,
       })
@@ -1342,7 +1342,10 @@ async function buildWordDoc(
         rows: [new TableRow({
           children: [
             new TableCell({
-              children: [new Paragraph({ children: [new TextRun({ text: companyName, bold: true, size: 20, color: NAVY_HEX })] })],
+              children: [new Paragraph({
+                children: [new TextRun({ text: companyName, bold: true, size: 22, color: "1A1A2E" })],
+                style: "Normal",
+              })],
               width: { size: 62, type: WidthType.PERCENTAGE },
               borders: noBorders,
               verticalAlign: VerticalAlign.CENTER,
