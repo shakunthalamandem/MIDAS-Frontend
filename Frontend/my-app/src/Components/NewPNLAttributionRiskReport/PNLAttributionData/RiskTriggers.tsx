@@ -14,6 +14,11 @@ import {
   Button,
   Collapse,
   Tooltip,
+  Checkbox,
+  ListItemText,
+  OutlinedInput,
+  Divider,
+  FormHelperText,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -261,7 +266,7 @@ const RiskTriggers: React.FC = () => {
         setPortfolios(result.portfolios || []);
         if (!selectedDate && result.max_position_date) setSelectedDate(result.max_position_date);
         if (selectedFunds.length === 0 && result.portfolios?.length > 0) {
-          setSelectedFunds([...result.portfolios]);
+          setSelectedFunds((result.portfolios as string[]).filter((p) => p !== "FMAP" && p !== "MMLS"));
         }
       } catch (err: any) { setError(err.message || "Failed to load portfolios"); }
     };
@@ -425,17 +430,50 @@ const RiskTriggers: React.FC = () => {
             <Typography className="trig-header-title">{fundsLabel} Limits and Alerts</Typography>
           </Box>
           <Box className="trig-header-right">
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                value={selectedFunds.length === portfolios.length && portfolios.length > 0 ? "__ALL__" : selectedFunds.length === 1 ? selectedFunds[0] : "__ALL__"}
-                onChange={(e) => { const v = e.target.value; setSelectedFunds(v === "__ALL__" ? [...portfolios] : [v]); }}
-                sx={{ color: "#fff", ".MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.25)" }, "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.4)" }, ".MuiSvgIcon-root": { color: "rgba(255,255,255,0.6)" }, fontSize: 13, fontWeight: 600, borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.1)" }}
-                renderValue={(s) => s === "__ALL__" ? "All Funds" : s}
-              >
-                <MenuItem value="__ALL__">All Funds</MenuItem>
-                {portfolios.filter((p) => p !== "FMAP" && p !== "MMLS").map((p) => <MenuItem key={p} value={p}>{p}</MenuItem>)}
-              </Select>
-            </FormControl>
+            {(() => {
+              const visiblePortfolios = portfolios;
+              const allSelected = visiblePortfolios.length > 0 && selectedFunds.length === visiblePortfolios.length;
+              const displayLabel = allSelected ? "All Funds" : selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds.length > 1 ? `${selectedFunds.length} Funds` : "Select Fund";
+              const handleToggleAll = () => setSelectedFunds(allSelected ? [] : [...visiblePortfolios]);
+              const handleToggleFund = (fund: string) => setSelectedFunds(selectedFunds.includes(fund) ? selectedFunds.filter((f) => f !== fund) : [...selectedFunds, fund]);
+              return (
+                <FormControl size="small" sx={{ minWidth: 140 }} error={selectedFunds.length === 0}>
+                  <Select
+                    multiple
+                    value={selectedFunds}
+                    input={<OutlinedInput sx={{
+                      color: "#fff",
+                      borderRadius: "8px",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      "& .MuiOutlinedInput-notchedOutline": { borderColor: selectedFunds.length === 0 ? "#f87171 !important" : "rgba(255,255,255,0.25)" },
+                      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: selectedFunds.length === 0 ? "#f87171 !important" : "rgba(255,255,255,0.4)" },
+                      "& .MuiSvgIcon-root": { color: "rgba(255,255,255,0.6)" },
+                    }} />}
+                    renderValue={() => displayLabel}
+                    MenuProps={{ PaperProps: { sx: { mt: 0.5, bgcolor: "#1a2035", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 2, "& .MuiMenuItem-root": { color: "#e2e8f0", fontSize: 13, py: 0.5, "&:hover": { bgcolor: "rgba(255,255,255,0.06)" }, "&.Mui-selected": { bgcolor: "rgba(255,255,255,0.04)" } }, "& .MuiCheckbox-root": { color: "#a0aec0", "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#10b981" } } } }, disableAutoFocusItem: true }}
+                  >
+                    <MenuItem onClick={handleToggleAll} disableRipple>
+                      <Checkbox checked={allSelected} indeterminate={selectedFunds.length > 0 && !allSelected} sx={{ color: "#a0aec0", "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#10b981" } }} />
+                      <ListItemText primary={<strong>All Funds</strong>} />
+                    </MenuItem>
+                    <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.1)" }} />
+                    {visiblePortfolios.map((p) => (
+                      <MenuItem key={p} onClick={() => handleToggleFund(p)} disableRipple>
+                        <Checkbox checked={selectedFunds.includes(p)} sx={{ color: "#a0aec0", "&.Mui-checked": { color: "#10b981" } }} />
+                        <ListItemText primary={p} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {selectedFunds.length === 0 && (
+                    <FormHelperText sx={{ color: "#f87171", fontSize: "11px", mt: 0.5, ml: 1.5, whiteSpace: "nowrap" }}>
+                      Select at least one fund
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              );
+            })()}
 
             <Box className="trig-header-date-nav">
               <IconButton size="small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#fff" } }}><ChevronLeftIcon fontSize="small" /></IconButton>
