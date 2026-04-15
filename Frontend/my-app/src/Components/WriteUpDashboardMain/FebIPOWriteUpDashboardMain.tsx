@@ -3,11 +3,9 @@ import {
   Box,
   Card,
   CardContent,
-  FormControlLabel,
   List,
   ListItemButton,
   ListItemText,
-  Switch,
   Typography
 } from "@mui/material"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -15,17 +13,13 @@ import { BasicDealDetails } from "./types/DealInformation"
 
 import IPOWriteUpMetaDataBusinessOverview from "./IPOWriteUpMetaData/IPOWriteUpMetaDataBusinessOverview"
 import IPOWriteUpMetaDataComps from "./IPOWriteUpMetaData/IPOWriteUpMetaDataComps"
-import IPOWriteUpMetaDataDealIndication from "./IPOWriteUpMetaData/IPOWriteUpMetaDataDealIndication"
 import IPOWriteUpMetaDataDealInfo from "./IPOWriteUpMetaData/IPOWriteUpMetaDataDealInfo"
 import IPOWriteUpMetaDataFinalVerdict from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinalVerdict"
 import IPOWriteUpMetaDataFinancialHighlights from "./IPOWriteUpMetaData/IPOWriteUpMetaDataFinancialHighlights"
-import IPOWriteUpMetaDataKeyMetrics from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetrics"
 import IPOWriteUpMetaDataKeyMetricsNew from "./IPOWriteUpMetaData/IPOWriteUpMetaDataKeyMetricsNew"
 import IPOWriteUpMetaDataMarketStatergy from "./IPOWriteUpMetaData/IPOWriteUpMetaDataMarketStatergy"
 import IPOWriteUpMetaDataRedFlag from "./IPOWriteUpMetaData/IPOWriteUpMetaDataRedFlag"
 import IPOWriteUpMetaDataValuationAnalysis from "./IPOWriteUpMetaData/IPOWriteUpMetaDataValuationAnalysis"
-import FebIPOWriteUpPdfContent from "./FebIPOWriteUpPdfContent"
-import FebIPOWriteUpPdfExporter from "./FebIPOWriteUpPdfExporter"
 import IPOWriteUpPdfAutomation from "./IPOWriteUpPdfAutomation"
 
 interface FebIPOWriteUpDashboardMainProps {
@@ -114,8 +108,6 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
   )
 
   const [activeSection, setActiveSection] = useState(sections[0].id)
-  const [pdfMode, setPdfMode] = useState(false)
-  const [showOutlookInPdf, setShowOutlookInPdf] = useState(false)
   const isManualScrollRef = useRef(false)
   const manualScrollTimeoutRef = useRef<number | null>(null)
   const sectionCardSx = {
@@ -125,11 +117,6 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
     boxShadow: "0 10px 20px rgba(30, 41, 59, 0.08)",
     scrollMarginTop: 220
   }
-  const pdfRootId = "feb-ipo-writeup-pdf-root"
-
-  const fileSafeTicker = (basicDealDetails?.ticker || "IPO").toUpperCase()
-  const todayIso = new Date().toISOString().slice(0, 10)
-  const pdfFileName = `${fileSafeTicker}_${todayIso}.pdf`
 
 
   const handleNavClick = (sectionId: string) => {
@@ -221,38 +208,6 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
             IPO Write-up
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, mb: 1 }}>
-            <FebIPOWriteUpPdfExporter
-              targetId={pdfRootId}
-              headerTitle="IPO Write-up"
-              fileName={pdfFileName}
-              onTogglePdfMode={setPdfMode}
-              buttonLabel="Generate Monashee PDF"
-              loadingLabel="Generating..."
-              className="pdf-hidden"
-              ticker={basicDealDetails?.ticker}
-              pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
-              issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
-              exchange={writeUpData?.exchange || basicDealDetails?.exchange}
-            />
-            <FormControlLabel
-              className="pdf-hidden"
-              control={
-                <Switch
-                  size="small"
-                  checked={showOutlookInPdf}
-                  onChange={(e) => setShowOutlookInPdf(e.target.checked)}
-                  sx={{
-                    "& .MuiSwitch-switchBase.Mui-checked": { color: "#002060" },
-                    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "#002060" }
-                  }}
-                />
-              }
-              label={
-                <Typography variant="caption" sx={{ color: "#1d2b5a", fontWeight: 500 }}>
-                  Include Outlook Summary
-                </Typography>
-              }
-            />
             <IPOWriteUpPdfAutomation
               ticker={basicDealDetails?.ticker}
               issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
@@ -298,16 +253,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
 
       {/* Right Content */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {pdfMode ? (
-          <FebIPOWriteUpPdfContent
-            basicDealDetails={basicDealDetails}
-            sectionCardSx={sectionCardSx}
-            rootId={pdfRootId}
-            writeUpData={writeUpData}
-            showOutlookSummary={showOutlookInPdf}
-          />
-        ) : (
-          <>
+        <>
             <Card id="deal-info" sx={sectionCardSx}>
               <CardContent sx={{ p: { xs: 2, md: 2.5 } }}>
                 <IPOWriteUpMetaDataDealInfo
@@ -394,8 +340,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
                 />
               </CardContent>
             </Card>
-          </>
-        )}
+        </>
       </Box>
     </Box>
   )
