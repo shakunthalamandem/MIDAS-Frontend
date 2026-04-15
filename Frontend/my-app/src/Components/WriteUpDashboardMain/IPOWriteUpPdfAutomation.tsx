@@ -839,7 +839,6 @@ class DocBuilder {
 
     // ── Valuation ──
     if (sel.valuation) {
-      this.newPage()
       this.h1("Valuation")
       if (va.narrative?.length) {
         for (const item of va.narrative) {
@@ -1276,7 +1275,7 @@ async function buildWordDoc(
 
   /* ── Valuation ── */
   if (sel.valuation) {
-    push(wH1("Valuation", true))
+    push(wH1("Valuation", false))
     const narrative = toArr(va?.narrative)
     if (narrative.length) { for (const item of narrative) push(wBody(strip(item))) }
     else push(wBody("No valuation narrative available."))
