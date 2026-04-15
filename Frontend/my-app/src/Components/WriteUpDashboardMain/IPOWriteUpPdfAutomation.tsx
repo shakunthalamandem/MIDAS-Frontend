@@ -1182,7 +1182,7 @@ async function buildWordDoc(
 
   /* ── Proprietary Model Indication ── */
   if (sel.outlookSummary) {
-    push(wH1("Proprietary Model Indication", true))
+    push(wH1("Proprietary Model Indication", false))
     if (aiOutlook) {
       if (aiOutlook.executiveSummary) push(wH2("Executive Summary"), wBody(aiOutlook.executiveSummary))
       push(wH2("Outlook"), makeTable(["Timeframe", "Outlook"], [
@@ -1196,7 +1196,7 @@ async function buildWordDoc(
 
   /* ── Company Overview ── */
   if (sel.companyOverview && co) {
-    push(wH1("Company Overview", true))
+    push(wH1("Company Overview", false))
     for (const sec of [
       { title: "Business Overview", items: toArr(co.business_overview) },
       { title: "Key Highlights", items: toArr(co.key_highlights) },
@@ -1218,7 +1218,7 @@ async function buildWordDoc(
 
   /* ── Key Metrics ── */
   if (sel.keyMetrics && Object.keys(km).length > 0) {
-    push(wH1("Key Metrics", true))
+    push(wH1("Key Metrics", false))
     push(makeTable(["Category", "Value", "Status"],
       Object.entries(km).map(([k, v]) => [k.replace(/_/g, " "), v.label || "—", statusLabel(v.color).text]),
       [35, 40, 25]))
@@ -1226,7 +1226,7 @@ async function buildWordDoc(
 
   /* ── Financial Highlights ── */
   if (sel.financialHighlights && fh && Object.keys(fh).length > 0) {
-    push(wH1("Financial Highlights", true))
+    push(wH1("Financial Highlights", false))
     const yearKeysSet = new Set<string>(); const metricNames = new Set<string>()
     const parsedFh: Record<string, Record<string, number | string | null>> = {}
     let hasNested = false
@@ -1262,7 +1262,7 @@ async function buildWordDoc(
 
   /* ── Comparative Multiples ── */
   if (sel.comparativeMultiples && cm?.data?.length) {
-    push(wH1("Comparative Multiples", true))
+    push(wH1("Comparative Multiples", false))
     const cH = ["Company", "Price", "Mkt Cap", "EV", "EV/Sales NTM", "EV/Sales +1", "P/E NTM", "P/E +1", "EV/EBITDA NTM", "EV/EBITDA +1", "Sales Gr.", "EPS Gr."]
     const cRows = cm.data.map(r => [r.competitor || "—", n2s(r.price_usd), n2s(r.market_cap), n2s(r.ev_usd_million), n2s(r.present_year_ev_sales), n2s(r.one_year_later_ev_sales), n2s(r.present_year_price_earning), n2s(r.one_year_later_price_earning), n2s(r.present_year_ev_ebitda), n2s(r.one_year_later_ev_ebitda), n2s(r.sales_growth), n2s(r.eps_growth)])
     if (cm.aggregates) {
@@ -1283,7 +1283,7 @@ async function buildWordDoc(
 
   /* ── Risk Assessment ── */
   if (sel.riskAssessment) {
-    push(wH1("Risk Assessment", !sel.valuation))
+    push(wH1("Risk Assessment", false))
     const rfItems = Array.isArray(ra?.data) ? ra.data : []
     if (rfItems.length > 0) {
       push(makeTable(["Risk Category", "Score", "Observation"], rfItems.map(item => [item.category || "—", item.score != null ? `${item.score} / 5` : "—", strip(item.observation) || "—"]), [25, 12, 63], { boldFirstCol: true }))
@@ -1292,7 +1292,7 @@ async function buildWordDoc(
 
   /* ── Investment Summary ── */
   if (sel.investmentSummary) {
-    push(wH1("Investment Summary", true))
+    push(wH1("Investment Summary", false))
     if (inv.writeup_overall_rating != null) {
       push(new Paragraph({ children: [new TextRun({ text: `Overall Rating: ${inv.writeup_overall_rating}%`, bold: true, size: 28, color: NAVY_HEX })], spacing: { after: 160 } }))
     }
