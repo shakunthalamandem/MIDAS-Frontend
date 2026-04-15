@@ -1,132 +1,137 @@
-import React from "react";
-import { Routes, Route, Navigate, } from "react-router-dom";
+import React, { Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import ErrorBoundary from "../Pages/ErrorBoundary";
+import AuthGuard from "./AuthGuard";
+
+/* ── Eagerly loaded (lightweight / auth pages needed immediately) ── */
 import CapitalMarketsStatic from "../Components/HomepageStatic/CapitalMarketsStatic";
 import Login from "../Components/Main/HomePage/Authentication/Login";
 import SignUp from "../Components/Main/HomePage/Authentication/SignUp";
-import CapitalMarkets from "../Components/Main/HomePage/Dashboard/CapitalMarkets";
-import MonasheeDeals from "../Components/Main/HomePage/Dashboard/MonasheeDeals";
-import InvestmentMain from "../Components/Main/InvestmentStrategy/InvestmentMain";
-import TechnicalMain from "../Components/Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
 import ErrorPage from "../Pages/ErrorPage";
 import EmailVerification from "../Components/Main/HomePage/Authentication/EmailVerification";
 import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
-import ErrorBoundary from "../Pages/ErrorBoundary";
-import AuthGuard from "./AuthGuard";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
-import DetailedGapData from "../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData";
-
-import Logs from "../Components/Main/HomePage/Authentication/Logs";
-import DealStats from "../Components/Main/MonasheeDeals/MddGraphs/DealStats";
-import FOllowOnDiscount from "../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount";
-import MDDScreener from "../Components/Main/MonasheeDeals/MddGraphs/MDDScreener";
-import AllocationCaptureReturn from "../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn";
-import BankTable from "../Components/Main/MonasheeDeals/MDDSettings/BankTable";
-import FundWiseTable from "../Components/Main/PortfolioAttribution/FundwiseTable";
-import HighYieldsMain from "../Components/HighYields/HighYieldsMain";
-import DealStatsMain from "../Components/HighYields/Tabs/DealStatsMain";
-import HYSkewTableMain from "../Components/HighYields/Tabs/HYSkewTableMain";
-import MDDSelectedTicker from "../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker";
-import MarketFilters from "../Components/Main/MonasheeCapitalMarkets/MarketFilters";
-import ScreenerMain from "../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain";
-import SkewTableMain from "../Components/Main/MonasheeGraphs/SkewTableMain";
-import MacroMain from "../Components/Macro/MacroMain";
-import StockTickerNews from "../Components/Macro/StockTickerNews";
-import ConvertsMain from "../Components/Converts/ConvertsMain";
-import ConvertsDealStatsMain from "../Components/Converts/Tabs/ConvertsDealStatsMain";
-import ConvertsSkewMain from "../Components/Converts/Tabs/ConvertsSkewMain";
-
-
-
-import MainUpload from "../Components/Uploads/MainUpload";
-import FundamentalsTechnical from "../Components/Uploads/FundamentalsTechnical";
-
-
-import LandingPageMain from "../Components/Main/DashBoards/LandingPageMain";
-import OperationsDashboard from "../Components/Main/DashBoards/OperationsDashboard";
-import DailyReportPost from "../Components/Main/WriteUpsRecords/DailyReportPost";
-import ReportWriteUpMain from "../Components/Main/WriteUpsRecords/ReportWriteUpMain";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
-import CombinedSelectedTicker from "../Components/Main/MonasheeGraphs/CombinedSelectedTicker";
-import MarketOpportnuityMain from "../Components/Main/HomePage/Dashboard/MarketOpportnuityMain";
-import WeeklyMain from "../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain";
-import DeatiledRegionPnlAttribution from "../Components/PNLAttribution/DeatiledRegionPnlAttribution";
-import EquityNewDealFormMain from "../Components/EquityNewDealFormMain/EquityNewDealFormMain";
-import LkFileUpload from "../Components/Uploads/LkFileUpload";
-import DetailedDealsView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedDealsView";
-import DetailedLeadBankView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedLeadBankView";
-import PNLTabMain from "../Components/PNLAttribution/PNLTabMain";
-import DetailedRegionView from "../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView";
-import UploadAiInsights from "../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights";
-import VersionUploadForm from "../Components/Uploads/DailyMonasheeUploads/VersionUploadForm";
-import Agents from "../Components/Agents/Agents";
-import AgentOutputView from "../Components/Agents/AgentOutputView";
-import AgentTasksMain from "../Components/Agents/AgentTasksMain";
-import BetaTransferMain from "../Components/BetaTransfer/BetaTransferMain";
-import DealDetailedGapAnalysis from "../Components/Main/DealDetailedGapAnalysis";
-import PerplexityChatMain from "../Components/GhcAi/PerplexityChatMain";
-import HeatMapMain from "../Components/GhcAi/AIPages/HeatMap/HeatMapMain";
-import EquityDealsIPOFO from "../Components/Main/DashBoards/EquityDealsIPOFO";
-import ExportUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData";
-import UnifiedDealDataUpload from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload";
-import TickerDashboard from "../Components/DealTracking/TickerDashboard";
-import UploadsWriteUpMain from "../Components/Main/WriteUpsRecords/UploadsWriteUpMain";
-import NewDealsCycleMain from "../Components/Main/NewDealsLifeCycle/NewDealsCycleMain";
-import TickerTrackingWrapper from "../Components/DealTracking/TickerTrackingWrapper";
-import FOWriteUpMain from "../Components/Main/FOWriteUpMain/FOWriteUpMain";
-import FOFinancialForecastUpload from "../Components/Main/FOWriteUpMain/FOWriteUpUploads/FOFinancialForecastUpload";
-import DealsTabsLayout from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout";
-import EquityAiMlPage from "../Components/AIML/EquityAiMlPage";
-import NewDashboardLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleDetails";
 
-import WriteUpIPODashbaord from "../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
-import UploadFactSetTickers from "../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers";
-import FSDealUnifiedMain from "../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain";
-import DeleteUnifiedDealData from "../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData";
-import DailyNoteDeleteTickersData from "../Components/Uploads/DailyNoteDeleteTickersData";
-import IPOUploadsPage from "../Components/IPOwriteUp/IPOUploadsPage";
-import ExcelUploads from "../Components/UpcomingPipelineDeals/ExcelUploads";
-import ABBModelMain from "../Components/ABBModelMain/ABBModelMain";
-import AIMLResultsHome from "../Components/AIMLResults/AIMLResultsHome";
-import MattermostChat from "../Components/Discussion/MattermostChat";
-import MDRMainTableS3Data from "../Components/MDRMainS3Data/MDRMainTableS3Data";
-import SentimentAnalysisTabs from "../Components/AIML/SentimentAnalysisTabs";
-import FewShotAnalysisUpload from "../Components/AIFewshotAnalysis/FewShotAnalysisUpload";
-import AIFewshotAnalysis from "../Components/AIFewshotAnalysis/AIFewshotAnalysis";
-import ShowUSSentimentAnalysis from "../Components/AIML/ShowUSSentimentAnalysis";
-import NotesUI from "../Components/mattermostupload/NotesUI";
-import APACEquityAiMlPage from "../Components/AIML/APACEquityAIMLPage";
-import DealMeetingNotesMain from "../Components/Main/DealMeetingNotes/DealMeetingNotesMain";
-import NewDashboardLifeCycleMain from "../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain";
-import FuturePipelineDealsMain from "../Components/UpcomingPipelineDeals/FuturePipelineDealsMain";
-import TickerChange from "../Components/TickerChange/TickerChange";
-import NewDashboardFOLifeCycleDetails from "../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails";
-import SignalBoardMain from "../Components/SignalBoard/SignalBoardMain";
-import PNLAttributionSectionMain from "../Components/NewPNLAttributionRiskReport/PNLAttributionSectionMain";
-import NewPortfolioRiskUpload from "../Components/Uploads/NewPortfolioRiskUpload";
-import RiskDashboard from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard";
-import TickerDetail from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/TickerDetail";
-import RiskTriggers from "../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskTriggers";
-import PortfolioReportDocumentMain from "../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain";
-import RiskAIDocumentUpload from "../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload";
-import DocumentUploadTabs from "../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs";
-import AIPortfolioReview from "../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview";
-import JayRitterIPOAnalysis from "../Components/JayRitter/JayRitterIPOAnalysis";
-import SentimentSummary from "../Components/AIML/SentimentSummary";
-import UnsupervisedDealSummary from "../Components/AIML/UnsupervisedDealSummary";
-import PortfolioSummaryTabs from "../Components/IPODashboardLLM/PortfolioSummaryTabs";
-import UploadClaudeSentiment from "../Components/AIML/UploadClaudeSentiment";
-import SummarySignalBoard from "../Components/SummarySignalBoard/SummarySignalBoard";
-import S3DataTransfer from "../Components/S3DataTransfer/S3DataTransfer";
-import DataDump from "../Components/DataDump/DataDump";
-import JRitterAgentMain from "../Components/JRitterAgent/JRitterAgentMain";
-import JUploadPage from "../Components/JRitterAgent/JUploadPage";
-import DatabaseExplorer from "../Components/DatabaseExplorer/DatabaseExplorer";
-import CIOPortfolioReviewWizard from "../Components/CIOPortfolioReview/CIOPortfolioReviewWizard";
+/* ── Route-level lazy loading (each page loads only when navigated to) ── */
+const CapitalMarkets = React.lazy(() => import("../Components/Main/HomePage/Dashboard/CapitalMarkets"));
+const MonasheeDeals = React.lazy(() => import("../Components/Main/HomePage/Dashboard/MonasheeDeals"));
+const InvestmentMain = React.lazy(() => import("../Components/Main/InvestmentStrategy/InvestmentMain"));
+const TechnicalMain = React.lazy(() => import("../Components/Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain"));
+const DetailedGapData = React.lazy(() => import("../Components/Main/MonasheeDeals/MDDSettings/DetailedGapData"));
+const Logs = React.lazy(() => import("../Components/Main/HomePage/Authentication/Logs"));
+const DealStats = React.lazy(() => import("../Components/Main/MonasheeDeals/MddGraphs/DealStats"));
+const FOllowOnDiscount = React.lazy(() => import("../Components/Main/MonasheeDeals/MddGraphs/FOllowOnDiscount"));
+const MDDScreener = React.lazy(() => import("../Components/Main/MonasheeDeals/MddGraphs/MDDScreener"));
+const AllocationCaptureReturn = React.lazy(() => import("../Components/Main/MonasheeDeals/MddGraphs/AllocationCaptureReturn"));
+const BankTable = React.lazy(() => import("../Components/Main/MonasheeDeals/MDDSettings/BankTable"));
+const FundWiseTable = React.lazy(() => import("../Components/Main/PortfolioAttribution/FundwiseTable"));
+const HighYieldsMain = React.lazy(() => import("../Components/HighYields/HighYieldsMain"));
+const DealStatsMain = React.lazy(() => import("../Components/HighYields/Tabs/DealStatsMain"));
+const HYSkewTableMain = React.lazy(() => import("../Components/HighYields/Tabs/HYSkewTableMain"));
+const MDDSelectedTicker = React.lazy(() => import("../Components/Main/MonasheeDeals/MddGraphs/MDDSelectedTicker"));
+const MarketFilters = React.lazy(() => import("../Components/Main/MonasheeCapitalMarkets/MarketFilters"));
+const ScreenerMain = React.lazy(() => import("../Components/Main/MonasheeGraphs/ScreenerTable/ScreenerMain"));
+const SkewTableMain = React.lazy(() => import("../Components/Main/MonasheeGraphs/SkewTableMain"));
+const MacroMain = React.lazy(() => import("../Components/Macro/MacroMain"));
+const StockTickerNews = React.lazy(() => import("../Components/Macro/StockTickerNews"));
+const ConvertsMain = React.lazy(() => import("../Components/Converts/ConvertsMain"));
+const ConvertsDealStatsMain = React.lazy(() => import("../Components/Converts/Tabs/ConvertsDealStatsMain"));
+const ConvertsSkewMain = React.lazy(() => import("../Components/Converts/Tabs/ConvertsSkewMain"));
+const MainUpload = React.lazy(() => import("../Components/Uploads/MainUpload"));
+const FundamentalsTechnical = React.lazy(() => import("../Components/Uploads/FundamentalsTechnical"));
+const LandingPageMain = React.lazy(() => import("../Components/Main/DashBoards/LandingPageMain"));
+const OperationsDashboard = React.lazy(() => import("../Components/Main/DashBoards/OperationsDashboard"));
+const DailyReportPost = React.lazy(() => import("../Components/Main/WriteUpsRecords/DailyReportPost"));
+const ReportWriteUpMain = React.lazy(() => import("../Components/Main/WriteUpsRecords/ReportWriteUpMain"));
+const CombinedSelectedTicker = React.lazy(() => import("../Components/Main/MonasheeGraphs/CombinedSelectedTicker"));
+const MarketOpportnuityMain = React.lazy(() => import("../Components/Main/HomePage/Dashboard/MarketOpportnuityMain"));
+const WeeklyMain = React.lazy(() => import("../Components/Main/MonasheeDeals/MDDSettings/WeeklyMain"));
+const DeatiledRegionPnlAttribution = React.lazy(() => import("../Components/PNLAttribution/DeatiledRegionPnlAttribution"));
+const EquityNewDealFormMain = React.lazy(() => import("../Components/EquityNewDealFormMain/EquityNewDealFormMain"));
+const LkFileUpload = React.lazy(() => import("../Components/Uploads/LkFileUpload"));
+const DetailedDealsView = React.lazy(() => import("../Components/Main/MonasheeGraphs/ScreenerTable/DetailedDealsView"));
+const DetailedLeadBankView = React.lazy(() => import("../Components/Main/MonasheeGraphs/ScreenerTable/DetailedLeadBankView"));
+const PNLTabMain = React.lazy(() => import("../Components/PNLAttribution/PNLTabMain"));
+const DetailedRegionView = React.lazy(() => import("../Components/Main/MonasheeGraphs/ScreenerTable/DetailedRegionView"));
+const UploadAiInsights = React.lazy(() => import("../Components/Main/DashBoards/InsightsAi/UploadsInsights/UploadAiInsights"));
+const VersionUploadForm = React.lazy(() => import("../Components/Uploads/DailyMonasheeUploads/VersionUploadForm"));
+const Agents = React.lazy(() => import("../Components/Agents/Agents"));
+const AgentOutputView = React.lazy(() => import("../Components/Agents/AgentOutputView"));
+const AgentTasksMain = React.lazy(() => import("../Components/Agents/AgentTasksMain"));
+const BetaTransferMain = React.lazy(() => import("../Components/BetaTransfer/BetaTransferMain"));
+const DealDetailedGapAnalysis = React.lazy(() => import("../Components/Main/DealDetailedGapAnalysis"));
+const PerplexityChatMain = React.lazy(() => import("../Components/GhcAi/PerplexityChatMain"));
+const HeatMapMain = React.lazy(() => import("../Components/GhcAi/AIPages/HeatMap/HeatMapMain"));
+const EquityDealsIPOFO = React.lazy(() => import("../Components/Main/DashBoards/EquityDealsIPOFO"));
+const ExportUnifiedDealData = React.lazy(() => import("../Components/Main/UnifiedDealsDataMain/ExportUnifiedDealData"));
+const UnifiedDealDataUpload = React.lazy(() => import("../Components/Main/UnifiedDealsDataMain/DesignUiPath/UnifiedDealDataUpload"));
+const TickerDashboard = React.lazy(() => import("../Components/DealTracking/TickerDashboard"));
+const UploadsWriteUpMain = React.lazy(() => import("../Components/Main/WriteUpsRecords/UploadsWriteUpMain"));
+const NewDealsCycleMain = React.lazy(() => import("../Components/Main/NewDealsLifeCycle/NewDealsCycleMain"));
+const TickerTrackingWrapper = React.lazy(() => import("../Components/DealTracking/TickerTrackingWrapper"));
+const FOWriteUpMain = React.lazy(() => import("../Components/Main/FOWriteUpMain/FOWriteUpMain"));
+const FOFinancialForecastUpload = React.lazy(() => import("../Components/Main/FOWriteUpMain/FOWriteUpUploads/FOFinancialForecastUpload"));
+const DealsTabsLayout = React.lazy(() => import("../Components/Main/UnifiedDealsDataMain/DesignUiPath/DealsTabsLayout"));
+const EquityAiMlPage = React.lazy(() => import("../Components/AIML/EquityAiMlPage"));
+const NewDashboardLifeCycleDetails = React.lazy(() => import("../Components/NewDashboardLifeCycle/NewDashboardLifeCycleDetails"));
+const WriteUpIPODashbaord = React.lazy(() => import("../Components/IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord"));
+const UploadFactSetTickers = React.lazy(() => import("../Components/Uploads/DailyMonasheeUploads/UploadFactSetTickers"));
+const FSDealUnifiedMain = React.lazy(() => import("../Components/Main/UnifiedDealsDataMain/DesignUiPath/FactsetDataDetails/FSDealUnifiedMain"));
+const DeleteUnifiedDealData = React.lazy(() => import("../Components/Main/UnifiedDealsDataMain/DeleteUnifiedDealData"));
+const DailyNoteDeleteTickersData = React.lazy(() => import("../Components/Uploads/DailyNoteDeleteTickersData"));
+const IPOUploadsPage = React.lazy(() => import("../Components/IPOwriteUp/IPOUploadsPage"));
+const ExcelUploads = React.lazy(() => import("../Components/UpcomingPipelineDeals/ExcelUploads"));
+const ABBModelMain = React.lazy(() => import("../Components/ABBModelMain/ABBModelMain"));
+const AIMLResultsHome = React.lazy(() => import("../Components/AIMLResults/AIMLResultsHome"));
+const MattermostChat = React.lazy(() => import("../Components/Discussion/MattermostChat"));
+const MDRMainTableS3Data = React.lazy(() => import("../Components/MDRMainS3Data/MDRMainTableS3Data"));
+const SentimentAnalysisTabs = React.lazy(() => import("../Components/AIML/SentimentAnalysisTabs"));
+const FewShotAnalysisUpload = React.lazy(() => import("../Components/AIFewshotAnalysis/FewShotAnalysisUpload"));
+const AIFewshotAnalysis = React.lazy(() => import("../Components/AIFewshotAnalysis/AIFewshotAnalysis"));
+const ShowUSSentimentAnalysis = React.lazy(() => import("../Components/AIML/ShowUSSentimentAnalysis"));
+const NotesUI = React.lazy(() => import("../Components/mattermostupload/NotesUI"));
+const APACEquityAiMlPage = React.lazy(() => import("../Components/AIML/APACEquityAIMLPage"));
+const DealMeetingNotesMain = React.lazy(() => import("../Components/Main/DealMeetingNotes/DealMeetingNotesMain"));
+const NewDashboardLifeCycleMain = React.lazy(() => import("../Components/NewDashboardLifeCycle/NewDashboardLifeCycleMain"));
+const FuturePipelineDealsMain = React.lazy(() => import("../Components/UpcomingPipelineDeals/FuturePipelineDealsMain"));
+const TickerChange = React.lazy(() => import("../Components/TickerChange/TickerChange"));
+const NewDashboardFOLifeCycleDetails = React.lazy(() => import("../Components/NewDashboardLifeCycle/NewDashboardFOLifeCycleDetails"));
+const SignalBoardMain = React.lazy(() => import("../Components/SignalBoard/SignalBoardMain"));
+const PNLAttributionSectionMain = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/PNLAttributionSectionMain"));
+const NewPortfolioRiskUpload = React.lazy(() => import("../Components/Uploads/NewPortfolioRiskUpload"));
+const RiskDashboard = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskDashboard"));
+const TickerDetail = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/PNLAttributionData/TickerDetail"));
+const RiskTriggers = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/PNLAttributionData/RiskTriggers"));
+const PortfolioReportDocumentMain = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/RiskReportNew/PortfolioReportDocumentMain"));
+const RiskAIDocumentUpload = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/RiskReportNew/RiskAIDocumentUpload"));
+const DocumentUploadTabs = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/RiskReportNew/DocumentUploadTabs"));
+const AIPortfolioReview = React.lazy(() => import("../Components/NewPNLAttributionRiskReport/RiskReportNew/AIPortfolioReview"));
+const JayRitterIPOAnalysis = React.lazy(() => import("../Components/JayRitter/JayRitterIPOAnalysis"));
+const SentimentSummary = React.lazy(() => import("../Components/AIML/SentimentSummary"));
+const UnsupervisedDealSummary = React.lazy(() => import("../Components/AIML/UnsupervisedDealSummary"));
+const PortfolioSummaryTabs = React.lazy(() => import("../Components/IPODashboardLLM/PortfolioSummaryTabs"));
+const UploadClaudeSentiment = React.lazy(() => import("../Components/AIML/UploadClaudeSentiment"));
+const SummarySignalBoard = React.lazy(() => import("../Components/SummarySignalBoard/SummarySignalBoard"));
+const S3DataTransfer = React.lazy(() => import("../Components/S3DataTransfer/S3DataTransfer"));
+const DataDump = React.lazy(() => import("../Components/DataDump/DataDump"));
+const JRitterAgentMain = React.lazy(() => import("../Components/JRitterAgent/JRitterAgentMain"));
+const JUploadPage = React.lazy(() => import("../Components/JRitterAgent/JUploadPage"));
+const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
+const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
+
+const RouteFallback = () => (
+  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+    <CircularProgress size={40} />
+  </Box>
+);
 
 
 const AppRouters: React.FC = () => {
   return (
     <ErrorBoundary>
+      <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route path="/" element={<CapitalMarketsStatic />} />
         <Route path="/login" element={<Login />} />
@@ -376,6 +381,7 @@ const AppRouters: React.FC = () => {
 
 
       </Routes>
+      </Suspense>
     </ErrorBoundary>
 
   );
