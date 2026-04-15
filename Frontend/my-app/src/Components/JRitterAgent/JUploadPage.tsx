@@ -102,7 +102,7 @@ const JUploadPage: React.FC = () => {
     setSaved(false);
     const result = validateRitterJson(text);
     setValidation(result);
-    if (result.valid && result.ticker) setTicker(result.ticker);
+    if (result.valid && result.ticker) setTicker(result.ticker + " US");
   }, []);
 
   const handleSave = async () => {
