@@ -16,6 +16,7 @@ interface PdfAutomationProps {
   issuerName?: string | null
   exchange?: string | null
   pricingDate?: string | null
+  uniqueDealId?: string | null
 }
 
 interface SectionSelection {
@@ -710,23 +711,27 @@ class DocBuilder {
     } // end fairValue
 
     // ── Proprietary Model Indication ──
-    if (sel.outlookSummary && aiOutlook) {
+    if (sel.outlookSummary) {
       this.h1("Proprietary Model Indication")
-      if (aiOutlook.executiveSummary) {
-        this.body(aiOutlook.executiveSummary)
+      if (aiOutlook) {
+        if (aiOutlook.executiveSummary) {
+          this.body(aiOutlook.executiveSummary)
+        }
+        this.h2("Outlook Summary")
+        this.table(
+          ["Metric", "Value"],
+          [
+            ["1-Week Sentiment", aiOutlook.week || "—"],
+            ["1-Month Sentiment", aiOutlook.month || "—"],
+            ["Expected Volatility", aiOutlook.volatility || "—"],
+            ["Confidence", aiOutlook.confidence || "—"],
+          ],
+          [55, CW - 55],
+          { boldFirstCol: true }
+        )
+      } else {
+        this.body("Proprietary Model Indication data is not available for this ticker.")
       }
-      this.h2("Outlook Summary")
-      this.table(
-        ["Metric", "Value"],
-        [
-          ["1-Week Sentiment", aiOutlook.week || "—"],
-          ["1-Month Sentiment", aiOutlook.month || "—"],
-          ["Expected Volatility", aiOutlook.volatility || "—"],
-          ["Confidence", aiOutlook.confidence || "—"],
-        ],
-        [55, CW - 55],
-        { boldFirstCol: true }
-      )
     } // end outlookSummary
 
     // ── Company Overview ──
@@ -1012,7 +1017,7 @@ class DocBuilder {
 /* ═══════════════════════════════════════════════
    React Component
    ═══════════════════════════════════════════════ */
-const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate }) => {
+const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate, uniqueDealId }) => {
   const [loading, setLoading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selections, setSelections] = useState<SectionSelection>({ ...DEFAULT_SECTIONS })
@@ -1037,7 +1042,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
           ? fetch(`${apiUrl}/api/get_few_shot_review/`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ticker }),
+              body: JSON.stringify({ ticker, unique_deal_id: uniqueDealId ?? null }),
             })
           : Promise.resolve(null),
       ])

@@ -213,6 +213,7 @@ const FebIPOWriteUpDashboardMain: React.FC<FebIPOWriteUpDashboardMainProps> = ({
               issuerName={writeUpData?.company_name || basicDealDetails?.issuer_name}
               exchange={writeUpData?.exchange || basicDealDetails?.exchange}
               pricingDate={writeUpData?.pricing_date || basicDealDetails?.pricing_date}
+              uniqueDealId={basicDealDetails?.unique_deal_id}
             />
           </Box>
 
