@@ -81,10 +81,16 @@ const IntelligenceSourcesBar: React.FC<IntelligenceSourcesBarProps> = ({
 
   useEffect(() => {
     const timer = setTimeout(updateLines, 350);
-    window.addEventListener("resize", updateLines);
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const debouncedUpdate = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateLines, 200);
+    };
+    window.addEventListener("resize", debouncedUpdate);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", updateLines);
+      clearTimeout(resizeTimer);
+      window.removeEventListener("resize", debouncedUpdate);
     };
   }, [updateLines, sourceDetails]);
 

@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, Suspense } from "react";
 import {
   Box,
   Chip,
+  CircularProgress,
   Container,
   Paper,
   Tabs,
@@ -12,24 +13,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
-import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
-import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
-import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
 import DealHeaderCard from "./DealHeaderCard";
-import AIMLDealDetails from "./AIMLDealDetails";
-import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
-import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import TechnicalMain from "../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain";
-// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
-import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
-
-import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
-import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
-import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
-import CombinedSelectedTicker from "../Main/MonasheeGraphs/CombinedSelectedTicker";
-import FebFOWriteUpDashboardMain from "../WriteUpDashboardMain/FebFOWriteUpDashboardMain";
 import FOWriteupTickerSearchData from "../WriteUpDashboardMain/FoWriteUpMetaData/FOWriteupTickerSearchData";
-import DealBot from "./DealBot";
+
+/* ── Lazy-loaded tab components (only loaded when the tab is clicked) ── */
+const TradingSignalsMain = React.lazy(() => import("../TradingSignals/TradingSignalsMain"));
+const WriteUpIPODashbaord = React.lazy(() => import("../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord"));
+const FOWriteUpDashboardMain = React.lazy(() => import("../Main/FOWriteUpMain/FOWriteUpDashboardMain"));
+const AIMLDealDetails = React.lazy(() => import("./AIMLDealDetails"));
+const DashboardSentimentAnalysis = React.lazy(() => import("../AIML/DashboardSentimentAnalysis"));
+const NewDashboardLifeCyclePeerDeals = React.lazy(() => import("./NewDashboardLifeCyclePeerDeals"));
+const TechnicalMain = React.lazy(() => import("../Main/InvestmentStrategy/TechnicalIndicators/TechnicalMain"));
+const NewDashboardLifeCycleNews = React.lazy(() => import("./NewDashboardLifeCycleNews"));
+const NewDashboardLifeCycleMeetingNotes = React.lazy(() => import("./NewDashboardLifeCycleMeetingNotes"));
+const DealRecommendationHome = React.lazy(() => import("./DealRecommendation/DealRecommendationHome"));
+const CombinedSelectedTicker = React.lazy(() => import("../Main/MonasheeGraphs/CombinedSelectedTicker"));
+const FebFOWriteUpDashboardMain = React.lazy(() => import("../WriteUpDashboardMain/FebFOWriteUpDashboardMain"));
+const DealBot = React.lazy(() => import("./DealBot"));
+
+const TabFallback = () => (
+  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 300 }}>
+    <CircularProgress size={32} />
+  </Box>
+);
 
 
 /* ── Region-aware tab visibility for FO deals ── */
@@ -277,11 +283,11 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          <Box sx={{ display: showDealBot ? "block" : "none" }}>
+          <Suspense fallback={<TabFallback />}>
+          {showDealBot ? (
             <DealBot basicDealDetails={dealBotDetails} />
-          </Box>
-
-          <Box sx={{ display: showDealBot ? "none" : "block" }}>
+          ) : (
+          <Box>
             {(() => {
               const currentLabel = tabItems[tabValue]?.label ?? "";
 
@@ -388,6 +394,8 @@ const NewDashboardFOLifeCycleDetails: React.FC = () => {
               <PageUnderDevelopment />
             ))}
           </Box>
+          )}
+          </Suspense>
         </Box>
       </Paper>
     </Container>

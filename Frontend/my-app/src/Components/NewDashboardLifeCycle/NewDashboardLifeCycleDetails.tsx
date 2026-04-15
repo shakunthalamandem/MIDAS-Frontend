@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, Suspense } from "react";
 import {
   Box,
   Chip,
+  CircularProgress,
   Container,
   Paper,
   Tabs,
@@ -12,27 +13,33 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { formatDate } from "./NewDashboardLifeCycleUtils";
 import PageUnderDevelopment from "../../Pages/PageUnderDevelopment";
-import NewDashboardLifeCycleTickerSearch from "./NewDashboardLifeCycleTickerSearch";
-import WriteUpIPODashbaord from "../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord";
-import FOWriteUpDashboardMain from "../Main/FOWriteUpMain/FOWriteUpDashboardMain";
-import NewDashboardLifeCycleOverviewFO from "./NewDashboardLifeCycleOverviewFO";
 import DealHeaderCard from "./DealHeaderCard";
-import DashboardAIFewShotAnalysis from "../AIFewshotAnalysis/DashboardAIFewShotAnalysis";
-import AIMLDealDetails from "./AIMLDealDetails";
-import DashboardSentimentAnalysis from "../AIML/DashboardSentimentAnalysis";
-import NewDashboardLifeCyclePeerDeals from "./NewDashboardLifeCyclePeerDeals";
-import FebWriteUpDashboardMain from "../WriteUpDashboardMain/FebWriteUpDashboardMain";
-import S1QueryBot from "./S1QueryBot";
-import NewDashboardLifeCycleNews from "./NewDashboardLifeCycleNews";
-import NewDashboardLifeCycleMeetingNotes from "./NewDashboardLifeCycleMeetingNotes";
-import DealRecommendationHome from "./DealRecommendation/DealRecommendationHome";
 import NewDashbaordIPOTickerList from "./NewDashbaordIPOTickerList";
-import DealBot from "./DealBot";
-// import TradingDynamics from "./TradingDynamics"; // Commented out — replaced by Trading Signals
-import TradingSignalsMain from "../TradingSignals/TradingSignalsMain";
 import TabErrorBoundary from "./TabErrorBoundary";
 import DashboardStateCard from "./DashboardStateCard";
-import GatorSignalAnalysis from "./GatorSignalAnalysis";
+
+/* ── Lazy-loaded tab components (only loaded when the tab is clicked) ── */
+const TradingSignalsMain = React.lazy(() => import("../TradingSignals/TradingSignalsMain"));
+const WriteUpIPODashbaord = React.lazy(() => import("../IPOwriteUp/IPOWriteUpDashboard/WriteUpIPODashbaord"));
+const FOWriteUpDashboardMain = React.lazy(() => import("../Main/FOWriteUpMain/FOWriteUpDashboardMain"));
+const NewDashboardLifeCycleOverviewFO = React.lazy(() => import("./NewDashboardLifeCycleOverviewFO"));
+const DashboardAIFewShotAnalysis = React.lazy(() => import("../AIFewshotAnalysis/DashboardAIFewShotAnalysis"));
+const AIMLDealDetails = React.lazy(() => import("./AIMLDealDetails"));
+const DashboardSentimentAnalysis = React.lazy(() => import("../AIML/DashboardSentimentAnalysis"));
+const NewDashboardLifeCyclePeerDeals = React.lazy(() => import("./NewDashboardLifeCyclePeerDeals"));
+const FebWriteUpDashboardMain = React.lazy(() => import("../WriteUpDashboardMain/FebWriteUpDashboardMain"));
+const S1QueryBot = React.lazy(() => import("./S1QueryBot"));
+const NewDashboardLifeCycleNews = React.lazy(() => import("./NewDashboardLifeCycleNews"));
+const NewDashboardLifeCycleMeetingNotes = React.lazy(() => import("./NewDashboardLifeCycleMeetingNotes"));
+const DealRecommendationHome = React.lazy(() => import("./DealRecommendation/DealRecommendationHome"));
+const DealBot = React.lazy(() => import("./DealBot"));
+const GatorSignalAnalysis = React.lazy(() => import("./GatorSignalAnalysis"));
+
+const TabFallback = () => (
+  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 300 }}>
+    <CircularProgress size={32} />
+  </Box>
+);
 
 /* ── Region-aware tab visibility for IPO deals ── */
 const IPO_ENABLED_TABS: Record<string, Set<string>> = {
@@ -288,15 +295,15 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
         </Paper>
 
         <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
-          <Box sx={{ display: showDealBot ? "block" : "none" }}>
+          <Suspense fallback={<TabFallback />}>
+          {showDealBot ? (
             <TabErrorBoundary tabLabel="Ask My Analyst" ticker={activePayload.ticker}>
               <DealBot
                 basicDealDetails={dealBotDetails}
               />
             </TabErrorBoundary>
-          </Box>
-
-          <Box sx={{ display: showDealBot ? "none" : "block" }}>
+          ) : (
+          <Box>
             {(() => {
               const currentLabel = tabItems[tabValue]?.label;
               const ticker = activePayload.ticker;
@@ -513,6 +520,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
               return <PageUnderDevelopment />;
             })()}
           </Box>
+          )}
+          </Suspense>
         </Box>
       </Paper>
     </Container>
