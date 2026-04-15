@@ -1157,7 +1157,7 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
           "&.Mui-disabled": { background: "#ccc" },
         }}
       >
-        {loading ? "Generating Document..." : "Generate Monashee Document"}
+        {loading ? "Generating Document..." : "Generate Monashee PDF"}
       </Button>
     </>
   )
