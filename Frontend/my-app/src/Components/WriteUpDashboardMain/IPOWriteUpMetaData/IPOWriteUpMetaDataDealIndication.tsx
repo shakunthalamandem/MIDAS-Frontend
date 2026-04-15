@@ -184,10 +184,11 @@ interface IPOWriteUpMetaDataDealIndicationProps {
   basicDealDetails: BasicDealDetails
   writeUpData?: WriteUpData | null
   onDataLoaded?: (data: WriteUpData) => void
+  hideOutlookSummary?: boolean
 }
 const IPOWriteUpMetaDataDealIndication: React.FC<
   IPOWriteUpMetaDataDealIndicationProps
-> = ({ basicDealDetails, writeUpData, onDataLoaded }) => {
+> = ({ basicDealDetails, writeUpData, onDataLoaded, hideOutlookSummary = false }) => {
   const API_URL = process.env.REACT_APP_API_URL
   const [analysis, setAnalysis] = useState<AiAnalysisRecord | null>(null)
   const [loading, setLoading] = useState(false)
@@ -351,16 +352,20 @@ const parseDealInfoRating = (value?: number | string | null) => {
 
       ) : (
         <>
-          <ExecutiveSummaryCard
-            companyName={basicDealDetails.ticker}
-            summary={executiveSummary}
-          />
-          <OutlookSummaryRow
-            week={outlook.week}
-            month={outlook.month}
-            volatility={outlook.volatility}
-            confidence={outlook.confidence}
-          />
+          {!hideOutlookSummary && (
+            <ExecutiveSummaryCard
+              companyName={basicDealDetails.ticker}
+              summary={executiveSummary}
+            />
+          )}
+          {!hideOutlookSummary && (
+            <OutlookSummaryRow
+              week={outlook.week}
+              month={outlook.month}
+              volatility={outlook.volatility}
+              confidence={outlook.confidence}
+            />
+          )}
           <Box className="pdf-hidden">
             <ScenarioCards
               base={scenarios.base}

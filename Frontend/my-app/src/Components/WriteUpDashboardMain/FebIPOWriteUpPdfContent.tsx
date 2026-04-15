@@ -36,13 +36,15 @@ type FebIPOWriteUpPdfContentProps = {
   sectionCardSx: Record<string, unknown>
   rootId: string
   writeUpData?: WriteUpData | null
+  showOutlookSummary?: boolean
 }
 
 const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
   basicDealDetails,
   sectionCardSx,
   rootId,
-  writeUpData
+  writeUpData,
+  showOutlookSummary = false
 }) => {
   const pdfPages = useMemo(
     () => [
@@ -54,7 +56,9 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
             id: "market-strategy",
             content: <IPOWriteUpMetaDataMarketStatergy basicDealDetails={basicDealDetails} />
           },
-          { id: "ai-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} writeUpData={writeUpData} /> }
+          ...(showOutlookSummary
+            ? [{ id: "ai-indication", content: <IPOWriteUpMetaDataDealIndication basicDealDetails={basicDealDetails} writeUpData={writeUpData} hideOutlookSummary={false} /> }]
+            : [])
         ]
       },
       {
@@ -105,7 +109,7 @@ const FebIPOWriteUpPdfContent: React.FC<FebIPOWriteUpPdfContentProps> = ({
         ]
       }
     ],
-    [basicDealDetails, writeUpData]
+    [basicDealDetails, writeUpData, showOutlookSummary]
   )
 
   return (

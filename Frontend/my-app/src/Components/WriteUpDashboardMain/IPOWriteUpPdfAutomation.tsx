@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, CircularProgress } from "@mui/material"
+import { Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControlLabel, FormGroup, Typography } from "@mui/material"
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
 import jsPDF from "jspdf"
 import monasheeLogo from "../../Assets/images/monashee_logo.png"
@@ -16,7 +16,56 @@ interface PdfAutomationProps {
   issuerName?: string | null
   exchange?: string | null
   pricingDate?: string | null
+  uniqueDealId?: string | null
 }
+
+interface SectionSelection {
+  dealInfo: boolean
+  fairValue: boolean
+  outlookSummary: boolean
+  companyOverview: boolean
+  keyMetrics: boolean
+  financialHighlights: boolean
+  comparativeMultiples: boolean
+  valuation: boolean
+  riskAssessment: boolean
+  investmentSummary: boolean
+}
+
+interface AiOutlookData {
+  executiveSummary: string
+  week: string
+  month: string
+  volatility: string
+  confidence: string
+}
+
+const DEFAULT_SECTIONS: SectionSelection = {
+  dealInfo: true,
+  fairValue: true,
+  outlookSummary: false,
+  companyOverview: true,
+  keyMetrics: true,
+  financialHighlights: true,
+  comparativeMultiples: true,
+  valuation: true,
+  riskAssessment: true,
+  investmentSummary: true,
+}
+
+const SECTION_LABELS: { key: keyof SectionSelection; label: string }[] = [
+  { key: "dealInfo", label: "Deal Information" },
+  { key: "fairValue", label: "Fair Value Estimate & IOI" },
+  { key: "outlookSummary", label: "Proprietary Model Indication" },
+  { key: "companyOverview", label: "Company Overview" },
+  { key: "keyMetrics", label: "Key Metrics" },
+  { key: "financialHighlights", label: "Financial Highlights" },
+  { key: "comparativeMultiples", label: "Comparative Multiples" },
+  { key: "valuation", label: "Valuation" },
+  { key: "riskAssessment", label: "Risk Assessment" },
+  { key: "investmentSummary", label: "Investment Summary" },
+]
+
 interface DealInfo {
   ticker_name: string; exchange: string; company_name: string
   pricing_date: string | null; filed_date: string | null; term_date: string | null; trade_date: string | null
@@ -58,6 +107,47 @@ interface ApiResponse {
     writeup_finalverdict_summary: string
     writeup_overall_rating: number | null
     writeup_ratings: Record<string, number>
+  }
+}
+
+const stripMd = (input?: unknown): string => {
+  if (!input) return ""
+  const s = typeof input === "string" ? input : String(input)
+  return s
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*(?:\d+\.|[-*+])\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/`+/g, "")
+    .trim()
+}
+
+const parseAiOutlook = (record: Record<string, unknown>): AiOutlookData => {
+  const outlookField = record["Final Sentiment & Volatility Outlook"]
+  const pickObj = (obj: Record<string, string>, ...keys: string[]) =>
+    stripMd(keys.map(k => obj[k]).find(Boolean) || "-")
+
+  if (outlookField && typeof outlookField === "object") {
+    const obj = outlookField as Record<string, string>
+    return {
+      executiveSummary: stripMd(record["Executive Summary"] as string),
+      week: pickObj(obj, "1-Week Sentiment", "1-week sentiment"),
+      month: pickObj(obj, "1-Month Sentiment", "1-month sentiment"),
+      volatility: pickObj(obj, "Expected Volatility", "expected volatility"),
+      confidence: pickObj(obj, "Confidence Level", "confidence level", "confidence"),
+    }
+  }
+  const fromFinal = typeof outlookField === "string" ? outlookField : ""
+  const extract = (label: string) => {
+    const m = fromFinal.match(new RegExp(`${label}\\s*:\\s*([^\\n]+)`, "i"))
+    return stripMd(m?.[1]?.trim() || "-")
+  }
+  return {
+    executiveSummary: stripMd(record["Executive Summary"] as string),
+    week: extract("1-week sentiment"),
+    month: extract("1-month sentiment"),
+    volatility: extract("expected volatility"),
+    confidence: extract("confidence level") || extract("confidence"),
   }
 }
 
@@ -533,7 +623,7 @@ class DocBuilder {
   /* ═════════════════════════════════════════════
      BUILD
      ═════════════════════════════════════════════ */
-  async build(data: ApiResponse, ticker: string, exchange?: string | null, pricingDate?: string | null) {
+  async build(data: ApiResponse, ticker: string, exchange?: string | null, pricingDate?: string | null, sel: SectionSelection = DEFAULT_SECTIONS, aiOutlook?: AiOutlookData) {
     await this.init()
     const p = this.p
     const di = data.deal_info
@@ -572,6 +662,7 @@ class DocBuilder {
     this.newPage()
 
     // ── Deal Information ──
+    if (sel.dealInfo) {
     this.h1("Deal Information")
 
     const bookStr = Array.isArray(di.bookrunners) && di.bookrunners.length > 0
@@ -602,8 +693,10 @@ class DocBuilder {
       [48, CW - 48],
       { boldFirstCol: true }
     )
+    } // end dealInfo
 
     // ── Fair Value ──
+    if (sel.fairValue) {
     this.h1("Fair Value Estimate & Indication of Interest")
     this.table(
       ["Metric", "Value"],
@@ -615,157 +708,189 @@ class DocBuilder {
       [55, CW - 55],
       { boldFirstCol: true }
     )
+    } // end fairValue
+
+    // ── Proprietary Model Indication ──
+    if (sel.outlookSummary) {
+      this.h1("Proprietary Model Indication")
+      if (aiOutlook) {
+        if (aiOutlook.executiveSummary) {
+          this.body(aiOutlook.executiveSummary)
+        }
+        this.h2("Outlook Summary")
+        this.table(
+          ["Metric", "Value"],
+          [
+            ["1-Week Sentiment", aiOutlook.week || "—"],
+            ["1-Month Sentiment", aiOutlook.month || "—"],
+            ["Expected Volatility", aiOutlook.volatility || "—"],
+            ["Confidence", aiOutlook.confidence || "—"],
+          ],
+          [55, CW - 55],
+          { boldFirstCol: true }
+        )
+      } else {
+        this.body("Proprietary Model Indication data is not available for this ticker.")
+      }
+    } // end outlookSummary
 
     // ── Company Overview ──
-    this.h1("Company Overview")
-
-    const sections: [string, string[], boolean][] = [
-      ["Business Description", co.business_overview, false],
-      ["Differentiated Summary", co.differentiated_summary, false],
-      ["Key Highlights", co.key_highlights, false],
-      ["Strengths", co.strengths, false],
-      ["Concerns", co.concerns, false],
-      ["Use of Proceeds", co.use_of_proceeds, false],
-      ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
-      ["Key Management Personnel", co.key_management_personnel, true],
-    ]
-    for (const [title, items, isPerson] of sections) {
-      if (items?.length) {
-        this.h2(title)
-        const processed = isPerson ? splitPersons(items) : items
-        this.bulletList(processed)
+    if (sel.companyOverview) {
+      this.h1("Company Overview")
+      const sections: [string, string[], boolean][] = [
+        ["Business Description", co.business_overview, false],
+        ["Differentiated Summary", co.differentiated_summary, false],
+        ["Key Highlights", co.key_highlights, false],
+        ["Strengths", co.strengths, false],
+        ["Concerns", co.concerns, false],
+        ["Use of Proceeds", co.use_of_proceeds, false],
+        ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
+        ["Key Management Personnel", co.key_management_personnel, true],
+      ]
+      for (const [title, items, isPerson] of sections) {
+        if (items?.length) {
+          this.h2(title)
+          const processed = isPerson ? splitPersons(items) : items
+          this.bulletList(processed)
+        }
       }
-    }
+    } // end companyOverview
 
     // ── Key Metrics ──
-    this.h1("Key Metrics")
-    const metricEntries = Object.entries(km)
-    if (metricEntries.length > 0) {
-      const metricRows: string[][] = []
-      for (const [key, val] of metricEntries) {
-        const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
-        const st = statusLabel(val?.color)
-        const notes = strip(val?.category) || "—"
-        metricRows.push([criteria, st.text, notes])
+    if (sel.keyMetrics) {
+      this.h1("Key Metrics")
+      const metricEntries = Object.entries(km)
+      if (metricEntries.length > 0) {
+        const metricRows: string[][] = []
+        for (const [key, val] of metricEntries) {
+          const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
+          const st = statusLabel(val?.color)
+          const notes = strip(val?.category) || "—"
+          metricRows.push([criteria, st.text, notes])
+        }
+        this.table(
+          ["Criteria", "Status", "Notes"],
+          metricRows,
+          [35, 18, CW - 53],
+          { boldFirstCol: true }
+        )
+      } else {
+        this.body("No key metrics data available.")
       }
-      this.table(
-        ["Criteria", "Status", "Notes"],
-        metricRows,
-        [35, 18, CW - 53],
-        { boldFirstCol: true }
-      )
-    } else {
-      this.body("No key metrics data available.")
-    }
+    } // end keyMetrics
 
     // ── Financial Highlights ──
-    this.h1("Financial Overview")
-    this.renderFinancials(fh)
+    if (sel.financialHighlights) {
+      this.h1("Financial Overview")
+      this.renderFinancials(fh)
+    } // end financialHighlights
 
     // ── Comparative Multiples ──
-    this.h1("Comparative Multiples")
-    if (cm.data?.length) {
-      const cH = ["Company", "Price", "Mkt Cap", "EV ($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "Sales\nGr%", "EPS\nGr%"]
-      const rawW = [26, 12, 16, 16, 14, 14, 12, 12, 14, 14]
-      const tot = rawW.reduce((a, b) => a + b, 0)
-      const cW = rawW.map(w => (w / tot) * CW)
-
-      const cRows = cm.data.map(row => [
-        row.competitor || "—", n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
-        n2s(row.present_year_ev_sales), n2s(row.one_year_later_ev_sales),
-        n2s(row.present_year_price_earning), n2s(row.one_year_later_price_earning),
-        n2s(row.sales_growth), n2s(row.eps_growth),
-      ])
-      if (cm.aggregates) {
-        const a = cm.aggregates
-        cRows.push(
-          ["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
-            n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average),
-            n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)],
-          ["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
-            n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median),
-            n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)]
-        )
+    if (sel.comparativeMultiples) {
+      this.h1("Comparative Multiples")
+      if (cm.data?.length) {
+        const cH = ["Company", "Price", "Mkt Cap", "EV ($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "Sales\nGr%", "EPS\nGr%"]
+        const rawW = [26, 12, 16, 16, 14, 14, 12, 12, 14, 14]
+        const tot = rawW.reduce((a, b) => a + b, 0)
+        const cW = rawW.map(w => (w / tot) * CW)
+        const cRows = cm.data.map(row => [
+          row.competitor || "—", n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
+          n2s(row.present_year_ev_sales), n2s(row.one_year_later_ev_sales),
+          n2s(row.present_year_price_earning), n2s(row.one_year_later_price_earning),
+          n2s(row.sales_growth), n2s(row.eps_growth),
+        ])
+        if (cm.aggregates) {
+          const a = cm.aggregates
+          cRows.push(
+            ["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
+              n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average),
+              n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)],
+            ["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
+              n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median),
+              n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)]
+          )
+        }
+        this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1 })
+        if (cm.latest_updated_at) {
+          this.setFont("italic", 8)
+          p.setTextColor(...DARK_GRAY)
+          p.text(`Source: FactSet — last updated ${fDate(cm.latest_updated_at)}`, MG, this.y)
+          this.y += 5
+          p.setTextColor(...BLACK)
+        }
+      } else {
+        this.body("No comparable company data available.")
       }
-      this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1 })
+    } // end comparativeMultiples
 
-      if (cm.latest_updated_at) {
-        this.setFont("italic", 8)
-        p.setTextColor(...DARK_GRAY)
-        p.text(`Source: FactSet — last updated ${fDate(cm.latest_updated_at)}`, MG, this.y)
-        this.y += 5
-        p.setTextColor(...BLACK)
+    // ── Valuation ──
+    if (sel.valuation) {
+      this.newPage()
+      this.h1("Valuation")
+      if (va.narrative?.length) {
+        for (const item of va.narrative) {
+          this.body(item)
+        }
+      } else {
+        this.body("No valuation narrative available.")
       }
-    } else {
-      this.body("No comparable company data available.")
-    }
-
-    // ── Valuation — always start on a fresh page ──
-    this.newPage()
-    this.h1("Valuation")
-    if (va.narrative?.length) {
-      // Render as paragraphs, NOT bullets
-      for (const item of va.narrative) {
-        this.body(item)
-      }
-    } else {
-      this.body("No valuation narrative available.")
-    }
+    } // end valuation
 
     // ── Risk Assessment ──
-    this.h1("Risks")
-    const rfItems = Array.isArray(ra?.data) ? ra.data : []
-    if (rfItems.length > 0) {
-      const rfRows = rfItems.map(item => [
-        item.category || "—",
-        item.score != null ? `${item.score} / 5` : "—",
-        strip(item.observation) || "—",
-      ])
-      this.table(
-        ["Risk Category", "Score", "Observation"],
-        rfRows,
-        [35, 16, CW - 51],
-        { boldFirstCol: true }
-      )
-    } else {
-      this.body("No risk assessment data available.")
-    }
+    if (sel.riskAssessment) {
+      this.h1("Risks")
+      const rfItems = Array.isArray(ra?.data) ? ra.data : []
+      if (rfItems.length > 0) {
+        const rfRows = rfItems.map(item => [
+          item.category || "—",
+          item.score != null ? `${item.score} / 5` : "—",
+          strip(item.observation) || "—",
+        ])
+        this.table(
+          ["Risk Category", "Score", "Observation"],
+          rfRows,
+          [35, 16, CW - 51],
+          { boldFirstCol: true }
+        )
+      } else {
+        this.body("No risk assessment data available.")
+      }
+    } // end riskAssessment
 
     // ── Investment Summary ──
-    this.h1("Investment Summary")
-
-    if (inv.writeup_overall_rating != null) {
-      this.ensureSpace(12)
-      this.setFont("bold", 13)
-      p.setTextColor(...NAVY)
-      p.text(`Overall Rating: ${inv.writeup_overall_rating}%`, MG, this.y)
-      p.setTextColor(...BLACK)
-      this.y += 10
-    }
-
-    const ratings = inv.writeup_ratings || {}
-    const ratingLabels: Record<string, string> = {
-      "ai_indication": "AI Indication",
-      "business-overview": "Business Overview",
-      "key-metrics": "Key Metrics",
-      "financial-highlights": "Financial Highlights",
-      "comps": "Comparative Multiples",
-      "valuation-analysis": "Valuation Analysis",
-      "red-flag": "Risk Assessment",
-    }
-    const ratingEntries = Object.entries(ratings)
-    if (ratingEntries.length > 0) {
-      this.h2("Section Ratings")
-      for (const [key, value] of ratingEntries) {
-        this.ratingBar(ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), value)
+    if (sel.investmentSummary) {
+      this.h1("Investment Summary")
+      if (inv.writeup_overall_rating != null) {
+        this.ensureSpace(12)
+        this.setFont("bold", 13)
+        p.setTextColor(...NAVY)
+        p.text(`Overall Rating: ${inv.writeup_overall_rating}%`, MG, this.y)
+        p.setTextColor(...BLACK)
+        this.y += 10
       }
-      this.y += 4
-    }
-
-    if (inv.writeup_finalverdict_summary) {
-      this.h2("Final Verdict")
-      this.body(inv.writeup_finalverdict_summary)
-    }
+      const ratings = inv.writeup_ratings || {}
+      const ratingLabels: Record<string, string> = {
+        "ai_indication": "AI Indication",
+        "business-overview": "Business Overview",
+        "key-metrics": "Key Metrics",
+        "financial-highlights": "Financial Highlights",
+        "comps": "Comparative Multiples",
+        "valuation-analysis": "Valuation Analysis",
+        "red-flag": "Risk Assessment",
+      }
+      const ratingEntries = Object.entries(ratings)
+      if (ratingEntries.length > 0) {
+        this.h2("Section Ratings")
+        for (const [key, value] of ratingEntries) {
+          this.ratingBar(ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), value)
+        }
+        this.y += 4
+      }
+      if (inv.writeup_finalverdict_summary) {
+        this.h2("Final Verdict")
+        this.body(inv.writeup_finalverdict_summary)
+      }
+    } // end investmentSummary
 
     /* ═══ DISCLAIMER PAGE ═════════════════════ */
     this.newPage()
@@ -892,30 +1017,60 @@ class DocBuilder {
 /* ═══════════════════════════════════════════════
    React Component
    ═══════════════════════════════════════════════ */
-const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate }) => {
+const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerName, exchange, pricingDate, uniqueDealId }) => {
   const [loading, setLoading] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selections, setSelections] = useState<SectionSelection>({ ...DEFAULT_SECTIONS })
+
+  const handleCheckChange = (key: keyof SectionSelection, checked: boolean) =>
+    setSelections(prev => ({ ...prev, [key]: checked }))
 
   const handleGenerate = async () => {
+    setDialogOpen(false)
     setLoading(true)
     try {
       const apiUrl = process.env.REACT_APP_API_URL
       const token = localStorage.getItem("access_token")
-      const res = await fetch(`${apiUrl}/api/ipo_writeup_pdf_data/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
-        body: JSON.stringify({ ticker }),
-      })
+
+      const [res, outlookRes] = await Promise.all([
+        fetch(`${apiUrl}/api/ipo_writeup_pdf_data/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
+          body: JSON.stringify({ ticker }),
+        }),
+        selections.outlookSummary
+          ? fetch(`${apiUrl}/api/get_few_shot_review/`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ticker, unique_deal_id: uniqueDealId ?? null }),
+            })
+          : Promise.resolve(null),
+      ])
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         alert(`Failed to fetch PDF data: ${(err as any)?.error || res.statusText}`)
         return
       }
       const data: ApiResponse = await res.json()
+
+      let aiOutlook: AiOutlookData | undefined
+      if (selections.outlookSummary && outlookRes?.ok) {
+        try {
+          const aiJson = await outlookRes.json()
+          const answer = aiJson?.answer
+          const first = Array.isArray(answer) && answer.length > 0 ? answer[0] : null
+          if (first) aiOutlook = parseAiOutlook(first)
+        } catch {
+          // Outlook fetch failed — proceed without it
+        }
+      }
+
       const companyName = data.deal_info?.company_name || issuerName || ticker
       const dataAsOf = pricingDate ? fDate(pricingDate) : data.deal_info?.pricing_date ? fDate(data.deal_info.pricing_date) : ""
 
       const builder = new DocBuilder(companyName, dataAsOf)
-      const pdf = await builder.build(data, ticker, exchange, pricingDate)
+      const pdf = await builder.build(data, ticker, exchange, pricingDate, selections, aiOutlook)
       pdf.save(`${ticker.toUpperCase()}_WriteUp_${new Date().toISOString().slice(0, 10)}.pdf`)
     } catch (err) {
       console.error("PDF generation error:", err)
@@ -926,20 +1081,85 @@ const IPOWriteUpPdfAutomation: React.FC<PdfAutomationProps> = ({ ticker, issuerN
   }
 
   return (
-    <Button
-      variant="contained"
-      onClick={handleGenerate}
-      disabled={loading}
-      startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdfIcon />}
-      sx={{
-        textTransform: "none", fontWeight: 600, fontSize: 13, borderRadius: 2, px: 2.5, py: 1,
-        background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
-        "&:hover": { background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)" },
-        "&.Mui-disabled": { background: "#ccc" },
-      }}
-    >
-      {loading ? "Generating Document..." : "Generate Document PDF"}
-    </Button>
+    <>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: 3 } } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, color: "#002060", pb: 1 }}>
+          Select Sections to Include
+        </DialogTitle>
+        <Divider />
+        <DialogContent sx={{ pt: 2 }}>
+          <FormGroup>
+            {SECTION_LABELS.map(({ key, label }) => (
+              <FormControlLabel
+                key={key}
+                control={
+                  <Checkbox
+                    checked={selections[key]}
+                    onChange={(e) => handleCheckChange(key, e.target.checked)}
+                    size="small"
+                    sx={{ color: "#002060", "&.Mui-checked": { color: "#002060" } }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: key === "outlookSummary" ? 600 : 400 }}>
+                      {label}
+                    </Typography>
+                    {key === "outlookSummary" && (
+                      <Typography variant="caption" sx={{ color: "#6b7280", fontStyle: "italic" }}>
+                        (AI generated)
+                      </Typography>
+                    )}
+                  </Box>
+                }
+              />
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <Divider />
+        <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            sx={{ textTransform: "none", color: "#6b7280" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleGenerate}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
+              "&:hover": { background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)" },
+            }}
+          >
+            Generate PDF
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Button
+        variant="contained"
+        onClick={() => setDialogOpen(true)}
+        disabled={loading}
+        startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdfIcon />}
+        sx={{
+          textTransform: "none", fontWeight: 600, fontSize: 13, borderRadius: 2, px: 2.5, py: 1,
+          background: "linear-gradient(135deg, #002060 0%, #1a3a7a 100%)",
+          "&:hover": { background: "linear-gradient(135deg, #001540 0%, #0d2860 100%)" },
+          "&.Mui-disabled": { background: "#ccc" },
+        }}
+      >
+        {loading ? "Generating Document..." : "Generate Monashee PDF"}
+      </Button>
+    </>
   )
 }
 
