@@ -763,10 +763,7 @@ class DocBuilder {
       const sections: [string, string[], boolean][] = [
         ["Business Description", co.business_overview, false],
         ["Differentiated Summary", co.differentiated_summary, false],
-        ["Key Highlights", co.key_highlights, false],
-        ["Strengths", co.strengths, false],
         ["Concerns", co.concerns, false],
-        ["Use of Proceeds", co.use_of_proceeds, false],
         ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
         ["Key Management Personnel", co.key_management_personnel, true],
       ]
@@ -1236,10 +1233,7 @@ async function buildWordDoc(
     for (const sec of [
       { title: "Business Overview", items: toArr(co.business_overview), isPerson: false },
       { title: "Differentiated Summary", items: toArr(co.differentiated_summary), isPerson: false },
-      { title: "Key Highlights", items: toArr(co.key_highlights), isPerson: false },
-      { title: "Strengths", items: toArr(co.strengths), isPerson: false },
       { title: "Concerns", items: toArr(co.concerns), isPerson: false },
-      { title: "Use of Proceeds", items: toArr(co.use_of_proceeds), isPerson: false },
       { title: "Principal Stockholders (Pre-IPO)", items: toArr(co.principal_stockholders_preipo), isPerson: true },
     ]) {
       if (!sec.items.length) continue
