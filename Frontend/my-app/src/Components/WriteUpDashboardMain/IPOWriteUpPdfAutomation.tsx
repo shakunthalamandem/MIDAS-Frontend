@@ -485,14 +485,18 @@ class DocBuilder {
       boldFirstCol?: boolean
       rightAlignFrom?: number
       showHeader?: boolean
+      boldRows?: number[]
+      headerFontSize?: number
+      bodyFontSize?: number
+      cellPadH?: number
     }
   ) {
     const p = this.p
-    const fs = TABLE_BODY_SIZE
-    const hfs = TABLE_HDR_SIZE
+    const fs = opts?.bodyFontSize ?? TABLE_BODY_SIZE
+    const hfs = opts?.headerFontSize ?? TABLE_HDR_SIZE
     const lh = this.lineH(fs)
     const hlh = hfs * PT * LINE_SPACING
-    const pad = 2.5
+    const pad = opts?.cellPadH ?? 2.5
     const nCols = headers.length
     const raFrom = opts?.rightAlignFrom ?? -1
     const showHeader = opts?.showHeader !== false
@@ -545,6 +549,7 @@ class DocBuilder {
 
     // ── Data rows ──
     for (let r = 0; r < rows.length; r++) {
+      const isHighlightedRow = opts?.boldRows?.includes(r) ?? false
       // Calculate wrapped lines per cell
       this.setFont("normal", fs)
       let maxLines = 1
@@ -552,8 +557,8 @@ class DocBuilder {
       for (let i = 0; i < nCols; i++) {
         const cellText = strip(rows[r]?.[i] ?? "—")
         const cellW = colW[i] - pad * 2
-        const isFirst = i === 0 && opts?.boldFirstCol
-        const wrapped = isFirst ? this.wrapBold(cellText, cellW, fs) : this.wrap(cellText, cellW, fs)
+        const useBold = isHighlightedRow || (i === 0 && opts?.boldFirstCol)
+        const wrapped = useBold ? this.wrapBold(cellText, cellW, fs) : this.wrap(cellText, cellW, fs)
         cellLines.push(wrapped)
         maxLines = Math.max(maxLines, wrapped.length)
       }
@@ -562,8 +567,11 @@ class DocBuilder {
 
       this.ensureSpace(rowH + 1)
 
-      // Alt row background
-      if (r % 2 === 1) {
+      // Highlighted row gets a light navy tint; others get normal alt-row shading
+      if (isHighlightedRow) {
+        p.setFillColor(224, 232, 246)
+        p.rect(MG, this.y, CW, rowH, "F")
+      } else if (r % 2 === 1) {
         p.setFillColor(...TABLE_ALT_ROW)
         p.rect(MG, this.y, CW, rowH, "F")
       }
@@ -572,8 +580,8 @@ class DocBuilder {
       for (let i = 0; i < nCols; i++) {
         const align = i >= raFrom && raFrom >= 0 ? "right" : "left"
         const tx = align === "right" ? x + colW[i] - pad : x + pad
-        const isFirst = i === 0 && opts?.boldFirstCol
-        this.setFont(isFirst ? "bold" : "normal", fs)
+        const useBold = isHighlightedRow || (i === 0 && opts?.boldFirstCol)
+        this.setFont(useBold ? "bold" : "normal", fs)
         p.setTextColor(...BLACK)
 
         // Vertically center cell text within the row
@@ -664,7 +672,8 @@ class DocBuilder {
       const cn = di.company_name.trim()
       p.text(cn, PW - MG - p.getTextWidth(cn), 34)
     }
-    const coverParts = [exchange || di.exchange, fDate(pricingDate || di.pricing_date)].filter(Boolean)
+    const rawPricingDate = pricingDate || di.pricing_date
+    const coverParts = [exchange || di.exchange, rawPricingDate ? fDate(rawPricingDate) : null].filter(Boolean)
     if (coverParts.length) {
       this.setFont("bold", 10.5)
       const pt = coverParts.join("  |  ")
@@ -754,10 +763,7 @@ class DocBuilder {
       const sections: [string, string[], boolean][] = [
         ["Business Description", co.business_overview, false],
         ["Differentiated Summary", co.differentiated_summary, false],
-        ["Key Highlights", co.key_highlights, false],
-        ["Strengths", co.strengths, false],
         ["Concerns", co.concerns, false],
-        ["Use of Proceeds", co.use_of_proceeds, false],
         ["Principal Stockholders (Pre-IPO)", co.principal_stockholders_preipo, true],
         ["Key Management Personnel", co.key_management_personnel, true],
       ]
@@ -777,9 +783,10 @@ class DocBuilder {
       if (metricEntries.length > 0) {
         const metricRows: string[][] = []
         for (const [key, val] of metricEntries) {
+          const notes = strip(val?.category)
+          if (!notes) continue  // skip rows with no description
           const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
           const st = statusLabel(val?.color)
-          const notes = strip(val?.category) || "—"
           metricRows.push([criteria, st.text, notes])
         }
         this.table(
@@ -803,28 +810,42 @@ class DocBuilder {
     if (sel.comparativeMultiples) {
       this.h1("Comparative Multiples")
       if (cm.data?.length) {
-        const cH = ["Company", "Price", "Mkt Cap", "EV ($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "Sales\nGr%", "EPS\nGr%"]
-        const rawW = [26, 12, 16, 16, 14, 14, 12, 12, 14, 14]
+        const cH = ["Company", "Price\n(USD)", "Mkt Cap\n(USDm)", "EV\n($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "EV/\nEBITDA\nCY", "EV/\nEBITDA\nNY", "Sales\nGr%", "EPS\nGr%"]
+        const rawW = [17, 14, 13, 12, 12, 12, 11, 11, 12, 12, 12, 12]
         const tot = rawW.reduce((a, b) => a + b, 0)
         const cW = rawW.map(w => (w / tot) * CW)
-        const cRows = cm.data.map(row => [
+        // Subject ticker always first
+        const sortedData = [...cm.data].sort((a, b) => {
+          const aMatch = (a.competitor || "").toUpperCase() === ticker.toUpperCase()
+          const bMatch = (b.competitor || "").toUpperCase() === ticker.toUpperCase()
+          if (aMatch && !bMatch) return -1
+          if (!aMatch && bMatch) return 1
+          return 0
+        })
+        const cRows = sortedData.map(row => [
           row.competitor || "—", n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
           n2s(row.present_year_ev_sales), n2s(row.one_year_later_ev_sales),
           n2s(row.present_year_price_earning), n2s(row.one_year_later_price_earning),
+          n2s(row.present_year_ev_ebitda), n2s(row.one_year_later_ev_ebitda),
           n2s(row.sales_growth), n2s(row.eps_growth),
         ])
+        const subjectRowIndex = sortedData.findIndex(r => (r.competitor || "").toUpperCase() === ticker.toUpperCase())
         if (cm.aggregates) {
           const a = cm.aggregates
           cRows.push(
-            ["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
+            ["Average", "", "", "",
+              n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
               n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average),
+              n2s(a.present_year_ev_ebitda?.average), n2s(a.one_year_later_ev_ebitda?.average),
               n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)],
-            ["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
+            ["Median", "", "", "",
+              n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
               n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median),
+              n2s(a.present_year_ev_ebitda?.median), n2s(a.one_year_later_ev_ebitda?.median),
               n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)]
           )
         }
-        this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1 })
+        this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1, boldRows: subjectRowIndex >= 0 ? [subjectRowIndex] : [], headerFontSize: 7.5, bodyFontSize: 7.5, cellPadH: 2 })
         if (cm.latest_updated_at) {
           this.setFont("italic", 8)
           p.setTextColor(...DARK_GRAY)
@@ -1001,7 +1022,21 @@ class DocBuilder {
       "EBIT": "EBIT", "EBIT Margin": "EBIT Margin",
       "Net Income": "Net Income", "Net Income Margin": "Net Income Margin",
     }
-    const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+    const metricOrder = [
+      "Sales", "Sales Growth",
+      "Collaboration Revenue", "Collaboration Revenue Growth",
+      "Total Revenue & Financial Income",
+      "Revenue", "Revenue Growth", "Net Revenue",
+      "Net Interest Income", "Net Interest Income Growth",
+      "Gross Profit", "Gross Profit Margin",
+      "EBIT", "EBIT Margin",
+      "Net Operating Income", "Net Operating Income Growth",
+      "NII after provision for credit losses", "NII after provision for credit losses Growth",
+      "EBITDA", "EBITDA Margin",
+      "Adj. EBITDA", "Adj. EBITDA Margin",
+      "PBT", "PBT Margin",
+      "Net Income", "Net Income Margin",
+    ]
     const ordered = metricOrder.filter(m => metricNames.has(m))
     for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
 
@@ -1109,7 +1144,7 @@ async function buildWordDoc(
 
   const wSpacer = () => new Paragraph({ text: "", spacing: { after: 80 } })
 
-  const makeTable = (headers: string[], rows: string[][], colPcts: number[], opts?: { boldFirstCol?: boolean }): Table => {
+  const makeTable = (headers: string[], rows: string[][], colPcts: number[], opts?: { boldFirstCol?: boolean; boldRows?: number[] }): Table => {
     const pcts = colPcts.length === headers.length ? colPcts : headers.map(() => Math.floor(100 / headers.length))
     const headerRow = new TableRow({
       tableHeader: true,
@@ -1120,14 +1155,17 @@ async function buildWordDoc(
         borders: tableBorders,
       })),
     })
-    const dataRows = rows.map((row, ri) => new TableRow({
-      children: row.map((cell, ci) => new TableCell({
-        children: [new Paragraph({ children: [new TextRun({ text: cell || "—", size: 19, bold: !!(opts?.boldFirstCol && ci === 0) })], spacing: { after: 40 } })],
-        width: { size: pcts[ci], type: WidthType.PERCENTAGE },
-        shading: { type: ShadingType.CLEAR, color: "auto", fill: ri % 2 === 1 ? TBL_ALT : WHITE_HEX },
-        borders: tableBorders,
-      })),
-    }))
+    const dataRows = rows.map((row, ri) => {
+      const isHighlighted = opts?.boldRows?.includes(ri) ?? false
+      return new TableRow({
+        children: row.map((cell, ci) => new TableCell({
+          children: [new Paragraph({ children: [new TextRun({ text: cell || "—", size: 19, bold: isHighlighted || !!(opts?.boldFirstCol && ci === 0) })], spacing: { after: 40 } })],
+          width: { size: pcts[ci], type: WidthType.PERCENTAGE },
+          shading: { type: ShadingType.CLEAR, color: "auto", fill: isHighlighted ? "D9E5F3" : ri % 2 === 1 ? TBL_ALT : WHITE_HEX },
+          borders: tableBorders,
+        })),
+      })
+    })
     return new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE }, borders: tableBorders })
   }
 
@@ -1147,15 +1185,19 @@ async function buildWordDoc(
     push(wH1("Deal Information", true))
     const bookrunners = Array.isArray(di.bookrunners) ? di.bookrunners : (di.bookrunners ? [String(di.bookrunners)] : [])
     const dealRows: string[][] = [
-      ["Company", di.company_name || "—"], ["Ticker", di.ticker_name || ticker],
-      ["Exchange", di.exchange || exchange || "—"], ["Industry", di.industry || "—"],
-      ["Established", di.established_year ? String(di.established_year) : "—"],
-      ["Pricing Date", fDate(di.pricing_date || pricingDate)], ["Filed Date", fDate(di.filed_date)],
-      ["Term Date", fDate(di.term_date)], ["Trade Date", fDate(di.trade_date)],
+      ["Ticker", di.ticker_name || ticker],
+      ["Company", di.company_name || "—"],
+      ["Exchange", di.exchange || exchange || "—"],
+      ["Sector / Industry", [di.sector, di.industry].filter(Boolean).join(" — ") || "—"],
+      ["Filed Date", fDate(di.filed_date)],
+      ["Pricing Range Date", fDate(di.term_date)],
+      ["Pricing Date", fDate(di.pricing_date || pricingDate)],
+      ["First Trade Date", fDate(di.trade_date)],
       ["Price Range", (di.lower_bound != null && di.upper_bound != null) ? `$${n2s(di.lower_bound, 2)} – $${n2s(di.upper_bound, 2)}` : "—"],
-      ["Deal Size", di.deal_size != null ? `$${n2s(di.deal_size)}M` : "—"],
-      ["Shares Offered", di.shares_offered != null ? `${n2s(di.shares_offered)}M` : "—"],
-      ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh)}M` : "—"],
+      ["Deal Size ($ Million)", di.deal_size != null ? `$${n2s(di.deal_size)} M` : "—"],
+      ["Shares Offered", di.shares_offered != null ? n2s(di.shares_offered, 0) : "—"],
+      ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh, 0)}M` : "—"],
+      ["Established", di.established_year ? String(di.established_year) : "—"],
       ["Bookrunners", bookrunners.length ? bookrunners.join(", ") : "—"],
     ]
     push(makeTable(["Field", "Value"], dealRows, [35, 65], { boldFirstCol: true }))
@@ -1189,15 +1231,15 @@ async function buildWordDoc(
   if (sel.companyOverview && co) {
     push(wH1("Company Overview", false))
     for (const sec of [
-      { title: "Business Overview", items: toArr(co.business_overview) },
-      { title: "Key Highlights", items: toArr(co.key_highlights) },
-      { title: "Strengths", items: toArr(co.strengths) },
-      { title: "Concerns", items: toArr(co.concerns) },
-      { title: "Use of Proceeds", items: toArr(co.use_of_proceeds) },
+      { title: "Business Overview", items: toArr(co.business_overview), isPerson: false },
+      { title: "Differentiated Summary", items: toArr(co.differentiated_summary), isPerson: false },
+      { title: "Concerns", items: toArr(co.concerns), isPerson: false },
+      { title: "Principal Stockholders (Pre-IPO)", items: toArr(co.principal_stockholders_preipo), isPerson: true },
     ]) {
       if (!sec.items.length) continue
       push(wH2(sec.title))
-      for (const item of sec.items) push(wBullet(strip(item)))
+      const processed = sec.isPerson ? splitPersons(sec.items) : sec.items
+      for (const item of processed) push(wBullet(strip(item)))
       push(wSpacer())
     }
     const kmp = toArr(co.key_management_personnel)
@@ -1210,14 +1252,14 @@ async function buildWordDoc(
   /* ── Key Metrics ── */
   if (sel.keyMetrics && Object.keys(km).length > 0) {
     push(wH1("Key Metrics", false))
-    push(makeTable(["Criteria", "Status", "Description"],
-      Object.entries(km).map(([k, v]) => [
+    const kmRows = Object.entries(km)
+      .filter(([, v]) => !!strip(v.category))  // skip rows with no description
+      .map(([k, v]) => [
         v.label || k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
         statusLabel(v.color).text,
-        strip(v.category) || "—",
-      ]),
-      [18, 12, 70],
-      { boldFirstCol: true }))
+        strip(v.category) || "",
+      ])
+    if (kmRows.length > 0) push(makeTable(["Criteria", "Status", "Description"], kmRows, [18, 12, 70], { boldFirstCol: true }))
   }
 
   /* ── Financial Highlights ── */
@@ -1245,7 +1287,21 @@ async function buildWordDoc(
     }
     const yearKeys = Array.from(yearKeysSet).sort((a, b) => { const ya = parseInt(a), yb = parseInt(b); if (!isNaN(ya) && !isNaN(yb) && ya !== yb) return ya - yb; return a.localeCompare(b) })
     if (yearKeys.length > 0) {
-      const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+      const metricOrder = [
+        "Sales", "Sales Growth",
+        "Collaboration Revenue", "Collaboration Revenue Growth",
+        "Total Revenue & Financial Income",
+        "Revenue", "Revenue Growth", "Net Revenue",
+        "Net Interest Income", "Net Interest Income Growth",
+        "Gross Profit", "Gross Profit Margin",
+        "EBIT", "EBIT Margin",
+        "Net Operating Income", "Net Operating Income Growth",
+        "NII after provision for credit losses", "NII after provision for credit losses Growth",
+        "EBITDA", "EBITDA Margin",
+        "Adj. EBITDA", "Adj. EBITDA Margin",
+        "PBT", "PBT Margin",
+        "Net Income", "Net Income Margin",
+      ]
       const ordered = metricOrder.filter(m => metricNames.has(m))
       for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
       const metColPct = 22; const yColPct = Math.floor((100 - metColPct) / yearKeys.length)
@@ -1259,14 +1315,22 @@ async function buildWordDoc(
   /* ── Comparative Multiples ── */
   if (sel.comparativeMultiples && cm?.data?.length) {
     push(wH1("Comparative Multiples", false))
-    const cH = ["Company", "Price", "Mkt Cap", "EV", "EV/Sales NTM", "EV/Sales +1", "P/E NTM", "P/E +1", "EV/EBITDA NTM", "EV/EBITDA +1", "Sales Gr.", "EPS Gr."]
-    const cRows = cm.data.map(r => [r.competitor || "—", n2s(r.price_usd), n2s(r.market_cap), n2s(r.ev_usd_million), n2s(r.present_year_ev_sales), n2s(r.one_year_later_ev_sales), n2s(r.present_year_price_earning), n2s(r.one_year_later_price_earning), n2s(r.present_year_ev_ebitda), n2s(r.one_year_later_ev_ebitda), n2s(r.sales_growth), n2s(r.eps_growth)])
+    const cH = ["Company", "Price\n(USD)", "Mkt Cap\n(USDm)", "EV\n($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "EV/EBITDA\nCY", "EV/EBITDA\nNY", "Sales\nGr%", "EPS\nGr%"]
+    const wSortedData = [...cm.data].sort((a, b) => {
+      const aMatch = (a.competitor || "").toUpperCase() === ticker.toUpperCase()
+      const bMatch = (b.competitor || "").toUpperCase() === ticker.toUpperCase()
+      if (aMatch && !bMatch) return -1
+      if (!aMatch && bMatch) return 1
+      return 0
+    })
+    const wSubjectIdx = wSortedData.findIndex(r => (r.competitor || "").toUpperCase() === ticker.toUpperCase())
+    const cRows = wSortedData.map(r => [r.competitor || "—", n2s(r.price_usd), n2s(r.market_cap, 0), n2s(r.ev_usd_million, 0), n2s(r.present_year_ev_sales), n2s(r.one_year_later_ev_sales), n2s(r.present_year_price_earning), n2s(r.one_year_later_price_earning), n2s(r.present_year_ev_ebitda), n2s(r.one_year_later_ev_ebitda), n2s(r.sales_growth), n2s(r.eps_growth)])
     if (cm.aggregates) {
       const a = cm.aggregates
       cRows.push(["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average), n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average), n2s(a.present_year_ev_ebitda?.average), n2s(a.one_year_later_ev_ebitda?.average), n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)])
       cRows.push(["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median), n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median), n2s(a.present_year_ev_ebitda?.median), n2s(a.one_year_later_ev_ebitda?.median), n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)])
     }
-    push(makeTable(cH, cRows, [14, 6, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6], { boldFirstCol: true }))
+    push(makeTable(cH, cRows, [14, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 6], { boldFirstCol: true, boldRows: wSubjectIdx >= 0 ? [wSubjectIdx] : [] }))
   }
 
   /* ── Valuation ── */
