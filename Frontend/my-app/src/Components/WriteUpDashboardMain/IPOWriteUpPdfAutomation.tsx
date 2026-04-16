@@ -1135,15 +1135,6 @@ async function buildWordDoc(
   const push = (...items: DocChild[]) => children.push(...items)
 
   /* ── Cover page ── */
-  if (logoBuffer) {
-    try {
-      push(new Paragraph({
-        children: [new ImageRun({ data: logoBuffer as ArrayBuffer, transformation: { width: 140, height: 42 }, type: "png" as any })],
-        alignment: AlignmentType.RIGHT,
-        spacing: { after: 200 },
-      }))
-    } catch { /* skip logo if ImageRun fails */ }
-  }
   push(
     new Paragraph({ children: [new TextRun({ text: companyName.toUpperCase(), bold: true, size: 56, color: NAVY_HEX })], alignment: AlignmentType.CENTER, spacing: { before: 400, after: 160 } }),
     new Paragraph({ children: [new TextRun({ text: `${ticker.toUpperCase()} | ${exchange || ""} | IPO Write-Up`, size: 26, color: GRAY_HEX })], alignment: AlignmentType.CENTER, spacing: { after: 100 } }),
@@ -1154,6 +1145,7 @@ async function buildWordDoc(
   /* ── Deal Information ── */
   if (sel.dealInfo && di) {
     push(wH1("Deal Information", true))
+    const bookrunners = Array.isArray(di.bookrunners) ? di.bookrunners : (di.bookrunners ? [String(di.bookrunners)] : [])
     const dealRows: string[][] = [
       ["Company", di.company_name || "—"], ["Ticker", di.ticker_name || ticker],
       ["Exchange", di.exchange || exchange || "—"], ["Industry", di.industry || "—"],
@@ -1164,19 +1156,18 @@ async function buildWordDoc(
       ["Deal Size", di.deal_size != null ? `$${n2s(di.deal_size)}M` : "—"],
       ["Shares Offered", di.shares_offered != null ? `${n2s(di.shares_offered)}M` : "—"],
       ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh)}M` : "—"],
+      ["Bookrunners", bookrunners.length ? bookrunners.join(", ") : "—"],
     ]
     push(makeTable(["Field", "Value"], dealRows, [35, 65], { boldFirstCol: true }))
-    const bookrunners = Array.isArray(di.bookrunners) ? di.bookrunners : (di.bookrunners ? [String(di.bookrunners)] : [])
-    if (bookrunners.length) push(wSpacer(), wBody(`Bookrunners: ${bookrunners.join(", ")}`, { bold: true }))
   }
 
   /* ── Fair Value ── */
   if (sel.fairValue && fv) {
     push(wH1("Fair Value Estimate & IOI", !sel.dealInfo))
     push(makeTable(["Metric", "Value"], [
-      ["Fair Value Estimate", fv.fair_value_estimate != null ? `$${fv.fair_value_estimate}` : "—"],
-      ["Indication of Interest", fv.indication_of_interest || "—"],
-      ["After-Market Threshold", fv.after_market_threshold || "—"],
+      ["Fair Value Estimate", strip(String(fv.fair_value_estimate ?? "—"))],
+      ["Indication of Interest", strip(String(fv.indication_of_interest ?? "—"))],
+      ["After-Market Threshold", strip(String(fv.after_market_threshold ?? "—"))],
     ], [45, 55], { boldFirstCol: true }))
   }
 
@@ -1219,9 +1210,14 @@ async function buildWordDoc(
   /* ── Key Metrics ── */
   if (sel.keyMetrics && Object.keys(km).length > 0) {
     push(wH1("Key Metrics", false))
-    push(makeTable(["Category", "Value", "Status"],
-      Object.entries(km).map(([k, v]) => [k.replace(/_/g, " "), v.label || "—", statusLabel(v.color).text]),
-      [35, 40, 25]))
+    push(makeTable(["Criteria", "Status", "Description"],
+      Object.entries(km).map(([k, v]) => [
+        v.label || k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        statusLabel(v.color).text,
+        strip(v.category) || "—",
+      ]),
+      [18, 12, 70],
+      { boldFirstCol: true }))
   }
 
   /* ── Financial Highlights ── */
