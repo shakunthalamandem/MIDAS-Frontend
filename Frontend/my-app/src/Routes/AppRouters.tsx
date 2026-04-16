@@ -120,6 +120,7 @@ const JRitterAgentMain = React.lazy(() => import("../Components/JRitterAgent/JRi
 const JUploadPage = React.lazy(() => import("../Components/JRitterAgent/JUploadPage"));
 const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
+const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
@@ -335,6 +336,7 @@ const AppRouters: React.FC = () => {
 
 
         <Route path='/deals/future_pipeline' element={<AuthGuard><FuturePipelineDealsMain /></AuthGuard>} />
+        <Route path="/deals_data" element={<AuthGuard><DealsDataDashboard /></AuthGuard>} />
         <Route path="/ticker-change" element={<AuthGuard><TickerChange /></AuthGuard>} />
 
 
