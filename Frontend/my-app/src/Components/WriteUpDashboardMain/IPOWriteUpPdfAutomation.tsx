@@ -786,9 +786,10 @@ class DocBuilder {
       if (metricEntries.length > 0) {
         const metricRows: string[][] = []
         for (const [key, val] of metricEntries) {
+          const notes = strip(val?.category)
+          if (!notes) continue  // skip rows with no description
           const criteria = strip(val?.label) || key.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
           const st = statusLabel(val?.color)
-          const notes = strip(val?.category) || "—"
           metricRows.push([criteria, st.text, notes])
         }
         this.table(
@@ -1257,14 +1258,14 @@ async function buildWordDoc(
   /* ── Key Metrics ── */
   if (sel.keyMetrics && Object.keys(km).length > 0) {
     push(wH1("Key Metrics", false))
-    push(makeTable(["Criteria", "Status", "Description"],
-      Object.entries(km).map(([k, v]) => [
+    const kmRows = Object.entries(km)
+      .filter(([, v]) => !!strip(v.category))  // skip rows with no description
+      .map(([k, v]) => [
         v.label || k.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
         statusLabel(v.color).text,
-        strip(v.category) || "—",
-      ]),
-      [18, 12, 70],
-      { boldFirstCol: true }))
+        strip(v.category) || "",
+      ])
+    if (kmRows.length > 0) push(makeTable(["Criteria", "Status", "Description"], kmRows, [18, 12, 70], { boldFirstCol: true }))
   }
 
   /* ── Financial Highlights ── */
