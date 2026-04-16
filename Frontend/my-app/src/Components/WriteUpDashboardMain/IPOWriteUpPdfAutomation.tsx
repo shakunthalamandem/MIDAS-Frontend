@@ -804,7 +804,7 @@ class DocBuilder {
       this.h1("Comparative Multiples")
       if (cm.data?.length) {
         const cH = ["Company", "Price", "Mkt Cap", "EV ($M)", "EV/Sales\nCY", "EV/Sales\nNY", "P/E\nCY", "P/E\nNY", "Sales\nGr%", "EPS\nGr%"]
-        const rawW = [26, 12, 16, 16, 14, 14, 12, 12, 14, 14]
+        const rawW = [24, 16, 15, 15, 14, 14, 12, 12, 14, 14]
         const tot = rawW.reduce((a, b) => a + b, 0)
         const cW = rawW.map(w => (w / tot) * CW)
         const cRows = cm.data.map(row => [
