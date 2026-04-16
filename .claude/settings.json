@@ -5,7 +5,8 @@
       "Bash(grep -v \"^Components$\")",
       "Bash(npx tsc:*)",
       "Bash(node -e \"const fm = require\\(''framer-motion''\\); console.log\\(Object.keys\\(fm\\).filter\\(k => k.includes\\(''motion''\\) || k.includes\\(''Motion''\\) || k === ''AnimatePresence''\\).join\\(''\\\\n''\\)\\)\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Read(//c/Users/ranjith.a/Documents/**)"
     ]
   }
 }
