@@ -563,8 +563,8 @@ const RiskDashboard: React.FC = () => {
                   { term: "Net Market Value (NMV)", def: "Long market value minus short market value: Σ MV (longs) − Σ MV (shorts)." },
                   { term: "Delta", def: "Rate of change of a derivative's price with respect to a $1 move in the underlying. Equities and futures have delta = 1; options carry a fractional delta (see Proxy Values table)." },
                   { term: "Beta", def: "Sensitivity of a security's returns relative to the benchmark (S&P 500). A beta of 1 moves in line with the market; <1 is less volatile; >1 is more volatile." },
-                  { term: "Delta Adj. Net Exposure", def: "Net market value weighted by each position's delta proxy, capturing the effective directional exposure of the book including derivatives." },
-                  { term: "Beta Adj. Net Exposure", def: "Delta-adjusted net exposure further scaled by each position's beta proxy, normalising the portfolio's market-equivalent exposure to the benchmark." },
+                  { term: "Delta Adj. Net Exposure", def: "Net market value weighted by each position's delta , capturing the effective directional exposure of the book including derivatives." },
+                  { term: "Beta Adj. Net Exposure", def: "Delta-adjusted net exposure further scaled by each position's beta , normalising the portfolio's market-equivalent exposure to the benchmark." },
                   { term: "YTD P&L", def: "Year-to-date realised and unrealised profit & loss, from 1 Jan of the current year to the selected report date." },
                   { term: "MTD P&L", def: "Month-to-date profit & loss, from the first calendar day of the current month to the selected report date." },
                   { term: "1D P&L", def: "One-day (overnight) profit & loss — the change in portfolio value between the prior trading day and the selected report date." },
@@ -586,8 +586,8 @@ const RiskDashboard: React.FC = () => {
                 {[
                   { term: "Gross MV", def: "Σ | Position MV |" },
                   { term: "Net MV", def: "Σ (Long MV) − Σ (Short MV)" },
-                  { term: "Delta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy )" },
-                  { term: "Beta Adj. Net MV", def: "Σ ( Position MV × Delta Proxy × Beta Proxy )" },
+                  { term: "Delta Adj. Net MV", def: "Σ ( Position MV × Delta  )" },
+                  { term: "Beta Adj. Net MV", def: "Σ ( Position MV × Delta  × Beta  )" },
                   { term: "% of AUM", def: "Metric Value ÷ AUM × 100" },
                   { term: "Cumulative P&L", def: "Σ Daily P&L from period start date to report date" },
                 ].map(({ term, def }) => (

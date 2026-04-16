@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, TextField, MenuItem, IconButton, Button } from "@mui/material";
+import { Box, TextField, MenuItem, IconButton, Select, Checkbox, ListItemText, OutlinedInput, FormControl, InputLabel, Divider, FormHelperText } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { formatCurrency } from "./utils";
@@ -33,6 +33,35 @@ const fundSelectSx = {
     "&.Mui-focused": { color: "#10b981" },
   },
   "& .MuiSvgIcon-root": { color: "#a0aec0" },
+};
+
+const multiSelectSx = {
+  minWidth: 200,
+  borderRadius: "20px",
+  backgroundColor: "rgba(255,255,255,0.08)",
+  color: "#fff",
+  "& fieldset": { borderColor: "rgba(255,255,255,0.2)", borderRadius: "20px" },
+  "&:hover fieldset": { borderColor: "rgba(255,255,255,0.4)" },
+  "&.Mui-focused fieldset": { borderColor: "#10b981" },
+  "& .MuiSvgIcon-root": { color: "#a0aec0" },
+  "& .MuiSelect-select": { py: "8.5px" },
+};
+
+const menuPaperSx = {
+  mt: 0.5,
+  bgcolor: "#1a2035",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: 2,
+  "& .MuiMenuItem-root": {
+    color: "#e2e8f0",
+    fontSize: 13,
+    py: 0.5,
+    "&:hover": { bgcolor: "rgba(16,185,129,0.1)" },
+    "&.Mui-selected": { bgcolor: "rgba(16,185,129,0.08)" },
+    "&.Mui-selected:hover": { bgcolor: "rgba(16,185,129,0.15)" },
+  },
+  "& .MuiCheckbox-root": { color: "#a0aec0", "&.Mui-checked": { color: "#10b981" } },
+  "& .MuiListItemText-primary": { fontSize: 13 },
 };
 
 const dateInputSx = {
@@ -72,13 +101,24 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
-  const displayValue = allSelected ? ALL_FUNDS : (selectedFunds[0] || "");
 
-  const handleFundChange = (value: string) => {
-    if (value === ALL_FUNDS) {
-      onFundsChange([...portfolios]);
+  const displayLabel = allSelected
+    ? "All Funds"
+    : selectedFunds.length === 1
+      ? selectedFunds[0]
+      : selectedFunds.length > 1
+        ? `${selectedFunds.length} Funds`
+        : "Select Fund";
+
+  const handleToggleAll = () => {
+    onFundsChange(allSelected ? [] : [...portfolios]);
+  };
+
+  const handleToggleFund = (fund: string) => {
+    if (selectedFunds.includes(fund)) {
+      onFundsChange(selectedFunds.filter((f) => f !== fund));
     } else {
-      onFundsChange([value]);
+      onFundsChange([...selectedFunds, fund]);
     }
   };
 
@@ -102,22 +142,49 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </Box>
 
       <Box className="risk-dashboard-header-right">
-        <TextField
-          select
-          size="small"
-          label="Fund"
-          value={displayValue}
-          onChange={(e) => handleFundChange(e.target.value)}
-          className="risk-dashboard-fund-select"
-          sx={fundSelectSx}
-        >
-          <MenuItem value={ALL_FUNDS}>{ALL_FUNDS}</MenuItem>
-          {portfolios.map((p) => (
-            <MenuItem key={p} value={p}>
-              {p}
+        <FormControl size="small" className="risk-dashboard-fund-select" sx={{ minWidth: 200 }} error={selectedFunds.length === 0}>
+          <InputLabel sx={{ color: selectedFunds.length === 0 ? "#f87171" : "#a0aec0", "&.Mui-focused": { color: "#10b981" } }}>
+            Fund
+          </InputLabel>
+          <Select
+            multiple
+            value={selectedFunds}
+            input={<OutlinedInput label="Fund" sx={{
+              ...multiSelectSx,
+              ...(selectedFunds.length === 0 && {
+                "& fieldset": { borderColor: "#f87171 !important" },
+              }),
+            }} />}
+            renderValue={() => displayLabel}
+            MenuProps={{ PaperProps: { sx: menuPaperSx }, disableAutoFocusItem: true }}
+            sx={multiSelectSx}
+          >
+            {/* All Funds toggle */}
+            <MenuItem onClick={handleToggleAll} disableRipple>
+              <Checkbox
+                checked={allSelected}
+                indeterminate={selectedFunds.length > 0 && !allSelected}
+                sx={{ color: "#a0aec0", "&.Mui-checked, &.MuiCheckbox-indeterminate": { color: "#10b981" } }}
+              />
+              <ListItemText primary={<strong>All Funds</strong>} />
             </MenuItem>
-          ))}
-        </TextField>
+            <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.1)" }} />
+            {portfolios.map((p) => (
+              <MenuItem key={p} onClick={() => handleToggleFund(p)} disableRipple>
+                <Checkbox
+                  checked={selectedFunds.includes(p)}
+                  sx={{ color: "#a0aec0", "&.Mui-checked": { color: "#10b981" } }}
+                />
+                <ListItemText primary={p} />
+              </MenuItem>
+            ))}
+          </Select>
+          {selectedFunds.length === 0 && (
+            <FormHelperText sx={{ color: "#f87171", fontSize: "11px", mt: 0.5, ml: 1.5, whiteSpace: "nowrap" }}>
+              Select at least one fund
+            </FormHelperText>
+          )}
+        </FormControl>
 
         {aum !== undefined && (
           <Box className="risk-dashboard-aum-badge">

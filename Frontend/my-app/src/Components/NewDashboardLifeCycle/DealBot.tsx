@@ -18,14 +18,34 @@ import { alpha } from "@mui/material/styles";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import PictureAsPdfRoundedIcon from "@mui/icons-material/PictureAsPdfRounded";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import GENAIRenderer from "../GhcAi/AIPages/GENAIRenderer";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 import DealBotPdfContent from "./DealBotPdfContent";
 import { type DealBotBasicDealDetails } from "./DealBotPdfExport";
 import introImage from "../../Assets/images/monashee_page1.png";
 import monasheeLogo from "../../Assets/images/monashee_logo.png";
+
+// html2canvas and jsPDF are dynamically imported at PDF export time
+// to avoid loading ~500KB+ of PDF libraries on page mount
+type Html2CanvasFn = typeof import("html2canvas")["default"];
+type JsPDFClass = typeof import("jspdf")["default"];
+
+let _html2canvas: Html2CanvasFn | null = null;
+let _jsPDF: JsPDFClass | null = null;
+
+type jsPDF = InstanceType<JsPDFClass>;
+
+const loadPdfLibs = async () => {
+  if (!_html2canvas || !_jsPDF) {
+    const [h2cModule, jsPDFModule] = await Promise.all([
+      import("html2canvas"),
+      import("jspdf"),
+    ]);
+    _html2canvas = h2cModule.default;
+    _jsPDF = jsPDFModule.default;
+  }
+  return { html2canvas: _html2canvas, jsPDF: _jsPDF };
+};
 
 type DealBotProps = {
   basicDealDetails: DealBotBasicDealDetails;
@@ -225,6 +245,7 @@ const captureSectionCanvas = async ({
   sectionKey?: string;
   captureWidth: number;
 }) => {
+  const { html2canvas } = await loadPdfLibs();
   const renderSection = async (foreignObjectRendering: boolean) =>
     html2canvas(section, {
       scale: Math.max(getCanvasScale(), 2.4),
@@ -1008,7 +1029,8 @@ const DealBot: React.FC<DealBotProps> = ({ basicDealDetails }) => {
       await waitForLayout();
       await waitForContentReady(root);
 
-      const pdf = new jsPDF("p", "mm", "a4");
+      const { jsPDF: JsPDF } = await loadPdfLibs();
+      const pdf = new JsPDF("p", "mm", "a4");
       if (typeof (pdf as any).setDisplayMode === "function") {
         (pdf as any).setDisplayMode(160);
       }
