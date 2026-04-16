@@ -1001,7 +1001,21 @@ class DocBuilder {
       "EBIT": "EBIT", "EBIT Margin": "EBIT Margin",
       "Net Income": "Net Income", "Net Income Margin": "Net Income Margin",
     }
-    const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+    const metricOrder = [
+      "Sales", "Sales Growth",
+      "Collaboration Revenue", "Collaboration Revenue Growth",
+      "Total Revenue & Financial Income",
+      "Revenue", "Revenue Growth", "Net Revenue",
+      "Net Interest Income", "Net Interest Income Growth",
+      "Gross Profit", "Gross Profit Margin",
+      "EBIT", "EBIT Margin",
+      "Net Operating Income", "Net Operating Income Growth",
+      "NII after provision for credit losses", "NII after provision for credit losses Growth",
+      "EBITDA", "EBITDA Margin",
+      "Adj. EBITDA", "Adj. EBITDA Margin",
+      "PBT", "PBT Margin",
+      "Net Income", "Net Income Margin",
+    ]
     const ordered = metricOrder.filter(m => metricNames.has(m))
     for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
 
@@ -1147,15 +1161,19 @@ async function buildWordDoc(
     push(wH1("Deal Information", true))
     const bookrunners = Array.isArray(di.bookrunners) ? di.bookrunners : (di.bookrunners ? [String(di.bookrunners)] : [])
     const dealRows: string[][] = [
-      ["Company", di.company_name || "—"], ["Ticker", di.ticker_name || ticker],
-      ["Exchange", di.exchange || exchange || "—"], ["Industry", di.industry || "—"],
-      ["Established", di.established_year ? String(di.established_year) : "—"],
-      ["Pricing Date", fDate(di.pricing_date || pricingDate)], ["Filed Date", fDate(di.filed_date)],
-      ["Term Date", fDate(di.term_date)], ["Trade Date", fDate(di.trade_date)],
+      ["Ticker", di.ticker_name || ticker],
+      ["Company", di.company_name || "—"],
+      ["Exchange", di.exchange || exchange || "—"],
+      ["Sector / Industry", [di.sector, di.industry].filter(Boolean).join(" — ") || "—"],
+      ["Filed Date", fDate(di.filed_date)],
+      ["Pricing Range Date", fDate(di.term_date)],
+      ["Pricing Date", fDate(di.pricing_date || pricingDate)],
+      ["First Trade Date", fDate(di.trade_date)],
       ["Price Range", (di.lower_bound != null && di.upper_bound != null) ? `$${n2s(di.lower_bound, 2)} – $${n2s(di.upper_bound, 2)}` : "—"],
-      ["Deal Size", di.deal_size != null ? `$${n2s(di.deal_size)}M` : "—"],
-      ["Shares Offered", di.shares_offered != null ? `${n2s(di.shares_offered)}M` : "—"],
-      ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh)}M` : "—"],
+      ["Deal Size ($ Million)", di.deal_size != null ? `$${n2s(di.deal_size)} M` : "—"],
+      ["Shares Offered", di.shares_offered != null ? n2s(di.shares_offered, 0) : "—"],
+      ["Shares Outstanding", di.nosh != null ? `${n2s(di.nosh, 0)}M` : "—"],
+      ["Established", di.established_year ? String(di.established_year) : "—"],
       ["Bookrunners", bookrunners.length ? bookrunners.join(", ") : "—"],
     ]
     push(makeTable(["Field", "Value"], dealRows, [35, 65], { boldFirstCol: true }))
@@ -1189,15 +1207,18 @@ async function buildWordDoc(
   if (sel.companyOverview && co) {
     push(wH1("Company Overview", false))
     for (const sec of [
-      { title: "Business Overview", items: toArr(co.business_overview) },
-      { title: "Key Highlights", items: toArr(co.key_highlights) },
-      { title: "Strengths", items: toArr(co.strengths) },
-      { title: "Concerns", items: toArr(co.concerns) },
-      { title: "Use of Proceeds", items: toArr(co.use_of_proceeds) },
+      { title: "Business Overview", items: toArr(co.business_overview), isPerson: false },
+      { title: "Differentiated Summary", items: toArr(co.differentiated_summary), isPerson: false },
+      { title: "Key Highlights", items: toArr(co.key_highlights), isPerson: false },
+      { title: "Strengths", items: toArr(co.strengths), isPerson: false },
+      { title: "Concerns", items: toArr(co.concerns), isPerson: false },
+      { title: "Use of Proceeds", items: toArr(co.use_of_proceeds), isPerson: false },
+      { title: "Principal Stockholders (Pre-IPO)", items: toArr(co.principal_stockholders_preipo), isPerson: true },
     ]) {
       if (!sec.items.length) continue
       push(wH2(sec.title))
-      for (const item of sec.items) push(wBullet(strip(item)))
+      const processed = sec.isPerson ? splitPersons(sec.items) : sec.items
+      for (const item of processed) push(wBullet(strip(item)))
       push(wSpacer())
     }
     const kmp = toArr(co.key_management_personnel)
@@ -1245,7 +1266,21 @@ async function buildWordDoc(
     }
     const yearKeys = Array.from(yearKeysSet).sort((a, b) => { const ya = parseInt(a), yb = parseInt(b); if (!isNaN(ya) && !isNaN(yb) && ya !== yb) return ya - yb; return a.localeCompare(b) })
     if (yearKeys.length > 0) {
-      const metricOrder = ["Sales", "Sales Growth", "EBITDA", "EBITDA Margin", "EBIT", "EBIT Margin", "Net Income", "Net Income Margin"]
+      const metricOrder = [
+        "Sales", "Sales Growth",
+        "Collaboration Revenue", "Collaboration Revenue Growth",
+        "Total Revenue & Financial Income",
+        "Revenue", "Revenue Growth", "Net Revenue",
+        "Net Interest Income", "Net Interest Income Growth",
+        "Gross Profit", "Gross Profit Margin",
+        "EBIT", "EBIT Margin",
+        "Net Operating Income", "Net Operating Income Growth",
+        "NII after provision for credit losses", "NII after provision for credit losses Growth",
+        "EBITDA", "EBITDA Margin",
+        "Adj. EBITDA", "Adj. EBITDA Margin",
+        "PBT", "PBT Margin",
+        "Net Income", "Net Income Margin",
+      ]
       const ordered = metricOrder.filter(m => metricNames.has(m))
       for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
       const metColPct = 22; const yColPct = Math.floor((100 - metColPct) / yearKeys.length)
