@@ -259,6 +259,8 @@ const RiskTriggers: React.FC = () => {
   const [savedGuidelines, setSavedGuidelines] = useState<Record<string, number>>({});
   const [savingGuidelines, setSavingGuidelines] = useState(false);
   const [issuerSearch, setIssuerSearch] = useState("");
+  const [sectorSearch, setSectorSearch] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
 
   const defaultGuidelines = GUIDELINE_FIELDS.reduce<Record<string, number>>((acc, f) => { acc[f.key] = f.defaultValue; return acc; }, {});
 
@@ -752,14 +754,15 @@ const RiskTriggers: React.FC = () => {
               );
             })}
 
-            {/* ════ SECTOR EXPOSURE ════ */}
+            {/* ════ SECTOR EXPOSURE — CARD GRID ════ */}
             {sectorEntry && (() => {
               const [sectionKey, section] = sectorEntry;
               const cfg = SECTION_CONFIG[sectionKey];
               if (!cfg) return null;
               const rows = (section.data || []).filter((r: any) => (r[cfg.firstColKey] || "").trim() !== "");
               const guideline = getActiveGuidelines().sector_threshold ?? 25;
-              const maxVal = Math.max(...rows.map((r: any) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
+              const needle = sectorSearch.trim().toUpperCase();
+              const filtered = needle ? rows.filter((r: any) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : rows;
               return (
                 <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
                   <Box className="trig-panel-head">
@@ -772,56 +775,45 @@ const RiskTriggers: React.FC = () => {
                       <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Sectors</span>
                     </Box>
                   </Box>
-                  <Box className="trig-table-wrap">
-                    <table className="trig-table">
-                      <thead>
-                        <tr>
-                          <th className="trig-th-l" style={{ width: 40 }}>#</th>
-                          <th className="trig-th-l">SECTOR</th>
-                          <th className="trig-th-l" style={{ width: 220 }}>EXPOSURE</th>
-                          <th className="trig-th-r" style={{ width: 130 }}>NET EXPOSURE</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map((row: any, idx: number) => {
+                  <TextField
+                    size="small" placeholder="Search sectors..." value={sectorSearch}
+                    onChange={(e) => setSectorSearch(e.target.value)}
+                    sx={{ mb: 2, width: 280, ...inputSx }}
+                  />
+                  <Box className="trig-card-grid-scroll">
+                    <Box className="trig-card-grid">
+                      {filtered.length === 0 ? (
+                        <Typography className="trig-empty">No sectors found</Typography>
+                      ) : (
+                        filtered.map((row: any, idx: number) => {
                           const raw = row[cfg.valueKey];
                           const num = parseSignedNumericValue(raw);
                           const absNum = Math.abs(num);
-                          const barWidth = Math.min((absNum / maxVal) * 100, 100);
                           const overLimit = absNum >= guideline;
                           const pillClass = overLimit ? "trig-pill--breach" : absNum >= guideline * 0.8 ? "trig-pill--warning" : "trig-pill--safe";
                           return (
-                            <tr key={idx}>
-                              <td className="trig-td-rank">{idx + 1}</td>
-                              <td className="trig-td-l">{row[cfg.firstColKey]}</td>
-                              <td>
-                                <Box className="trig-bar-cell">
-                                  <Box className="trig-bar-track">
-                                    <Box className="trig-bar-fill" style={{ width: `${barWidth}%`, background: overLimit ? "#dc2626" : "#7c3aed" }} />
-                                  </Box>
-                                </Box>
-                              </td>
-                              <td className="trig-td-r">
-                                <span className={`trig-pill ${pillClass}`}>{raw}</span>
-                              </td>
-                            </tr>
+                            <Box key={`${sectionKey}-${idx}`} className={`trig-ticker-card ${overLimit ? "trig-ticker-card--breach" : ""}`}>
+                              <Typography className="trig-ticker-card-name" title={row[cfg.firstColKey]}>{row[cfg.firstColKey]}</Typography>
+                              <span className={`trig-pill ${pillClass}`}>{raw}</span>
+                            </Box>
                           );
-                        })}
-                      </tbody>
-                    </table>
+                        })
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               );
             })()}
 
-            {/* ════ COUNTRY EXPOSURE ════ */}
+            {/* ════ COUNTRY EXPOSURE — CARD GRID ════ */}
             {countryEntry && (() => {
               const [sectionKey, section] = countryEntry;
               const cfg = SECTION_CONFIG[sectionKey];
               if (!cfg) return null;
               const rows = (section.data || []).filter((r: any) => (r[cfg.firstColKey] || "").trim() !== "");
               const guideline = getActiveGuidelines().country_threshold ?? 25;
-              const maxVal = Math.max(...rows.map((r: any) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
+              const needle = countrySearch.trim().toUpperCase();
+              const filtered = needle ? rows.filter((r: any) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : rows;
               return (
                 <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
                   <Box className="trig-panel-head">
@@ -834,43 +826,31 @@ const RiskTriggers: React.FC = () => {
                       <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Countries</span>
                     </Box>
                   </Box>
-                  <Box className="trig-table-wrap">
-                    <table className="trig-table">
-                      <thead>
-                        <tr>
-                          <th className="trig-th-l" style={{ width: 40 }}>#</th>
-                          <th className="trig-th-l">COUNTRY</th>
-                          <th className="trig-th-l" style={{ width: 220 }}>EXPOSURE</th>
-                          <th className="trig-th-r" style={{ width: 130 }}>NET EXPOSURE</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map((row: any, idx: number) => {
+                  <TextField
+                    size="small" placeholder="Search countries..." value={countrySearch}
+                    onChange={(e) => setCountrySearch(e.target.value)}
+                    sx={{ mb: 2, width: 280, ...inputSx }}
+                  />
+                  <Box className="trig-card-grid-scroll">
+                    <Box className="trig-card-grid">
+                      {filtered.length === 0 ? (
+                        <Typography className="trig-empty">No countries found</Typography>
+                      ) : (
+                        filtered.map((row: any, idx: number) => {
                           const raw = row[cfg.valueKey];
                           const num = parseSignedNumericValue(raw);
                           const absNum = Math.abs(num);
-                          const barWidth = Math.min((absNum / maxVal) * 100, 100);
                           const overLimit = absNum >= guideline;
                           const pillClass = overLimit ? "trig-pill--breach" : absNum >= guideline * 0.8 ? "trig-pill--warning" : "trig-pill--safe";
                           return (
-                            <tr key={idx}>
-                              <td className="trig-td-rank">{idx + 1}</td>
-                              <td className="trig-td-l">{row[cfg.firstColKey]}</td>
-                              <td>
-                                <Box className="trig-bar-cell">
-                                  <Box className="trig-bar-track">
-                                    <Box className="trig-bar-fill" style={{ width: `${barWidth}%`, background: overLimit ? "#dc2626" : "#2563eb" }} />
-                                  </Box>
-                                </Box>
-                              </td>
-                              <td className="trig-td-r">
-                                <span className={`trig-pill ${pillClass}`}>{raw}</span>
-                              </td>
-                            </tr>
+                            <Box key={`${sectionKey}-${idx}`} className={`trig-ticker-card ${overLimit ? "trig-ticker-card--breach" : ""}`}>
+                              <Typography className="trig-ticker-card-name" title={row[cfg.firstColKey]}>{row[cfg.firstColKey]}</Typography>
+                              <span className={`trig-pill ${pillClass}`}>{raw}</span>
+                            </Box>
                           );
-                        })}
-                      </tbody>
-                    </table>
+                        })
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               );

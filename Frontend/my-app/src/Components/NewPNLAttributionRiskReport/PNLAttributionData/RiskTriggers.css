@@ -650,7 +650,8 @@
 
 /* ── Ticker Card Grid ── */
 .trig-card-grid-scroll {
-  max-height: 500px;
+  max-height: 560px;
+  min-height: 320px;
   overflow-y: auto;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
