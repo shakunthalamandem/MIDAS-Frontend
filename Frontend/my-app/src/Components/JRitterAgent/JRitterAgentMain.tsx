@@ -29,6 +29,7 @@ interface SavedRecord {
   company_name: string;
   json_data: any;
   created_at: string;
+  updated_at: string;
 }
 
 interface MarketOutlook {
@@ -529,9 +530,14 @@ const JRitterAgentMain: React.FC = () => {
                           </IconButton>
                         </TableCell>
                         <TableCell sx={tdStyle}>
-                          <Typography sx={{ fontWeight: 800, color: "#0891b2", fontSize: "0.9rem", letterSpacing: 0.5 }}>
+                          <Typography sx={{ fontWeight: 800, color: "#0891b2", fontSize: "0.9rem", letterSpacing: 0.5, lineHeight: 1.2 }}>
                             {rec.ticker}
                           </Typography>
+                          {rec.updated_at && (
+                            <Typography sx={{ fontSize: "0.62rem", color: "#002060", fontWeight: 600, lineHeight: 1.2, mt: 0.3 }}>
+                              last updated: {new Date(rec.updated_at).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}
+                            </Typography>
+                          )}
                         </TableCell>
                         <TableCell sx={{ ...tdStyle, whiteSpace: "normal", wordBreak: "break-word" }}>
                           {rec.company_name || "—"}
