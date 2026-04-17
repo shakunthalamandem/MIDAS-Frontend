@@ -242,6 +242,95 @@ const statusLabel = (c: string | null | undefined): { text: string; color: [numb
   return { text: c || "—", color: BLACK }
 }
 
+/** Format multiple value: 1 decimal + "x", negative → "nm" */
+const n2x = (v: number | string | null | undefined): string => {
+  if (v == null || v === "") return "—"
+  const n = typeof v === "string" ? parseFloat(v) : v
+  if (isNaN(n) || n < 0) return "nm"
+  return `${(Math.round(n * 10) / 10).toFixed(1)}x`
+}
+
+/** Format growth percentage: 1 decimal + "%", negative → "nm" */
+const n2pct = (v: number | string | null | undefined): string => {
+  if (v == null || v === "") return "—"
+  const n = typeof v === "string" ? parseFloat(v) : v
+  if (isNaN(n) || n < 0) return "nm"
+  if (n > 500) return "nm"
+  return `${(Math.round(n * 10) / 10).toFixed(1)}%`
+}
+
+/** Convert risk score (1–5) to Low / Medium / High */
+const riskLabel = (score: number | undefined | null): string => {
+  if (score == null) return "—"
+  if (score <= 2) return "Low"
+  if (score <= 3) return "Medium"
+  return "High"
+}
+
+/** Clean HTML entities from a string */
+const cleanEntities = (s: string): string =>
+  s.replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim()
+
+/** Parse HTML into paragraphs of rich text segments (preserves bold) */
+interface TextSegment { text: string; bold: boolean }
+const parseRichText = (html: string | null | undefined): TextSegment[][] => {
+  if (!html) return []
+  const blocks = html.replace(/<br\s*\/?>/gi, "</p><p>").split(/<\/p>/gi)
+  const result: TextSegment[][] = []
+  for (let block of blocks) {
+    block = block.replace(/<p[^>]*>/gi, "").trim()
+    if (!block) continue
+    const segments: TextSegment[] = []
+    const re = /<(strong|b)>([\s\S]*?)<\/(strong|b)>/gi
+    let last = 0
+    let m: RegExpExecArray | null
+    while ((m = re.exec(block)) !== null) {
+      if (m.index > last) {
+        const t = cleanEntities(block.slice(last, m.index))
+        if (t) segments.push({ text: t, bold: false })
+      }
+      const t = cleanEntities(m[2])
+      if (t) segments.push({ text: t, bold: true })
+      last = m.index + m[0].length
+    }
+    if (last < block.length) {
+      const t = cleanEntities(block.slice(last))
+      if (t) segments.push({ text: t, bold: false })
+    }
+    if (segments.length > 0) result.push(segments)
+  }
+  return result
+}
+
+/** Expand each item by splitting on newlines so every line becomes its own bullet */
+const expandBullets = (items: string[]): string[] => {
+  const result: string[] = []
+  for (const raw of items) {
+    const cleaned = strip(raw)
+    if (!cleaned) continue
+    const lines = cleaned.split(/\n+/).map(l => l.trim()).filter(Boolean)
+    result.push(...lines)
+  }
+  return result
+}
+
+/** Rating sections in same order as MIDAS app */
+const RATING_SECTIONS: { id: string; label: string }[] = [
+  { id: "business-overview", label: "Company Overview" },
+  { id: "key-metrics", label: "Key Metrics" },
+  { id: "financial-highlights", label: "Financial Highlights" },
+  { id: "comps", label: "Comps & Peer Trends" },
+  { id: "valuation-analysis", label: "Valuation" },
+  { id: "red-flag", label: "Risk Assessment" },
+]
+
 /* Split concatenated person entries */
 const splitPersons = (items: string[]): string[] => {
   const result: string[] = []
@@ -438,6 +527,52 @@ class DocBuilder {
       this.y += lh
     }
     this.y += BODY_AFTER
+  }
+
+  /** Rich text body: preserves bold formatting from HTML */
+  private richBody(html: string) {
+    const paragraphs = parseRichText(html)
+    if (!paragraphs.length) {
+      const plain = strip(html)
+      if (plain) this.body(plain)
+      return
+    }
+    const p = this.p
+    const lh = this.lineH(BODY_SIZE)
+    for (const segments of paragraphs) {
+      const words: { text: string; bold: boolean; w: number }[] = []
+      for (const seg of segments) {
+        this.setFont(seg.bold ? "bold" : "normal", BODY_SIZE)
+        for (const part of seg.text.split(/( +)/g)) {
+          if (!part) continue
+          this.setFont(seg.bold ? "bold" : "normal", BODY_SIZE)
+          words.push({ text: part, bold: seg.bold, w: p.getTextWidth(part) })
+        }
+      }
+      const lines: (typeof words)[] = []
+      let cur: typeof words = []
+      let lw = 0
+      for (const word of words) {
+        if (lw + word.w > CW && cur.length > 0 && word.text.trim()) {
+          lines.push(cur); cur = []; lw = 0
+        }
+        cur.push(word); lw += word.w
+      }
+      if (cur.length) lines.push(cur)
+      for (const line of lines) {
+        this.ensureSpace(lh + 1)
+        this.setFont("normal", BODY_SIZE)
+        p.setTextColor(...BLACK)
+        let x = MG
+        for (const w of line) {
+          this.setFont(w.bold ? "bold" : "normal", BODY_SIZE)
+          p.text(w.text, x, this.y)
+          x += w.w
+        }
+        this.y += lh
+      }
+      this.y += BODY_AFTER
+    }
   }
 
   /** Bullet list: 10.5pt Regular, solid round bullet, 0.25" indent */
@@ -770,7 +905,7 @@ class DocBuilder {
       for (const [title, items, isPerson] of sections) {
         if (items?.length) {
           this.h2(title)
-          const processed = isPerson ? splitPersons(items) : items
+          const processed = isPerson ? splitPersons(items) : expandBullets(items)
           this.bulletList(processed)
         }
       }
@@ -823,26 +958,26 @@ class DocBuilder {
           return 0
         })
         const cRows = sortedData.map(row => [
-          row.competitor || "—", n2s(row.price_usd), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
-          n2s(row.present_year_ev_sales), n2s(row.one_year_later_ev_sales),
-          n2s(row.present_year_price_earning), n2s(row.one_year_later_price_earning),
-          n2s(row.present_year_ev_ebitda), n2s(row.one_year_later_ev_ebitda),
-          n2s(row.sales_growth), n2s(row.eps_growth),
+          row.competitor || "—", n2s(row.price_usd, 1), n2s(row.market_cap, 0), n2s(row.ev_usd_million, 0),
+          n2x(row.present_year_ev_sales), n2x(row.one_year_later_ev_sales),
+          n2x(row.present_year_price_earning), n2x(row.one_year_later_price_earning),
+          n2x(row.present_year_ev_ebitda), n2x(row.one_year_later_ev_ebitda),
+          n2pct(row.sales_growth), n2pct(row.eps_growth),
         ])
         const subjectRowIndex = sortedData.findIndex(r => (r.competitor || "").toUpperCase() === ticker.toUpperCase())
         if (cm.aggregates) {
           const a = cm.aggregates
           cRows.push(
             ["Average", "", "", "",
-              n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average),
-              n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average),
-              n2s(a.present_year_ev_ebitda?.average), n2s(a.one_year_later_ev_ebitda?.average),
-              n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)],
+              n2x(a.present_year_ev_sales?.average), n2x(a.one_year_later_ev_sales?.average),
+              n2x(a.present_year_price_earning?.average), n2x(a.one_year_later_price_earning?.average),
+              n2x(a.present_year_ev_ebitda?.average), n2x(a.one_year_later_ev_ebitda?.average),
+              n2pct(a.sales_growth?.average), n2pct(a.eps_growth?.average)],
             ["Median", "", "", "",
-              n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median),
-              n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median),
-              n2s(a.present_year_ev_ebitda?.median), n2s(a.one_year_later_ev_ebitda?.median),
-              n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)]
+              n2x(a.present_year_ev_sales?.median), n2x(a.one_year_later_ev_sales?.median),
+              n2x(a.present_year_price_earning?.median), n2x(a.one_year_later_price_earning?.median),
+              n2x(a.present_year_ev_ebitda?.median), n2x(a.one_year_later_ev_ebitda?.median),
+              n2pct(a.sales_growth?.median), n2pct(a.eps_growth?.median)]
           )
         }
         this.table(cH, cRows, cW, { boldFirstCol: true, rightAlignFrom: 1, boldRows: subjectRowIndex >= 0 ? [subjectRowIndex] : [], headerFontSize: 7.5, bodyFontSize: 7.5, cellPadH: 2 })
@@ -863,7 +998,7 @@ class DocBuilder {
       this.h1("Valuation")
       if (va.narrative?.length) {
         for (const item of va.narrative) {
-          this.body(item)
+          this.richBody(item)
         }
       } else {
         this.body("No valuation narrative available.")
@@ -877,11 +1012,11 @@ class DocBuilder {
       if (rfItems.length > 0) {
         const rfRows = rfItems.map(item => [
           item.category || "—",
-          item.score != null ? `${item.score} / 5` : "—",
+          riskLabel(item.score),
           strip(item.observation) || "—",
         ])
         this.table(
-          ["Risk Category", "Score", "Observation"],
+          ["Risk Category", "Rating", "Observation"],
           rfRows,
           [35, 16, CW - 51],
           { boldFirstCol: true }
@@ -903,26 +1038,17 @@ class DocBuilder {
         this.y += 10
       }
       const ratings = inv.writeup_ratings || {}
-      const ratingLabels: Record<string, string> = {
-        "ai_indication": "AI Indication",
-        "business-overview": "Business Overview",
-        "key-metrics": "Key Metrics",
-        "financial-highlights": "Financial Highlights",
-        "comps": "Comparative Multiples",
-        "valuation-analysis": "Valuation Analysis",
-        "red-flag": "Risk Assessment",
-      }
-      const ratingEntries = Object.entries(ratings)
-      if (ratingEntries.length > 0) {
+      const matchedRatings = RATING_SECTIONS.filter(s => ratings[s.id] != null)
+      if (matchedRatings.length > 0) {
         this.h2("Section Ratings")
-        for (const [key, value] of ratingEntries) {
-          this.ratingBar(ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), value)
+        for (const s of matchedRatings) {
+          this.ratingBar(s.label, ratings[s.id])
         }
         this.y += 4
       }
       if (inv.writeup_finalverdict_summary) {
         this.h2("Final Verdict")
-        this.body(inv.writeup_finalverdict_summary)
+        this.richBody(inv.writeup_finalverdict_summary)
       }
     } // end investmentSummary
 
@@ -1053,7 +1179,7 @@ class DocBuilder {
         const num = typeof v === "string" ? parseFloat(v) : v as number
         if (isNaN(num)) return String(v)
         if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) return `${num.toFixed(1)}%`
-        return n2s(num)
+        return n2s(num, 0)
       })
       return [friendly, ...vals]
     })
@@ -1143,6 +1269,21 @@ async function buildWordDoc(
     })
 
   const wSpacer = () => new Paragraph({ text: "", spacing: { after: 80 } })
+
+  /** Rich text body: preserves bold formatting from HTML */
+  const wRichBody = (html: string): Paragraph[] => {
+    const paragraphs = parseRichText(html)
+    if (!paragraphs.length) {
+      const plain = strip(html)
+      return plain ? [wBody(plain)] : []
+    }
+    return paragraphs.map(segments =>
+      new Paragraph({
+        children: segments.map(seg => new TextRun({ text: seg.text, size: 21, bold: seg.bold || undefined })),
+        spacing: { after: 80 },
+      })
+    )
+  }
 
   const makeTable = (headers: string[], rows: string[][], colPcts: number[], opts?: { boldFirstCol?: boolean; boldRows?: number[] }): Table => {
     const pcts = colPcts.length === headers.length ? colPcts : headers.map(() => Math.floor(100 / headers.length))
@@ -1238,7 +1379,7 @@ async function buildWordDoc(
     ]) {
       if (!sec.items.length) continue
       push(wH2(sec.title))
-      const processed = sec.isPerson ? splitPersons(sec.items) : sec.items
+      const processed = sec.isPerson ? splitPersons(sec.items) : expandBullets(sec.items)
       for (const item of processed) push(wBullet(strip(item)))
       push(wSpacer())
     }
@@ -1306,7 +1447,7 @@ async function buildWordDoc(
       for (const m of metricNames) { if (!ordered.includes(m)) ordered.push(m) }
       const metColPct = 22; const yColPct = Math.floor((100 - metColPct) / yearKeys.length)
       push(makeTable(["Metric ($M)", ...yearKeys], ordered.map(metric => {
-        const vals = yearKeys.map(yk => { const v = parsedFh[yk]?.[metric]; if (v == null) return "—"; const num = typeof v === "string" ? parseFloat(v) : v as number; if (isNaN(num)) return String(v); if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) return `${num.toFixed(1)}%`; return n2s(num) })
+        const vals = yearKeys.map(yk => { const v = parsedFh[yk]?.[metric]; if (v == null) return "—"; const num = typeof v === "string" ? parseFloat(v) : v as number; if (isNaN(num)) return String(v); if (metric.toLowerCase().includes("margin") || metric.toLowerCase().includes("growth")) return `${num.toFixed(1)}%`; return n2s(num, 0) })
         return [metric, ...vals]
       }), [metColPct, ...yearKeys.map(() => yColPct)], { boldFirstCol: true }))
     } else { push(wBody("No financial highlights data available.")) }
@@ -1324,11 +1465,11 @@ async function buildWordDoc(
       return 0
     })
     const wSubjectIdx = wSortedData.findIndex(r => (r.competitor || "").toUpperCase() === ticker.toUpperCase())
-    const cRows = wSortedData.map(r => [r.competitor || "—", n2s(r.price_usd), n2s(r.market_cap, 0), n2s(r.ev_usd_million, 0), n2s(r.present_year_ev_sales), n2s(r.one_year_later_ev_sales), n2s(r.present_year_price_earning), n2s(r.one_year_later_price_earning), n2s(r.present_year_ev_ebitda), n2s(r.one_year_later_ev_ebitda), n2s(r.sales_growth), n2s(r.eps_growth)])
+    const cRows = wSortedData.map(r => [r.competitor || "—", n2s(r.price_usd, 1), n2s(r.market_cap, 0), n2s(r.ev_usd_million, 0), n2x(r.present_year_ev_sales), n2x(r.one_year_later_ev_sales), n2x(r.present_year_price_earning), n2x(r.one_year_later_price_earning), n2x(r.present_year_ev_ebitda), n2x(r.one_year_later_ev_ebitda), n2pct(r.sales_growth), n2pct(r.eps_growth)])
     if (cm.aggregates) {
       const a = cm.aggregates
-      cRows.push(["Average", "", "", "", n2s(a.present_year_ev_sales?.average), n2s(a.one_year_later_ev_sales?.average), n2s(a.present_year_price_earning?.average), n2s(a.one_year_later_price_earning?.average), n2s(a.present_year_ev_ebitda?.average), n2s(a.one_year_later_ev_ebitda?.average), n2s(a.sales_growth?.average), n2s(a.eps_growth?.average)])
-      cRows.push(["Median", "", "", "", n2s(a.present_year_ev_sales?.median), n2s(a.one_year_later_ev_sales?.median), n2s(a.present_year_price_earning?.median), n2s(a.one_year_later_price_earning?.median), n2s(a.present_year_ev_ebitda?.median), n2s(a.one_year_later_ev_ebitda?.median), n2s(a.sales_growth?.median), n2s(a.eps_growth?.median)])
+      cRows.push(["Average", "", "", "", n2x(a.present_year_ev_sales?.average), n2x(a.one_year_later_ev_sales?.average), n2x(a.present_year_price_earning?.average), n2x(a.one_year_later_price_earning?.average), n2x(a.present_year_ev_ebitda?.average), n2x(a.one_year_later_ev_ebitda?.average), n2pct(a.sales_growth?.average), n2pct(a.eps_growth?.average)])
+      cRows.push(["Median", "", "", "", n2x(a.present_year_ev_sales?.median), n2x(a.one_year_later_ev_sales?.median), n2x(a.present_year_price_earning?.median), n2x(a.one_year_later_price_earning?.median), n2x(a.present_year_ev_ebitda?.median), n2x(a.one_year_later_ev_ebitda?.median), n2pct(a.sales_growth?.median), n2pct(a.eps_growth?.median)])
     }
     push(makeTable(cH, cRows, [14, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 6], { boldFirstCol: true, boldRows: wSubjectIdx >= 0 ? [wSubjectIdx] : [] }))
   }
@@ -1337,7 +1478,7 @@ async function buildWordDoc(
   if (sel.valuation) {
     push(wH1("Valuation", false))
     const narrative = toArr(va?.narrative)
-    if (narrative.length) { for (const item of narrative) push(wBody(strip(item))) }
+    if (narrative.length) { for (const item of narrative) push(...wRichBody(item)) }
     else push(wBody("No valuation narrative available."))
   }
 
@@ -1346,7 +1487,7 @@ async function buildWordDoc(
     push(wH1("Risk Assessment", false))
     const rfItems = Array.isArray(ra?.data) ? ra.data : []
     if (rfItems.length > 0) {
-      push(makeTable(["Risk Category", "Score", "Observation"], rfItems.map(item => [item.category || "—", item.score != null ? `${item.score} / 5` : "—", strip(item.observation) || "—"]), [25, 12, 63], { boldFirstCol: true }))
+      push(makeTable(["Risk Category", "Rating", "Observation"], rfItems.map(item => [item.category || "—", riskLabel(item.score), strip(item.observation) || "—"]), [25, 12, 63], { boldFirstCol: true }))
     } else { push(wBody("No risk assessment data available.")) }
   }
 
@@ -1356,12 +1497,12 @@ async function buildWordDoc(
     if (inv.writeup_overall_rating != null) {
       push(new Paragraph({ children: [new TextRun({ text: `Overall Rating: ${inv.writeup_overall_rating}%`, bold: true, size: 28, color: NAVY_HEX })], spacing: { after: 160 } }))
     }
-    const ratingLabels: Record<string, string> = { "ai_indication": "AI Indication", "business-overview": "Business Overview", "key-metrics": "Key Metrics", "financial-highlights": "Financial Highlights", "comps": "Comparative Multiples", "valuation-analysis": "Valuation Analysis", "red-flag": "Risk Assessment" }
-    const ratingEntries = Object.entries(inv.writeup_ratings || {})
-    if (ratingEntries.length > 0) {
-      push(wH2("Section Ratings"), makeTable(["Section", "Rating"], ratingEntries.map(([key, value]) => [ratingLabels[key] || key.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()), `${value}%`]), [70, 30]))
+    const wRatings = inv.writeup_ratings || {}
+    const wMatchedRatings = RATING_SECTIONS.filter(s => wRatings[s.id] != null)
+    if (wMatchedRatings.length > 0) {
+      push(wH2("Section Ratings"), makeTable(["Section", "Rating"], wMatchedRatings.map(s => [s.label, `${wRatings[s.id]}/10`]), [70, 30]))
     }
-    if (inv.writeup_finalverdict_summary) push(wH2("Final Verdict"), wBody(strip(inv.writeup_finalverdict_summary)))
+    if (inv.writeup_finalverdict_summary) push(wH2("Final Verdict"), ...wRichBody(inv.writeup_finalverdict_summary))
   }
 
   /* ── Disclaimer ── */
