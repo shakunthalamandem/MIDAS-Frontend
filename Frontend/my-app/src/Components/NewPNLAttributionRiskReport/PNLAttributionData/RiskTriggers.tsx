@@ -54,9 +54,13 @@ const GUIDELINE_FIELDS: GuidelineField[] = [
   { key: "equity_beta_net_exposure", label: "Beta Adj Net Exposure (%)", defaultValue: 20 },
   { key: "drawdown", label: "Drawdown (%)", defaultValue: 8 },
   { key: "var_99", label: "VaR 99% (%)", defaultValue: 2 },
-  { key: "top_10_issuer_guideline", label: "Top 10 Issuer Guideline (%)", defaultValue: 35 },
-  { key: "issuer_delta_net_exposure", label: "Single Issuer Limit (%)", defaultValue: 10 },
-  { key: "liquidity_days", label: "Liquidity Days (%)", defaultValue: 95 },
+  { key: "top_10_issuer_guideline", label: "Top 10 Issuer Guideline (%)", defaultValue: 80 },
+  { key: "issuer_delta_net_exposure", label: "Single Issuer Limit (%)", defaultValue: 30 },
+  { key: "sector_threshold", label: "Sector Limit (%)", defaultValue: 25 },
+  { key: "country_threshold", label: "Country Limit (%)", defaultValue: 25 },
+  { key: "liquidity_1d_pct", label: "Liquidity 1-Day Target (%)", defaultValue: 20 },
+  { key: "liquidity_5d_pct", label: "Liquidity 5-Day Target (%)", defaultValue: 60 },
+  { key: "liquidity_20d_pct", label: "Liquidity 20-Day Target (%)", defaultValue: 95 },
 ];
 
 const getStorageKey = (funds: string[]) => `risk_guidelines_${[...funds].sort().join("_")}`;
@@ -76,8 +80,12 @@ const SECTION_CONFIG: Record<string, SectionConfig> = {
   equity_beta_net_exposure: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "beta_net_exposure", valueLabel: "Beta Net Exposure", summaryLabel: "Beta Adj Net Exposure" },
   drawdown: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "drawdown", valueLabel: "Drawdown", summaryLabel: "Drawdown" },
   var_99: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "var", valueLabel: "VaR", summaryLabel: "VaR (99%)" },
+  top_10_issuer_total: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "top_10_total", valueLabel: "Top 10 Issuer Delta Net Exposure", summaryLabel: "Top 10 Issuer Delta Net Exposure" },
+  issuer_max_exposure: { firstColKey: "issuer", firstColLabel: "Issuer", valueKey: "max_issuer_exposure", valueLabel: "Max Single Issuer Exposure", summaryLabel: "Individual Issuers" },
   top_10_issuer_delta_net_exposure: { firstColKey: "issuer", firstColLabel: "Issuer", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
   issuer_delta_net_exposure: { firstColKey: "issuer", firstColLabel: "Issuer", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
+  sector_exposure: { firstColKey: "sector", firstColLabel: "Sector", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
+  country_exposure: { firstColKey: "country", firstColLabel: "Country", valueKey: "delta_adjusted_net_exposure", valueLabel: "Delta Adjusted Net Exposure" },
   liquidity: { firstColKey: "fund", firstColLabel: "Fund", valueKey: "liquidity_waterfall", valueLabel: "Liquidity (Waterfall)" },
 };
 
@@ -109,7 +117,7 @@ const shiftDate = (dateStr: string, days: number): string => {
   return d.toISOString().split("T")[0];
 };
 
-const SUMMARY_KEYS = ["delta_gross_exposure", "equity_delta_net_exposure", "equity_beta_net_exposure", "drawdown", "var_99"];
+const SUMMARY_KEYS = ["delta_gross_exposure", "equity_delta_net_exposure", "equity_beta_net_exposure", "drawdown", "var_99", "top_10_issuer_total", "issuer_max_exposure"];
 
 const SUMMARY_CARD_INFO: Record<string, { definition: string; formula: string; notes?: string }> = {
   delta_gross_exposure: {
@@ -133,6 +141,14 @@ const SUMMARY_CARD_INFO: Record<string, { definition: string; formula: string; n
   var_99: {
     definition: "Estimates the maximum expected loss at a 99% confidence level, meaning there is only a 1% probability that losses will exceed this level over the specified time horizon.",
     formula: "VaR (99%) = | PERCENTILE.INC(Returns, 0.01) | × √T\n(Where T = time horizon, e.g., 252 for 1 year)",
+  },
+  top_10_issuer_total: {
+    definition: "Aggregate absolute delta-adjusted net exposure of the top 10 issuers as a percentage of AUM.",
+    formula: "Top 10 Issuer Total = Σ|Issuer Δ Net Exposure (top 10)| / AUM",
+  },
+  issuer_max_exposure: {
+    definition: "Largest single-issuer delta-adjusted net exposure in the fund, shown against the per-issuer limit.",
+    formula: "Max Single Issuer = MAX(|Issuer Δ Net Exposure|) / AUM",
   },
 };
 const EXPOSURE_KEYS = new Set(["top_10_issuer_delta_net_exposure", "issuer_delta_net_exposure"]);
@@ -232,7 +248,7 @@ const RiskTriggers: React.FC = () => {
   const [portfolios, setPortfolios] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>(initialFund ? [initialFund] : []);
   const [selectedDate, setSelectedDate] = useState(initialDate);
-  const [data, setData] = useState<TriggersResponse | null>(null);
+  const [fundResponses, setFundResponses] = useState<Record<string, TriggersResponse>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [guidelinesExpanded, setGuidelinesExpanded] = useState(false);
@@ -240,7 +256,6 @@ const RiskTriggers: React.FC = () => {
   const [savedGuidelines, setSavedGuidelines] = useState<Record<string, number>>({});
   const [savingGuidelines, setSavingGuidelines] = useState(false);
   const [issuerSearch, setIssuerSearch] = useState("");
-  const [liqSearch, setLiqSearch] = useState("");
 
   const defaultGuidelines = GUIDELINE_FIELDS.reduce<Record<string, number>>((acc, f) => { acc[f.key] = f.defaultValue; return acc; }, {});
 
@@ -287,28 +302,17 @@ const RiskTriggers: React.FC = () => {
             body: JSON.stringify({ date: selectedDate, fund: [fund], guidelines: g }),
           });
           if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || `Failed for ${fund}`); }
-          return (await res.json()) as TriggersResponse;
+          return [fund, (await res.json()) as TriggersResponse] as [string, TriggersResponse];
         })
       );
-      setData(mergeResponses(responses));
-    } catch (err: any) { setError(err.message || "Failed to load triggers"); setData(null); }
+      const byFund: Record<string, TriggersResponse> = {};
+      for (const [fund, resp] of responses) byFund[fund] = resp;
+      setFundResponses(byFund);
+    } catch (err: any) { setError(err.message || "Failed to load triggers"); setFundResponses({}); }
     finally { setLoading(false); }
   }, [selectedFunds, selectedDate]);
 
   useEffect(() => { fetchTriggers(); }, [fetchTriggers]);
-
-  const getGuideline = (k: string): number | undefined => {
-    const section = data?.current_levels?.[k];
-    if (!section) return undefined;
-    // Check section-level guideline first
-    if (section.guideline != null) return section.guideline;
-    // Fall back to row-level guideline (API returns guideline inside each data row)
-    const rows = section.data || [];
-    for (const row of rows) {
-      if (row.guideline != null) return row.guideline;
-    }
-    return undefined;
-  };
 
   const handleSaveGuidelines = async () => {
     const toSave: Record<string, number> = {};
@@ -332,15 +336,24 @@ const RiskTriggers: React.FC = () => {
     funds: { name: string; value: string; status: Status }[];
   }
 
-  const getSummaryCards = (): SummaryCard[] => {
-    if (!data?.current_levels) return [];
-    return SUMMARY_KEYS.filter((k) => data.current_levels[k]).map((key) => {
-      const section = data.current_levels[key];
+  const getGuidelineFrom = (resp: TriggersResponse | null, k: string): number | undefined => {
+    const section = resp?.current_levels?.[k];
+    if (!section) return undefined;
+    if (section.guideline != null) return section.guideline;
+    const rows = section.data || [];
+    for (const row of rows) if (row.guideline != null) return row.guideline;
+    return undefined;
+  };
+
+  const computeSummaryCards = (resp: TriggersResponse | null): SummaryCard[] => {
+    if (!resp?.current_levels) return [];
+    return SUMMARY_KEYS.filter((k) => resp.current_levels[k]).map((key) => {
+      const section = resp.current_levels[key];
       const cfg = SECTION_CONFIG[key];
       if (!cfg) return null;
       const rows = section.data || [];
       if (!rows.length) return null;
-      const guideline = getGuideline(key);
+      const guideline = getGuidelineFrom(resp, key);
 
       const funds = rows.map((row) => {
         const raw = row[cfg.valueKey];
@@ -361,37 +374,17 @@ const RiskTriggers: React.FC = () => {
     }).filter(Boolean) as SummaryCard[];
   };
 
-  const summaryCards = data ? getSummaryCards() : [];
-  const entries = data?.current_levels ? Object.entries(data.current_levels) : [];
-  const liquidityEntry = entries.find(([k]) => k === "liquidity");
-  const exposureEntries = entries.filter(([k]) => EXPOSURE_KEYS.has(k));
-
-  const breachedIssuers = new Set<string>();
-  if (data?.limits) {
-    for (const s of Object.values(data.limits)) for (const r of s.data || []) if (r.top_10_issuers) breachedIssuers.add(r.top_10_issuers.trim().toLowerCase());
-  }
-
-  // Alerts
-  const alerts: { name: string; desc: string; status: Status }[] = [];
-  if (data) {
-    for (const c of summaryCards) {
-      const topVal = c.funds[0]?.value || "N/A";
-      if (c.status === "breach") alerts.push({ name: `${c.label} breach`, desc: `Current: ${topVal} | Limit: ${c.limit || "N/A"}`, status: "breach" });
-      else if (c.status === "warning") alerts.push({ name: `${c.label} elevated`, desc: `Approaching: ${topVal} vs ${c.limit || "N/A"}`, status: "warning" });
+  const concernScore = (resp: TriggersResponse): number => {
+    const cards = computeSummaryCards(resp);
+    let score = 0;
+    for (const c of cards) {
+      if (c.status === "breach") score += 100 + (c.ratio || 0);
+      else if (c.status === "warning") score += 10 + (c.ratio || 0);
     }
-    if (breachedIssuers.size > 0) alerts.push({ name: "Concentration risk", desc: `Top issuers: ${Array.from(breachedIssuers).slice(0, 3).join(", ")}`, status: "warning" });
-  }
+    return score;
+  };
 
-  // Insights
-  const insights: { icon: string; text: string }[] = [];
-  if (data && summaryCards.length > 0) {
-    const bc = summaryCards.filter((c) => c.status === "breach").length;
-    const wc = summaryCards.filter((c) => c.status === "warning").length;
-    if (bc === 0 && wc === 0) insights.push({ icon: "\u2713", text: "All metrics within tolerance levels." });
-    if (bc > 0) insights.push({ icon: "\u26A0", text: `${bc} metric${bc > 1 ? "s" : ""} breaching guidelines.` });
-    if (wc > 0) insights.push({ icon: "\u2191", text: `${wc} metric${wc > 1 ? "s" : ""} approaching limits.` });
-    if (breachedIssuers.size > 0) insights.push({ icon: "\u25CF", text: `Issuer concentration: ${breachedIssuers.size} issuer${breachedIssuers.size > 1 ? "s" : ""} flagged.` });
-  }
+  const sortedFunds = Object.entries(fundResponses).sort(([, a], [, b]) => concernScore(b) - concernScore(a));
 
   const fundsLabel = selectedFunds.length === 0 ? "Fund" : selectedFunds.length === 1 ? selectedFunds[0] : selectedFunds.length === portfolios.length ? "All Funds" : `${selectedFunds[0]} +${selectedFunds.length - 1}`;
 
@@ -486,7 +479,7 @@ const RiskTriggers: React.FC = () => {
         {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
         {loading && <Box className="trig-loading"><CircularProgress sx={{ color: "#002060" }} /></Box>}
 
-        {!loading && data && (
+        {!loading && sortedFunds.length > 0 && (
           <>
             {/* ════ GUIDELINES PANEL (TOP) ════ */}
             <Box className="trig-guidelines-panel">
@@ -526,7 +519,52 @@ const RiskTriggers: React.FC = () => {
               </Collapse>
             </Box>
 
-            {/* ════ SUMMARY CARDS ════ */}
+            {sortedFunds.map(([fundName, fundData], fundIdx) => {
+              const summaryCards = computeSummaryCards(fundData);
+              const entries = fundData?.current_levels ? Object.entries(fundData.current_levels) : [];
+              const liquidityHorizonEntry = entries.find(([k]) => k === "liquidity_horizons");
+              const top10Entry = entries.find(([k]) => k === "top_10_issuer_delta_net_exposure");
+              const allIssuerEntry = entries.find(([k]) => k === "issuer_delta_net_exposure");
+              const sectorEntry = entries.find(([k]) => k === "sector_exposure");
+              const countryEntry = entries.find(([k]) => k === "country_exposure");
+
+              const breachedIssuers = new Set<string>();
+              if (fundData?.limits) {
+                for (const s of Object.values(fundData.limits)) for (const r of s.data || []) if (r.top_10_issuers) breachedIssuers.add(r.top_10_issuers.trim().toLowerCase());
+              }
+
+              const alerts: { name: string; desc: string; status: Status }[] = [];
+              for (const c of summaryCards) {
+                const topVal = c.funds[0]?.value || "N/A";
+                if (c.status === "breach") alerts.push({ name: `${c.label} breach`, desc: `Current: ${topVal} | Limit: ${c.limit || "N/A"}`, status: "breach" });
+                else if (c.status === "warning") alerts.push({ name: `${c.label} elevated`, desc: `Approaching: ${topVal} vs ${c.limit || "N/A"}`, status: "warning" });
+              }
+              if (breachedIssuers.size > 0) alerts.push({ name: "Concentration risk", desc: `Top issuers: ${Array.from(breachedIssuers).slice(0, 3).join(", ")}`, status: "warning" });
+
+              const insights: { icon: string; text: string }[] = [];
+              const bc = summaryCards.filter((c) => c.status === "breach").length;
+              const wc = summaryCards.filter((c) => c.status === "warning").length;
+              if (bc === 0 && wc === 0) insights.push({ icon: "\u2713", text: "All metrics within tolerance levels." });
+              if (bc > 0) insights.push({ icon: "\u26A0", text: `${bc} metric${bc > 1 ? "s" : ""} breaching guidelines.` });
+              if (wc > 0) insights.push({ icon: "\u2191", text: `${wc} metric${wc > 1 ? "s" : ""} approaching limits.` });
+              if (breachedIssuers.size > 0) insights.push({ icon: "\u25CF", text: `Issuer concentration: ${breachedIssuers.size} issuer${breachedIssuers.size > 1 ? "s" : ""} flagged.` });
+
+              const overallStatus: Status = bc > 0 ? "breach" : wc > 0 ? "warning" : "safe";
+
+              return (
+                <Box key={fundName} sx={{ mb: sortedFunds.length > 1 ? 4 : 0 }}>
+                  {sortedFunds.length > 1 && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, mt: fundIdx === 0 ? 0 : 3, pb: 1.5, borderBottom: "2px solid #e2e8f0" }}>
+                      <Box sx={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", letterSpacing: 1 }}>#{fundIdx + 1}</Box>
+                      <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#0f172a" }}>{fundName}</Typography>
+                      <Box className={`trig-scard-status trig-scard-status--${overallStatus}`}>
+                        <span className="trig-scard-status-dot" />
+                        {overallStatus === "breach" ? `${bc} breach${bc > 1 ? "es" : ""}` : overallStatus === "warning" ? `${wc} warning${wc > 1 ? "s" : ""}` : "All within limits"}
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* ════ SUMMARY CARDS ════ */}
             {summaryCards.length > 0 && (
               <Box className="trig-summary-row">
                 {summaryCards.map((c) => {
@@ -596,7 +634,7 @@ const RiskTriggers: React.FC = () => {
             )}
 
             {/* ════ TOP 10 ISSUER TABLE (with exposure bars) ════ */}
-            {exposureEntries.filter(([k]) => k === "top_10_issuer_delta_net_exposure").map(([sectionKey, section]) => {
+            {top10Entry && [top10Entry].map(([sectionKey, section]) => {
               const cfg = SECTION_CONFIG[sectionKey];
               if (!cfg) return null;
               const rows = section.data || [];
@@ -670,8 +708,132 @@ const RiskTriggers: React.FC = () => {
               );
             })}
 
+            {/* ════ SECTOR EXPOSURE ════ */}
+            {sectorEntry && (() => {
+              const [sectionKey, section] = sectorEntry;
+              const cfg = SECTION_CONFIG[sectionKey];
+              if (!cfg) return null;
+              const rows = (section.data || []).filter((r: any) => (r[cfg.firstColKey] || "").trim() !== "");
+              const guideline = getActiveGuidelines().sector_threshold ?? 25;
+              const maxVal = Math.max(...rows.map((r: any) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
+              return (
+                <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
+                  <Box className="trig-panel-head">
+                    <Box className="trig-panel-head-left">
+                      <Box className="trig-panel-icon trig-panel-icon--purple">&#9733;</Box>
+                      <Typography className="trig-panel-title">{section.title}</Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <span className="trig-guideline-tag">Sector Limit: {guideline}%</span>
+                      <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Sectors</span>
+                    </Box>
+                  </Box>
+                  <Box className="trig-table-wrap">
+                    <table className="trig-table">
+                      <thead>
+                        <tr>
+                          <th className="trig-th-l" style={{ width: 40 }}>#</th>
+                          <th className="trig-th-l">SECTOR</th>
+                          <th className="trig-th-l" style={{ width: 220 }}>EXPOSURE</th>
+                          <th className="trig-th-r" style={{ width: 130 }}>NET EXPOSURE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row: any, idx: number) => {
+                          const raw = row[cfg.valueKey];
+                          const num = parseSignedNumericValue(raw);
+                          const absNum = Math.abs(num);
+                          const barWidth = Math.min((absNum / maxVal) * 100, 100);
+                          const overLimit = absNum >= guideline;
+                          const pillClass = overLimit ? "trig-pill--breach" : absNum >= guideline * 0.8 ? "trig-pill--warning" : "trig-pill--safe";
+                          return (
+                            <tr key={idx}>
+                              <td className="trig-td-rank">{idx + 1}</td>
+                              <td className="trig-td-l">{row[cfg.firstColKey]}</td>
+                              <td>
+                                <Box className="trig-bar-cell">
+                                  <Box className="trig-bar-track">
+                                    <Box className="trig-bar-fill" style={{ width: `${barWidth}%`, background: overLimit ? "#dc2626" : "#7c3aed" }} />
+                                  </Box>
+                                </Box>
+                              </td>
+                              <td className="trig-td-r">
+                                <span className={`trig-pill ${pillClass}`}>{raw}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </Box>
+                </Box>
+              );
+            })()}
+
+            {/* ════ COUNTRY EXPOSURE ════ */}
+            {countryEntry && (() => {
+              const [sectionKey, section] = countryEntry;
+              const cfg = SECTION_CONFIG[sectionKey];
+              if (!cfg) return null;
+              const rows = (section.data || []).filter((r: any) => (r[cfg.firstColKey] || "").trim() !== "");
+              const guideline = getActiveGuidelines().country_threshold ?? 25;
+              const maxVal = Math.max(...rows.map((r: any) => Math.abs(parseSignedNumericValue(r[cfg.valueKey]))), 1);
+              return (
+                <Box key={sectionKey} className="trig-panel" sx={{ mb: 3 }}>
+                  <Box className="trig-panel-head">
+                    <Box className="trig-panel-head-left">
+                      <Box className="trig-panel-icon trig-panel-icon--blue">&#9673;</Box>
+                      <Typography className="trig-panel-title">{section.title}</Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <span className="trig-guideline-tag">Country Limit: {guideline}%</span>
+                      <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Countries</span>
+                    </Box>
+                  </Box>
+                  <Box className="trig-table-wrap">
+                    <table className="trig-table">
+                      <thead>
+                        <tr>
+                          <th className="trig-th-l" style={{ width: 40 }}>#</th>
+                          <th className="trig-th-l">COUNTRY</th>
+                          <th className="trig-th-l" style={{ width: 220 }}>EXPOSURE</th>
+                          <th className="trig-th-r" style={{ width: 130 }}>NET EXPOSURE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row: any, idx: number) => {
+                          const raw = row[cfg.valueKey];
+                          const num = parseSignedNumericValue(raw);
+                          const absNum = Math.abs(num);
+                          const barWidth = Math.min((absNum / maxVal) * 100, 100);
+                          const overLimit = absNum >= guideline;
+                          const pillClass = overLimit ? "trig-pill--breach" : absNum >= guideline * 0.8 ? "trig-pill--warning" : "trig-pill--safe";
+                          return (
+                            <tr key={idx}>
+                              <td className="trig-td-rank">{idx + 1}</td>
+                              <td className="trig-td-l">{row[cfg.firstColKey]}</td>
+                              <td>
+                                <Box className="trig-bar-cell">
+                                  <Box className="trig-bar-track">
+                                    <Box className="trig-bar-fill" style={{ width: `${barWidth}%`, background: overLimit ? "#dc2626" : "#2563eb" }} />
+                                  </Box>
+                                </Box>
+                              </td>
+                              <td className="trig-td-r">
+                                <span className={`trig-pill ${pillClass}`}>{raw}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </Box>
+                </Box>
+              );
+            })()}
+
             {/* ════ ALL ISSUER — CARD GRID ════ */}
-            {exposureEntries.filter(([k]) => k === "issuer_delta_net_exposure").map(([sectionKey, section]) => {
+            {allIssuerEntry && [allIssuerEntry].map(([sectionKey, section]) => {
               const cfg = SECTION_CONFIG[sectionKey];
               if (!cfg) return null;
               const rows = section.data || [];
@@ -726,54 +888,47 @@ const RiskTriggers: React.FC = () => {
               );
             })}
 
-            {/* ════ LIQUIDITY — FULL WIDTH CARD GRID ════ */}
-            {liquidityEntry && (() => {
-              const [, section] = liquidityEntry;
-              const cfg = SECTION_CONFIG["liquidity"];
-              const titleParts = section.title.split(": Guideline ");
-              const activeLiqDays = getActiveGuidelines().liquidity_days;
-              const displayTitle = activeLiqDays !== undefined
-                ? titleParts[0].replace(/\d+(\.\d+)?%/, `${activeLiqDays}%`)
-                : titleParts[0];
-              const guidelineDisplay = titleParts[1] || (section.guideline ? `${section.guideline}%` : null);
-              const rows = section.data || [];
-              const needle = liqSearch.trim().toUpperCase();
-              const filtered = needle ? rows.filter((r: any) => (r[cfg.firstColKey] || "").toUpperCase().includes(needle)) : rows;
-
+            {/* ════ LIQUIDITY HORIZONS (portfolio % liquidatable at 20% of ADT) ════ */}
+            {liquidityHorizonEntry && (() => {
+              const [, section] = liquidityHorizonEntry;
+              const row: any = (section.data || [])[0];
+              if (!row) return null;
+              const activeG = getActiveGuidelines();
+              const bars = [
+                { label: "1 Day", valueStr: row.liq_1d_pct, value: parseNumericValue(row.liq_1d_pct), guideline: activeG.liquidity_1d_pct ?? row.guideline_1d ?? 20 },
+                { label: "5 Days", valueStr: row.liq_5d_pct, value: parseNumericValue(row.liq_5d_pct), guideline: activeG.liquidity_5d_pct ?? row.guideline_5d ?? 60 },
+                { label: "20 Days", valueStr: row.liq_20d_pct, value: parseNumericValue(row.liq_20d_pct), guideline: activeG.liquidity_20d_pct ?? row.guideline_20d ?? 95 },
+              ];
               return (
                 <Box className="trig-panel" sx={{ mb: 3 }}>
                   <Box className="trig-panel-head">
                     <Box className="trig-panel-head-left">
                       <Box className="trig-panel-icon trig-panel-icon--green">&#9900;</Box>
-                      <Typography className="trig-panel-title">{displayTitle}</Typography>
+                      <Typography className="trig-panel-title">Liquidation at 20% of ADT</Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      {guidelineDisplay && <span className="trig-panel-badge trig-panel-badge--green">Guideline {guidelineDisplay}</span>}
-                      <span className="trig-panel-badge trig-panel-badge--blue">{rows.length} Positions</span>
+                      <span className="trig-panel-badge trig-panel-badge--green">Portfolio % liquidatable</span>
                     </Box>
                   </Box>
-                  <TextField
-                    size="small" placeholder="Search tickers..." value={liqSearch}
-                    onChange={(e) => setLiqSearch(e.target.value)}
-                    sx={{ mb: 2, width: 280, ...inputSx }}
-                  />
-                  <Box className="trig-card-grid-scroll">
-                    <Box className="trig-card-grid">
-                      {filtered.length === 0 ? (
-                        <Typography className="trig-empty">No tickers found</Typography>
-                      ) : (
-                        filtered.map((row: any, i: number) => {
-                          const val = parseNumericValue(row[cfg.valueKey]);
-                          const pillClass = val > 5 ? "trig-pill--breach" : val > 1 ? "trig-pill--warning" : "trig-pill--safe";
-                          return (
-                            <Box key={i} className="trig-ticker-card">
-                              <Typography className="trig-ticker-card-name">{row[cfg.firstColKey]}</Typography>
-                              <span className={`trig-pill ${pillClass}`}>{row[cfg.valueKey]}</span>
-                            </Box>
-                          );
-                        })
-                      )}
-                    </Box>
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
+                    {bars.map((b) => {
+                      const meetsTarget = b.value >= b.guideline;
+                      const pct = Math.min(100, Math.max(0, b.value));
+                      return (
+                        <Box key={b.label} sx={{ border: "1px solid #e5e7eb", borderRadius: 2, p: 2 }}>
+                          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                            <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{b.label}</Typography>
+                            <span className={`trig-pill ${meetsTarget ? "trig-pill--safe" : "trig-pill--warning"}`}>{b.valueStr}</span>
+                          </Box>
+                          <Box className="trig-bar-track" sx={{ height: "10px !important" }}>
+                            <Box className="trig-bar-fill" style={{ width: `${pct}%`, background: meetsTarget ? "#16a34a" : "#f59e0b" }} />
+                          </Box>
+                          <Typography sx={{ fontSize: 11, color: "#64748b", mt: 0.75 }}>
+                            Target: ≥ {b.guideline}%
+                          </Typography>
+                        </Box>
+                      );
+                    })}
                   </Box>
                 </Box>
               );
@@ -823,6 +978,9 @@ const RiskTriggers: React.FC = () => {
                 </Box>
               </Box>
             )}
+                </Box>
+              );
+            })}
           </>
         )}
       </Container>
