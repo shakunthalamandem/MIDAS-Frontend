@@ -164,9 +164,9 @@ const DARK_GRAY: [number, number, number] = [100, 100, 100]
 const TABLE_HEADER_BG: [number, number, number] = [243, 244, 246]  // 5% gray
 const TABLE_ALT_ROW: [number, number, number] = [249, 250, 252]
 const TABLE_BORDER: [number, number, number] = [220, 220, 225]
-const GREEN: [number, number, number] = [22, 128, 57]
-const AMBER: [number, number, number] = [180, 130, 0]
-const RED: [number, number, number] = [195, 45, 45]
+const GREEN: [number, number, number] = [24, 169, 87]    // #18a957 — matches MIDAS app
+const AMBER: [number, number, number] = [245, 158, 11]   // #f59e0b — matches MIDAS app
+const RED: [number, number, number] = [220, 38, 38]       // #dc2626 — matches MIDAS app
 const WHITE: [number, number, number] = [255, 255, 255]
 
 // Layout — 1 inch margins = 25.4mm
@@ -772,10 +772,10 @@ class DocBuilder {
     p.setFillColor(230, 232, 238)
     p.roundedRect(barX, this.y, barW, barH, 1.5, 1.5, "F")
 
-    // Fill
+    // Fill — thresholds match MIDAS app: <=3 red, 4-7 amber, 8-10 green
     const pct = Math.min(Math.max(value / max, 0), 1)
     if (pct > 0) {
-      const [r, g, b] = pct >= 0.7 ? GREEN : pct >= 0.4 ? AMBER : RED
+      const [r, g, b] = value >= 8 ? GREEN : value >= 4 ? AMBER : RED
       p.setFillColor(r, g, b)
       p.roundedRect(barX, this.y, barW * pct, barH, 1.5, 1.5, "F")
     }
