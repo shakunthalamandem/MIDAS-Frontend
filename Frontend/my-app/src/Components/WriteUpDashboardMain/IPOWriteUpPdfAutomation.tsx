@@ -309,14 +309,19 @@ const parseRichText = (html: string | null | undefined): TextSegment[][] => {
   return result
 }
 
-/** Expand each item by splitting on newlines so every line becomes its own bullet */
+/** Expand each item by splitting on newlines, then on sentence boundaries */
 const expandBullets = (items: string[]): string[] => {
   const result: string[] = []
   for (const raw of items) {
     const cleaned = strip(raw)
     if (!cleaned) continue
+    // Split by newlines first
     const lines = cleaned.split(/\n+/).map(l => l.trim()).filter(Boolean)
-    result.push(...lines)
+    for (const line of lines) {
+      // Then split by sentence boundaries: period (optional space) then uppercase+lowercase
+      const sentences = line.split(/(?<=\.)\s*(?=[A-Z][a-z])/).map(s => s.trim()).filter(Boolean)
+      result.push(...sentences)
+    }
   }
   return result
 }
@@ -331,17 +336,22 @@ const RATING_SECTIONS: { id: string; label: string }[] = [
   { id: "red-flag", label: "Risk Assessment" },
 ]
 
-/* Split concatenated person entries */
+/* Split concatenated person / stockholder entries */
 const splitPersons = (items: string[]): string[] => {
   const result: string[] = []
   for (const raw of items) {
     const cleaned = strip(raw)
     if (!cleaned) continue
+    // 1) Split by newlines first (most reliable — HTML <p>/<br> become \n via strip)
+    const byNewline = cleaned.split(/\n+/).map(s => s.trim()).filter(Boolean)
+    if (byNewline.length > 1) { result.push(...byNewline); continue }
+    // 2) Semicolons
     const bySemicolon = cleaned.split(/[;]/).map(s => s.trim()).filter(Boolean)
     if (bySemicolon.length > 1) { result.push(...bySemicolon); continue }
-    const split = cleaned.split(/(?<=[a-z)])(?=[A-Z][a-z]+ [A-Z]\.?\s)/g)
-    if (split.length > 1) { result.push(...split.map(s => s.trim()).filter(Boolean)) }
-    else { result.push(cleaned) }
+    // 3) Sentence boundaries (period then uppercase+lowercase = new person entry)
+    const bySentence = cleaned.split(/(?<=\.)\s*(?=[A-Z][a-z]+ [A-Z])/).map(s => s.trim()).filter(Boolean)
+    if (bySentence.length > 1) { result.push(...bySentence); continue }
+    result.push(cleaned)
   }
   return result
 }
