@@ -532,13 +532,14 @@ const RiskTriggers: React.FC = () => {
 
             {(() => {
               const blocks: Array<{ id: string; name: string; data: TriggersResponse; isTotal: boolean }> = [];
-              if (mergedData && Object.keys(fundResponses).length >= 1) {
-                const totalLabel = Object.keys(fundResponses).length === 1
-                  ? Object.keys(fundResponses)[0]
-                  : `Total (${Object.keys(fundResponses).length} Funds)`;
-                blocks.push({ id: "__TOTAL__", name: totalLabel, data: mergedData, isTotal: true });
+              const fundCount = Object.keys(fundResponses).length;
+              if (fundCount === 1) {
+                const [onlyFund, onlyResp] = sortedFunds[0] ?? Object.entries(fundResponses)[0];
+                blocks.push({ id: onlyFund, name: onlyFund, data: onlyResp, isTotal: false });
+              } else if (fundCount > 1) {
+                if (mergedData) blocks.push({ id: "__TOTAL__", name: `Total (${fundCount} Funds)`, data: mergedData, isTotal: true });
+                for (const [f, r] of sortedFunds) blocks.push({ id: f, name: f, data: r, isTotal: false });
               }
-              for (const [f, r] of sortedFunds) blocks.push({ id: f, name: f, data: r, isTotal: false });
               return blocks;
             })().map(({ id: blockId, name: blockName, data: fundData, isTotal }, fundIdx) => {
               const summaryCards = computeSummaryCards(fundData);
@@ -577,7 +578,7 @@ const RiskTriggers: React.FC = () => {
                 else setExpandedFunds((p) => ({ ...p, [blockId]: !p[blockId] }));
               };
               const isMulti = Object.keys(fundResponses).length > 1;
-              const showHeader = isTotal ? isMulti : true;
+              const showHeader = isMulti;
 
               return (
                 <Box key={blockId} sx={{ mb: 3 }}>
@@ -666,6 +667,11 @@ const RiskTriggers: React.FC = () => {
                         </Typography>
                         {topFund && renderTrendIcon(topFund.status)}
                       </Box>
+                      {c.key === "issuer_max_exposure" && topFund?.name && (
+                        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mt: 0.25, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={topFund.name}>
+                          {topFund.name}
+                        </Typography>
+                      )}
                       <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         {c.limit && <Typography className="trig-scard-limit">Limit: {c.limit}</Typography>}
                         <Box className={`trig-scard-status trig-scard-status--${c.status}`}>
@@ -928,7 +934,7 @@ const RiskTriggers: React.FC = () => {
                   <Box className="trig-panel-head">
                     <Box className="trig-panel-head-left">
                       <Box className="trig-panel-icon trig-panel-icon--green">&#9900;</Box>
-                      <Typography className="trig-panel-title">Liquidation at 20% of ADT</Typography>
+                      <Typography className="trig-panel-title">Liquidation at 10% of Volume</Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <span className="trig-panel-badge trig-panel-badge--green">Portfolio % liquidatable</span>
