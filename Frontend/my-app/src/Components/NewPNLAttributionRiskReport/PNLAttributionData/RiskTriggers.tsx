@@ -249,6 +249,9 @@ const RiskTriggers: React.FC = () => {
   const [selectedFunds, setSelectedFunds] = useState<string[]>(initialFund ? [initialFund] : []);
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [fundResponses, setFundResponses] = useState<Record<string, TriggersResponse>>({});
+  const [mergedData, setMergedData] = useState<TriggersResponse | null>(null);
+  const [expandedFunds, setExpandedFunds] = useState<Record<string, boolean>>({});
+  const [totalExpanded, setTotalExpanded] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [guidelinesExpanded, setGuidelinesExpanded] = useState(false);
@@ -308,7 +311,13 @@ const RiskTriggers: React.FC = () => {
       const byFund: Record<string, TriggersResponse> = {};
       for (const [fund, resp] of responses) byFund[fund] = resp;
       setFundResponses(byFund);
-    } catch (err: any) { setError(err.message || "Failed to load triggers"); setFundResponses({}); }
+      setMergedData(mergeResponses(responses.map(([, r]) => r)));
+      setExpandedFunds((prev) => {
+        const next: Record<string, boolean> = {};
+        for (const f of Object.keys(byFund)) next[f] = prev[f] ?? false;
+        return next;
+      });
+    } catch (err: any) { setError(err.message || "Failed to load triggers"); setFundResponses({}); setMergedData(null); }
     finally { setLoading(false); }
   }, [selectedFunds, selectedDate]);
 
@@ -519,7 +528,17 @@ const RiskTriggers: React.FC = () => {
               </Collapse>
             </Box>
 
-            {sortedFunds.map(([fundName, fundData], fundIdx) => {
+            {(() => {
+              const blocks: Array<{ id: string; name: string; data: TriggersResponse; isTotal: boolean }> = [];
+              if (mergedData && Object.keys(fundResponses).length >= 1) {
+                const totalLabel = Object.keys(fundResponses).length === 1
+                  ? Object.keys(fundResponses)[0]
+                  : `Total (${Object.keys(fundResponses).length} Funds)`;
+                blocks.push({ id: "__TOTAL__", name: totalLabel, data: mergedData, isTotal: true });
+              }
+              for (const [f, r] of sortedFunds) blocks.push({ id: f, name: f, data: r, isTotal: false });
+              return blocks;
+            })().map(({ id: blockId, name: blockName, data: fundData, isTotal }, fundIdx) => {
               const summaryCards = computeSummaryCards(fundData);
               const entries = fundData?.current_levels ? Object.entries(fundData.current_levels) : [];
               const liquidityHorizonEntry = entries.find(([k]) => k === "liquidity_horizons");
@@ -550,19 +569,44 @@ const RiskTriggers: React.FC = () => {
               if (breachedIssuers.size > 0) insights.push({ icon: "\u25CF", text: `Issuer concentration: ${breachedIssuers.size} issuer${breachedIssuers.size > 1 ? "s" : ""} flagged.` });
 
               const overallStatus: Status = bc > 0 ? "breach" : wc > 0 ? "warning" : "safe";
+              const expanded = isTotal ? totalExpanded : !!expandedFunds[blockId];
+              const toggleBlock = () => {
+                if (isTotal) setTotalExpanded((v) => !v);
+                else setExpandedFunds((p) => ({ ...p, [blockId]: !p[blockId] }));
+              };
+              const isMulti = Object.keys(fundResponses).length > 1;
+              const showHeader = isTotal ? isMulti : true;
 
               return (
-                <Box key={fundName} sx={{ mb: sortedFunds.length > 1 ? 4 : 0 }}>
-                  {sortedFunds.length > 1 && (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2, mt: fundIdx === 0 ? 0 : 3, pb: 1.5, borderBottom: "2px solid #e2e8f0" }}>
-                      <Box sx={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", letterSpacing: 1 }}>#{fundIdx + 1}</Box>
-                      <Typography sx={{ fontSize: 22, fontWeight: 800, color: "#0f172a" }}>{fundName}</Typography>
+                <Box key={blockId} sx={{ mb: 3 }}>
+                  {showHeader && (
+                    <Box
+                      onClick={toggleBlock}
+                      sx={{
+                        display: "flex", alignItems: "center", gap: 2, mb: 2, mt: fundIdx === 0 ? 0 : 2,
+                        p: 1.5, borderRadius: 2, cursor: "pointer",
+                        background: isTotal ? "linear-gradient(135deg, #002060 0%, #001440 100%)" : "#fff",
+                        color: isTotal ? "#fff" : "#0f172a",
+                        border: isTotal ? "none" : "1px solid #e2e8f0",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                        "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" },
+                      }}
+                    >
+                      {!isTotal && <Box sx={{ fontSize: 13, fontWeight: 700, color: "#94a3b8", letterSpacing: 1, minWidth: 30 }}>#{fundIdx}</Box>}
+                      <Typography sx={{ fontSize: isTotal ? 20 : 18, fontWeight: 800, color: "inherit", flex: 1 }}>
+                        {isTotal ? "\u03A3 " : ""}{blockName}
+                      </Typography>
                       <Box className={`trig-scard-status trig-scard-status--${overallStatus}`}>
                         <span className="trig-scard-status-dot" />
                         {overallStatus === "breach" ? `${bc} breach${bc > 1 ? "es" : ""}` : overallStatus === "warning" ? `${wc} warning${wc > 1 ? "s" : ""}` : "All within limits"}
                       </Box>
+                      <IconButton size="small" sx={{ color: "inherit" }} onClick={(e) => { e.stopPropagation(); toggleBlock(); }}>
+                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      </IconButton>
                     </Box>
                   )}
+
+                  <Collapse in={expanded || !showHeader}>
 
                   {/* ════ SUMMARY CARDS ════ */}
             {summaryCards.length > 0 && (
@@ -978,6 +1022,7 @@ const RiskTriggers: React.FC = () => {
                 </Box>
               </Box>
             )}
+                  </Collapse>
                 </Box>
               );
             })}
