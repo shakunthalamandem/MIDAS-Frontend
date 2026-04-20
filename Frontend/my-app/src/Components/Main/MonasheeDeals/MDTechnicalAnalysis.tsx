@@ -51,6 +51,11 @@ interface TechnicalAnalysisData {
   updated_at: string;
 }
 
+interface SortConfig {
+  key: string;
+  direction: 'asc' | 'desc';
+}
+
 const MDTechnicalAnalysis: React.FC = () => {
   const [dates, setDates] = useState<DateOption[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -58,6 +63,7 @@ const MDTechnicalAnalysis: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [rulesExpanded, setRulesExpanded] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
   const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   const getAuthHeaders = () => {
@@ -231,6 +237,11 @@ const MDTechnicalAnalysis: React.FC = () => {
                 <div className="alert-priority">
                   Alert Priority Order: Price Near Stop — Death Cross — RSI Oversold (most urgent first)
                 </div>
+
+                <div className="note-on-counts">
+                  <h4>Note on Counts</h4>
+                  <p>The Alert, Warning, and Signal counts represent the total number of triggers fired, not the total number of stocks. A single stock can trigger multiple rules at the same time (e.g., both High Volatility and Bullish Momentum). Some stocks may trigger zero rules. That is why the sum of Alerts + Warnings + Signals may not equal the total positions.</p>
+                </div>
               </div>
             )}
           </Box>
@@ -263,6 +274,8 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="ALERTS - Critical Triggers (Action Needed)"
             items={analysisData.technical_analysis.alerts}
             rowClass="alert-row"
+            sortConfig={sortConfig}
+            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Warnings Section */}
@@ -270,6 +283,8 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="WARNINGS - Caution Required"
             items={analysisData.technical_analysis.warnings}
             rowClass="warning-row"
+            sortConfig={sortConfig}
+            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Signals Section */}
@@ -277,48 +292,16 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="SIGNALS - Positive Indicators"
             items={analysisData.technical_analysis.signals}
             rowClass="signal-row"
+            sortConfig={sortConfig}
+            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Full Portfolio Overview */}
-          <Box className="section portfolio-section">
-            <h2>Full Portfolio Overview - ECM-US ({analysisData.technical_analysis.portfolio.length} Positions)</h2>
-            <div className="table-wrapper">
-              <table className="portfolio-table">
-                <thead>
-                  <tr>
-                    <th>Ticker</th>
-                    <th>Deal Type</th>
-                    <th>Price</th>
-                    <th>DTD P&L</th>
-                    <th>RSI</th>
-                    <th>DMA50</th>
-                    <th>DMA200</th>
-                    <th>Vol 60d</th>
-                    <th>Triggers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analysisData.technical_analysis.portfolio.map((item, idx) => (
-                    <tr key={idx}>
-                      <td className="ticker-cell">{item.ticker}</td>
-                      <td>{item.deal_type}</td>
-                      <td className="number-cell">{item.price.toFixed(2)}</td>
-                      <td className={`number-cell ${item.dtd_pnl >= 0 ? 'positive' : 'negative'}`}>
-                        {item.dtd_pnl >= 0 ? '+' : ''}{item.dtd_pnl.toFixed(2)}
-                      </td>
-                      <td className="number-cell">{item.rsi !== null ? item.rsi.toFixed(2) : 'N/A'}</td>
-                      <td className="number-cell">{item.dma50 !== null ? item.dma50.toFixed(2) : 'N/A'}</td>
-                      <td className="number-cell">{item.dma200 !== null ? item.dma200.toFixed(2) : 'N/A'}</td>
-                      <td className="number-cell">{item.vol60 !== null ? item.vol60.toFixed(2) : 'N/A'}</td>
-                      <td className="triggers-cell">
-                        {item.triggers_fired.length > 0 ? item.triggers_fired.join(', ') : 'None'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Box>
+          <PortfolioTable
+            portfolio={analysisData.technical_analysis.portfolio}
+            sortConfig={sortConfig}
+            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
+          />
 
         </>
       ) : null}
@@ -330,9 +313,47 @@ interface TableSectionProps {
   title: string;
   items: AnalysisItem[];
   rowClass: string;
+  sortConfig: SortConfig;
+  onSort: (key: string) => void;
 }
 
-const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass }) => {
+const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass, sortConfig, onSort }) => {
+  const getSortedItems = () => {
+    if (!sortConfig.key) return items;
+
+    const sorted = [...items].sort((a, b) => {
+      const aVal = a[sortConfig.key as keyof AnalysisItem];
+      const bVal = b[sortConfig.key as keyof AnalysisItem];
+
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      return sortConfig.direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+    });
+
+    return sorted;
+  };
+
+  const handleSort = (key: string) => {
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      onSort(key);
+    } else {
+      onSort(key);
+    }
+  };
+
+  const SortIcon = ({ columnKey }: { columnKey: string }) => {
+    const isActive = sortConfig.key === columnKey;
+    const icon = isActive ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : ' ⇅';
+    return <span className={`sort-icon ${isActive ? 'active' : ''}`}>{icon}</span>;
+  };
+
   return (
     <Box className="section">
       <h2>{title}</h2>
@@ -341,16 +362,26 @@ const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass }) =
           <table className="analysis-table">
             <thead>
               <tr>
-                <th>Ticker</th>
-                <th>Deal Type</th>
-                <th>Price</th>
-                <th>RSI</th>
-                <th>Trigger</th>
+                <th onClick={() => handleSort('ticker')} className="sortable">
+                  Ticker <SortIcon columnKey="ticker" />
+                </th>
+                <th onClick={() => handleSort('deal_type')} className="sortable">
+                  Deal Type <SortIcon columnKey="deal_type" />
+                </th>
+                <th onClick={() => handleSort('price')} className="sortable">
+                  Price <SortIcon columnKey="price" />
+                </th>
+                <th onClick={() => handleSort('rsi')} className="sortable">
+                  RSI <SortIcon columnKey="rsi" />
+                </th>
+                <th onClick={() => handleSort('trigger')} className="sortable">
+                  Trigger <SortIcon columnKey="trigger" />
+                </th>
                 <th>Details</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item, idx) => (
+              {getSortedItems().map((item, idx) => (
                 <tr key={idx} className={rowClass}>
                   <td className="ticker-cell">{item.ticker}</td>
                   <td>{item.deal_type}</td>
@@ -366,6 +397,104 @@ const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass }) =
       ) : (
         <p className="no-data">No items to display</p>
       )}
+    </Box>
+  );
+};
+
+interface PortfolioTableProps {
+  portfolio: PortfolioItem[];
+  sortConfig: SortConfig;
+  onSort: (key: string) => void;
+}
+
+const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolio, sortConfig, onSort }) => {
+  const getSortedPortfolio = () => {
+    if (!sortConfig.key) return portfolio;
+
+    const sorted = [...portfolio].sort((a, b) => {
+      const aVal = a[sortConfig.key as keyof PortfolioItem];
+      const bVal = b[sortConfig.key as keyof PortfolioItem];
+
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      return sortConfig.direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+    });
+
+    return sorted;
+  };
+
+  const handleSort = (key: string) => {
+    onSort(key);
+  };
+
+  const SortIcon = ({ columnKey }: { columnKey: string }) => {
+    const isActive = sortConfig.key === columnKey;
+    const icon = isActive ? (sortConfig.direction === 'asc' ? ' ↑' : ' ↓') : ' ⇅';
+    return <span className={`sort-icon ${isActive ? 'active' : ''}`}>{icon}</span>;
+  };
+
+  return (
+    <Box className="section portfolio-section">
+      <h2>Full Portfolio Overview - ECM-US ({portfolio.length} Positions)</h2>
+      <div className="table-wrapper">
+        <table className="portfolio-table">
+          <thead>
+            <tr>
+              <th onClick={() => handleSort('ticker')} className="sortable">
+                Ticker <SortIcon columnKey="ticker" />
+              </th>
+              <th onClick={() => handleSort('deal_type')} className="sortable">
+                Deal Type <SortIcon columnKey="deal_type" />
+              </th>
+              <th onClick={() => handleSort('price')} className="sortable">
+                Price <SortIcon columnKey="price" />
+              </th>
+              <th onClick={() => handleSort('dtd_pnl')} className="sortable">
+                DTD P&L <SortIcon columnKey="dtd_pnl" />
+              </th>
+              <th onClick={() => handleSort('rsi')} className="sortable">
+                RSI <SortIcon columnKey="rsi" />
+              </th>
+              <th onClick={() => handleSort('dma50')} className="sortable">
+                DMA50 <SortIcon columnKey="dma50" />
+              </th>
+              <th onClick={() => handleSort('dma200')} className="sortable">
+                DMA200 <SortIcon columnKey="dma200" />
+              </th>
+              <th onClick={() => handleSort('vol60')} className="sortable">
+                Vol 60d <SortIcon columnKey="vol60" />
+              </th>
+              <th>Triggers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {getSortedPortfolio().map((item, idx) => (
+              <tr key={idx}>
+                <td className="ticker-cell">{item.ticker}</td>
+                <td>{item.deal_type}</td>
+                <td className="number-cell">{item.price.toFixed(2)}</td>
+                <td className={`number-cell ${item.dtd_pnl >= 0 ? 'positive' : 'negative'}`}>
+                  {item.dtd_pnl >= 0 ? '+' : ''}{item.dtd_pnl.toFixed(2)}
+                </td>
+                <td className="number-cell">{item.rsi !== null ? item.rsi.toFixed(2) : 'N/A'}</td>
+                <td className="number-cell">{item.dma50 !== null ? item.dma50.toFixed(2) : 'N/A'}</td>
+                <td className="number-cell">{item.dma200 !== null ? item.dma200.toFixed(2) : 'N/A'}</td>
+                <td className="number-cell">{item.vol60 !== null ? item.vol60.toFixed(2) : 'N/A'}</td>
+                <td className="triggers-cell">
+                  {item.triggers_fired.length > 0 ? item.triggers_fired.join(', ') : 'None'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Box>
   );
 };

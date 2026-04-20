@@ -10,7 +10,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 200px;
 }
 
 /* Header Styles */
@@ -174,8 +174,13 @@
 /* Tables */
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
   border-radius: 4px;
   border: 1px solid #ddd;
+  min-height: 200px;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 .analysis-table,
@@ -183,6 +188,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  min-height: 200px;
 }
 
 .analysis-table thead,
@@ -197,6 +203,39 @@
   padding: 12px;
   text-align: left;
   border: 1px solid #163a52;
+  cursor: pointer;
+  user-select: none;
+}
+
+.analysis-table th.sortable,
+.portfolio-table th.sortable {
+  transition: background-color 0.2s ease;
+}
+
+.analysis-table th.sortable:hover,
+.portfolio-table th.sortable:hover {
+  background-color: #1a5a7e;
+}
+
+.sort-icon {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sort-icon.active {
+  opacity: 1;
+}
+
+.analysis-table th.sortable:hover .sort-icon,
+.portfolio-table th.sortable:hover .sort-icon {
+  opacity: 0.6;
+}
+
+.analysis-table th.sortable:hover .sort-icon.active,
+.portfolio-table th.sortable:hover .sort-icon.active {
+  opacity: 1;
 }
 
 .analysis-table td,
@@ -237,22 +276,24 @@
 .number-cell {
   text-align: right;
   font-family: 'Courier New', monospace;
+  font-weight: 500;
 }
 
 .trigger-cell {
   font-weight: 500;
-  color: #333;
+  color: #000;
 }
 
 .details-cell {
-  font-size: 12px;
-  color: #666;
+  font-size: 14px;
+  color: #000;
   max-width: 300px;
 }
 
 .triggers-cell {
-  font-size: 12px;
-  color: #666;
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
 }
 
 .positive {
@@ -403,6 +444,28 @@
   color: #333;
   font-weight: 500;
   margin-top: 10px;
+}
+
+.note-on-counts {
+  background-color: #fffacd;
+  border-left: 4px solid #d4af37;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.note-on-counts h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.note-on-counts p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
 }
 
 /* Responsive */
