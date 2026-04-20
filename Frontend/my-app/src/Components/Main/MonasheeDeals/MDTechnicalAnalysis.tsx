@@ -57,6 +57,7 @@ const MDTechnicalAnalysis: React.FC = () => {
   const [analysisData, setAnalysisData] = useState<TechnicalAnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [rulesExpanded, setRulesExpanded] = useState(false);
   const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   const getAuthHeaders = () => {
@@ -121,33 +122,36 @@ const MDTechnicalAnalysis: React.FC = () => {
   }
 
   return (
-    <Container maxWidth={false} className="md-technical-container">
+    <Container maxWidth="lg" className="md-technical-container">
       <Box className="report-header">
-        <h1 className="report-title">MIDAS Daily Technical Analysis Report</h1>
-        {analysisData && (
-          <Box className="header-meta">
-            <span>Trade Date: {analysisData.date}</span>
-            <span> | Indicators Date: {analysisData.date}</span>
-            <span> | Generated: {new Date(analysisData.updated_at).toLocaleString()}</span>
+        <Box className="header-content">
+          <Box>
+            <h1 className="report-title">MIDAS Daily Technical Analysis Report</h1>
+            {analysisData && (
+              <Box className="header-meta">
+                <span>Trade Date: {analysisData.date}</span>
+                <span> | Indicators Date: {analysisData.date}</span>
+                <span> | Generated: {new Date(analysisData.updated_at).toLocaleString()}</span>
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
-
-      {/* Date Selector */}
-      <Box className="date-selector-container">
-        <label htmlFor="date-dropdown">Select Date:</label>
-        <select
-          id="date-dropdown"
-          value={selectedDate || ''}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="date-dropdown"
-        >
-          {dates.map((d) => (
-            <option key={d.id} value={d.date}>
-              {d.date}
-            </option>
-          ))}
-        </select>
+          {/* Date Selector */}
+          <Box className="date-selector-header">
+            <label htmlFor="date-dropdown">Select Date:</label>
+            <select
+              id="date-dropdown"
+              value={selectedDate || ''}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="date-dropdown"
+            >
+              {dates.map((d) => (
+                <option key={d.id} value={d.date}>
+                  {d.date}
+                </option>
+              ))}
+            </select>
+          </Box>
+        </Box>
       </Box>
 
       {loading ? (
@@ -156,6 +160,81 @@ const MDTechnicalAnalysis: React.FC = () => {
         </Box>
       ) : analysisData ? (
         <>
+          {/* Technical Trigger Rules Reference - Collapsible */}
+          <Box className="section rules-reference">
+            <Box>
+              <Box
+                className="rules-header"
+                onClick={() => setRulesExpanded(!rulesExpanded)}
+              >
+                <h2>Technical Trigger Rules Reference</h2>
+                <span className={`expand-icon ${rulesExpanded ? 'expanded' : ''}`}>▼</span>
+              </Box>
+              <span className="expand-caption">
+                {rulesExpanded ? 'collapse' : 'Expand for more details'}
+              </span>
+            </Box>
+            {rulesExpanded && (
+              <div className="rules-content">
+                <div className="rule-category alert-category">
+                  <h3>ALERTS (Critical — Action Needed)</h3>
+                  <div className="rule-item">
+                    <span className="rule-number">1. Price Near Stop</span>
+                    <span className="rule-desc">Current price is within 0-5% above the ultimate stop loss. The stock is very close to hitting the stop.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">2. Death Cross</span>
+                    <span className="rule-desc">50-day MA is below 200-day MA, AND price is below 50-day MA. Short-term trend has crossed below long-term trend — classic bearish signal.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">3. RSI Oversold</span>
+                    <span className="rule-desc">RSI (14-day) is below 30. The stock has been selling too much and may bounce back or keep falling.</span>
+                  </div>
+                </div>
+
+                <div className="rule-category warning-category">
+                  <h3>WARNINGS (Caution)</h3>
+                  <div className="rule-item">
+                    <span className="rule-number">4. RSI Overbought</span>
+                    <span className="rule-desc">RSI (14-day) is above 70. The stock has been bought too much and may pull back soon.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">5. Bearish Momentum</span>
+                    <span className="rule-desc">Price &lt; 9-day MA &lt; 20-day MA &lt; 50-day MA. All trending downward — stock is in a clear downtrend.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">6. High Volatility</span>
+                    <span className="rule-desc">60-day volatility is above 80%. The stock price is swinging wildly and is risky.</span>
+                  </div>
+                </div>
+
+                <div className="rule-category signal-category">
+                  <h3>SIGNALS (Positive)</h3>
+                  <div className="rule-item">
+                    <span className="rule-number">7. Bullish Momentum</span>
+                    <span className="rule-desc">Price &gt; 9-day MA &gt; 20-day MA &gt; 50-day MA. All trending upward — stock is in a strong uptrend.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">8. Golden Cross</span>
+                    <span className="rule-desc">50-day MA is above 200-day MA, AND price is above 50-day MA. Short-term trend crossed above long-term trend — classic bullish signal.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">9. Price Near Target</span>
+                    <span className="rule-desc">Current price is within 0-5% below the target price. The stock is almost reaching its target.</span>
+                  </div>
+                  <div className="rule-item">
+                    <span className="rule-number">10. Volume Spike</span>
+                    <span className="rule-desc">Today's volume is more than 2x the 20-day average volume. Unusually high trading activity.</span>
+                  </div>
+                </div>
+
+                <div className="alert-priority">
+                  Alert Priority Order: Price Near Stop — Death Cross — RSI Oversold (most urgent first)
+                </div>
+              </div>
+            )}
+          </Box>
+
           {/* Executive Summary */}
           <Box className="section executive-summary">
             <h2>Executive Summary</h2>
@@ -241,67 +320,6 @@ const MDTechnicalAnalysis: React.FC = () => {
             </div>
           </Box>
 
-          {/* Technical Trigger Rules Reference */}
-          <Box className="section rules-reference">
-            <h2>Technical Trigger Rules Reference</h2>
-            <div className="rules-content">
-              <div className="rule-category alert-category">
-                <h3>ALERTS (Critical — Action Needed)</h3>
-                <div className="rule-item">
-                  <span className="rule-number">1. Price Near Stop</span>
-                  <span className="rule-desc">Current price is within 0-5% above the ultimate stop loss. The stock is very close to hitting the stop.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">2. Death Cross</span>
-                  <span className="rule-desc">50-day MA is below 200-day MA, AND price is below 50-day MA. Short-term trend has crossed below long-term trend — classic bearish signal.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">3. RSI Oversold</span>
-                  <span className="rule-desc">RSI (14-day) is below 30. The stock has been selling too much and may bounce back or keep falling.</span>
-                </div>
-              </div>
-
-              <div className="rule-category warning-category">
-                <h3>WARNINGS (Caution)</h3>
-                <div className="rule-item">
-                  <span className="rule-number">4. RSI Overbought</span>
-                  <span className="rule-desc">RSI (14-day) is above 70. The stock has been bought too much and may pull back soon.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">5. Bearish Momentum</span>
-                  <span className="rule-desc">Price &lt; 9-day MA &lt; 20-day MA &lt; 50-day MA. All trending downward — stock is in a clear downtrend.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">6. High Volatility</span>
-                  <span className="rule-desc">60-day volatility is above 80%. The stock price is swinging wildly and is risky.</span>
-                </div>
-              </div>
-
-              <div className="rule-category signal-category">
-                <h3>SIGNALS (Positive)</h3>
-                <div className="rule-item">
-                  <span className="rule-number">7. Bullish Momentum</span>
-                  <span className="rule-desc">Price &gt; 9-day MA &gt; 20-day MA &gt; 50-day MA. All trending upward — stock is in a strong uptrend.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">8. Golden Cross</span>
-                  <span className="rule-desc">50-day MA is above 200-day MA, AND price is above 50-day MA. Short-term trend crossed above long-term trend — classic bullish signal.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">9. Price Near Target</span>
-                  <span className="rule-desc">Current price is within 0-5% below the target price. The stock is almost reaching its target.</span>
-                </div>
-                <div className="rule-item">
-                  <span className="rule-number">10. Volume Spike</span>
-                  <span className="rule-desc">Today's volume is more than 2x the 20-day average volume. Unusually high trading activity.</span>
-                </div>
-              </div>
-
-              <div className="alert-priority">
-                Alert Priority Order: Price Near Stop — Death Cross — RSI Oversold (most urgent first)
-              </div>
-            </div>
-          </Box>
         </>
       ) : null}
     </Container>
