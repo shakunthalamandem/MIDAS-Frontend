@@ -224,14 +224,14 @@ const mergeResponses = (responses: TriggersResponse[]): TriggersResponse => {
 
 /* ── Circular Gauge SVG ── */
 const CircularGauge: React.FC<{ ratio: number; status: Status; label: string }> = ({ ratio, status, label }) => {
-  const r = 18;
+  const r = 20;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - Math.min(ratio, 1));
   return (
     <Box className="trig-gauge">
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <circle cx="22" cy="22" r={r} className="trig-gauge-bg" />
-        <circle cx="22" cy="22" r={r} className={`trig-gauge-fill trig-gauge-fill--${status}`} strokeDasharray={circ} strokeDashoffset={offset} />
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r={r} className="trig-gauge-bg" />
+        <circle cx="24" cy="24" r={r} className={`trig-gauge-fill trig-gauge-fill--${status}`} strokeDasharray={circ} strokeDashoffset={offset} />
       </svg>
       <span className="trig-gauge-text">{label}</span>
     </Box>
@@ -618,6 +618,7 @@ const RiskTriggers: React.FC = () => {
                   const topFund = c.funds[0];
                   return (
                     <Box key={c.key} className={`trig-scard trig-scard--${c.status}`} sx={{ position: "relative" }}>
+                      {/* Info icon */}
                       {SUMMARY_CARD_INFO[c.key] && (
                         <Tooltip
                           title={
@@ -645,34 +646,42 @@ const RiskTriggers: React.FC = () => {
                           <InfoOutlinedIcon
                             sx={{
                               position: "absolute",
-                              top: 8,
-                              right: 8,
-                              fontSize: "15px",
+                              top: 10,
+                              right: 10,
+                              fontSize: "14px",
                               cursor: "help",
-                              opacity: 0.45,
-                              color: "inherit",
+                              opacity: 0.4,
+                              color: "#64748b",
                               zIndex: 1,
                               "&:hover": { opacity: 1 },
                             }}
                           />
                         </Tooltip>
                       )}
-                      <Box className="trig-scard-top">
-                        <Typography className="trig-scard-label">{c.label}</Typography>
+
+                      {/* Label row */}
+                      <Typography className="trig-scard-label" sx={{ pr: 2 }}>{c.label}</Typography>
+
+                      {/* Value + gauge row */}
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                        <Box>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                            <Typography className={`trig-scard-value trig-scard-value--${topFund?.status || c.status}`}>
+                              {topFund?.value || "N/A"}
+                            </Typography>
+                            {topFund && renderTrendIcon(topFund.status)}
+                          </Box>
+                          {c.key === "issuer_max_exposure" && topFund?.name && (
+                            <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#64748b", mt: 0.25, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 120 }} title={topFund.name}>
+                              {topFund.name}
+                            </Typography>
+                          )}
+                        </Box>
                         <CircularGauge ratio={c.ratio} status={c.status} label={`${c.pct}%`} />
                       </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
-                        <Typography className={`trig-scard-value trig-scard-value--${topFund?.status || c.status}`}>
-                          {topFund?.value || "N/A"}
-                        </Typography>
-                        {topFund && renderTrendIcon(topFund.status)}
-                      </Box>
-                      {c.key === "issuer_max_exposure" && topFund?.name && (
-                        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mt: 0.25, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={topFund.name}>
-                          {topFund.name}
-                        </Typography>
-                      )}
-                      <Box sx={{ mt: 1.5, pt: 1, borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+
+                      {/* Footer: limit + status */}
+                      <Box sx={{ pt: 1, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 0.5 }}>
                         {c.limit && <Typography className="trig-scard-limit">Limit: {c.limit}</Typography>}
                         <Box className={`trig-scard-status trig-scard-status--${c.status}`}>
                           <span className="trig-scard-status-dot" />
