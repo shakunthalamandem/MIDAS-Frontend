@@ -13,6 +13,7 @@ import EmailVerification from "../Components/Main/HomePage/Authentication/EmailV
 import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassword";
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
+import MDTechnicalAnalysis from "../Components/Main/MonasheeDeals/MDTechnicalAnalysis";
 
 /* ── Route-level lazy loading (each page loads only when navigated to) ── */
 const CapitalMarkets = React.lazy(() => import("../Components/Main/HomePage/Dashboard/CapitalMarkets"));
@@ -372,7 +373,7 @@ const AppRouters: React.FC = () => {
         <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
         <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 
-
+       <Route path="/md_technical_analysis" element={<AuthGuard><MDTechnicalAnalysis /></AuthGuard>} />
 
 
 
