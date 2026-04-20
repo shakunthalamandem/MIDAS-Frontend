@@ -485,9 +485,17 @@ const RiskTriggers: React.FC = () => {
                   </Box>
                 </MenuItem>
                 <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.1)" }} />
-                {portfolios.map((p) => (
-                  <MenuItem key={p} value={p}>{p}</MenuItem>
-                ))}
+                {portfolios.map((p) => {
+                  const isRetired = RETIRED_FUNDS.has(p);
+                  return (
+                    <MenuItem key={p} value={p} sx={{ opacity: isRetired ? 0.4 : 1, fontStyle: isRetired ? "italic" : "normal" }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 2 }}>
+                        <span>{p}</span>
+                        {isRetired && <span style={{ fontSize: 10, color: "#94a3b8" }}>retired</span>}
+                      </Box>
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </FormControl>
 
