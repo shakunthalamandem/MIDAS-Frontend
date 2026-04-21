@@ -63,7 +63,6 @@ const MDTechnicalAnalysis: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [rulesExpanded, setRulesExpanded] = useState(false);
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
   const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   const getAuthHeaders = () => {
@@ -274,8 +273,6 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="ALERTS - Critical Triggers (Action Needed)"
             items={analysisData.technical_analysis.alerts}
             rowClass="alert-row"
-            sortConfig={sortConfig}
-            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Warnings Section */}
@@ -283,8 +280,6 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="WARNINGS - Caution Required"
             items={analysisData.technical_analysis.warnings}
             rowClass="warning-row"
-            sortConfig={sortConfig}
-            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Signals Section */}
@@ -292,15 +287,11 @@ const MDTechnicalAnalysis: React.FC = () => {
             title="SIGNALS - Positive Indicators"
             items={analysisData.technical_analysis.signals}
             rowClass="signal-row"
-            sortConfig={sortConfig}
-            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
           {/* Full Portfolio Overview */}
           <PortfolioTable
             portfolio={analysisData.technical_analysis.portfolio}
-            sortConfig={sortConfig}
-            onSort={(key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' })}
           />
 
         </>
@@ -313,11 +304,11 @@ interface TableSectionProps {
   title: string;
   items: AnalysisItem[];
   rowClass: string;
-  sortConfig: SortConfig;
-  onSort: (key: string) => void;
 }
 
-const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass, sortConfig, onSort }) => {
+const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass }) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
+
   const getSortedItems = () => {
     if (!sortConfig.key) return items;
 
@@ -341,11 +332,10 @@ const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass, sor
   };
 
   const handleSort = (key: string) => {
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      onSort(key);
-    } else {
-      onSort(key);
-    }
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
   };
 
   const SortIcon = ({ columnKey }: { columnKey: string }) => {
@@ -403,11 +393,11 @@ const TableSection: React.FC<TableSectionProps> = ({ title, items, rowClass, sor
 
 interface PortfolioTableProps {
   portfolio: PortfolioItem[];
-  sortConfig: SortConfig;
-  onSort: (key: string) => void;
 }
 
-const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolio, sortConfig, onSort }) => {
+const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolio }) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
+
   const getSortedPortfolio = () => {
     if (!sortConfig.key) return portfolio;
 
@@ -431,7 +421,10 @@ const PortfolioTable: React.FC<PortfolioTableProps> = ({ portfolio, sortConfig, 
   };
 
   const handleSort = (key: string) => {
-    onSort(key);
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
   };
 
   const SortIcon = ({ columnKey }: { columnKey: string }) => {
