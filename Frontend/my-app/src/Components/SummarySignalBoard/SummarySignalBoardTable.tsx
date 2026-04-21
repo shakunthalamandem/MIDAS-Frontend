@@ -392,66 +392,82 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
 
                       {/* Sentiment Agent Column */}
                       <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                            deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
-                            (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
-                            (typeof deal.sentiment?.sentiment_summary === 'object' &&
-                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null)) && (
-                            <Typography
-                              variant="caption"
-                              sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
-                            >
-                              Score:{' '}
-                              {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                  deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : typeof deal.sentiment?.sentiment_summary === 'object' &&
-                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : null}
-                            </Typography>
-                          )}
-                          {(deal.sentiment?.one_week_sentiment ||
-                            deal.sentiment_summary?.one_week_sentiment) && (
-                              <Chip
-                                label={`1W: ${deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
-                                )}
-                                sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
-                              />
+                        {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                          deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                          (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                            deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                          (typeof deal.sentiment?.sentiment_summary === 'object' &&
+                            deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                            deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                          deal.sentiment?.one_week_sentiment ||
+                          deal.sentiment_summary?.one_week_sentiment ||
+                          deal.sentiment?.one_month_sentiment ||
+                          deal.sentiment_summary?.one_month_sentiment) ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                            {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                              (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                              (typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null)) && (
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
+                              >
+                                Score:{' '}
+                                {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment?.socialmedia_retail_sentiment_score !== null
+                                  ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
+                                  : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                  ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                    deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                  ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : null}
+                              </Typography>
                             )}
-                          {(deal.sentiment?.one_month_sentiment ||
-                            deal.sentiment_summary?.one_month_sentiment) && (
-                              <Chip
-                                label={`1M: ${deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
-                                )}
-                                sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
-                              />
+                            {(deal.sentiment?.one_week_sentiment ||
+                              deal.sentiment_summary?.one_week_sentiment) && (
+                                <Chip
+                                  label={`1W: ${deal.sentiment?.one_week_sentiment ||
+                                    deal.sentiment_summary?.one_week_sentiment
+                                    }`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    deal.sentiment?.one_week_sentiment ||
+                                    deal.sentiment_summary?.one_week_sentiment
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            {(deal.sentiment?.one_month_sentiment ||
+                              deal.sentiment_summary?.one_month_sentiment) && (
+                                <Chip
+                                  label={`1M: ${deal.sentiment?.one_month_sentiment ||
+                                    deal.sentiment_summary?.one_month_sentiment
+                                    }`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    deal.sentiment?.one_month_sentiment ||
+                                    deal.sentiment_summary?.one_month_sentiment
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
+                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
+                              </Typography>
                             )}
-                          {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
-                            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                              Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
-                            </Typography>
-                          )}
-                        </Box>
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="textSecondary">
+                            None
+                          </Typography>
+                        )}
                       </TableCell>
 
                       {/* Gator Signal Column */}
@@ -467,6 +483,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.75rem' }}>
                               Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
                             </Typography>
+                            {deal.jay_ritter?.updated_at && (
+                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                Last run: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
+                              </Typography>
+                            )}
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
