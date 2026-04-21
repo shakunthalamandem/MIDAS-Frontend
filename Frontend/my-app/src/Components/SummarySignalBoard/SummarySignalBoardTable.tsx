@@ -15,7 +15,10 @@ import {
   TextField,
   TableSortLabel,
   useTheme,
+  Collapse,
+  IconButton,
 } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { CardType, DealData } from './types';
 import {
   getSentimentColor,
@@ -40,6 +43,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   const [searchTicker, setSearchTicker] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('trade_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [isTableExpanded, setIsTableExpanded] = useState(false);
 
   const filteredData = useMemo(() => {
     let filtered = selectedData.filter((deal) =>
@@ -82,6 +86,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
         bValue = b.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
       }
 
+      if (sortColumn === 'technical_agent') {
+        aValue = a.technical_data?.triggers_fired?.[0] || '';
+        bValue = b.technical_data?.triggers_fired?.[0] || '';
+      }
+
       if (typeof aValue === 'string') aValue = aValue.toLowerCase();
       if (typeof bValue === 'string') bValue = bValue.toLowerCase();
 
@@ -100,6 +109,10 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       setSortColumn(column);
       setSortDirection('asc');
     }
+  };
+
+  const toggleTableExpand = () => {
+    setIsTableExpanded(!isTableExpanded);
   };
 
   const handleTickerClick = (deal: DealData) => {
@@ -220,7 +233,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
             },
           }}
         >
-          <Table stickyHeader>
+          <Table stickyHeader sx={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow
                 sx={{
@@ -231,7 +244,10 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     fontSize: '0.85rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
-                    padding: '16px 14px',
+                    padding: '12px 8px',
+                    wordWrap: 'break-word',
+                    whiteSpace: 'normal',
+                    overflowWrap: 'break-word',
                   },
                   '& .MuiTableSortLabel-root': {
                     color: 'white !important',
@@ -241,7 +257,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                   },
                 }}
               >
-                <TableCell sortDirection={sortColumn === 'ticker' ? sortDirection : false}>
+                <TableCell sx={{ width: '12%' }} sortDirection={sortColumn === 'ticker' ? sortDirection : false}>
                   <TableSortLabel
                     active={sortColumn === 'ticker'}
                     direction={sortColumn === 'ticker' ? sortDirection : 'asc'}
@@ -252,86 +268,76 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                 </TableCell>
 
                 {selectedCard === 'portfolio' && (
-                  <>
-                    <TableCell sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'trade_date'}
-                        direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('trade_date')}
-                      >
-                       First Trade Date
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'sentiment_score'}
-                        direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('sentiment_score')}
-                      >
-                        Sentiment Agent
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'deal_agent'}
-                        direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('deal_agent')}
-                      >
-                        Deal (IPO) Agent
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'factors_agent'}
-                        direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('factors_agent')}
-                      >
-                        Factors Based Agent
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'gator_signal'}
-                        direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('gator_signal')}
-                      >
-                        Jay Ritter Signal
-                      </TableSortLabel>
-                    </TableCell>
-                  </>
+                  <TableCell sx={{ width: '12%' }} sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
+                    <TableSortLabel
+                      active={sortColumn === 'trade_date'}
+                      direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('trade_date')}
+                    >
+                      First Trade Date
+                    </TableSortLabel>
+                  </TableCell>
                 )}
 
                 {selectedCard === 'recent' && (
-                  <>
-                    <TableCell sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'trade_date'}
-                        direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('trade_date')}
-                      >
-                       First Trade Date
-                      </TableSortLabel>
-                    </TableCell>
-                  </>
+                  <TableCell sx={{ width: '12%' }} sortDirection={sortColumn === 'trade_date' ? sortDirection : false}>
+                    <TableSortLabel
+                      active={sortColumn === 'trade_date'}
+                      direction={sortColumn === 'trade_date' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('trade_date')}
+                    >
+                      First Trade Date
+                    </TableSortLabel>
+                  </TableCell>
                 )}
 
-                {(selectedCard === 'upcoming' || selectedCard === 'recent') && (
-                  <>
-                    <TableCell sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'sentiment_score'}
-                        direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('sentiment_score')}
-                      >
-                        Sentiment Agent
-                      </TableSortLabel>
-                    </TableCell>
+                <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'sentiment_score' ? sortDirection : false}>
+                  <TableSortLabel
+                    active={sortColumn === 'sentiment_score'}
+                    direction={sortColumn === 'sentiment_score' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('sentiment_score')}
+                  >
+                    Sentiment Agent
+                  </TableSortLabel>
+                </TableCell>
 
-                    <TableCell sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
+                <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
+                  <TableSortLabel
+                    active={sortColumn === 'gator_signal'}
+                    direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('gator_signal')}
+                  >
+                    Gator Signal
+                  </TableSortLabel>
+                </TableCell>
+
+                {selectedCard === 'portfolio' && (
+                  <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'technical_agent' ? sortDirection : false}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <TableSortLabel
+                        active={sortColumn === 'technical_agent'}
+                        direction={sortColumn === 'technical_agent' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('technical_agent')}
+                      >
+                        Technical Agent
+                      </TableSortLabel>
+                      <IconButton
+                        size="small"
+                        onClick={toggleTableExpand}
+                        sx={{
+                          transform: isTableExpanded ? 'rotate(0deg)' : 'rotate(180deg)',
+                          transition: 'transform 0.3s',
+                        }}
+                      >
+                        <ChevronLeftIcon sx={{ fontSize: '1.5rem', color: 'white' }} />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                )}
+
+                {(selectedCard !== 'portfolio' || isTableExpanded) && (
+                  <>
+                    <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'deal_agent'}
                         direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
@@ -341,23 +347,13 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       </TableSortLabel>
                     </TableCell>
 
-                    <TableCell sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
+                    <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
                       <TableSortLabel
                         active={sortColumn === 'factors_agent'}
                         direction={sortColumn === 'factors_agent' ? sortDirection : 'asc'}
                         onClick={() => handleSort('factors_agent')}
                       >
                         Factors Based Agent
-                      </TableSortLabel>
-                    </TableCell>
-
-                    <TableCell sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'gator_signal'}
-                        direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('gator_signal')}
-                      >
-                        Jay Ritter Signal
                       </TableSortLabel>
                     </TableCell>
                   </>
@@ -371,10 +367,9 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                   deal.ticker
                 );
 
-                if (selectedCard === 'portfolio') {
-                  return (
+                return (
+                  <React.Fragment key={index}>
                     <TableRow
-                      key={index}
                       sx={{
                         backgroundColor: index % 2 === 0 ? '#fff' : '#fcfcfc',
                         '&:hover': {
@@ -383,419 +378,218 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       }}
                     >
                       <TableCell
-                        sx={{ fontWeight: 600, color: '#273faa', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                        sx={{ width: '12%', fontWeight: 600, color: '#273faa', cursor: 'pointer', wordWrap: 'break-word', overflowWrap: 'break-word', '&:hover': { textDecoration: 'underline' } }}
                         onClick={() => handleTickerClick(deal)}
                       >
                         {deal.ticker}
                       </TableCell>
-                      <TableCell>{deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}</TableCell>
 
-                      {/* Sentiment Agent Column */}
-                      <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                            deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
-                            (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
-                            (typeof deal.sentiment?.sentiment_summary === 'object' &&
-                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null)) && (
-                            <Typography
-                              variant="caption"
-                              sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
-                            >
-                              Score:{' '}
-                              {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                                : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                  deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : typeof deal.sentiment?.sentiment_summary === 'object' &&
-                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                  deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null
-                                ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                : null}
-                            </Typography>
-                          )}
-                          {(deal.sentiment?.one_week_sentiment ||
-                            deal.sentiment_summary?.one_week_sentiment) && (
-                              <Chip
-                                label={`1W: ${deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          {(deal.sentiment?.one_month_sentiment ||
-                            deal.sentiment_summary?.one_month_sentiment) && (
-                              <Chip
-                                label={`1M: ${deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
-                            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                              Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-
-                      {/* Deal (IPO) Agent Column */}
-                      <TableCell>
-                        {volatilityOutlook ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {volatilityOutlook['1-Week Sentiment'] && (
-                              <Chip
-                                label={`1W: ${volatilityOutlook['1-Week Sentiment']}`}
-                                size="small"
-                                color={getSentimentColor(
-                                  volatilityOutlook['1-Week Sentiment']
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {volatilityOutlook['1-Month Sentiment'] && (
-                              <Chip
-                                label={`1M: ${volatilityOutlook['1-Month Sentiment']}`}
-                                size="small"
-                                color={getSentimentColor(
-                                  volatilityOutlook['1-Month Sentiment']
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            N/A
-                          </Typography>
-                        )}
-                      </TableCell>
-
-                      {/* Factors Based Agent Column */}
-                      <TableCell>
-                        {deal.ml_results &&
-                          (deal.ml_results.t1d_pred || deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {deal.ml_results.t1d_pred && (
-                              <Chip
-                                label={`1D: ${deal.ml_results.t1d_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1d_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {deal.ml_results.t1w_pred && (
-                              <Chip
-                                label={`1W: ${deal.ml_results.t1w_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1w_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {deal.ml_results.t1m_pred && (
-                              <Chip
-                                label={`1M: ${deal.ml_results.t1m_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1m_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            N/A
-                          </Typography>
-                        )}
-                      </TableCell>
-
-                      {/* Jay Ritter Signal Column */}
-                      <TableCell>
-                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
-                              <Chip
-                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
-                                size="small"
-                                color={
-                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
-                                    ? 'success'
-                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
-                                      ? 'error'
-                                      : 'warning'
-                                }
-                                sx={{ fontWeight: 700 }}
-                              />
-                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
-                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
-                              </Typography>
-                            </Box>
-                            <Typography variant="caption" color="textSecondary">
-                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
-                            </Typography>
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            N/A
-                          </Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                } else {
-                  // Detailed layout for Upcoming and Recently Listed
-                  return (
-                    <TableRow
-                      key={index}
-                      sx={{
-                        backgroundColor: index % 2 === 0 ? '#fff' : '#fcfcfc',
-                        '&:hover': {
-                          bgcolor: theme.palette.action.hover,
-                        },
-                      }}
-                    >
-                      <TableCell
-                        onClick={() => handleTickerClick(deal)}
-                        sx={{ cursor: 'pointer' }}
-                      >
-                        <Typography
-                          sx={{
-                            fontWeight: 700,
-                            fontSize: '1rem',
-                            color: '#273faa',
-                            '&:hover': { textDecoration: 'underline' },
-                          }}
-                        >
-                          {deal.ticker}
-                        </Typography>
-                      </TableCell>
-                      {selectedCard === 'recent' && (
-                        <TableCell>
-                          <Typography sx={{ fontSize: '0.85rem', color: '#000' }}>
-                            {deal.unsupervised_summary?.trade_date || deal.trade_date || 'N/A'}
-                          </Typography>
+                      {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
+                        <TableCell sx={{ width: '12%', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                          {deal.unsupervised_summary?.trade_date || deal.trade_date || 'None'}
                         </TableCell>
                       )}
 
                       {/* Sentiment Agent Column */}
-                      <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                          {((selectedCard === 'recent' &&
-                            ((deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                              deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
-                              (deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                                deal.sentiment?.socialmedia_retail_sentiment_score !== null))) ||
-                            (selectedCard !== 'recent' &&
-                              ((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                                deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
-                                (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                  deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null)))) && (
-                            <Box
-                              sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                padding: '6px 12px',
-                                borderRadius: '8px',
-                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                                width: 'fit-content',
-                              }}
-                            >
+                      <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                        {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                          deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                          (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                            deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                          (typeof deal.sentiment?.sentiment_summary === 'object' &&
+                            deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                            deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                          deal.sentiment?.one_week_sentiment ||
+                          deal.sentiment_summary?.one_week_sentiment ||
+                          deal.sentiment?.one_month_sentiment ||
+                          deal.sentiment_summary?.one_month_sentiment) ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                            {((deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                              deal.sentiment?.socialmedia_retail_sentiment_score !== null) ||
+                              (deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null) ||
+                              (typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null)) && (
                               <Typography
                                 variant="caption"
-                                sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#667eea' }}
+                                sx={{ fontWeight: 600, color: '#1a237e', fontSize: '0.75rem' }}
                               >
-                                Score:
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{ fontWeight: 700, fontSize: '0.85rem' }}
-                              >
-                                {selectedCard === 'recent'
-                                  ? deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
-                                    deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
-                                    ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
-                                    : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                                      deal.sentiment?.socialmedia_retail_sentiment_score !== null
-                                    ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
-                                    : null
-                                  : deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
-                                    deal.sentiment?.socialmedia_retail_sentiment_score !== null
+                                Score:{' '}
+                                {deal.sentiment?.socialmedia_retail_sentiment_score !== undefined &&
+                                deal.sentiment?.socialmedia_retail_sentiment_score !== null
                                   ? `${deal.sentiment.socialmedia_retail_sentiment_score}/100`
                                   : deal.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
                                     deal.sentiment_summary?.socialmedia_retail_sentiment_score !== null
                                   ? `${deal.sentiment_summary.socialmedia_retail_sentiment_score}/100`
+                                  : typeof deal.sentiment?.sentiment_summary === 'object' &&
+                                    deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== undefined &&
+                                    deal.sentiment.sentiment_summary?.socialmedia_retail_sentiment_score !== null
+                                  ? `${deal.sentiment.sentiment_summary.socialmedia_retail_sentiment_score}/100`
                                   : null}
                               </Typography>
-                            </Box>
-                          )}
-                          {(deal.sentiment?.one_week_sentiment ||
-                            deal.sentiment_summary?.one_week_sentiment ||
-                            (selectedCard === 'recent' && deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment)) && (
-                              <Chip
-                                label={`1W: ${deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment ||
-                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment : undefined)
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_week_sentiment ||
-                                  deal.sentiment_summary?.one_week_sentiment ||
-                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_week_sentiment : undefined)
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
                             )}
-                          {(deal.sentiment?.one_month_sentiment ||
-                            deal.sentiment_summary?.one_month_sentiment ||
-                            (selectedCard === 'recent' && deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment)) && (
-                              <Chip
-                                label={`1M: ${deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment ||
-                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment : undefined)
-                                  }`}
-                                size="small"
-                                color={getSentimentColor(
-                                  deal.sentiment?.one_month_sentiment ||
-                                  deal.sentiment_summary?.one_month_sentiment ||
-                                  (selectedCard === 'recent' ? deal.unsupervised_summary?.sentiment_summary?.one_month_sentiment : undefined)
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          {!deal.sentiment?.one_week_sentiment &&
-                            !deal.sentiment_summary?.one_week_sentiment &&
-                            !deal.sentiment?.one_month_sentiment &&
-                            !deal.sentiment_summary?.one_month_sentiment && (
-                              <Typography variant="caption" color="textSecondary">
-                                N/A
+                            {(deal.sentiment?.one_week_sentiment ||
+                              deal.sentiment_summary?.one_week_sentiment) && (
+                                <Chip
+                                  label={`1W: ${deal.sentiment?.one_week_sentiment ||
+                                    deal.sentiment_summary?.one_week_sentiment
+                                    }`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    deal.sentiment?.one_week_sentiment ||
+                                    deal.sentiment_summary?.one_week_sentiment
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            {(deal.sentiment?.one_month_sentiment ||
+                              deal.sentiment_summary?.one_month_sentiment) && (
+                                <Chip
+                                  label={`1M: ${deal.sentiment?.one_month_sentiment ||
+                                    deal.sentiment_summary?.one_month_sentiment
+                                    }`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    deal.sentiment?.one_month_sentiment ||
+                                    deal.sentiment_summary?.one_month_sentiment
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
+                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
                               </Typography>
                             )}
-                          {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
-                            <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                              Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-
-                      {/* Deal (IPO) Agent Column */}
-                      <TableCell>
-                        {volatilityOutlook ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {volatilityOutlook['1-Week Sentiment'] && (
-                              <Chip
-                                label={`1W: ${volatilityOutlook['1-Week Sentiment']}`}
-                                size="small"
-                                color={getSentimentColor(
-                                  volatilityOutlook['1-Week Sentiment']
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {volatilityOutlook['1-Month Sentiment'] && (
-                              <Chip
-                                label={`1M: ${volatilityOutlook['1-Month Sentiment']}`}
-                                size="small"
-                                color={getSentimentColor(
-                                  volatilityOutlook['1-Month Sentiment']
-                                )}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
-                            N/A
+                            None
                           </Typography>
                         )}
                       </TableCell>
 
-                      {/* Factors Based Agent Column */}
-                      <TableCell>
-                        {deal.ml_results &&
-                          (deal.ml_results.t1d_pred || deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {deal.ml_results.t1d_pred && (
-                              <Chip
-                                label={`1D: ${deal.ml_results.t1d_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1d_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {deal.ml_results.t1w_pred && (
-                              <Chip
-                                label={`1W: ${deal.ml_results.t1w_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1w_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                            {deal.ml_results.t1m_pred && (
-                              <Chip
-                                label={`1M: ${deal.ml_results.t1m_pred}`}
-                                size="small"
-                                color={getPredictionColor(deal.ml_results.t1m_pred)}
-                                sx={{ width: 'fit-content', fontWeight: 600 }}
-                              />
-                            )}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            N/A
-                          </Typography>
-                        )}
-                      </TableCell>
-
-                      {/* Jay Ritter Signal Column */}
-                      <TableCell>
+                      {/* Gator Signal Column */}
+                      <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
                         {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                            <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
-                              <Chip
-                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
-                                size="small"
-                                color={
-                                  deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'buy'
-                                    ? 'success'
-                                    : deal.jay_ritter.json_data.analysis.composite_score.signal.toLowerCase() === 'sell'
-                                      ? 'error'
-                                      : 'warning'
-                                }
-                                sx={{ fontWeight: 700 }}
-                              />
-                              <Typography variant="caption" sx={{ fontWeight: 600, color: '#000' }}>
-                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
-                              </Typography>
-                            </Box>
-                            <Typography variant="caption" color="textSecondary">
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                            <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
+                              {deal.jay_ritter.json_data.analysis.composite_score.signal}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
+                              Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.75rem' }}>
                               Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
                             </Typography>
+                            {deal.jay_ritter?.updated_at && (
+                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                Last run: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
+                              </Typography>
+                            )}
                           </Box>
                         ) : (
                           <Typography variant="body2" color="textSecondary">
-                            N/A
+                            None
                           </Typography>
                         )}
                       </TableCell>
+
+                      {/* Technical Agent Column */}
+                      {selectedCard === 'portfolio' && (
+                        <TableCell sx={{ width: '16%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                          {deal.technical_data?.triggers_fired && deal.technical_data.triggers_fired.length > 0 ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              {deal.technical_data.triggers_fired.map((trigger: string, idx: number) => (
+                                <Typography key={idx} variant="caption" sx={{ color: '#000', fontSize: '0.75rem', wordBreak: 'break-word' }}>
+                                  {trigger}
+                                </Typography>
+                              ))}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="textSecondary">
+                              None
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )}
+
+                      {/* Deal (IPO) Agent Column - Shown when Expanded or for non-portfolio tables */}
+                      {(selectedCard !== 'portfolio' || isTableExpanded) && (
+                        <TableCell sx={{ width: '16%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                          {volatilityOutlook ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              {volatilityOutlook['1-Week Sentiment'] && (
+                                <Chip
+                                  label={`1W: ${volatilityOutlook['1-Week Sentiment']}`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    volatilityOutlook['1-Week Sentiment']
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                              {volatilityOutlook['1-Month Sentiment'] && (
+                                <Chip
+                                  label={`1M: ${volatilityOutlook['1-Month Sentiment']}`}
+                                  size="small"
+                                  color={getSentimentColor(
+                                    volatilityOutlook['1-Month Sentiment']
+                                  )}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="textSecondary">
+                              None
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )}
+
+                      {/* Factors Based Agent Column - Shown when Expanded or for non-portfolio tables */}
+                      {(selectedCard !== 'portfolio' || isTableExpanded) && (
+                        <TableCell sx={{ width: '16%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                          {deal.ml_results &&
+                            (deal.ml_results.t1d_pred || deal.ml_results.t1w_pred || deal.ml_results.t1m_pred) ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              {deal.ml_results.t1d_pred && (
+                                <Chip
+                                  label={`1D: ${deal.ml_results.t1d_pred}`}
+                                  size="small"
+                                  color={getPredictionColor(deal.ml_results.t1d_pred)}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                              {deal.ml_results.t1w_pred && (
+                                <Chip
+                                  label={`1W: ${deal.ml_results.t1w_pred}`}
+                                  size="small"
+                                  color={getPredictionColor(deal.ml_results.t1w_pred)}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                              {deal.ml_results.t1m_pred && (
+                                <Chip
+                                  label={`1M: ${deal.ml_results.t1m_pred}`}
+                                  size="small"
+                                  color={getPredictionColor(deal.ml_results.t1m_pred)}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="textSecondary">
+                              None
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
-                  );
-                }
+                  </React.Fragment>
+                );
               })}
             </TableBody>
           </Table>

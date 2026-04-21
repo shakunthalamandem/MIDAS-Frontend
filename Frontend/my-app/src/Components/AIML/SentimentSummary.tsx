@@ -233,6 +233,10 @@ const SentimentSummary: React.FC = () => {
   const [orderBy, setOrderBy] = useState<keyof SentimentData | "summary" | null>(null);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
+  // Sentiment-column cycle: null → "bullish" → "bearish" → "neutral" → null
+  type SentimentPriority = "bullish" | "bearish" | "neutral";
+  const [sentimentPriority, setSentimentPriority] = useState<SentimentPriority | null>(null);
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -301,12 +305,34 @@ const SentimentSummary: React.FC = () => {
   }, [data]);
 
   const handleSort = (column: keyof SentimentData | "summary") => {
+    const isSentimentCol =
+      column === "one_week_sentiment" || column === "one_month_sentiment";
+
+    if (isSentimentCol) {
+      // Cycle: null → bullish → bearish → neutral → null
+      if (orderBy !== column) {
+        setOrderBy(column);
+        setSentimentPriority("bullish");
+        return;
+      }
+      const next: SentimentPriority | null =
+        sentimentPriority === "bullish"
+          ? "bearish"
+          : sentimentPriority === "bearish"
+          ? "neutral"
+          : null;
+      setSentimentPriority(next);
+      if (next === null) setOrderBy(null);
+      return;
+    }
+
     if (orderBy === column) {
       const isAsc = order === "asc";
       setOrder(isAsc ? "desc" : "asc");
     } else {
       setOrderBy(column);
       setOrder("asc");
+      setSentimentPriority(null);
     }
   };
 
@@ -327,6 +353,19 @@ const SentimentSummary: React.FC = () => {
   const sortedData = useMemo(
     () => {
       if (!orderBy) return filteredData;
+
+      // Sentiment-column priority sort: matches bubble to top
+      if (
+        (orderBy === "one_week_sentiment" || orderBy === "one_month_sentiment") &&
+        sentimentPriority
+      ) {
+        return [...filteredData].sort((a, b) => {
+          const aMatch = a[orderBy]?.toLowerCase() === sentimentPriority ? 0 : 1;
+          const bMatch = b[orderBy]?.toLowerCase() === sentimentPriority ? 0 : 1;
+          return aMatch - bMatch;
+        });
+      }
+
       return [...filteredData].sort((a, b) => {
         const valA = getComparableValue(a, orderBy);
         const valB = getComparableValue(b, orderBy);
@@ -335,7 +374,7 @@ const SentimentSummary: React.FC = () => {
         return 0;
       });
     },
-    [filteredData, orderBy, order]
+    [filteredData, orderBy, order, sentimentPriority]
   );
 
   const paginatedData = sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
