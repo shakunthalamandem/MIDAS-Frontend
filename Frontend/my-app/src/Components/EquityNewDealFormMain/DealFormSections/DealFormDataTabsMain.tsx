@@ -46,6 +46,11 @@ const DealFormDataTabsMain: React.FC<Props> = ({
   const [editable, setEditable] = useState<boolean>(isCreate);
   const [localData, setLocalData] = useState<FormData>(formData);
   const [originalData] = useState<FormData>(formData);
+  const [currentUniqueDealId, setCurrentUniqueDealId] = useState<string | undefined>(uniquedealid);
+
+  useEffect(() => {
+    setCurrentUniqueDealId(uniquedealid);
+  }, [uniquedealid]);
 
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{
@@ -94,7 +99,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
         : {
           operation: "new_deal_update",
           data: localData,
-          uniquedealid: uniquedealid,
+          uniquedealid: currentUniqueDealId,
         };
 
       const response = await axios.post(url, payload, {
@@ -105,6 +110,12 @@ const DealFormDataTabsMain: React.FC<Props> = ({
       });
 
       if (response.status === 200 || response.status === 201) {
+        // Track the backend-returned unique_deal_id so subsequent saves update
+        // the same record even if pricing_date changes regenerated the id.
+        const returnedId = response.data?.unique_deal_id;
+        if (returnedId !== undefined) {
+          setCurrentUniqueDealId(returnedId ?? undefined);
+        }
         setEditable(false);
         setSnackbar({
           open: true,
