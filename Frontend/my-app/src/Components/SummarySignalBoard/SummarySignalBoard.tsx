@@ -184,11 +184,10 @@ const SummarySignalBoard: React.FC = () => {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography
-            variant="h3"
+            variant="h4"
             component="h2"
             sx={{
               fontWeight: 800,
-              mb: 1,
               background: '#002060',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',

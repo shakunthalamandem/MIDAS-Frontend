@@ -777,7 +777,7 @@ const SignalBoardMain: React.FC = () => {
             <ShowChartIcon sx={{ fontSize: 24, color: "#7C3AED" }} />
           </Box>
           <Box>
-            <Typography sx={{ fontWeight: 900, fontSize: 22, color: "#0F172A" }}>
+            <Typography sx={{ fontWeight: 900, fontSize: 20, color: "#0F172A" }}>
               Signal Board
             </Typography>
             <Typography sx={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>
