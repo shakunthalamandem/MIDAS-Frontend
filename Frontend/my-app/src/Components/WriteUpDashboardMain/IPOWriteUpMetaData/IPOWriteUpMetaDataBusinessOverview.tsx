@@ -485,6 +485,11 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
     if (editMode === section) {
       handleSaveSection(section)
     } else {
+      const currentData = (updatedData?.[section] as string[] | undefined) ?? (writeUpData?.[section] as string[] | undefined) ?? []
+      const isEmpty = currentData.length === 0 || currentData.every(v => !v || v.replace(/<[^>]*>/g, "").trim() === "")
+      if (isEmpty) {
+        setUpdatedData(prev => ({ ...(prev ?? writeUpData ?? {} as WriteUpData), [section]: [""] }))
+      }
       setEditMode(section)
     }
   }
@@ -595,6 +600,12 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
         />
       )
     )
+  }
+
+  const isSectionDataEmpty = (section: keyof WriteUpData): boolean => {
+    const data = getSectionData(section)
+    if (data.length === 0) return true
+    return data.every(item => !item || item.replace(/<[^>]*>/g, "").trim() === "")
   }
 
   /* ===================== UI ===================== */
@@ -834,6 +845,30 @@ const IPOWriteUpMetaDataBusinessOverview: React.FC<Props> = ({
                 renderSectionContent(section, getSectionData(section))
               ) : pdfMode ? (
                 renderSectionContent(section, getSectionData(section))
+              ) : isSectionDataEmpty(section) ? (
+                <Box
+                  onClick={(e) => handleAccordionAction(section, e as any)}
+                  sx={{
+                    border: "2px dashed #b0bcd4",
+                    borderRadius: 2,
+                    minHeight: 80,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 0.5,
+                    cursor: "pointer",
+                    color: "#7a8fa6",
+                    "&:hover": {
+                      borderColor: "#124180",
+                      color: "#124180",
+                      backgroundColor: "rgba(18, 65, 128, 0.04)"
+                    }
+                  }}
+                >
+                  <AddIcon fontSize="small" />
+                  <Typography variant="caption" fontWeight={600}>Click to add</Typography>
+                </Box>
               ) : (
                 <ClampedContent>
                   {getSectionData(section).map((item, index) => (
