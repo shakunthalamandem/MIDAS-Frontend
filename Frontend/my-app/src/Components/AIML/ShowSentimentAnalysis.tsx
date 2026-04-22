@@ -98,6 +98,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [socialMediaBlocks, setSocialMediaBlocks] = useState<Block[]>([]);
+  const [changeInSentimentBlocks, setChangeInSentimentBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -110,6 +111,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
     if (!focusTicker || !selectedTicker) {
       setBlocks([]);
       setSocialMediaBlocks([]);
+      setChangeInSentimentBlocks([]);
       setError(null);
       setStatus(null);
       setLoading(false);
@@ -177,18 +179,25 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
         const socialMediaRaw = data?.socialmedia_retail_sentiment;
         const parsedSocialMediaBlocks = socialMediaRaw ? normalizeBlocks(socialMediaRaw) : [];
 
-        if (!parsedBlocks.length && !parsedSocialMediaBlocks.length) {
+        const changeInSentimentRaw = data?.changein_sentiment;
+        const parsedChangeInSentimentBlocks = changeInSentimentRaw ? normalizeBlocks(changeInSentimentRaw) : [];
+
+        if (!parsedBlocks.length && !parsedSocialMediaBlocks.length && !parsedChangeInSentimentBlocks.length) {
           setStatus("Data will update soon for this ticker.");
           setBlocks([]);
           setSocialMediaBlocks([]);
+          setChangeInSentimentBlocks([]);
         } else {
           setBlocks(parsedBlocks);
           setSocialMediaBlocks(parsedSocialMediaBlocks);
+          setChangeInSentimentBlocks(parsedChangeInSentimentBlocks);
           // Auto-activate the appropriate tab based on available data
-          if (parsedSocialMediaBlocks.length > 0) {
+          if (parsedChangeInSentimentBlocks.length > 0) {
             setActiveTab(0);
-          } else if (parsedBlocks.length > 0) {
+          } else if (parsedSocialMediaBlocks.length > 0) {
             setActiveTab(1);
+          } else if (parsedBlocks.length > 0) {
+            setActiveTab(2);
           }
         }
       } catch (err: any) {
@@ -204,6 +213,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
           }
           setBlocks([]);
           setSocialMediaBlocks([]);
+          setChangeInSentimentBlocks([]);
           setActiveTab(0);
         }
       } finally {
@@ -220,9 +230,10 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   }, [apiUrl, focusTicker, selectedTicker]);
 
   const showPlaceholder =
-    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
+    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length && !changeInSentimentBlocks.length);
 
   const tabs = [
+    { label: "Change in Sentiment", icon: <InsightsRoundedIcon sx={{ fontSize: 16 }} />, show: changeInSentimentBlocks.length > 0 },
     { label: "Social Media/Retail Sentiment", icon: <ForumRoundedIcon sx={{ fontSize: 16 }} />, show: socialMediaBlocks.length > 0 },
     { label: "Other Details", icon: <InsightsRoundedIcon sx={{ fontSize: 16 }} />, show: blocks.length > 0 },
   ];
@@ -561,8 +572,9 @@ Each ticker is analyzed independently using live market data, news sentiment, an
               overflow: "hidden",
             }}
           >
-            {activeTab === 0 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
-            {activeTab === 1 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
+            {activeTab === 0 && changeInSentimentBlocks.length > 0 && <GENAIRenderer blocks={changeInSentimentBlocks} renderAll />}
+            {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+            {activeTab === 2 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
           </Box>
         </>
       )}
