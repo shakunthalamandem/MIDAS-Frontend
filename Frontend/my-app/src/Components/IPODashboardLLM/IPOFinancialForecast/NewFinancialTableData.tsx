@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 import { priorityOrder } from "./utils/financialHelpers";
 import {
@@ -134,6 +135,12 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
   const [snapshot, setSnapshot] = useState<TableSnapshot>(() =>
     metaDataToSnapshot(initialData),
   );
+
+  // Drag-and-drop state
+  const dragColRef = useRef<number | null>(null);
+  const dragRowRef = useRef<number | null>(null);
+  const [dragOverCol, setDragOverCol] = useState<number | null>(null);
+  const [dragOverRow, setDragOverRow] = useState<number | null>(null);
 
   useEffect(() => {
     if (!editing) {
@@ -262,6 +269,62 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
     });
   };
 
+  // Column drag handlers
+  const handleColDragStart = (index: number) => {
+    dragColRef.current = index;
+  };
+  const handleColDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverCol(index);
+  };
+  const handleColDrop = (toIndex: number) => {
+    const fromIndex = dragColRef.current;
+    if (fromIndex === null || fromIndex === toIndex) {
+      setDragOverCol(null);
+      return;
+    }
+    setSnapshot((prev) => {
+      const columns = [...prev.columns];
+      const [moved] = columns.splice(fromIndex, 1);
+      columns.splice(toIndex, 0, moved);
+      return { ...prev, columns };
+    });
+    dragColRef.current = null;
+    setDragOverCol(null);
+  };
+  const handleColDragEnd = () => {
+    dragColRef.current = null;
+    setDragOverCol(null);
+  };
+
+  // Row drag handlers
+  const handleRowDragStart = (index: number) => {
+    dragRowRef.current = index;
+  };
+  const handleRowDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverRow(index);
+  };
+  const handleRowDrop = (toIndex: number) => {
+    const fromIndex = dragRowRef.current;
+    if (fromIndex === null || fromIndex === toIndex) {
+      setDragOverRow(null);
+      return;
+    }
+    setSnapshot((prev) => {
+      const rows = [...prev.rows];
+      const [moved] = rows.splice(fromIndex, 1);
+      rows.splice(toIndex, 0, moved);
+      return { ...prev, rows };
+    });
+    dragRowRef.current = null;
+    setDragOverRow(null);
+  };
+  const handleRowDragEnd = () => {
+    dragRowRef.current = null;
+    setDragOverRow(null);
+  };
+
   const { columns, rows, values } = snapshot;
 
   return (
@@ -371,16 +434,32 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
               >
                 Metric Name
               </TableCell>
-              {columns.map((col) => (
+              {columns.map((col, colIndex) => (
                 <TableCell
                   key={col}
+                  draggable={editing}
+                  onDragStart={() => handleColDragStart(colIndex)}
+                  onDragOver={(e) => handleColDragOver(e, colIndex)}
+                  onDrop={() => handleColDrop(colIndex)}
+                  onDragEnd={handleColDragEnd}
                   sx={{
                     fontSize: "0.9rem",
                     fontWeight: "bold",
                     color: "#0f172a",
                     borderBottom: "1px solid #e3e7f3",
                     textAlign: "center",
-                    backgroundColor: "#cfd6ff",
+                    backgroundColor:
+                      dragOverCol === colIndex && editing
+                        ? "#b6c0f5"
+                        : "#cfd6ff",
+                    cursor: editing ? "grab" : "default",
+                    opacity:
+                      dragColRef.current === colIndex ? 0.4 : 1,
+                    transition: "background-color 0.15s, opacity 0.15s",
+                    borderLeft:
+                      dragOverCol === colIndex && editing
+                        ? "2px solid #3f51b5"
+                        : undefined,
                   }}
                 >
                   {editing ? (
@@ -392,14 +471,21 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                         gap: 0.5,
                       }}
                     >
+                      <DragIndicatorIcon
+                        sx={{
+                          fontSize: 16,
+                          color: "#7986cb",
+                          cursor: "grab",
+                          flexShrink: 0,
+                        }}
+                      />
                       <TextField
                         variant="standard"
                         size="small"
                         defaultValue={col}
                         key={`col-${col}`}
-                        onBlur={(e) =>
-                          renameColumn(col, e.target.value)
-                        }
+                        onBlur={(e) => renameColumn(col, e.target.value)}
+                        onMouseDown={(e) => e.stopPropagation()}
                         inputProps={{
                           style: {
                             fontSize: "0.9rem",
@@ -444,32 +530,63 @@ const NewFinancialTableData: React.FC<NewFinancialTableDataProps> = ({
                 rowName.toLowerCase().includes("growth");
 
               return (
-                <TableRow key={rowName}>
+                <TableRow
+                  key={rowName}
+                  sx={{
+                    opacity: dragRowRef.current === rowIndex ? 0.4 : 1,
+                    borderTop:
+                      dragOverRow === rowIndex && editing
+                        ? "2px solid #3f51b5"
+                        : undefined,
+                    transition: "opacity 0.15s",
+                  }}
+                >
                   <TableCell
+                    draggable={editing}
+                    onDragStart={() => handleRowDragStart(rowIndex)}
+                    onDragOver={(e) => handleRowDragOver(e, rowIndex)}
+                    onDrop={() => handleRowDrop(rowIndex)}
+                    onDragEnd={handleRowDragEnd}
                     sx={{
                       borderBottom: "1px solid #e3e7f3",
                       fontWeight: "bold",
                       fontStyle: isOddRow ? "italic" : "normal",
                       fontSize: isOddRow ? "1rem" : "1.3rem",
-                      backgroundColor: "transparent",
+                      backgroundColor:
+                        dragOverRow === rowIndex && editing
+                          ? "#eef0fb"
+                          : "transparent",
+                      cursor: editing ? "grab" : "default",
+                      transition: "background-color 0.15s",
                     }}
                   >
                     {editing ? (
-                      <TextField
-                        variant="standard"
-                        size="small"
-                        defaultValue={rowName}
-                        key={`row-${rowName}`}
-                        onBlur={(e) => renameRow(rowName, e.target.value)}
-                        inputProps={{
-                          style: {
-                            fontSize: isOddRow ? "1rem" : "1.1rem",
-                            fontWeight: "bold",
-                            fontStyle: isOddRow ? "italic" : "normal",
-                          },
-                        }}
-                        sx={{ width: "100%" }}
-                      />
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <DragIndicatorIcon
+                          sx={{
+                            fontSize: 16,
+                            color: "#7986cb",
+                            cursor: "grab",
+                            flexShrink: 0,
+                          }}
+                        />
+                        <TextField
+                          variant="standard"
+                          size="small"
+                          defaultValue={rowName}
+                          key={`row-${rowName}`}
+                          onBlur={(e) => renameRow(rowName, e.target.value)}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          inputProps={{
+                            style: {
+                              fontSize: isOddRow ? "1rem" : "1.1rem",
+                              fontWeight: "bold",
+                              fontStyle: isOddRow ? "italic" : "normal",
+                            },
+                          }}
+                          sx={{ width: "100%" }}
+                        />
+                      </Box>
                     ) : (
                       formatLabel(rowName)
                     )}
