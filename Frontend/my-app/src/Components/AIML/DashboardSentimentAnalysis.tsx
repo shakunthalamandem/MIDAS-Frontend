@@ -55,6 +55,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [socialMediaBlocks, setSocialMediaBlocks] = useState<Block[]>([]);
+  const [changeInSentimentBlocks, setChangeInSentimentBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -67,6 +68,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
     if (!focusTicker) {
       setBlocks([]);
       setSocialMediaBlocks([]);
+      setChangeInSentimentBlocks([]);
       setError(null);
       setStatus(null);
       setLoading(false);
@@ -137,18 +139,25 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
         const socialMediaRaw = data?.socialmedia_retail_sentiment;
         const parsedSocialMediaBlocks = socialMediaRaw ? normalizeBlocks(socialMediaRaw) : [];
 
-        if (!parsedBlocks.length && !parsedSocialMediaBlocks.length) {
+        const changeInSentimentRaw = data?.changein_sentiment;
+        const parsedChangeInSentimentBlocks = changeInSentimentRaw ? normalizeBlocks(changeInSentimentRaw) : [];
+
+        if (!parsedBlocks.length && !parsedSocialMediaBlocks.length && !parsedChangeInSentimentBlocks.length) {
           setStatus("Data will update soon for this ticker.");
           setBlocks([]);
           setSocialMediaBlocks([]);
+          setChangeInSentimentBlocks([]);
         } else {
           setBlocks(parsedBlocks);
           setSocialMediaBlocks(parsedSocialMediaBlocks);
+          setChangeInSentimentBlocks(parsedChangeInSentimentBlocks);
           // Auto-activate the appropriate tab based on available data
-          if (parsedSocialMediaBlocks.length > 0) {
+          if (parsedChangeInSentimentBlocks.length > 0) {
             setActiveTab(0);
-          } else if (parsedBlocks.length > 0) {
+          } else if (parsedSocialMediaBlocks.length > 0) {
             setActiveTab(1);
+          } else if (parsedBlocks.length > 0) {
+            setActiveTab(2);
           }
         }
       } catch (err: any) {
@@ -164,6 +173,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
           }
           setBlocks([]);
           setSocialMediaBlocks([]);
+          setChangeInSentimentBlocks([]);
           setActiveTab(0);
         }
       } finally {
@@ -180,7 +190,7 @@ const DashboardSentimentAnalysis: React.FC<DashboardSentimentAnalysisProps> = ({
   }, [apiUrl, focusTicker, pricingDate, region]);
 
   const showPlaceholder =
-    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length);
+    !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length && !changeInSentimentBlocks.length);
 
   return (
     <Box sx={{ py: 2 }}>
@@ -250,11 +260,11 @@ Each ticker is analyzed independently using live market data, news sentiment, an
             </Typography>
           )}
 
-          {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
+          {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0 || changeInSentimentBlocks.length > 0) && (
             <>
               <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap", justifyContent: "center" }}>
 
-                {socialMediaBlocks.length > 0 && (
+                {changeInSentimentBlocks.length > 0 && (
                   <Button
                     variant={activeTab === 0 ? "contained" : "outlined"}
                     onClick={() => setActiveTab(0)}
@@ -273,10 +283,11 @@ Each ticker is analyzed independently using live market data, news sentiment, an
                       },
                     }}
                   >
-                    Social Media/Retail Sentiment
+                    Change in Sentiment
                   </Button>
                 )}
-                                {blocks.length > 0 && (
+
+                {socialMediaBlocks.length > 0 && (
                   <Button
                     variant={activeTab === 1 ? "contained" : "outlined"}
                     onClick={() => setActiveTab(1)}
@@ -295,13 +306,37 @@ Each ticker is analyzed independently using live market data, news sentiment, an
                       },
                     }}
                   >
+                    Social Media/Retail Sentiment
+                  </Button>
+                )}
+
+                {blocks.length > 0 && (
+                  <Button
+                    variant={activeTab === 2 ? "contained" : "outlined"}
+                    onClick={() => setActiveTab(2)}
+                    sx={{
+                      textTransform: "none",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                      backgroundColor: activeTab === 2 ? "#155ec5" : "transparent",
+                      color: activeTab === 2 ? "#ffffff" : "#3a4556",
+                      border: activeTab === 2 ? "none" : "1.5px solid #3a4556",
+                      "&:hover": {
+                        backgroundColor: activeTab === 2 ? "#155ec5" : "#f5f5f5",
+                      },
+                    }}
+                  >
                     Other Details
                   </Button>
                 )}
               </Box>
 
-              {activeTab === 0 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
-              {activeTab === 1 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
+              {activeTab === 0 && changeInSentimentBlocks.length > 0 && <GENAIRenderer blocks={changeInSentimentBlocks} renderAll />}
+              {activeTab === 1 && socialMediaBlocks.length > 0 && <GENAIRenderer blocks={socialMediaBlocks} renderAll />}
+              {activeTab === 2 && blocks.length > 0 && <GENAIRenderer blocks={blocks} renderAll />}
             </>
           )}
         </CardContent>
