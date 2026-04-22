@@ -20,22 +20,24 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
   defaultTicker = "",
   deal_id,
 }) => {
-  const [forecastsInput, setForecastsInput] = useState(defaultTicker);
   const [forecastsTicker, setForecastsTicker] = useState(defaultTicker);
   const [forecasts, setForecasts] = useState<any | null>(null);
   const [forecastsLoading, setForecastsLoading] = useState(false);
   const [forecastsError, setForecastsError] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [editedData, setEditedData] = useState<any>({});
+  const [saving, setSaving] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success",
   );
 
-  const handleCloseSnackbar = () => setSnackbarOpen(false);
+  const closeSnackbar = () => setSnackbarOpen(false);
+  const showSnackbar = (msg: string, severity: "success" | "error") => {
+    setSnackbarMessage(msg);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
-  // ---------------------- Fetch ----------------------
   const handleFetchForecasts = async (customTicker?: string) => {
     setForecastsLoading(true);
     setForecastsError(null);
@@ -45,7 +47,7 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
       const token = localStorage.getItem("access_token");
       if (!apiUrl) throw new Error("API URL not set");
 
-      const tickerToFetch = customTicker ?? forecastsInput;
+      const tickerToFetch = customTicker ?? defaultTicker;
       const response = await fetch(`${apiUrl}/api/financial_forecasts_data/`, {
         method: "POST",
         headers: {
@@ -93,70 +95,38 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
   };
 
   useEffect(() => {
-    setForecastsInput(defaultTicker);
     setForecastsTicker(defaultTicker);
     handleFetchForecasts(defaultTicker);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultTicker]);
 
-  // ---------------------- Edit ----------------------
-  const handleEdit = () => {
-    setEditing(true);
-    const metaData = forecasts?.meta_data || {};
-    const copied = JSON.parse(JSON.stringify(metaData || {}));
-    setEditedData(copied);
-  };
-
-  const handleCancelEdit = () => {
-    setEditing(false);
-    setEditedData({});
-  };
-
-  // ---------------------- Cell Edit Change ----------------------
-  const handleEditChange = (
-    metricName: string,
-    yearKey: string,
-    value: string,
-  ) => {
-    setEditedData((prev: any) => {
-      const updated = {
-        ...prev,
-        [yearKey]: {
-          ...prev?.[yearKey],
-          [metricName]: value === "" ? null : value,
-        },
-      };
-
-      return updated;
-    });
-  };
-
-  const handleSave = async () => {
-    setEditing(false);
+  const handleSave = async (meta: any) => {
+    setSaving(true);
     setForecastsError(null);
-
-    const apiUrl = process.env.REACT_APP_API_URL;
-    const token = localStorage.getItem("access_token");
-    if (!apiUrl) return;
-
     try {
-      const updatedMeta = editedData;
-      if (!updatedMeta || !Object.keys(updatedMeta).length) {
-        throw new Error("No edited data found.");
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const token = localStorage.getItem("access_token");
+      if (!apiUrl) throw new Error("API URL not set");
+
+      if (!meta || typeof meta !== "object") {
+        throw new Error("No table data to save.");
       }
 
-      const columnKeys = Object.keys(updatedMeta);
-      const editableColumnKeys = columnKeys.slice(-2);
-      const metaDataPayload: any = {};
-
-      for (const colKey of editableColumnKeys) {
-        const colData = updatedMeta[colKey] || {};
+      const cleanedMeta: any = {};
+      for (const key of Object.keys(meta)) {
+        const value = meta[key];
+        if (Array.isArray(value)) {
+          cleanedMeta[key] = value;
+          continue;
+        }
+        if (!value || typeof value !== "object") {
+          cleanedMeta[key] = value;
+          continue;
+        }
         const cleanedCol: any = {};
-        for (const metricName of Object.keys(colData)) {
-          const rawVal = colData[metricName];
-          if (rawVal === "" || rawVal === undefined) {
-            cleanedCol[metricName] = null;
-          } else if (rawVal === null) {
+        for (const metricName of Object.keys(value)) {
+          const rawVal = value[metricName];
+          if (rawVal === "" || rawVal === undefined || rawVal === null) {
             cleanedCol[metricName] = null;
           } else if (typeof rawVal === "number") {
             cleanedCol[metricName] = rawVal;
@@ -165,12 +135,13 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
             cleanedCol[metricName] = Number.isNaN(num) ? rawVal : num;
           }
         }
-        metaDataPayload[colKey] = cleanedCol;
+        cleanedMeta[key] = cleanedCol;
       }
 
       const payload = {
         ticker: forecastsTicker,
-        meta_data: metaDataPayload,
+        meta_data: cleanedMeta,
+        replace: true,
         ...(deal_id ? { deal_id } : {}),
       };
 
@@ -189,20 +160,21 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
           result.error || result.message || "Failed to update data",
         );
       }
-      setSnackbarMessage("Financial forecasts updated successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
 
-      // ---------------- Refresh forecasts ----------------
+      showSnackbar("Financial forecasts updated successfully!", "success");
       await handleFetchForecasts(forecastsTicker);
     } catch (error: any) {
+      showSnackbar(error.message || "Failed to save data.", "error");
       setForecastsError(error.message || "Failed to save data.");
+    } finally {
+      setSaving(false);
     }
   };
 
-  // ---------------------- Render ----------------------
   return (
-    <Container sx={{ maxWidth: "xl", mb: 2, background: "#f0f5ff",borderRadius: 3 }}>
+    <Container
+      sx={{ maxWidth: "xl", mb: 2, background: "#f0f5ff", borderRadius: 3 }}
+    >
       <Typography
         variant="h6"
         sx={{ p: 3 }}
@@ -220,16 +192,20 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
 
       {!forecastsLoading && forecasts && forecasts?.meta_data && (
         <NewFinancialTableData
-          data={editing ? editedData : forecasts?.meta_data}
-          editing={editing}
-          onEdit={handleEdit}
+          initialData={forecasts?.meta_data}
+          saving={saving}
           onSave={handleSave}
-          onCancel={handleCancelEdit}
-          onChange={handleEditChange}
         />
       )}
+
       {forecastsTicker.toUpperCase() !== "MINIMAX" && (
-        <Box display="flex" alignItems="center" justifyContent="center" mt={2} pb={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          mt={2}
+          pb={2}
+        >
           <InfoIcon sx={{ mr: 1 }} />
           <Typography sx={{ mr: 3 }} variant="body2">
             Above values are in local currency
@@ -240,14 +216,15 @@ const NewFinancialTableMain: React.FC<NewFinancialTableMainProps> = ({
           </Typography>
         </Box>
       )}
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
-        onClose={handleCloseSnackbar}
+        onClose={closeSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
+          onClose={closeSnackbar}
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >

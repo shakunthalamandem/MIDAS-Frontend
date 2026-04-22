@@ -112,7 +112,7 @@ const DealFormDataTabsMain: React.FC<Props> = ({
       if (response.status === 200 || response.status === 201) {
         // Track the backend-returned unique_deal_id so subsequent saves update
         // the same record even if pricing_date changes regenerated the id.
-        const returnedId = response.data?.unique_deal_id;
+        const returnedId = (response.data as { unique_deal_id?: string })?.unique_deal_id;
         if (returnedId !== undefined) {
           setCurrentUniqueDealId(returnedId ?? undefined);
         }
