@@ -85,15 +85,23 @@ const AGENT_THEMES: Record<string, { accent: string; bg: string; light: string; 
     light: "#a5f3fc",
     icon: <AssessmentOutlinedIcon sx={{ fontSize: 22, color: "#fff" }} />,
   },
+  "Gator POST IPO": {
+    accent: "#0f766e",
+    bg: "#f0fdfa",
+    light: "#99f6e4",
+    icon: <TrendingUpIcon sx={{ fontSize: 22, color: "#fff" }} />,
+  },
 };
 
 /* Override display names/descriptions without changing backend keys */
 const AGENT_DISPLAY_NAMES: Record<string, string> = {
   "JRitter IPO Agent": "Gator IPO Agent",
+  "Gator POST IPO": "Gator POST IPO",
 };
 
 const AGENT_DISPLAY_DESCRIPTIONS: Record<string, string> = {
   "JRitter IPO Agent": "Academic IPO analysis applying Jay Ritter's research framework. Analyzes pricing, underpricing, and long-term performance of US IPOs.",
+  "Gator POST IPO": "Post-IPO performance signal reports over the Day 1–40 horizon. Paste Claude-generated block JSON to store scorecards, price action, catalyst timelines, and risk registers — view full sentiment and details inline.",
 };
 
 const FALLBACK_THEMES = [
