@@ -36,16 +36,14 @@ const getAuthHeaders = (contentType?: string) => {
 
 const RiskDashboard: React.FC = () => {
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  const [selection, setSelection] = useState<"all" | string>("all");
+  // Multi-select: list of currently selected fund names
+  const [selectedFundList, setSelectedFundList] = useState<string[]>([]);
   const [allFundsConfig, setAllFundsConfig] = useState<string[]>([]);
   const [allFundsDraft, setAllFundsDraft] = useState<string[]>([]);
   const [configureAllOpen, setConfigureAllOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
 
-  const selectedFunds = useMemo(
-    () => (selection === "all" ? allFundsConfig : selection ? [selection] : []),
-    [selection, allFundsConfig]
-  );
+  const selectedFunds = useMemo(() => selectedFundList, [selectedFundList]);
   const [data, setData] = useState<DashboardData | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [exchrateLatestPnl, setExchrateLatestPnl] = useState<number | null>(null);
@@ -95,6 +93,8 @@ const RiskDashboard: React.FC = () => {
         const effective = saved ? saved.filter((f) => portfolioList.includes(f)) : activeFunds;
         setAllFundsConfig(effective);
         setAllFundsDraft(effective);
+        // Initial selection: every fund in the saved "All Funds" default
+        setSelectedFundList(effective);
       } catch (err: any) {
         setError(err.message || "Failed to load portfolios");
       }
@@ -348,9 +348,22 @@ const RiskDashboard: React.FC = () => {
     setSelectedIndexMetric((prev) => (prev === metricKey ? null : metricKey));
   };
 
-  const fundLabel = selection === "all"
-    ? (allFundsConfig.length === 1 ? allFundsConfig[0] : `All Funds (${allFundsConfig.length})`)
-    : (selection || "Fund");
+  const activeFundsCount = portfolios.filter((p) => !RETIRED_FUNDS.has(p)).length;
+  const isAllSelected =
+    activeFundsCount > 0 &&
+    selectedFundList.length === activeFundsCount &&
+    portfolios
+      .filter((p) => !RETIRED_FUNDS.has(p))
+      .every((f) => selectedFundList.includes(f));
+
+  const fundLabel =
+    selectedFundList.length === 0
+      ? "Fund"
+      : selectedFundList.length === 1
+      ? selectedFundList[0]
+      : isAllSelected
+      ? `All Funds (${selectedFundList.length})`
+      : `${selectedFundList.length} Funds`;
 
   const [legendOpen, setLegendOpen] = useState(false);
   const [showPdfTabs, setShowPdfTabs] = useState(false);
@@ -377,10 +390,10 @@ const RiskDashboard: React.FC = () => {
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
       <Box className="pdf-section" data-pdf-page="1">
         <DashboardHeader
-          selection={selection}
+          selectedFundList={selectedFundList}
+          onSelectedFundsChange={setSelectedFundList}
           allFundsConfig={allFundsConfig}
           portfolios={portfolios}
-          onSelectionChange={setSelection}
           onToggleConfigure={() => { setAllFundsDraft(allFundsConfig); setConfigureAllOpen((v) => !v); }}
           configureAllOpen={configureAllOpen}
           selectedDate={selectedDate}
@@ -490,6 +503,10 @@ const RiskDashboard: React.FC = () => {
                   onClick={() => {
                     setAllFundsConfig(allFundsDraft);
                     localStorage.setItem(ALL_FUNDS_CONFIG_KEY, JSON.stringify(allFundsDraft));
+                    // If dropdown previously reflected "All" (or nothing picked yet), sync to new default
+                    if (isAllSelected || selectedFundList.length === 0) {
+                      setSelectedFundList(allFundsDraft);
+                    }
                     setConfigureAllOpen(false);
                   }}
                   sx={{ textTransform: "none", borderRadius: "8px", backgroundColor: "#002060", fontSize: 13, px: 2.5, "&:hover": { backgroundColor: "#001540" }, "&.Mui-disabled": { backgroundColor: "#94a3b8", color: "#fff" } }}>

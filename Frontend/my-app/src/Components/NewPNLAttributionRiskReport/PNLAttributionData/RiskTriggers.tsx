@@ -17,6 +17,7 @@ import {
   Checkbox,
   OutlinedInput,
   Divider,
+  ListItemText,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -252,8 +253,12 @@ const RiskTriggers: React.FC = () => {
   const initialDate = searchParams.get("date") || "";
 
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  // "all" uses allFundsConfig; any other value is a single fund name
-  const [selection, setSelection] = useState<"all" | string>(initialFund || "all");
+  // Multi-select: list of currently selected fund names
+  const initialFundList = useMemo(
+    () => (initialFund ? initialFund.split(",").map((s) => s.trim()).filter(Boolean) : []),
+    [initialFund],
+  );
+  const [selectedFundList, setSelectedFundList] = useState<string[]>(initialFundList);
   const [allFundsConfig, setAllFundsConfig] = useState<string[]>([]);
   const [allFundsDraft, setAllFundsDraft] = useState<string[]>([]);
   const [configureAllOpen, setConfigureAllOpen] = useState(false);
@@ -272,11 +277,8 @@ const RiskTriggers: React.FC = () => {
   const [sectorSearch, setSectorSearch] = useState("");
   const [countrySearch, setCountrySearch] = useState("");
 
-  // Derived: the actual funds being queried
-  const selectedFunds = useMemo(
-    () => (selection === "all" ? allFundsConfig : selection ? [selection] : []),
-    [selection, allFundsConfig]
-  );
+  // Derived: the actual funds being queried (= the multi-select list)
+  const selectedFunds = useMemo(() => selectedFundList, [selectedFundList]);
 
   const defaultGuidelines = GUIDELINE_FIELDS.reduce<Record<string, number>>((acc, f) => { acc[f.key] = f.defaultValue; return acc; }, {});
 
@@ -308,6 +310,11 @@ const RiskTriggers: React.FC = () => {
         const effective = saved ? saved.filter((f) => allPortfolios.includes(f)) : activeFunds;
         setAllFundsConfig(effective);
         setAllFundsDraft(effective);
+        // Initial selection: use the URL param fund list if provided, otherwise "All Funds"
+        setSelectedFundList((prev) => {
+          if (prev.length > 0) return prev.filter((f) => allPortfolios.includes(f));
+          return effective;
+        });
       } catch (err: any) { setError(err.message || "Failed to load portfolios"); }
     };
     fetchPortfolios();
@@ -417,9 +424,22 @@ const RiskTriggers: React.FC = () => {
 
   const sortedFunds = Object.entries(fundResponses).sort(([, a], [, b]) => concernScore(b) - concernScore(a));
 
-  const fundsLabel = selection === "all"
-    ? (allFundsConfig.length === 1 ? allFundsConfig[0] : `All Funds (${allFundsConfig.length})`)
-    : (selection || "Fund");
+  const activeFundsInPortfolios = useMemo(
+    () => portfolios.filter((p) => !RETIRED_FUNDS.has(p)),
+    [portfolios],
+  );
+  const isAllSelected =
+    activeFundsInPortfolios.length > 0 &&
+    activeFundsInPortfolios.every((f) => selectedFundList.includes(f));
+  const someSelected = selectedFundList.length > 0 && !isAllSelected;
+  const fundsLabel =
+    selectedFundList.length === 0
+      ? "Fund"
+      : selectedFundList.length === 1
+      ? selectedFundList[0]
+      : isAllSelected
+      ? `All Funds (${selectedFundList.length})`
+      : `${selectedFundList.length} Funds`;
 
   const hasGuidelineChanges = (() => {
     const nums: Record<string, number> = {};
@@ -456,11 +476,23 @@ const RiskTriggers: React.FC = () => {
             <Typography className="trig-header-title">{fundsLabel} Limits and Alerts</Typography>
           </Box>
           <Box className="trig-header-right">
-            {/* Fund selector — All or single fund */}
-            <FormControl size="small" sx={{ minWidth: 160 }}>
+            {/* Fund multi-select dropdown with checkboxes */}
+            <FormControl size="small" sx={{ minWidth: 220 }}>
               <Select
-                value={selection}
-                onChange={(e) => setSelection(e.target.value)}
+                multiple
+                value={selectedFundList}
+                onChange={(e) => {
+                  const raw = e.target.value as string[];
+                  if (raw.includes("__ALL__")) {
+                    // Master "All" toggles only active funds; preserve any manually-added retired funds.
+                    const retiredKept = selectedFundList.filter((f) => RETIRED_FUNDS.has(f));
+                    setSelectedFundList(
+                      isAllSelected ? retiredKept : [...activeFundsInPortfolios, ...retiredKept],
+                    );
+                    return;
+                  }
+                  setSelectedFundList(raw.filter((v) => v !== "__ALL__"));
+                }}
                 input={<OutlinedInput sx={{
                   color: "#fff",
                   borderRadius: "8px",
@@ -471,28 +503,66 @@ const RiskTriggers: React.FC = () => {
                   "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.4)" },
                   "& .MuiSvgIcon-root": { color: "rgba(255,255,255,0.6)" },
                 }} />}
-                renderValue={(val) =>
-                  val === "all"
-                    ? `All Funds (${allFundsConfig.length})`
-                    : (val as string)
-                }
-                MenuProps={{ PaperProps: { sx: { mt: 0.5, bgcolor: "#1a2035", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 2, "& .MuiMenuItem-root": { color: "#e2e8f0", fontSize: 13, py: 0.75, "&:hover": { bgcolor: "rgba(255,255,255,0.06)" }, "&.Mui-selected": { bgcolor: "rgba(255,255,255,0.1)" } } } }, disableAutoFocusItem: true }}
+                renderValue={() => {
+                  if (selectedFundList.length === 0) return "Select Funds";
+                  if (isAllSelected) return `All Funds (${activeFundsInPortfolios.length})`;
+                  if (selectedFundList.length === 1) return selectedFundList[0];
+                  return `${selectedFundList.length} of ${activeFundsInPortfolios.length} selected`;
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      mt: 0.5,
+                      bgcolor: "#1a2035",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 2,
+                      maxHeight: 360,
+                      "& .MuiMenuItem-root": {
+                        color: "#e2e8f0",
+                        fontSize: 13,
+                        py: 0.5,
+                        "&:hover": { bgcolor: "rgba(255,255,255,0.06)" },
+                        "&.Mui-selected": { bgcolor: "transparent" },
+                        "&.Mui-selected:hover": { bgcolor: "rgba(255,255,255,0.06)" },
+                      },
+                      "& .MuiCheckbox-root": { p: 0.5, color: "#94a3b8" },
+                      "& .MuiCheckbox-root.Mui-checked": { color: "#10b981" },
+                      "& .MuiCheckbox-root.MuiCheckbox-indeterminate": { color: "#10b981" },
+                    },
+                  },
+                  disableAutoFocusItem: true,
+                }}
               >
-                <MenuItem value="all">
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 3 }}>
-                    <strong>All Funds</strong>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>{allFundsConfig.length} funds</span>
-                  </Box>
+                <MenuItem value="__ALL__" disableRipple>
+                  <Checkbox
+                    size="small"
+                    checked={isAllSelected}
+                    indeterminate={someSelected}
+                  />
+                  <ListItemText
+                    primary="All Funds"
+                    secondary={`${activeFundsInPortfolios.length} funds`}
+                    primaryTypographyProps={{ fontWeight: 700, color: "#fff" }}
+                    secondaryTypographyProps={{ fontSize: 11, color: "#94a3b8" }}
+                  />
                 </MenuItem>
                 <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.1)" }} />
                 {portfolios.map((p) => {
                   const isRetired = RETIRED_FUNDS.has(p);
+                  const checked = selectedFundList.includes(p);
                   return (
-                    <MenuItem key={p} value={p} sx={{ opacity: isRetired ? 0.4 : 1, fontStyle: isRetired ? "italic" : "normal" }}>
-                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 2 }}>
-                        <span>{p}</span>
-                        {isRetired && <span style={{ fontSize: 10, color: "#94a3b8" }}>retired</span>}
-                      </Box>
+                    <MenuItem
+                      key={p}
+                      value={p}
+                      sx={{ opacity: isRetired ? 0.7 : 1, fontStyle: isRetired ? "italic" : "normal" }}
+                    >
+                      <Checkbox size="small" checked={checked} />
+                      <ListItemText primary={p} />
+                      {isRetired && (
+                        <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: 8 }}>
+                          retired
+                        </span>
+                      )}
                     </MenuItem>
                   );
                 })}
@@ -645,6 +715,10 @@ const RiskTriggers: React.FC = () => {
                         onClick={() => {
                           setAllFundsConfig(allFundsDraft);
                           localStorage.setItem(ALL_FUNDS_CONFIG_KEY, JSON.stringify(allFundsDraft));
+                          // If the dropdown was previously showing "All", update it to the new set
+                          if (isAllSelected || selectedFundList.length === 0) {
+                            setSelectedFundList(allFundsDraft);
+                          }
                           setConfigureAllOpen(false);
                         }}
                         sx={{ textTransform: "none", borderRadius: "8px", backgroundColor: "#002060", fontSize: 13, px: 2.5, "&:hover": { backgroundColor: "#001540" }, "&.Mui-disabled": { backgroundColor: "#94a3b8", color: "#fff" } }}
