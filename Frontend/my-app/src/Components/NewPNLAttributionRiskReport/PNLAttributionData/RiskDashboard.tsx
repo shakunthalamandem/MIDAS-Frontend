@@ -10,7 +10,7 @@ import HeadlineRisks from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
-import TopBottomPnLTable from "./TopBottomPnLTable";
+import TopBottomPnLTable, { PnlPeriod } from "./TopBottomPnLTable";
 import IndexComparisonChart from "./IndexComparisonChart";
 import Attribution from "./Attribution";
 import AttributionAllTabs from "./AttributionAllTabs";
@@ -54,6 +54,8 @@ const RiskDashboard: React.FC = () => {
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
   const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
+  const [topBottomPeriod, setTopBottomPeriod] = useState<PnlPeriod>("dtd");
+  const [topBottomLoading, setTopBottomLoading] = useState(false);
   const [metricChartData, setMetricChartData] = useState<MetricChartDataPoint[]>([]);
   const [metricChartLoading, setMetricChartLoading] = useState(false);
   const [metricTop10, setMetricTop10] = useState<TopBottomMetricTicker[]>([]);
@@ -116,7 +118,7 @@ const RiskDashboard: React.FC = () => {
       setError("");
 
       try {
-        const [dashboardRes, chartRes, topBottomRes, indexChartRes] = await Promise.all([
+        const [dashboardRes, chartRes, indexChartRes] = await Promise.all([
           fetch(`${apiUrl}/api/portfolio_risk_dashboard/`, {
             method: "POST",
             headers: getAuthHeaders("application/json"),
@@ -131,12 +133,6 @@ const RiskDashboard: React.FC = () => {
               fund: selectedFunds,
               period: metricToPeriod(selectedMetric),
             }),
-            signal,
-          }),
-          fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
-            method: "POST",
-            headers: getAuthHeaders("application/json"),
-            body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
             signal,
           }),
           fetch(`${apiUrl}/api/portfolio_index_comparison_chart/`, {
@@ -169,16 +165,6 @@ const RiskDashboard: React.FC = () => {
           setExchrateLatestPnl(null);
         }
 
-        // Process top/bottom
-        if (topBottomRes.ok) {
-          const tbResult = await topBottomRes.json();
-          setTopBottomTop(tbResult.top_10 || []);
-          setTopBottomBottom(tbResult.bottom_10 || []);
-        } else {
-          setTopBottomTop([]);
-          setTopBottomBottom([]);
-        }
-
         // Process index chart
         if (indexChartRes.ok) {
           const indexResult = await indexChartRes.json();
@@ -199,6 +185,48 @@ const RiskDashboard: React.FC = () => {
 
     return () => { if (abortRefs.current["pnlData"]) abortRefs.current["pnlData"].abort(); };
   }, [selectedFunds, selectedDate]);
+
+  // Separate effect for top/bottom P&L tickers — reacts to period toggle
+  useEffect(() => {
+    if (selectedFunds.length === 0 || !selectedDate) return;
+
+    const signal = getSignal("topBottomPnl");
+    setTopBottomLoading(true);
+
+    const fetchTopBottom = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
+          method: "POST",
+          headers: getAuthHeaders("application/json"),
+          body: JSON.stringify({
+            date: selectedDate,
+            fund: selectedFunds,
+            period: topBottomPeriod,
+          }),
+          signal,
+        });
+        if (signal.aborted) return;
+        if (res.ok) {
+          const result = await res.json();
+          setTopBottomTop(result.top_10 || []);
+          setTopBottomBottom(result.bottom_10 || []);
+        } else {
+          setTopBottomTop([]);
+          setTopBottomBottom([]);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setTopBottomTop([]);
+        setTopBottomBottom([]);
+      } finally {
+        if (!signal.aborted) setTopBottomLoading(false);
+      }
+    };
+
+    fetchTopBottom();
+
+    return () => { if (abortRefs.current["topBottomPnl"]) abortRefs.current["topBottomPnl"].abort(); };
+  }, [selectedFunds, selectedDate, topBottomPeriod]);
 
   // Separate effect for chart data when only metric changes (not funds/date)
   useEffect(() => {
@@ -616,11 +644,13 @@ const RiskDashboard: React.FC = () => {
             <TopBottomPnLTable
               top10={topBottomTop}
               bottom10={topBottomBottom}
-              loading={loading}
+              loading={loading || topBottomLoading}
               category={selectedCategory}
               metricTop10={metricTop10}
               metricBottom10={metricBottom10}
               metricLoading={metricTopBottomLoading}
+              period={topBottomPeriod}
+              onPeriodChange={setTopBottomPeriod}
             />
           </Box>
 

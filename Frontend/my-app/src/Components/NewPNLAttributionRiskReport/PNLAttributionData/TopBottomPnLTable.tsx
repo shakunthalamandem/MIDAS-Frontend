@@ -12,6 +12,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   beta_adj_net_mv: "Beta Adj. Net Exposure",
 };
 
+export type PnlPeriod = "dtd" | "mtd" | "ytd";
+
+const PERIOD_OPTIONS: { key: PnlPeriod; label: string }[] = [
+  { key: "dtd", label: "DTD" },
+  { key: "mtd", label: "MTD" },
+  { key: "ytd", label: "YTD" },
+];
+
 interface TopBottomPnLTableProps {
   top10: TopBottomPnlTicker[];
   bottom10: TopBottomPnlTicker[];
@@ -20,6 +28,8 @@ interface TopBottomPnLTableProps {
   metricTop10?: TopBottomMetricTicker[];
   metricBottom10?: TopBottomMetricTicker[];
   metricLoading?: boolean;
+  period?: PnlPeriod;
+  onPeriodChange?: (period: PnlPeriod) => void;
 }
 
 const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
@@ -30,17 +40,40 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
   metricTop10 = [],
   metricBottom10 = [],
   metricLoading = false,
+  period = "dtd",
+  onPeriodChange,
 }) => {
   const isPnl = category === "pnl";
   const activeTop = isPnl ? top10 : metricTop10;
   const activeBottom = isPnl ? bottom10 : metricBottom10;
   const activeLoading = isPnl ? loading : metricLoading;
-  const label = CATEGORY_LABELS[category] || "P&L (Gross)";
+  const baseLabel = CATEGORY_LABELS[category] || "P&L (Gross)";
+  const periodLabel = period.toUpperCase();
+  const label = isPnl ? `${periodLabel} ${baseLabel}` : baseLabel;
   const valueKey = isPnl ? "pnl" : "value";
+
+  const periodToggle = isPnl && onPeriodChange ? (
+    <Box className="tb-pnl-period-toggle" role="tablist" aria-label="PNL period">
+      {PERIOD_OPTIONS.map((opt) => (
+        <Box
+          key={opt.key}
+          role="tab"
+          aria-selected={period === opt.key}
+          className={`tb-pnl-period-btn${period === opt.key ? " tb-pnl-period-btn--active" : ""}`}
+          onClick={() => onPeriodChange(opt.key)}
+        >
+          {opt.label}
+        </Box>
+      ))}
+    </Box>
+  ) : null;
 
   if (activeLoading) {
     return (
       <Box className="risk-dashboard-section">
+        {periodToggle && (
+          <Box className="tb-pnl-toolbar">{periodToggle}</Box>
+        )}
         <Box className="risk-dashboard-loading" sx={{ minHeight: 200 }}>
           <CircularProgress size={32} />
         </Box>
@@ -49,11 +82,20 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
   }
 
   if (activeTop.length === 0 && activeBottom.length === 0) {
-    return null;
+    if (!periodToggle) return null;
+    return (
+      <Box className="risk-dashboard-section">
+        <Box className="tb-pnl-toolbar">{periodToggle}</Box>
+        <Box className="tb-pnl-empty" sx={{ padding: "24px 16px" }}>No data available</Box>
+      </Box>
+    );
   }
 
   return (
     <Box className="risk-dashboard-section">
+      {periodToggle && (
+        <Box className="tb-pnl-toolbar">{periodToggle}</Box>
+      )}
       <Box className="tb-pnl-container">
         {/* Top 10 */}
         <Box className="tb-pnl-card">
