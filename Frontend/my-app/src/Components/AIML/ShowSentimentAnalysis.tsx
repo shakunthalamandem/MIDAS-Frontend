@@ -173,14 +173,41 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
           setLatestDate(null);
         }
 
-        const raw = data?.sentiment ?? data?.answer ?? data;
+        let raw = data?.sentiment ?? data?.answer ?? data;
+        // Handle if sentiment is a string that needs parsing
+        if (typeof raw === "string") {
+          try {
+            raw = JSON.parse(raw);
+          } catch {
+            // If parsing fails, normalizeBlocks will handle it
+          }
+        }
         const parsedBlocks = normalizeBlocks(raw);
 
-        const socialMediaRaw = data?.socialmedia_retail_sentiment;
+        let socialMediaRaw = data?.socialmedia_retail_sentiment;
+        // Handle if socialmedia_retail_sentiment is a string that needs parsing
+        if (typeof socialMediaRaw === "string") {
+          try {
+            socialMediaRaw = JSON.parse(socialMediaRaw);
+          } catch {
+            // If parsing fails, normalizeBlocks will handle it
+          }
+        }
         const parsedSocialMediaBlocks = socialMediaRaw ? normalizeBlocks(socialMediaRaw) : [];
 
-        const changeInSentimentRaw = data?.changein_sentiment;
+        let changeInSentimentRaw = data?.changein_sentiment;
+        // Handle if changein_sentiment is a string that needs parsing
+        if (typeof changeInSentimentRaw === "string") {
+          try {
+            changeInSentimentRaw = JSON.parse(changeInSentimentRaw);
+          } catch (e) {
+            console.error("Error parsing changein_sentiment:", e);
+            // If parsing fails, normalizeBlocks will handle it
+          }
+        }
         const parsedChangeInSentimentBlocks = changeInSentimentRaw ? normalizeBlocks(changeInSentimentRaw) : [];
+        console.log("changeInSentimentRaw:", changeInSentimentRaw);
+        console.log("parsedChangeInSentimentBlocks:", parsedChangeInSentimentBlocks);
 
         if (!parsedBlocks.length && !parsedSocialMediaBlocks.length && !parsedChangeInSentimentBlocks.length) {
           setStatus("Data will update soon for this ticker.");
@@ -191,6 +218,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
           setBlocks(parsedBlocks);
           setSocialMediaBlocks(parsedSocialMediaBlocks);
           setChangeInSentimentBlocks(parsedChangeInSentimentBlocks);
+          console.log("Setting states - blocks:", parsedBlocks.length, "socialMedia:", parsedSocialMediaBlocks.length, "changeInSentiment:", parsedChangeInSentimentBlocks.length);
           // Auto-activate the appropriate tab based on available data
           if (parsedChangeInSentimentBlocks.length > 0) {
             setActiveTab(0);
@@ -509,7 +537,7 @@ Each ticker is analyzed independently using live market data, news sentiment, an
       )}
 
       {/* Content with Tabs */}
-      {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0) && (
+      {!loading && !error && (blocks.length > 0 || socialMediaBlocks.length > 0 || changeInSentimentBlocks.length > 0) && (
         <>
           {/* Tab Pills */}
           <Box
