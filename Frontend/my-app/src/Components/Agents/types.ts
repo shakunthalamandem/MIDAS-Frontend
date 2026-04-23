@@ -99,13 +99,14 @@ export interface ChatResponse {
 export const SYSTEM_AGENT_ROUTES: Record<string, string> = {
   "Portfolio Risk Agent": "/ai_risk_review",
   "Portfolio CIO Agent": "/ai_portfolio_review",
+  "Technical Portfoliio Agent": "/md_technical_analysis",
   "Risk Agent": "/ai_risk_review",
   "IPO Ranking Agent": "/last_30_days_ai_ranking",
   "Deal(IPO) Agent": "/ai_unsupervised_summary",
   "Sentiment Agent": "/ai_sentiment_summary",
   "Gator IPO Agent": "/gator_ipo_analysis",
   "JRitter IPO Agent": "/jritter_agent",
-  "Technical Agent": "/md_technical_analysis"
+  "Quant Agent": "/quant_agent",
 };
 
 export const SCHEDULE_LABELS: Record<string, string> = {
