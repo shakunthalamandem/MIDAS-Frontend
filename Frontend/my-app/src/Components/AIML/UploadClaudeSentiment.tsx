@@ -128,7 +128,8 @@ const uploadSentiment = async (
   oneMonthSentiment: string,
   sentimentSummary: string,
   sentimentScore: string,
-  socialMediaSentimentScore: string
+  socialMediaSentimentScore: string,
+  changeInSentiment: string
 ) => {
   const token = localStorage.getItem("access_token");
 
@@ -145,6 +146,7 @@ const uploadSentiment = async (
   if (sentimentSummary.trim()) payload.sentiment_summary = sentimentSummary;
   if (sentimentScore.trim()) payload.sentiment_score = sentimentScore;
   if (socialMediaSentimentScore.trim()) payload.socialmedia_sentiment_score = socialMediaSentimentScore;
+  if (changeInSentiment.trim()) payload.change_in_sentiment = changeInSentiment;
 
   const res = await fetch(`${apiUrl}/api/upload_claude_sentiment/`, {
     method: "POST",
@@ -169,6 +171,7 @@ const UploadClaudeSentiment: React.FC = () => {
   const [sentimentSummary, setSentimentSummary] = useState("");
   const [sentimentScore, setSentimentScore] = useState("");
   const [socialMediaSentimentScore, setSocialMediaSentimentScore] = useState("");
+  const [changeInSentiment, setChangeInSentiment] = useState("");
   const [loadingTickers, setLoadingTickers] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -226,8 +229,9 @@ const UploadClaudeSentiment: React.FC = () => {
     const trimmedSentimentSummary = sentimentSummary.trim();
     const trimmedSentimentScore = sentimentScore.trim();
     const trimmedSocialMediaSentimentScore = socialMediaSentimentScore.trim();
+    const trimmedChangeInSentiment = changeInSentiment.trim();
 
-    if (!trimmedSentiment && !trimmedSocialMediaSentiment && !trimmedOneWeekSentiment && !trimmedOneMonthSentiment && !trimmedSentimentSummary && !trimmedSentimentScore && !trimmedSocialMediaSentimentScore) {
+    if (!trimmedSentiment && !trimmedSocialMediaSentiment && !trimmedOneWeekSentiment && !trimmedOneMonthSentiment && !trimmedSentimentSummary && !trimmedSentimentScore && !trimmedSocialMediaSentimentScore && !trimmedChangeInSentiment) {
       setError("Please enter at least one sentiment field");
       return;
     }
@@ -246,7 +250,8 @@ const UploadClaudeSentiment: React.FC = () => {
         trimmedOneMonthSentiment,
         trimmedSentimentSummary,
         trimmedSentimentScore,
-        trimmedSocialMediaSentimentScore
+        trimmedSocialMediaSentimentScore,
+        trimmedChangeInSentiment
       );
 
       setSuccess(`Successfully uploaded sentiment for ${selectedTicker.ticker}`);
@@ -257,6 +262,7 @@ const UploadClaudeSentiment: React.FC = () => {
       setSentimentSummary("");
       setSentimentScore("");
       setSocialMediaSentimentScore("");
+      setChangeInSentiment("");
       setSelectedTicker(null);
       setTickerSearchValue("");
     } catch (err: any) {
@@ -455,6 +461,19 @@ const UploadClaudeSentiment: React.FC = () => {
               placeholder="Enter social media sentiment score (e.g., 0-100)..."
               value={socialMediaSentimentScore}
               onChange={(e) => setSocialMediaSentimentScore(e.target.value)}
+              fullWidth
+              variant="outlined"
+              disabled={uploading}
+            />
+
+            {/* Change in Sentiment Field */}
+            <TextField
+              label="Change in Sentiment"
+              placeholder="Enter change in sentiment..."
+              value={changeInSentiment}
+              onChange={(e) => setChangeInSentiment(e.target.value)}
+              multiline
+              rows={4}
               fullWidth
               variant="outlined"
               disabled={uploading}
