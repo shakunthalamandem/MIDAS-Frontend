@@ -1,18 +1,30 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, TextField, MenuItem, IconButton, Select, OutlinedInput, FormControl, Tooltip } from "@mui/material";
+import {
+  Box,
+  TextField,
+  MenuItem,
+  IconButton,
+  Select,
+  OutlinedInput,
+  FormControl,
+  Tooltip,
+  Checkbox,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TuneIcon from "@mui/icons-material/Tune";
 import { formatCurrency } from "./utils";
 
 const RETIRED_FUNDS = new Set(["FMAP", "MMLS"]);
+const ALL_VALUE = "__ALL__";
 
 interface DashboardHeaderProps {
-  selection: "all" | string;
-  allFundsConfig: string[];
+  selectedFundList: string[];
+  onSelectedFundsChange: (funds: string[]) => void;
+  allFundsConfig: string[]; // saved "All Funds" default set (for the Configure panel)
   portfolios: string[];
-  onSelectionChange: (val: string) => void;
   onToggleConfigure: () => void;
   configureAllOpen: boolean;
   selectedDate: string;
@@ -23,7 +35,7 @@ interface DashboardHeaderProps {
 }
 
 const selectSx = {
-  minWidth: 180,
+  minWidth: 220,
   borderRadius: "20px",
   backgroundColor: "rgba(255,255,255,0.08)",
   color: "#fff",
@@ -39,14 +51,19 @@ const menuPaperSx = {
   bgcolor: "#1a2035",
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: 2,
+  maxHeight: 360,
   "& .MuiMenuItem-root": {
     color: "#e2e8f0",
     fontSize: 13,
-    py: 0.75,
+    py: 0.5,
     "&:hover": { bgcolor: "rgba(16,185,129,0.1)" },
-    "&.Mui-selected": { bgcolor: "rgba(16,185,129,0.12)" },
-    "&.Mui-selected:hover": { bgcolor: "rgba(16,185,129,0.18)" },
+    "&.Mui-selected": { bgcolor: "transparent" },
+    "&.Mui-selected:hover": { bgcolor: "rgba(16,185,129,0.1)" },
   },
+  "& .MuiCheckbox-root": { p: 0.5, color: "#94a3b8" },
+  "& .MuiCheckbox-root.Mui-checked": { color: "#10b981" },
+  "& .MuiCheckbox-root.MuiCheckbox-indeterminate": { color: "#10b981" },
+  "& .MuiListItemText-primary": { fontSize: 13 },
 };
 
 const dateInputSx = {
@@ -75,10 +92,10 @@ const shiftDate = (dateStr: string, days: number): string => {
 };
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
-  selection,
+  selectedFundList,
+  onSelectedFundsChange,
   allFundsConfig,
   portfolios,
-  onSelectionChange,
   onToggleConfigure,
   configureAllOpen,
   selectedDate,
@@ -87,12 +104,45 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   exportButton,
   triggersButton,
 }) => {
-  const navigate = useNavigate();
+  const activeFunds = React.useMemo(
+    () => portfolios.filter((p) => !RETIRED_FUNDS.has(p)),
+    [portfolios],
+  );
+
+  // "All" = every non-retired fund is selected
+  const allSelected =
+    activeFunds.length > 0 && activeFunds.every((f) => selectedFundList.includes(f));
+  const someSelected = selectedFundList.length > 0 && !allSelected;
 
   const titleLabel =
-    selection === "all"
-      ? (allFundsConfig.length === 1 ? `${allFundsConfig[0]} Risk Dashboard` : "All Funds Risk Dashboard")
-      : `${selection} Risk Dashboard`;
+    selectedFundList.length === 0
+      ? "Select Funds"
+      : selectedFundList.length === 1
+      ? `${selectedFundList[0]} Risk Dashboard`
+      : allSelected
+      ? "All Funds Risk Dashboard"
+      : `${selectedFundList.length} Funds Risk Dashboard`;
+
+  const handleChange = (event: any) => {
+    const raw = event.target.value as string[];
+    // User clicked the "All" master row (MUI added ALL_VALUE to the array).
+    if (raw.includes(ALL_VALUE)) {
+      // Master "All" toggles only active (non-retired) funds. Any manually-added
+      // retired funds are preserved on this toggle.
+      const retiredKept = selectedFundList.filter((f) => RETIRED_FUNDS.has(f));
+      onSelectedFundsChange(allSelected ? retiredKept : [...activeFunds, ...retiredKept]);
+      return;
+    }
+    // Regular toggle — strip out the ALL marker, keep retired funds if user picked them.
+    onSelectedFundsChange(raw.filter((v) => v !== ALL_VALUE));
+  };
+
+  const renderValue = () => {
+    if (selectedFundList.length === 0) return "Select Funds";
+    if (allSelected) return `All Funds (${activeFunds.length})`;
+    if (selectedFundList.length === 1) return selectedFundList[0];
+    return `${selectedFundList.length} of ${activeFunds.length} selected`;
+  };
 
   return (
     <Box className="risk-dashboard-header">
@@ -106,45 +156,61 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </Box>
 
       <Box className="risk-dashboard-header-right">
-        {/* Fund selector — All or single fund */}
+        {/* Fund multi-select dropdown with checkboxes */}
         <FormControl size="small">
           <Select
-            value={selection}
-            onChange={(e) => onSelectionChange(e.target.value)}
+            multiple
+            value={selectedFundList}
+            onChange={handleChange}
             input={<OutlinedInput sx={selectSx} />}
-            renderValue={(val) =>
-              val === "all"
-                ? `All Funds (${allFundsConfig.length})`
-                : (val as string)
-            }
-            MenuProps={{ PaperProps: { sx: menuPaperSx }, disableAutoFocusItem: true }}
+            renderValue={renderValue}
+            MenuProps={{
+              PaperProps: { sx: menuPaperSx },
+              disableAutoFocusItem: true,
+            }}
             sx={selectSx}
           >
-            <MenuItem value="all">
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 3 }}>
-                <strong>All Funds</strong>
-                <span style={{ fontSize: 11, color: "#94a3b8" }}>{allFundsConfig.length} funds</span>
-              </Box>
+            <MenuItem value={ALL_VALUE} disableRipple>
+              <Checkbox
+                size="small"
+                checked={allSelected}
+                indeterminate={someSelected}
+              />
+              <ListItemText
+                primary="All Funds"
+                secondary={`${activeFunds.length} funds`}
+                primaryTypographyProps={{ fontWeight: 700, color: "#fff" }}
+                secondaryTypographyProps={{ fontSize: 11, color: "#94a3b8" }}
+              />
             </MenuItem>
-            <Box sx={{ height: "1px", bgcolor: "rgba(255,255,255,0.1)", my: 0.5 }} />
+            <Divider sx={{ my: 0.5, borderColor: "rgba(255,255,255,0.1)" }} />
             {portfolios.map((p) => {
               const isRetired = RETIRED_FUNDS.has(p);
+              const checked = selectedFundList.includes(p);
               return (
-                <MenuItem key={p} value={p}
-                  sx={{ opacity: isRetired ? 0.4 : 1, fontStyle: isRetired ? "italic" : "normal" }}
+                <MenuItem
+                  key={p}
+                  value={p}
+                  sx={{
+                    opacity: isRetired ? 0.7 : 1,
+                    fontStyle: isRetired ? "italic" : "normal",
+                  }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 2 }}>
-                    <span>{p}</span>
-                    {isRetired && <span style={{ fontSize: 10, color: "#64748b" }}>retired</span>}
-                  </Box>
+                  <Checkbox size="small" checked={checked} />
+                  <ListItemText primary={p} />
+                  {isRetired && (
+                    <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: 8 }}>
+                      retired
+                    </span>
+                  )}
                 </MenuItem>
               );
             })}
           </Select>
         </FormControl>
 
-        {/* Configure "All Funds" toggle */}
-        <Tooltip title='Configure "All Funds"' placement="bottom">
+        {/* Configure "All Funds" default set */}
+        <Tooltip title='Configure default "All Funds" set' placement="bottom">
           <IconButton
             size="small"
             onClick={onToggleConfigure}
