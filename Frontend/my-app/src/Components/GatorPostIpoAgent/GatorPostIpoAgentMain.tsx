@@ -16,7 +16,6 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -24,12 +23,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import BlockRenderer, { GatorBlock } from "./BlockRenderer";
-import RunTickerDialog from "./RunTickerDialog";
 
 interface SavedRecord {
   id: number;
@@ -133,12 +128,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
 
-  // Run-Ticker dialog state
-  const [runDialogOpen, setRunDialogOpen] = useState(false);
-  const [autoRunTicker, setAutoRunTicker] = useState<string | undefined>(undefined);
-  // Per-row refresh state: ticker → true while that row's refresh is in flight
-  const [rowRefreshing, setRowRefreshing] = useState<Record<string, boolean>>({});
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("access_token");
 
@@ -233,110 +222,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number, ticker: string) => {
-    if (!window.confirm(`Delete ${ticker} Post-IPO record? This cannot be undone.`)) return;
-    try {
-      const res = await fetch(`${apiUrl}/api/gator_post_ipo/${id}/`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-      if (!res.ok) throw new Error("Delete failed");
-      setSnackbar({
-        open: true,
-        message: `${ticker} deleted successfully`,
-        severity: "success",
-      });
-      fetchRecords();
-    } catch (err: any) {
-      setSnackbar({
-        open: true,
-        message: err.message || "Failed to delete",
-        severity: "error",
-      });
-    }
-  };
-
-  /**
-   * Kick off a Gator POST IPO sync for a single ticker and poll until it
-   * completes. Updates `rowRefreshing[ticker]` so the row shows a spinner.
-   */
-  const refreshSingleTicker = useCallback(
-    async (ticker: string) => {
-      if (!ticker) return;
-      setRowRefreshing((prev) => ({ ...prev, [ticker]: true }));
-      const tokenNow = localStorage.getItem("access_token");
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        ...(tokenNow ? { Authorization: `Bearer ${tokenNow}` } : {}),
-      };
-      try {
-        const startRes = await fetch(`${apiUrl}/api/gator_post_ipo/run/`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ ticker }),
-        });
-        const startData = await startRes.json();
-        if (!startRes.ok) throw new Error(startData.error || "Failed to start run");
-
-        const taskId = startData.task_id as string;
-        const deadline = Date.now() + 8 * 60 * 1000; // 8-min ceiling
-
-        // Poll every 3s until ready / deadline
-        while (Date.now() < deadline) {
-          await new Promise((r) => setTimeout(r, 3000));
-          const statusRes = await fetch(
-            `${apiUrl}/api/gator_post_ipo/run-status/${taskId}/?ticker=${encodeURIComponent(ticker)}`,
-            { headers },
-          );
-          const statusData = await statusRes.json();
-          if (!statusRes.ok) throw new Error(statusData.error || "Status poll failed");
-          if (statusData.ready) {
-            if (statusData.successful) {
-              setSnackbar({
-                open: true,
-                message: `${ticker} report refreshed`,
-                severity: "success",
-              });
-              await fetchRecords();
-            } else {
-              throw new Error(statusData.error || "Task failed");
-            }
-            return;
-          }
-        }
-        throw new Error("Timed out waiting for task to finish");
-      } catch (err: any) {
-        setSnackbar({
-          open: true,
-          message: `${ticker}: ${err.message || "Refresh failed"}`,
-          severity: "error",
-        });
-      } finally {
-        setRowRefreshing((prev) => {
-          const next = { ...prev };
-          delete next[ticker];
-          return next;
-        });
-      }
-    },
-    [apiUrl, fetchRecords],
-  );
-
-  const handleDialogRunComplete = useCallback(
-    (ticker: string) => {
-      setSnackbar({
-        open: true,
-        message: `${ticker} report refreshed`,
-        severity: "success",
-      });
-      fetchRecords();
-    },
-    [fetchRecords],
-  );
-
   const PX = { xs: 2, sm: 3, md: 5, lg: 8 };
 
   if (loading) {
@@ -400,51 +285,26 @@ const GatorPostIpoAgentMain: React.FC = () => {
                 Post-IPO performance signal reports — Ritter framework, Day 1–40 horizon.
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", gap: 1.2, flexWrap: "wrap" }}>
-              <Button
-                variant="contained"
-                startIcon={<PlayArrowOutlinedIcon />}
-                onClick={() => {
-                  setAutoRunTicker(undefined);
-                  setRunDialogOpen(true);
-                }}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  px: 3,
-                  py: 1.1,
-                  borderRadius: 2.5,
-                  background: "#ffffff",
-                  color: "#0891b2",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  boxShadow: "0 4px 12px rgba(8,145,178,0.2)",
-                  "&:hover": { background: "#f0fdff" },
-                }}
-              >
-                Run Ticker
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<CloudUploadOutlinedIcon />}
-                onClick={() => navigate("/gator_post_ipo/upload")}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  px: 3,
-                  py: 1.1,
-                  borderRadius: 2.5,
-                  background: "rgba(255,255,255,0.15)",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  color: "#fff",
-                  backdropFilter: "blur(8px)",
-                  "&:hover": { background: "rgba(255,255,255,0.25)" },
-                }}
-              >
-                Upload JSON
-              </Button>
-            </Box>
+            <Button
+              variant="contained"
+              startIcon={<CloudUploadOutlinedIcon />}
+              onClick={() => navigate("/gator_post_ipo/upload")}
+              sx={{
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                px: 3,
+                py: 1.1,
+                borderRadius: 2.5,
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "#fff",
+                backdropFilter: "blur(8px)",
+                "&:hover": { background: "rgba(255,255,255,0.25)" },
+              }}
+            >
+              Upload JSON
+            </Button>
           </Box>
 
           {/* Stat cards */}
@@ -650,15 +510,12 @@ const GatorPostIpoAgentMain: React.FC = () => {
                       Updated
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle} align="right">
-                    {" "}
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} sx={{ textAlign: "center", py: 10 }}>
+                    <TableCell colSpan={8} sx={{ textAlign: "center", py: 10 }}>
                       <Typography
                         sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem" }}
                       >
@@ -808,48 +665,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
                               })}
                             </Typography>
                           </TableCell>
-                          <TableCell align="right" sx={{ py: 1.5, px: 1.5 }}>
-                            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.2 }}>
-                              <Tooltip title={rowRefreshing[rec.ticker] ? "Running…" : "Refresh this ticker"} arrow>
-                                <span>
-                                  <IconButton
-                                    size="small"
-                                    disabled={!!rowRefreshing[rec.ticker]}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      refreshSingleTicker(rec.ticker);
-                                    }}
-                                    sx={{
-                                      color: "#94a3b8",
-                                      "&:hover": { color: "#0891b2", bgcolor: "#ecfeff" },
-                                      "&.Mui-disabled": { color: "#0891b2" },
-                                    }}
-                                  >
-                                    {rowRefreshing[rec.ticker] ? (
-                                      <CircularProgress size={16} sx={{ color: "#0891b2" }} />
-                                    ) : (
-                                      <RefreshIcon fontSize="small" />
-                                    )}
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title="Delete" arrow>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(rec.id, rec.ticker);
-                                  }}
-                                  sx={{
-                                    color: "#94a3b8",
-                                    "&:hover": { color: "#dc2626", bgcolor: "#fef2f2" },
-                                  }}
-                                >
-                                  <DeleteOutlineIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          </TableCell>
                         </TableRow>
 
                       </React.Fragment>
@@ -956,17 +771,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
           );
         })()}
       </Box>
-
-      <RunTickerDialog
-        open={runDialogOpen}
-        onClose={() => setRunDialogOpen(false)}
-        onRunComplete={handleDialogRunComplete}
-        autoRunTicker={autoRunTicker}
-        suggestions={records.map((r) => ({
-          ticker: r.ticker,
-          company_name: r.company_name,
-        }))}
-      />
 
       <Snackbar
         open={snackbar.open}
