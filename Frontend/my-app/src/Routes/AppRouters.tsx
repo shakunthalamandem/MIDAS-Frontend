@@ -124,6 +124,7 @@ const JRitterAgentMain = React.lazy(() => import("../Components/JRitterAgent/JRi
 const JUploadPage = React.lazy(() => import("../Components/JRitterAgent/JUploadPage"));
 const GatorPostIpoAgentMain = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoAgentMain"));
 const GatorPostIpoUpload = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoUpload"));
+const IpoGatorRunDashboard = React.lazy(() => import("../Components/GatorPostIpoAgent/IpoGatorRunDashboard"));
 const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
 const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
@@ -381,6 +382,7 @@ const AppRouters: React.FC = () => {
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
         <Route path="/gator_post_ipo" element={<AuthGuard><GatorPostIpoAgentMain /></AuthGuard>} />
         <Route path="/gator_post_ipo/upload" element={<AuthGuard><GatorPostIpoUpload /></AuthGuard>} />
+        <Route path="/ipo_gator_run" element={<AuthGuard><IpoGatorRunDashboard /></AuthGuard>} />
         <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
         <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 
