@@ -812,17 +812,28 @@ class DocBuilder {
     p.setTextColor(...NAVY)
     const tk = ticker.toUpperCase()
     p.text(tk, PW - MG - p.getTextWidth(tk), 24)
+    let coverY = 34
     if (di.company_name) {
       this.setFont("bold", 14)
       const cn = di.company_name.trim()
-      p.text(cn, PW - MG - p.getTextWidth(cn), 34)
+      // Wrap company name to 2 lines (max) if it exceeds available width
+      const COMPANY_MAX_W = 50
+      const COMPANY_LINE_H = 14 * PT * 1.25
+      const wrapped: string[] = (p as any).splitTextToSize(cn, COMPANY_MAX_W)
+      const companyLines = wrapped.length > 2
+        ? [wrapped[0], wrapped.slice(1).join(" ")]
+        : wrapped
+      companyLines.forEach((line: string, i: number) => {
+        p.text(line, PW - MG - p.getTextWidth(line), coverY + i * COMPANY_LINE_H)
+      })
+      coverY += companyLines.length * COMPANY_LINE_H
     }
     const rawPricingDate = pricingDate || di.pricing_date
     const coverParts = [exchange || di.exchange, rawPricingDate ? fDate(rawPricingDate) : null].filter(Boolean)
     if (coverParts.length) {
       this.setFont("bold", 10.5)
       const pt = coverParts.join("  |  ")
-      p.text(pt, PW - MG - p.getTextWidth(pt), 42)
+      p.text(pt, PW - MG - p.getTextWidth(pt), coverY + 2)
     }
     p.setTextColor(...BLACK)
 
