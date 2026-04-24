@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 
 const ACCENT_PALETTES = [
   { accent: "#4f46e5", accentBg: "#eef2ff", accentBorder: "#c7d2fe" },
-  { accent: "#0891b2", accentBg: "#ecfeff", accentBorder: "#a5f3fc" },
-  { accent: "#059669", accentBg: "#ecfdf5", accentBorder: "#a7f3d0" },
-  { accent: "#d97706", accentBg: "#fffbeb", accentBorder: "#fde68a" },
-  { accent: "#dc2626", accentBg: "#fef2f2", accentBorder: "#fecaca" },
+  { accent: "#4c97aa", accentBg: "#ecfeff", accentBorder: "#a5f3fc" },
+  // { accent: "#4d87bd", accentBg: "#ecfdf5", accentBorder: "#a7f3d0" },
+  // { accent: "#be8644", accentBg: "#fffbeb", accentBorder: "#fde68a" },
+  // { accent: "#6a5edb", accentBg: "#fef2f2", accentBorder: "#fef2f2" },
   { accent: "#7c3aed", accentBg: "#f5f3ff", accentBorder: "#ddd6fe" },
 ];
 
