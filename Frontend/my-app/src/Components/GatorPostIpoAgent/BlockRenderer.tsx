@@ -237,6 +237,9 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         flexDirection: "column",
         gap: 1,
         height: "100%",
+        minWidth: 0,
+        overflow: "hidden",
+        boxSizing: "border-box",
         transition: "transform 0.15s, box-shadow 0.15s",
         "&:hover": {
           boxShadow: "0 6px 20px rgba(8,145,178,0.12)",
@@ -244,8 +247,8 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         },
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
-        <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1, minWidth: 0 }}>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
             sx={{
               fontSize: "1.05rem",
@@ -253,6 +256,8 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
               color: "#0f172a",
               letterSpacing: "-0.02em",
               lineHeight: 1.2,
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
             }}
           >
             {block.title}
@@ -267,6 +272,7 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
                 borderRadius: 1.5,
                 bgcolor: tone.bg,
                 border: `1px solid ${tone.border}`,
+                maxWidth: "100%",
               }}
             >
               <Typography
@@ -276,6 +282,9 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
                   color: tone.color,
                   textTransform: "uppercase",
                   letterSpacing: "0.04em",
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                  lineHeight: 1.35,
                 }}
               >
                 {block.subtitle}
@@ -303,7 +312,17 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         )}
       </Box>
       {block.description && (
-        <Typography sx={{ fontSize: "0.78rem", color: "#475569", lineHeight: 1.55, mt: 0.5 }}>
+        <Typography
+          sx={{
+            fontSize: "0.78rem",
+            color: "#475569",
+            lineHeight: 1.55,
+            mt: 0.5,
+            wordBreak: "break-word",
+            overflowWrap: "anywhere",
+            flex: 1,
+          }}
+        >
           {block.description}
         </Typography>
       )}
@@ -522,9 +541,17 @@ const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block 
     if (isCircular) return base;
     return {
       ...base,
+      layout: { padding: { bottom: 4 } },
       scales: {
         x: {
-          ticks: { color: "#64748b", font: { size: 10 }, maxRotation: 0, autoSkip: true },
+          ticks: {
+            color: "#64748b",
+            font: { size: 9 },
+            autoSkip: false,
+            maxRotation: 35,
+            minRotation: 0,
+            padding: 2,
+          },
           grid: { display: false },
         },
         y: {
