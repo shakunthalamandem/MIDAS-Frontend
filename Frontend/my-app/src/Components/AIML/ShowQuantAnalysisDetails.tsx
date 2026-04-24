@@ -82,7 +82,11 @@ const ShowQuantAnalysisDetails: React.FC = () => {
       }
 
       if (data.data && data.data.length > 0) {
-        setTickerData(data.data[0]);
+        const tickerInfo = data.data[0];
+        if (tickerInfo.quant_analysis && typeof tickerInfo.quant_analysis === "string") {
+          tickerInfo.quant_analysis = JSON.parse(tickerInfo.quant_analysis);
+        }
+        setTickerData(tickerInfo);
       } else {
         setError("No data found for this ticker.");
       }
