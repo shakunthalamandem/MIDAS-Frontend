@@ -16,6 +16,7 @@ import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import MDTechnicalAnalysis from "../Components/Main/MonasheeDeals/MDTechnicalAnalysis";
 import ShowQuantAnalysis from "../Components/AIML/ShowQuantAnalysis";
 import ShowQuantAnalysisDetails from "../Components/AIML/ShowQuantAnalysisDetails";
+import QuantAnalysisUpload from "../Components/AIML/QuantAnalysisUpload";
 
 /* ── Route-level lazy loading (each page loads only when navigated to) ── */
 const CapitalMarkets = React.lazy(() => import("../Components/Main/HomePage/Dashboard/CapitalMarkets"));
@@ -328,7 +329,8 @@ const AppRouters: React.FC = () => {
         <Route path="/upload_claude_sentiment" element={<AuthGuard><UploadClaudeSentiment /></AuthGuard>} />
         <Route path="/summary_signal_board" element={<AuthGuard><SummarySignalBoard /></AuthGuard>} />
         <Route path="/quant_agent" element={<AuthGuard><ShowQuantAnalysis /></AuthGuard>} />
-        <Route path="/quant-analysis/:ticker" element={<AuthGuard><ShowQuantAnalysisDetails  /></AuthGuard>} />
+        <Route path="/quant-analysis/:ticker" element={<AuthGuard><ShowQuantAnalysisDetails /></AuthGuard>} />
+        <Route path="/quant_analysis_upload" element={<AuthGuard><QuantAnalysisUpload /></AuthGuard>} />
 
        
 

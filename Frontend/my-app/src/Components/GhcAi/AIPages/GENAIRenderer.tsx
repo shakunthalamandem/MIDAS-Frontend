@@ -58,20 +58,21 @@ const GENAIRenderer: React.FC<{
   handleSubmit?: () => void;
   renderAll?: boolean;
   disableMotion?: boolean;
-}> = ({ blocks, setQuestion, handleSubmit, renderAll = false, disableMotion = false }) => {
+}> = ({ blocks = [], setQuestion, handleSubmit, renderAll = false, disableMotion = false }) => {
   const [visibleBlocks, setVisibleBlocks] = useState<Block[]>([]);
 
   useEffect(() => {
-    setVisibleBlocks(renderAll ? blocks : []);
+    const safeBlocks = Array.isArray(blocks) ? blocks : [];
+    setVisibleBlocks(renderAll ? safeBlocks : []);
     if (renderAll) return;
 
     let idx = 0;
     const interval = setInterval(() => {
-      if (idx >= blocks.length) {
+      if (idx >= safeBlocks.length) {
         clearInterval(interval);
         return;
       }
-      const nextBlock = blocks[idx];
+      const nextBlock = safeBlocks[idx];
       if (nextBlock) {
         setVisibleBlocks((prev) => [...prev, nextBlock]);
       }
@@ -81,7 +82,9 @@ const GENAIRenderer: React.FC<{
     return () => clearInterval(interval);
   }, [blocks, renderAll]);
 
-  const sortedVisibleBlocks = [...visibleBlocks]
+  const safeVisibleBlocks = Array.isArray(visibleBlocks) ? visibleBlocks : [];
+
+  const sortedVisibleBlocks = [...safeVisibleBlocks]
     .filter((block) => block.type !== "suggested_questions")
     .sort((a, b) => {
       const rowA = a?.row ?? 0;
@@ -92,7 +95,7 @@ const GENAIRenderer: React.FC<{
       return colA - colB;
     });
 
-  const suggestedBlock = visibleBlocks.find((block) => block.type === "suggested_questions") as SuggestedQuestionsBlock | undefined;
+  const suggestedBlock = safeVisibleBlocks.find((block) => block.type === "suggested_questions") as SuggestedQuestionsBlock | undefined;
 
   const grouped: Record<number, Block[]> = {};
   sortedVisibleBlocks.forEach((block) => {
@@ -104,7 +107,7 @@ const GENAIRenderer: React.FC<{
   const sortedRows = Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b));
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Box sx={{}}>
       {sortedRows.map(([rowKey, rowBlocks]) => (
         <Grid
           container
