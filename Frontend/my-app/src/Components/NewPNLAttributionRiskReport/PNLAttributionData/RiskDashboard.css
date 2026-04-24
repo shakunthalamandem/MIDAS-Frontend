@@ -1638,6 +1638,47 @@
 }
 
 /* ── Top / Bottom PNL Tables ── */
+.tb-pnl-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tb-pnl-period-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.tb-pnl-period-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  letter-spacing: 0.5px;
+}
+
+.tb-pnl-period-btn + .tb-pnl-period-btn {
+  border-left: 1px solid #e2e8f0;
+}
+
+.tb-pnl-period-btn:hover {
+  background: #f8fafc;
+}
+
+.tb-pnl-period-btn--active,
+.tb-pnl-period-btn--active:hover {
+  background: #7c3aed;
+  color: #fff;
+}
+
 .tb-pnl-container {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -378,6 +378,8 @@ const NewDashboardLifeCycleDetails: React.FC = () => {
                     <TradingSignalsMain
                       ticker={ticker}
                       trade_date={activePayload.trade_date}
+                      dealType={activePayload.deal_type}
+                      pricingDate={activePayload.pricing_date}
                       isUpcoming={isUpcoming}
                       dealStatus={status}
                       issuerName={activePayload.issuer_name || activePayload.company_name || ""}
