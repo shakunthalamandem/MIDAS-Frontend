@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -6,33 +6,19 @@ import {
   Typography,
   Alert,
   CircularProgress,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  Autocomplete,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-const DEAL_TYPES = ["IPO", "FO"];
-
-const SECTORS = [
-  "Health Care",
-  "Financials",
-  "Information Technology",
-  "Real Estate",
-  "Consumer Staples",
-  "Industrials",
-  "Energy",
-  "Materials",
-  "Utilities",
-  "Consumer Discretionary",
-  "Communication Services",
-];
+interface PortfolioTicker {
+  ticker: string;
+  pricing_date: string | null;
+  region: string;
+  deal_type: string;
+  unique_deal_id: string;
+  issuer_name: string;
+  sector: string;
+}
 
 interface FormData {
   ticker: string;
@@ -45,8 +31,16 @@ interface FormData {
   quant_analysis: string;
 }
 
+interface TickerOption {
+  label: string;
+  data: PortfolioTicker;
+}
+
 const QuantAnalysisUpload: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [portfolioTickers, setPortfolioTickers] = useState<TickerOption[]>([]);
+  const [loadingPortfolio, setLoadingPortfolio] = useState(false);
+  const [selectedTicker, setSelectedTicker] = useState<TickerOption | null>(null);
   const [formData, setFormData] = useState<FormData>({
     ticker: "",
     deal_type: "",
@@ -62,21 +56,101 @@ const QuantAnalysisUpload: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  useEffect(() => {
+    fetchPortfolioTickers();
+  }, []);
+
+  const fetchPortfolioTickers = async () => {
+    if (!apiUrl) {
+      setError("API URL is not configured.");
+      return;
+    }
+
+    setLoadingPortfolio(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`${apiUrl}/api/quant_agent/current_portfolio/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.detail || "Failed to fetch portfolio");
+      }
+
+      const allTickers = [
+        ...(data.current_portfolio?.data || []),
+        ...(data.upcoming?.data || []),
+      ];
+
+      const options: TickerOption[] = allTickers.map((ticker) => ({
+        label: `${ticker.ticker} (${ticker.deal_type}) - ${ticker.unique_deal_id}`,
+        data: ticker,
+      }));
+
+      setPortfolioTickers(options);
+      console.log("Fetched portfolio tickers:", options);
+    } catch (err: any) {
+      const msg = err?.message || "Failed to load portfolio tickers.";
+      console.error("Portfolio fetch error:", err);
+      setError(msg);
+    } finally {
+      setLoadingPortfolio(false);
+    }
+  };
+
+  const handleTickerSelect = (option: TickerOption | null) => {
+    setSelectedTicker(option);
+
+    if (option) {
+      const tickerData = option.data;
+      setFormData({
+        ticker: tickerData.ticker,
+        deal_type: tickerData.deal_type,
+        region: tickerData.region,
+        sector: tickerData.sector,
+        pricing_date: tickerData.pricing_date || "",
+        unique_deal_id: tickerData.unique_deal_id,
+        issuer_name: tickerData.issuer_name,
+        quant_analysis: "",
+      });
+      setError(null);
+    } else {
+      setFormData({
+        ticker: "",
+        deal_type: "",
+        region: "",
+        sector: "",
+        pricing_date: "",
+        unique_deal_id: "",
+        issuer_name: "",
+        quant_analysis: "",
+      });
+    }
+  };
+
+  const handleAnalysisChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      quant_analysis: e.target.value,
     }));
   };
 
   const validateForm = (): boolean => {
-    const requiredFields = Object.keys(formData) as (keyof FormData)[];
-    for (const field of requiredFields) {
-      if (!formData[field]?.trim()) {
-        setError(`${field.replace(/_/g, " ")} is required.`);
-        return false;
-      }
+    if (!formData.ticker.trim()) {
+      setError("Please select a ticker.");
+      return false;
+    }
+    if (!formData.quant_analysis.trim()) {
+      setError("Quant analysis is required.");
+      return false;
     }
     return true;
   };
@@ -129,6 +203,7 @@ const QuantAnalysisUpload: React.FC = () => {
 
       console.log("Upload successful:", data);
       setSuccess(true);
+      setSelectedTicker(null);
       setFormData({
         ticker: "",
         deal_type: "",
@@ -153,42 +228,45 @@ const QuantAnalysisUpload: React.FC = () => {
   return (
     <Box
       sx={{
-        maxWidth: 1000,
+        maxWidth: 900,
         mx: "auto",
-        px: { xs: 1, sm: 2, md: 3 },
-        py: 3,
+        px: { xs: 2, sm: 3, md: 4 },
+        py: { xs: 3, md: 4 },
       }}
     >
-      {/* Header */}
-      <Card
+      {/* Title */}
+      <Typography
+        variant="h4"
         sx={{
-          background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-          color: "#fff",
-          mb: 3,
-          borderRadius: 3,
+          fontWeight: 700,
+          color: "#1e293b",
+          mb: 1,
+          fontSize: { xs: "1.5rem", md: "2rem" },
         }}
       >
-        <CardContent sx={{ py: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <CloudUploadIcon sx={{ fontSize: 32 }} />
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                Upload Quant Analysis
-              </Typography>
-              <Typography sx={{ fontSize: "0.9rem", opacity: 0.9 }}>
-                Add new ticker analysis to the system
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+        Upload Quant Analysis
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: "0.95rem",
+          color: "#64748b",
+          mb: 3,
+        }}
+      >
+        Select a ticker and paste the quant analysis outputs
+      </Typography>
 
       {/* Success Alert */}
       {success && (
         <Alert
           icon={<CheckCircleIcon fontSize="inherit" />}
           severity="success"
-          sx={{ mb: 2.5, borderRadius: 2, border: "1px solid #86efac" }}
+          sx={{
+            mb: 3,
+            borderRadius: 1.5,
+            border: "1px solid #86efac",
+            fontSize: "0.9rem",
+          }}
           onClose={() => setSuccess(false)}
         >
           Quant analysis uploaded successfully!
@@ -199,7 +277,12 @@ const QuantAnalysisUpload: React.FC = () => {
       {error && (
         <Alert
           severity="error"
-          sx={{ mb: 2.5, borderRadius: 2, border: "1px solid #fecaca" }}
+          sx={{
+            mb: 3,
+            borderRadius: 1.5,
+            border: "1px solid #fecaca",
+            fontSize: "0.9rem",
+          }}
           onClose={() => setError(null)}
         >
           {error}
@@ -207,263 +290,199 @@ const QuantAnalysisUpload: React.FC = () => {
       )}
 
       {/* Form */}
-      <Paper
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          p: { xs: 2.5, md: 3.5 },
-          borderRadius: 2.5,
-          border: "1px solid #e2e8f0",
-          background: "#ffffff",
-        }}
-      >
-        <Grid container spacing={2.5}>
-          {/* Ticker */}
-          <Grid item xs={12} sm={6}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+        {/* Ticker Selection with Search */}
+        <Autocomplete
+          options={portfolioTickers}
+          value={selectedTicker}
+          onChange={(event, newValue) => handleTickerSelect(newValue)}
+          loading={loadingPortfolio}
+          disabled={loadingPortfolio || loading}
+          renderInput={(params) => (
             <TextField
-              fullWidth
-              label="Ticker Symbol"
-              name="ticker"
-              value={formData.ticker}
-              onChange={handleInputChange}
-              placeholder="e.g., NKTR"
+              {...params}
+              label="Select ticker"
+              placeholder="Search ticker"
               variant="outlined"
-              size="small"
-              disabled={loading}
+              size="medium"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loadingPortfolio && <CircularProgress color="inherit" size={20} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  borderRadius: 1,
+                  fontSize: "0.95rem",
+                  "&:hover fieldset": {
+                    borderColor: "#0ea5e9",
+                  },
                 },
               }}
             />
-          </Grid>
+          )}
+          sx={{
+            "& .MuiAutocomplete-listbox": {
+              fontSize: "0.9rem",
+            },
+          }}
+        />
 
-          {/* Deal Type */}
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth size="small" disabled={loading}>
-              <InputLabel>Deal Type</InputLabel>
-              <Select
-                name="deal_type"
-                value={formData.deal_type}
-                onChange={(e) => setFormData(prev => ({ ...prev, deal_type: e.target.value }))}
-                label="Deal Type"
-                sx={{
-                  borderRadius: 1.5,
-                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#4f46e5" },
-                }}
-              >
-                {DEAL_TYPES.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {/* Region */}
-          <Grid item xs={12} sm={6}>
+        {/* Auto-filled Fields (Read-only) */}
+        {selectedTicker && (
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
             <TextField
-              fullWidth
+              label="Deal Type"
+              value={formData.deal_type}
+              variant="outlined"
+              size="small"
+              disabled
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  background: "#f8fafc",
+                  borderRadius: 1,
+                },
+              }}
+            />
+
+            <TextField
               label="Region"
-              name="region"
               value={formData.region}
-              onChange={handleInputChange}
-              placeholder="e.g., North America"
               variant="outlined"
               size="small"
-              disabled={loading}
+              disabled
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  background: "#f8fafc",
+                  borderRadius: 1,
                 },
               }}
             />
-          </Grid>
 
-          {/* Sector */}
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth size="small" disabled={loading}>
-              <InputLabel>Sector</InputLabel>
-              <Select
-                name="sector"
-                value={formData.sector}
-                onChange={(e) => setFormData(prev => ({ ...prev, sector: e.target.value }))}
-                label="Sector"
-                sx={{
-                  borderRadius: 1.5,
-                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#4f46e5" },
-                }}
-              >
-                {SECTORS.map((sector) => (
-                  <MenuItem key={sector} value={sector}>
-                    {sector}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {/* Pricing Date */}
-          <Grid item xs={12} sm={6}>
             <TextField
-              fullWidth
-              label="Pricing Date"
-              name="pricing_date"
-              type="date"
-              value={formData.pricing_date}
-              onChange={handleInputChange}
+              label="Sector"
+              value={formData.sector}
               variant="outlined"
               size="small"
-              disabled={loading}
-              InputLabelProps={{ shrink: true }}
+              disabled
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  background: "#f8fafc",
+                  borderRadius: 1,
                 },
               }}
             />
-          </Grid>
 
-          {/* Unique Deal ID */}
-          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Pricing Date"
+              value={formData.pricing_date}
+              variant="outlined"
+              size="small"
+              disabled
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  background: "#f8fafc",
+                  borderRadius: 1,
+                },
+              }}
+            />
+
             <TextField
               fullWidth
               label="Unique Deal ID"
-              name="unique_deal_id"
               value={formData.unique_deal_id}
-              onChange={handleInputChange}
-              placeholder="e.g., NKTR-UPSIZED-325M-2026"
               variant="outlined"
               size="small"
-              disabled={loading}
+              disabled
               sx={{
+                gridColumn: { xs: "1", sm: "1 / -1" },
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  background: "#f8fafc",
+                  borderRadius: 1,
                 },
               }}
             />
-          </Grid>
 
-          {/* Issuer Name */}
-          <Grid item xs={12}>
             <TextField
               fullWidth
               label="Issuer Name"
-              name="issuer_name"
               value={formData.issuer_name}
-              onChange={handleInputChange}
-              placeholder="e.g., Nektar Therapeutics Inc."
               variant="outlined"
               size="small"
-              disabled={loading}
+              disabled
               sx={{
+                gridColumn: "1 / -1",
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  background: "#f8fafc",
+                  borderRadius: 1,
                 },
               }}
             />
-          </Grid>
+          </Box>
+        )}
 
-          {/* Quant Analysis JSON */}
-          <Grid item xs={12}>
+        {/* Quant Analysis - Only Editable Field */}
+        {selectedTicker && (
+          <>
             <TextField
               fullWidth
               label="Quant Analysis (JSON)"
-              name="quant_analysis"
               value={formData.quant_analysis}
-              onChange={handleInputChange}
+              onChange={handleAnalysisChange}
               placeholder='[{"row": 1, "type": "text", "column": 1, "content": "..."}]'
               variant="outlined"
               multiline
-              minRows={8}
-              maxRows={15}
+              minRows={12}
+              maxRows={18}
               disabled={loading}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: 1.5,
-                  "&:hover fieldset": { borderColor: "#4f46e5" },
+                  borderRadius: 1,
+                  "&:hover fieldset": { borderColor: "#0ea5e9" },
                 },
                 "& .MuiOutlinedInput-input": {
                   fontFamily: "monospace",
-                  fontSize: "0.85rem",
+                  fontSize: "0.8rem",
                 },
               }}
             />
-            <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mt: 0.75 }}>
-              Enter valid JSON array of blocks (text, card, chart, table, etc.)
-            </Typography>
-          </Grid>
 
-          {/* Submit Button */}
-          <Grid item xs={12}>
+            <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mt: -1 }}>
+              Enter valid JSON array of blocks
+            </Typography>
+
+            {/* Submit Button */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
               disabled={loading}
               sx={{
-                background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                background: "#0ea5e9",
                 color: "#fff",
-                py: 1.2,
+                py: 1.3,
                 fontWeight: 600,
                 fontSize: "0.95rem",
-                borderRadius: 1.5,
+                borderRadius: 1,
                 textTransform: "none",
+                mt: 1,
                 "&:hover": {
-                  background: "linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)",
+                  background: "#0284c7",
                 },
                 "&:disabled": {
                   background: "#cbd5e1",
-                  color: "#64748b",
+                  color: "#94a3b8",
                 },
               }}
-              startIcon={loading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
             >
               {loading ? "Uploading..." : "Upload Analysis"}
             </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Info Box */}
-      <Box
-        sx={{
-          mt: 3,
-          p: 2.5,
-          background: "#f0f4ff",
-          border: "1px solid #c7d2fe",
-          borderRadius: 2,
-        }}
-      >
-        <Typography sx={{ fontSize: "0.85rem", color: "#4338ca", fontWeight: 600, mb: 1 }}>
-          💡 Quant Analysis JSON Format
-        </Typography>
-        <Typography sx={{ fontSize: "0.8rem", color: "#4f46e5", fontFamily: "monospace", whiteSpace: "pre-wrap" }}>
-          {`[
-  {
-    "row": 1,
-    "column": 1,
-    "type": "text",
-    "content": "Your analysis text here",
-    "total_columns": 1
-  },
-  {
-    "row": 2,
-    "column": 1,
-    "type": "card",
-    "title": "Card Title",
-    "subtitle": "Subtitle",
-    "description": "Description",
-    "total_columns": 1
-  }
-]`}
-        </Typography>
+          </>
+        )}
       </Box>
     </Box>
   );
