@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, CircularProgress, Alert, Container, Collapse, IconButton, Tooltip } from "@mui/material";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Box, CircularProgress, Alert, Container, Collapse, IconButton, Tooltip, Button, Checkbox, Typography } from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -18,6 +19,12 @@ import "./RiskDashboard.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
+const RETIRED_FUNDS = new Set(["FMAP", "MMLS"]);
+const ALL_FUNDS_CONFIG_KEY = "risk_all_funds_config";
+const loadAllFundsConfig = (): string[] | null => {
+  try { const raw = localStorage.getItem(ALL_FUNDS_CONFIG_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+};
+
 const getAuthHeaders = (contentType?: string) => {
   const token = localStorage.getItem("access_token");
   const headers: Record<string, string> = {
@@ -29,8 +36,14 @@ const getAuthHeaders = (contentType?: string) => {
 
 const RiskDashboard: React.FC = () => {
   const [portfolios, setPortfolios] = useState<string[]>([]);
-  const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
+  // Multi-select: list of currently selected fund names
+  const [selectedFundList, setSelectedFundList] = useState<string[]>([]);
+  const [allFundsConfig, setAllFundsConfig] = useState<string[]>([]);
+  const [allFundsDraft, setAllFundsDraft] = useState<string[]>([]);
+  const [configureAllOpen, setConfigureAllOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
+
+  const selectedFunds = useMemo(() => selectedFundList, [selectedFundList]);
   const [data, setData] = useState<DashboardData | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [exchrateLatestPnl, setExchrateLatestPnl] = useState<number | null>(null);
@@ -71,13 +84,17 @@ const RiskDashboard: React.FC = () => {
         );
         if (!res.ok) throw new Error("Failed to fetch portfolios");
         const result: PortfolioResponse = await res.json();
-        const portfolioList = result.portfolios || [];
+        const portfolioList: string[] = result.portfolios || [];
         const date = result.max_position_date || "";
         setPortfolios(portfolioList);
         if (date) setSelectedDate(date);
-        if (portfolioList.length > 0) {
-          setSelectedFunds([...portfolioList]);
-        }
+        const activeFunds = portfolioList.filter((p) => !RETIRED_FUNDS.has(p));
+        const saved = loadAllFundsConfig();
+        const effective = saved ? saved.filter((f) => portfolioList.includes(f)) : activeFunds;
+        setAllFundsConfig(effective);
+        setAllFundsDraft(effective);
+        // Initial selection: every fund in the saved "All Funds" default
+        setSelectedFundList(effective);
       } catch (err: any) {
         setError(err.message || "Failed to load portfolios");
       }
@@ -331,12 +348,22 @@ const RiskDashboard: React.FC = () => {
     setSelectedIndexMetric((prev) => (prev === metricKey ? null : metricKey));
   };
 
-  const allSelected = portfolios.length > 0 && selectedFunds.length === portfolios.length;
-  const fundLabel = allSelected
-    ? "All Funds"
-    : selectedFunds.length === 1
-      ? selectedFunds[0]
-      : `${selectedFunds.length} Funds`;
+  const activeFundsCount = portfolios.filter((p) => !RETIRED_FUNDS.has(p)).length;
+  const isAllSelected =
+    activeFundsCount > 0 &&
+    selectedFundList.length === activeFundsCount &&
+    portfolios
+      .filter((p) => !RETIRED_FUNDS.has(p))
+      .every((f) => selectedFundList.includes(f));
+
+  const fundLabel =
+    selectedFundList.length === 0
+      ? "Fund"
+      : selectedFundList.length === 1
+      ? selectedFundList[0]
+      : isAllSelected
+      ? `All Funds (${selectedFundList.length})`
+      : `${selectedFundList.length} Funds`;
 
   const [legendOpen, setLegendOpen] = useState(false);
   const [showPdfTabs, setShowPdfTabs] = useState(false);
@@ -363,9 +390,12 @@ const RiskDashboard: React.FC = () => {
     <Box id="risk-dashboard-pdf-root" className="risk-dashboard">
       <Box className="pdf-section" data-pdf-page="1">
         <DashboardHeader
-          selectedFunds={selectedFunds}
+          selectedFundList={selectedFundList}
+          onSelectedFundsChange={setSelectedFundList}
+          allFundsConfig={allFundsConfig}
           portfolios={portfolios}
-          onFundsChange={setSelectedFunds}
+          onToggleConfigure={() => { setAllFundsDraft(allFundsConfig); setConfigureAllOpen((v) => !v); }}
+          configureAllOpen={configureAllOpen}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
           aum={data?.headline_risks?.aum}
@@ -409,6 +439,84 @@ const RiskDashboard: React.FC = () => {
           }
         />
       </Box>
+
+      {/* ════ CONFIGURE ALL FUNDS PANEL ════ */}
+      <Collapse in={configureAllOpen}>
+        <Box sx={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "14px", mb: 3, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
+          <Box sx={{ p: "16px 28px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 1.5 }}>
+            <TuneIcon sx={{ fontSize: 18, color: "#002060" }} />
+            <Box>
+              <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>Configure "All Funds"</Typography>
+              <Typography sx={{ fontSize: 12, color: "#64748b", mt: 0.25 }}>
+                Select which funds are included when viewing "All Funds". Retired funds (FMAP, MMLS) are excluded by default.
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ p: "20px 28px" }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
+              {portfolios.map((p) => {
+                const isRetired = RETIRED_FUNDS.has(p);
+                const isChecked = allFundsDraft.includes(p);
+                return (
+                  <Box
+                    key={p}
+                    onClick={() => {
+                      if (isRetired) return;
+                      setAllFundsDraft((prev) => prev.includes(p) ? prev.filter((f) => f !== p) : [...prev, p]);
+                    }}
+                    sx={{
+                      display: "flex", alignItems: "center", gap: 0.75,
+                      px: 1.5, py: 0.75,
+                      border: `1.5px solid ${isChecked ? "#002060" : "#e2e8f0"}`,
+                      borderRadius: "10px",
+                      cursor: isRetired ? "not-allowed" : "pointer",
+                      backgroundColor: isChecked ? "#eff6ff" : isRetired ? "#f8fafc" : "#fff",
+                      opacity: isRetired ? 0.45 : 1,
+                      transition: "border-color 0.15s, background 0.15s",
+                      "&:hover": !isRetired ? { borderColor: "#002060", boxShadow: "0 2px 8px rgba(0,32,96,0.08)" } : {},
+                    }}
+                  >
+                    <Checkbox size="small" checked={isChecked} disabled={isRetired}
+                      sx={{ p: 0, color: "#94a3b8", "&.Mui-checked": { color: "#002060" } }} />
+                    <Typography sx={{ fontSize: 13, fontWeight: 600, color: isChecked ? "#002060" : "#475569" }}>{p}</Typography>
+                    {isRetired && <Typography sx={{ fontSize: 10, color: "#94a3b8", ml: 0.25, fontStyle: "italic" }}>retired</Typography>}
+                  </Box>
+                );
+              })}
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <Typography sx={{ fontSize: 12, color: "#64748b" }}>
+                {allFundsDraft.length} fund{allFundsDraft.length !== 1 ? "s" : ""} selected
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1.5 }}>
+                <Button variant="outlined" size="small"
+                  onClick={() => { setAllFundsDraft(allFundsConfig); setConfigureAllOpen(false); }}
+                  sx={{ textTransform: "none", borderRadius: "8px", color: "#64748b", borderColor: "#e2e8f0", fontSize: 13, px: 2.5, "&:hover": { borderColor: "#94a3b8", backgroundColor: "#f1f5f9" } }}>
+                  Cancel
+                </Button>
+                <Button variant="outlined" size="small"
+                  onClick={() => setAllFundsDraft(portfolios.filter((p) => !RETIRED_FUNDS.has(p)))}
+                  sx={{ textTransform: "none", borderRadius: "8px", color: "#2563eb", borderColor: "#bfdbfe", fontSize: 13, px: 2.5, "&:hover": { backgroundColor: "#eff6ff" } }}>
+                  Reset to Active
+                </Button>
+                <Button variant="contained" size="small" disabled={allFundsDraft.length === 0}
+                  onClick={() => {
+                    setAllFundsConfig(allFundsDraft);
+                    localStorage.setItem(ALL_FUNDS_CONFIG_KEY, JSON.stringify(allFundsDraft));
+                    // If dropdown previously reflected "All" (or nothing picked yet), sync to new default
+                    if (isAllSelected || selectedFundList.length === 0) {
+                      setSelectedFundList(allFundsDraft);
+                    }
+                    setConfigureAllOpen(false);
+                  }}
+                  sx={{ textTransform: "none", borderRadius: "8px", backgroundColor: "#002060", fontSize: 13, px: 2.5, "&:hover": { backgroundColor: "#001540" }, "&.Mui-disabled": { backgroundColor: "#94a3b8", color: "#fff" } }}>
+                  Apply
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Collapse>
 
       {error && (
         <Alert severity="error" className="risk-dashboard-error" onClose={() => setError("")}>

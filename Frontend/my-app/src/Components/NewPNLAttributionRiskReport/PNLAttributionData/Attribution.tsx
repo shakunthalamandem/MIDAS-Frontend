@@ -244,6 +244,15 @@ const Attribution: React.FC<AttributionProps> = ({
                   <strong>Gross Market Value, Net Notional Exposure, Delta Adj. Net Exp, Beta Adj. Net Exp</strong> — excludes Security Type = 'Exchrate'
                 </Box>
               </Box>
+
+              {data.some((d) => d.name?.toString().toUpperCase() === "UNCLASSIFIED") && (
+                <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.75, width: "100%" }}>
+                  <Box sx={{ width: 8, height: 8, borderRadius: "2px", bgcolor: "#f59e0b", flexShrink: 0, mt: "2px" }} />
+                  <Box sx={{ fontSize: "11px", color: "#475569", fontStyle: "italic" }}>
+                    <strong>Unclassified</strong> — represents transactions or positions where the Deal Captain information is currently unavailable or missing.
+                  </Box>
+                </Box>
+              )}
             </Box>
 
             {/* Area charts - only for analyst and sector group_by */}

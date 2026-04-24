@@ -14,6 +14,8 @@ import ResetPassword from "../Components/Main/HomePage/Authentication/ResetPassw
 import SummaryPopup from "../Components/Main/HomePage/Authentication/SummaryPopup";
 import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import MDTechnicalAnalysis from "../Components/Main/MonasheeDeals/MDTechnicalAnalysis";
+import ShowQuantAnalysis from "../Components/AIML/ShowQuantAnalysis";
+import ShowQuantAnalysisDetails from "../Components/AIML/ShowQuantAnalysisDetails";
 
 /* ── Route-level lazy loading (each page loads only when navigated to) ── */
 const CapitalMarkets = React.lazy(() => import("../Components/Main/HomePage/Dashboard/CapitalMarkets"));
@@ -119,6 +121,8 @@ const S3DataTransfer = React.lazy(() => import("../Components/S3DataTransfer/S3D
 const DataDump = React.lazy(() => import("../Components/DataDump/DataDump"));
 const JRitterAgentMain = React.lazy(() => import("../Components/JRitterAgent/JRitterAgentMain"));
 const JUploadPage = React.lazy(() => import("../Components/JRitterAgent/JUploadPage"));
+const GatorPostIpoAgentMain = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoAgentMain"));
+const GatorPostIpoUpload = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoUpload"));
 const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
 const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
@@ -323,7 +327,10 @@ const AppRouters: React.FC = () => {
         <Route path="/portfolio_summary" element={<AuthGuard><PortfolioSummaryTabs /></AuthGuard>} />
         <Route path="/upload_claude_sentiment" element={<AuthGuard><UploadClaudeSentiment /></AuthGuard>} />
         <Route path="/summary_signal_board" element={<AuthGuard><SummarySignalBoard /></AuthGuard>} />
+        <Route path="/quant_agent" element={<AuthGuard><ShowQuantAnalysis /></AuthGuard>} />
+        <Route path="/quant-analysis/:ticker" element={<AuthGuard><ShowQuantAnalysisDetails  /></AuthGuard>} />
 
+       
 
 
 
@@ -370,6 +377,8 @@ const AppRouters: React.FC = () => {
         <Route path="/data_dump" element={<AuthGuard><DataDump /></AuthGuard>} />
         <Route path="/jritter_agent" element={<AuthGuard><JRitterAgentMain /></AuthGuard>} />
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
+        <Route path="/gator_post_ipo" element={<AuthGuard><GatorPostIpoAgentMain /></AuthGuard>} />
+        <Route path="/gator_post_ipo/upload" element={<AuthGuard><GatorPostIpoUpload /></AuthGuard>} />
         <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
         <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 

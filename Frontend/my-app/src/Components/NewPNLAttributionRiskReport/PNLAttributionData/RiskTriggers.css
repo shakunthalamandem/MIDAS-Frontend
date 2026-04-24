@@ -110,62 +110,71 @@
 /* ── Summary Cards Row ── */
 .trig-summary-row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
   margin-bottom: 24px;
 }
 
 .trig-scard {
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 18px 20px 16px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
   transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .trig-scard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.09);
 }
 
-/* Colored top accent line */
+/* Colored left accent bar */
 .trig-scard::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 4px;
+  bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
 }
 
-.trig-scard--breach::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
-.trig-scard--warning::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
-.trig-scard--safe::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.trig-scard--breach::before { background: linear-gradient(180deg, #ef4444, #dc2626); }
+.trig-scard--warning::before { background: linear-gradient(180deg, #f59e0b, #d97706); }
+.trig-scard--safe::before { background: linear-gradient(180deg, #22c55e, #16a34a); }
 
+/* card label row */
 .trig-scard-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 0;
 }
 
 .trig-scard-label {
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  color: #0f172a !important;
-  letter-spacing: 0.5px;
+  color: #64748b !important;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  margin-bottom: 2px !important;
+  line-height: 1.35 !important;
+  margin-bottom: 0 !important;
+  flex: 1;
 }
 
 /* Circular gauge */
 .trig-gauge {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   position: relative;
+  flex-shrink: 0;
 }
 
 .trig-gauge svg {
@@ -201,11 +210,11 @@
 }
 
 .trig-scard-value {
-  font-size: 28px !important;
+  font-size: 26px !important;
   font-weight: 800 !important;
   line-height: 1.1 !important;
   font-variant-numeric: tabular-nums;
-  margin-bottom: 6px !important;
+  margin-bottom: 0 !important;
 }
 
 .trig-scard-value--breach { color: #dc2626 !important; }
@@ -715,10 +724,6 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 1400px) {
-  .trig-summary-row { grid-template-columns: repeat(4, 1fr); }
-}
-
 @media (max-width: 1200px) {
   .trig-summary-row { grid-template-columns: repeat(3, 1fr); }
   .trig-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
