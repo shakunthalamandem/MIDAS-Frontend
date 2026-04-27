@@ -119,7 +119,7 @@ const AgentTickerOverview: React.FC = () => {
             mb: 3,
             p: 2,
             borderRadius: 3,
-            backgroundColor: "rgba(206, 225, 233, 0.92)",
+            backgroundColor: "#cacce2eb",
             backdropFilter: "blur(14px)",
             border: `1px solid ${theme.palette.divider}`,
             position: "sticky",
@@ -140,7 +140,7 @@ const AgentTickerOverview: React.FC = () => {
             {/* Back Button - Left */}
             <Chip
               icon={<ArrowBackIcon />}
-              // label="Back"
+              label="Back"
               onClick={() => navigate('/agents/dashboard')}
               sx={{ cursor: "pointer" }}
               variant="outlined"
