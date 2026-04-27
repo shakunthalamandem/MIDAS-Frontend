@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import {
   Box,
   Tab,
@@ -8,8 +8,15 @@ import {
   Container,
   Paper,
   Chip,
+  TextField,
+  InputAdornment,
+  Autocomplete,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SearchIcon from "@mui/icons-material/Search";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import TabErrorBoundary from "../NewDashboardLifeCycle/TabErrorBoundary";
 import TechnicalAgentTab from "./AgentTabs/TechnicalAgentTab";
@@ -32,11 +39,56 @@ const AgentTickerOverview: React.FC = () => {
   const location = useLocation();
   const { ticker } = useParams<{ ticker: string }>();
   const [activeTab, setActiveTab] = useState(0);
+  const [searchTicker, setSearchTicker] = useState("");
+  const [tickerList, setTickerList] = useState<any[]>([]);
+  const [loadingTickers, setLoadingTickers] = useState(false);
   const tickerValue = ticker || "";
 
   // Get deal data from route state
   const dealData = (location.state as any)?.dealData || {};
   const uniqueDealId = dealData.unique_deal_id || "";
+
+  // Fetch ticker list
+  useEffect(() => {
+    const fetchTickerList = async () => {
+      try {
+        setLoadingTickers(true);
+        const token = localStorage.getItem("access_token");
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/agent_ticker_list/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: token ? `Bearer ${token}` : "",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setTickerList(Array.isArray(data) ? data : data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching ticker list:", error);
+      } finally {
+        setLoadingTickers(false);
+      }
+    };
+
+    fetchTickerList();
+  }, []);
+
+  const handleSearchTicker = (value: string) => {
+    if (value.trim()) {
+      navigate(`/agents/ticker/${value.trim().toUpperCase()}`, {
+        state: { dealData: {} },
+      });
+      setSearchTicker("");
+    }
+  };
+
+  // Get ticker options for autocomplete
+  const tickerOptions = Array.isArray(tickerList) ? tickerList : [];
 
   const tabs = [
     {
@@ -128,13 +180,14 @@ const AgentTickerOverview: React.FC = () => {
             boxShadow: "0 16px 32px rgba(15, 23, 42, 0.12)",
           })}
         >
-          {/* Back Button and Title Row */}
+          {/* Back Button, Title, and Search Bar Row */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               mb: 2,
+              gap: 2,
             }}
           >
             {/* Back Button - Left */}
@@ -142,7 +195,7 @@ const AgentTickerOverview: React.FC = () => {
               icon={<ArrowBackIcon />}
               label="Back"
               onClick={() => navigate('/agents/dashboard')}
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: "pointer", flexShrink: 0 }}
               variant="outlined"
             />
 
@@ -154,14 +207,105 @@ const AgentTickerOverview: React.FC = () => {
                 color: "#262268",
                 textAlign: "center",
                 flex: 1,
-                mb:2,
+                minWidth: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               {tickerValue ? `${tickerValue.toUpperCase()} - ${dealData.issuer_name || tickerValue.toUpperCase()}` : "Ticker Details"}
             </Typography>
 
-            {/* Spacer - Right (for balance) */}
-            <Box sx={{ width: "auto" }} />
+            {/* Search Bar - Right */}
+            <Box sx={{ flexShrink: 0, minWidth: 250, position: "relative" }}>
+              <Autocomplete
+                freeSolo
+                options={tickerOptions}
+                getOptionLabel={(option: any) =>
+                  typeof option === "string" ? option : option.ticker || ""
+                }
+                inputValue={searchTicker}
+                onInputChange={(event, value) => setSearchTicker(value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchTicker(searchTicker);
+                  }
+                }}
+                onChange={(event, value) => {
+                  if (value) {
+                    const ticker = typeof value === "string" ? value : value.ticker;
+                    handleSearchTicker(ticker);
+                  }
+                }}
+                loading={loadingTickers}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search ticker"
+                    size="small"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon sx={{ color: "#666", mr: 1 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      backgroundColor: "#ffffff",
+                      borderRadius: 1,
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d0d0d0",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#1976d2",
+                        },
+                      },
+                    }}
+                  />
+                )}
+                renderOption={(props, option: any) => {
+                  const formatDate = (dateString: string | null) => {
+                    if (!dateString) return "N/A";
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+                  };
+
+                  return (
+                    <Box
+                      component="li"
+                      {...props}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.4,
+                        py: 1.2,
+                        px: 2,
+                        borderBottom: "1px solid #e0e0f7",
+                        "&:last-child": { borderBottom: "none" },
+                        "&:hover": {
+                          backgroundColor: "#f8f9ff",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>
+                        {option.ticker} <span style={{ fontWeight: 500, color: "#0b4ca8" }}>({formatDate(option.pricing_date)})</span>
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#373446" }}>
+                        {option.issuer_name || "N/A"}
+                      </Typography>
+                    </Box>
+                  );
+                }}
+                sx={{
+                  width: "100%",
+                  "& .MuiAutocomplete-paper": {
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    borderRadius: 1.5,
+                  },
+                }}
+              />
+            </Box>
           </Box>
 
           {/* Tabs */}
