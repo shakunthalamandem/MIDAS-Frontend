@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -24,9 +26,19 @@ import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import EditAgentDialog from "./EditAgentDialog";
 import { AIAgent } from "./types";
-import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
+import { fetchAgents, toggleEmailPreference, deleteAgent, fetchAgentTickerList } from "./agentService";
 
 const POLL_INTERVAL_MS = 15_000;
+
+interface TickerItem {
+  ticker: string;
+  pricing_date: string | null;
+  region: string;
+  deal_type: string;
+  unique_deal_id: string;
+  issuer_name: string;
+  sector: string;
+}
 
 const Agents: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +58,8 @@ const Agents: React.FC = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+  const [tickerList, setTickerList] = useState<TickerItem[]>([]);
+  const [tickerLoading, setTickerLoading] = useState(false);
 
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -79,6 +93,21 @@ const Agents: React.FC = () => {
   }, []);
 
   useEffect(() => { loadAgents(); }, [loadAgents]);
+
+  useEffect(() => {
+    const loadTickers = async () => {
+      try {
+        setTickerLoading(true);
+        const data = await fetchAgentTickerList();
+        setTickerList(data.data || []);
+      } catch (err) {
+        console.error("Failed to load ticker list:", err);
+      } finally {
+        setTickerLoading(false);
+      }
+    };
+    loadTickers();
+  }, []);
 
   useEffect(() => {
     const hasInProgress = agents.some(
@@ -223,8 +252,8 @@ const Agents: React.FC = () => {
             </Button>
           </Stack>
 
-          {/* Stat pills */}
-          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap">
+          {/* Stat pills and Search Bar */}
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="flex-end">
             {/* Total */}
             <Box
               sx={{
@@ -274,6 +303,78 @@ const Agents: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
+
+            {/* Ticker Search Bar */}
+            <Autocomplete
+              options={tickerList}
+              getOptionLabel={(option) =>
+                `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
+              }
+              loading={tickerLoading}
+              disabled={tickerLoading}
+              onChange={(event, value) => {
+                if (value) {
+                  navigate(`/agents/ticker/${value.ticker}`, {
+                    state: { dealData: value }
+                  });
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search ticker..."
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    width: 300,
+                    "& .MuiOutlinedInput-root": {
+                      fontSize: "0.9rem",
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  {...props}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    py: 1.2,
+                    px: 2,
+                    borderBottom: "1px solid #e0e0f7",
+                    "&:last-child": { borderBottom: "none" },
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, color: "#111827", fontSize: "0.9rem" }}>
+                    {option.ticker}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 3, ml: 2, textAlign: "right" }}>
+                    <Box>
+                      <Typography sx={{ fontSize: "0.75rem", color: "#64748b" }}>Pricing Date</Typography>
+                      <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#111827" }}>
+                        {option.pricing_date || "N/A"}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "0.75rem", color: "#64748b" }}>Deal Type</Typography>
+                      <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#111827" }}>
+                        {option.deal_type}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+              noOptionsText="No tickers found"
+              sx={{
+                "& .MuiAutocomplete-paper": {
+                  borderRadius: 2,
+                  border: "1px solid #c7d2fe",
+                },
+              }}
+            />
 
             {/* Working */}
             {workingAgents > 0 && (

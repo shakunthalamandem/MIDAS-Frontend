@@ -64,6 +64,7 @@ const VersionUploadForm = React.lazy(() => import("../Components/Uploads/DailyMo
 const Agents = React.lazy(() => import("../Components/Agents/Agents"));
 const AgentOutputView = React.lazy(() => import("../Components/Agents/AgentOutputView"));
 const AgentTasksMain = React.lazy(() => import("../Components/Agents/AgentTasksMain"));
+const AgentTickerOverview = React.lazy(() => import("../Components/Agents/AgentTickerOverview"));
 const BetaTransferMain = React.lazy(() => import("../Components/BetaTransfer/BetaTransferMain"));
 const DealDetailedGapAnalysis = React.lazy(() => import("../Components/Main/DealDetailedGapAnalysis"));
 const PerplexityChatMain = React.lazy(() => import("../Components/GhcAi/PerplexityChatMain"));
@@ -372,6 +373,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
         <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
         <Route path="/agents_tasks" element={<AuthGuard><AgentTasksMain /></AuthGuard>} />
+        <Route path="/agents/ticker/:ticker" element={<AuthGuard><AgentTickerOverview /></AuthGuard>} />
         <Route path="/beta_transfer" element={<AuthGuard><BetaTransferMain /></AuthGuard>} />
         <Route path="/agents/:agentId/output" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/agents/:agentId/output/:outputId" element={<AuthGuard><AgentOutputView /></AuthGuard>} />

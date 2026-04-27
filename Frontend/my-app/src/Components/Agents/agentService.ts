@@ -161,3 +161,11 @@ export async function fetchAgent(agentId: number): Promise<AIAgent> {
   });
   return handleResponse<AIAgent>(res);
 }
+
+/** Fetch ticker list for agent search */
+export async function fetchAgentTickerList(): Promise<any> {
+  const res = await fetch(`${apiUrl}/api/agent_ticker_list/`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
