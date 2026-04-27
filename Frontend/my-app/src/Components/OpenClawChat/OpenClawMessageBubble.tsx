@@ -1,5 +1,5 @@
-import React, { memo, useState } from "react";
-import { Box, IconButton, Tooltip, Typography, Dialog } from "@mui/material";
+import React, { memo, useEffect, useRef, useState } from "react";
+import { Box, CircularProgress, IconButton, Tooltip, Typography, Dialog } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopyOutlined";
 import CheckIcon from "@mui/icons-material/CheckOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
@@ -11,14 +11,19 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { OpenClawMessage } from "./openclawTypes";
+import { fetchOpenClawFileBlob, isOpenClawProxiedFile } from "./openclawApi";
 
 interface Props {
   message: OpenClawMessage;
   isLastAssistant?: boolean;
 }
 
-const FILE_EXT_RE = /\.(pdf|xlsx?|csv|tsv|docx?|pptx?|zip|txt|json|png|jpg|jpeg|gif|svg|webp)$/i;
+const FILE_EXT_RE = /\.(pdf|xlsx?|csv|tsv|docx?|pptx?|zip|txt|json|png|jpg|jpeg|gif|svg|webp|html?|md|rtf)$/i;
 const IMAGE_EXT_RE = /\.(png|jpe?g|gif|svg|webp)$/i;
+const ABS_URL_RE = /^(https?:|mailto:|tel:|data:)/i;
+
+const API_BASE: string =
+  (process.env.REACT_APP_API_URL as string) || "";
 
 function fileNameFromUrl(url: string): string {
   try {
@@ -29,14 +34,57 @@ function fileNameFromUrl(url: string): string {
   }
 }
 
+/**
+ * If `href` looks like a local OpenClaw file reference (relative or absolute
+ * filesystem path), rewrite it to hit the Django file-proxy endpoint so it
+ * actually loads instead of being intercepted by React Router.
+ */
+function rewriteFileHref(href: string): string {
+  if (!href) return href;
+  if (ABS_URL_RE.test(href)) return href; // already a real URL
+  if (href.startsWith("/api/")) return `${API_BASE}${href}`;
+  // Treat anything else (bare filename, /Users/... path, ~/...) as an
+  // OpenClaw workspace ref and proxy it.
+  return `${API_BASE}/api/openclaw_chat/file/?ref=${encodeURIComponent(href)}`;
+}
+
 const FileCard: React.FC<{ href: string; label?: string }> = ({ href, label }) => {
   const name = label || fileNameFromUrl(href);
+  const proxied = isOpenClawProxiedFile(href);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const downloadProxiedFile = async (e: React.MouseEvent) => {
+    if (!proxied) return; // external URLs: let the browser handle natively
+    e.preventDefault();
+    if (busy) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const { blobUrl, filename } = await fetchOpenClawFileBlob(href);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename || fileNameFromUrl(href);
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Free the blob after the browser has had time to start the download.
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
+    } catch (err: any) {
+      setError(err?.message || "Could not download file.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <Box
       component="a"
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={downloadProxiedFile}
       sx={{
         display: "inline-flex",
         alignItems: "center",
@@ -45,15 +93,20 @@ const FileCard: React.FC<{ href: string; label?: string }> = ({ href, label }) =
         py: 1,
         my: 0.5,
         borderRadius: 2,
-        border: "1px solid rgba(15, 23, 42, 0.12)",
-        backgroundColor: "rgba(15, 23, 42, 0.04)",
+        border: error
+          ? "1px solid rgba(239, 68, 68, 0.4)"
+          : "1px solid rgba(15, 23, 42, 0.12)",
+        backgroundColor: error
+          ? "rgba(254, 226, 226, 0.6)"
+          : "rgba(15, 23, 42, 0.04)",
         color: "inherit",
         textDecoration: "none",
         maxWidth: "100%",
+        cursor: busy ? "wait" : "pointer",
         transition: "all 0.15s",
         "&:hover": {
-          backgroundColor: "rgba(15, 23, 42, 0.08)",
-          borderColor: "rgba(15, 23, 42, 0.2)",
+          backgroundColor: error ? "rgba(254, 226, 226, 0.8)" : "rgba(15, 23, 42, 0.08)",
+          borderColor: error ? "rgba(239, 68, 68, 0.5)" : "rgba(15, 23, 42, 0.2)",
         },
       }}
     >
@@ -71,22 +124,80 @@ const FileCard: React.FC<{ href: string; label?: string }> = ({ href, label }) =
         >
           {name}
         </Typography>
-        <Typography variant="caption" sx={{ color: "text.secondary" }}>
-          Click to open
+        <Typography variant="caption" sx={{ color: error ? "error.main" : "text.secondary" }}>
+          {error ? error : busy ? "Downloading…" : "Click to download"}
         </Typography>
       </Box>
-      <DownloadOutlinedIcon fontSize="small" sx={{ ml: 0.5, color: "text.secondary" }} />
+      {busy ? (
+        <CircularProgress size={16} sx={{ ml: 0.5 }} />
+      ) : (
+        <DownloadOutlinedIcon fontSize="small" sx={{ ml: 0.5, color: "text.secondary" }} />
+      )}
     </Box>
   );
 };
 
 const ImageWithLightbox: React.FC<{ src: string; alt?: string }> = ({ src, alt }) => {
   const [open, setOpen] = useState(false);
+  const [resolvedSrc, setResolvedSrc] = useState<string>(
+    isOpenClawProxiedFile(src) ? "" : src
+  );
+  const [failed, setFailed] = useState(false);
+  const blobUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpenClawProxiedFile(src)) {
+      setResolvedSrc(src);
+      return;
+    }
+    let cancelled = false;
+    setFailed(false);
+    setResolvedSrc("");
+    fetchOpenClawFileBlob(src)
+      .then(({ blobUrl }) => {
+        if (cancelled) {
+          URL.revokeObjectURL(blobUrl);
+          return;
+        }
+        blobUrlRef.current = blobUrl;
+        setResolvedSrc(blobUrl);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, [src]);
+
+  if (failed) {
+    return (
+      <Typography variant="caption" color="error" sx={{ display: "block", my: 0.5 }}>
+        Could not load image: {fileNameFromUrl(src)}
+      </Typography>
+    );
+  }
+
+  if (!resolvedSrc) {
+    return (
+      <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1, my: 0.5 }}>
+        <CircularProgress size={14} />
+        <Typography variant="caption" color="text.secondary">
+          Loading image…
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box
         component="img"
-        src={src}
+        src={resolvedSrc}
         alt={alt || ""}
         loading="lazy"
         onClick={() => setOpen(true)}
@@ -102,7 +213,7 @@ const ImageWithLightbox: React.FC<{ src: string; alt?: string }> = ({ src, alt }
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg">
         <Box
           component="img"
-          src={src}
+          src={resolvedSrc}
           alt={alt || ""}
           sx={{ maxWidth: "90vw", maxHeight: "90vh", display: "block" }}
         />
@@ -279,12 +390,13 @@ const OpenClawMessageBubble: React.FC<Props> = ({ message, isLastAssistant }) =>
             remarkPlugins={[remarkGfm as any]}
             components={{
               a({ href, children, ...rest }) {
-                const url = href || "";
+                const original = href || "";
+                const url = rewriteFileHref(original);
                 const text = String(children);
-                if (url && IMAGE_EXT_RE.test(url)) {
+                if (original && IMAGE_EXT_RE.test(original)) {
                   return <ImageWithLightbox src={url} alt={text} />;
                 }
-                if (url && FILE_EXT_RE.test(url)) {
+                if (original && FILE_EXT_RE.test(original)) {
                   return <FileCard href={url} label={text} />;
                 }
                 return (
@@ -299,7 +411,7 @@ const OpenClawMessageBubble: React.FC<Props> = ({ message, isLastAssistant }) =>
               },
               img({ src, alt }) {
                 if (!src) return null;
-                return <ImageWithLightbox src={src} alt={alt} />;
+                return <ImageWithLightbox src={rewriteFileHref(String(src))} alt={alt} />;
               },
               code({ inline, className, children, ...rest }: any) {
                 const raw = String(children).replace(/\n$/, "");

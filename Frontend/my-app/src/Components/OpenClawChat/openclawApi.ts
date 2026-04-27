@@ -49,6 +49,38 @@ export async function resumeOpenClawChat(salt: string): Promise<{ ok: boolean; s
   return r.data;
 }
 
+/** Fetch an OpenClaw-proxied file with the JWT, return a blob: URL the
+ *  browser can open without an Authorization header. */
+export async function fetchOpenClawFileBlob(
+  href: string
+): Promise<{ blobUrl: string; filename: string; contentType: string }> {
+  const resp = await fetch(href, { headers: authHeaders() });
+  if (!resp.ok) {
+    let detail = "";
+    try {
+      detail = await resp.text();
+    } catch {
+      /* noop */
+    }
+    throw new Error(`HTTP ${resp.status}${detail ? `: ${detail.slice(0, 200)}` : ""}`);
+  }
+  const blob = await resp.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const contentType = resp.headers.get("Content-Type") || blob.type || "application/octet-stream";
+  const cd = resp.headers.get("Content-Disposition") || "";
+  const m = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(cd);
+  const fallback = href.split("?")[0].split("/").pop() || "file";
+  const filename = m ? decodeURIComponent(m[1]) : fallback;
+  return { blobUrl, filename, contentType };
+}
+
+/** Returns true if `href` points at our backend's file proxy and therefore
+ *  needs the authed fetch+blob trick to load. */
+export function isOpenClawProxiedFile(href: string): boolean {
+  if (!href) return false;
+  return href.includes("/api/openclaw_chat/file/");
+}
+
 /**
  * Stream an OpenClaw reply over SSE. Uses fetch + ReadableStream because
  * axios cannot stream response bodies in the browser.
