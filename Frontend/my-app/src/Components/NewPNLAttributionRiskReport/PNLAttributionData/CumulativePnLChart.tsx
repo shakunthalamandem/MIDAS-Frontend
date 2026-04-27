@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import {
   AreaChart,
@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import type { ChartDataPoint, DashboardCategory, MetricChartDataPoint } from "./types";
 import { formatCurrency, formatDate, formatChartXAxis } from "./utils";
+import "./Attribution.css";
 
 interface CumulativePnLChartProps {
   chartData: ChartDataPoint[];
@@ -51,9 +52,11 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
   exchrateLatestPnl,
 }) => {
   const isPnl = category === "pnl";
+  const [showPct, setShowPct] = useState(false);
   const activeData = isPnl ? chartData : metricChartData;
   const activeLoading = isPnl ? loading : metricChartLoading;
-  const dataKey = isPnl ? (period === "dtd" ? "daily_pnl" : "cumulative_pnl") : "value";
+  const baseKey = isPnl ? (period === "dtd" ? "daily_pnl" : "cumulative_pnl") : "value";
+  const dataKey = showPct ? `${baseKey}_pct` : baseKey;
   const color = CATEGORY_COLORS[category] || "#7c3aed";
   const label = CATEGORY_LABELS[category] || "P&L";
   const gradientId = `chartGradient_${category}`;
@@ -64,6 +67,11 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
     : `HISTORICAL: ${periodLabel} ${label}`;
 
   const legendLabel = isPnl ? (period === "dtd" ? "Daily P&L" : "Cumulative P&L") : label;
+
+  const formatValue = (value: number) => {
+    if (showPct) return `${value.toFixed(2)}%`;
+    return formatCurrency(value);
+  };
 
   return (
     <Box className="risk-dashboard-section">
@@ -77,9 +85,27 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
               </Box>
             )}
           </Box>
-          <Box className="pnl-chart-legend">
-            <Box className="pnl-chart-legend-dot" sx={{ background: `${color} !important` }} />
-            {legendLabel}
+          <Box sx={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <Box className="attribution-toggle">
+              <Box
+                className={`attribution-toggle-btn${!showPct ? " attribution-toggle-btn--active" : ""}`}
+                sx={!showPct ? { background: `${color} !important`, color: "#fff !important" } : {}}
+                onClick={() => setShowPct(false)}
+              >
+                $
+              </Box>
+              <Box
+                className={`attribution-toggle-btn${showPct ? " attribution-toggle-btn--active" : ""}`}
+                sx={showPct ? { background: `${color} !important`, color: "#fff !important" } : {}}
+                onClick={() => setShowPct(true)}
+              >
+                % AUM
+              </Box>
+            </Box>
+            <Box className="pnl-chart-legend">
+              <Box className="pnl-chart-legend-dot" sx={{ background: `${color} !important` }} />
+              {legendLabel}
+            </Box>
           </Box>
         </Box>
 
@@ -109,14 +135,14 @@ const CumulativePnLChart: React.FC<CumulativePnLChartProps> = ({
                 interval="preserveStartEnd"
               />
               <YAxis
-                tickFormatter={formatCurrency}
+                tickFormatter={formatValue}
                 tick={{ fontSize: 11, fill: "#000000" }}
                 axisLine={{ stroke: "#000000" }}
                 tickLine={false}
                 width={70}
               />
               <Tooltip
-                formatter={(value: number) => [formatCurrency(value), legendLabel]}
+                formatter={(value: number) => [formatValue(value), legendLabel]}
                 labelFormatter={(label: string) => formatDate(label)}
                 contentStyle={{
                   borderRadius: "10px",
