@@ -213,17 +213,14 @@ const AgentCard: React.FC<AgentCardProps> = ({
             >
               {theme.icon}
             </Box>
-            <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.95rem",
                   color: "#111827",
-                  lineHeight: 1.3,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  maxWidth: 190,
+                  lineHeight: 1.4,
+                  wordBreak: "break-word",
                 }}
               >
                 {AGENT_DISPLAY_NAMES[agent.name] ?? agent.name}
