@@ -42,6 +42,7 @@ import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
+import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 
 const NavbarMain: React.FC = () => {
   const navigate = useNavigate();
@@ -355,6 +356,46 @@ const NavbarMain: React.FC = () => {
                 Beta
               </span>
             </Button>
+
+            <Tooltip title="Chat with MONA — your private MIDAS AI partner (built on OpenClaw)">
+              <Button
+                onClick={() => {
+                  setSelectedTab("MONA");
+                  localStorage.setItem("selectedTab", "MONA");
+                  navigate("/openclaw_chat");
+                }}
+                startIcon={<SmartToyRoundedIcon fontSize="small" />}
+                sx={{
+                  color: "#005166",
+                  fontWeight: "bold",
+                  fontSize: "0.725rem",
+                  mx: 1,
+                  borderBottom:
+                    selectedTab === "MONA"
+                      ? "3px solid #005166"
+                      : "3px solid transparent",
+                  borderRadius: 0,
+                  "&:hover": {
+                    borderBottom: "3px solid #005166",
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
+                MONA
+                <span
+                  style={{
+                    fontSize: "0.55rem",
+                    marginLeft: "4px",
+                    verticalAlign: "super",
+                    color: "#ff1e00",
+                    fontWeight: 700,
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Beta
+                </span>
+              </Button>
+            </Tooltip>
 
 
             {/*
