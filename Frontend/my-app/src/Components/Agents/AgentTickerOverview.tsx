@@ -92,9 +92,9 @@ const AgentTickerOverview: React.FC = () => {
       ),
     },
     {
-      label: "Aunat Agent",
+      label: "Quant Agent",
       component: (
-        <TabErrorBoundary tabLabel="Aunat Agent" ticker={tickerValue}>
+        <TabErrorBoundary tabLabel="Quant Agent" ticker={tickerValue}>
           <AunatAgentTab ticker={ticker} />
         </TabErrorBoundary>
       ),
