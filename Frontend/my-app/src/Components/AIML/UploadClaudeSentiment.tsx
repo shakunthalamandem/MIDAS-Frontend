@@ -120,8 +120,7 @@ const fetchUpcomingFoTickers = async (): Promise<Deal[]> => {
 };
 
 const uploadSentiment = async (
-  ticker: string,
-  uniqueDealId: string,
+  deal: TickerOption,
   sentiment: string,
   socialMediaSentiment: string,
   oneWeekSentiment: string,
@@ -133,20 +132,26 @@ const uploadSentiment = async (
 ) => {
   const token = localStorage.getItem("access_token");
 
-  // Build payload with only non-empty fields
+  // Build payload with mandatory deal fields
   const payload: any = {
-    ticker,
-    unique_deal_id: uniqueDealId,
+    ticker: deal.ticker,
+    unique_deal_id: deal.unique_deal_id,
+    deal_type: deal.deal_type,
   };
 
-  if (sentiment.trim()) payload.sentiment = sentiment;
-  if (socialMediaSentiment.trim()) payload.socialmedia_retail_sentiment = socialMediaSentiment;
-  if (oneWeekSentiment.trim()) payload.one_week_sentiment = oneWeekSentiment;
-  if (oneMonthSentiment.trim()) payload.one_month_sentiment = oneMonthSentiment;
-  if (sentimentSummary.trim()) payload.sentiment_summary = sentimentSummary;
-  if (sentimentScore.trim()) payload.sentiment_score = sentimentScore;
-  if (socialMediaSentimentScore.trim()) payload.socialmedia_sentiment_score = socialMediaSentimentScore;
-  if (changeInSentiment.trim()) payload.change_in_sentiment = changeInSentiment;
+  // Add optional deal fields if they exist
+  if (deal.region) payload.region = deal.region;
+  if (deal.issuer_name) payload.issuer_name = deal.issuer_name;
+
+  // Only add sentiment fields if they have non-empty content
+  if (sentiment.trim()) payload.sentiment = sentiment.trim();
+  if (socialMediaSentiment.trim()) payload.socialmedia_retail_sentiment = socialMediaSentiment.trim();
+  if (oneWeekSentiment.trim()) payload.one_week_sentiment = oneWeekSentiment.trim();
+  if (oneMonthSentiment.trim()) payload.one_month_sentiment = oneMonthSentiment.trim();
+  if (sentimentSummary.trim()) payload.sentiment_summary = sentimentSummary.trim();
+  if (sentimentScore.trim()) payload.sentiment_score = sentimentScore.trim();
+  if (socialMediaSentimentScore.trim()) payload.socialmedia_sentiment_score = socialMediaSentimentScore.trim();
+  if (changeInSentiment.trim()) payload.change_in_sentiment = changeInSentiment.trim();
 
   const res = await fetch(`${apiUrl}/api/upload_claude_sentiment/`, {
     method: "POST",
@@ -242,8 +247,7 @@ const UploadClaudeSentiment: React.FC = () => {
 
     try {
       await uploadSentiment(
-        selectedTicker.ticker,
-        selectedTicker.unique_deal_id,
+        selectedTicker,
         trimmedSentiment,
         trimmedSocialMediaSentiment,
         trimmedOneWeekSentiment,

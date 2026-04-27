@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -24,9 +26,19 @@ import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import EditAgentDialog from "./EditAgentDialog";
 import { AIAgent } from "./types";
-import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
+import { fetchAgents, toggleEmailPreference, deleteAgent, fetchAgentTickerList } from "./agentService";
 
 const POLL_INTERVAL_MS = 15_000;
+
+interface TickerItem {
+  ticker: string;
+  pricing_date: string | null;
+  region: string;
+  deal_type: string;
+  unique_deal_id: string;
+  issuer_name: string;
+  sector: string;
+}
 
 const Agents: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +58,8 @@ const Agents: React.FC = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+  const [tickerList, setTickerList] = useState<TickerItem[]>([]);
+  const [tickerLoading, setTickerLoading] = useState(false);
 
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -79,6 +93,21 @@ const Agents: React.FC = () => {
   }, []);
 
   useEffect(() => { loadAgents(); }, [loadAgents]);
+
+  useEffect(() => {
+    const loadTickers = async () => {
+      try {
+        setTickerLoading(true);
+        const data = await fetchAgentTickerList();
+        setTickerList(data.data || []);
+      } catch (err) {
+        console.error("Failed to load ticker list:", err);
+      } finally {
+        setTickerLoading(false);
+      }
+    };
+    loadTickers();
+  }, []);
 
   useEffect(() => {
     const hasInProgress = agents.some(
@@ -198,33 +227,108 @@ const Agents: React.FC = () => {
               </Box>
             </Stack>
 
-            <Button
-              variant="contained"
-              startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
-              onClick={() =>
-                isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
-              }
-              sx={{
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: "0.85rem",
-                px: 3,
-                py: 1.1,
-                borderRadius: 2.5,
-                bgcolor: isAdmin ? "#4f46e5" : "#475569",
-                boxShadow: "none",
-                "&:hover": {
-                  bgcolor: isAdmin ? "#4338ca" : "#334155",
-                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-                },
-              }}
-            >
-              Create Agent
-            </Button>
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              {/* Ticker Search Bar */}
+              <Autocomplete
+                options={tickerList}
+                getOptionLabel={(option) =>
+                  `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
+                }
+                loading={tickerLoading}
+                disabled={tickerLoading}
+                onChange={(event, value) => {
+                  if (value) {
+                    navigate(`/agents/ticker/${value.ticker}`, {
+                      state: { dealData: value }
+                    });
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search ticker..."
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      width: 280,
+                      "& .MuiOutlinedInput-root": {
+                        fontSize: "0.9rem",
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const formatDate = (dateString: string | null) => {
+                    if (!dateString) return "N/A";
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+                  };
+
+                  return (
+                    <Box
+                      component="li"
+                      {...props}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.4,
+                        py: 1.2,
+                        px: 2,
+                        borderBottom: "1px solid #e0e0f7",
+                        "&:last-child": { borderBottom: "none" },
+                        "&:hover": {
+                          backgroundColor: "#f8f9ff",
+                        },
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>
+                        {option.ticker} <span style={{ fontWeight: 500, color: "#0b4ca8" }}>({formatDate(option.pricing_date)})</span>
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#373446" }}>
+                        {option.issuer_name || "N/A"}
+                      </Typography>
+                    </Box>
+                  );
+                }}
+                noOptionsText="No tickers found"
+                sx={{
+                  "& .MuiAutocomplete-paper": {
+                    borderRadius: 2,
+                    border: "1px solid #c7d2fe",
+                  },
+                }}
+              />
+
+              <Button
+                variant="contained"
+                startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
+                onClick={() =>
+                  isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
+                }
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  px: 3,
+                  py: 1.1,
+                  borderRadius: 2.5,
+                  bgcolor: isAdmin ? "#4f46e5" : "#475569",
+                  boxShadow: "none",
+                  "&:hover": {
+                    bgcolor: isAdmin ? "#4338ca" : "#334155",
+                    boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                  },
+                  flexShrink: 0,
+                }}
+              >
+                Create Agent
+              </Button>
+            </Stack>
           </Stack>
 
           {/* Stat pills */}
-          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap">
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="flex-end">
             {/* Total */}
             <Box
               sx={{

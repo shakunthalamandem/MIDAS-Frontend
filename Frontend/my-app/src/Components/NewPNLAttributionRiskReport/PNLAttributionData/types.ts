@@ -52,6 +52,8 @@ export interface ChartDataPoint {
   date: string;
   daily_pnl?: number;
   cumulative_pnl?: number;
+  daily_pnl_pct?: number;
+  cumulative_pnl_pct?: number;
 }
 
 export interface IndexComparisonChartPoint {
@@ -110,6 +112,7 @@ export interface TopBottomMetricTicker {
 export interface MetricChartDataPoint {
   date: string;
   value: number;
+  value_pct?: number;
 }
 
 export interface HeadlineMetricValues {
