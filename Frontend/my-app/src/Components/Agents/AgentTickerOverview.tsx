@@ -87,7 +87,7 @@ const AgentTickerOverview: React.FC = () => {
       label: "Technical Agent",
       component: (
         <TabErrorBoundary tabLabel="Technical Agent" ticker={tickerValue}>
-          <TechnicalAgentTab ticker={ticker} />
+          <TechnicalAgentTab ticker={ticker} dealType={dealData.deal_type} />
         </TabErrorBoundary>
       ),
     },
