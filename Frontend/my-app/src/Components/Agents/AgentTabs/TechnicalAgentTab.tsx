@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Alert, Paper, Typography, Grid, Card, CardContent } from "@mui/material";
+import { Box, CircularProgress, Alert, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Grid } from "@mui/material";
 
 interface TechnicalAgentTabProps {
   ticker?: string;
@@ -83,89 +83,99 @@ const TechnicalAgentTab: React.FC<TechnicalAgentTabProps> = ({ ticker, dealType 
     return <Alert severity="error">{error}</Alert>;
   }
 
-  const MetricCard = ({ label, value, isCurrency = true }: { label: string; value?: number | null; isCurrency?: boolean }) => (
-    <Card sx={{ boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-      <CardContent sx={{ p: 2 }}>
-        <Typography variant="caption" sx={{ color: "#666", fontWeight: 500 }}>
-          {label}
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#1a1a1a", mt: 0.5 }}>
-          {value !== undefined && value !== null ? (
-            isCurrency ? `$${value.toFixed(2)}` : value.toFixed(2)
-          ) : (
-            "—"
-          )}
-        </Typography>
-      </CardContent>
-    </Card>
+  const formatValue = (value: number | null | undefined, isCurrency = true) => {
+    if (value === undefined || value === null) return "—";
+    if (isCurrency) return `$${value.toFixed(2)}`;
+    if (value > 1000) return (value as number).toLocaleString();
+    return value.toFixed(2);
+  };
+
+  const technicalMetrics = [
+    { label: "Price", value: data?.price, isCurrency: true },
+    { label: "RSI", value: data?.rsi, isCurrency: false },
+    { label: "DMA 9", value: data?.dma9, isCurrency: true },
+    { label: "DMA 20", value: data?.dma20, isCurrency: true },
+    { label: "DMA 50", value: data?.dma50, isCurrency: true },
+    { label: "DMA 200", value: data?.dma200, isCurrency: true },
+  ];
+
+  const tradingMetrics = [
+    { label: "Volume", value: data?.volume, isCurrency: false },
+    { label: "Avg Volume", value: data?.full_data?.avg_vol, isCurrency: false },
+    { label: "DTD PnL", value: data?.full_data?.dtd_pnl, isCurrency: true },
+    { label: "Target Price", value: data?.full_data?.target_price, isCurrency: true },
+    { label: "Ultimate Stop", value: data?.full_data?.ultimate_stop, isCurrency: true },
+    { label: "Vol 60", value: data?.full_data?.vol60, isCurrency: false },
+  ];
+
+  const renderTable = (metrics: typeof technicalMetrics, title: string) => (
+    <Box>
+      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, color: "#1976d2", fontSize: "0.95rem" }}>
+        {title}
+      </Typography>
+      <TableContainer sx={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)", borderRadius: 1 }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#e3f2fd" }}>
+              <TableCell sx={{ fontWeight: 700, color: "#1976d2", width: "50%" }}>Metric</TableCell>
+              <TableCell sx={{ fontWeight: 700, color: "#1976d2", width: "50%" }}>Value</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {metrics.map((metric, idx) => (
+              <TableRow key={idx} sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}>
+                <TableCell sx={{ color: "#666", fontWeight: 500, fontSize: "0.9rem" }}>
+                  {metric.label}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "#1a1a1a", fontSize: "0.95rem" }}>
+                  {formatValue(metric.value, metric.isCurrency)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 
   return (
     <Box sx={{ p: 0 }}>
       {data ? (
         <Box>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Technical Analysis
-          </Typography>
-
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            {data.price !== undefined && data.price !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="Price" value={data.price} />
-              </Grid>
-            )}
-            {data.rsi !== undefined && data.rsi !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="RSI" value={data.rsi} isCurrency={false} />
-              </Grid>
-            )}
-            {data.dma9 !== undefined && data.dma9 !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="DMA 9" value={data.dma9} />
-              </Grid>
-            )}
-            {data.dma20 !== undefined && data.dma20 !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="DMA 20" value={data.dma20} />
-              </Grid>
-            )}
-            {data.dma50 !== undefined && data.dma50 !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="DMA 50" value={data.dma50} />
-              </Grid>
-            )}
-            {data.dma200 !== undefined && data.dma200 !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <MetricCard label="DMA 200" value={data.dma200} />
-              </Grid>
-            )}
-            {data.volume !== undefined && data.volume !== null && (
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-                  <CardContent sx={{ p: 2 }}>
-                    <Typography variant="caption" sx={{ color: "#666", fontWeight: 500 }}>
-                      Volume
-                    </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: "#1a1a1a", mt: 0.5 }}>
-                      {(data.volume as number)?.toLocaleString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            )}
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            <Grid item xs={12} md={6}>
+              {renderTable(technicalMetrics, "Technical Indicators")}
+            </Grid>
+            <Grid item xs={12} md={6}>
+              {renderTable(tradingMetrics, "Trading Metrics")}
+            </Grid>
           </Grid>
 
           {data.triggers_fired && (
-            <Card sx={{ boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-              <CardContent sx={{ p: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Triggers Fired
-                </Typography>
-                <Typography variant="body2">
-                  {Array.isArray(data.triggers_fired) ? data.triggers_fired.join(", ") : data.triggers_fired}
-                </Typography>
-              </CardContent>
-            </Card>
+            <Paper sx={{ p: 2.5, backgroundColor: "#f5f5f5", borderLeft: "4px solid #1976d2" }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, color: "#1976d2" }}>
+                Triggers Fired
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {Array.isArray(data.triggers_fired) ? (
+                  data.triggers_fired.map((trigger: string, idx: number) => (
+                    <Chip
+                      key={idx}
+                      label={trigger}
+                      size="small"
+                      sx={{
+                        backgroundColor: "#e3f2fd",
+                        color: "#1976d2",
+                        fontWeight: 600,
+                        fontSize: "0.85rem",
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2">{data.triggers_fired}</Typography>
+                )}
+              </Box>
+            </Paper>
           )}
         </Box>
       ) : (
