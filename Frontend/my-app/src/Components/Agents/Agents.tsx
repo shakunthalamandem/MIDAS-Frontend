@@ -25,7 +25,7 @@ import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import EditAgentDialog from "./EditAgentDialog";
-import { AIAgent } from "./types";
+import { AIAgent, SYSTEM_AGENT_ROUTES } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent, fetchAgentTickerList } from "./agentService";
 
 const POLL_INTERVAL_MS = 15_000;
@@ -67,13 +67,15 @@ const Agents: React.FC = () => {
     try {
       setLoading(true);
       const data = await fetchAgents();
-      // Hide IPO Ranking Agent; merge Portfolio CIO Agent + Risk Agent into one
+      // Hide IPO Ranking Agent, Risk Agent, Technical Agent; merge Portfolio CIO Agent + Risk Agent into one
+      const routeOrder = Object.keys(SYSTEM_AGENT_ROUTES);
       let cioAgent: AIAgent | undefined;
       const transformed: AIAgent[] = [];
       for (const agent of data) {
         if (agent.name === "IPO Ranking Agent") continue;
         if (agent.name === "Portfolio CIO Agent") { cioAgent = agent; continue; }
         if (agent.name === "Risk Agent") continue;
+        if (agent.name === "Technical Agent") continue;
         transformed.push(agent);
       }
       if (cioAgent) {
@@ -83,6 +85,11 @@ const Agents: React.FC = () => {
           description: "AI-powered portfolio oversight combining risk and performance analysis. Monitors exposures, P&L attribution, and risk triggers to support capital allocation decisions.",
         });
       }
+      transformed.sort((a, b) => {
+        const ai = routeOrder.indexOf(a.name);
+        const bi = routeOrder.indexOf(b.name);
+        return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+      });
       setAgents(transformed);
     } catch (err) {
       console.error("Failed to load agents:", err);
