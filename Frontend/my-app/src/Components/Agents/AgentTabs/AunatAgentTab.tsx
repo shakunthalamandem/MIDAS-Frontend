@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
+import DashboardStateCard from "../../NewDashboardLifeCycle/DashboardStateCard";
 import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 
 interface AunatAgentTabProps {
@@ -82,7 +83,13 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <DashboardStateCard
+        variant="empty"
+        title="No data available"
+        message="Quant Agent data not available for this ticker.It Will be updated soon."
+      />
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Alert, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Grid } from "@mui/material";
+import { Box, CircularProgress, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Grid } from "@mui/material";
+import DashboardStateCard from "../../NewDashboardLifeCycle/DashboardStateCard";
 
 interface TechnicalAgentTabProps {
   ticker?: string;
@@ -80,7 +81,13 @@ const TechnicalAgentTab: React.FC<TechnicalAgentTabProps> = ({ ticker, dealType 
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <DashboardStateCard
+        variant="empty"
+        title="No data available"
+        message="Technical Agent data not available for this ticker."
+      />
+    );
   }
 
   const formatValue = (value: number | null | undefined, isCurrency = true) => {
