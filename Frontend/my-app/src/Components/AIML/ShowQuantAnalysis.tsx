@@ -142,9 +142,21 @@ const ShowQuantAnalysis: React.FC = () => {
     }
 
     const textBlocks = parsedBlocks.filter((b: any) => b.type === "text");
+
+    // Try to get the last text block first
     if (textBlocks.length > 0) {
-      const firstTextBlock = textBlocks[0] as any;
-      const content = firstTextBlock.content || "";
+      const lastTextBlock = textBlocks[textBlocks.length - 1] as any;
+      const content = lastTextBlock.content || "";
+      if (content) {
+        return content.substring(0, 120) + "...";
+      }
+    }
+
+    // Fallback to card blocks if no text blocks
+    const cardBlocks = parsedBlocks.filter((b: any) => b.type === "card");
+    if (cardBlocks.length > 0) {
+      const firstCard = cardBlocks[0] as any;
+      const content = firstCard.description || "";
       if (content) {
         return content.substring(0, 120) + "...";
       }
@@ -381,25 +393,26 @@ const ShowQuantAnalysis: React.FC = () => {
                             year: "numeric",
                           })}
                         </TableCell>
-                        <TableCell sx={{ fontSize: "0.86rem", maxWidth: 350 }}>
+                        <TableCell sx={{ maxWidth: 350, padding: "8px" }}>
                           <Typography
                             sx={{
-                              color: "#475569",
-                              lineHeight: 1.3,
-                              fontSize: "0.86rem",
+                              color: "#312f2f",
+                              lineHeight: 1.4,
+                              fontSize: "0.8rem",
+                              fontWeight: 500,
+                              fontFamily: "'Segoe UI', 'Helvetica Neue', sans-serif",
                               display: "-webkit-box",
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: "vertical",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              mb: 0.5,
+                              mb: 0.75,
                             }}
                           >
                             {getSummaryFromBlocks(ticker.quant_analysis)}
                           </Typography>
                           <Link
                             component="button"
-                            variant="body2"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/quant-analysis/${encodeURIComponent(ticker.ticker)}`);
@@ -409,7 +422,14 @@ const ShowQuantAnalysis: React.FC = () => {
                               fontWeight: 600,
                               color: "#4f46e5",
                               textDecoration: "none",
-                              "&:hover": { textDecoration: "underline" },
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              padding: 0,
+                              "&:hover": {
+                                textDecoration: "underline",
+                                color: "#3730a3",
+                              },
                             }}
                           >
                             Read more
