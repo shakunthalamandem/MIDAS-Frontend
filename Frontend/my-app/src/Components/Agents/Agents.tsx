@@ -25,7 +25,7 @@ import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import EditAgentDialog from "./EditAgentDialog";
-import { AIAgent } from "./types";
+import { AIAgent, SYSTEM_AGENT_ROUTES } from "./types";
 import { fetchAgents, toggleEmailPreference, deleteAgent, fetchAgentTickerList } from "./agentService";
 
 const POLL_INTERVAL_MS = 15_000;
@@ -67,13 +67,15 @@ const Agents: React.FC = () => {
     try {
       setLoading(true);
       const data = await fetchAgents();
-      // Hide IPO Ranking Agent; merge Portfolio CIO Agent + Risk Agent into one
+      // Hide IPO Ranking Agent, Risk Agent, Technical Agent; merge Portfolio CIO Agent + Risk Agent into one
+      const routeOrder = Object.keys(SYSTEM_AGENT_ROUTES);
       let cioAgent: AIAgent | undefined;
       const transformed: AIAgent[] = [];
       for (const agent of data) {
         if (agent.name === "IPO Ranking Agent") continue;
         if (agent.name === "Portfolio CIO Agent") { cioAgent = agent; continue; }
         if (agent.name === "Risk Agent") continue;
+        if (agent.name === "Technical Agent") continue;
         transformed.push(agent);
       }
       if (cioAgent) {
@@ -83,6 +85,11 @@ const Agents: React.FC = () => {
           description: "AI-powered portfolio oversight combining risk and performance analysis. Monitors exposures, P&L attribution, and risk triggers to support capital allocation decisions.",
         });
       }
+      transformed.sort((a, b) => {
+        const ai = routeOrder.indexOf(a.name);
+        const bi = routeOrder.indexOf(b.name);
+        return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+      });
       setAgents(transformed);
     } catch (err) {
       console.error("Failed to load agents:", err);
@@ -188,13 +195,16 @@ const Agents: React.FC = () => {
         }}
       >
         <Box sx={{ maxWidth: 1320, mx: "auto" }}>
-          {/* Title row */}
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            spacing={2}
+          {/* Title row — 3-column: title | search (center) | button */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+              alignItems: "center",
+              gap: 2,
+            }}
           >
+            {/* Left: title */}
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <Box
                 sx={{
@@ -205,6 +215,7 @@ const Agents: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >
                 <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
@@ -227,13 +238,41 @@ const Agents: React.FC = () => {
               </Box>
             </Stack>
 
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              {/* Ticker Search Bar */}
+            {/* Center: highlighted search */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.6,
+                justifySelf: { xs: "stretch", sm: "center" },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  color: "#4f46e5",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                Search Ticker
+              </Typography>
               <Autocomplete
                 options={tickerList}
                 getOptionLabel={(option) =>
                   `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
                 }
+                filterOptions={(options, { inputValue }) => {
+                  const q = inputValue.toLowerCase().trim();
+                  if (!q) return options;
+                  return options.filter(
+                    (o) =>
+                      o.ticker.toLowerCase().includes(q) ||
+                      (o.issuer_name || "").toLowerCase().includes(q)
+                  );
+                }}
                 loading={tickerLoading}
                 disabled={tickerLoading}
                 onChange={(event, value) => {
@@ -246,14 +285,28 @@ const Agents: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Search ticker..."
+                    placeholder="Search ticker, issuer..."
                     variant="outlined"
                     size="small"
                     sx={{
-                      width: 280,
+                      width: { xs: "100%", sm: 360 },
                       "& .MuiOutlinedInput-root": {
-                        fontSize: "0.9rem",
-                        borderRadius: 2,
+                        fontSize: "0.92rem",
+                        borderRadius: 3,
+                        bgcolor: "#fff",
+                        boxShadow: "0 0 0 3px rgba(79,70,229,0.12), 0 2px 8px rgba(79,70,229,0.1)",
+                        "& fieldset": {
+                          borderColor: "#818cf8",
+                          borderWidth: "1.5px",
+                        },
+                        "&:hover fieldset": { borderColor: "#4f46e5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#4f46e5",
+                          borderWidth: "2px",
+                        },
+                        "&.Mui-focused": {
+                          boxShadow: "0 0 0 4px rgba(79,70,229,0.18), 0 4px 16px rgba(79,70,229,0.15)",
+                        },
                       },
                     }}
                   />
@@ -264,7 +317,6 @@ const Agents: React.FC = () => {
                     const date = new Date(dateString);
                     return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
                   };
-
                   return (
                     <Box
                       component="li"
@@ -277,13 +329,14 @@ const Agents: React.FC = () => {
                         px: 2,
                         borderBottom: "1px solid #e0e0f7",
                         "&:last-child": { borderBottom: "none" },
-                        "&:hover": {
-                          backgroundColor: "#f8f9ff",
-                        },
+                        "&:hover": { backgroundColor: "#f8f9ff" },
                       }}
                     >
                       <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>
-                        {option.ticker} <span style={{ fontWeight: 500, color: "#0b4ca8" }}>({formatDate(option.pricing_date)})</span>
+                        {option.ticker}{" "}
+                        <span style={{ fontWeight: 500, color: "#0b4ca8" }}>
+                          ({formatDate(option.pricing_date)})
+                        </span>
                       </Typography>
                       <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#373446" }}>
                         {option.issuer_name || "N/A"}
@@ -296,10 +349,14 @@ const Agents: React.FC = () => {
                   "& .MuiAutocomplete-paper": {
                     borderRadius: 2,
                     border: "1px solid #c7d2fe",
+                    boxShadow: "0 8px 24px rgba(79,70,229,0.12)",
                   },
                 }}
               />
+            </Box>
 
+            {/* Right: create button */}
+            <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", sm: "flex-end" } }}>
               <Button
                 variant="contained"
                 startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
@@ -324,8 +381,8 @@ const Agents: React.FC = () => {
               >
                 Create Agent
               </Button>
-            </Stack>
-          </Stack>
+            </Box>
+          </Box>
 
           {/* Stat pills */}
           <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="flex-end">
