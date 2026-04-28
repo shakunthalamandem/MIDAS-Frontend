@@ -87,6 +87,7 @@ const QuantAnalysisUpload: React.FC = () => {
 
       const allTickers = [
         ...(data.current_portfolio?.data || []),
+        ...(data.recently_traded?.data || []),
         ...(data.upcoming?.data || []),
       ];
 
