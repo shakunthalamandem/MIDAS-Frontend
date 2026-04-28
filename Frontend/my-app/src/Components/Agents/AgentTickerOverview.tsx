@@ -48,6 +48,11 @@ const AgentTickerOverview: React.FC = () => {
   const dealData = (location.state as any)?.dealData || {};
   const uniqueDealId = dealData.unique_deal_id || "";
 
+  // Reset to Sentiment Agent tab when ticker changes
+  useEffect(() => {
+    setActiveTab(0);
+  }, [ticker]);
+
   // Fetch ticker list
   useEffect(() => {
     const fetchTickerList = async () => {
@@ -113,7 +118,6 @@ const AgentTickerOverview: React.FC = () => {
             }}
             prefillTicker={{
               ticker: ticker || "",
-              pricing_date: dealData.pricing_date || null,
             }}
           />
         </TabErrorBoundary>
