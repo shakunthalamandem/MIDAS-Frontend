@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  InputAdornment,
   Snackbar,
   Stack,
   TextField,
@@ -21,6 +22,7 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
@@ -33,6 +35,7 @@ const POLL_INTERVAL_MS = 15_000;
 interface TickerItem {
   ticker: string;
   pricing_date: string | null;
+  trade_date?: string | null;
   region: string;
   deal_type: string;
   unique_deal_id: string;
@@ -195,11 +198,11 @@ const Agents: React.FC = () => {
         }}
       >
         <Box sx={{ maxWidth: 1320, mx: "auto" }}>
-          {/* Title row — 3-column: title | search (center) | button */}
+          {/* Title row — 2-column: title | button */}
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto" },
               alignItems: "center",
               gap: 2,
             }}
@@ -238,123 +241,6 @@ const Agents: React.FC = () => {
               </Box>
             </Stack>
 
-            {/* Center: highlighted search */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 0.6,
-                justifySelf: { xs: "stretch", sm: "center" },
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  color: "#4f46e5",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
-              >
-                Search Ticker
-              </Typography>
-              <Autocomplete
-                options={tickerList}
-                getOptionLabel={(option) =>
-                  `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
-                }
-                filterOptions={(options, { inputValue }) => {
-                  const q = inputValue.toLowerCase().trim();
-                  if (!q) return options;
-                  return options.filter(
-                    (o) =>
-                      o.ticker.toLowerCase().includes(q) ||
-                      (o.issuer_name || "").toLowerCase().includes(q)
-                  );
-                }}
-                loading={tickerLoading}
-                disabled={tickerLoading}
-                onChange={(event, value) => {
-                  if (value) {
-                    navigate(`/agents/ticker/${value.ticker}`, {
-                      state: { dealData: value }
-                    });
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search ticker, issuer..."
-                    variant="outlined"
-                    size="small"
-                    sx={{
-                      width: { xs: "100%", sm: 360 },
-                      "& .MuiOutlinedInput-root": {
-                        fontSize: "0.92rem",
-                        borderRadius: 3,
-                        bgcolor: "#fff",
-                        boxShadow: "0 0 0 3px rgba(79,70,229,0.12), 0 2px 8px rgba(79,70,229,0.1)",
-                        "& fieldset": {
-                          borderColor: "#818cf8",
-                          borderWidth: "1.5px",
-                        },
-                        "&:hover fieldset": { borderColor: "#4f46e5" },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#4f46e5",
-                          borderWidth: "2px",
-                        },
-                        "&.Mui-focused": {
-                          boxShadow: "0 0 0 4px rgba(79,70,229,0.18), 0 4px 16px rgba(79,70,229,0.15)",
-                        },
-                      },
-                    }}
-                  />
-                )}
-                renderOption={(props, option) => {
-                  const formatDate = (dateString: string | null) => {
-                    if (!dateString) return "N/A";
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
-                  };
-                  return (
-                    <Box
-                      component="li"
-                      {...props}
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0.4,
-                        py: 1.2,
-                        px: 2,
-                        borderBottom: "1px solid #e0e0f7",
-                        "&:last-child": { borderBottom: "none" },
-                        "&:hover": { backgroundColor: "#f8f9ff" },
-                      }}
-                    >
-                      <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>
-                        {option.ticker}{" "}
-                        <span style={{ fontWeight: 500, color: "#0b4ca8" }}>
-                          ({formatDate(option.pricing_date)})
-                        </span>
-                      </Typography>
-                      <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#373446" }}>
-                        {option.issuer_name || "N/A"}
-                      </Typography>
-                    </Box>
-                  );
-                }}
-                noOptionsText="No tickers found"
-                sx={{
-                  "& .MuiAutocomplete-paper": {
-                    borderRadius: 2,
-                    border: "1px solid #c7d2fe",
-                    boxShadow: "0 8px 24px rgba(79,70,229,0.12)",
-                  },
-                }}
-              />
-            </Box>
-
             {/* Right: create button */}
             <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", sm: "flex-end" } }}>
               <Button
@@ -384,8 +270,8 @@ const Agents: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Stat pills */}
-          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="flex-end">
+          {/* Stat pills + search */}
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="center">
             {/* Total */}
             <Box
               sx={{
@@ -462,6 +348,167 @@ const Agents: React.FC = () => {
                 </Box>
               </Box>
             )}
+
+            {/* Search bar — grows to fill remaining space */}
+            <Box sx={{ flex: 1, minWidth: 240 }}>
+              <Autocomplete
+                options={[...tickerList].sort((a, b) => {
+                  if (!a.pricing_date && !b.pricing_date) return 0;
+                  if (!a.pricing_date) return 1;
+                  if (!b.pricing_date) return -1;
+                  return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
+                })}
+                getOptionLabel={(option) =>
+                  `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
+                }
+                filterOptions={(options, { inputValue }) => {
+                  const q = inputValue.toLowerCase().trim();
+                  if (!q) return options;
+                  return options.filter(
+                    (o) =>
+                      o.ticker.toLowerCase().includes(q) ||
+                      (o.issuer_name || "").toLowerCase().includes(q)
+                  );
+                }}
+                loading={tickerLoading}
+                disabled={tickerLoading}
+                onChange={(_event, value) => {
+                  if (value) {
+                    navigate(`/agents/ticker/${value.ticker}`, {
+                      state: { dealData: value }
+                    });
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search ticker, issuer..."
+                    variant="outlined"
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <InputAdornment position="start">
+                              <SearchIcon sx={{ color: "#818cf8", fontSize: 20 }} />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                    sx={{
+                      width: "100%",
+                      "& .MuiOutlinedInput-root": {
+                        fontSize: "1rem",
+                        borderRadius: 3,
+                        bgcolor: "#eef2ff",
+                        boxShadow: "0 0 0 3px rgba(79,70,229,0.1), 0 2px 8px rgba(79,70,229,0.08)",
+                        "& fieldset": {
+                          borderColor: "#818cf8",
+                          borderWidth: "1.5px",
+                        },
+                        "&:hover": {
+                          bgcolor: "#e0e7ff",
+                        },
+                        "&:hover fieldset": { borderColor: "#4f46e5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#4f46e5",
+                          borderWidth: "2px",
+                        },
+                        "&.Mui-focused": {
+                          bgcolor: "#fff",
+                          boxShadow: "0 0 0 4px rgba(79,70,229,0.18), 0 4px 16px rgba(79,70,229,0.15)",
+                        },
+                      },
+                    }}
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const formatDate = (dateString: string | null) => {
+                    if (!dateString) return null;
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+                  };
+                  const formattedDate = formatDate(option.pricing_date);
+                  return (
+                    <Box
+                      component="li"
+                      {...props}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.2,
+                        py: 0.85,
+                        px: 2,
+                        borderBottom: "1px solid #f0f0fa",
+                        "&:last-child": { borderBottom: "none" },
+                        cursor: "pointer",
+                        transition: "background 0.15s ease, transform 0.1s ease",
+                        "&:hover": {
+                          backgroundColor: "#eef2ff",
+                          transform: "translateX(3px)",
+                        },
+                        "&:active": { backgroundColor: "#e0e7ff" },
+                      }}
+                    >
+                      {/* Ticker */}
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: "0.82rem",
+                          color: "#4f139c",
+                          flexShrink: 0,
+                          minWidth: 64,
+                          letterSpacing: "0.03em",
+                        }}
+                      >
+                        {option.ticker}
+                      </Typography>
+
+                      {/* Company name — bold, grows to fill space */}
+                      <Typography
+                        noWrap
+                        sx={{ flex: 1, fontSize: "0.76rem", fontWeight: 700, color: "#1e293b", pl: 1 }}
+                      >
+                        {option.issuer_name || "—"}
+                      </Typography>
+
+                      {/* Date chip */}
+                      {formattedDate && (
+                        <Box
+                          sx={{
+                            bgcolor: "#ede9fe",
+                            color: "#5b21b6",
+                            fontSize: "0.7rem",
+                            fontWeight: 600,
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {formattedDate}
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                }}
+                noOptionsText="No tickers found"
+                sx={{
+                  "& .MuiAutocomplete-paper": {
+                    borderRadius: 2.5,
+                    border: "1px solid #c7d2fe",
+                    boxShadow: "0 12px 32px rgba(79,70,229,0.15)",
+                    mt: 0.5,
+                  },
+                  "& .MuiAutocomplete-listbox": {
+                    py: 0.5,
+                  },
+                }}
+              />
+            </Box>
           </Stack>
         </Box>
       </Box>
