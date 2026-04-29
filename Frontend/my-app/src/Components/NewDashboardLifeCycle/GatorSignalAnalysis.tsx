@@ -15,6 +15,7 @@ import {
 import DashboardStateCard from "./DashboardStateCard";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 type GatorSignalAnalysisProps = {
   ticker: string;
@@ -185,8 +186,53 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
 
   const analysis = signal.json_data.analysis;
 
+  const updatedLabel = (() => {
+    try {
+      return new Date(signal.updated_at).toLocaleString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return signal.updated_at;
+    }
+  })();
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      {/* Updated timestamp — pinned top-right */}
+      {signal.updated_at && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: -1, mb: -1 }}>
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.7,
+              px: 1.25,
+              py: 0.55,
+              borderRadius: 1.5,
+              bgcolor: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+            }}
+          >
+            <AccessTimeIcon sx={{ fontSize: 13, color: "#64748b" }} />
+            <Typography
+              sx={{
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                color: "#475569",
+                letterSpacing: "0.02em",
+              }}
+            >
+              Updated {updatedLabel}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
       {/* Composite Score Card */}
       <Card
         sx={{

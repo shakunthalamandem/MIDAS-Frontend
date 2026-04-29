@@ -371,7 +371,7 @@ const Agents: React.FC = () => {
                   );
                 }}
                 loading={tickerLoading}
-                disabled={tickerLoading}
+                loadingText="Loading tickers…"
                 onChange={(_event, value) => {
                   if (value) {
                     navigate(`/agents/ticker/${value.ticker}`, {
