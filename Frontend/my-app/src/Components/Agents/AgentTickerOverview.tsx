@@ -178,15 +178,15 @@ const AgentTickerOverview: React.FC = () => {
             </TabErrorBoundary>
           ),
         },
-    {
-      label: "Technical Agent",
-      accent: "#dc2626",
-      component: (
-        <TabErrorBoundary tabLabel="Technical Agent" ticker={tickerValue}>
-          <TechnicalAgentTab ticker={ticker} dealType={hydratedDeal.deal_type} />
-        </TabErrorBoundary>
-      ),
-    },
+    // {
+    //   label: "Technical Agent",
+    //   accent: "#dc2626",
+    //   component: (
+    //     <TabErrorBoundary tabLabel="Technical Agent" ticker={tickerValue}>
+    //       <TechnicalAgentTab ticker={ticker} dealType={hydratedDeal.deal_type} />
+    //     </TabErrorBoundary>
+    //   ),
+    // },
     {
       label: "Quant Agent",
       accent: "#4f46e5",
