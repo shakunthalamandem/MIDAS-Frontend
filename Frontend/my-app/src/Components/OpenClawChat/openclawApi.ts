@@ -108,7 +108,19 @@ export async function streamOpenClawChat(
       } catch {
         errText = `HTTP ${resp.status}`;
       }
-      cb.onError(errText || `HTTP ${resp.status}`);
+      // Try to surface the JSON detail message
+      let detail = errText || `HTTP ${resp.status}`;
+      try {
+        const parsed = JSON.parse(errText);
+        detail = parsed.detail || parsed.error || detail;
+      } catch {
+        /* not JSON */
+      }
+      if (resp.status === 403 && cb.onAccessDenied) {
+        cb.onAccessDenied(detail);
+      } else {
+        cb.onError(detail);
+      }
       return;
     }
 

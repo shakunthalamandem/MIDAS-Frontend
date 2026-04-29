@@ -35,4 +35,5 @@ export interface OpenClawStreamCallbacks {
   onChunk: (text: string) => void;
   onDone: () => void;
   onError: (message: string) => void;
+  onAccessDenied?: (message: string) => void;
 }

@@ -11,6 +11,7 @@ import {
   Chip,
   useMediaQuery,
   useTheme,
+  Dialog,
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import AddCommentRoundedIcon from "@mui/icons-material/AddCommentRounded";
@@ -18,6 +19,7 @@ import KeyboardDoubleArrowDownRoundedIcon from "@mui/icons-material/KeyboardDoub
 import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
@@ -63,6 +65,7 @@ const OpenClawChatPage: React.FC = () => {
   const [currentSalt, setCurrentSalt] = useState<string>("");
   const [viewingSalt, setViewingSalt] = useState<string | null>(null); // null = viewing current
   const [resumingSalt, setResumingSalt] = useState<string | null>(null);
+  const [accessDenied, setAccessDenied] = useState<{ message: string } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -80,12 +83,21 @@ const OpenClawChatPage: React.FC = () => {
       } else {
         setViewingSalt(data.session_salt);
       }
+      setAccessDenied(null);
     } catch (e: any) {
-      setError(
-        e?.response?.data?.error ||
-          e?.message ||
-          "Failed to load your chat history."
-      );
+      const status = e?.response?.status;
+      if (status === 403) {
+        // Silent on load — let the user see the empty chat. The lock
+        // popup only appears when they actually try to send a message.
+        setMessages([]);
+      } else {
+        setError(
+          e?.response?.data?.error ||
+            e?.response?.data?.detail ||
+            e?.message ||
+            "Failed to load your chat history."
+        );
+      }
     } finally {
       setLoadingHistory(false);
     }
@@ -199,6 +211,12 @@ const OpenClawChatPage: React.FC = () => {
             });
             setSending(false);
             setError(msg);
+          },
+          onAccessDenied: (msg) => {
+            // Drop the optimistic user/assistant pair we just appended.
+            setMessages((m) => m.slice(0, -2));
+            setSending(false);
+            setAccessDenied({ message: msg });
           },
         },
         abortRef.current.signal
@@ -625,6 +643,113 @@ const OpenClawChatPage: React.FC = () => {
         onResumed={handleResumedFromHistory}
         currentSalt={currentSalt}
       />
+
+      <Dialog
+        open={!!accessDenied}
+        onClose={() => setAccessDenied(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: "hidden",
+            border: "1px solid rgba(15, 23, 42, 0.08)",
+            boxShadow:
+              "0 30px 60px -20px rgba(15, 23, 42, 0.35), 0 8px 20px rgba(15, 23, 42, 0.08)",
+          },
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: "rgba(15, 23, 42, 0.55)",
+            backdropFilter: "blur(4px)",
+          },
+        }}
+      >
+        <Box sx={{ p: { xs: 3, sm: 4 }, textAlign: "center", bgcolor: "#fff" }}>
+          <Box
+            sx={{
+              width: 72,
+              height: 72,
+              borderRadius: "50%",
+              mx: "auto",
+              mb: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(30, 58, 138, 0.08)",
+              color: BRAND_NAVY,
+            }}
+          >
+            <LockOutlinedIcon sx={{ fontSize: 36 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 800, color: BRAND_NAVY, mb: 1 }}
+          >
+            MONA is restricted
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 0.75, lineHeight: 1.55 }}
+          >
+            {accessDenied?.message}
+          </Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 3, opacity: 0.8 }}
+          >
+            Your MIDAS account isn't on the MONA access list yet.
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+            <Box
+              component="button"
+              onClick={() => setAccessDenied(null)}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                px: 2,
+                py: 0.85,
+                border: "1px solid rgba(15, 23, 42, 0.16)",
+                borderRadius: 999,
+                backgroundColor: "#ffffff",
+                color: "#0f172a",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "background-color 0.15s",
+                "&:hover": { backgroundColor: "#f1f5f9" },
+              }}
+            >
+              Close
+            </Box>
+            <Box
+              component="button"
+              onClick={() => navigate(-1)}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.75,
+                px: 2.25,
+                py: 0.85,
+                border: "none",
+                borderRadius: 999,
+                backgroundColor: BRAND_NAVY,
+                color: "#fff",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "background-color 0.15s",
+                "&:hover": { backgroundColor: BRAND_NAVY_DEEP },
+              }}
+            >
+              <ArrowBackRoundedIcon sx={{ fontSize: 16 }} />
+              Back to MIDAS
+            </Box>
+          </Box>
+        </Box>
+      </Dialog>
 
       <Snackbar
         open={!!error}
