@@ -60,6 +60,7 @@ const AgentTickerOverview: React.FC = () => {
   }, [dealData, tickerList, ticker]);
 
   // Determine if the deal is already trading. Prefer first-trade-date; fall back to pricing_date.
+  // Activate Post-IPO one day BEFORE trade_date (T-1), so the prior-session "as of" report can render.
   const isTrading = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -70,6 +71,7 @@ const AgentTickerOverview: React.FC = () => {
     const refDate = new Date(ref);
     if (isNaN(refDate.getTime())) return false;
     refDate.setHours(0, 0, 0, 0);
+    refDate.setDate(refDate.getDate() - 1); // T-1
     return refDate <= today;
   }, [hydratedDeal]);
 
@@ -459,13 +461,21 @@ const AgentTickerOverview: React.FC = () => {
             onChange={(_: React.SyntheticEvent, newValue: number) => setActiveTab(newValue)}
             variant="scrollable"
             scrollButtons="auto"
+            allowScrollButtonsMobile
             sx={{
+              mt: 0.5,
               mb: 0.5,
+              px: 0.5,
               backgroundColor: "transparent",
-              p: 0,
-              minHeight: 40,
+              minHeight: 44,
+              overflow: "visible",
+              "& .MuiTabs-scroller": {
+                py: 0.75,
+                px: 0.25,
+              },
               "& .MuiTabs-flexContainer": {
-                gap: 1,
+                gap: 1.25,
+                alignItems: "center",
               },
               "& .MuiTabs-indicator": {
                 display: "none",
@@ -484,6 +494,12 @@ const AgentTickerOverview: React.FC = () => {
                 boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
                 transition:
                   "background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease",
+                "&:first-of-type": {
+                  ml: 0.5,
+                },
+                "&:last-of-type": {
+                  mr: 0.5,
+                },
                 "&:hover": {
                   borderColor: "rgba(79, 70, 229, 0.4)",
                   color: "#312e81",
@@ -500,6 +516,26 @@ const AgentTickerOverview: React.FC = () => {
               },
               "& .MuiTabScrollButton-root": {
                 color: "#4f46e5",
+                width: 28,
+                opacity: 1,
+                alignSelf: "center",
+                borderRadius: "50%",
+                bgcolor: "rgba(255,255,255,0.85)",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 2px 6px rgba(15, 23, 42, 0.06)",
+                mx: 0.5,
+                "&.Mui-disabled": {
+                  opacity: 0,
+                  width: 0,
+                  mx: 0,
+                  border: "none",
+                  boxShadow: "none",
+                  pointerEvents: "none",
+                },
+                "&:hover": {
+                  bgcolor: "#eef2ff",
+                  borderColor: "#c7d2fe",
+                },
               },
             }}
           >
