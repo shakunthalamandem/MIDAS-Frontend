@@ -60,7 +60,8 @@ const AgentTickerOverview: React.FC = () => {
   }, [dealData, tickerList, ticker]);
 
   // Determine if the deal is already trading. Prefer first-trade-date; fall back to pricing_date.
-  // Activate Post-IPO one day BEFORE trade_date (T-1), so the prior-session "as of" report can render.
+  // Activate Post-IPO one day AFTER trade_date (T+1), so on the pricing/debut day itself
+  // the Gator IPO (Signal) tab is still shown — Post-IPO only kicks in once Day-1 close has happened.
   const isTrading = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -71,7 +72,7 @@ const AgentTickerOverview: React.FC = () => {
     const refDate = new Date(ref);
     if (isNaN(refDate.getTime())) return false;
     refDate.setHours(0, 0, 0, 0);
-    refDate.setDate(refDate.getDate() - 1); // T-1
+    refDate.setDate(refDate.getDate() + 1); // T+1
     return refDate <= today;
   }, [hydratedDeal]);
 
