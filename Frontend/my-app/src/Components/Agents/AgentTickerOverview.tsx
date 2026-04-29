@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense, useEffect, useMemo } from "react";
 import {
   Box,
   Tab,
@@ -27,6 +27,7 @@ const DashboardSentimentAnalysis = React.lazy(() => import("../AIML/DashboardSen
 const AIMLDealDetails = React.lazy(() => import("../NewDashboardLifeCycle/AIMLDealDetails"));
 const DashboardAIFewShotAnalysis = React.lazy(() => import("../AIFewshotAnalysis/DashboardAIFewShotAnalysis"));
 const GatorSignalAnalysis = React.lazy(() => import("../NewDashboardLifeCycle/GatorSignalAnalysis"));
+const GatorPostIpoTickerTab = React.lazy(() => import("./AgentTabs/GatorPostIpoTickerTab"));
 
 const TabFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 300 }}>
@@ -47,6 +48,30 @@ const AgentTickerOverview: React.FC = () => {
   // Get deal data from route state
   const dealData = (location.state as any)?.dealData || {};
   const uniqueDealId = dealData.unique_deal_id || "";
+
+  // Hydrate deal data from ticker list when route state is empty (e.g., direct URL hit / refresh)
+  const hydratedDeal = useMemo(() => {
+    if (dealData && (dealData.trade_date || dealData.pricing_date)) return dealData;
+    const t = (ticker || "").toUpperCase();
+    const match = (tickerList || []).find(
+      (x: any) => (x?.ticker || "").toUpperCase() === t,
+    );
+    return match ? { ...match, ...dealData } : dealData;
+  }, [dealData, tickerList, ticker]);
+
+  // Determine if the deal is already trading. Prefer first-trade-date; fall back to pricing_date.
+  const isTrading = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tdRaw = hydratedDeal?.trade_date || null;
+    const pdRaw = hydratedDeal?.pricing_date || null;
+    const ref = tdRaw || pdRaw;
+    if (!ref) return false;
+    const refDate = new Date(ref);
+    if (isNaN(refDate.getTime())) return false;
+    refDate.setHours(0, 0, 0, 0);
+    return refDate <= today;
+  }, [hydratedDeal]);
 
   // Reset to Sentiment Agent tab when ticker changes
   useEffect(() => {
@@ -98,6 +123,7 @@ const AgentTickerOverview: React.FC = () => {
   const tabs = [
     {
       label: "Sentiment Agent",
+      accent: "#7c3aed",
       component: (
         <TabErrorBoundary tabLabel="Sentiment Agent" ticker={tickerValue}>
           <DashboardSentimentAnalysis
@@ -110,6 +136,7 @@ const AgentTickerOverview: React.FC = () => {
     },
     {
       label: "Deal(IPO) Agent",
+      accent: "#d97706",
       component: (
         <TabErrorBoundary tabLabel="Deal(IPO) Agent" ticker={tickerValue}>
           <DashboardAIFewShotAnalysis
@@ -125,30 +152,44 @@ const AgentTickerOverview: React.FC = () => {
     },
     {
       label: "Factors Based Agent",
+      accent: "#0891b2",
       component: (
         <TabErrorBoundary tabLabel="Factors Based Agent" ticker={tickerValue}>
           <AIMLDealDetails ticker={tickerValue} />
         </TabErrorBoundary>
       ),
     },
-    {
-      label: "Gator Signal",
-      component: (
-        <TabErrorBoundary tabLabel="Gator Signal" ticker={tickerValue}>
-          <GatorSignalAnalysis ticker={tickerValue} />
-        </TabErrorBoundary>
-      ),
-    },
+    isTrading
+      ? {
+          label: "Gator Post-IPO",
+          accent: "#0f766e",
+          component: (
+            <TabErrorBoundary tabLabel="Gator Post-IPO" ticker={tickerValue}>
+              <GatorPostIpoTickerTab ticker={tickerValue} />
+            </TabErrorBoundary>
+          ),
+        }
+      : {
+          label: "Gator Signal",
+          accent: "#0f766e",
+          component: (
+            <TabErrorBoundary tabLabel="Gator Signal" ticker={tickerValue}>
+              <GatorSignalAnalysis ticker={tickerValue} />
+            </TabErrorBoundary>
+          ),
+        },
     {
       label: "Technical Agent",
+      accent: "#dc2626",
       component: (
         <TabErrorBoundary tabLabel="Technical Agent" ticker={tickerValue}>
-          <TechnicalAgentTab ticker={ticker} dealType={dealData.deal_type} />
+          <TechnicalAgentTab ticker={ticker} dealType={hydratedDeal.deal_type} />
         </TabErrorBoundary>
       ),
     },
     {
       label: "Quant Agent",
+      accent: "#4f46e5",
       component: (
         <TabErrorBoundary tabLabel="Quant Agent" ticker={tickerValue}>
           <AunatAgentTab ticker={ticker} />
@@ -156,6 +197,8 @@ const AgentTickerOverview: React.FC = () => {
       ),
     },
   ];
+
+  const activeAccent = tabs[activeTab]?.accent || "#4f46e5";
 
   return (
     <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
@@ -174,14 +217,17 @@ const AgentTickerOverview: React.FC = () => {
           sx={(theme) => ({
             mb: 3,
             p: 2,
-            borderRadius: 3,
-            backgroundColor: "#cacce2eb",
-            backdropFilter: "blur(14px)",
-            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 3.5,
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(238,242,255,0.86) 100%)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+            border: "1px solid rgba(199, 210, 254, 0.7)",
             position: "sticky",
             top: { xs: 90, md: 95 },
             zIndex: theme.zIndex.appBar + 10,
-            boxShadow: "0 16px 32px rgba(15, 23, 42, 0.12)",
+            boxShadow:
+              "0 1px 0 rgba(255,255,255,0.7) inset, 0 12px 32px rgba(79, 70, 229, 0.10)",
           })}
         >
           {/* Back Button, Title, and Search Bar Row */}
@@ -204,20 +250,47 @@ const AgentTickerOverview: React.FC = () => {
             />
 
             {/* Title - Center */}
-            <Typography
-              variant="h4"
+            <Box
               sx={{
-                fontWeight: 700,
-                color: "#262268",
-                textAlign: "center",
                 flex: 1,
                 minWidth: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.5,
               }}
             >
-              {tickerValue ? `${tickerValue.toUpperCase()} - ${dealData.issuer_name || tickerValue.toUpperCase()}` : "Ticker Details"}
-            </Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 800,
+                  color: "#262268",
+                  textAlign: "center",
+                  letterSpacing: "-0.01em",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  maxWidth: "100%",
+                }}
+              >
+                {tickerValue ? `${tickerValue.toUpperCase()} — ${hydratedDeal.issuer_name || tickerValue.toUpperCase()}` : "Ticker Details"}
+              </Typography>
+              {tickerValue && (
+                <Chip
+                  size="small"
+                  label={isTrading ? "TRADING · Post-IPO" : "PRE-IPO · Upcoming"}
+                  sx={{
+                    fontSize: "0.66rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    height: 22,
+                    bgcolor: isTrading ? "#ecfdf5" : "#eef2ff",
+                    color: isTrading ? "#065f46" : "#3730a3",
+                    border: `1px solid ${isTrading ? "#a7f3d0" : "#c7d2fe"}`,
+                  }}
+                />
+              )}
+            </Box>
 
             {/* Search Bar - Right */}
             <Box sx={{ flexShrink: 0, minWidth: 280, position: "relative" }}>
@@ -380,52 +453,91 @@ const AgentTickerOverview: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Tabs */}
+          {/* Tabs — animated accent pills */}
           <Tabs
             value={activeTab}
             onChange={(_: React.SyntheticEvent, newValue: number) => setActiveTab(newValue)}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
-              mb: 1,
+              mb: 0.5,
               backgroundColor: "transparent",
-              borderRadius: 0,
               p: 0,
-              boxShadow: "none",
-              border: "none",
+              minHeight: 40,
+              "& .MuiTabs-flexContainer": {
+                gap: 1,
+              },
               "& .MuiTabs-indicator": {
                 display: "none",
               },
               "& .MuiTab-root": {
                 textTransform: "none",
                 fontWeight: 600,
-                color: "#0f0f0fff",
-                fontSize: "0.85rem",
+                color: "#1e293b",
+                fontSize: "0.84rem",
                 minHeight: 36,
-                px: 1.8,
+                px: 2,
+                py: 0.5,
                 borderRadius: 999,
                 border: "1px solid #e2e8f0",
                 backgroundColor: "#ffffff",
-                boxShadow: "none",
-                transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
-                mr: 1,
+                boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+                transition:
+                  "background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease",
+                "&:hover": {
+                  borderColor: "rgba(79, 70, 229, 0.4)",
+                  color: "#312e81",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(79, 70, 229, 0.10)",
+                },
               },
               "& .Mui-selected": {
                 color: "#ffffff !important",
-                backgroundColor: "#262268ff",
-                borderColor: "#c7d2fe",
-                boxShadow: "none",
+                backgroundColor: `${activeAccent} !important`,
+                borderColor: `${activeAccent} !important`,
+                boxShadow: `0 6px 18px ${activeAccent}33, 0 1px 0 rgba(255,255,255,0.4) inset`,
+                transform: "translateY(-1px)",
+              },
+              "& .MuiTabScrollButton-root": {
+                color: "#4f46e5",
               },
             }}
           >
             {tabs.map((tab, index) => (
-              <Tab key={index} label={tab.label} />
+              <Tab key={index} label={tab.label} disableRipple />
             ))}
           </Tabs>
         </Paper>
 
-        {/* Tab Content */}
-        <Box sx={{ mb: 3, mt: { xs: 2, md: 3 } }}>
+        {/* Tab Content — animated accent shell + smooth fade-in on switch */}
+        <Box
+          key={activeTab}
+          sx={{
+            mb: 3,
+            mt: { xs: 2, md: 3 },
+            position: "relative",
+            borderRadius: 3,
+            overflow: "hidden",
+            border: "1px solid #e8ebff",
+            background: "linear-gradient(180deg, #ffffff 0%, #fafbff 100%)",
+            boxShadow: "0 1px 0 rgba(255,255,255,0.7) inset, 0 6px 22px rgba(15, 23, 42, 0.05)",
+            "&:before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(90deg, ${activeAccent} 0%, ${activeAccent}80 60%, transparent 100%)`,
+            },
+            animation: "tabFadeIn 0.32s ease-out",
+            "@keyframes tabFadeIn": {
+              from: { opacity: 0, transform: "translateY(6px)" },
+              to: { opacity: 1, transform: "translateY(0)" },
+            },
+            p: { xs: 1.5, md: 2.5 },
+          }}
+        >
           <Suspense fallback={<TabFallback />}>
             {tabs[activeTab]?.component}
           </Suspense>

@@ -35,6 +35,7 @@ const POLL_INTERVAL_MS = 15_000;
 interface TickerItem {
   ticker: string;
   pricing_date: string | null;
+  trade_date?: string | null;
   region: string;
   deal_type: string;
   unique_deal_id: string;
