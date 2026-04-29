@@ -220,10 +220,15 @@ const AgentTickerOverview: React.FC = () => {
             </Typography>
 
             {/* Search Bar - Right */}
-            <Box sx={{ flexShrink: 0, minWidth: 250, position: "relative" }}>
+            <Box sx={{ flexShrink: 0, minWidth: 280, position: "relative" }}>
               <Autocomplete
                 freeSolo
-                options={tickerOptions}
+                options={[...tickerOptions].sort((a: any, b: any) => {
+                  if (!a.pricing_date && !b.pricing_date) return 0;
+                  if (!a.pricing_date) return 1;
+                  if (!b.pricing_date) return -1;
+                  return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
+                })}
                 getOptionLabel={(option: any) =>
                   typeof option === "string" ? option : option.ticker || ""
                 }
@@ -244,25 +249,41 @@ const AgentTickerOverview: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Search ticker"
+                    placeholder="Search ticker, issuer..."
                     size="small"
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon sx={{ color: "#666", mr: 1 }} />
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <InputAdornment position="start">
+                              <SearchIcon sx={{ color: "#818cf8", fontSize: 20 }} />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      },
                     }}
                     sx={{
-                      backgroundColor: "#ffffff",
-                      borderRadius: 1,
+                      width: "100%",
                       "& .MuiOutlinedInput-root": {
+                        fontSize: "0.9rem",
+                        borderRadius: 3,
+                        bgcolor: "#eef2ff",
+                        boxShadow: "0 0 0 3px rgba(79,70,229,0.1), 0 2px 8px rgba(79,70,229,0.08)",
                         "& fieldset": {
-                          borderColor: "#d0d0d0",
+                          borderColor: "#818cf8",
+                          borderWidth: "1.5px",
                         },
-                        "&:hover fieldset": {
-                          borderColor: "#1976d2",
+                        "&:hover": { bgcolor: "#e0e7ff" },
+                        "&:hover fieldset": { borderColor: "#4f46e5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#4f46e5",
+                          borderWidth: "2px",
+                        },
+                        "&.Mui-focused": {
+                          bgcolor: "#fff",
+                          boxShadow: "0 0 0 4px rgba(79,70,229,0.18), 0 4px 16px rgba(79,70,229,0.15)",
                         },
                       },
                     }}
@@ -270,10 +291,11 @@ const AgentTickerOverview: React.FC = () => {
                 )}
                 renderOption={(props, option: any) => {
                   const formatDate = (dateString: string | null) => {
-                    if (!dateString) return "N/A";
+                    if (!dateString) return null;
                     const date = new Date(dateString);
                     return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
                   };
+                  const formattedDate = formatDate(option.pricing_date);
 
                   return (
                     <Box
@@ -282,21 +304,62 @@ const AgentTickerOverview: React.FC = () => {
                       sx={{
                         display: "flex",
                         flexDirection: "column",
-                        gap: 0.4,
-                        py: 1.2,
+                        alignItems: "flex-start",
+                        gap: 0.3,
+                        py: 0.9,
                         px: 2,
-                        borderBottom: "1px solid #e0e0f7",
+                        borderBottom: "1px solid #f0f0fa",
                         "&:last-child": { borderBottom: "none" },
+                        cursor: "pointer",
+                        transition: "background 0.15s ease, transform 0.1s ease",
                         "&:hover": {
-                          backgroundColor: "#f8f9ff",
+                          backgroundColor: "#eef2ff",
+                          transform: "translateX(3px)",
                         },
+                        "&:active": { backgroundColor: "#e0e7ff" },
                       }}
                     >
-                      <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.95rem" }}>
-                        {option.ticker} <span style={{ fontWeight: 500, color: "#0b4ca8" }}>({formatDate(option.pricing_date)})</span>
-                      </Typography>
-                      <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#373446" }}>
-                        {option.issuer_name || "N/A"}
+                      {/* Row 1: ticker badge + date chip */}
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+                        <Box
+                          sx={{
+                            bgcolor: "#4f46e5",
+                            color: "#fff",
+                            fontWeight: 700,
+                            fontSize: "0.72rem",
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            letterSpacing: "0.04em",
+                            flexShrink: 0,
+                            minWidth: 64,
+                            textAlign: "center",
+                          }}
+                        >
+                          {option.ticker}
+                        </Box>
+                        {formattedDate && (
+                          <Box
+                            sx={{
+                              bgcolor: "#ede9fe",
+                              color: "#5b21b6",
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              px: 1,
+                              py: 0.2,
+                              borderRadius: 1,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {formattedDate}
+                          </Box>
+                        )}
+                      </Box>
+                      {/* Row 2: full issuer name */}
+                      <Typography
+                        sx={{ fontSize: "0.78rem", fontWeight: 500, color: "#475569", pl: 0.25 }}
+                      >
+                        {option.issuer_name || "—"}
                       </Typography>
                     </Box>
                   );
@@ -304,8 +367,13 @@ const AgentTickerOverview: React.FC = () => {
                 sx={{
                   width: "100%",
                   "& .MuiAutocomplete-paper": {
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                    borderRadius: 1.5,
+                    borderRadius: 2.5,
+                    border: "1px solid #c7d2fe",
+                    boxShadow: "0 12px 32px rgba(79,70,229,0.15)",
+                    mt: 0.5,
+                  },
+                  "& .MuiAutocomplete-listbox": {
+                    py: 0.5,
                   },
                 }}
               />

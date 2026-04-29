@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -175,6 +175,13 @@ const isSeverityCell = (value: string, header: string | undefined) => {
 
 /* ═══════════════ Individual Block Components ═══════════════ */
 
+function renderBold(text: string): React.ReactNode {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+  );
+}
+
 const TextBlockCmp: React.FC<{ block: GatorTextBlock; isHeadline?: boolean }> = ({
   block,
   isHeadline,
@@ -200,7 +207,7 @@ const TextBlockCmp: React.FC<{ block: GatorTextBlock; isHeadline?: boolean }> = 
             letterSpacing: "-0.01em",
           }}
         >
-          {block.content}
+          {renderBold(block.content)}
         </Typography>
       </Box>
     );
@@ -216,7 +223,7 @@ const TextBlockCmp: React.FC<{ block: GatorTextBlock; isHeadline?: boolean }> = 
       }}
     >
       <Typography sx={{ fontSize: "0.9rem", color: "#1e293b", lineHeight: 1.7 }}>
-        {block.content}
+        {renderBold(block.content)}
       </Typography>
     </Box>
   );
@@ -503,6 +510,9 @@ const BAR_PALETTE = [
 ];
 
 const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
+
   const isCircular = block.chartType === "pie" || block.chartType === "doughnut";
 
   const chartData = useMemo(
@@ -598,7 +608,7 @@ const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block 
         </Typography>
       )}
       <Box sx={{ position: "relative", height: canvasHeight, width: "100%" }}>
-        {chartNode}
+        {mounted && chartNode}
       </Box>
     </Box>
   );
