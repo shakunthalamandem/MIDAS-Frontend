@@ -153,62 +153,127 @@ const GatorPostIpoTickerTab: React.FC<Props> = ({ ticker }) => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-      {/* Header strip */}
+      {/* Header strip — dark neat */}
       <Box
         sx={{
+          position: "relative",
           background:
-            "linear-gradient(135deg, #ecfeff 0%, #f0fdfa 60%, #ffffff 100%)",
-          border: "1px solid #99f6e4",
+            "linear-gradient(135deg, #0b1220 0%, #0f172a 55%, #111c33 100%)",
+          border: "1px solid rgba(45, 212, 191, 0.22)",
           borderRadius: 3,
-          p: 2.5,
-          display: "flex",
-          alignItems: { xs: "flex-start", md: "center" },
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          boxShadow: "0 8px 24px rgba(15, 118, 110, 0.06)",
+          p: { xs: 2, md: 2.5 },
+          boxShadow:
+            "0 12px 32px rgba(2, 6, 23, 0.45), inset 0 1px 0 rgba(255,255,255,0.04)",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background:
+              "linear-gradient(90deg, #14b8a6 0%, #2dd4bf 50%, #5eead4 100%)",
+            opacity: 0.85,
+          },
         }}
       >
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2.5,
-            bgcolor: "#0f766e",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
+        {/* Top row: eyebrow + updated-on-right */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mb: 1.25 }}
         >
-          <TrendingUpIcon sx={{ color: "#fff", fontSize: 26 }} />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            sx={{ fontSize: "0.7rem", fontWeight: 700, color: "#0f766e", letterSpacing: "0.08em" }}
-          >
-            GATOR POST-IPO · DAY 1–40
-          </Typography>
-          <Typography sx={{ fontSize: "1.05rem", fontWeight: 800, color: "#0f172a", mt: 0.2 }}>
-            {matched.headline || matched.company_name || matched.ticker}
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1.25}>
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1.5,
+                background:
+                  "linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 12px rgba(20, 184, 166, 0.35)",
+              }}
+            >
+              <TrendingUpIcon sx={{ color: "#fff", fontSize: 18 }} />
+            </Box>
+            <Typography
+              sx={{
+                fontSize: "0.68rem",
+                fontWeight: 800,
+                color: "#5eead4",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+              }}
+            >
+              Gator Post-IPO · Day 1–40
+            </Typography>
+          </Stack>
+
           {matched.updated_at && (
-            <Stack direction="row" alignItems="center" spacing={0.6} sx={{ mt: 0.5 }}>
-              <AccessTimeIcon sx={{ fontSize: 13, color: "#64748b" }} />
-              <Typography sx={{ fontSize: "0.72rem", color: "#64748b" }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={0.7}
+              sx={{
+                px: 1.25,
+                py: 0.55,
+                borderRadius: 1.5,
+                bgcolor: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(148, 163, 184, 0.18)",
+              }}
+            >
+              <AccessTimeIcon sx={{ fontSize: 13, color: "#94a3b8" }} />
+              <Typography
+                sx={{
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                  color: "#cbd5e1",
+                  letterSpacing: "0.02em",
+                }}
+              >
                 Updated {formatTime(matched.updated_at)}
               </Typography>
             </Stack>
           )}
-        </Box>
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+        </Stack>
+
+        {/* Headline */}
+        <Typography
+          sx={{
+            fontSize: { xs: "1.05rem", md: "1.15rem" },
+            fontWeight: 800,
+            color: "#f1f5f9",
+            lineHeight: 1.45,
+            letterSpacing: "-0.005em",
+          }}
+        >
+          {matched.headline || matched.company_name || matched.ticker}
+        </Typography>
+
+        {/* Chips row */}
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          flexWrap="wrap"
+          sx={{ mt: 1.5, rowGap: 1 }}
+        >
           {meta.score !== null && (
             <Chip
               label={`Score ${meta.score > 0 ? "+" : ""}${meta.score}`}
               sx={{
                 fontWeight: 800,
-                fontSize: "0.78rem",
-                bgcolor: "#0f766e",
+                fontSize: "0.75rem",
+                background:
+                  "linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)",
                 color: "#fff",
+                border: "1px solid rgba(45, 212, 191, 0.4)",
+                boxShadow: "0 2px 8px rgba(20, 184, 166, 0.3)",
                 "& .MuiChip-label": { px: 1.4 },
               }}
             />
@@ -218,10 +283,11 @@ const GatorPostIpoTickerTab: React.FC<Props> = ({ ticker }) => {
               label={meta.sentiment.toUpperCase()}
               sx={{
                 fontWeight: 700,
-                fontSize: "0.72rem",
-                bgcolor: tone.bg,
-                color: tone.color,
-                border: `1px solid ${tone.border}`,
+                fontSize: "0.7rem",
+                bgcolor: "rgba(30, 41, 59, 0.85)",
+                color: "#e2e8f0",
+                border: "1px solid rgba(148, 163, 184, 0.25)",
+                letterSpacing: "0.04em",
               }}
             />
           )}
@@ -230,10 +296,10 @@ const GatorPostIpoTickerTab: React.FC<Props> = ({ ticker }) => {
               label={meta.horizon}
               sx={{
                 fontWeight: 600,
-                fontSize: "0.72rem",
-                bgcolor: "#fff",
-                color: "#0f172a",
-                border: "1px solid #e2e8f0",
+                fontSize: "0.7rem",
+                bgcolor: "rgba(15, 23, 42, 0.7)",
+                color: "#cbd5e1",
+                border: "1px solid rgba(148, 163, 184, 0.2)",
               }}
             />
           )}
