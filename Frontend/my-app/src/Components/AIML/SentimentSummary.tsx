@@ -239,19 +239,34 @@ const SentimentSummary: React.FC = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [dealType, setDealType] = useState<"IPO" | "FO">("IPO");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const token = localStorage.getItem("access_token");
-        const res = await fetch(`${apiUrl}/api/sentiment_sumamry_data/`, {
+        const res = await fetch(`${apiUrl}/api/sentiment_sumamry_data/?deal_type=${dealType}&region=US`, {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },
         });
 
         const result = await res.json();
-        const arr = Array.isArray(result) ? result : result.data || [];
+        console.log("API Response:", result);
+
+        let arr: SentimentData[] = [];
+        if (Array.isArray(result)) {
+          arr = result;
+        } else if (result.data && Array.isArray(result.data)) {
+          arr = result.data;
+        } else if (result.results && Array.isArray(result.results)) {
+          arr = result.results;
+        } else if (typeof result === "object" && result !== null) {
+          // If it's a single object, wrap it in an array
+          arr = [result];
+        }
 
         setData(arr);
       } catch (err: any) {
@@ -262,7 +277,7 @@ const SentimentSummary: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl]);
+  }, [apiUrl, dealType]);
 
   const filteredData = useMemo(() => {
     const term = searchTerm.toLowerCase();
@@ -493,6 +508,59 @@ const SentimentSummary: React.FC = () => {
               AI-driven IPO sentiment insights
             </Typography>
           </Box>
+
+          {/* Deal Type Tabs */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              onClick={() => {
+                setDealType("IPO");
+                setPage(0);
+              }}
+              sx={{
+                px: 2.5,
+                py: 0.8,
+                borderRadius: 2,
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                textTransform: "none",
+                border: `2px solid ${dealType === "IPO" ? C.accent : C.border}`,
+                color: dealType === "IPO" ? C.accent : C.textMuted,
+                backgroundColor: dealType === "IPO" ? C.accentBg : "transparent",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: C.accent,
+                  backgroundColor: C.accentBg,
+                },
+              }}
+            >
+              IPO
+            </Button>
+            <Button
+              onClick={() => {
+                setDealType("FO");
+                setPage(0);
+              }}
+              sx={{
+                px: 2.5,
+                py: 0.8,
+                borderRadius: 2,
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                textTransform: "none",
+                border: `2px solid ${dealType === "FO" ? C.accent : C.border}`,
+                color: dealType === "FO" ? C.accent : C.textMuted,
+                backgroundColor: dealType === "FO" ? C.accentBg : "transparent",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: C.accent,
+                  backgroundColor: C.accentBg,
+                },
+              }}
+            >
+              FO
+            </Button>
+          </Box>
+
           <FormControl size="small">
             <Select
               value={statusFilter}
