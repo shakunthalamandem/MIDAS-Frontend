@@ -15,6 +15,7 @@ import {
   Chip,
   TablePagination,
   Link,
+  Button,
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
@@ -51,10 +52,11 @@ const ShowQuantAnalysis: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [dealType, setDealType] = useState<"IPO" | "FO">("IPO");
 
   useEffect(() => {
     fetchQuantAnalysis();
-  }, []);
+  }, [dealType]);
 
   useEffect(() => {
     const filtered = tickers.filter(
@@ -76,7 +78,7 @@ const ShowQuantAnalysis: React.FC = () => {
     setError(null);
     try {
       const token = localStorage.getItem("access_token");
-      const res = await fetch(`${apiUrl}/api/quant_agent/all_tickers_latest/`, {
+      const res = await fetch(`${apiUrl}/api/quant_agent/all_tickers_latest/?deal_type=${dealType}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -176,7 +178,7 @@ const ShowQuantAnalysis: React.FC = () => {
     >
       {/* Header Section - Minimal Layout */}
       <Box sx={{ mb: 2.5 }}>
-        {/* Top Row: Title + Search */}
+        {/* Top Row: Title + Tabs + Search */}
         <Box
           sx={{
             display: "flex",
@@ -213,6 +215,58 @@ const ShowQuantAnalysis: React.FC = () => {
             >
               Quant Analysis
             </Typography>
+          </Box>
+
+          {/* Middle - Deal Type Tabs */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              onClick={() => {
+                setDealType("IPO");
+                setPage(0);
+              }}
+              sx={{
+                px: 2.5,
+                py: 0.8,
+                borderRadius: 2,
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                textTransform: "none",
+                border: `2px solid ${dealType === "IPO" ? "#4f46e5" : "#e2e8f0"}`,
+                color: dealType === "IPO" ? "#4f46e5" : "#94a3b8",
+                backgroundColor: dealType === "IPO" ? "#eef2ff" : "transparent",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: "#4f46e5",
+                  backgroundColor: "#eef2ff",
+                },
+              }}
+            >
+              IPO
+            </Button>
+            <Button
+              onClick={() => {
+                setDealType("FO");
+                setPage(0);
+              }}
+              sx={{
+                px: 2.5,
+                py: 0.8,
+                borderRadius: 2,
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                textTransform: "none",
+                border: `2px solid ${dealType === "FO" ? "#4f46e5" : "#e2e8f0"}`,
+                color: dealType === "FO" ? "#4f46e5" : "#94a3b8",
+                backgroundColor: dealType === "FO" ? "#eef2ff" : "transparent",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: "#4f46e5",
+                  backgroundColor: "#eef2ff",
+                },
+              }}
+            >
+              FO
+            </Button>
           </Box>
 
           {/* Right - Search Bar */}
