@@ -25,6 +25,7 @@ import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 interface QuantAnalysisData {
   count: number;
+  deal_type: string;
   data: QuantTicker[];
 }
 
@@ -418,7 +419,7 @@ const ShowQuantAnalysis: React.FC = () => {
                       <TableRow
                         key={ticker.unique_deal_id}
                         onClick={() =>
-                          navigate(`/quant-analysis/${encodeURIComponent(ticker.ticker)}`)
+                          navigate(`/quant-analysis/${encodeURIComponent(ticker.ticker)}?deal_type=${dealType}`)
                         }
                         sx={{
                           background: "#ffffff",
