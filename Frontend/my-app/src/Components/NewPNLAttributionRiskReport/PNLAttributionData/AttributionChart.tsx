@@ -35,6 +35,7 @@ interface AttributionChartProps {
   metric: string;
   accentColor: string;
   currentValue?: number;
+  betaPeriod?: "1m" | "3m" | "6m";
 }
 
 const AttributionChart: React.FC<AttributionChartProps> = ({
@@ -45,6 +46,7 @@ const AttributionChart: React.FC<AttributionChartProps> = ({
   metric,
   accentColor,
   currentValue,
+  betaPeriod = "1m",
 }) => {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,7 @@ const AttributionChart: React.FC<AttributionChartProps> = ({
             group_by: groupBy,
             [groupBy]: groupValue,
             metric,
+            beta_period: betaPeriod,
           }),
         }
       );
@@ -79,7 +82,7 @@ const AttributionChart: React.FC<AttributionChartProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [selectedFunds, selectedDate, groupBy, groupValue, metric]);
+  }, [selectedFunds, selectedDate, groupBy, groupValue, metric, betaPeriod]);
 
   useEffect(() => {
     fetchChartData();

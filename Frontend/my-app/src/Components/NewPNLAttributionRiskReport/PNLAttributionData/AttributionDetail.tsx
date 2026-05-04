@@ -86,6 +86,7 @@ interface AttributionDetailProps {
   showPct: boolean;
   theme: TabTheme;
   onClose: () => void;
+  betaPeriod?: "1m" | "3m" | "6m";
 }
 
 const DetailToolbar = () => (
@@ -106,6 +107,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
   showPct,
   theme,
   onClose,
+  betaPeriod = "1m",
 }) => {
   const [tickerData, setTickerData] = useState<TickerItem[]>([]);
   const [closedTickerDetails, setClosedTickerDetails] = useState<ClosedTickerDetail[]>([]);
@@ -130,6 +132,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
         fund: selectedFunds,
         date: selectedDate,
         [groupBy]: groupValue,
+        beta_period: betaPeriod,
       };
       const res = await fetch(
         `${apiUrl}/api/portfolio_attribution_ticker_data/`,
@@ -162,7 +165,7 @@ const AttributionDetail: React.FC<AttributionDetailProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [selectedFunds, selectedDate, groupBy, groupValue]);
+  }, [selectedFunds, selectedDate, groupBy, groupValue, betaPeriod]);
 
   useEffect(() => {
     fetchTickerData();

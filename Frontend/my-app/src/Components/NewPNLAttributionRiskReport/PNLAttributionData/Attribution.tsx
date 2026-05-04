@@ -12,6 +12,7 @@ import "./AttributionRowCards.css";
 interface AttributionProps {
   selectedFunds: string[];
   selectedDate: string;
+  betaPeriod?: "1m" | "3m" | "6m";
 }
 
 interface TabTheme {
@@ -93,6 +94,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const Attribution: React.FC<AttributionProps> = ({
   selectedFunds,
   selectedDate,
+  betaPeriod = "1m",
 }) => {
   const [groupBy, setGroupBy] = useState<AttributionGroupBy>("analyst");
   const [data, setData] = useState<AttributionItem[]>([]);
@@ -125,6 +127,7 @@ const Attribution: React.FC<AttributionProps> = ({
             date: selectedDate,
             fund: selectedFunds,
             group_by: groupBy,
+            beta_period: betaPeriod,
           }),
         }
       );
@@ -136,7 +139,7 @@ const Attribution: React.FC<AttributionProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [selectedFunds, selectedDate, groupBy]);
+  }, [selectedFunds, selectedDate, groupBy, betaPeriod]);
 
   useEffect(() => {
     fetchAttribution();
@@ -262,6 +265,7 @@ const Attribution: React.FC<AttributionProps> = ({
                 selectedDate={selectedDate}
                 groupBy={groupBy}
                 accentColor={activeTheme.activeTab}
+                betaPeriod={betaPeriod}
               />
             )}
 
@@ -289,6 +293,7 @@ const Attribution: React.FC<AttributionProps> = ({
                 metric={selectedCard}
                 accentColor={activeTheme.activeTab}
                 currentValue={expandedRowData ? (expandedRowData[selectedCard as keyof AttributionItem] as number) : undefined}
+                betaPeriod={betaPeriod}
               />
             )}
 
@@ -304,6 +309,7 @@ const Attribution: React.FC<AttributionProps> = ({
                   setExpandedRow(null);
                   setSelectedCard(null);
                 }}
+                betaPeriod={betaPeriod}
               />
             )}
           </>
