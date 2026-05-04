@@ -20,7 +20,7 @@ import {
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Block } from "../GhcAi/Utils/ComponentsUtils";
 
 interface QuantAnalysisData {
@@ -46,6 +46,10 @@ interface QuantTicker {
 const ShowQuantAnalysis: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialDealType = (searchParams.get("deal_type") as "IPO" | "FO") || "IPO";
+
   const [tickers, setTickers] = useState<QuantTicker[]>([]);
   const [filteredTickers, setFilteredTickers] = useState<QuantTicker[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,7 +57,7 @@ const ShowQuantAnalysis: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [dealType, setDealType] = useState<"IPO" | "FO">("IPO");
+  const [dealType, setDealType] = useState<"IPO" | "FO">(initialDealType);
 
   useEffect(() => {
     fetchQuantAnalysis();
