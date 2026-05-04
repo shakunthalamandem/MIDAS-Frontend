@@ -190,7 +190,7 @@ const AgentTickerOverview: React.FC = () => {
       label: "Quant Agent",
       component: (
         <TabErrorBoundary tabLabel="Quant Agent" ticker={tickerValue}>
-          <QunatAgentTab ticker={ticker} />
+          <QunatAgentTab ticker={ticker} dealType={(hydratedDeal.deal_type as "IPO" | "FO") || "IPO"} />
         </TabErrorBoundary>
       ),
     },
