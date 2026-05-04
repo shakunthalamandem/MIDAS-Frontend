@@ -25,6 +25,7 @@ const ShowUSSentimentAnalysis: React.FC = () => {
   const navigate = useNavigate();
 
   const queryTicker = searchParams.get("ticker");
+  const dealType = searchParams.get("deal_type") || "IPO";
 
   useEffect(() => {
     const loadSentimentTickers = async () => {
@@ -101,7 +102,7 @@ const ShowUSSentimentAnalysis: React.FC = () => {
             transition: "all 0.2s ease",
             "&:hover": { color: "#4f46e5" },
           }}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/ai_sentiment_summary?deal_type=${dealType}`)}
         >
           <ArrowBackRoundedIcon sx={{ fontSize: 20 }} />
           <Typography sx={{ fontSize: "0.85rem", fontWeight: 600 }}>Back</Typography>
@@ -114,6 +115,7 @@ const ShowUSSentimentAnalysis: React.FC = () => {
           onSelectTicker={setSentimentTicker}
           loadingTickers={sentimentLoading}
           tickerError={sentimentErr}
+          dealType={(dealType as "IPO" | "FO") || "IPO"}
         />
       </Container>
     </Box>

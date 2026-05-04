@@ -5,26 +5,25 @@ import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
 import DashboardStateCard from "../../NewDashboardLifeCycle/DashboardStateCard";
 import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 
-interface AunatAgentTabProps {
+interface QunatAgentTabProps {
   ticker?: string;
+  dealType?: "IPO" | "FO";
 }
 
 const formatUpdated = (iso: string | null): string | null => {
   if (!iso) return null;
   try {
-    return new Date(iso).toLocaleString("en-US", {
+    return new Date(iso).toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   } catch {
     return iso;
   }
 };
 
-const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
+const QunatAgentTab: React.FC<QunatAgentTabProps> = ({ ticker, dealType = "IPO" }) => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,7 +47,8 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
               Authorization: token ? `Bearer ${token}` : "",
             },
             body: JSON.stringify({
-              tickers: [ticker.trim()],
+              ticker: ticker.trim(),
+              deal_type: dealType,
             }),
           }
         );
@@ -58,16 +58,21 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
         }
 
         const data = await response.json();
+        console.log("Quant Agent API Response:", data);
 
         // Extract and parse quant_analysis from the response
-        if (data.data && data.data.length > 0) {
-          const tickerInfo = data.data[0];
+        if (data.data) {
+          const tickerInfo = Array.isArray(data.data) ? data.data[0] : data.data;
+          console.log("Ticker Info:", tickerInfo);
+
           let quantAnalysis = tickerInfo.quant_analysis;
+          console.log("Raw quant_analysis:", quantAnalysis);
 
           // Parse if it's a string
           if (typeof quantAnalysis === "string") {
             try {
               quantAnalysis = JSON.parse(quantAnalysis);
+              console.log("Parsed quant_analysis:", quantAnalysis);
             } catch (e) {
               console.error("Failed to parse quant_analysis:", e);
               quantAnalysis = [];
@@ -76,8 +81,14 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
 
           // Convert to Block array if it's an array
           const blockArray = Array.isArray(quantAnalysis) ? quantAnalysis : [];
-          setBlocks(blockArray);
-          setUpdatedAt(tickerInfo.updated_at || tickerInfo.created_at || null);
+          console.log("Block array:", blockArray, "Length:", blockArray.length);
+
+          if (blockArray.length === 0) {
+            setError("No blocks available in quant analysis data");
+          } else {
+            setBlocks(blockArray);
+            setUpdatedAt(tickerInfo.updated_at || tickerInfo.created_at || null);
+          }
         } else {
           setError("No quant analysis data found for this ticker");
         }
@@ -90,7 +101,7 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
     };
 
     fetchQuantAnalysis();
-  }, [ticker]);
+  }, [ticker, dealType]);
 
   if (loading) {
     return (
@@ -138,7 +149,7 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
                 letterSpacing: "0.02em",
               }}
             >
-              Updated {updatedLabel}
+              Updated: {updatedLabel}
             </Typography>
           </Box>
         </Box>
@@ -148,4 +159,4 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
   );
 };
 
-export default AunatAgentTab;
+export default QunatAgentTab;

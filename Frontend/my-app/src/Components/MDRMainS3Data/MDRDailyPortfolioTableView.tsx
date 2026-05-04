@@ -105,6 +105,14 @@ const columns: GridColDef[] = [
     minWidth: 100,
   },
   {
+    field: "firstTradeDate",
+    headerName: "First Trade Date",
+    flex: 0.9,
+    minWidth: 120,
+    align: "left",
+    headerAlign: "left",
+  },
+  {
     field: "daysHeld",
     headerName: "Days Held",
     flex: 0.6,

@@ -20,4 +20,5 @@ export interface MDRDailyPortfolioRow {
   currentPrice: number | null;
   ultimateStop: number | null;
   targetPrice: number | null;
+  firstTradeDate: string;
 }

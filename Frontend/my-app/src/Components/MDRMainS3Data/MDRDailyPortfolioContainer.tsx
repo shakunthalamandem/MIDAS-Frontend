@@ -55,6 +55,7 @@ const normalizeRow = (raw: any, index: number): MDRDailyPortfolioRow => ({
     raw.target_price === null || raw.target_price === undefined
       ? null
       : Number(raw.target_price ?? raw.targetPrice ?? 0),
+  firstTradeDate: raw.first_trade_date ?? "",
 });
 
 export const MDRDailyPortfolioContainer: React.FC<

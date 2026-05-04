@@ -192,8 +192,8 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
         day: "numeric",
         month: "short",
         year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        // hour: "2-digit",
+        // minute: "2-digit",
       });
     } catch {
       return signal.updated_at;
@@ -218,16 +218,16 @@ const GatorSignalAnalysis: React.FC<GatorSignalAnalysisProps> = ({ ticker }) => 
               boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
             }}
           >
-            <AccessTimeIcon sx={{ fontSize: 13, color: "#64748b" }} />
+            <AccessTimeIcon sx={{ fontSize: 13, color: "#365a8b" }} />
             <Typography
               sx={{
                 fontSize: "0.7rem",
                 fontWeight: 600,
-                color: "#475569",
+                color: "#365a8b",
                 letterSpacing: "0.02em",
               }}
             >
-              Updated {updatedLabel}
+              Updated: {updatedLabel}
             </Typography>
           </Box>
         </Box>
