@@ -39,6 +39,7 @@ interface QuantTicker {
   issuer_name: string;
   sector: string;
   quant_analysis?: Block[];
+  quant_signal?: string;
   created_at: string;
   updated_at: string;
 }
@@ -170,6 +171,15 @@ const ShowQuantAnalysis: React.FC = () => {
     }
 
     return "No summary available";
+  };
+
+  const getSignalColor = (signal: string | undefined) => {
+    if (!signal) return { bg: "#f1f5f9", color: "#64748b" };
+    const s = signal.toLowerCase();
+    if (/buy|strong buy/.test(s)) return { bg: "#dcfce7", color: "#166534" };
+    if (/sell|strong sell/.test(s)) return { bg: "#fee2e2", color: "#991b1b" };
+    if (/hold|neutral/.test(s)) return { bg: "#fef3c7", color: "#92400e" };
+    return { bg: "#f1f5f9", color: "#64748b" };
   };
 
   return (
@@ -409,6 +419,9 @@ const ShowQuantAnalysis: React.FC = () => {
                     Run Date
                   </TableCell>
                   <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
+                    Signal
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
                     Summary
                   </TableCell>
                 </TableRow>
@@ -451,6 +464,21 @@ const ShowQuantAnalysis: React.FC = () => {
                             day: "numeric",
                             year: "numeric",
                           })}
+                        </TableCell>
+                        <TableCell sx={{ padding: "8px" }}>
+                          {ticker.quant_signal && (
+                            <Chip
+                              label={ticker.quant_signal}
+                              size="small"
+                              sx={{
+                                fontWeight: 600,
+                                fontSize: "0.75rem",
+                                backgroundColor: getSignalColor(ticker.quant_signal).bg,
+                                color: getSignalColor(ticker.quant_signal).color,
+                                border: "none",
+                              }}
+                            />
+                          )}
                         </TableCell>
                         <TableCell sx={{ maxWidth: 350, padding: "8px" }}>
                           <Typography
