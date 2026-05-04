@@ -115,6 +115,7 @@ const ShowUSSentimentAnalysis: React.FC = () => {
           onSelectTicker={setSentimentTicker}
           loadingTickers={sentimentLoading}
           tickerError={sentimentErr}
+          dealType={(dealType as "IPO" | "FO") || "IPO"}
         />
       </Container>
     </Box>
