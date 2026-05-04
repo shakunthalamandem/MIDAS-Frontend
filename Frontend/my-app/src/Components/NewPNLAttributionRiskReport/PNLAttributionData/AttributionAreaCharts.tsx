@@ -21,6 +21,7 @@ interface AttributionAreaChartsProps {
   selectedDate: string;
   groupBy: AttributionGroupBy;
   accentColor: string;
+  betaPeriod?: "1m" | "3m" | "6m";
 }
 
 const METRIC_CONFIG: { key: MetricKey; label: string }[] = [
@@ -50,6 +51,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
   selectedDate,
   groupBy,
   accentColor,
+  betaPeriod = "1m",
 }) => {
   const [data, setData] = useState<Record<MetricKey, AttributionAreaSeries[]>>({
     ytd_pnl: [],
@@ -92,6 +94,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
               date: selectedDate,
               fund: selectedFunds,
               group_by: groupBy,
+              beta_period: betaPeriod,
             }),
             signal: controller.signal,
           }
@@ -117,7 +120,7 @@ const AttributionAreaCharts: React.FC<AttributionAreaChartsProps> = ({
     fetchData();
 
     return () => controller.abort();
-  }, [selectedFunds, selectedDate, groupBy]);
+  }, [selectedFunds, selectedDate, groupBy, betaPeriod]);
 
   const activeSeries = data[selectedMetric];
 
