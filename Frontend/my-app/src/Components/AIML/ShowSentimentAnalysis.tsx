@@ -56,6 +56,7 @@ type ShowSentimentAnalysisProps = {
   ) => void;
   loadingTickers?: boolean;
   tickerError?: string | null;
+  dealType?: "IPO" | "FO";
 };
 
 const parseLooseJson = (value: string): any | null => {
@@ -94,6 +95,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
   onSelectTicker,
   loadingTickers = false,
   tickerError = null,
+  dealType = "IPO",
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -142,6 +144,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
             unique_deal_id: selectedTicker.unique_deal_id,
             updated_at: selectedTicker.updated_at,
             pricing_date: selectedTicker.pricing_date,
+            deal_type: dealType,
           }),
         });
 
@@ -255,7 +258,7 @@ const ShowSentimentAnalysis: React.FC<ShowSentimentAnalysisProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [apiUrl, focusTicker, selectedTicker]);
+  }, [apiUrl, focusTicker, selectedTicker, dealType]);
 
   const showPlaceholder =
     !focusTicker || (!!focusTicker && !loading && !error && !status && !blocks.length && !socialMediaBlocks.length && !changeInSentimentBlocks.length);

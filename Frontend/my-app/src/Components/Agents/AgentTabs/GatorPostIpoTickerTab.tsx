@@ -59,12 +59,10 @@ const sentimentTone = (s: string) => {
 };
 
 const formatTime = (iso: string) =>
-  new Date(iso).toLocaleString("en-US", {
+  new Date(iso).toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 
 const GatorPostIpoTickerTab: React.FC<Props> = ({ ticker }) => {
