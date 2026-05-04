@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Alert,
   Box,
@@ -16,6 +16,7 @@ import {
   TablePagination,
   Link,
   Button,
+  TableSortLabel,
 } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
@@ -59,10 +60,39 @@ const ShowQuantAnalysis: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [dealType, setDealType] = useState<"IPO" | "FO">(initialDealType);
+  const [sortColumn, setSortColumn] = useState<string>("run_date");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     fetchQuantAnalysis();
   }, [dealType]);
+
+  const sortTickers = (data: QuantTicker[], column: string, direction: "asc" | "desc") => {
+    const sorted = [...data].sort((a, b) => {
+      let aVal: any = a[column as keyof QuantTicker];
+      let bVal: any = b[column as keyof QuantTicker];
+
+      // Handle null/undefined values - push them to the end
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return direction === "asc" ? 1 : -1;
+      if (bVal == null) return direction === "asc" ? -1 : 1;
+
+      if (column === "pricing_date" || column === "run_date") {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      } else if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (direction === "asc") {
+        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+      } else {
+        return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+      }
+    });
+    return sorted;
+  };
 
   useEffect(() => {
     const filtered = tickers.filter(
@@ -71,8 +101,10 @@ const ShowQuantAnalysis: React.FC = () => {
         ticker.issuer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ticker.sector.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredTickers(filtered);
-  }, [searchQuery, tickers]);
+    const sorted = sortTickers(filtered, sortColumn, sortDirection);
+    setFilteredTickers(sorted);
+    setPage(0);
+  }, [searchQuery, tickers, sortColumn, sortDirection]);
 
   const fetchQuantAnalysis = async () => {
     if (!apiUrl) {
@@ -181,6 +213,43 @@ const ShowQuantAnalysis: React.FC = () => {
     if (/hold|neutral/.test(s)) return { bg: "#fef3c7", color: "#92400e" };
     return { bg: "#f1f5f9", color: "#64748b" };
   };
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const SortableHeader = ({ column, label }: { column: string; label: string }) => (
+    <TableCell
+      sx={{
+        fontWeight: 700,
+        color: "#0f172a",
+        fontSize: "0.85rem",
+        cursor: "pointer",
+        userSelect: "none",
+        "&:hover": {
+          backgroundColor: "#f1f5f9",
+        },
+      }}
+      onClick={() => handleSort(column)}
+    >
+      <TableSortLabel
+        active={sortColumn === column}
+        direction={sortColumn === column ? sortDirection : "asc"}
+        sx={{
+          "& .MuiTableSortLabel-icon": {
+            color: sortColumn === column ? "#4f46e5" : "#cbd5e1",
+          },
+        }}
+      >
+        {label}
+      </TableSortLabel>
+    </TableCell>
+  );
 
   return (
     <Box
@@ -406,21 +475,11 @@ const ShowQuantAnalysis: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow sx={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
-                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
-                    Ticker
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
-                    Issuer Name
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
-                    Pricing Date
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
-                    Run Date
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
-                    Signal
-                  </TableCell>
+                  <SortableHeader column="ticker" label="Ticker" />
+                  <SortableHeader column="issuer_name" label="Issuer Name" />
+                  <SortableHeader column="pricing_date" label="Pricing Date" />
+                  <SortableHeader column="run_date" label="Run Date" />
+                  <SortableHeader column="quant_signal" label="Signal" />
                   <TableCell sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.85rem" }}>
                     Summary
                   </TableCell>
