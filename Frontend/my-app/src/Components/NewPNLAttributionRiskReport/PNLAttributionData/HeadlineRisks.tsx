@@ -7,12 +7,22 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import type { HeadlineRisks as HeadlineRisksData, HeadlinePnl, DashboardCategory } from "./types";
 import { formatCurrency, formatFullCurrency, formatPct } from "./utils";
 
+export type BetaPeriod = "1m" | "3m" | "6m";
+
 interface HeadlineRisksProps {
   data: HeadlineRisksData;
   pnlData?: HeadlinePnl;
   selectedCategory: DashboardCategory;
   onCategorySelect: (category: DashboardCategory) => void;
+  betaPeriod: BetaPeriod;
+  onBetaPeriodChange: (p: BetaPeriod) => void;
 }
+
+const BETA_PERIOD_OPTIONS: { key: BetaPeriod; label: string }[] = [
+  { key: "1m", label: "1M Beta" },
+  { key: "3m", label: "3M Beta" },
+  { key: "6m", label: "6M Beta" },
+];
 
 interface RiskCardInfo {
   definition: string;
@@ -66,13 +76,50 @@ const PNL_BOXES = [
   { label: "YTD P&L", valueKey: "ytd_pnl", pctKey: "ytd_pnl_pct", colorVariant: "ytd" },
 ] as const;
 
-const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCategory, onCategorySelect }) => {
+const HeadlineRisks: React.FC<HeadlineRisksProps> = ({ data, pnlData, selectedCategory, onCategorySelect, betaPeriod, onBetaPeriodChange }) => {
   return (
     <Box className="risk-dashboard-section">
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, flexWrap: "wrap" }}>
         <Box className="risk-dashboard-section-title" sx={{ mb: "0 !important" }}>HEADLINE RISKS</Box>
         <Box sx={{ fontSize: "11px", color: "#343d49", fontStyle: "italic", fontWeight: 400 }}>
           (excluding Security Type = 'Exchrate')
+        </Box>
+        <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 0.75 }}>
+          <Box sx={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", mr: 0.5 }}>
+            Beta Period:
+          </Box>
+          <Box className="beta-period-toggle" sx={{
+            display: "inline-flex",
+            border: "1px solid #cbd5e1",
+            borderRadius: "8px",
+            overflow: "hidden",
+            background: "#fff",
+          }}>
+            {BETA_PERIOD_OPTIONS.map((opt, idx) => {
+              const isActive = betaPeriod === opt.key;
+              return (
+                <Box
+                  key={opt.key}
+                  onClick={() => onBetaPeriodChange(opt.key)}
+                  sx={{
+                    px: 1.75,
+                    py: 0.65,
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    color: isActive ? "#fff" : "#475569",
+                    background: isActive ? "#002060" : "transparent",
+                    borderLeft: idx === 0 ? "none" : "1px solid #cbd5e1",
+                    transition: "background 0.15s, color 0.15s",
+                    userSelect: "none",
+                    "&:hover": isActive ? {} : { background: "#f1f5f9" },
+                  }}
+                >
+                  {opt.label}
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       </Box>
       <Box className="risk-cards-grid">
