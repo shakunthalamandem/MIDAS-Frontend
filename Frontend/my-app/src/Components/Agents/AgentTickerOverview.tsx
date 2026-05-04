@@ -20,7 +20,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import TabErrorBoundary from "../NewDashboardLifeCycle/TabErrorBoundary";
 import TechnicalAgentTab from "./AgentTabs/TechnicalAgentTab";
-import AunatAgentTab from "./AgentTabs/AunatAgentTab";
+import QunatAgentTab from "./AgentTabs/QunatAgentTab";
 
 // Import existing components where available
 const DashboardSentimentAnalysis = React.lazy(() => import("../AIML/DashboardSentimentAnalysis"));
@@ -190,7 +190,7 @@ const AgentTickerOverview: React.FC = () => {
       label: "Quant Agent",
       component: (
         <TabErrorBoundary tabLabel="Quant Agent" ticker={tickerValue}>
-          <AunatAgentTab ticker={ticker} />
+          <QunatAgentTab ticker={ticker} />
         </TabErrorBoundary>
       ),
     },

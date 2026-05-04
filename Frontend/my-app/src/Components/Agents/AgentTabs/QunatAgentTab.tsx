@@ -5,7 +5,7 @@ import GENAIRenderer from "../../GhcAi/AIPages/GENAIRenderer";
 import DashboardStateCard from "../../NewDashboardLifeCycle/DashboardStateCard";
 import { Block } from "../../GhcAi/Utils/ComponentsUtils";
 
-interface AunatAgentTabProps {
+interface QunatAgentTabProps {
   ticker?: string;
 }
 
@@ -24,7 +24,7 @@ const formatUpdated = (iso: string | null): string | null => {
   }
 };
 
-const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
+const QunatAgentTab: React.FC<QunatAgentTabProps> = ({ ticker }) => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -148,4 +148,4 @@ const AunatAgentTab: React.FC<AunatAgentTabProps> = ({ ticker }) => {
   );
 };
 
-export default AunatAgentTab;
+export default QunatAgentTab;
