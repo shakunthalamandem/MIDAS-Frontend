@@ -130,7 +130,7 @@ const OpenClawHistoryDrawer: React.FC<Props> = ({
           <Typography variant="caption" sx={{ opacity: 0.85 }}>
             {conversations.length
               ? `${conversations.length} thread${conversations.length === 1 ? "" : "s"}`
-              : "Your past MONA chats"}
+              : "Your past EMMY chats"}
           </Typography>
         </Box>
         <IconButton size="small" onClick={onClose} sx={{ color: "#f8fafc" }}>

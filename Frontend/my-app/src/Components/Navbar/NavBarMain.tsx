@@ -357,11 +357,11 @@ const NavbarMain: React.FC = () => {
               </span>
             </Button>
 
-            <Tooltip title="Chat with MONA — your private MIDAS AI partner (built on OpenClaw)">
+            <Tooltip title="Chat with EMMY — your private MIDAS AI partner (built on OpenClaw)">
               <Button
                 onClick={() => {
-                  setSelectedTab("MONA");
-                  localStorage.setItem("selectedTab", "MONA");
+                  setSelectedTab("EMMY");
+                  localStorage.setItem("selectedTab", "EMMY");
                   navigate("/openclaw_chat");
                 }}
                 startIcon={<SmartToyRoundedIcon fontSize="small" />}
@@ -371,7 +371,7 @@ const NavbarMain: React.FC = () => {
                   fontSize: "0.725rem",
                   mx: 1,
                   borderBottom:
-                    selectedTab === "MONA"
+                    selectedTab === "EMMY"
                       ? "3px solid #005166"
                       : "3px solid transparent",
                   borderRadius: 0,
@@ -381,7 +381,7 @@ const NavbarMain: React.FC = () => {
                   },
                 }}
               >
-                MONA
+                EMMY
                 <span
                   style={{
                     fontSize: "0.55rem",

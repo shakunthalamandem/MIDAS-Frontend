@@ -43,7 +43,7 @@ const SUGGESTIONS = [
   "What did we discuss yesterday?",
 ];
 
-const ASSISTANT_NAME = "MONA";
+const ASSISTANT_NAME = "EMMY";
 const ASSISTANT_TAGLINE = "Built on top of OpenClaw · your MIDAS AI partner";
 
 // Single dark-blue palette
@@ -686,7 +686,7 @@ const OpenClawChatPage: React.FC = () => {
             variant="h6"
             sx={{ fontWeight: 800, color: BRAND_NAVY, mb: 1 }}
           >
-            MONA is restricted
+            EMMY is restricted
           </Typography>
           <Typography
             variant="body2"
@@ -700,7 +700,7 @@ const OpenClawChatPage: React.FC = () => {
             color="text.secondary"
             sx={{ display: "block", mb: 3, opacity: 0.8 }}
           >
-            Your MIDAS account isn't on the MONA access list yet.
+            Your MIDAS account isn't on the EMMY access list yet.
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
             <Box
