@@ -129,6 +129,7 @@ const IpoGatorRunDashboard = React.lazy(() => import("../Components/GatorPostIpo
 const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
 const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
+const OpenClawChatPage = React.lazy(() => import("../Components/OpenClawChat/OpenClawChatPage"));
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
@@ -389,6 +390,8 @@ const AppRouters: React.FC = () => {
         <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 
        <Route path="/md_technical_analysis" element={<AuthGuard><MDTechnicalAnalysis /></AuthGuard>} />
+
+        <Route path="/openclaw_chat" element={<AuthGuard><OpenClawChatPage /></AuthGuard>} />
 
 
 
