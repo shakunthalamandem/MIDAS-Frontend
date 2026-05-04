@@ -16,6 +16,7 @@ import PageUnderDevelopment from "../Pages/PageUnderDevelopment";
 import MDTechnicalAnalysis from "../Components/Main/MonasheeDeals/MDTechnicalAnalysis";
 import ShowQuantAnalysis from "../Components/AIML/ShowQuantAnalysis";
 import ShowQuantAnalysisDetails from "../Components/AIML/ShowQuantAnalysisDetails";
+import QuantAnalysisUpload from "../Components/AIML/QuantAnalysisUpload";
 
 /* ── Route-level lazy loading (each page loads only when navigated to) ── */
 const CapitalMarkets = React.lazy(() => import("../Components/Main/HomePage/Dashboard/CapitalMarkets"));
@@ -63,6 +64,7 @@ const VersionUploadForm = React.lazy(() => import("../Components/Uploads/DailyMo
 const Agents = React.lazy(() => import("../Components/Agents/Agents"));
 const AgentOutputView = React.lazy(() => import("../Components/Agents/AgentOutputView"));
 const AgentTasksMain = React.lazy(() => import("../Components/Agents/AgentTasksMain"));
+const AgentTickerOverview = React.lazy(() => import("../Components/Agents/AgentTickerOverview"));
 const BetaTransferMain = React.lazy(() => import("../Components/BetaTransfer/BetaTransferMain"));
 const DealDetailedGapAnalysis = React.lazy(() => import("../Components/Main/DealDetailedGapAnalysis"));
 const PerplexityChatMain = React.lazy(() => import("../Components/GhcAi/PerplexityChatMain"));
@@ -123,6 +125,7 @@ const JRitterAgentMain = React.lazy(() => import("../Components/JRitterAgent/JRi
 const JUploadPage = React.lazy(() => import("../Components/JRitterAgent/JUploadPage"));
 const GatorPostIpoAgentMain = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoAgentMain"));
 const GatorPostIpoUpload = React.lazy(() => import("../Components/GatorPostIpoAgent/GatorPostIpoUpload"));
+const IpoGatorRunDashboard = React.lazy(() => import("../Components/GatorPostIpoAgent/IpoGatorRunDashboard"));
 const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer/DatabaseExplorer"));
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
 const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
@@ -329,7 +332,8 @@ const AppRouters: React.FC = () => {
         <Route path="/upload_claude_sentiment" element={<AuthGuard><UploadClaudeSentiment /></AuthGuard>} />
         <Route path="/summary_signal_board" element={<AuthGuard><SummarySignalBoard /></AuthGuard>} />
         <Route path="/quant_agent" element={<AuthGuard><ShowQuantAnalysis /></AuthGuard>} />
-        <Route path="/quant-analysis/:ticker" element={<AuthGuard><ShowQuantAnalysisDetails  /></AuthGuard>} />
+        <Route path="/quant-analysis/:ticker" element={<AuthGuard><ShowQuantAnalysisDetails /></AuthGuard>} />
+        <Route path="/quant_analysis_upload" element={<AuthGuard><QuantAnalysisUpload /></AuthGuard>} />
 
        
 
@@ -370,6 +374,7 @@ const AppRouters: React.FC = () => {
         {/* <Route path="/agents" element={<AuthGuard><Agents /></AuthGuard>} /> */}
         <Route path="/agents/dashboard" element={<AuthGuard><Agents /></AuthGuard>} />
         <Route path="/agents_tasks" element={<AuthGuard><AgentTasksMain /></AuthGuard>} />
+        <Route path="/agents/ticker/:ticker" element={<AuthGuard><AgentTickerOverview /></AuthGuard>} />
         <Route path="/beta_transfer" element={<AuthGuard><BetaTransferMain /></AuthGuard>} />
         <Route path="/agents/:agentId/output" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
         <Route path="/agents/:agentId/output/:outputId" element={<AuthGuard><AgentOutputView /></AuthGuard>} />
@@ -380,6 +385,7 @@ const AppRouters: React.FC = () => {
         <Route path="/j_upload" element={<AuthGuard><JUploadPage /></AuthGuard>} />
         <Route path="/gator_post_ipo" element={<AuthGuard><GatorPostIpoAgentMain /></AuthGuard>} />
         <Route path="/gator_post_ipo/upload" element={<AuthGuard><GatorPostIpoUpload /></AuthGuard>} />
+        <Route path="/ipo_gator_run" element={<AuthGuard><IpoGatorRunDashboard /></AuthGuard>} />
         <Route path="/database_explorer" element={<AuthGuard><DatabaseExplorer /></AuthGuard>} />
         <Route path="/cio_portfolio_review" element={<AuthGuard><CIOPortfolioReviewWizard /></AuthGuard>} />
 

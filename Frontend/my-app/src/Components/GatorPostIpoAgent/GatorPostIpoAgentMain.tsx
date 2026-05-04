@@ -16,7 +16,6 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +23,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import BlockRenderer, { GatorBlock } from "./BlockRenderer";
 
@@ -221,32 +219,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
     else {
       setSortField(f);
       setSortDir("desc");
-    }
-  };
-
-  const handleDelete = async (id: number, ticker: string) => {
-    if (!window.confirm(`Delete ${ticker} Post-IPO record? This cannot be undone.`)) return;
-    try {
-      const res = await fetch(`${apiUrl}/api/gator_post_ipo/${id}/`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-      if (!res.ok) throw new Error("Delete failed");
-      setSnackbar({
-        open: true,
-        message: `${ticker} deleted successfully`,
-        severity: "success",
-      });
-      fetchRecords();
-    } catch (err: any) {
-      setSnackbar({
-        open: true,
-        message: err.message || "Failed to delete",
-        severity: "error",
-      });
     }
   };
 
@@ -538,15 +510,12 @@ const GatorPostIpoAgentMain: React.FC = () => {
                       Updated
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={thStyle} align="right">
-                    {" "}
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} sx={{ textAlign: "center", py: 10 }}>
+                    <TableCell colSpan={8} sx={{ textAlign: "center", py: 10 }}>
                       <Typography
                         sx={{ color: "#94a3b8", fontWeight: 500, fontSize: "0.88rem" }}
                       >
@@ -695,23 +664,6 @@ const GatorPostIpoAgentMain: React.FC = () => {
                                 year: "numeric",
                               })}
                             </Typography>
-                          </TableCell>
-                          <TableCell align="right" sx={{ py: 1.5, px: 1.5 }}>
-                            <Tooltip title="Delete" arrow>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(rec.id, rec.ticker);
-                                }}
-                                sx={{
-                                  color: "#94a3b8",
-                                  "&:hover": { color: "#dc2626", bgcolor: "#fef2f2" },
-                                }}
-                              >
-                                <DeleteOutlineIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
                           </TableCell>
                         </TableRow>
 

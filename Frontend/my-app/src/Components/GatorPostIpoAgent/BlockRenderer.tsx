@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -17,6 +17,8 @@ import ZapIcon from "@mui/icons-material/BoltOutlined";
 import CpuIcon from "@mui/icons-material/MemoryOutlined";
 import BuildingIcon from "@mui/icons-material/BusinessOutlined";
 import InfoIcon from "@mui/icons-material/InfoOutlined";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -175,33 +177,84 @@ const isSeverityCell = (value: string, header: string | undefined) => {
 
 /* ═══════════════ Individual Block Components ═══════════════ */
 
+function renderBold(text: string): React.ReactNode {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+  );
+}
+
 const TextBlockCmp: React.FC<{ block: GatorTextBlock; isHeadline?: boolean }> = ({
   block,
   isHeadline,
 }) => {
   if (isHeadline) {
+    // Split pipe-separated metadata into chips for a cleaner, scannable header.
+    const segments = (block.content || "")
+      .split(/\s*\|\s*/)
+      .map((s) => s.trim())
+      .filter(Boolean);
     return (
       <Box
         sx={{
-          px: 3,
-          py: 2.5,
-          borderRadius: 3,
+          px: { xs: 1.5, md: 2 },
+          py: 1.2,
+          borderRadius: 2,
           background:
-            "linear-gradient(135deg, rgba(14,90,128,0.08) 0%, rgba(8,145,178,0.08) 100%)",
-          border: "1px solid #bae6fd",
+            "linear-gradient(135deg, rgba(14,90,128,0.05) 0%, rgba(8,145,178,0.05) 100%)",
+          border: "1px solid #cfeafd",
         }}
       >
-        <Typography
-          sx={{
-            fontSize: { xs: "0.9rem", md: "1rem" },
-            fontWeight: 700,
-            color: "#0c4a6e",
-            lineHeight: 1.55,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          {block.content}
-        </Typography>
+        {segments.length > 1 ? (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.6, alignItems: "center" }}>
+            {segments.map((seg, i) => (
+              <React.Fragment key={i}>
+                {i === 0 ? (
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "0.74rem", md: "0.78rem" },
+                      fontWeight: 700,
+                      color: "#0c4a6e",
+                      letterSpacing: "-0.005em",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {renderBold(seg)}
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{
+                      fontSize: { xs: "0.66rem", md: "0.7rem" },
+                      fontWeight: 500,
+                      color: "#0c4a6e",
+                      bgcolor: "rgba(255,255,255,0.7)",
+                      border: "1px solid #cfeafd",
+                      borderRadius: 1,
+                      px: 0.8,
+                      py: 0.2,
+                      lineHeight: 1.4,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {renderBold(seg)}
+                  </Box>
+                )}
+              </React.Fragment>
+            ))}
+          </Box>
+        ) : (
+          <Typography
+            sx={{
+              fontSize: { xs: "0.74rem", md: "0.78rem" },
+              fontWeight: 600,
+              color: "#0c4a6e",
+              lineHeight: 1.45,
+              letterSpacing: "-0.005em",
+            }}
+          >
+            {renderBold(block.content)}
+          </Typography>
+        )}
       </Box>
     );
   }
@@ -216,7 +269,7 @@ const TextBlockCmp: React.FC<{ block: GatorTextBlock; isHeadline?: boolean }> = 
       }}
     >
       <Typography sx={{ fontSize: "0.9rem", color: "#1e293b", lineHeight: 1.7 }}>
-        {block.content}
+        {renderBold(block.content)}
       </Typography>
     </Box>
   );
@@ -237,6 +290,9 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         flexDirection: "column",
         gap: 1,
         height: "100%",
+        minWidth: 0,
+        overflow: "hidden",
+        boxSizing: "border-box",
         transition: "transform 0.15s, box-shadow 0.15s",
         "&:hover": {
           boxShadow: "0 6px 20px rgba(8,145,178,0.12)",
@@ -244,15 +300,20 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         },
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
-        <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1, minWidth: 0 }}>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
             sx={{
-              fontSize: "1.05rem",
+              fontSize: "0.95rem",
               fontWeight: 800,
               color: "#0f172a",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.2,
+              letterSpacing: "-0.015em",
+              lineHeight: 1.25,
+              // Numbers/symbols like "$14.00" shouldn't break mid-token.
+              wordBreak: "normal",
+              overflowWrap: "break-word",
+              // If the title fits on one line, keep it there; otherwise wrap cleanly.
+              hyphens: "manual",
             }}
           >
             {block.title}
@@ -267,6 +328,7 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
                 borderRadius: 1.5,
                 bgcolor: tone.bg,
                 border: `1px solid ${tone.border}`,
+                maxWidth: "100%",
               }}
             >
               <Typography
@@ -276,6 +338,9 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
                   color: tone.color,
                   textTransform: "uppercase",
                   letterSpacing: "0.04em",
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                  lineHeight: 1.35,
                 }}
               >
                 {block.subtitle}
@@ -303,7 +368,17 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
         )}
       </Box>
       {block.description && (
-        <Typography sx={{ fontSize: "0.78rem", color: "#475569", lineHeight: 1.55, mt: 0.5 }}>
+        <Typography
+          sx={{
+            fontSize: "0.78rem",
+            color: "#475569",
+            lineHeight: 1.55,
+            mt: 0.5,
+            wordBreak: "break-word",
+            overflowWrap: "anywhere",
+            flex: 1,
+          }}
+        >
           {block.description}
         </Typography>
       )}
@@ -311,73 +386,159 @@ const CardBlockCmp: React.FC<{ block: GatorCardBlock }> = ({ block }) => {
   );
 };
 
-const isNumericCell = (val: string) => /^[+\-]?\$?\d+(\.\d+)?[%x]?$/.test(val.trim()) || /^[+\-]?\d+(\.\d+)?%$/.test(val.trim());
+// Detect a token that *looks* numeric/financial — handles $, %, ×, x, M/K/B suffixes,
+// negatives, leading +, and tolerates trailing notes ("$14.00 priced").
+const NUMERIC_TOKEN = /^[-+]?\$?\d{1,3}(?:[,]?\d{3})*(?:\.\d+)?[%xX×]?[KMB]?$/;
+const isNumericCell = (val: string) => {
+  const t = (val || "").trim();
+  if (!t) return false;
+  if (NUMERIC_TOKEN.test(t)) return true;
+  // Allow numeric prefix with a short trailing word, e.g. "$14.00 priced", "1.91M shares".
+  const head = t.split(/\s+/)[0];
+  return head !== t && NUMERIC_TOKEN.test(head);
+};
 
-const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => (
-  <Box
-    sx={{
-      bgcolor: "#fff",
-      border: "1px solid #e2e8f0",
-      borderRadius: 3,
-      overflow: "hidden",
-      boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-    }}
-  >
-    {block.title && (
-      <Box sx={{ px: 2.2, py: 1.5, bgcolor: "#0f2d4a" }}>
-        <Typography
+const NUMERIC_HEADER = /price|open|high|low|close|volume|return|change|%|offer|score|cap|shares|count|raise|discount|ratio|adv|adtv|day\b|d\d/i;
+
+const TABLE_DEFAULT_VISIBLE = 8;
+const TABLE_COLLAPSE_THRESHOLD = 12;
+
+const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
+  const totalRows = block.rows.length;
+  const collapsible = totalRows > TABLE_COLLAPSE_THRESHOLD;
+  const [expanded, setExpanded] = useState(false);
+  const visibleRows = collapsible && !expanded ? block.rows.slice(0, TABLE_DEFAULT_VISIBLE) : block.rows;
+
+  // Decide column alignment from header AND from sampled cells (majority numeric → right-align).
+  const colAlignRight = useMemo(() => {
+    return block.headers.map((h, ci) => {
+      if (ci === 0) return false; // first column is always the row label
+      if (NUMERIC_HEADER.test(h || "")) return true;
+      let numeric = 0;
+      let total = 0;
+      for (const row of block.rows) {
+        const cell = row[ci];
+        if (cell === null || cell === undefined || cell === "" || cell === "—" || cell === "TBD") continue;
+        total++;
+        if (isNumericCell(String(cell))) numeric++;
+      }
+      return total > 0 && numeric / total >= 0.5;
+    });
+  }, [block.headers, block.rows]);
+
+  return (
+    <Box
+      sx={{
+        bgcolor: "#fff",
+        border: "1px solid #e2e8f0",
+        borderRadius: 3,
+        overflow: "hidden",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+      }}
+    >
+      {block.title && (
+        <Box
           sx={{
-            fontSize: "0.82rem",
-            fontWeight: 800,
-            color: "#fff",
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            lineHeight: 1.4,
+            px: 2.2,
+            py: 1.5,
+            bgcolor: "#0f2d4a",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
           }}
         >
-          {block.title}
-        </Typography>
-      </Box>
-    )}
-    <TableContainer sx={{ overflowX: "auto" }}>
-      <Table size="small" sx={{ minWidth: 640, tableLayout: "auto" }}>
-        <TableHead>
-          <TableRow sx={{ bgcolor: "#f1f5f9" }}>
-            {block.headers.map((h, i) => (
-              <TableCell
-                key={i}
-                sx={{
-                  fontSize: "0.7rem",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  py: 1.3,
-                  px: 1.6,
-                  borderBottom: "2px solid #cbd5e1",
-                  whiteSpace: "nowrap",
-                  verticalAlign: "bottom",
-                }}
-              >
-                {h}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {block.rows.map((row, ri) => (
-            <TableRow
-              key={ri}
+          <Typography
+            sx={{
+              fontSize: "0.82rem",
+              fontWeight: 800,
+              color: "#fff",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              lineHeight: 1.4,
+            }}
+          >
+            {block.title}
+          </Typography>
+          {collapsible && (
+            <Box
+              component="button"
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
               sx={{
-                "&:nth-of-type(even)": { bgcolor: "#f8fafc" },
-                "&:hover": { bgcolor: "#ecfeff" },
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.6,
+                bgcolor: "rgba(255,255,255,0.12)",
+                color: "#e0f2fe",
+                border: "1px solid rgba(255,255,255,0.2)",
+                borderRadius: 999,
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                px: 1.4,
+                py: 0.5,
+                cursor: "pointer",
+                transition: "background 0.15s ease, transform 0.15s ease",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
+                "&:active": { transform: "translateY(1px)" },
               }}
             >
-              {row.map((cell, ci) => {
-                const cellStr = cell === null || cell === undefined ? "—" : String(cell);
-                const header = block.headers[ci];
+              {expanded ? (
+                <>
+                  <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
+                  Show all ({totalRows})
+                </>
+              )}
+            </Box>
+          )}
+        </Box>
+      )}
+      <TableContainer sx={{ overflowX: "auto" }}>
+        <Table size="small" sx={{ minWidth: 640, tableLayout: "auto" }}>
+          <TableHead>
+            <TableRow sx={{ bgcolor: "#f1f5f9" }}>
+              {block.headers.map((h, i) => (
+                <TableCell
+                  key={i}
+                  align={colAlignRight[i] ? "right" : "left"}
+                  sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 800,
+                    color: "#0f172a",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    py: 1.3,
+                    px: 1.6,
+                    borderBottom: "2px solid #cbd5e1",
+                    whiteSpace: "nowrap",
+                    verticalAlign: "bottom",
+                  }}
+                >
+                  {h}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {visibleRows.map((row, ri) => (
+              <TableRow
+                key={ri}
+                sx={{
+                  "&:nth-of-type(even)": { bgcolor: "#f8fafc" },
+                  "&:hover": { bgcolor: "#ecfeff" },
+                }}
+              >
+                {row.map((cell, ci) => {
+                  const cellStr = cell === null || cell === undefined ? "—" : String(cell);
+                  const header = block.headers[ci];
 
-                if (isVerdictCell(cellStr, header)) {
+                  if (isVerdictCell(cellStr, header)) {
                   const tone = VERDICT_CELL_TONE(cellStr);
                   return (
                     <TableCell
@@ -443,10 +604,11 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => (
                 }
 
                 const numeric = isNumericCell(cellStr);
+                const rightAlign = colAlignRight[ci];
                 return (
                   <TableCell
                     key={ci}
-                    align={numeric && ci !== 0 ? "right" : "left"}
+                    align={rightAlign ? "right" : "left"}
                     sx={{
                       py: 1.2,
                       px: 1.6,
@@ -454,24 +616,78 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => (
                       color: "#1e293b",
                       fontWeight: ci === 0 ? 700 : numeric ? 600 : 500,
                       lineHeight: 1.55,
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
-                      overflowWrap: "anywhere",
+                      // Numeric columns get tabular-nums + normal break behavior so digits stay aligned.
+                      whiteSpace: rightAlign ? "nowrap" : "normal",
+                      wordBreak: rightAlign ? "normal" : "break-word",
+                      overflowWrap: rightAlign ? "normal" : "anywhere",
                       verticalAlign: "top",
-                      fontVariantNumeric: numeric ? "tabular-nums" : "normal",
+                      fontVariantNumeric: rightAlign ? "tabular-nums" : "normal",
                     }}
                   >
                     {cellStr}
                   </TableCell>
                 );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
-);
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {collapsible && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 1,
+            px: 2,
+            py: 1.2,
+            borderTop: "1px solid #e2e8f0",
+            bgcolor: "#f8fafc",
+          }}
+        >
+          <Box
+            component="button"
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              bgcolor: "transparent",
+              color: "#0f2d4a",
+              border: "1px solid #cbd5e1",
+              borderRadius: 999,
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              px: 1.6,
+              py: 0.5,
+              cursor: "pointer",
+              transition: "background 0.15s ease, border-color 0.15s ease",
+              "&:hover": { bgcolor: "#e2e8f0", borderColor: "#94a3b8" },
+            }}
+          >
+            {expanded ? (
+              <>
+                <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
+                Show less
+              </>
+            ) : (
+              <>
+                <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
+                Show all {totalRows} rows
+              </>
+            )}
+          </Box>
+          <Typography sx={{ fontSize: "0.7rem", color: "#64748b" }}>
+            {expanded ? `Showing all ${totalRows}` : `Showing ${visibleRows.length} of ${totalRows}`}
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 const PIE_PALETTE = [
   "#60a5fa", "#34d399", "#fbbf24", "#f87171",
@@ -484,6 +700,9 @@ const BAR_PALETTE = [
 ];
 
 const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
+
   const isCircular = block.chartType === "pie" || block.chartType === "doughnut";
 
   const chartData = useMemo(
@@ -522,9 +741,17 @@ const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block 
     if (isCircular) return base;
     return {
       ...base,
+      layout: { padding: { bottom: 4 } },
       scales: {
         x: {
-          ticks: { color: "#64748b", font: { size: 10 }, maxRotation: 0, autoSkip: true },
+          ticks: {
+            color: "#64748b",
+            font: { size: 9 },
+            autoSkip: false,
+            maxRotation: 35,
+            minRotation: 0,
+            padding: 2,
+          },
           grid: { display: false },
         },
         y: {
@@ -571,7 +798,7 @@ const ChartBlockCmp: React.FC<{ block: GatorChartBlock }> = React.memo(({ block 
         </Typography>
       )}
       <Box sx={{ position: "relative", height: canvasHeight, width: "100%" }}>
-        {chartNode}
+        {mounted && chartNode}
       </Box>
     </Box>
   );

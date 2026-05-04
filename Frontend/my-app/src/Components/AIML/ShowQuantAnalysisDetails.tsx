@@ -37,6 +37,9 @@ const ShowQuantAnalysisDetails: React.FC = () => {
   const params = useParams<{ ticker: string }>();
   const ticker = params.ticker ? decodeURIComponent(params.ticker) : undefined;
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const dealType = searchParams.get("deal_type") || "IPO";
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const [tickerData, setTickerData] = useState<QuantTickerDetails | null>(null);
@@ -47,7 +50,7 @@ const ShowQuantAnalysisDetails: React.FC = () => {
     if (ticker) {
       fetchQuantAnalysisDetails();
     }
-  }, [ticker]);
+  }, [ticker, dealType]);
 
   const fetchQuantAnalysisDetails = async () => {
     if (!apiUrl || !ticker) {
@@ -62,7 +65,7 @@ const ShowQuantAnalysisDetails: React.FC = () => {
     setError(null);
     try {
       const token = localStorage.getItem("access_token");
-      const payload = { tickers: [ticker] };
+      const payload = { ticker, deal_type: dealType };
       console.log("API Payload:", payload);
 
       const res = await fetch(`${apiUrl}/api/quant_agent/all_tickers_latest/`, {
@@ -81,8 +84,12 @@ const ShowQuantAnalysisDetails: React.FC = () => {
         throw new Error(data?.error || data?.detail || `Request failed with status ${res.status}`);
       }
 
-      if (data.data && data.data.length > 0) {
-        setTickerData(data.data[0]);
+      if (data.data) {
+        const tickerInfo = Array.isArray(data.data) ? data.data[0] : data.data;
+        if (tickerInfo && tickerInfo.quant_analysis && typeof tickerInfo.quant_analysis === "string") {
+          tickerInfo.quant_analysis = JSON.parse(tickerInfo.quant_analysis);
+        }
+        setTickerData(tickerInfo);
       } else {
         setError("No data found for this ticker.");
       }

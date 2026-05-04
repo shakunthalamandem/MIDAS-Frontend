@@ -25,6 +25,8 @@ const MotionBox = motion(Box);
 interface Props {
   ticker: string;
   trade_date: string;
+  dealType: string;
+  pricingDate?: string | null;
   isUpcoming?: boolean;
   dealStatus?: string;
   issuerName?: string;
@@ -435,6 +437,8 @@ function buildDefaultSources(dealType: string): SourceDetails {
 const TradingSignalsMain: React.FC<Props> = ({
   ticker,
   trade_date,
+  dealType: dealTypeProp,
+  pricingDate,
   isUpcoming,
   dealStatus,
   issuerName,
@@ -443,7 +447,7 @@ const TradingSignalsMain: React.FC<Props> = ({
 }) => {
   const [signalData, setSignalData] = useState<TradingSignalData | null>(null);
   const [popupSource, setPopupSource] = useState<string | null>(null);
-  const [dealType, setDealType] = useState<string>("");
+  const [dealType, setDealType] = useState<string>(dealTypeProp || "");
   const [apiSourceDetails, setApiSourceDetails] = useState<SourceDetails>({});
   const [defaultSources, setDefaultSources] = useState<SourceDetails>({});
 
@@ -452,18 +456,24 @@ const TradingSignalsMain: React.FC<Props> = ({
 
   // Fetch source details with real data on mount (before signal generation)
   useEffect(() => {
-    if (!ticker || !apiUrl) return;
+    if (!ticker || !apiUrl || !dealTypeProp) return;
 
     const fetchSourceDetails = async () => {
       try {
         const operation = isUpcoming ? "upcoming" : "listed";
+        const payload: Record<string, unknown> = {
+          ticker,
+          operation,
+          deal_type: dealTypeProp,
+        };
+        if (pricingDate) payload.pricing_date = pricingDate;
         const res = await fetch(`${apiUrl}/api/trading_signal_source_details/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
           },
-          body: JSON.stringify({ ticker, operation }),
+          body: JSON.stringify(payload),
         });
         if (res.ok) {
           const data = await res.json();
@@ -492,7 +502,7 @@ const TradingSignalsMain: React.FC<Props> = ({
     };
 
     fetchSourceDetails();
-  }, [ticker, apiUrl, isUpcoming, token]);
+  }, [ticker, apiUrl, isUpcoming, token, dealTypeProp, pricingDate]);
 
   const handleSignalLoaded = useCallback((data: TradingSignalData | null) => {
     setSignalData(data);
@@ -550,6 +560,8 @@ const TradingSignalsMain: React.FC<Props> = ({
       >
         <TradingSignalCard
           ticker={ticker}
+          dealType={dealTypeProp}
+          pricingDate={pricingDate ?? undefined}
           onSignalLoaded={handleSignalLoaded}
           isUpcoming={isUpcoming}
         />

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -9,8 +10,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  InputAdornment,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,14 +22,26 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 
 import AgentCard from "./AgentCards/AgentCard";
 import CreateAgentDialog from "./CreateAgentDialog";
 import EditAgentDialog from "./EditAgentDialog";
-import { AIAgent } from "./types";
-import { fetchAgents, toggleEmailPreference, deleteAgent } from "./agentService";
+import { AIAgent, SYSTEM_AGENT_ROUTES } from "./types";
+import { fetchAgents, toggleEmailPreference, deleteAgent, fetchAgentTickerList } from "./agentService";
 
 const POLL_INTERVAL_MS = 15_000;
+
+interface TickerItem {
+  ticker: string;
+  pricing_date: string | null;
+  trade_date?: string | null;
+  region: string;
+  deal_type: string;
+  unique_deal_id: string;
+  issuer_name: string;
+  sector: string;
+}
 
 const Agents: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +61,8 @@ const Agents: React.FC = () => {
     message: string;
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
+  const [tickerList, setTickerList] = useState<TickerItem[]>([]);
+  const [tickerLoading, setTickerLoading] = useState(false);
 
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -53,13 +70,15 @@ const Agents: React.FC = () => {
     try {
       setLoading(true);
       const data = await fetchAgents();
-      // Hide IPO Ranking Agent; merge Portfolio CIO Agent + Risk Agent into one
+      // Hide IPO Ranking Agent, Risk Agent, Technical Agent; merge Portfolio CIO Agent + Risk Agent into one
+      const routeOrder = Object.keys(SYSTEM_AGENT_ROUTES);
       let cioAgent: AIAgent | undefined;
       const transformed: AIAgent[] = [];
       for (const agent of data) {
         if (agent.name === "IPO Ranking Agent") continue;
         if (agent.name === "Portfolio CIO Agent") { cioAgent = agent; continue; }
         if (agent.name === "Risk Agent") continue;
+        if (agent.name === "Technical Agent") continue;
         transformed.push(agent);
       }
       if (cioAgent) {
@@ -69,6 +88,11 @@ const Agents: React.FC = () => {
           description: "AI-powered portfolio oversight combining risk and performance analysis. Monitors exposures, P&L attribution, and risk triggers to support capital allocation decisions.",
         });
       }
+      transformed.sort((a, b) => {
+        const ai = routeOrder.indexOf(a.name);
+        const bi = routeOrder.indexOf(b.name);
+        return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+      });
       setAgents(transformed);
     } catch (err) {
       console.error("Failed to load agents:", err);
@@ -79,6 +103,21 @@ const Agents: React.FC = () => {
   }, []);
 
   useEffect(() => { loadAgents(); }, [loadAgents]);
+
+  useEffect(() => {
+    const loadTickers = async () => {
+      try {
+        setTickerLoading(true);
+        const data = await fetchAgentTickerList();
+        setTickerList(data.data || []);
+      } catch (err) {
+        console.error("Failed to load ticker list:", err);
+      } finally {
+        setTickerLoading(false);
+      }
+    };
+    loadTickers();
+  }, []);
 
   useEffect(() => {
     const hasInProgress = agents.some(
@@ -159,13 +198,16 @@ const Agents: React.FC = () => {
         }}
       >
         <Box sx={{ maxWidth: 1320, mx: "auto" }}>
-          {/* Title row */}
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            spacing={2}
+          {/* Title row — 2-column: title | button */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr auto" },
+              alignItems: "center",
+              gap: 2,
+            }}
           >
+            {/* Left: title */}
             <Stack direction="row" alignItems="center" spacing={1.5}>
               <Box
                 sx={{
@@ -176,6 +218,7 @@ const Agents: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >
                 <SmartToyOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
@@ -198,33 +241,37 @@ const Agents: React.FC = () => {
               </Box>
             </Stack>
 
-            <Button
-              variant="contained"
-              startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
-              onClick={() =>
-                isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
-              }
-              sx={{
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: "0.85rem",
-                px: 3,
-                py: 1.1,
-                borderRadius: 2.5,
-                bgcolor: isAdmin ? "#4f46e5" : "#475569",
-                boxShadow: "none",
-                "&:hover": {
-                  bgcolor: isAdmin ? "#4338ca" : "#334155",
-                  boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-                },
-              }}
-            >
-              Create Agent
-            </Button>
-          </Stack>
+            {/* Right: create button */}
+            <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", sm: "flex-end" } }}>
+              <Button
+                variant="contained"
+                startIcon={isAdmin ? <AddIcon /> : <LockOutlinedIcon />}
+                onClick={() =>
+                  isAdmin ? setCreateOpen(true) : setAdminGateOpen(true)
+                }
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  px: 3,
+                  py: 1.1,
+                  borderRadius: 2.5,
+                  bgcolor: isAdmin ? "#4f46e5" : "#475569",
+                  boxShadow: "none",
+                  "&:hover": {
+                    bgcolor: isAdmin ? "#4338ca" : "#334155",
+                    boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+                  },
+                  flexShrink: 0,
+                }}
+              >
+                Create Agent
+              </Button>
+            </Box>
+          </Box>
 
-          {/* Stat pills */}
-          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap">
+          {/* Stat pills + search */}
+          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="center">
             {/* Total */}
             <Box
               sx={{
@@ -301,6 +348,167 @@ const Agents: React.FC = () => {
                 </Box>
               </Box>
             )}
+
+            {/* Search bar — grows to fill remaining space */}
+            <Box sx={{ flex: 1, minWidth: 240 }}>
+              <Autocomplete
+                options={[...tickerList].sort((a, b) => {
+                  if (!a.pricing_date && !b.pricing_date) return 0;
+                  if (!a.pricing_date) return 1;
+                  if (!b.pricing_date) return -1;
+                  return new Date(b.pricing_date).getTime() - new Date(a.pricing_date).getTime();
+                })}
+                getOptionLabel={(option) =>
+                  `${option.ticker} | ${option.pricing_date || "N/A"} | ${option.deal_type}`
+                }
+                filterOptions={(options, { inputValue }) => {
+                  const q = inputValue.toLowerCase().trim();
+                  if (!q) return options;
+                  return options.filter(
+                    (o) =>
+                      o.ticker.toLowerCase().includes(q) ||
+                      (o.issuer_name || "").toLowerCase().includes(q)
+                  );
+                }}
+                loading={tickerLoading}
+                loadingText="Loading tickers…"
+                onChange={(_event, value) => {
+                  if (value) {
+                    navigate(`/agents/ticker/${value.ticker}`, {
+                      state: { dealData: value }
+                    });
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search ticker, issuer..."
+                    variant="outlined"
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        startAdornment: (
+                          <>
+                            <InputAdornment position="start">
+                              <SearchIcon sx={{ color: "#818cf8", fontSize: 20 }} />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                    sx={{
+                      width: "100%",
+                      "& .MuiOutlinedInput-root": {
+                        fontSize: "1rem",
+                        borderRadius: 3,
+                        bgcolor: "#eef2ff",
+                        boxShadow: "0 0 0 3px rgba(79,70,229,0.1), 0 2px 8px rgba(79,70,229,0.08)",
+                        "& fieldset": {
+                          borderColor: "#818cf8",
+                          borderWidth: "1.5px",
+                        },
+                        "&:hover": {
+                          bgcolor: "#e0e7ff",
+                        },
+                        "&:hover fieldset": { borderColor: "#4f46e5" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#4f46e5",
+                          borderWidth: "2px",
+                        },
+                        "&.Mui-focused": {
+                          bgcolor: "#fff",
+                          boxShadow: "0 0 0 4px rgba(79,70,229,0.18), 0 4px 16px rgba(79,70,229,0.15)",
+                        },
+                      },
+                    }}
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const formatDate = (dateString: string | null) => {
+                    if (!dateString) return null;
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+                  };
+                  const formattedDate = formatDate(option.pricing_date);
+                  return (
+                    <Box
+                      component="li"
+                      {...props}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.2,
+                        py: 0.85,
+                        px: 2,
+                        borderBottom: "1px solid #f0f0fa",
+                        "&:last-child": { borderBottom: "none" },
+                        cursor: "pointer",
+                        transition: "background 0.15s ease, transform 0.1s ease",
+                        "&:hover": {
+                          backgroundColor: "#eef2ff",
+                          transform: "translateX(3px)",
+                        },
+                        "&:active": { backgroundColor: "#e0e7ff" },
+                      }}
+                    >
+                      {/* Ticker */}
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: "0.82rem",
+                          color: "#4f139c",
+                          flexShrink: 0,
+                          minWidth: 64,
+                          letterSpacing: "0.03em",
+                        }}
+                      >
+                        {option.ticker}
+                      </Typography>
+
+                      {/* Company name — bold, grows to fill space */}
+                      <Typography
+                        noWrap
+                        sx={{ flex: 1, fontSize: "0.76rem", fontWeight: 700, color: "#1e293b", pl: 1 }}
+                      >
+                        {option.issuer_name || "—"}
+                      </Typography>
+
+                      {/* Date chip */}
+                      {formattedDate && (
+                        <Box
+                          sx={{
+                            bgcolor: "#ede9fe",
+                            color: "#5b21b6",
+                            fontSize: "0.7rem",
+                            fontWeight: 600,
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {formattedDate}
+                        </Box>
+                      )}
+                    </Box>
+                  );
+                }}
+                noOptionsText="No tickers found"
+                sx={{
+                  "& .MuiAutocomplete-paper": {
+                    borderRadius: 2.5,
+                    border: "1px solid #c7d2fe",
+                    boxShadow: "0 12px 32px rgba(79,70,229,0.15)",
+                    mt: 0.5,
+                  },
+                  "& .MuiAutocomplete-listbox": {
+                    py: 0.5,
+                  },
+                }}
+              />
+            </Box>
           </Stack>
         </Box>
       </Box>
