@@ -123,10 +123,11 @@ const AgentTickerOverview: React.FC = () => {
   // Get ticker options for autocomplete
   const tickerOptions = Array.isArray(tickerList) ? tickerList : [];
 
+  const ACCENT_COLOR = "#38348f";
+
   const tabs = [
     {
       label: "Sentiment Agent",
-      accent: "#7c3aed",
       component: (
         <TabErrorBoundary tabLabel="Sentiment Agent" ticker={tickerValue}>
           <DashboardSentimentAnalysis
@@ -139,7 +140,6 @@ const AgentTickerOverview: React.FC = () => {
     },
     {
       label: "Deal(IPO) Agent",
-      accent: "#d97706",
       component: (
         <TabErrorBoundary tabLabel="Deal(IPO) Agent" ticker={tickerValue}>
           <DashboardAIFewShotAnalysis
@@ -155,7 +155,6 @@ const AgentTickerOverview: React.FC = () => {
     },
     {
       label: "Factors Based Agent",
-      accent: "#0891b2",
       component: (
         <TabErrorBoundary tabLabel="Factors Based Agent" ticker={tickerValue}>
           <AIMLDealDetails ticker={tickerValue} />
@@ -165,7 +164,6 @@ const AgentTickerOverview: React.FC = () => {
     isTrading
       ? {
           label: "Gator Post-IPO",
-          accent: "#0f766e",
           component: (
             <TabErrorBoundary tabLabel="Gator Post-IPO" ticker={tickerValue}>
               <GatorPostIpoTickerTab ticker={tickerValue} />
@@ -174,7 +172,6 @@ const AgentTickerOverview: React.FC = () => {
         }
       : {
           label: "Gator Signal",
-          accent: "#0f766e",
           component: (
             <TabErrorBoundary tabLabel="Gator Signal" ticker={tickerValue}>
               <GatorSignalAnalysis ticker={tickerValue} />
@@ -183,7 +180,6 @@ const AgentTickerOverview: React.FC = () => {
         },
     // {
     //   label: "Technical Agent",
-    //   accent: "#dc2626",
     //   component: (
     //     <TabErrorBoundary tabLabel="Technical Agent" ticker={tickerValue}>
     //       <TechnicalAgentTab ticker={ticker} dealType={hydratedDeal.deal_type} />
@@ -192,7 +188,6 @@ const AgentTickerOverview: React.FC = () => {
     // },
     {
       label: "Quant Agent",
-      accent: "#4f46e5",
       component: (
         <TabErrorBoundary tabLabel="Quant Agent" ticker={tickerValue}>
           <AunatAgentTab ticker={ticker} />
@@ -201,7 +196,6 @@ const AgentTickerOverview: React.FC = () => {
     },
   ];
 
-  const activeAccent = tabs[activeTab]?.accent || "#4f46e5";
 
   return (
     <Container maxWidth="xl" sx={{ mt: 1, mb: 6 }}>
@@ -219,18 +213,16 @@ const AgentTickerOverview: React.FC = () => {
           elevation={0}
           sx={(theme) => ({
             mb: 3,
-            p: 2,
+            p: { xs: 1.5, md: 2.5 },
             borderRadius: 3.5,
-            background:
-              "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(238,242,255,0.86) 100%)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            border: "1px solid rgba(199, 210, 254, 0.7)",
+            background: "#ffffff",
+            border: "1px solid #e2e8f0",
             position: "sticky",
             top: { xs: 90, md: 95 },
             zIndex: theme.zIndex.appBar + 10,
-            boxShadow:
-              "0 1px 0 rgba(255,255,255,0.7) inset, 0 12px 32px rgba(79, 70, 229, 0.10)",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
+            width: "100%",
+            boxSizing: "border-box",
           })}
         >
           {/* Back Button, Title, and Search Bar Row */}
@@ -510,9 +502,9 @@ const AgentTickerOverview: React.FC = () => {
               },
               "& .Mui-selected": {
                 color: "#ffffff !important",
-                backgroundColor: `${activeAccent} !important`,
-                borderColor: `${activeAccent} !important`,
-                boxShadow: `0 6px 18px ${activeAccent}33, 0 1px 0 rgba(255,255,255,0.4) inset`,
+                backgroundColor: `${ACCENT_COLOR} !important`,
+                borderColor: `${ACCENT_COLOR} !important`,
+                // boxShadow: `0 6px 18px ${ACCENT_COLOR}33, 0 1px 0 rgba(255,255,255,0.4) inset`,
                 transform: "translateY(-1px)",
               },
               "& .MuiTabScrollButton-root": {
@@ -546,7 +538,7 @@ const AgentTickerOverview: React.FC = () => {
           </Tabs>
         </Paper>
 
-        {/* Tab Content — animated accent shell + smooth fade-in on switch */}
+        {/* Tab Content */}
         <Box
           key={activeTab}
           sx={{
@@ -555,24 +547,14 @@ const AgentTickerOverview: React.FC = () => {
             position: "relative",
             borderRadius: 3,
             overflow: "hidden",
-            border: "1px solid #e8ebff",
-            background: "linear-gradient(180deg, #ffffff 0%, #fafbff 100%)",
-            boxShadow: "0 1px 0 rgba(255,255,255,0.7) inset, 0 6px 22px rgba(15, 23, 42, 0.05)",
-            "&:before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              background: `linear-gradient(90deg, ${activeAccent} 0%, ${activeAccent}80 60%, transparent 100%)`,
-            },
             animation: "tabFadeIn 0.32s ease-out",
             "@keyframes tabFadeIn": {
               from: { opacity: 0, transform: "translateY(6px)" },
               to: { opacity: 1, transform: "translateY(0)" },
             },
             p: { xs: 1.5, md: 2.5 },
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           <Suspense fallback={<TabFallback />}>
