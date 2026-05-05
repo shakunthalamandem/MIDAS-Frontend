@@ -130,6 +130,7 @@ const DatabaseExplorer = React.lazy(() => import("../Components/DatabaseExplorer
 const CIOPortfolioReviewWizard = React.lazy(() => import("../Components/CIOPortfolioReview/CIOPortfolioReviewWizard"));
 const DealsDataDashboard = React.lazy(() => import("../Components/DealsData/DealsDataDashboard"));
 const OpenClawChatPage = React.lazy(() => import("../Components/OpenClawChat/OpenClawChatPage"));
+const MonthlyDecDashboard = React.lazy(() => import("../Components/MonthlyDec/MonthlyDecDashboard"));
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
@@ -392,6 +393,8 @@ const AppRouters: React.FC = () => {
        <Route path="/md_technical_analysis" element={<AuthGuard><MDTechnicalAnalysis /></AuthGuard>} />
 
         <Route path="/openclaw_chat" element={<AuthGuard><OpenClawChatPage /></AuthGuard>} />
+
+        <Route path="/monthly_dec" element={<AuthGuard><MonthlyDecDashboard /></AuthGuard>} />
 
 
 
