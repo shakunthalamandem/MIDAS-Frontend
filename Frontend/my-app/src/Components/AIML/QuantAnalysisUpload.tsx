@@ -28,6 +28,7 @@ interface FormData {
   pricing_date: string;
   unique_deal_id: string;
   issuer_name: string;
+  quant_signal: string;
   quant_analysis: string;
 }
 
@@ -49,6 +50,7 @@ const QuantAnalysisUpload: React.FC = () => {
     pricing_date: "",
     unique_deal_id: "",
     issuer_name: "",
+    quant_signal: "",
     quant_analysis: "",
   });
 
@@ -120,6 +122,7 @@ const QuantAnalysisUpload: React.FC = () => {
         pricing_date: tickerData.pricing_date || "",
         unique_deal_id: tickerData.unique_deal_id,
         issuer_name: tickerData.issuer_name,
+        quant_signal: "",
         quant_analysis: "",
       });
       setError(null);
@@ -132,9 +135,17 @@ const QuantAnalysisUpload: React.FC = () => {
         pricing_date: "",
         unique_deal_id: "",
         issuer_name: "",
+        quant_signal: "",
         quant_analysis: "",
       });
     }
+  };
+
+  const handleSignalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      quant_signal: e.target.value,
+    }));
   };
 
   const handleAnalysisChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -149,8 +160,8 @@ const QuantAnalysisUpload: React.FC = () => {
       setError("Please select a ticker.");
       return false;
     }
-    if (!formData.quant_analysis.trim()) {
-      setError("Quant analysis is required.");
+    if (!formData.quant_signal.trim() && !formData.quant_analysis.trim()) {
+      setError("Please provide either Quant Signal or Quant Analysis.");
       return false;
     }
     return true;
@@ -174,16 +185,17 @@ const QuantAnalysisUpload: React.FC = () => {
 
     try {
       const token = localStorage.getItem("access_token");
-      const payload = {
-        ticker: formData.ticker.trim(),
-        deal_type: formData.deal_type.trim(),
-        region: formData.region.trim(),
-        sector: formData.sector.trim(),
-        pricing_date: formData.pricing_date.trim(),
-        unique_deal_id: formData.unique_deal_id.trim(),
-        issuer_name: formData.issuer_name.trim(),
-        quant_analysis: formData.quant_analysis.trim(),
-      };
+      const payload: any = {};
+
+      if (formData.ticker.trim()) payload.ticker = formData.ticker.trim();
+      if (formData.deal_type.trim()) payload.deal_type = formData.deal_type.trim();
+      if (formData.region.trim()) payload.region = formData.region.trim();
+      if (formData.sector.trim()) payload.sector = formData.sector.trim();
+      if (formData.pricing_date.trim()) payload.pricing_date = formData.pricing_date.trim();
+      if (formData.unique_deal_id.trim()) payload.unique_deal_id = formData.unique_deal_id.trim();
+      if (formData.issuer_name.trim()) payload.issuer_name = formData.issuer_name.trim();
+      if (formData.quant_signal.trim()) payload.quant_signal = formData.quant_signal.trim();
+      if (formData.quant_analysis.trim()) payload.quant_analysis = formData.quant_analysis.trim();
 
       console.log("Uploading payload:", payload);
 
@@ -213,6 +225,7 @@ const QuantAnalysisUpload: React.FC = () => {
         pricing_date: "",
         unique_deal_id: "",
         issuer_name: "",
+        quant_signal: "",
         quant_analysis: "",
       });
 
@@ -424,6 +437,26 @@ const QuantAnalysisUpload: React.FC = () => {
               }}
             />
           </Box>
+        )}
+
+        {/* Quant Signal Field */}
+        {selectedTicker && (
+          <TextField
+            fullWidth
+            label="Quant Signal"
+            value={formData.quant_signal}
+            onChange={handleSignalChange}
+            placeholder="Enter quant signal"
+            variant="outlined"
+            size="medium"
+            disabled={loading}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 1,
+                "&:hover fieldset": { borderColor: "#0ea5e9" },
+              },
+            }}
+          />
         )}
 
         {/* Quant Analysis - Only Editable Field */}

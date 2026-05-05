@@ -30,7 +30,7 @@ import {
   FormControl,
   SelectChangeEvent,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -219,6 +219,9 @@ const StatCard: React.FC<{
 const SentimentSummary: React.FC = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialDealType = (searchParams.get("deal_type") as "IPO" | "FO") || "IPO";
 
   const [data, setData] = useState<SentimentData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,7 +242,7 @@ const SentimentSummary: React.FC = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [dealType, setDealType] = useState<"IPO" | "FO">("IPO");
+  const [dealType, setDealType] = useState<"IPO" | "FO">(initialDealType);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -429,7 +432,7 @@ const SentimentSummary: React.FC = () => {
   };
 
   const handleRowClick = (row: SentimentData) => {
-    navigate(`/ai_sentiment_view?ticker=${row.ticker}`);
+    navigate(`/ai_sentiment_view?ticker=${row.ticker}&deal_type=${dealType}`);
   };
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -1137,7 +1140,7 @@ const SentimentSummary: React.FC = () => {
               onClick={() => {
                 if (selectedSummary) {
                   handleCloseDialog();
-                  navigate(`/ai_sentiment_view?ticker=${selectedSummary.ticker}`);
+                  navigate(`/ai_sentiment_view?ticker=${selectedSummary.ticker}&deal_type=${dealType}`);
                 }
               }}
               sx={{

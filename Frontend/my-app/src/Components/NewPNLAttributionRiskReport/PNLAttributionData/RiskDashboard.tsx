@@ -6,7 +6,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import type { DashboardData, ChartDataPoint, IndexComparisonChartPoint, PortfolioResponse, TopBottomPnlTicker, DashboardCategory, MetricChartDataPoint, TopBottomMetricTicker, HeadlineMetricValues } from "./types";
 import DashboardHeader from "./DashboardHeader";
-import HeadlineRisks from "./HeadlineRisks";
+import HeadlineRisks, { BetaPeriod } from "./HeadlineRisks";
 import HeadlinePnL from "./HeadlinePnL";
 import IndexesComparison from "./IndexesComparison";
 import CumulativePnLChart from "./CumulativePnLChart";
@@ -68,6 +68,7 @@ const RiskDashboard: React.FC = () => {
   const [metricHeadlineLoading, setMetricHeadlineLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [betaPeriod, setBetaPeriod] = useState<BetaPeriod>("1m");
 
   // AbortController refs to cancel stale requests
   const abortRefs = useRef<Record<string, AbortController>>({});
@@ -125,7 +126,7 @@ const RiskDashboard: React.FC = () => {
           fetch(`${apiUrl}/api/portfolio_risk_dashboard/`, {
             method: "POST",
             headers: getAuthHeaders("application/json"),
-            body: JSON.stringify({ date: selectedDate, fund: selectedFunds }),
+            body: JSON.stringify({ date: selectedDate, fund: selectedFunds, beta_period: betaPeriod }),
             signal,
           }),
           fetch(`${apiUrl}/api/portfolio_cumulative_pnl_chart/`, {
@@ -187,7 +188,7 @@ const RiskDashboard: React.FC = () => {
     fetchAllPnlData();
 
     return () => { if (abortRefs.current["pnlData"]) abortRefs.current["pnlData"].abort(); };
-  }, [selectedFunds, selectedDate]);
+  }, [selectedFunds, selectedDate, betaPeriod]);
 
   // Separate effect for top 10 P&L tickers — reacts to pnlPeriod
   useEffect(() => {
@@ -332,6 +333,7 @@ const RiskDashboard: React.FC = () => {
               fund: selectedFunds,
               metric: selectedCategory,
               period: selectedMetric,
+              beta_period: betaPeriod,
             }),
             signal,
           }),
@@ -342,6 +344,7 @@ const RiskDashboard: React.FC = () => {
               date: selectedDate,
               fund: selectedFunds,
               metric: selectedCategory,
+              beta_period: betaPeriod,
             }),
             signal,
           }),
@@ -352,6 +355,7 @@ const RiskDashboard: React.FC = () => {
               date: selectedDate,
               fund: selectedFunds,
               metric: selectedCategory,
+              beta_period: betaPeriod,
             }),
             signal,
           }),
@@ -399,7 +403,7 @@ const RiskDashboard: React.FC = () => {
     fetchAllMetricData();
 
     return () => { if (abortRefs.current["metricData"]) abortRefs.current["metricData"].abort(); };
-  }, [selectedFunds, selectedDate, selectedCategory, selectedMetric]);
+  }, [selectedFunds, selectedDate, selectedCategory, selectedMetric, betaPeriod]);
 
   // Fetch metric top/bottom data for the shared table category
   useEffect(() => {
@@ -650,6 +654,8 @@ const RiskDashboard: React.FC = () => {
                 pnlData={data.headline_pnl}
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
+                betaPeriod={betaPeriod}
+                onBetaPeriodChange={setBetaPeriod}
               />
               {/* Category Toggles + Headline PNL in one row */}
               <Box className="category-pnl-row">
@@ -738,6 +744,7 @@ const RiskDashboard: React.FC = () => {
             <Attribution
               selectedFunds={selectedFunds}
               selectedDate={selectedDate}
+              betaPeriod={betaPeriod}
             />
           </Box>
 
@@ -748,6 +755,7 @@ const RiskDashboard: React.FC = () => {
                 ref={attributionAllTabsRef}
                 selectedFunds={selectedFunds}
                 selectedDate={selectedDate}
+                betaPeriod={betaPeriod}
               />
             </Box>
           )}

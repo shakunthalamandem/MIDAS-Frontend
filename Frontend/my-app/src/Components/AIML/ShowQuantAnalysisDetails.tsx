@@ -125,7 +125,7 @@ const ShowQuantAnalysisDetails: React.FC = () => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/quant_agent")}
+            onClick={() => navigate(`/quant_agent?deal_type=${dealType}`)}
             sx={{
               textTransform: "none",
               color: "#4f46e5",

@@ -97,6 +97,7 @@ const GROUP_BY_TABS: TabThemeWithPage[] = [
 interface AttributionAllTabsProps {
   selectedFunds: string[];
   selectedDate: string;
+  betaPeriod?: "1m" | "3m" | "6m";
 }
 
 export interface AttributionAllTabsHandle {
@@ -106,7 +107,7 @@ export interface AttributionAllTabsHandle {
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTabsProps>(
-  ({ selectedFunds, selectedDate }, ref) => {
+  ({ selectedFunds, selectedDate, betaPeriod = "1m" }, ref) => {
     const [allData, setAllData] = useState<Record<string, AttributionItem[]>>({});
     const [loading, setLoading] = useState(false);
 
@@ -129,6 +130,7 @@ const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTa
                   date: selectedDate,
                   fund: selectedFunds,
                   group_by: tab.key,
+                  beta_period: betaPeriod,
                 }),
               }
             );
@@ -147,7 +149,7 @@ const AttributionAllTabs = forwardRef<AttributionAllTabsHandle, AttributionAllTa
       } finally {
         setLoading(false);
       }
-    }, [selectedFunds, selectedDate]);
+    }, [selectedFunds, selectedDate, betaPeriod]);
 
     useImperativeHandle(ref, () => ({
       fetchAllData: fetchAll,
