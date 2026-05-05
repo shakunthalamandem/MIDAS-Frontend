@@ -1645,6 +1645,63 @@
   margin-bottom: 12px;
 }
 
+.tb-pnl-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.tb-pnl-category-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.tb-pnl-category-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  user-select: none;
+}
+
+.tb-pnl-category-btn:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+.tb-pnl-category-btn--active {
+  background: linear-gradient(135deg, #002060 0%, #003494 100%);
+  border-color: #002060;
+  box-shadow: 0 3px 10px rgba(0, 32, 96, 0.28);
+}
+
+.tb-pnl-category-btn--active .tb-pnl-category-label {
+  color: #fff;
+  font-weight: 700;
+}
+
+.tb-pnl-category-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.tb-pnl-category-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
 .tb-pnl-period-toggle {
   display: inline-flex;
   align-items: center;
@@ -1708,6 +1765,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
 
 .tb-pnl-header--top {
   background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);

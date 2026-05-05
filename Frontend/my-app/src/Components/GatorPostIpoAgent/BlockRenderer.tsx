@@ -4,7 +4,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Typography,
@@ -403,16 +402,19 @@ const NUMERIC_HEADER = /price|open|high|low|close|volume|return|change|%|offer|s
 const TABLE_DEFAULT_VISIBLE = 8;
 const TABLE_COLLAPSE_THRESHOLD = 12;
 
+/** Headers that contain long narrative text — give them a generous min-width and allow wrapping. */
+const NOTES_HEADER = /note|comment|narrative|description|detail|observation|remark|analysis|context|summary/i;
+
 const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
   const totalRows = block.rows.length;
   const collapsible = totalRows > TABLE_COLLAPSE_THRESHOLD;
   const [expanded, setExpanded] = useState(false);
   const visibleRows = collapsible && !expanded ? block.rows.slice(0, TABLE_DEFAULT_VISIBLE) : block.rows;
 
-  // Decide column alignment from header AND from sampled cells (majority numeric → right-align).
   const colAlignRight = useMemo(() => {
     return block.headers.map((h, ci) => {
-      if (ci === 0) return false; // first column is always the row label
+      if (ci === 0) return false;
+      if (NOTES_HEADER.test(h || "")) return false; // narrative columns always left
       if (NUMERIC_HEADER.test(h || "")) return true;
       let numeric = 0;
       let total = 0;
@@ -426,6 +428,12 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
     });
   }, [block.headers, block.rows]);
 
+  /** True for columns whose header is explicitly a notes/narrative column. */
+  const isNotesCol = useMemo(
+    () => block.headers.map((h) => NOTES_HEADER.test(h || "")),
+    [block.headers],
+  );
+
   return (
     <Box
       sx={{
@@ -433,14 +441,14 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
         border: "1px solid #e2e8f0",
         borderRadius: 3,
         overflow: "hidden",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
       {block.title && (
         <Box
           sx={{
-            px: 2.2,
-            py: 1.5,
+            px: 2.5,
+            py: 1.6,
             bgcolor: "#0f2d4a",
             display: "flex",
             alignItems: "center",
@@ -454,7 +462,7 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
               fontWeight: 800,
               color: "#fff",
               textTransform: "uppercase",
-              letterSpacing: "0.06em",
+              letterSpacing: "0.07em",
               lineHeight: 1.4,
             }}
           >
@@ -479,28 +487,31 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
                 px: 1.4,
                 py: 0.5,
                 cursor: "pointer",
-                transition: "background 0.15s ease, transform 0.15s ease",
+                transition: "background 0.15s ease",
                 "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
-                "&:active": { transform: "translateY(1px)" },
               }}
             >
               {expanded ? (
-                <>
-                  <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
-                  Show less
-                </>
+                <><KeyboardArrowUpIcon sx={{ fontSize: 16 }} />Show less</>
               ) : (
-                <>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
-                  Show all ({totalRows})
-                </>
+                <><KeyboardArrowDownIcon sx={{ fontSize: 16 }} />Show all ({totalRows})</>
               )}
             </Box>
           )}
         </Box>
       )}
-      <TableContainer sx={{ overflowX: "auto" }}>
-        <Table size="small" sx={{ minWidth: 640, tableLayout: "auto" }}>
+
+      {/* Scrollable wrapper — table never collapses, it scrolls horizontally */}
+      <Box sx={{ overflowX: "auto", width: "100%" }}>
+        <Table
+          size="small"
+          sx={{
+            tableLayout: "auto",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            "& td, & th": { borderBottom: "1px solid #e2e8f0" },
+          }}
+        >
           <TableHead>
             <TableRow sx={{ bgcolor: "#f1f5f9" }}>
               {block.headers.map((h, i) => (
@@ -508,16 +519,23 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
                   key={i}
                   align={colAlignRight[i] ? "right" : "left"}
                   sx={{
-                    fontSize: "0.7rem",
+                    fontSize: "0.68rem",
                     fontWeight: 800,
-                    color: "#0f172a",
+                    color: "#334155",
                     textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    py: 1.3,
-                    px: 1.6,
+                    letterSpacing: "0.07em",
+                    py: 1.1,
+                    px: 1.5,
                     borderBottom: "2px solid #cbd5e1",
                     whiteSpace: "nowrap",
                     verticalAlign: "bottom",
+                    bgcolor: "#f1f5f9",
+                    // Notes column gets a generous width hint
+                    ...(isNotesCol[i] && { minWidth: 320 }),
+                    // Numeric columns stay compact
+                    ...(colAlignRight[i] && { minWidth: 72 }),
+                    // First label column — consistent width
+                    ...(i === 0 && { minWidth: 80 }),
                   }}
                 >
                   {h}
@@ -531,7 +549,9 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
                 key={ri}
                 sx={{
                   "&:nth-of-type(even)": { bgcolor: "#f8fafc" },
-                  "&:hover": { bgcolor: "#ecfeff" },
+                  "&:last-child td": { borderBottom: "none" },
+                  "&:hover": { bgcolor: "#f0f9ff" },
+                  transition: "background 0.1s",
                 }}
               >
                 {row.map((cell, ci) => {
@@ -539,61 +559,24 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
                   const header = block.headers[ci];
 
                   if (isVerdictCell(cellStr, header)) {
-                  const tone = VERDICT_CELL_TONE(cellStr);
-                  return (
-                    <TableCell
-                      key={ci}
-                      sx={{
-                        py: 1.2,
-                        px: 1.6,
-                        verticalAlign: "top",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "inline-block",
-                          px: 1.2,
-                          py: 0.3,
-                          borderRadius: 1.5,
-                          bgcolor: tone.bg,
-                          color: tone.color,
-                          fontWeight: 700,
-                          fontSize: "0.7rem",
-                          letterSpacing: "0.04em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {cellStr}
-                      </Box>
-                    </TableCell>
-                  );
-                }
-
-                if (isSeverityCell(cellStr, header)) {
-                  const tone = SEVERITY_TONE(cellStr);
-                  if (tone) {
+                    const tone = VERDICT_CELL_TONE(cellStr);
                     return (
                       <TableCell
                         key={ci}
-                        sx={{
-                          py: 1.2,
-                          px: 1.6,
-                          verticalAlign: "top",
-                          whiteSpace: "nowrap",
-                        }}
+                        sx={{ py: 1.1, px: 1.5, verticalAlign: "top", whiteSpace: "nowrap" }}
                       >
                         <Box
                           sx={{
                             display: "inline-block",
-                            px: 1.2,
+                            px: 1.1,
                             py: 0.3,
                             borderRadius: 1.5,
                             bgcolor: tone.bg,
                             color: tone.color,
                             fontWeight: 700,
-                            fontSize: "0.7rem",
-                            letterSpacing: "0.04em",
+                            fontSize: "0.68rem",
+                            letterSpacing: "0.05em",
+                            textTransform: "uppercase",
                           }}
                         >
                           {cellStr}
@@ -601,38 +584,69 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
                       </TableCell>
                     );
                   }
-                }
 
-                const numeric = isNumericCell(cellStr);
-                const rightAlign = colAlignRight[ci];
-                return (
-                  <TableCell
-                    key={ci}
-                    align={rightAlign ? "right" : "left"}
-                    sx={{
-                      py: 1.2,
-                      px: 1.6,
-                      fontSize: "0.8rem",
-                      color: "#1e293b",
-                      fontWeight: ci === 0 ? 700 : numeric ? 600 : 500,
-                      lineHeight: 1.55,
-                      // Numeric columns get tabular-nums + normal break behavior so digits stay aligned.
-                      whiteSpace: rightAlign ? "nowrap" : "normal",
-                      wordBreak: rightAlign ? "normal" : "break-word",
-                      overflowWrap: rightAlign ? "normal" : "anywhere",
-                      verticalAlign: "top",
-                      fontVariantNumeric: rightAlign ? "tabular-nums" : "normal",
-                    }}
-                  >
-                    {cellStr}
-                  </TableCell>
-                );
+                  if (isSeverityCell(cellStr, header)) {
+                    const tone = SEVERITY_TONE(cellStr);
+                    if (tone) {
+                      return (
+                        <TableCell
+                          key={ci}
+                          sx={{ py: 1.1, px: 1.5, verticalAlign: "top", whiteSpace: "nowrap" }}
+                        >
+                          <Box
+                            sx={{
+                              display: "inline-block",
+                              px: 1.1,
+                              py: 0.3,
+                              borderRadius: 1.5,
+                              bgcolor: tone.bg,
+                              color: tone.color,
+                              fontWeight: 700,
+                              fontSize: "0.68rem",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {cellStr}
+                          </Box>
+                        </TableCell>
+                      );
+                    }
+                  }
+
+                  const numeric = isNumericCell(cellStr);
+                  const rightAlign = colAlignRight[ci];
+                  const notesCol = isNotesCol[ci];
+
+                  return (
+                    <TableCell
+                      key={ci}
+                      align={rightAlign ? "right" : "left"}
+                      sx={{
+                        py: 1.1,
+                        px: 1.5,
+                        fontSize: "0.8rem",
+                        color: "#1e293b",
+                        fontWeight: ci === 0 ? 700 : numeric ? 600 : 400,
+                        lineHeight: 1.6,
+                        verticalAlign: "top",
+                        // First column and numeric columns never wrap
+                        whiteSpace: ci === 0 || rightAlign ? "nowrap" : "normal",
+                        // Notes/narrative columns wrap freely with a min-width guarantee
+                        ...(notesCol && { minWidth: 320, whiteSpace: "normal", wordBreak: "break-word" }),
+                        // Numeric alignment
+                        fontVariantNumeric: rightAlign ? "tabular-nums" : "normal",
+                      }}
+                    >
+                      {cellStr}
+                    </TableCell>
+                  );
                 })}
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </Box>
+
       {collapsible && (
         <Box
           sx={{
@@ -669,15 +683,9 @@ const TableBlockCmp: React.FC<{ block: GatorTableBlock }> = ({ block }) => {
             }}
           >
             {expanded ? (
-              <>
-                <KeyboardArrowUpIcon sx={{ fontSize: 16 }} />
-                Show less
-              </>
+              <><KeyboardArrowUpIcon sx={{ fontSize: 16 }} />Show less</>
             ) : (
-              <>
-                <KeyboardArrowDownIcon sx={{ fontSize: 16 }} />
-                Show all {totalRows} rows
-              </>
+              <><KeyboardArrowDownIcon sx={{ fontSize: 16 }} />Show all {totalRows} rows</>
             )}
           </Box>
           <Typography sx={{ fontSize: "0.7rem", color: "#64748b" }}>
