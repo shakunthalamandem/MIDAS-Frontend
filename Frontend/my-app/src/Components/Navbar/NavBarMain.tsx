@@ -357,7 +357,7 @@ const NavbarMain: React.FC = () => {
               </span>
             </Button>
 
-            <Button
+            {/* <Button
               onClick={() => {
                 setSelectedTab("Monthly Dec");
                 localStorage.setItem("selectedTab", "Monthly Dec");
@@ -381,7 +381,7 @@ const NavbarMain: React.FC = () => {
               }}
             >
               Monthly Dec
-            </Button>
+            </Button> */}
 
             <Tooltip title="Chat with EMMY — your private MIDAS AI partner (built on OpenClaw)">
               <Button
