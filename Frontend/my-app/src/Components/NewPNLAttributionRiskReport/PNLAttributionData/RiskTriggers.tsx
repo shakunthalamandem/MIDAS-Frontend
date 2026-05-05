@@ -588,6 +588,49 @@ const RiskTriggers: React.FC = () => {
               </IconButton>
             </Tooltip>
 
+            {/* AUM multiplier technical note */}
+            <Tooltip
+              placement="bottom-end"
+              arrow
+              title={
+                <Box sx={{ p: 0.5 }}>
+                  <Box sx={{ fontWeight: 700, fontSize: "11px", letterSpacing: "0.05em", textTransform: "uppercase", color: "#90caf9", mb: 1 }}>
+                    AUM Multiplier
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, bgcolor: "rgba(255,255,255,0.07)", borderRadius: 1, px: 1.2, py: 0.6 }}>
+                      <Box sx={{ fontSize: "12px", fontWeight: 600, color: "#e0f2fe" }}>BHM Fund</Box>
+                      <Box sx={{ fontSize: "12px", fontWeight: 700, color: "#34d399" }}>3× AUM</Box>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, bgcolor: "rgba(255,255,255,0.07)", borderRadius: 1, px: 1.2, py: 0.6 }}>
+                      <Box sx={{ fontSize: "12px", fontWeight: 600, color: "#e0f2fe" }}>Other Funds</Box>
+                      <Box sx={{ fontSize: "12px", fontWeight: 700, color: "#60a5fa" }}>2× AUM</Box>
+                    </Box>
+                  </Box>
+                  <Box sx={{ fontSize: "10.5px", color: "#94a3b8", mt: 0.75, lineHeight: 1.5, borderTop: "1px solid rgba(255,255,255,0.1)", pt: 0.75 }}>
+                    Exposure % limits are calculated against adjusted AUM.
+                  </Box>
+                </Box>
+              }
+              slotProps={{
+                tooltip: { sx: { bgcolor: "#1e293b", maxWidth: 260, fontSize: "12px" } },
+                arrow: { sx: { color: "#1e293b" } },
+              }}
+            >
+              <IconButton
+                size="small"
+                sx={{
+                  color: "rgba(255,255,255,0.5)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: "8px",
+                  p: 0.75,
+                  "&:hover": { color: "#fff", borderColor: "rgba(255,255,255,0.5)", bgcolor: "rgba(255,255,255,0.08)" },
+                }}
+              >
+                <InfoOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
             <Box className="trig-header-date-nav">
               <IconButton size="small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#fff" } }}><ChevronLeftIcon fontSize="small" /></IconButton>
               <TextField type="date" size="small" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="trig-header-date" />
