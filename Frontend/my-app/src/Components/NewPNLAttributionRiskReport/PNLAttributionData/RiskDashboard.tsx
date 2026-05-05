@@ -703,6 +703,23 @@ const RiskDashboard: React.FC = () => {
             />
           </Box>
 
+          <Box className="pdf-section" data-pdf-page="1">
+            <TopBottomPnLTable
+              top10={topBottomTop}
+              bottom10={topBottomBottom}
+              topLoading={loading || topBottomLoading}
+              bottomLoading={loading || bottomLoading}
+              category={tableCategory}
+              onCategoryChange={setTableCategory}
+              metricTop10={metricTop10}
+              metricBottom10={metricBottom10}
+              metricTopLoading={metricTopLoading}
+              metricBottomLoading={metricBottomLoading}
+              period={pnlPeriod}
+              onPeriodChange={setPnlPeriod}
+            />
+          </Box>
+
           {data.indexes_comparison && (
             <Box className="pdf-section" data-pdf-page="1">
               <IndexesComparison
@@ -722,23 +739,6 @@ const RiskDashboard: React.FC = () => {
               />
             </Box>
           )}
-
-          <Box className="pdf-section" data-pdf-page="1">
-            <TopBottomPnLTable
-              top10={topBottomTop}
-              bottom10={topBottomBottom}
-              topLoading={loading || topBottomLoading}
-              bottomLoading={loading || bottomLoading}
-              category={tableCategory}
-              onCategoryChange={setTableCategory}
-              metricTop10={metricTop10}
-              metricBottom10={metricBottom10}
-              metricTopLoading={metricTopLoading}
-              metricBottomLoading={metricBottomLoading}
-              period={pnlPeriod}
-              onPeriodChange={setPnlPeriod}
-            />
-          </Box>
 
           <Box className="pdf-section attribution-interactive">
             <Attribution
