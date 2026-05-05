@@ -54,13 +54,16 @@ const RiskDashboard: React.FC = () => {
   const [indexChartData, setIndexChartData] = useState<IndexComparisonChartPoint[]>([]);
   const [topBottomTop, setTopBottomTop] = useState<TopBottomPnlTicker[]>([]);
   const [topBottomBottom, setTopBottomBottom] = useState<TopBottomPnlTicker[]>([]);
-  const [topBottomPeriod, setTopBottomPeriod] = useState<PnlPeriod>("dtd");
+  const [pnlPeriod, setPnlPeriod] = useState<PnlPeriod>("dtd");
   const [topBottomLoading, setTopBottomLoading] = useState(false);
+  const [bottomLoading, setBottomLoading] = useState(false);
+  const [tableCategory, setTableCategory] = useState<DashboardCategory>("pnl");
   const [metricChartData, setMetricChartData] = useState<MetricChartDataPoint[]>([]);
   const [metricChartLoading, setMetricChartLoading] = useState(false);
   const [metricTop10, setMetricTop10] = useState<TopBottomMetricTicker[]>([]);
   const [metricBottom10, setMetricBottom10] = useState<TopBottomMetricTicker[]>([]);
-  const [metricTopBottomLoading, setMetricTopBottomLoading] = useState(false);
+  const [metricTopLoading, setMetricTopLoading] = useState(false);
+  const [metricBottomLoading, setMetricBottomLoading] = useState(false);
   const [metricHeadlineData, setMetricHeadlineData] = useState<HeadlineMetricValues | null>(null);
   const [metricHeadlineLoading, setMetricHeadlineLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -186,14 +189,14 @@ const RiskDashboard: React.FC = () => {
     return () => { if (abortRefs.current["pnlData"]) abortRefs.current["pnlData"].abort(); };
   }, [selectedFunds, selectedDate]);
 
-  // Separate effect for top/bottom P&L tickers — reacts to period toggle
+  // Separate effect for top 10 P&L tickers — reacts to pnlPeriod
   useEffect(() => {
     if (selectedFunds.length === 0 || !selectedDate) return;
 
-    const signal = getSignal("topBottomPnl");
+    const signal = getSignal("topPnl");
     setTopBottomLoading(true);
 
-    const fetchTopBottom = async () => {
+    const fetchTop = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
           method: "POST",
@@ -201,7 +204,7 @@ const RiskDashboard: React.FC = () => {
           body: JSON.stringify({
             date: selectedDate,
             fund: selectedFunds,
-            period: topBottomPeriod,
+            period: pnlPeriod,
           }),
           signal,
         });
@@ -209,24 +212,60 @@ const RiskDashboard: React.FC = () => {
         if (res.ok) {
           const result = await res.json();
           setTopBottomTop(result.top_10 || []);
-          setTopBottomBottom(result.bottom_10 || []);
         } else {
           setTopBottomTop([]);
-          setTopBottomBottom([]);
         }
       } catch (err: any) {
         if (err.name === "AbortError") return;
         setTopBottomTop([]);
-        setTopBottomBottom([]);
       } finally {
         if (!signal.aborted) setTopBottomLoading(false);
       }
     };
 
-    fetchTopBottom();
+    fetchTop();
 
-    return () => { if (abortRefs.current["topBottomPnl"]) abortRefs.current["topBottomPnl"].abort(); };
-  }, [selectedFunds, selectedDate, topBottomPeriod]);
+    return () => { if (abortRefs.current["topPnl"]) abortRefs.current["topPnl"].abort(); };
+  }, [selectedFunds, selectedDate, pnlPeriod]);
+
+  // Separate effect for bottom 10 P&L tickers — reacts to pnlPeriod
+  useEffect(() => {
+    if (selectedFunds.length === 0 || !selectedDate) return;
+
+    const signal = getSignal("bottomPnl");
+    setBottomLoading(true);
+
+    const fetchBottom = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/top_bottom_pnl_tickers/`, {
+          method: "POST",
+          headers: getAuthHeaders("application/json"),
+          body: JSON.stringify({
+            date: selectedDate,
+            fund: selectedFunds,
+            period: pnlPeriod,
+          }),
+          signal,
+        });
+        if (signal.aborted) return;
+        if (res.ok) {
+          const result = await res.json();
+          setTopBottomBottom(result.bottom_10 || []);
+        } else {
+          setTopBottomBottom([]);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setTopBottomBottom([]);
+      } finally {
+        if (!signal.aborted) setBottomLoading(false);
+      }
+    };
+
+    fetchBottom();
+
+    return () => { if (abortRefs.current["bottomPnl"]) abortRefs.current["bottomPnl"].abort(); };
+  }, [selectedFunds, selectedDate, pnlPeriod]);
 
   // Separate effect for chart data when only metric changes (not funds/date)
   useEffect(() => {
@@ -279,7 +318,7 @@ const RiskDashboard: React.FC = () => {
 
     const signal = getSignal("metricData");
     setMetricChartLoading(true);
-    setMetricTopBottomLoading(true);
+
     setMetricHeadlineLoading(true);
 
     const fetchAllMetricData = async () => {
@@ -351,7 +390,7 @@ const RiskDashboard: React.FC = () => {
       } finally {
         if (!signal.aborted) {
           setMetricChartLoading(false);
-          setMetricTopBottomLoading(false);
+
           setMetricHeadlineLoading(false);
         }
       }
@@ -361,6 +400,44 @@ const RiskDashboard: React.FC = () => {
 
     return () => { if (abortRefs.current["metricData"]) abortRefs.current["metricData"].abort(); };
   }, [selectedFunds, selectedDate, selectedCategory, selectedMetric]);
+
+  // Fetch metric top/bottom data for the shared table category
+  useEffect(() => {
+    if (selectedFunds.length === 0 || !selectedDate || tableCategory === "pnl") {
+      if (tableCategory === "pnl") { setMetricTop10([]); setMetricBottom10([]); }
+      return;
+    }
+    const signal = getSignal("metricTableData");
+    setMetricTopLoading(true);
+    setMetricBottomLoading(true);
+    const fetchMetricTableData = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/portfolio_metric_top_bottom/`, {
+          method: "POST",
+          headers: getAuthHeaders("application/json"),
+          body: JSON.stringify({ date: selectedDate, fund: selectedFunds, metric: tableCategory }),
+          signal,
+        });
+        if (signal.aborted) return;
+        if (res.ok) {
+          const result = await res.json();
+          setMetricTop10(result.top_10 || []);
+          setMetricBottom10(result.bottom_10 || []);
+        } else {
+          setMetricTop10([]);
+          setMetricBottom10([]);
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        setMetricTop10([]);
+        setMetricBottom10([]);
+      } finally {
+        if (!signal.aborted) { setMetricTopLoading(false); setMetricBottomLoading(false); }
+      }
+    };
+    fetchMetricTableData();
+    return () => { if (abortRefs.current["metricTableData"]) abortRefs.current["metricTableData"].abort(); };
+  }, [selectedFunds, selectedDate, tableCategory]);
 
   const handleCategorySelect = (category: DashboardCategory) => {
     setSelectedCategory(category);
@@ -644,13 +721,16 @@ const RiskDashboard: React.FC = () => {
             <TopBottomPnLTable
               top10={topBottomTop}
               bottom10={topBottomBottom}
-              loading={loading || topBottomLoading}
-              category={selectedCategory}
+              topLoading={loading || topBottomLoading}
+              bottomLoading={loading || bottomLoading}
+              category={tableCategory}
+              onCategoryChange={setTableCategory}
               metricTop10={metricTop10}
               metricBottom10={metricBottom10}
-              metricLoading={metricTopBottomLoading}
-              period={topBottomPeriod}
-              onPeriodChange={setTopBottomPeriod}
+              metricTopLoading={metricTopLoading}
+              metricBottomLoading={metricBottomLoading}
+              period={pnlPeriod}
+              onPeriodChange={setPnlPeriod}
             />
           </Box>
 

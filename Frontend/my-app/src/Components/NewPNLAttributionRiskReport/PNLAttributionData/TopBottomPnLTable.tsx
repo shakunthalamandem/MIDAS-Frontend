@@ -12,6 +12,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   beta_adj_net_mv: "Beta Adj. Net Exposure",
 };
 
+const CATEGORY_OPTIONS: { key: DashboardCategory; label: string; icon: string }[] = [
+  { key: "pnl", label: "P&L", icon: "💰" },
+  { key: "gross_market_value", label: "Gross Market Value", icon: "📊" },
+  { key: "delta_adj_net_mv", label: "Delta Adj. Net Exposure", icon: "📈" },
+  { key: "beta_adj_net_mv", label: "Beta Adj. Net Exposure", icon: "📉" },
+];
+
 export type PnlPeriod = "dtd" | "mtd" | "ytd";
 
 const PERIOD_OPTIONS: { key: PnlPeriod; label: string }[] = [
@@ -23,11 +30,14 @@ const PERIOD_OPTIONS: { key: PnlPeriod; label: string }[] = [
 interface TopBottomPnLTableProps {
   top10: TopBottomPnlTicker[];
   bottom10: TopBottomPnlTicker[];
-  loading: boolean;
+  topLoading: boolean;
+  bottomLoading: boolean;
   category?: DashboardCategory;
+  onCategoryChange?: (cat: DashboardCategory) => void;
   metricTop10?: TopBottomMetricTicker[];
   metricBottom10?: TopBottomMetricTicker[];
-  metricLoading?: boolean;
+  metricTopLoading?: boolean;
+  metricBottomLoading?: boolean;
   period?: PnlPeriod;
   onPeriodChange?: (period: PnlPeriod) => void;
 }
@@ -35,106 +45,104 @@ interface TopBottomPnLTableProps {
 const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
   top10,
   bottom10,
-  loading,
+  topLoading,
+  bottomLoading,
   category = "pnl",
+  onCategoryChange,
   metricTop10 = [],
   metricBottom10 = [],
-  metricLoading = false,
+  metricTopLoading = false,
+  metricBottomLoading = false,
   period = "dtd",
   onPeriodChange,
 }) => {
   const isPnl = category === "pnl";
+
   const activeTop = isPnl ? top10 : metricTop10;
   const activeBottom = isPnl ? bottom10 : metricBottom10;
-  const activeLoading = isPnl ? loading : metricLoading;
+  const isTopLoading = isPnl ? topLoading : metricTopLoading;
+  const isBottomLoading = isPnl ? bottomLoading : metricBottomLoading;
+
   const baseLabel = CATEGORY_LABELS[category] || "P&L (Gross)";
-  const periodLabel = period.toUpperCase();
-  const label = isPnl ? `${periodLabel} ${baseLabel}` : baseLabel;
-  const valueKey = isPnl ? "pnl" : "value";
-
-  const periodToggle = isPnl && onPeriodChange ? (
-    <Box className="tb-pnl-period-toggle" role="tablist" aria-label="PNL period">
-      {PERIOD_OPTIONS.map((opt) => (
-        <Box
-          key={opt.key}
-          role="tab"
-          aria-selected={period === opt.key}
-          className={`tb-pnl-period-btn${period === opt.key ? " tb-pnl-period-btn--active" : ""}`}
-          onClick={() => onPeriodChange(opt.key)}
-        >
-          {opt.label}
-        </Box>
-      ))}
-    </Box>
-  ) : null;
-
-  if (activeLoading) {
-    return (
-      <Box className="risk-dashboard-section">
-        {periodToggle && (
-          <Box className="tb-pnl-toolbar">{periodToggle}</Box>
-        )}
-        <Box className="risk-dashboard-loading" sx={{ minHeight: 200 }}>
-          <CircularProgress size={32} />
-        </Box>
-      </Box>
-    );
-  }
-
-  if (activeTop.length === 0 && activeBottom.length === 0) {
-    if (!periodToggle) return null;
-    return (
-      <Box className="risk-dashboard-section">
-        <Box className="tb-pnl-toolbar">{periodToggle}</Box>
-        <Box className="tb-pnl-empty" sx={{ padding: "24px 16px" }}>No data available</Box>
-      </Box>
-    );
-  }
+  const tableLabel = isPnl ? `${period.toUpperCase()} ${baseLabel}` : baseLabel;
 
   return (
     <Box className="risk-dashboard-section">
-      {periodToggle && (
-        <Box className="tb-pnl-toolbar">{periodToggle}</Box>
-      )}
+      {/* Toolbar: category buttons left, period toggle right */}
+      <Box className="tb-pnl-toolbar-row">
+        <Box className="tb-pnl-category-bar">
+          {CATEGORY_OPTIONS.map((opt) => (
+            <Box
+              key={opt.key}
+              className={`tb-pnl-category-btn${category === opt.key ? " tb-pnl-category-btn--active" : ""}`}
+              onClick={() => onCategoryChange?.(opt.key)}
+            >
+              <span className="tb-pnl-category-icon">{opt.icon}</span>
+              <span className="tb-pnl-category-label">{opt.label}</span>
+            </Box>
+          ))}
+        </Box>
+
+        {isPnl && onPeriodChange && (
+          <Box className="tb-pnl-period-toggle" role="tablist" aria-label="PNL period">
+            {PERIOD_OPTIONS.map((opt) => (
+              <Box
+                key={opt.key}
+                role="tab"
+                aria-selected={period === opt.key}
+                className={`tb-pnl-period-btn${period === opt.key ? " tb-pnl-period-btn--active" : ""}`}
+                onClick={() => onPeriodChange(opt.key)}
+              >
+                {opt.label}
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+
       <Box className="tb-pnl-container">
         {/* Top 10 */}
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--top">
             <TrendingUpIcon sx={{ fontSize: 20 }} />
-            <span>Top 10 {label}</span>
+            <span>Top 10 {tableLabel}</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
-            <table className="tb-pnl-table">
-              <thead>
-                <tr>
-                  <th className="tb-pnl-th tb-pnl-th--rank">#</th>
-                  <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
-                  <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
-                  <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeTop.map((item: any, idx: number) => (
-                  <tr key={item.ticker} className="tb-pnl-row">
-                    <td className="tb-pnl-td tb-pnl-td--rank">
-                      <span className="tb-pnl-rank-badge tb-pnl-rank-badge--top">
-                        {idx + 1}
-                      </span>
-                    </td>
-                    <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
-                    <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
-                    <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-positive">
-                      {formatFullCurrency(item[valueKey])}
-                    </td>
-                  </tr>
-                ))}
-                {activeTop.length === 0 && (
+            {isTopLoading ? (
+              <Box className="risk-dashboard-loading" sx={{ minHeight: 160 }}>
+                <CircularProgress size={28} />
+              </Box>
+            ) : (
+              <table className="tb-pnl-table">
+                <thead>
                   <tr>
-                    <td colSpan={4} className="tb-pnl-empty">No data available</td>
+                    <th className="tb-pnl-th tb-pnl-th--rank">#</th>
+                    <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
+                    <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
+                    <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {activeTop.map((item: any, idx: number) => (
+                    <tr key={item.ticker} className="tb-pnl-row">
+                      <td className="tb-pnl-td tb-pnl-td--rank">
+                        <span className="tb-pnl-rank-badge tb-pnl-rank-badge--top">{idx + 1}</span>
+                      </td>
+                      <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
+                      <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
+                      <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-positive">
+                        {formatFullCurrency(isPnl ? item.pnl : item.value)}
+                      </td>
+                    </tr>
+                  ))}
+                  {activeTop.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="tb-pnl-empty">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </Box>
         </Box>
 
@@ -142,40 +150,44 @@ const TopBottomPnLTable: React.FC<TopBottomPnLTableProps> = ({
         <Box className="tb-pnl-card">
           <Box className="tb-pnl-header tb-pnl-header--bottom">
             <TrendingDownIcon sx={{ fontSize: 20 }} />
-            <span>Bottom 10 {label}</span>
+            <span>Bottom 10 {tableLabel}</span>
           </Box>
           <Box className="tb-pnl-table-wrapper">
-            <table className="tb-pnl-table">
-              <thead>
-                <tr>
-                  <th className="tb-pnl-th tb-pnl-th--rank">#</th>
-                  <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
-                  <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
-                  <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeBottom.map((item: any, idx: number) => (
-                  <tr key={item.ticker} className="tb-pnl-row">
-                    <td className="tb-pnl-td tb-pnl-td--rank">
-                      <span className="tb-pnl-rank-badge tb-pnl-rank-badge--bottom">
-                        {idx + 1}
-                      </span>
-                    </td>
-                    <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
-                    <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
-                    <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-negative">
-                      {formatFullCurrency(item[valueKey])}
-                    </td>
-                  </tr>
-                ))}
-                {activeBottom.length === 0 && (
+            {isBottomLoading ? (
+              <Box className="risk-dashboard-loading" sx={{ minHeight: 160 }}>
+                <CircularProgress size={28} />
+              </Box>
+            ) : (
+              <table className="tb-pnl-table">
+                <thead>
                   <tr>
-                    <td colSpan={4} className="tb-pnl-empty">No data available</td>
+                    <th className="tb-pnl-th tb-pnl-th--rank">#</th>
+                    <th className="tb-pnl-th tb-pnl-th--ticker">Ticker</th>
+                    <th className="tb-pnl-th tb-pnl-th--issuer">Issuer</th>
+                    <th className="tb-pnl-th tb-pnl-th--pnl">{isPnl ? "P&L" : "Value"}</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {activeBottom.map((item: any, idx: number) => (
+                    <tr key={item.ticker} className="tb-pnl-row">
+                      <td className="tb-pnl-td tb-pnl-td--rank">
+                        <span className="tb-pnl-rank-badge tb-pnl-rank-badge--bottom">{idx + 1}</span>
+                      </td>
+                      <td className="tb-pnl-td tb-pnl-td--ticker">{item.ticker}</td>
+                      <td className="tb-pnl-td tb-pnl-td--issuer">{item.issuer}</td>
+                      <td className="tb-pnl-td tb-pnl-td--pnl tb-pnl-negative">
+                        {formatFullCurrency(isPnl ? item.pnl : item.value)}
+                      </td>
+                    </tr>
+                  ))}
+                  {activeBottom.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="tb-pnl-empty">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </Box>
         </Box>
       </Box>
