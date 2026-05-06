@@ -292,6 +292,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     </TableSortLabel>
                   </TableCell>
                 )}
+                
                 {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
                   <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'quant_signal' ? sortDirection : false}>
                     <TableSortLabel
