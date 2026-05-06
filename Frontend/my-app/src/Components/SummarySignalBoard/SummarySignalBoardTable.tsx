@@ -23,6 +23,8 @@ import { CardType, DealData } from './types';
 import {
   getSentimentColor,
   getPredictionColor,
+  getQuantSignalColor,
+  getGatorSignalColor,
   parseVolatilityOutlook,
   getPricingDate,
 } from './utils';
@@ -84,6 +86,11 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
       if (sortColumn === 'gator_signal') {
         aValue = a.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
         bValue = b.jay_ritter?.json_data?.analysis?.composite_score?.signal || '';
+      }
+
+      if (sortColumn === 'quant_signal') {
+        aValue = a.quant_agent?.quant_signal || '';
+        bValue = b.quant_agent?.quant_signal || '';
       }
 
       if (sortColumn === 'technical_agent') {
@@ -311,6 +318,18 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                   </TableSortLabel>
                 </TableCell>
 
+                {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
+                  <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'quant_signal' ? sortDirection : false}>
+                    <TableSortLabel
+                      active={sortColumn === 'quant_signal'}
+                      direction={sortColumn === 'quant_signal' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('quant_signal')}
+                    >
+                      Quant Signal
+                    </TableSortLabel>
+                  </TableCell>
+                )}
+
                 {selectedCard === 'portfolio' && (
                   <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'technical_agent' ? sortDirection : false}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -474,9 +493,12 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
                         {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                            <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
-                              {deal.jay_ritter.json_data.analysis.composite_score.signal}
-                            </Typography>
+                            <Chip
+                              label={deal.jay_ritter.json_data.analysis.composite_score.signal}
+                              size="small"
+                              color={getGatorSignalColor(deal.jay_ritter.json_data.analysis.composite_score.signal)}
+                              sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                            />
                             <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
                               Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
                             </Typography>
@@ -495,6 +517,31 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                           </Typography>
                         )}
                       </TableCell>
+
+                      {/* Quant Signal Column */}
+                      {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
+                        <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                          {deal.quant_agent?.quant_signal ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              <Chip
+                                label={deal.quant_agent.quant_signal}
+                                size="small"
+                                color={getQuantSignalColor(deal.quant_agent.quant_signal)}
+                                sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                              />
+                              {deal.quant_agent?.run_date && (
+                                <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                  Last run: {new Date(deal.quant_agent.run_date).toLocaleDateString()}
+                                </Typography>
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="textSecondary">
+                              None
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )}
 
                       {/* Technical Agent Column */}
                       {selectedCard === 'portfolio' && (

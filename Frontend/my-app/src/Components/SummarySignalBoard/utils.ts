@@ -20,6 +20,26 @@ export const getPredictionColor = (prediction: string | null) => {
   return 'default' as const;
 };
 
+// Helper function for quant signal color
+export const getQuantSignalColor = (signal: string | null) => {
+  if (!signal) return 'default' as const;
+  const lower = signal.toLowerCase();
+  if (lower.includes('buy')) return 'success' as const;
+  if (lower.includes('sell')) return 'error' as const;
+  if (lower.includes('hold')) return 'warning' as const;
+  return 'default' as const;
+};
+
+// Helper function for gator signal color (same as sentiment)
+export const getGatorSignalColor = (signal: string | null) => {
+  if (!signal) return 'default' as const;
+  const lower = signal.toLowerCase();
+  if (lower.includes('bullish')) return 'success' as const;
+  if (lower.includes('bearish')) return 'error' as const;
+  if (lower.includes('neutral')) return 'warning' as const;
+  return 'default' as const;
+};
+
 // Parse volatility outlook from few_shot_review JSON
 export const parseVolatilityOutlook = (unsupervisedData: any, ticker: string) => {
   if (!unsupervisedData?.few_shot_review) return null;
