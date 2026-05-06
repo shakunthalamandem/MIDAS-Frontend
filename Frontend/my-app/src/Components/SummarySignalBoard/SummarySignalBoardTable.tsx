@@ -33,19 +33,22 @@ interface SummarySignalBoardTableProps {
   selectedCard: CardType;
   selectedData: DealData[];
   onClose: () => void;
+  searchTicker: string;
+  onSearchChange: (value: string) => void;
 }
 
 const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   selectedCard,
   selectedData,
   onClose,
+  searchTicker,
+  onSearchChange,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [searchTicker, setSearchTicker] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('trade_date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [isTableExpanded, setIsTableExpanded] = useState(false);
+  const [isTableExpanded, setIsTableExpanded] = useState(true);
 
   const filteredData = useMemo(() => {
     let filtered = selectedData.filter((deal) =>
@@ -154,84 +157,6 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-          pb: 2,
-          gap: 2,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Typography variant="h6" component="div" sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#1f2937' }}>
-            {getTableTitle()}
-          </Typography>
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: '40px',
-              height: '32px',
-              borderRadius: '8px',
-              backgroundColor: '#4f46e5',
-              color: '#ffffff',
-              fontSize: '0.9rem',
-              fontWeight: 700,
-            }}
-          >
-            {filteredData.length}
-          </Box>
-          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
-            deal{filteredData.length !== 1 ? 's' : ''}{searchTicker && ` (filtered from ${selectedData.length})`}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <TextField
-            placeholder="🔍 Search by Ticker..."
-            value={searchTicker}
-            onChange={(e) => setSearchTicker(e.target.value)}
-            size="small"
-            variant="outlined"
-            autoFocus
-            sx={{
-              width: '100%',
-              maxWidth: '350px',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                transition: 'all 0.3s ease',
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                },
-                '&.Mui-focused': {
-                  backgroundColor: 'white',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                },
-              },
-              '& .MuiOutlinedInput-input': {
-                fontSize: '0.9rem',
-                padding: '10px 14px',
-              },
-            }}
-          />
-          {/* <Button
-            onClick={onClose}
-            variant="outlined"
-            size="small"
-            sx={{
-              borderRadius: '8px',
-              textTransform: 'none',
-              fontWeight: 600,
-              mt: 0.5,
-            }}
-          >
-            Close
-          </Button> */}
-        </Box>
-      </Box>
 
       {selectedData.length > 0 ? (
         <TableContainer
@@ -411,7 +336,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       }}
                     >
                       <TableCell
-                        sx={{ width: '12%', fontWeight: 600, color: '#273faa', cursor: 'pointer', wordWrap: 'break-word', overflowWrap: 'break-word', '&:hover': { textDecoration: 'underline' } }}
+                        sx={{ width: '12%', fontWeight: 700, fontSize: '1rem', color: '#273faa', cursor: 'pointer', wordWrap: 'break-word', overflowWrap: 'break-word', '&:hover': { textDecoration: 'underline' } }}
                         onClick={() => handleTickerClick(deal)}
                       >
                         {deal.ticker}

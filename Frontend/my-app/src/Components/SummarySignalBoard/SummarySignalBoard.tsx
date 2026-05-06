@@ -7,6 +7,7 @@ import {
   Grid,
   Typography,
   CircularProgress,
+  TextField,
   useTheme,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -23,6 +24,7 @@ const SummarySignalBoard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [selectedData, setSelectedData] = useState<DealData[]>([]);
+  const [searchTicker, setSearchTicker] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL;
 
   // Get initial tab from URL query parameter
@@ -181,43 +183,42 @@ const SummarySignalBoard: React.FC = () => {
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Header with Tabs on Right */}
+        {/* Header with Title */}
+        <Box sx={{ mb: 2 }}>
+          <Typography
+            variant="h4"
+            component="h2"
+            sx={{
+              fontWeight: 800,
+              color: '#002c8b',
+              letterSpacing: '-0.5px',
+              mb: 1,
+            }}
+          >
+            Signal Board
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Select a category to view deals and their signals.
+          </Typography>
+        </Box>
+
+        {/* Tabs and Search Bar Row */}
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             mb: 3,
             gap: 2,
           }}
         >
-          <Box>
-            <Typography
-              variant="h4"
-              component="h2"
-              sx={{
-                fontWeight: 800,
-                color: '#002c8b',
-                letterSpacing: '-0.5px',
-                mb: 1,
-              }}
-            >
-              Signal Board
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Select a category to view deals and their signals.
-            </Typography>
-          </Box>
-
-          {/* Tab Buttons - Right Side */}
+          {/* Tab Buttons - Left Side */}
           <Box
             sx={{
               display: 'flex',
               gap: 1.5,
               flexWrap: 'wrap',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-start',
-              pt: 0.5,
+              alignItems: 'center',
             }}
           >
           {cards.map((card) => {
@@ -281,6 +282,45 @@ const SummarySignalBoard: React.FC = () => {
             );
           })}
           </Box>
+
+          {/* Search Bar - Right Side */}
+          <TextField
+            placeholder="🔍 Search by Ticker or Issuer..."
+            value={searchTicker}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTicker(e.target.value)}
+            size="small"
+            variant="outlined"
+            autoFocus
+            sx={{
+              width: '100%',
+              maxWidth: '300px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                '& fieldset': {
+                  borderColor: '#c7d2fe',
+                },
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  '& fieldset': {
+                    borderColor: '#4f46e5',
+                  },
+                },
+                '&.Mui-focused': {
+                  backgroundColor: 'white',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  '& fieldset': {
+                    borderColor: '#4f46e5',
+                  },
+                },
+              },
+              '& .MuiOutlinedInput-input': {
+                fontSize: '0.9rem',
+                padding: '10px 14px',
+              },
+            }}
+          />
         </Box>
 
         {/* Data Table - Inline */}
@@ -289,6 +329,8 @@ const SummarySignalBoard: React.FC = () => {
             selectedCard={selectedCard}
             selectedData={selectedData}
             onClose={handleCloseTable}
+            searchTicker={searchTicker}
+            onSearchChange={setSearchTicker}
           />
         )}
       </Box>
