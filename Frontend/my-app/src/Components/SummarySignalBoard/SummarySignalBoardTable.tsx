@@ -158,23 +158,37 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          mb: 1,
-          pb: 3,
+          alignItems: 'center',
+          mb: 2,
+          pb: 2,
           gap: 2,
         }}
       >
-        <Box>
-          <Typography variant="h6" component="div" sx={{ fontWeight: 700, fontSize: '1.25rem', mb: 0.5 }}>
-            {getTableTitle()}: {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
-            {searchTicker && `(filtered from ${selectedData.length})`}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Typography variant="h6" component="div" sx={{ fontWeight: 700, fontSize: '1.1rem', color: '#1f2937' }}>
+            {getTableTitle()}
           </Typography>
-          {/* <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.9rem' }}>
-            Showing {filteredData.length} deal{filteredData.length !== 1 ? 's' : ''}{' '}
-            {searchTicker && `(filtered from ${selectedData.length})`}
-          </Typography> */}
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '40px',
+              height: '32px',
+              borderRadius: '8px',
+              backgroundColor: '#4f46e5',
+              color: '#ffffff',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+            }}
+          >
+            {filteredData.length}
+          </Box>
+          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
+            deal{filteredData.length !== 1 ? 's' : ''}{searchTicker && ` (filtered from ${selectedData.length})`}
+          </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             placeholder="🔍 Search by Ticker..."
             value={searchTicker}
