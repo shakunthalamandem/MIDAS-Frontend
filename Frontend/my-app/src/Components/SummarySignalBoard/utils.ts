@@ -34,9 +34,9 @@ export const getQuantSignalColor = (signal: string | null) => {
 export const getGatorSignalColor = (signal: string | null) => {
   if (!signal) return 'default' as const;
   const lower = signal.toLowerCase();
-  if (lower.includes('bullish')) return 'success' as const;
-  if (lower.includes('bearish')) return 'error' as const;
-  if (lower.includes('neutral')) return 'warning' as const;
+  if (lower.includes('bullish') || lower.includes('buy')) return 'success' as const;
+  if (lower.includes('bearish') || lower.includes('sell')) return 'error' as const;
+  if (lower.includes('neutral') || lower.includes('hold')) return 'warning' as const;
   return 'default' as const;
 };
 

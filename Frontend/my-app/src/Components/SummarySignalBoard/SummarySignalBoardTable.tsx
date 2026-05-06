@@ -285,7 +285,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                     onClick={() => handleSort('gator_signal')}
                   >
-                    Gator Signal
+                    Gator Post Signal
                   </TableSortLabel>
                 </TableCell>
 
@@ -449,7 +449,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                               )}
                             {(deal.sentiment?.last_run || deal.sentiment_summary?.last_run) && (
                               <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                Last run: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
+                                Updated: {new Date(deal.sentiment?.last_run || deal.sentiment_summary?.last_run).toLocaleDateString()}
                               </Typography>
                             )}
                           </Box>
@@ -462,7 +462,30 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
 
                       {/* Gator Signal Column */}
                       <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
-                        {deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
+                        {(selectedCard === 'portfolio' || selectedCard === 'recent') ? (
+                          deal.gator_post_ipo?.gatorpost_signal ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem', fontWeight: 600 }}>
+                                Post-IPO
+                              </Typography>
+                              <Chip
+                                label={deal.gator_post_ipo.gatorpost_signal}
+                                size="small"
+                                color={getGatorSignalColor(deal.gator_post_ipo.gatorpost_signal)}
+                                sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                              />
+                              {deal.gator_post_ipo?.updated_at && (
+                                <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                  Updated: {new Date(deal.gator_post_ipo.updated_at).toLocaleDateString()}
+                                </Typography>
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="textSecondary">
+                              None
+                            </Typography>
+                          )
+                        ) : deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                             <Chip
                               label={deal.jay_ritter.json_data.analysis.composite_score.signal}
@@ -478,7 +501,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                             </Typography>
                             {deal.jay_ritter?.updated_at && (
                               <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                Last run: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
+                                Updated: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
                               </Typography>
                             )}
                           </Box>
@@ -501,8 +524,8 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                                 sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
                               />
                               {deal.quant_agent?.run_date && (
-                                <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                  Last run: {new Date(deal.quant_agent.run_date).toLocaleDateString()}
+                                <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#777777', marginTop: '4px' }}>
+                                  Updated: {new Date(deal.quant_agent.run_date).toLocaleDateString()}
                                 </Typography>
                               )}
                             </Box>
