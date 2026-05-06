@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SearchIcon from "@mui/icons-material/Search";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import TabErrorBoundary from "../NewDashboardLifeCycle/TabErrorBoundary";
 import TechnicalAgentTab from "./AgentTabs/TechnicalAgentTab";
 import QunatAgentTab from "./AgentTabs/QunatAgentTab";
@@ -39,15 +39,17 @@ const AgentTickerOverview: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { ticker } = useParams<{ ticker: string }>();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(0);
   const [searchTicker, setSearchTicker] = useState("");
   const [tickerList, setTickerList] = useState<any[]>([]);
   const [loadingTickers, setLoadingTickers] = useState(false);
   const tickerValue = ticker || "";
 
-  // Get deal data from route state
+  // Get deal data from route state or URL query params
   const dealData = (location.state as any)?.dealData || {};
-  const uniqueDealId = dealData.unique_deal_id || "";
+  const queryUniqueId = searchParams.get("uniqueId") || "";
+  const uniqueDealId = queryUniqueId || dealData.unique_deal_id || "";
 
   // Hydrate deal data from ticker list when route state is empty (e.g., direct URL hit / refresh)
   const hydratedDeal = useMemo(() => {
@@ -148,6 +150,7 @@ const AgentTickerOverview: React.FC = () => {
             }}
             prefillTicker={{
               ticker: ticker || "",
+              pricing_date: hydratedDeal?.pricing_date || hydratedDeal?.trade_date || null,
             }}
           />
         </TabErrorBoundary>

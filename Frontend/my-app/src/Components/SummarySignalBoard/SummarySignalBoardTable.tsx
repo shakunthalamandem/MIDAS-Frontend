@@ -17,6 +17,7 @@ import {
   useTheme,
   Collapse,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { CardType, DealData } from './types';
@@ -125,21 +126,51 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
     setIsTableExpanded(!isTableExpanded);
   };
 
+  const getTechnicalTriggerSeverity = (trigger: string): 'alert' | 'warning' | 'signal' | 'neutral' => {
+    const lowerTrigger = trigger.toLowerCase();
+
+    const alerts = ['price near stop', 'death cross', 'rsi oversold'];
+    if (alerts.some(alert => lowerTrigger.includes(alert))) return 'alert';
+
+    const warnings = ['rsi overbought', 'bearish momentum', 'high volatility'];
+    if (warnings.some(warning => lowerTrigger.includes(warning))) return 'warning';
+
+    const signals = ['bullish momentum', 'golden cross', 'price near target', 'volume spike'];
+    if (signals.some(signal => lowerTrigger.includes(signal))) return 'signal';
+
+    return 'neutral';
+  };
+
+  const getTriggerSeverityStyle = (severity: 'alert' | 'warning' | 'signal' | 'neutral') => {
+    switch (severity) {
+      case 'alert':
+        return { bg: '#ed6c02', text: '#ffffff', border: '#ed6c02', label: 'Critical Alert' };
+      case 'warning':
+        return { bg: '#d32f2f', text: '#ffffff', border: '#d32f2f', label: 'Warning' };
+      case 'signal':
+        return { bg: '#2e7d32', text: '#ffffff', border: '#2e7d32', label: 'Positive Signal' };
+      default:
+        return { bg: '#F3F4F6', text: '#374151', border: '#D1D5DB', label: 'Neutral' };
+    }
+  };
+
   const handleTickerClick = (deal: DealData) => {
     const ticker = deal.ticker;
-    const pricingDate = getPricingDate(deal, selectedCard);
-    const issuerName = deal.issuer_name || '';
 
-    // Format parameters with proper URL encoding (spaces become +)
-    const params = new URLSearchParams({
-      ticker: ticker,
-      pricing_date: pricingDate,
-      issuer_name: issuerName,
-      flag_for_writeup: 'Y',
-    }).toString();
+    // Try multiple possible property names for unique ID
+    const uniqueId =
+      (deal as any).unique_deal_id ||
+      (deal as any).unique_id ||
+      (deal as any).id ||
+      (deal as any).deal_id ||
+      ticker;
 
-    // Open in new tab
-    window.open(`/deals/new_dashboard/details?${params}`, '_blank');
+    console.log('Deal object properties:', Object.keys(deal));
+    console.log('Unique ID for navigation:', uniqueId);
+
+    // Navigate to agents page with ticker and deal ID
+    const url = `/agents/ticker/${encodeURIComponent(ticker)}?uniqueId=${encodeURIComponent(String(uniqueId))}`;
+    window.open(url, '_blank');
   };
 
   const getTableTitle = () => {
@@ -187,6 +218,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                     backgroundColor: '#1a237e !important',
                     color: 'white !important',
                     fontWeight: 700,
+                    mt:4,
                     fontSize: '0.85rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
@@ -264,7 +296,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       direction={sortColumn === 'quant_signal' ? sortDirection : 'asc'}
                       onClick={() => handleSort('quant_signal')}
                     >
-                      Quant Signal
+                      Quant Agent
                     </TableSortLabel>
                   </TableCell>
                 )}
@@ -487,11 +519,25 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                         <TableCell sx={{ width: '16%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
                           {deal.technical_data?.triggers_fired && deal.technical_data.triggers_fired.length > 0 ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                              {deal.technical_data.triggers_fired.map((trigger: string, idx: number) => (
-                                <Typography key={idx} variant="caption" sx={{ color: '#000', fontSize: '0.75rem', wordBreak: 'break-word' }}>
-                                  {trigger}
-                                </Typography>
-                              ))}
+                              {deal.technical_data.triggers_fired.map((trigger: string, idx: number) => {
+                                const severity = getTechnicalTriggerSeverity(trigger);
+                                const style = getTriggerSeverityStyle(severity);
+                                return (
+                                  <Chip
+                                    key={idx}
+                                    label={trigger}
+                                    size="small"
+                                    sx={{
+                                      maxWidth: 'fit-content',
+                                      fontWeight: 600,
+                                      fontSize: '0.75rem',
+                                      backgroundColor: style.bg,
+                                      color: style.text,
+                                      border: `1px solid ${style.border}`,
+                                    }}
+                                  />
+                                );
+                              })}
                             </Box>
                           ) : (
                             <Typography variant="body2" color="textSecondary">

@@ -500,8 +500,9 @@ const AiAnalysis: React.FC<AiAnalysisProps> = ({ ticker, pricingDate, uniqueDeal
         const payload: Record<string, unknown> = { ticker };
         if (uniqueDealId?.trim()) {
           payload.unique_deal_id = uniqueDealId.trim();
-        } else {
-          payload.pricing_date = pricingDate ?? null;
+        }
+        if (pricingDate) {
+          payload.pricing_date = pricingDate;
         }
 
         const res = await fetch(`${API_URL}/api/get_few_shot_review/`, {
