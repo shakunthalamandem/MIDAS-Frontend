@@ -63,6 +63,7 @@ const Agents: React.FC = () => {
   }>({ open: false, message: "", severity: "success" });
   const [tickerList, setTickerList] = useState<TickerItem[]>([]);
   const [tickerLoading, setTickerLoading] = useState(false);
+  const [dealTypeFilter, setDealTypeFilter] = useState<"IPO" | "FO">("IPO");
 
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -177,13 +178,15 @@ const Agents: React.FC = () => {
     }
   };
 
-  const totalAgents = agents.length;
-  const activeAgents = agents.filter(
-    (a) => a.output_status === "completed" || a.agent_type === "system"
-  ).length;
-  const workingAgents = agents.filter(
-    (a) => a.output_status === "pending" || a.output_status === "running"
-  ).length;
+  const foAgentNames = [
+    "Technical Portfolio Agent",
+    "Sentiment Agent",
+    "Quant Agent",
+  ];
+
+  const filteredAgents = dealTypeFilter === "FO"
+    ? agents.filter((a) => foAgentNames.includes(a.name))
+    : agents;
 
   return (
     <Box sx={{ bgcolor: "#e8eaf0", minHeight: "100vh" }}>
@@ -270,87 +273,11 @@ const Agents: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Stat pills + search */}
-          <Stack direction="row" spacing={2} mt={3.5} flexWrap="wrap" alignItems="center">
-            {/* Total */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                bgcolor: "#f0f0ff",
-                border: "1px solid #e0e0f7",
-                borderRadius: 3,
-                px: 2.5,
-                py: 1.5,
-                minWidth: 170,
-              }}
-            >
-              <WidgetsOutlinedIcon sx={{ color: "#4f46e5", fontSize: 22 }} />
-              <Box>
-                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
-                  {totalAgents}
-                </Typography>
-                <Typography sx={{ fontSize: "0.72rem", color: "#312e81", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Total Agents
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Ready */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                bgcolor: "#ecfdf5",
-                border: "1px solid #d1fae5",
-                borderRadius: 3,
-                px: 2.5,
-                py: 1.5,
-                minWidth: 170,
-              }}
-            >
-              <CheckCircleIcon sx={{ color: "#059669", fontSize: 22 }} />
-              <Box>
-                <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
-                  {activeAgents}
-                </Typography>
-                <Typography sx={{ fontSize: "0.72rem", color: "#064e3b", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Ready
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Working */}
-            {workingAgents > 0 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                  bgcolor: "#fffbeb",
-                  border: "1px solid #fde68a",
-                  borderRadius: 3,
-                  px: 2.5,
-                  py: 1.5,
-                  minWidth: 170,
-                }}
-              >
-                <PendingIcon sx={{ color: "#d97706", fontSize: 22 }} />
-                <Box>
-                  <Typography sx={{ fontSize: "1.5rem", fontWeight: 800, color: "#111827", lineHeight: 1 }}>
-                    {workingAgents}
-                  </Typography>
-                  <Typography sx={{ fontSize: "0.72rem", color: "#92400e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    Working
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {/* Search bar — grows to fill remaining space */}
-            <Box sx={{ flex: 1, minWidth: 240 }}>
+          {/* Search bar + deal type filters */}
+          <Box sx={{ mt: 3.5 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "stretch", sm: "center" }} sx={{ mb: 2 }}>
+              {/* Search bar */}
+              <Box sx={{ flex: 1, minWidth: 240 }}>
               <Autocomplete
                 options={[...tickerList].sort((a, b) => {
                   if (!a.pricing_date && !b.pricing_date) return 0;
@@ -508,8 +435,37 @@ const Agents: React.FC = () => {
                   },
                 }}
               />
-            </Box>
-          </Stack>
+              </Box>
+
+              {/* Deal Type Filter Buttons */}
+              <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                {["IPO", "FO"].map((type) => (
+                  <Button
+                    key={type}
+                    onClick={() => setDealTypeFilter(type as "IPO" | "FO")}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      px: 2.5,
+                      py: 1,
+                      borderRadius: 2,
+                      border: dealTypeFilter === type ? "2px solid #4f46e5" : "1.5px solid #c7d2fe",
+                      bgcolor: dealTypeFilter === type ? "#eef2ff" : "#fff",
+                      color: dealTypeFilter === type ? "#4f46e5" : "#64748b",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        bgcolor: dealTypeFilter === type ? "#e0e7ff" : "#f8f9ff",
+                        borderColor: "#4f46e5",
+                      },
+                    }}
+                  >
+                    {type}
+                  </Button>
+                ))}
+              </Stack>
+            </Stack>
+          </Box>
         </Box>
       </Box>
 
@@ -764,7 +720,7 @@ const Agents: React.FC = () => {
               />
             ))}
           </Box>
-        ) : agents.length === 0 ? (
+        ) : filteredAgents.length === 0 ? (
           <Box
             sx={{
               textAlign: "center",
@@ -780,11 +736,13 @@ const Agents: React.FC = () => {
               No agents found
             </Typography>
             <Typography sx={{ color: "#374151", mb: 3, maxWidth: 380, mx: "auto" }}>
-              {isAdmin
+              {dealTypeFilter === "FO"
+                ? "No agents available for this deal type."
+                : isAdmin
                 ? "Create your first AI agent to get started."
                 : "No agents have been set up yet. Contact your admin."}
             </Typography>
-            {isAdmin && (
+            {isAdmin && dealTypeFilter === "IPO" && (
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -812,7 +770,7 @@ const Agents: React.FC = () => {
               gap: 3,
             }}
           >
-            {agents.map((agent, index) => (
+            {filteredAgents.map((agent, index) => (
               <AgentCard
                 key={agent.id}
                 agent={agent}

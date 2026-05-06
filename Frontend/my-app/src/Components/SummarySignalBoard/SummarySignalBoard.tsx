@@ -179,7 +179,7 @@ const SummarySignalBoard: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: 4, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
+    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
@@ -188,30 +188,27 @@ const SummarySignalBoard: React.FC = () => {
             component="h2"
             sx={{
               fontWeight: 800,
-              background: '#002060',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: '#111827',
               letterSpacing: '-0.5px',
+              mb: 0.5,
             }}
           >
             Signal Board
           </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
+          <Typography variant="body2" color="textSecondary">
             Click on a card to view detailed information about the deals in that category.
           </Typography>
         </Box>
 
-        {/* Cards Grid - Horizontal Layout */}
+        {/* Cards Grid - Compact Layout */}
         <Grid container spacing={2} sx={{ mb: 3 }}>
           {cards.map((card) => {
-            const Icon = card.icon;
-            const colorMap: { [key: string]: { bg: string; gradient: string } } = {
-              primary: { bg: '#e3f2fd', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-              success: { bg: '#e8f5e9', gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-              warning: { bg: '#ffebee', gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)' },
+            const borderColors: { [key: string]: string } = {
+              primary: '#4f46e5',
+              success: '#059669',
+              warning: '#dc2626',
             };
-            const colors = colorMap[card.color] || colorMap.primary;
+            const isActive = selectedCard === card.id;
 
             return (
               <Grid item xs={12} sm={6} md={4} key={card.id}>
@@ -220,71 +217,100 @@ const SummarySignalBoard: React.FC = () => {
                   sx={{
                     cursor: 'pointer',
                     height: '100%',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    border: 'none',
-                    borderRadius: '16px',
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: isActive ? `3px solid ${borderColors[card.color]}` : '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    bgcolor: '#fff',
+                    boxShadow: isActive ? `0 4px 12px ${borderColors[card.color]}30` : '0 1px 2px rgba(0, 0, 0, 0.05)',
                     position: 'relative',
-                    overflow: 'hidden',
-                    borderLeft: '6px solid',
-                    borderLeftColor: card.color === 'primary' ? '#667eea' : card.color === 'success' ? '#11998e' : '#f5576c',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+                      boxShadow: isActive
+                        ? `0 6px 16px ${borderColors[card.color]}35`
+                        : `0 8px 16px rgba(0, 0, 0, 0.12), inset 0 0 0 1px ${borderColors[card.color]}20`,
+                      transform: 'translateY(-2px) scale(1.01)',
+                      borderColor: isActive ? borderColors[card.color] : borderColors[card.color] + '60',
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 2.5 }}>
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '12px',
-                        background: colors.bg,
-                        mb: 1.8,
-                      }}
-                    >
-                      <Icon
+                  <CardContent sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          sx={{
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.05em',
+                            color: '#6b7280',
+                            textTransform: 'uppercase',
+                            mb: 0.5,
+                            display: 'block',
+                          }}
+                        >
+                          {card.title}
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            fontWeight: 900,
+                            fontSize: '1.75rem',
+                            color: borderColors[card.color],
+                            lineHeight: 1.1,
+                            mb: 0.5,
+                          }}
+                        >
+                          {card.count}
+                        </Typography>
+
+                        <Typography
+                          sx={{
+                            fontSize: '0.7rem',
+                            color: '#9ca3af',
+                            display: 'block',
+                          }}
+                        >
+                          deals
+                        </Typography>
+                      </Box>
+                      <Box
                         sx={{
-                          fontSize: 24,
-                          color: `${card.color}.main`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 0.5,
                         }}
-                      />
+                      >
+                        <Box
+                          sx={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '8px',
+                            bgcolor: borderColors[card.color] + '15',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.25rem',
+                          }}
+                        >
+                          {card.id === 'upcoming' ? '📈' : card.id === 'portfolio' ? '💼' : '📊'}
+                        </Box>
+                        <Box
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            bgcolor: borderColors[card.color] + '20',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.9rem',
+                            opacity: 0.7,
+                            transition: 'all 0.3s ease',
+                          }}
+                        >
+                          ↗
+                        </Box>
+                      </Box>
                     </Box>
-
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.8px',
-                        color: "#1a1d2b",
-                        textTransform: 'uppercase',
-                        mb: 1,
-                        display: 'block',
-                      }}
-                    >
-                      {card.title}
-                    </Typography>
-
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontWeight: 800,
-                        fontSize: '2rem',
-                        background: colors.gradient,
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}
-                    >
-                      {card.count}
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
