@@ -288,7 +288,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
                       onClick={() => handleSort('gator_signal')}
                     >
-                      Gator Post Signal
+                      {selectedCard === 'upcoming' ? 'Gator Signal' : 'Gator Post Signal'}
                     </TableSortLabel>
                   </TableCell>
                 )}
