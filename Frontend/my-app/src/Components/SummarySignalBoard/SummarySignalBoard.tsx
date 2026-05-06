@@ -197,9 +197,9 @@ const SummarySignalBoard: React.FC = () => {
               component="h2"
               sx={{
                 fontWeight: 800,
-                color: '#111827',
+                color: '#002c8b',
                 letterSpacing: '-0.5px',
-                mb: 0.5,
+                mb: 1,
               }}
             >
               Signal Board
