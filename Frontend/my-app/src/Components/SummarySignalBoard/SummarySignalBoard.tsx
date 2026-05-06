@@ -396,6 +396,7 @@ const SummarySignalBoard: React.FC = () => {
             onClose={handleCloseTable}
             searchTicker={searchTicker}
             onSearchChange={setSearchTicker}
+            dealTypeFilter={dealTypeFilter}
           />
         )}
       </Box>

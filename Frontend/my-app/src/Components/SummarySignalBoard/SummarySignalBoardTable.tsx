@@ -36,6 +36,7 @@ interface SummarySignalBoardTableProps {
   onClose: () => void;
   searchTicker: string;
   onSearchChange: (value: string) => void;
+  dealTypeFilter: "IPO" | "FO";
 }
 
 const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
@@ -44,6 +45,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   onClose,
   searchTicker,
   onSearchChange,
+  dealTypeFilter,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -279,15 +281,17 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                   </TableSortLabel>
                 </TableCell>
 
-                <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
-                  <TableSortLabel
-                    active={sortColumn === 'gator_signal'}
-                    direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
-                    onClick={() => handleSort('gator_signal')}
-                  >
-                    Gator Post Signal
-                  </TableSortLabel>
-                </TableCell>
+                {dealTypeFilter === 'IPO' && (
+                  <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'gator_signal' ? sortDirection : false}>
+                    <TableSortLabel
+                      active={sortColumn === 'gator_signal'}
+                      direction={sortColumn === 'gator_signal' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('gator_signal')}
+                    >
+                      Gator Post Signal
+                    </TableSortLabel>
+                  </TableCell>
+                )}
 
                 {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
                   <TableCell sx={{ width: '14%' }} sortDirection={sortColumn === 'quant_signal' ? sortDirection : false}>
@@ -327,15 +331,17 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
 
                 {(selectedCard !== 'portfolio' || isTableExpanded) && (
                   <>
-                    <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
-                      <TableSortLabel
-                        active={sortColumn === 'deal_agent'}
-                        direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
-                        onClick={() => handleSort('deal_agent')}
-                      >
-                        Deal (IPO) Agent
-                      </TableSortLabel>
-                    </TableCell>
+                    {dealTypeFilter === 'IPO' && (
+                      <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'deal_agent' ? sortDirection : false}>
+                        <TableSortLabel
+                          active={sortColumn === 'deal_agent'}
+                          direction={sortColumn === 'deal_agent' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('deal_agent')}
+                        >
+                          Deal (IPO) Agent
+                        </TableSortLabel>
+                      </TableCell>
+                    )}
 
                     <TableCell sx={{ width: '16%' }} sortDirection={sortColumn === 'factors_agent' ? sortDirection : false}>
                       <TableSortLabel
@@ -461,22 +467,48 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       </TableCell>
 
                       {/* Gator Signal Column */}
-                      <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
-                        {(selectedCard === 'portfolio' || selectedCard === 'recent') ? (
-                          deal.gator_post_ipo?.gatorpost_signal ? (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                              <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem', fontWeight: 600 }}>
-                                Post-IPO
+                      {dealTypeFilter === 'IPO' && (
+                        <TableCell sx={{ width: '14%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
+                          {(selectedCard === 'portfolio' || selectedCard === 'recent') ? (
+                            deal.gator_post_ipo?.gatorpost_signal ? (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                                <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem', fontWeight: 600 }}>
+                                  Post-IPO
+                                </Typography>
+                                <Chip
+                                  label={deal.gator_post_ipo.gatorpost_signal}
+                                  size="small"
+                                  color={getGatorSignalColor(deal.gator_post_ipo.gatorpost_signal)}
+                                  sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
+                                />
+                                {deal.gator_post_ipo?.updated_at && (
+                                  <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
+                                    Updated: {new Date(deal.gator_post_ipo.updated_at).toLocaleDateString()}
+                                  </Typography>
+                                )}
+                              </Box>
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                None
                               </Typography>
+                            )
+                          ) : deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                               <Chip
-                                label={deal.gator_post_ipo.gatorpost_signal}
+                                label={deal.jay_ritter.json_data.analysis.composite_score.signal}
                                 size="small"
-                                color={getGatorSignalColor(deal.gator_post_ipo.gatorpost_signal)}
+                                color={getGatorSignalColor(deal.jay_ritter.json_data.analysis.composite_score.signal)}
                                 sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
                               />
-                              {deal.gator_post_ipo?.updated_at && (
+                              <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
+                                Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
+                              </Typography>
+                              <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.75rem' }}>
+                                Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
+                              </Typography>
+                              {deal.jay_ritter?.updated_at && (
                                 <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                  Updated: {new Date(deal.gator_post_ipo.updated_at).toLocaleDateString()}
+                                  Updated: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
                                 </Typography>
                               )}
                             </Box>
@@ -484,33 +516,9 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                             <Typography variant="body2" color="textSecondary">
                               None
                             </Typography>
-                          )
-                        ) : deal.jay_ritter?.json_data?.analysis?.composite_score?.signal ? (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                            <Chip
-                              label={deal.jay_ritter.json_data.analysis.composite_score.signal}
-                              size="small"
-                              color={getGatorSignalColor(deal.jay_ritter.json_data.analysis.composite_score.signal)}
-                              sx={{ maxWidth: 'fit-content', fontWeight: 600, fontSize: '0.75rem' }}
-                            />
-                            <Typography variant="caption" sx={{ color: '#000', wordBreak: 'break-word', fontSize: '0.75rem' }}>
-                              Score: {deal.jay_ritter.json_data.analysis.composite_score.score}
-                            </Typography>
-                            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.75rem' }}>
-                              Grade: {deal.jay_ritter.json_data.analysis.composite_score.grade}
-                            </Typography>
-                            {deal.jay_ritter?.updated_at && (
-                              <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#999', marginTop: '4px' }}>
-                                Updated: {new Date(deal.jay_ritter.updated_at).toLocaleDateString()}
-                              </Typography>
-                            )}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary">
-                            None
-                          </Typography>
-                        )}
-                      </TableCell>
+                          )}
+                        </TableCell>
+                      )}
 
                       {/* Quant Signal Column */}
                       {(selectedCard === 'portfolio' || selectedCard === 'recent') && (
@@ -571,7 +579,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
                       )}
 
                       {/* Deal (IPO) Agent Column - Shown when Expanded or for non-portfolio tables */}
-                      {(selectedCard !== 'portfolio' || isTableExpanded) && (
+                      {(selectedCard !== 'portfolio' || isTableExpanded) && dealTypeFilter === 'IPO' && (
                         <TableCell sx={{ width: '16%', wordWrap: 'break-word', overflowWrap: 'break-word', padding: '8px' }}>
                           {volatilityOutlook ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
