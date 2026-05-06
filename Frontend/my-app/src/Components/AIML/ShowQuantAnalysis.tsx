@@ -50,7 +50,7 @@ const ShowQuantAnalysis: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const initialDealType = (searchParams.get("deal_type") as "IPO" | "FO") || "IPO";
+  const initialDealType = (searchParams.get("dealType") as "IPO" | "FO") || "IPO";
 
   const [tickers, setTickers] = useState<QuantTicker[]>([]);
   const [filteredTickers, setFilteredTickers] = useState<QuantTicker[]>([]);

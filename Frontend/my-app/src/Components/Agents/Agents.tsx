@@ -109,7 +109,7 @@ const Agents: React.FC = () => {
     const loadTickers = async () => {
       try {
         setTickerLoading(true);
-        const data = await fetchAgentTickerList();
+        const data = await fetchAgentTickerList(dealTypeFilter);
         setTickerList(data.data || []);
       } catch (err) {
         console.error("Failed to load ticker list:", err);
@@ -118,7 +118,7 @@ const Agents: React.FC = () => {
       }
     };
     loadTickers();
-  }, []);
+  }, [dealTypeFilter]);
 
   useEffect(() => {
     const hasInProgress = agents.some(
@@ -781,6 +781,7 @@ const Agents: React.FC = () => {
                   setAgentToEdit(a);
                   setEditOpen(true);
                 }}
+                dealType={dealTypeFilter}
               />
             ))}
           </Box>

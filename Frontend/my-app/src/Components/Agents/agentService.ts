@@ -163,8 +163,8 @@ export async function fetchAgent(agentId: number): Promise<AIAgent> {
 }
 
 /** Fetch ticker list for agent search */
-export async function fetchAgentTickerList(): Promise<any> {
-  const res = await fetch(`${apiUrl}/api/agent_ticker_list/`, {
+export async function fetchAgentTickerList(dealType: "IPO" | "FO" = "IPO"): Promise<any> {
+  const res = await fetch(`${apiUrl}/api/agent_ticker_list/?deal_type=${dealType}`, {
     headers: authHeaders(),
   });
   return handleResponse(res);

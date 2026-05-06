@@ -33,6 +33,7 @@ export interface AgentCardProps {
   onEmailToggle: (agent: AIAgent, enabled: boolean) => void;
   onDelete?: (agent: AIAgent) => void;
   onEdit?: (agent: AIAgent) => void;
+  dealType?: "IPO" | "FO";
 }
 
 /* ── Unique theme per agent by name, with fallback by index ── */
@@ -119,6 +120,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
   onEmailToggle,
   onDelete,
   onEdit,
+  dealType = "IPO",
 }) => {
   const navigate = useNavigate();
   const scheduleLabel = formatSchedule(agent);
@@ -143,9 +145,10 @@ const AgentCard: React.FC<AgentCardProps> = ({
 
   const handleViewDetails = () => {
     if (systemRoute) {
-      window.open(`${window.location.origin}${systemRoute}`, "_blank");
+      const url = `${window.location.origin}${systemRoute}?dealType=${dealType}`;
+      window.open(url, "_blank");
     } else if (isUserCreated) {
-      navigate(`/agents/${agent.id}/output`);
+      navigate(`/agents/${agent.id}/output?dealType=${dealType}`);
     }
   };
 
@@ -372,67 +375,6 @@ const AgentCard: React.FC<AgentCardProps> = ({
           </Box>
         )}
 
-        {/* ── Details section ── */}
-        <Box
-          sx={{
-            mt: "auto",
-            bgcolor: theme.bg,
-            borderRadius: 3,
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.2,
-          }}
-        >
-          {/* Schedule */}
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <CalendarTodayIcon sx={{ fontSize: 14, color: theme.accent }} />
-            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#111827" }}>
-              Schedule
-            </Typography>
-            <Typography sx={{ fontSize: "0.78rem", color: "#1e293b", fontWeight: 500, ml: "auto !important" }}>
-              {scheduleLabel}
-            </Typography>
-          </Stack>
-
-          {/* Last Run */}
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <AccessTimeIcon sx={{ fontSize: 14, color: theme.accent }} />
-            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#111827" }}>
-              Last Run
-            </Typography>
-            <Typography sx={{ fontSize: "0.78rem", color: "#1e293b", fontWeight: 500, ml: "auto !important" }}>
-              {formattedLastRun}
-            </Typography>
-          </Stack>
-
-          {/* Email */}
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <EmailOutlinedIcon
-              sx={{
-                fontSize: 14,
-                color: agent.email_enabled ? "#059669" : "#475569",
-                transition: "color 0.2s",
-              }}
-            />
-            <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#111827" }}>
-              Email Alerts
-            </Typography>
-            <Box sx={{ ml: "auto !important" }}>
-              <Switch
-                size="small"
-                checked={agent.email_enabled ?? false}
-                onChange={(e) => onEmailToggle(agent, e.target.checked)}
-                sx={{
-                  "& .MuiSwitch-switchBase.Mui-checked": { color: theme.accent },
-                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: theme.light,
-                  },
-                }}
-              />
-            </Box>
-          </Stack>
-        </Box>
 
         {/* ── CTA Button ── */}
         {(systemRoute || isUserCreated) && (

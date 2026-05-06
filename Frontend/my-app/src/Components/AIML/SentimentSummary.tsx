@@ -221,7 +221,7 @@ const SentimentSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const initialDealType = (searchParams.get("deal_type") as "IPO" | "FO") || "IPO";
+  const initialDealType = (searchParams.get("dealType") as "IPO" | "FO") || "IPO";
 
   const [data, setData] = useState<SentimentData[]>([]);
   const [loading, setLoading] = useState(true);
