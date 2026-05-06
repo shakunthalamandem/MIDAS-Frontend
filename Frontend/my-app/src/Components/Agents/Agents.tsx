@@ -488,19 +488,20 @@ const Agents: React.FC = () => {
               letterSpacing: "-0.025em",
             }}
           >
-            US IPO Signal Board
+            {dealTypeFilter === "IPO" ? "US IPO Signal Board" : "US FO Signal Board"}
           </Typography>
 
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
+              gridTemplateColumns: { xs: "1fr", sm: dealTypeFilter === "FO" ? "repeat(2, 1fr)" : "repeat(2, 1fr)", md: dealTypeFilter === "FO" ? "repeat(2, 1fr)" : "repeat(3, 1fr)" },
               gap: 1.5,
             }}
           >
-            {/* Upcoming IPOs Card */}
+            {/* Upcoming IPOs Card - only for IPO deals */}
+            {dealTypeFilter === "IPO" && (
             <Box
-              onClick={() => navigate("/summary_signal_board?tab=upcoming")}
+              onClick={() => navigate(`/summary_signal_board?tab=upcoming&deal_type=${dealTypeFilter}`)}
               sx={{
                 bgcolor: "#f8f9ff",
                 border: "1px solid #e0e7ff",
@@ -561,10 +562,11 @@ const Agents: React.FC = () => {
                 Analyze opportunities
               </Typography> */}
             </Box>
+            )}
 
             {/* Current Portfolio Card */}
             <Box
-              onClick={() => navigate("/summary_signal_board?tab=portfolio")}
+              onClick={() => navigate(`/summary_signal_board?tab=portfolio&deal_type=${dealTypeFilter}`)}
               sx={{
                 bgcolor: "#f0fdf4",
                 border: "1px solid #dcfce7",
@@ -619,7 +621,7 @@ const Agents: React.FC = () => {
                 <Typography sx={{ fontSize: "1.1rem" }}>💼</Typography>
               </Box>
               <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.85rem", mb: 0.2 }}>
-                Current Portfolio: IPOs
+                Current Portfolio: {dealTypeFilter === "IPO" ? "IPOs" : "FOs"}
               </Typography>
               {/* <Typography sx={{ color: "#64748b", fontSize: "0.75rem" }}>
                 Monitor trading IPOs
@@ -628,7 +630,7 @@ const Agents: React.FC = () => {
 
             {/* Recently Traded Card */}
             <Box
-              onClick={() => navigate("/summary_signal_board?tab=recent")}
+              onClick={() => navigate(`/summary_signal_board?tab=recent&deal_type=${dealTypeFilter}`)}
               sx={{
                 bgcolor: "#fef2f2",
                 border: "1px solid #fee2e2",
@@ -683,7 +685,7 @@ const Agents: React.FC = () => {
                 <Typography sx={{ fontSize: "1.1rem" }}>📊</Typography>
               </Box>
               <Typography sx={{ fontWeight: 700, color: "#111827", fontSize: "0.85rem", mb: 0.2 }}>
-                Recently Traded IPOs(Last 60 days)
+                Recently Traded {dealTypeFilter === "IPO" ? "IPOs" : "FOs"}(Last 60 days)
               </Typography>
               {/* <Typography sx={{ color: "#64748b", fontSize: "0.75rem" }}>
                 Review listed IPOs

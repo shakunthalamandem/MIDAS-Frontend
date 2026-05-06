@@ -187,7 +187,7 @@ const SummarySignalBoardTable: React.FC<SummarySignalBoardTableProps> = ({
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box sx={{ mt: 6 }}>
 
       {selectedData.length > 0 ? (
         <TableContainer

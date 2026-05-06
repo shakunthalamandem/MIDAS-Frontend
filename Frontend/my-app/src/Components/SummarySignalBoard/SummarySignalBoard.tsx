@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Grid,
   Typography,
   CircularProgress,
   TextField,
+  Stack,
   useTheme,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -27,8 +29,34 @@ const SummarySignalBoard: React.FC = () => {
   const [searchTicker, setSearchTicker] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  // Get initial tab from URL query parameter
+  // Get initial tab and deal type from URL query parameters
   const initialTab = searchParams.get('tab') as CardType | null;
+  const initialDealType = searchParams.get('deal_type') as "IPO" | "FO" | null;
+
+  // Initialize dealTypeFilter from URL, default to IPO
+  const [dealTypeFilter, setDealTypeFilter] = useState<"IPO" | "FO">(() => {
+    return initialDealType || "IPO";
+  });
+
+  // Update data when deal type changes
+  useEffect(() => {
+    if (!data) return;
+
+    // If switching to FO and on "upcoming" tab, switch to "portfolio"
+    if (dealTypeFilter === "FO" && selectedCard === "upcoming") {
+      setSelectedCard("portfolio");
+      setSelectedData(data.current_portfolio_deals.data);
+    } else if (selectedCard) {
+      // Update data for current tab with new deal type data
+      if (selectedCard === "upcoming") {
+        setSelectedData(data.upcoming_deals.data);
+      } else if (selectedCard === "portfolio") {
+        setSelectedData(data.current_portfolio_deals.data);
+      } else if (selectedCard === "recent") {
+        setSelectedData(data.recently_traded_deals.data);
+      }
+    }
+  }, [dealTypeFilter, data]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +68,7 @@ const SummarySignalBoard: React.FC = () => {
           throw new Error('Authentication token not found. Please login first.');
         }
 
-        const response = await fetch(`${apiUrl}/api/summary_signal_board/`, {
+        const response = await fetch(`${apiUrl}/api/summary_signal_board/?deal_type=${dealTypeFilter}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -72,7 +100,7 @@ const SummarySignalBoard: React.FC = () => {
     };
 
     fetchData();
-  }, [apiUrl]);
+  }, [apiUrl, dealTypeFilter]);
 
   // Auto-select card based on URL parameter or default to portfolio
   useEffect(() => {
@@ -156,24 +184,26 @@ const SummarySignalBoard: React.FC = () => {
     return null;
   }
 
+  const dealTypeLabel = dealTypeFilter === "IPO" ? "IPOs" : "FOs";
+
   const cards = [
     {
       id: 'upcoming' as const,
-      title: 'Upcoming IPOs',
+      title: `Upcoming ${dealTypeLabel}`,
       count: data.upcoming_deals.count,
       icon: TrendingUpIcon,
       color: 'primary',
     },
     {
       id: 'portfolio' as const,
-      title: 'Current Portfolio: IPOs',
+      title: `Current Portfolio: ${dealTypeLabel}`,
       count: data.current_portfolio_deals.count,
       icon: WorkIcon,
       color: 'success',
     },
     {
       id: 'recent' as const,
-      title: 'Recently Traded IPOs(Last 60 Days)',
+      title: `Recently Traded ${dealTypeLabel}(Last 60 Days)`,
       count: data.recently_traded_deals.count,
       icon: ScheduleIcon,
       color: 'warning',
@@ -183,23 +213,53 @@ const SummarySignalBoard: React.FC = () => {
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: theme.palette.background.default, minHeight: '100vh' }}>
       <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Header with Title */}
-        <Box sx={{ mb: 2 }}>
-          <Typography
-            variant="h4"
-            component="h2"
-            sx={{
-              fontWeight: 800,
-              color: '#002c8b',
-              letterSpacing: '-0.5px',
-              mb: 1,
-            }}
-          >
-            Signal Board
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Select a category to view deals and their signals.
-          </Typography>
+        {/* Header with Title and Deal Type Filter */}
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography
+              variant="h4"
+              component="h2"
+              sx={{
+                fontWeight: 800,
+                color: '#002c8b',
+                letterSpacing: '-0.5px',
+                mb: 1,
+              }}
+            >
+              Signal Board
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Select a category to view deals and their signals.
+            </Typography>
+          </Box>
+
+          {/* Deal Type Filter Buttons - Center */}
+          <Stack direction="row" spacing={1}>
+            {["IPO", "FO"].map((type) => (
+              <Button
+                key={type}
+                onClick={() => setDealTypeFilter(type as "IPO" | "FO")}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: "0.9rem",
+                  px: 2.5,
+                  py: 1,
+                  borderRadius: 2,
+                  border: dealTypeFilter === type ? "2px solid #4f46e5" : "1.5px solid #c7d2fe",
+                  bgcolor: dealTypeFilter === type ? "#eef2ff" : "#fff",
+                  color: dealTypeFilter === type ? "#4f46e5" : "#64748b",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    bgcolor: dealTypeFilter === type ? "#e0e7ff" : "#f8f9ff",
+                    borderColor: "#4f46e5",
+                  },
+                }}
+              >
+                {type}
+              </Button>
+            ))}
+          </Stack>
         </Box>
 
         {/* Tabs and Search Bar Row */}
@@ -208,7 +268,7 @@ const SummarySignalBoard: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            mb: 3,
+            mb: 2,
             gap: 2,
           }}
         >
@@ -222,6 +282,11 @@ const SummarySignalBoard: React.FC = () => {
             }}
           >
           {cards.map((card) => {
+            // Hide Upcoming tab for FO deals
+            if (card.id === 'upcoming' && dealTypeFilter === 'FO') {
+              return null;
+            }
+
             const isActive = selectedCard === card.id;
             const activeColor = '#4f46e5';
             const activeBg = '#eef2ff';
